@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Add Kids Screen Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ─── Reset ─────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ─── Page wrapper ───────────────────────────────────── */
+  body {
+    background: #e8e4dc;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    padding: 48px 32px;
+    font-family: 'Inter', sans-serif;
+    flex-wrap: wrap;
+  }
+
+  /* ─── Labels ─────────────────────────────────────────── */
+  .variant-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .variant-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6b6355;
+  }
+
+  /* ─── iPhone shell ───────────────────────────────────── */
+  .phone {
+    width: 393px;
+    height: 852px;
+    background: #fff;
+    border-radius: 54px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.08),
+      0 4px 6px rgba(0,0,0,0.04),
+      0 24px 80px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── Status bar ─────────────────────────────────────── */
+  .status-bar {
+    height: 54px;
+    background: #f9f8f5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px 0;
+    flex-shrink: 0;
+  }
+  .status-time { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+  .status-icons { display: flex; align-items: center; gap: 6px; }
+  .status-icons svg { width: 16px; height: 16px; fill: #1a1a1a; }
+
+  /* Dynamic Island */
+  .dynamic-island {
+    width: 126px;
+    height: 37px;
+    background: #000;
+    border-radius: 20px;
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+  }
+
+  /* ─── Nav bar ────────────────────────────────────────── */
+  .nav-bar {
+    height: 56px;
+    background: #f9f8f5;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .nav-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #eeeae1;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .nav-back svg { width: 18px; height: 18px; }
+  .nav-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  /* ─── Screen body ────────────────────────────────────── */
+  .screen-body {
+    flex: 1;
+    background: #f9f8f5;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .screen-body::-webkit-scrollbar { display: none; }
+
+  /* ─── Progress dots ──────────────────────────────────── */
+  .progress-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 16px 0 0;
+  }
+  .prog-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ccc8be;
+    transition: all 0.3s;
+  }
+  .prog-dot.active {
+    width: 24px;
+    border-radius: 4px;
+    background: #186338;
+  }
+
+  /* ─── Screen header ──────────────────────────────────── */
+  .screen-header {
+    padding: 20px 24px 8px;
+  }
+  .screen-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .screen-subtitle {
+    font-size: 14px;
+    color: #7a7060;
+    line-height: 1.5;
+  }
+
+  /* ─── Content area ───────────────────────────────────── */
+  .content-area {
+    flex: 1;
+    padding: 16px 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* ─── Child card ─────────────────────────────────────── */
+  .child-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+    position: relative;
+    overflow: hidden;
+    animation: slideIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .child-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: #186338;
+    border-radius: 4px 0 0 4px;
+  }
+
+  /* Avatar */
+  .child-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #d4eddf 0%, #a8d5b5 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .child-avatar.boy {
+    background: linear-gradient(135deg, #dce8fd 0%, #adc8f5 100%);
+  }
+  .child-avatar.girl {
+    background: linear-gradient(135deg, #fce8f4 0%, #f5b8e0 100%);
+  }
+
+  .child-info { flex: 1; }
+  .child-name { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 3px; }
+  .child-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .child-age-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: #186338;
+    background: #d4eddf;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+  .child-dob {
+    font-size: 12px;
+    color: #9e9485;
+  }
+
+  .child-card-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .card-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    border: none;
+    background: #f2efe8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .card-action-btn:hover { background: #e6e2d8; }
+  .card-action-btn svg { width: 16px; height: 16px; }
+
+  /* ─── Add child button (the hero CTA) ────────────────── */
+  .add-child-btn {
+    background: #fff;
+    border: 2px dashed #a8c9b5;
+    border-radius: 20px;
+    padding: 0 16px;
+    height: 76px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+  }
+  .add-child-btn:hover {
+    border-color: #186338;
+    background: #f0f9f4;
+  }
+  .add-child-btn:active {
+    transform: scale(0.98);
+  }
+  .add-icon-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #186338 0%, #2a9459 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(24,99,56,0.3);
+  }
+  .add-icon-circle svg { width: 22px; height: 22px; fill: #fff; }
+  .add-child-text {}
+  .add-child-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #186338;
+    margin-bottom: 2px;
+  }
+  .add-child-hint {
+    font-size: 12px;
+    color: #9e9485;
+  }
+  .add-child-chevron {
+    margin-left: auto;
+    color: #c5beaf;
+  }
+  .add-child-chevron svg { width: 18px; height: 18px; }
+
+  /* ─── Empty state variant ────────────────────────────── */
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 24px;
+    text-align: center;
+    gap: 8px;
+    margin-top: -12px;
+  }
+  .empty-illustration {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #d4eddf 0%, #f4f1ea 100%);
+    border-radius: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    font-size: 54px;
+    box-shadow: 0 8px 24px rgba(24,99,56,0.12);
+  }
+  .empty-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  .empty-body {
+    font-size: 13px;
+    color: #7a7060;
+    line-height: 1.6;
+    max-width: 240px;
+  }
+
+  /* Big add button for empty state */
+  .add-child-hero {
+    background: linear-gradient(135deg, #186338 0%, #1e7a46 100%);
+    border-radius: 20px;
+    padding: 0 20px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    width: 100%;
+    border: none;
+    text-align: left;
+    box-shadow: 0 8px 24px rgba(24,99,56,0.28);
+    transition: all 0.2s;
+    margin-top: 16px;
+  }
+  .add-child-hero:hover { box-shadow: 0 12px 32px rgba(24,99,56,0.38); transform: translateY(-1px); }
+  .add-child-hero:active { transform: scale(0.98); }
+  .hero-icon-ring {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .hero-icon-ring svg { width: 26px; height: 26px; fill: #fff; }
+  .hero-text { flex: 1; }
+  .hero-btn-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+  .hero-btn-sub { font-size: 12px; color: rgba(255,255,255,0.7); }
+  .hero-chevron svg { width: 20px; height: 20px; fill: rgba(255,255,255,0.6); }
+
+  /* ─── Info banner ────────────────────────────────────── */
+  .info-banner {
+    background: #edf6f1;
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .info-banner svg { width: 18px; height: 18px; fill: #186338; flex-shrink: 0; margin-top: 1px; }
+  .info-banner-text { font-size: 12px; color: #3d7a55; line-height: 1.5; }
+
+  /* ─── Bottom action area ─────────────────────────────── */
+  .bottom-area {
+    padding: 12px 20px 32px;
+    background: #f9f8f5;
+    flex-shrink: 0;
+  }
+  .next-btn {
+    width: 100%;
+    height: 56px;
+    border-radius: 16px;
+    border: none;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .next-btn.active {
+    background: #186338;
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(24,99,56,0.3);
+  }
+  .next-btn.inactive {
+    background: #e6e2d8;
+    color: #b5afa4;
+  }
+  .next-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+  .skip-link {
+    text-align: center;
+    font-size: 13px;
+    color: #9e9485;
+    margin-top: 12px;
+    cursor: pointer;
+    display: block;
+  }
+  .skip-link:hover { color: #186338; }
+
+  /* ─── Home indicator ─────────────────────────────────── */
+  .home-indicator {
+    height: 34px;
+    background: #f9f8f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .home-bar {
+    width: 134px;
+    height: 5px;
+    background: #1a1a1a;
+    border-radius: 3px;
+    opacity: 0.2;
+  }
+
+  /* ─── Add child sheet (modal) ────────────────────────── */
+  .sheet-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .sheet-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .sheet {
+    width: 100%;
+    background: #fff;
+    border-radius: 28px 28px 0 0;
+    padding: 0 20px 32px;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    max-height: 75%;
+    overflow-y: auto;
+  }
+  .sheet-overlay.open .sheet {
+    transform: translateY(0);
+  }
+  .sheet-handle {
+    width: 40px;
+    height: 4px;
+    background: #e0dbd0;
+    border-radius: 2px;
+    margin: 12px auto 20px;
+  }
+  .sheet-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+  }
+
+  /* Form fields inside sheet */
+  .field-group { margin-bottom: 16px; }
+  .field-label { font-size: 12px; font-weight: 600; color: #7a7060; margin-bottom: 6px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .field-row { display: flex; gap: 10px; }
+  .field-input {
+    width: 100%;
+    height: 52px;
+    border-radius: 14px;
+    border: 1.5px solid #e6e2d8;
+    background: #faf9f6;
+    padding: 0 14px;
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    color: #1a1a1a;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .field-input:focus { border-color: #186338; background: #fff; }
+  .field-input::placeholder { color: #c5beaf; }
+
+  /* Gender selector */
+  .gender-selector { display: flex; gap: 10px; margin-top: 6px; }
+  .gender-btn {
+    flex: 1;
+    height: 52px;
+    border-radius: 14px;
+    border: 1.5px solid #e6e2d8;
+    background: #faf9f6;
+    font-size: 14px;
+    font-weight: 500;
+    color: #7a7060;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+  .gender-btn.selected {
+    border-color: #186338;
+    background: #edf6f1;
+    color: #186338;
+    font-weight: 600;
+  }
+
+  /* Avatar picker */
+  .avatar-picker { display: flex; gap: 10px; margin-top: 6px; overflow-x: auto; }
+  .avatar-picker::-webkit-scrollbar { display: none; }
+  .avatar-option {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .avatar-option.selected {
+    border-color: #186338;
+    box-shadow: 0 0 0 3px rgba(24,99,56,0.15);
+  }
+
+  /* Save button */
+  .sheet-save-btn {
+    width: 100%;
+    height: 56px;
+    border-radius: 16px;
+    background: #186338;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    margin-top: 24px;
+    box-shadow: 0 6px 20px rgba(24,99,56,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .sheet-save-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(24,99,56,0.38); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     VARIANT A — EMPTY STATE
+═══════════════════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <span class="variant-label">Empty State</span>
+  <div class="phone" id="phone-empty">
+    <div class="dynamic-island"></div>
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div style="width:126px"></div>
+      <div class="status-icons">
+        <!-- signal -->
+        <svg viewBox="0 0 17 12"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+        <!-- wifi -->
+        <svg viewBox="0 0 16 12"><path d="M8 10a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm0-3.5C9.9 6.5 11.6 7.3 12.8 8.6l1.4-1.5C12.5 5.4 10.3 4.5 8 4.5S3.5 5.4 1.8 7.1l1.4 1.5C4.4 7.3 6.1 6.5 8 6.5zm0-4C11 2.5 13.7 3.7 15.7 5.6L17 4.1C14.7 1.8 11.5.5 8 .5S1.3 1.8-1 4.1l1.3 1.5C2.3 3.7 5 2.5 8 2.5z"/></svg>
+        <!-- battery -->
+        <svg viewBox="0 0 25 12"><rect x="0" y="1" width="22" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="22.5" y="3.5" width="2" height="5" rx="1"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/></svg>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <div class="nav-bar">
+      <button class="nav-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="nav-title">Your Children</span>
+    </div>
+
+    <!-- Screen body -->
+    <div class="screen-body">
+      <!-- Progress -->
+      <div class="progress-row">
+        <div class="prog-dot"></div>
+        <div class="prog-dot"></div>
+        <div class="prog-dot active"></div>
+        <div class="prog-dot"></div>
+        <div class="prog-dot"></div>
+      </div>
+
+      <!-- Header -->
+      <div class="screen-header">
+        <div class="screen-title">Add your<br>little ones 🌱</div>
+        <div class="screen-subtitle">We'll personalise events, clubs, and activities to match each child's age and interests.</div>
+      </div>
+
+      <!-- Content -->
+      <div class="content-area">
+
+        <!-- Empty illustration -->
+        <div class="empty-state">
+          <div class="empty-illustration">👶</div>
+          <div class="empty-title">No kids added yet</div>
+          <div class="empty-body">Add your children so Sprout can find age-perfect activities, playdates, and local events for your family.</div>
+        </div>
+
+        <!-- Hero add button -->
+        <button class="add-child-hero" onclick="openSheet('empty')">
+          <div class="hero-icon-ring">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          </div>
+          <div class="hero-text">
+            <div class="hero-btn-title">Add a child</div>
+            <div class="hero-btn-sub">Takes less than a minute</div>
+          </div>
+          <div class="hero-chevron">
+            <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </button>
+
+        <!-- Info banner -->
+        <div class="info-banner">
+          <svg viewBox="0 0 24 24"><path d="M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z"/></svg>
+          <div class="info-banner-text">Your kids' information is private and only used to personalize your Sprout experience.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Bottom -->
+    <div class="bottom-area">
+      <button class="next-btn inactive">
+        Continue
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <a class="skip-link">Skip for now</a>
+    </div>
+    <div class="home-indicator"><div class="home-bar"></div></div>
+
+    <!-- Sheet overlay -->
+    <div class="sheet-overlay" id="sheet-empty" onclick="closeSheet('empty')">
+      <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">Add a child</div>
+
+        <div class="field-group">
+          <div class="field-label">Name</div>
+          <div class="field-row">
+            <input class="field-input" placeholder="First name" style="flex:1">
+            <input class="field-input" placeholder="Last" style="width:110px">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Date of Birth</div>
+          <input class="field-input" placeholder="MM / DD / YYYY">
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Gender <span style="color:#c5beaf;font-weight:400;text-transform:none">(optional)</span></div>
+          <div class="gender-selector">
+            <button class="gender-btn" onclick="this.classList.toggle('selected')">👦 Boy</button>
+            <button class="gender-btn" onclick="this.classList.toggle('selected')">👧 Girl</button>
+            <button class="gender-btn" onclick="this.classList.toggle('selected')">✨ Other</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Choose an avatar</div>
+          <div class="avatar-picker">
+            <div class="avatar-option selected" style="background:#d4eddf" onclick="selectAvatar(this)">🐸</div>
+            <div class="avatar-option" style="background:#dce8fd" onclick="selectAvatar(this)">🦁</div>
+            <div class="avatar-option" style="background:#fce8f4" onclick="selectAvatar(this)">🐰</div>
+            <div class="avatar-option" style="background:#fff3dc" onclick="selectAvatar(this)">🦊</div>
+            <div class="avatar-option" style="background:#e8e4fd" onclick="selectAvatar(this)">🐻</div>
+            <div class="avatar-option" style="background:#fde4e4" onclick="selectAvatar(this)">🐼</div>
+          </div>
+        </div>
+
+        <button class="sheet-save-btn" onclick="closeSheet('empty')">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+          Save child
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     VARIANT B — WITH KIDS ADDED
+═══════════════════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <span class="variant-label">With Kids Added</span>
+  <div class="phone" id="phone-filled">
+    <div class="dynamic-island"></div>
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div style="width:126px"></div>
+      <div class="status-icons">
+        <svg viewBox="0 0 17 12"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+        <svg viewBox="0 0 25 12"><rect x="0" y="1" width="22" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="22.5" y="3.5" width="2" height="5" rx="1"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/></svg>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <div class="nav-bar">
+      <button class="nav-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="nav-title">Your Children</span>
+    </div>
+
+    <!-- Screen body -->
+    <div class="screen-body">
+      <!-- Progress -->
+      <div class="progress-row">
+        <div class="prog-dot"></div>
+        <div class="prog-dot"></div>
+        <div class="prog-dot active"></div>
+        <div class="prog-dot"></div>
+        <div class="prog-dot"></div>
+      </div>
+
+      <!-- Header -->
+      <div class="screen-header">
+        <div class="screen-title">Your little<br>ones 🌱</div>
+        <div class="screen-subtitle">2 children added · events and clubs are being personalised for them.</div>
+      </div>
+
+      <!-- Content -->
+      <div class="content-area">
+
+        <!-- Child 1 -->
+        <div class="child-card" style="animation-delay:0.05s">
+          <div class="child-avatar boy">🦁</div>
+          <div class="child-info">
+            <div class="child-name">Liam</div>
+            <div class="child-meta">
+              <span class="child-age-badge">5 yrs</span>
+              <span class="child-dob">Jul 12, 2019</span>
+            </div>
+          </div>
+          <div class="child-card-actions">
+            <button class="card-action-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#7a7060" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="card-action-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#e06060" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Child 2 -->
+        <div class="child-card" style="animation-delay:0.12s">
+          <div class="child-avatar girl">🐰</div>
+          <div class="child-info">
+            <div class="child-name">Sophie</div>
+            <div class="child-meta">
+              <span class="child-age-badge">3 yrs</span>
+              <span class="child-dob">Mar 28, 2021</span>
+            </div>
+          </div>
+          <div class="child-card-actions">
+            <button class="card-action-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#7a7060" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="card-action-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#e06060" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Add another (secondary CTA) -->
+        <button class="add-child-btn" onclick="openSheet('filled')">
+          <div class="add-icon-circle">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          </div>
+          <div class="add-child-text">
+            <div class="add-child-title">Add another child</div>
+            <div class="add-child-hint">You can add up to 6 children</div>
+          </div>
+          <div class="add-child-chevron">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </button>
+
+        <!-- Info banner -->
+        <div class="info-banner">
+          <svg viewBox="0 0 24 24"><path d="M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z"/></svg>
+          <div class="info-banner-text">Sprout will suggest family-friendly events and clubs tailored to your children's ages.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Bottom -->
+    <div class="bottom-area">
+      <button class="next-btn active">
+        Continue
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <a class="skip-link" style="color:#186338;font-weight:500">Looks good ✓</a>
+    </div>
+    <div class="home-indicator"><div class="home-bar"></div></div>
+
+    <!-- Sheet overlay -->
+    <div class="sheet-overlay" id="sheet-filled" onclick="closeSheet('filled')">
+      <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">Add a child</div>
+
+        <div class="field-group">
+          <div class="field-label">Name</div>
+          <div class="field-row">
+            <input class="field-input" placeholder="First name" style="flex:1">
+            <input class="field-input" placeholder="Last" style="width:110px">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Date of Birth</div>
+          <input class="field-input" placeholder="MM / DD / YYYY">
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Gender <span style="color:#c5beaf;font-weight:400;text-transform:none">(optional)</span></div>
+          <div class="gender-selector">
+            <button class="gender-btn" onclick="this.classList.toggle('selected')">👦 Boy</button>
+            <button class="gender-btn" onclick="this.classList.toggle('selected')">👧 Girl</button>
+            <button class="gender-btn" onclick="this.classList.toggle('selected')">✨ Other</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Choose an avatar</div>
+          <div class="avatar-picker">
+            <div class="avatar-option selected" style="background:#d4eddf" onclick="selectAvatar(this)">🐸</div>
+            <div class="avatar-option" style="background:#dce8fd" onclick="selectAvatar(this)">🦁</div>
+            <div class="avatar-option" style="background:#fce8f4" onclick="selectAvatar(this)">🐰</div>
+            <div class="avatar-option" style="background:#fff3dc" onclick="selectAvatar(this)">🦊</div>
+            <div class="avatar-option" style="background:#e8e4fd" onclick="selectAvatar(this)">🐻</div>
+            <div class="avatar-option" style="background:#fde4e4" onclick="selectAvatar(this)">🐼</div>
+          </div>
+        </div>
+
+        <button class="sheet-save-btn" onclick="closeSheet('filled')">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+          Save child
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openSheet(id) {
+    document.getElementById('sheet-' + id).classList.add('open');
+  }
+  function closeSheet(id) {
+    document.getElementById('sheet-' + id).classList.remove('open');
+  }
+  function selectAvatar(el) {
+    const picker = el.parentElement;
+    picker.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+</script>
+
+</body>
+</html>

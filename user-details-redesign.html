@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprout – Member Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #c9c1b0;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 52px 0 80px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* ── Sprout Tokens ── */
+    :root {
+      --brand-700: #1e3e2b;
+      --brand-600: #134f2d;
+      --brand-500: #186338;
+      --brand-100: #d0dacf;
+      --brand-50:  #e2e9e3;
+
+      --bg:      #f4f1ea;   /* Secondary/500  — app background   */
+      --surf-1:  #eae6db;   /* Surface/L1     — cards / chips    */
+      --surf-2:  #dbd5c8;   /* Surface/L2     — pressed / badge  */
+      --surf-3:  #c2b9a6;   /* Surface/L3                        */
+
+      --text-primary:   #4d525b;   /* Grey/700 */
+      --text-secondary: #818898;   /* Grey/500 */
+      --text-tertiary:  #b3b8c1;   /* Grey/300 */
+      --text-brand:     #186338;
+      --text-brand-bold:#1e3e2b;
+
+      --border: #e6e7ea;    /* Grey/100 */
+    }
+
+    /* ═══════════════════════════════════════════ */
+    /*  PHONE SHELL                               */
+    /* ═══════════════════════════════════════════ */
+    .phone {
+      width: 393px;
+      min-height: 852px;
+      background: var(--bg);
+      border-radius: 54px;
+      overflow: hidden;
+      position: relative;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.10),
+        0 0 0 10px #1c1c1e,
+        0 0 0 12px #2c2c2e,
+        0 50px 100px rgba(0,0,0,0.48),
+        0 24px 48px  rgba(0,0,0,0.22);
+    }
+
+    /* Physical side buttons */
+    .phone::before {
+      content: '';
+      position: absolute;
+      left: -13px;
+      top: 120px;
+      width: 4px;
+      height: 32px;
+      background: #2a2a2a;
+      border-radius: 2px 0 0 2px;
+      box-shadow: 0 44px 0 #2a2a2a, 0 88px 0 #2a2a2a;
+    }
+    .phone::after {
+      content: '';
+      position: absolute;
+      right: -13px;
+      top: 148px;
+      width: 4px;
+      height: 66px;
+      background: #2a2a2a;
+      border-radius: 0 2px 2px 0;
+    }
+
+    /* Dynamic Island */
+    .island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 34px;
+      background: #0a0a0a;
+      border-radius: 18px;
+      z-index: 100;
+    }
+
+    /* ═══════════════════════════════════════════ */
+    /*  STATUS BAR                                */
+    /* ═══════════════════════════════════════════ */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 22px 0;
+    }
+
+    .s-time {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.1px;
+    }
+
+    .s-icons { display: flex; align-items: center; gap: 6px; }
+
+    /* ═══════════════════════════════════════════ */
+    /*  TOP NAV                                   */
+    /* ═══════════════════════════════════════════ */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px 0;
+      position: relative;
+    }
+
+    .back-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--surf-1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════ */
+    /*  PROFILE HERO AREA                         */
+    /* ═══════════════════════════════════════════ */
+    .profile-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 28px 16px;
+      text-align: center;
+    }
+
+    /* Photo */
+    .photo-wrap {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      margin-bottom: 14px;
+    }
+
+    .photo-circle {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2.5px solid var(--surf-2);
+      background: var(--surf-2);
+      position: relative;
+    }
+
+    /* Placeholder silhouette */
+    .photo-circle::before {
+      content: '';
+      position: absolute;
+      top: 22%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--surf-3);
+    }
+    .photo-circle::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 72px;
+      height: 48px;
+      border-radius: 50% 50% 0 0;
+      background: var(--surf-3);
+    }
+
+    /* Name */
+    .p-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-brand-bold);
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+      margin-bottom: 5px;
+    }
+
+    /* "Etan, Olivia, and Erick's dad" */
+    .p-relation {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    /* Location row */
+    .p-location {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      color: var(--text-tertiary);
+      margin-bottom: 14px;
+    }
+
+    /* Met + Meets row */
+    .met-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .met-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--brand-500);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px 4px 8px;
+      border-radius: 99px;
+    }
+
+    .dot-sep {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--text-tertiary);
+    }
+
+    .meets-txt {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    /* ═══════════════════════════════════════════ */
+    /*  DIVIDER                                   */
+    /* ═══════════════════════════════════════════ */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0 20px;
+    }
+
+    /* ═══════════════════════════════════════════ */
+    /*  SECTION WRAPPER                           */
+    /* ═══════════════════════════════════════════ */
+    .sect { padding: 18px 20px 14px; }
+
+    .sect-head {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      letter-spacing: 0.1px;
+    }
+
+    /* ═══════════════════════════════════════════ */
+    /*  CHILDREN CARDS  (matches reference style) */
+    /* ═══════════════════════════════════════════ */
+    .kids-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .kid-card {
+      flex: 1;
+      background: var(--surf-1);
+      border-radius: 14px;
+      padding: 12px 6px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    /* Emoji face circle — matches reference */
+    .kid-face {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--surf-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 7px;
+      line-height: 1;
+    }
+
+    .kid-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+      line-height: 1;
+    }
+
+    .kid-age {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    /* ═══════════════════════════════════════════ */
+    /*  PROFILE BIO CARD  (matches reference)     */
+    /* ═══════════════════════════════════════════ */
+    .bio-card {
+      background: var(--surf-1);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .bio-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .bio-text {
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--text-secondary);
+    }
+
+    /* ═══════════════════════════════════════════ */
+    /*  INTERESTS  (from reference)               */
+    /* ═══════════════════════════════════════════ */
+    .interests-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .interest-chip {
+      background: var(--surf-1);
+      border-radius: 99px;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    /* ═══════════════════════════════════════════ */
+    /*  EVENT HISTORY                             */
+    /* ═══════════════════════════════════════════ */
+    .event-card {
+      background: var(--surf-1);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .event-thumb {
+      width: 72px;
+      height: 72px;
+      border-radius: 10px;
+      background: var(--surf-2);
+      flex-shrink: 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Craft art placeholder using CSS */
+    .event-thumb::before {
+      content: '';
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2.5px solid var(--surf-3);
+      top: 10px;
+      left: 8px;
+    }
+    .event-thumb::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--surf-3);
+      bottom: 10px;
+      right: 8px;
+    }
+
+    .event-info { flex: 1; }
+
+    .event-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .evt-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+    .evt-row:last-child { margin-bottom: 0; }
+
+    .evt-bottom {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+
+    .dist-pill {
+      background: var(--surf-2);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 99px;
+    }
+
+    /* ═══════════════════════════════════════════ */
+    /*  BOTTOM CTA  (matches reference "Next")    */
+    /* ═══════════════════════════════════════════ */
+    .cta-area {
+      padding: 14px 20px 20px;
+      margin-top: 4px;
+    }
+
+    .cta-btn {
+      width: 100%;
+      height: 54px;
+      background: var(--brand-500);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      border: none;
+      border-radius: 99px;
+      cursor: pointer;
+      letter-spacing: -0.1px;
+      transition: background 0.14s, transform 0.1s;
+    }
+    .cta-btn:hover  { background: var(--brand-600); }
+    .cta-btn:active { background: var(--brand-700); transform: scale(0.98); }
+
+    .home-bar {
+      width: 89px;
+      height: 5px;
+      background: rgba(30,62,43,0.12);
+      border-radius: 3px;
+      margin: 14px auto 0;
+    }
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- Dynamic Island -->
+  <div class="island"></div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  STATUS BAR                             -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="status-bar">
+    <span class="s-time">9:41</span>
+    <div class="s-icons">
+      <!-- Signal -->
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
+        <rect x="0"    y="6"  width="3" height="6"  rx="1" fill="#4d525b"/>
+        <rect x="5"    y="4"  width="3" height="8"  rx="1" fill="#4d525b"/>
+        <rect x="10"   y="2"  width="3" height="10" rx="1" fill="#4d525b"/>
+        <rect x="15"   y="0"  width="3" height="12" rx="1" fill="#4d525b"/>
+      </svg>
+      <!-- Wi-Fi -->
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <path d="M0.5 4.4 Q8 -1.2 15.5 4.4"  stroke="#4d525b" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M3.2 7.1 Q8  3.1 12.8 7.1"   stroke="#4d525b" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M5.8 9.8 Q8  7.9 10.2 9.8"   stroke="#4d525b" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="8" cy="11.5" r="1.5" fill="#4d525b"/>
+      </svg>
+      <!-- Battery -->
+      <svg width="27" height="13" viewBox="0 0 27 13" fill="none">
+        <rect x="0.5"  y="1"   width="23" height="11" rx="3"   stroke="#4d525b" stroke-width="1.5"/>
+        <rect x="23.5" y="4"   width="3"  height="5"  rx="1.5" fill="#4d525b" opacity="0.45"/>
+        <rect x="2"    y="2.5" width="17" height="8"  rx="1.5" fill="#4d525b"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  TOP NAV                                -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="top-nav">
+    <div class="back-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
+           stroke="#4d525b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 4 L6 9 L11 14"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  PROFILE BLOCK                          -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="profile-block">
+
+    <!-- Photo -->
+    <div class="photo-wrap">
+      <div class="photo-circle"></div>
+    </div>
+
+    <!-- Name -->
+    <h1 class="p-name">Ronald Richard</h1>
+
+    <!-- Relationship -->
+    <p class="p-relation">Etan, Olivia, and Erick&#8217;s dad</p>
+
+    <!-- Location -->
+    <div class="p-location">
+      <svg width="11" height="14" viewBox="0 0 11 14" fill="none">
+        <path d="M5.5 0.5C2.738 0.5 0.5 2.738 0.5 5.5C0.5 9.25 5.5 13.5 5.5 13.5C5.5 13.5 10.5 9.25 10.5 5.5C10.5 2.738 8.262 0.5 5.5 0.5ZM5.5 7.5C4.395 7.5 3.5 6.605 3.5 5.5C3.5 4.395 4.395 3.5 5.5 3.5C6.605 3.5 7.5 4.395 7.5 5.5C7.5 6.605 6.605 7.5 5.5 7.5Z"
+              fill="#b3b8c1"/>
+      </svg>
+      Texas, USA
+    </div>
+
+    <!-- Met + meets -->
+    <div class="met-row">
+      <div class="met-badge">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+             stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1.5 6 L4.5 9 L10.5 3"/>
+        </svg>
+        Met
+      </div>
+      <div class="dot-sep"></div>
+      <div class="meets-txt">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+             stroke="#818898" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="7" cy="4.5" r="2.5"/>
+          <path d="M1.5 13 C2 9 12 9 12.5 13"/>
+        </svg>
+        12 meets
+      </div>
+    </div>
+
+  </div><!-- /profile-block -->
+
+  <div class="divider"></div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  CHILDREN                               -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="sect">
+    <div class="sect-head">Children</div>
+    <div class="kids-row">
+
+      <div class="kid-card">
+        <div class="kid-face">🧒</div>
+        <span class="kid-name">Etan</span>
+        <span class="kid-age">2 yrs</span>
+      </div>
+
+      <div class="kid-card">
+        <div class="kid-face">👧</div>
+        <span class="kid-name">Olivia</span>
+        <span class="kid-age">1 yr</span>
+      </div>
+
+      <div class="kid-card">
+        <div class="kid-face">🧒</div>
+        <span class="kid-name">Erick</span>
+        <span class="kid-age">6 yrs</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  PROFILE BIO                            -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="sect">
+    <div class="bio-card">
+      <div class="bio-label">Profile Bio</div>
+      <p class="bio-text">
+        James Martin is parent to Kenedy&#8217;s in 73301. Passionate about
+        active &amp; sports, nature &amp; outdoors, community. I love the
+        spontaneous connections — bumping into other parents at the park and
+        realizing you have so much in common.
+      </p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  INTERESTS                              -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="sect">
+    <div class="sect-head">Interests</div>
+    <div class="interests-row">
+      <span class="interest-chip">Sports &amp; Outdoors</span>
+      <span class="interest-chip">Community</span>
+      <span class="interest-chip">Nature</span>
+      <span class="interest-chip">Parenting</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  USER EVENT HISTORY                     -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="sect">
+    <div class="sect-head">User Event History</div>
+    <div class="event-card">
+
+      <!-- Thumbnail placeholder -->
+      <div class="event-thumb"></div>
+
+      <!-- Details -->
+      <div class="event-info">
+        <div class="event-title">Kids Art &amp; Craft Day</div>
+
+        <div class="evt-row">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+               stroke="#818898" stroke-width="1.3" stroke-linecap="round">
+            <rect x="1" y="2" width="10" height="9" rx="2" fill="none"/>
+            <line x1="3.5" y1="1" x2="3.5" y2="3.5"/>
+            <line x1="8.5" y1="1" x2="8.5" y2="3.5"/>
+            <line x1="1"   y1="5" x2="11"  y2="5" stroke-opacity="0.4"/>
+          </svg>
+          Mon, Feb 25 &nbsp;·&nbsp; 10:00am
+        </div>
+
+        <div class="evt-row">
+          <svg width="11" height="13" viewBox="0 0 11 13" fill="none">
+            <path d="M5.5 0.5C3.015 0.5 1 2.515 1 5C1 8.5 5.5 12.5 5.5 12.5C5.5 12.5 10 8.5 10 5C10 2.515 7.985 0.5 5.5 0.5Z"
+                  stroke="#818898" stroke-width="1.2" fill="none"/>
+            <circle cx="5.5" cy="5" r="1.6" fill="#818898"/>
+          </svg>
+          Griffith Park, LA
+        </div>
+
+        <div class="evt-bottom">
+          <span class="dist-pill">2.1 mi</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  CTA                                    -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="cta-area">
+    <button class="cta-btn">Continue</button>
+    <div class="home-bar"></div>
+  </div>
+
+</div><!-- /phone -->
+</body>
+</html>

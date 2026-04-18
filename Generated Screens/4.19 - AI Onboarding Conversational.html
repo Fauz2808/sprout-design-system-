@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — AI Onboarding 4.19</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ─── Reset & Root ─── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    /* Brand */
+    --brand-50:  #e2e9e3;
+    --brand-100: #d0dacf;
+    --brand-200: #77b691;
+    --brand-300: #579a74;
+    --brand-400: #387f56;
+    --brand-500: #186338;
+    --brand-600: #134f2d;
+    --brand-700: #1e3e2b;
+
+    /* Secondary (Cream) */
+    --sec-50:  #fefefd;
+    --sec-100: #fbf8f7;
+    --sec-200: #f6f1ee;
+    --sec-500: #f4f1ea;
+    --sec-600: #eae6db;
+    --sec-700: #dbd5c8;
+    --sec-800: #c2b9a6;
+    --sec-900: #aa9e83;
+
+    /* Content */
+    --text-primary:   #4d525b;
+    --text-secondary: #818898;
+    --text-tertiary:  #b3b8c1;
+    --text-brand:     #186338;
+    --text-white:     #ffffff;
+
+    /* App */
+    --bg: #f4f1ea;
+    --surface-l1: #eae6db;
+    --surface-l2: #dbd5c8;
+  }
+
+  html, body {
+    height: 100%;
+    background: #e8e3d8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* ─── Phone Frame ─── */
+  .phone {
+    width: 393px;
+    height: 852px;
+    background: var(--bg);
+    border-radius: 52px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.08),
+      0 32px 80px rgba(0,0,0,0.22),
+      0 8px 24px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── Status Bar ─── */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 28px 0;
+    flex-shrink: 0;
+  }
+  .status-time {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.2px;
+  }
+  .status-icons {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .status-icons svg { color: var(--text-primary); }
+
+  /* ─── Navigation ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px 12px;
+    flex-shrink: 0;
+  }
+  .nav-back {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-primary);
+    transition: background 0.15s;
+  }
+  .nav-back:hover { background: var(--surface-l1); }
+
+  /* Progress steps */
+  .progress-steps {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .step {
+    height: 3px;
+    border-radius: 99px;
+    background: var(--sec-700);
+    transition: width 0.4s ease, background 0.3s;
+  }
+  .step.done { background: var(--brand-500); }
+  .step.s1 { width: 32px; }
+  .step.s2 { width: 32px; }
+  .step.s3 { width: 32px; }
+  .step.s4 { width: 32px; background: var(--brand-500); }
+
+  .nav-spacer { width: 36px; }
+
+  /* ─── Screen Content ─── */
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 24px 0;
+    overflow: hidden;
+  }
+
+  /* Label */
+  .almost-done {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--brand-500);
+    margin-bottom: 8px;
+  }
+
+  /* Heading */
+  .heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--text-primary);
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+  .heading em {
+    font-style: italic;
+    color: var(--brand-500);
+  }
+
+  .subtext {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 28px;
+  }
+
+  /* ─── Conversation Area ─── */
+  .convo-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 12px;
+    overflow-y: auto;
+    padding-bottom: 8px;
+  }
+
+  /* AI Message Bubble */
+  .ai-bubble {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .ai-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--brand-500);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+  .ai-avatar svg { width: 16px; height: 16px; color: white; }
+
+  .ai-message {
+    background: white;
+    border-radius: 4px 16px 16px 16px;
+    padding: 14px 16px;
+    max-width: calc(100% - 48px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  }
+  .ai-message p {
+    font-size: 15px;
+    color: var(--text-primary);
+    line-height: 1.55;
+    font-weight: 400;
+  }
+
+  /* User Response Bubble */
+  .user-bubble {
+    display: none;
+    justify-content: flex-end;
+  }
+  .user-bubble.visible {
+    display: flex;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .user-message {
+    background: var(--brand-500);
+    border-radius: 16px 4px 16px 16px;
+    padding: 14px 16px;
+    max-width: 80%;
+  }
+  .user-message p {
+    font-size: 15px;
+    color: white;
+    line-height: 1.55;
+  }
+
+  /* Typing dots */
+  .typing-indicator {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .typing-indicator.show { opacity: 1; }
+  .typing-dots {
+    background: white;
+    border-radius: 4px 16px 16px 16px;
+    padding: 14px 18px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--brand-300);
+    animation: bounce 1.1s ease-in-out infinite;
+  }
+  .dot:nth-child(2) { animation-delay: 0.15s; }
+  .dot:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+    30% { transform: translateY(-5px); opacity: 1; }
+  }
+
+  /* ─── Talk Button Zone ─── */
+  .talk-zone {
+    padding: 20px 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+
+  /* State label */
+  .state-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.1px;
+    transition: all 0.3s ease;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* The main talk button */
+  .talk-btn-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 96px;
+    height: 96px;
+    cursor: pointer;
+  }
+
+  /* Pulse rings — idle only */
+  .pulse-ring {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--brand-500);
+    opacity: 0;
+    animation: pulseRing 2.8s ease-out infinite;
+  }
+  .pulse-ring:nth-child(1) { width: 96px; height: 96px; animation-delay: 0s; }
+  .pulse-ring:nth-child(2) { width: 96px; height: 96px; animation-delay: 0.9s; }
+  .pulse-ring:nth-child(3) { width: 96px; height: 96px; animation-delay: 1.8s; }
+
+  @keyframes pulseRing {
+    0%   { transform: scale(1);    opacity: 0.18; }
+    60%  { transform: scale(1.8);  opacity: 0; }
+    100% { transform: scale(1.8);  opacity: 0; }
+  }
+
+  /* Listening rings — active only */
+  .listen-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid var(--brand-400);
+    opacity: 0;
+    width: 96px;
+    height: 96px;
+    transition: opacity 0.3s;
+  }
+  .talk-btn-wrapper.listening .listen-ring { animation: listenPulse 0.9s ease-out infinite; }
+  .listen-ring:nth-child(4) { animation-delay: 0s; }
+  .listen-ring:nth-child(5) { animation-delay: 0.3s; }
+
+  @keyframes listenPulse {
+    0%   { transform: scale(1);   opacity: 0.6; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  /* Button itself */
+  .talk-btn {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--brand-500);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, background 0.25s ease, box-shadow 0.25s ease;
+    box-shadow:
+      0 4px 16px rgba(24, 99, 56, 0.35),
+      0 1px 4px rgba(24, 99, 56, 0.2);
+    z-index: 1;
+  }
+  .talk-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 24px rgba(24, 99, 56, 0.45);
+  }
+  .talk-btn:active { transform: scale(0.96); }
+
+  .talk-btn-wrapper.listening .talk-btn {
+    background: var(--brand-600);
+    box-shadow:
+      0 4px 20px rgba(24, 99, 56, 0.5),
+      0 0 0 3px rgba(24, 99, 56, 0.15);
+    animation: listenBreathe 1.6s ease-in-out infinite;
+  }
+  .talk-btn-wrapper.done .talk-btn {
+    background: var(--brand-700);
+    animation: none;
+  }
+
+  @keyframes listenBreathe {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.04); }
+  }
+
+  /* Pulse rings paused when listening/done */
+  .talk-btn-wrapper.listening .pulse-ring,
+  .talk-btn-wrapper.done .pulse-ring {
+    animation-play-state: paused;
+    opacity: 0;
+  }
+
+  /* Mic icon */
+  .mic-icon {
+    color: white;
+    width: 28px;
+    height: 28px;
+    transition: opacity 0.2s;
+  }
+  .stop-icon {
+    color: white;
+    width: 20px;
+    height: 20px;
+    opacity: 0;
+    position: absolute;
+    transition: opacity 0.2s;
+  }
+  .talk-btn-wrapper.listening .mic-icon { opacity: 0; }
+  .talk-btn-wrapper.listening .stop-icon { opacity: 1; }
+
+  /* Checkmark for done */
+  .check-icon {
+    color: white;
+    width: 28px;
+    height: 28px;
+    opacity: 0;
+    position: absolute;
+    transition: opacity 0.2s;
+  }
+  .talk-btn-wrapper.done .mic-icon { opacity: 0; }
+  .talk-btn-wrapper.done .stop-icon { opacity: 0; }
+  .talk-btn-wrapper.done .check-icon { opacity: 1; }
+
+  /* Waveform (listening only) */
+  .waveform {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 28px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    margin-top: -4px;
+  }
+  .waveform.show { opacity: 1; }
+  .wave-bar {
+    width: 3px;
+    border-radius: 2px;
+    background: var(--brand-400);
+    animation: wave 0.8s ease-in-out infinite alternate;
+  }
+  .wave-bar:nth-child(1) { height: 8px;  animation-delay: 0s; }
+  .wave-bar:nth-child(2) { height: 20px; animation-delay: 0.1s; }
+  .wave-bar:nth-child(3) { height: 14px; animation-delay: 0.2s; }
+  .wave-bar:nth-child(4) { height: 24px; animation-delay: 0.05s; }
+  .wave-bar:nth-child(5) { height: 10px; animation-delay: 0.15s; }
+  .wave-bar:nth-child(6) { height: 18px; animation-delay: 0.25s; }
+  .wave-bar:nth-child(7) { height: 6px;  animation-delay: 0.1s; }
+
+  @keyframes wave {
+    from { transform: scaleY(0.4); }
+    to   { transform: scaleY(1); }
+  }
+
+  /* Hint text */
+  .tap-hint {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    transition: opacity 0.3s;
+  }
+  .tap-hint.hide { opacity: 0; pointer-events: none; }
+
+  /* Type instead link */
+  .type-instead {
+    background: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: var(--sec-700);
+    text-underline-offset: 2px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+  }
+  .type-instead:hover { color: var(--text-primary); background: var(--surface-l1); }
+  .type-instead.hide { opacity: 0; pointer-events: none; }
+
+  /* ─── Inline Type Input (hidden by default) ─── */
+  .type-input-zone {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 0 0;
+  }
+  .type-input-zone.show { display: flex; }
+  .type-input-wrap {
+    background: white;
+    border: 1.5px solid var(--sec-700);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: border-color 0.2s;
+  }
+  .type-input-wrap:focus-within { border-color: var(--brand-400); }
+  .type-input {
+    border: none;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--text-primary);
+    line-height: 1.55;
+    background: transparent;
+    resize: none;
+    min-height: 80px;
+  }
+  .type-input::placeholder { color: var(--text-tertiary); }
+  .type-input-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .char-count {
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+  .back-to-voice {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--brand-500);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: background 0.15s;
+  }
+  .back-to-voice:hover { background: var(--brand-50); }
+  .back-to-voice svg { width: 14px; height: 14px; }
+
+  /* ─── Continue Button ─── */
+  .bottom-zone {
+    padding: 16px 0 40px;
+    flex-shrink: 0;
+  }
+  .continue-btn {
+    width: 100%;
+    height: 56px;
+    border-radius: 99px;
+    border: none;
+    background: var(--brand-500);
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.3s, transform 0.15s;
+    letter-spacing: -0.1px;
+  }
+  .continue-btn:not(:disabled):hover { background: var(--brand-600); }
+  .continue-btn:not(:disabled):active { transform: scale(0.98); }
+  .continue-btn:disabled {
+    background: var(--brand-200);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  /* ─── Animations ─── */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ─── Scrollbar ─── */
+  .convo-area::-webkit-scrollbar { width: 0; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+        <rect x="0" y="3" width="3" height="9" rx="1" fill="currentColor" opacity="0.3"/>
+        <rect x="4.5" y="2" width="3" height="10" rx="1" fill="currentColor" opacity="0.5"/>
+        <rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="currentColor" opacity="0.7"/>
+        <rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/>
+      </svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <path d="M8 2.4C10.7 2.4 13.1 3.5 14.8 5.3L16 4.1C13.9 1.9 11.1 0.6 8 0.6C4.9 0.6 2.1 1.9 0 4.1L1.2 5.3C2.9 3.5 5.3 2.4 8 2.4Z" fill="currentColor"/>
+        <path d="M8 5.6C9.9 5.6 11.6 6.4 12.8 7.7L14 6.5C12.4 4.8 10.3 3.8 8 3.8C5.7 3.8 3.6 4.8 2 6.5L3.2 7.7C4.4 6.4 6.1 5.6 8 5.6Z" fill="currentColor" opacity="0.7"/>
+        <circle cx="8" cy="10.5" r="1.5" fill="currentColor"/>
+      </svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+        <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/>
+        <rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/>
+        <path d="M23 4v4a2 2 0 0 0 0-4z" fill="currentColor" opacity="0.4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="nav">
+    <button class="nav-back" onclick="history.back()">
+      <svg width="9" height="16" viewBox="0 0 9 16" fill="none">
+        <path d="M8 1L1 8L8 15" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="progress-steps">
+      <div class="step s1 done"></div>
+      <div class="step s2 done"></div>
+      <div class="step s3 done"></div>
+      <div class="step s4 done"></div>
+    </div>
+    <div class="nav-spacer"></div>
+  </div>
+
+  <!-- Main Screen -->
+  <div class="screen">
+
+    <p class="almost-done">Almost done</p>
+    <h1 class="heading">One quick <em>question</em></h1>
+    <p class="subtext">Tap the button and tell our AI — it'll craft your bio from what you share.</p>
+
+    <!-- Conversation -->
+    <div class="convo-area" id="convoArea">
+
+      <!-- AI bubble always visible -->
+      <div class="ai-bubble">
+        <div class="ai-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+        </div>
+        <div class="ai-message">
+          <p>What do you love most about connecting with other parents?</p>
+        </div>
+      </div>
+
+      <!-- Typing indicator (shown while "AI" is processing) -->
+      <div class="typing-indicator" id="typingIndicator">
+        <div class="ai-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+        </div>
+        <div class="typing-dots">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      </div>
+
+      <!-- User response bubble (shown after recording) -->
+      <div class="user-bubble" id="userBubble">
+        <div class="user-message">
+          <p id="userText"></p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Inline type input zone (hidden by default) -->
+    <div class="type-input-zone" id="typeZone">
+      <div class="type-input-wrap">
+        <textarea
+          class="type-input"
+          id="typeInput"
+          placeholder="e.g. I love organizing playdates and finding families with same age kids nearby…"
+          maxlength="180"
+          oninput="onTypeInput()"
+        ></textarea>
+        <div class="type-input-footer">
+          <span class="char-count" id="charCount">0/180</span>
+          <button class="back-to-voice" onclick="switchToVoice()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="23"/>
+              <line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+            Use voice instead
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Talk Button Zone -->
+    <div class="talk-zone" id="talkZone">
+
+      <div class="waveform" id="waveform">
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+      </div>
+
+      <!-- Button wrapper controls state via class -->
+      <div class="talk-btn-wrapper" id="talkBtnWrapper">
+        <!-- Idle pulse rings -->
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <!-- Listening rings -->
+        <div class="listen-ring"></div>
+        <div class="listen-ring"></div>
+        <!-- Button -->
+        <button class="talk-btn" id="talkBtn" onclick="handleTalkTap()">
+          <!-- Mic (idle) -->
+          <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+          <!-- Stop (listening) -->
+          <svg class="stop-icon" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="5" y="5" width="14" height="14" rx="2"/>
+          </svg>
+          <!-- Check (done) -->
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <p class="state-label" id="stateLabel">Tap to talk with AI</p>
+      <button class="type-instead" id="typeInsteadBtn" onclick="switchToType()">Prefer to type?</button>
+
+    </div>
+
+    <!-- Bottom -->
+    <div class="bottom-zone">
+      <button class="continue-btn" id="continueBtn" disabled>Continue</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ─── State Machine ───────────────────────────────────────────────────────────
+  // States: idle → listening → processing → done
+  let appState = 'idle';
+  let listenTimer = null;
+
+  const wrapper   = document.getElementById('talkBtnWrapper');
+  const stateLabel = document.getElementById('stateLabel');
+  const typeInsteadBtn = document.getElementById('typeInsteadBtn');
+  const continueBtn = document.getElementById('continueBtn');
+  const userBubble  = document.getElementById('userBubble');
+  const userText    = document.getElementById('userText');
+  const typingIndicator = document.getElementById('typingIndicator');
+  const waveform    = document.getElementById('waveform');
+  const talkZone    = document.getElementById('talkZone');
+  const typeZone    = document.getElementById('typeZone');
+  const typeInput   = document.getElementById('typeInput');
+  const convoArea   = document.getElementById('convoArea');
+
+  // Simulated responses
+  const responses = [
+    "I love the sense of community — finding parents who just get it without needing to explain everything.",
+    "Honestly, it's the playdate moments. Seeing my kids bond with other kids while I finally get to talk to an adult!",
+    "I love organizing little meetups and building real friendships, not just nodding at the school gate.",
+    "The shared experiences. Parenting can feel so isolating sometimes — connecting with others who get it is everything."
+  ];
+
+  function handleTalkTap() {
+    if (appState === 'idle') {
+      startListening();
+    } else if (appState === 'listening') {
+      stopListening();
+    }
+  }
+
+  function startListening() {
+    appState = 'listening';
+    wrapper.classList.add('listening');
+    stateLabel.textContent = 'Listening…';
+    typeInsteadBtn.classList.add('hide');
+    waveform.classList.add('show');
+
+    // Auto-stop after 3.5s (simulate speech)
+    listenTimer = setTimeout(stopListening, 3500);
+  }
+
+  function stopListening() {
+    if (listenTimer) clearTimeout(listenTimer);
+    appState = 'processing';
+    wrapper.classList.remove('listening');
+    waveform.classList.remove('show');
+    stateLabel.textContent = 'Writing your bio…';
+
+    // Show typing indicator
+    typingIndicator.classList.add('show');
+    scrollToBottom();
+
+    // After "processing", show user response + done state
+    setTimeout(() => {
+      typingIndicator.classList.remove('show');
+
+      // Pick a random response to simulate
+      const resp = responses[Math.floor(Math.random() * responses.length)];
+      userText.textContent = resp;
+      userBubble.classList.add('visible');
+      scrollToBottom();
+
+      // Transition to done
+      setTimeout(() => {
+        appState = 'done';
+        wrapper.classList.add('done');
+        stateLabel.textContent = 'Your answer is captured';
+        continueBtn.disabled = false;
+        continueBtn.style.opacity = '1';
+      }, 300);
+
+    }, 2200);
+  }
+
+  function scrollToBottom() {
+    setTimeout(() => {
+      convoArea.scrollTop = convoArea.scrollHeight;
+    }, 50);
+  }
+
+  // ─── Switch to typing ────────────────────────────────────────────────────────
+  function switchToType() {
+    talkZone.style.display = 'none';
+    typeZone.classList.add('show');
+    typeInput.focus();
+  }
+
+  function switchToVoice() {
+    typeZone.classList.remove('show');
+    talkZone.style.display = '';
+  }
+
+  function onTypeInput() {
+    const val = typeInput.value.trim();
+    const len = typeInput.value.length;
+    document.getElementById('charCount').textContent = len + '/180';
+    continueBtn.disabled = val.length < 10;
+    continueBtn.style.opacity = val.length >= 10 ? '1' : '0.7';
+  }
+</script>
+</body>
+</html>

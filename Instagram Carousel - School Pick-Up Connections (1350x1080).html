@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Instagram Landscape Carousel: School Pick-Up Connections</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green:      #186338;
+  --green-dark: #1E3E2B;
+  --green-light:#E2E9E3;
+  --green-200:  #77B691;
+  --green-400:  #387F56;
+  --cream:      #F4F1EA;
+  --cream-deep: #EAE6DB;
+  --cream-darker:#DBD5C8;
+  --text-dark:  #1A1A1A;
+  --text-mid:   #4D525B;
+  --text-light: #818898;
+  --white:      #ffffff;
+}
+
+body {
+  background: #111;
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 20px;
+  gap: 28px;
+}
+
+.top-label {
+  color: #444;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.size-note {
+  color: #333;
+  font-size: 11px;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.05em;
+  margin-top: -16px;
+}
+
+/* ── IG CHROME ── */
+.ig-chrome {
+  width: 810px;
+  background: #1a1a1a;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+.ig-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px 10px;
+}
+.ig-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700;
+  color: white; border: 2px solid rgba(255,255,255,0.1);
+}
+.ig-info { flex: 1; }
+.ig-handle { color: #e0e0e0; font-size: 13px; font-weight: 600; }
+.ig-sub { color: #555; font-size: 11px; }
+.ig-more { color: #444; font-size: 18px; }
+
+/* ── SLIDE CONTAINER ── */
+.slide-wrapper {
+  position: relative;
+  width: 810px;
+  height: 648px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.slides-track {
+  display: flex;
+  width: calc(810px * 7);
+  height: 648px;
+  transition: transform 0.44s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.slide {
+  width: 810px; height: 648px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Nav arrows */
+.nav-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 20;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.slide-wrapper:hover .nav-btn { opacity: 1; pointer-events: all; }
+.nav-btn.hidden { opacity: 0 !important; pointer-events: none !important; }
+.nav-prev { left: 12px; }
+.nav-next { right: 12px; }
+
+/* Progress dots */
+.prog-dots {
+  position: absolute; bottom: 10px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 5px; z-index: 20;
+}
+.prog-dot {
+  width: 5px; height: 5px; border-radius: 99px;
+  background: rgba(255,255,255,0.3);
+  transition: all 0.3s;
+}
+.prog-dot.active { width: 18px; background: white; }
+
+/* ─── SLIDE 1: COVER ─── */
+.s1 {
+  background: var(--green-dark);
+  display: grid;
+  grid-template-columns: 1fr 310px;
+}
+.s1 .left {
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  padding: 52px 56px;
+  position: relative;
+  z-index: 2;
+}
+.s1::before {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(24,99,56,0.4) 0%, transparent 70%);
+  top: -150px; left: -100px;
+  pointer-events: none;
+}
+.s1 .right {
+  position: relative;
+  background: var(--green);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.s1 .right-inner {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 14px;
+  position: relative; z-index: 2;
+  padding: 32px 24px;
+}
+.s1 .right .big-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 200px; font-weight: 900; font-style: italic;
+  color: rgba(255,255,255,0.07);
+  position: absolute; bottom: -30px; right: -20px;
+  line-height: 1;
+  user-select: none;
+}
+.s1 .right .step-pills { display: flex; flex-direction: column; gap: 9px; }
+.s1 .right .step-pill {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 99px;
+  padding: 8px 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12.5px; font-weight: 500;
+  color: rgba(244,241,234,0.75);
+  backdrop-filter: blur(4px);
+}
+.s1 .badge {
+  position: absolute; top: 20px; right: 20px;
+  background: rgba(0,0,0,0.3); border-radius: 99px;
+  padding: 4px 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+  color: rgba(244,241,234,0.5); z-index: 10;
+}
+.s1 .logo-mark {
+  font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
+  color: var(--cream); margin-bottom: 28px;
+  display: flex; align-items: center; gap: 6px;
+}
+.s1 .logo-mark .dot { width: 8px; height: 8px; background: var(--green-200); border-radius: 50%; }
+.s1 .tag {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--green-200); margin-bottom: 16px;
+}
+.s1 h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 44px; font-weight: 700; line-height: 1.12;
+  color: var(--cream); margin-bottom: 28px;
+}
+.s1 h1 em { font-style: italic; color: var(--green-200); }
+.s1 .swipe {
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  color: rgba(244,241,234,0.35);
+  display: flex; align-items: center; gap: 8px;
+}
+.s1 .swipe span { animation: nudge 2s ease-in-out infinite; display: inline-block; }
+@keyframes nudge { 0%,100%{transform:translateX(0)} 50%{transform:translateX(5px)} }
+
+/* ─── SLIDES 2–6: STEP SLIDES ─── */
+.ss {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+}
+.ss .left-panel {
+  display: flex; flex-direction: column;
+  justify-content: center;
+  padding: 52px 50px;
+  position: relative; overflow: hidden;
+}
+.ss .right-panel {
+  background: var(--cream);
+  display: flex; flex-direction: column;
+  justify-content: center;
+  padding: 52px 52px;
+  position: relative;
+}
+
+/* Alternating panel colors */
+.ss.v1 .left-panel { background: var(--cream); }
+.ss.v2 .left-panel { background: var(--green-light); }
+.ss.v3 .left-panel { background: var(--green-dark); }
+.ss.v4 .left-panel { background: var(--cream-deep); }
+.ss.v5 .left-panel { background: var(--green); }
+
+.ss.v2 .right-panel { background: var(--white, #fff); }
+.ss.v3 .right-panel { background: var(--cream); }
+.ss.v4 .right-panel { background: var(--green-light); }
+.ss.v5 .right-panel { background: var(--cream); }
+
+.ss .step-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 110px; font-weight: 900; font-style: italic;
+  line-height: 1; margin-bottom: 10px;
+  position: relative; z-index: 2;
+}
+.ss.v1 .step-num { color: var(--green-light); }
+.ss.v2 .step-num { color: rgba(24,99,56,0.13); }
+.ss.v3 .step-num { color: rgba(255,255,255,0.08); }
+.ss.v4 .step-num { color: rgba(30,62,43,0.12); }
+.ss.v5 .step-num { color: rgba(255,255,255,0.10); }
+
+.ss .step-label {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  margin-bottom: 10px; position: relative; z-index: 2;
+}
+.ss.v1 .step-label,.ss.v2 .step-label,.ss.v4 .step-label { color: var(--green); }
+.ss.v3 .step-label,.ss.v5 .step-label { color: var(--green-200); }
+
+.ss .step-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 33px; font-weight: 700; line-height: 1.18;
+  position: relative; z-index: 2;
+}
+.ss.v1 .step-headline,.ss.v2 .step-headline,.ss.v4 .step-headline { color: var(--green-dark); }
+.ss.v3 .step-headline,.ss.v5 .step-headline { color: var(--cream); }
+.ss .step-headline em { font-style: italic; }
+.ss.v1 .step-headline em,.ss.v2 .step-headline em,.ss.v4 .step-headline em { color: var(--green); }
+.ss.v3 .step-headline em,.ss.v5 .step-headline em { color: var(--green-200); }
+
+/* Quote callout on left panel */
+.ss .quote-line {
+  position: relative; z-index: 2;
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: rgba(24,99,56,0.08);
+  border-left: 3px solid var(--green-200);
+  border-radius: 0 8px 8px 0;
+  font-family: 'Playfair Display', serif;
+  font-size: 14px; font-style: italic; line-height: 1.55;
+}
+.ss.v3 .quote-line,.ss.v5 .quote-line {
+  background: rgba(255,255,255,0.08);
+  border-left-color: var(--green-200);
+  color: rgba(244,241,234,0.8);
+}
+.ss.v1 .quote-line,.ss.v2 .quote-line,.ss.v4 .quote-line { color: var(--text-mid); }
+
+/* Right panel */
+.ss .divider {
+  width: 40px; height: 4px; border-radius: 99px;
+  background: var(--green); margin-bottom: 22px;
+}
+.ss .step-body {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 18px; line-height: 1.68;
+  color: var(--text-mid); margin-bottom: 26px;
+}
+.ss.v4 .step-body { color: var(--green-dark); }
+.ss .tip-box {
+  background: var(--green-dark);
+  border-radius: 14px; padding: 18px 22px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.ss.v3 .tip-box { background: rgba(30,62,43,0.15); border: 1px solid rgba(24,99,56,0.2); }
+.ss .tip-icon { font-size: 20px; flex-shrink: 0; padding-top: 2px; }
+.ss .tip-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; line-height: 1.55;
+  color: rgba(244,241,234,0.85);
+}
+.ss.v3 .tip-text { color: var(--green-dark); }
+.ss .slide-badge {
+  position: absolute; top: 16px; right: 16px;
+  background: rgba(0,0,0,0.12); border-radius: 99px;
+  padding: 4px 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+  color: var(--text-light);
+}
+.ss.v3 .slide-badge,.ss.v5 .slide-badge { color: rgba(244,241,234,0.4); }
+
+.ss .logo-sm {
+  position: absolute; top: 18px; left: 20px;
+  font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700;
+  display: flex; align-items: center; gap: 4px;
+}
+.ss.v1 .logo-sm,.ss.v2 .logo-sm,.ss.v4 .logo-sm { color: var(--green); }
+.ss.v3 .logo-sm,.ss.v5 .logo-sm { color: var(--cream); }
+.ss .logo-sm .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green-200); }
+
+/* ─── SLIDE 7: CTA ─── */
+.s7 {
+  background: var(--green);
+  display: grid; grid-template-columns: 1fr 360px;
+}
+.s7 .left {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 60px 64px; position: relative; z-index: 2;
+}
+.s7 .right {
+  background: var(--cream);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 52px 40px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.s7 .right::before {
+  content: ''; position: absolute;
+  width: 300px; height: 300px; border-radius: 50%;
+  background: var(--green-light); opacity: 0.4;
+  bottom: -100px; right: -100px;
+}
+.s7::before {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(119,182,145,0.15) 0%, transparent 70%);
+  top: -100px; left: 50px;
+  pointer-events: none;
+}
+.s7 .logo-cta {
+  font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700;
+  color: var(--cream); margin-bottom: 28px;
+  display: flex; align-items: center; gap: 7px;
+}
+.s7 .logo-cta .dot { width: 9px; height: 9px; background: var(--green-200); border-radius: 50%; }
+.s7 h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 40px; font-weight: 700; line-height: 1.14;
+  color: var(--cream); margin-bottom: 20px;
+}
+.s7 h2 em { font-style: italic; color: var(--green-200); }
+.s7 p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; color: rgba(244,241,234,0.72); line-height: 1.65;
+}
+.s7 .right-logo {
+  font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 900; font-style: italic;
+  color: var(--green); margin-bottom: 16px; position: relative; z-index: 2;
+}
+.s7 .right-tagline {
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: 14px; color: var(--text-mid); line-height: 1.55;
+  margin-bottom: 28px; position: relative; z-index: 2;
+}
+.s7 .cta-pill {
+  background: var(--green); color: white;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+  padding: 14px 28px; border-radius: 99px;
+  display: inline-flex; align-items: center; gap: 8px;
+  position: relative; z-index: 2;
+}
+.s7 .slide-badge {
+  position: absolute; top: 16px; right: 16px;
+  background: rgba(0,0,0,0.2); border-radius: 99px; padding: 4px 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+  color: rgba(244,241,234,0.45);
+}
+
+/* ── IG FOOTER ── */
+.ig-footer { background: #1a1a1a; padding: 10px 16px 12px; }
+.ig-actions { display: flex; align-items: center; gap: 14px; margin-bottom: 7px; }
+.ig-icon { color: #bbb; font-size: 18px; cursor: pointer; }
+.ig-icon.save { margin-left: auto; }
+.ig-likes { color: #bbb; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+.ig-caption { color: #666; font-size: 11px; line-height: 1.5; border-bottom: 1px solid #222; padding-bottom: 8px; margin-bottom: 6px; }
+.ig-caption strong { color: #bbb; }
+.ig-comments { color: #444; font-size: 11px; }
+
+/* ── CAPTION PANEL ── */
+.caption-panel {
+  width: 810px; background: #1a1a1a; border-radius: 14px;
+  padding: 24px; border: 1px solid #252525;
+}
+.caption-panel h3 { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #444; margin-bottom: 12px; }
+.caption-text { font-size: 13px; color: #bbb; line-height: 1.7; }
+.caption-text .hashtags { color: #4a9eff; margin-top: 10px; display: block; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<p class="top-label">Sprout · Instagram Landscape Carousel · School Pick-Up Connections</p>
+<p class="size-note">Actual export size: 1350 × 1080px · Preview scaled to 60%</p>
+
+<div class="ig-chrome">
+  <div class="ig-header">
+    <div class="ig-avatar">S</div>
+    <div class="ig-info">
+      <div class="ig-handle">sprout.app</div>
+      <div class="ig-sub">Parent Connection Tips 🌱</div>
+    </div>
+    <div class="ig-more">···</div>
+  </div>
+
+  <div class="slide-wrapper" id="sw">
+    <div class="slides-track" id="st">
+
+      <!-- SLIDE 1: COVER -->
+      <div class="slide s1">
+        <div class="badge">1 / 7</div>
+        <div class="left">
+          <div class="logo-mark">Sprout<div class="dot"></div></div>
+          <div class="tag">🏫 Parent Connection</div>
+          <h1>5 things to say at<br>school pick-up that<br><em>actually work</em></h1>
+          <div class="swipe">Swipe to read each one <span>→</span></div>
+        </div>
+        <div class="right">
+          <div class="big-num">5</div>
+          <div class="right-inner">
+            <div class="step-pills">
+              <div class="step-pill">👋 The Ice-Breaker</div>
+              <div class="step-pill">🌳 The Soft Ask</div>
+              <div class="step-pill">🗺️ The Local Intel Ask</div>
+              <div class="step-pill">🎁 Give First</div>
+              <div class="step-pill">⚡ The 48-Hour Follow-Up</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 2: STEP 1 -->
+      <div class="slide ss v1">
+        <div class="logo-sm">Sprout<div class="dot"></div></div>
+        <div class="slide-badge">2 / 7</div>
+        <div class="left-panel">
+          <div class="step-label">Say This 01</div>
+          <div class="step-num">01</div>
+          <div class="step-headline">The<br><em>ice-breaker</em><br>line</div>
+          <div class="quote-line">"Your kid's in Mrs. Chen's class, right?"</div>
+        </div>
+        <div class="right-panel">
+          <div class="divider"></div>
+          <p class="step-body">One shared detail is all it takes. A teacher's name, the same school bus, a jacket you recognize — it opens the door without making anyone feel put on the spot.</p>
+          <div class="tip-box">
+            <div class="tip-icon">💡</div>
+            <div class="tip-text">You don't need a clever opener. Shared context is the whole trick. "I think our kids know each other" works every time.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 3: STEP 2 -->
+      <div class="slide ss v2">
+        <div class="logo-sm">Sprout<div class="dot"></div></div>
+        <div class="slide-badge">3 / 7</div>
+        <div class="left-panel">
+          <div class="step-label">Say This 02</div>
+          <div class="step-num">02</div>
+          <div class="step-headline">The<br><em>soft ask</em><br>that lands</div>
+          <div class="quote-line">"We should do a park afternoon sometime."</div>
+        </div>
+        <div class="right-panel">
+          <div class="divider"></div>
+          <p class="step-body">Low-pressure, no date attached. It signals you're open to more without putting them on the spot. Most people will say yes — and mean it — because there's nothing to commit to yet.</p>
+          <div class="tip-box">
+            <div class="tip-icon">💡</div>
+            <div class="tip-text">The key word is "sometime." It takes the pressure off both of you and turns a casual hello into an open invitation.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 4: STEP 3 -->
+      <div class="slide ss v3">
+        <div class="logo-sm">Sprout<div class="dot"></div></div>
+        <div class="slide-badge">4 / 7</div>
+        <div class="left-panel">
+          <div class="step-label">Say This 03</div>
+          <div class="step-num">03</div>
+          <div class="step-headline">Ask for their<br><em>local intel</em></div>
+          <div class="quote-line">"Do you know the best playground around here?"</div>
+        </div>
+        <div class="right-panel">
+          <div class="divider"></div>
+          <p class="step-body">People love sharing what they know about their neighbourhood. A simple "where do you take the kids on weekends?" gives them something easy to answer and makes the conversation feel natural.</p>
+          <div class="tip-box">
+            <div class="tip-icon">💡</div>
+            <div class="tip-text">Asking for recommendations is a compliment. It says: "You know this place better than I do." Everyone likes being that person.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 5: STEP 4 -->
+      <div class="slide ss v4">
+        <div class="logo-sm">Sprout<div class="dot"></div></div>
+        <div class="slide-badge">5 / 7</div>
+        <div class="left-panel">
+          <div class="step-label">Say This 04</div>
+          <div class="step-num">04</div>
+          <div class="step-headline"><em>Give</em> before<br>you ask</div>
+          <div class="quote-line">"We're doing a park run Saturday — you're welcome to join."</div>
+        </div>
+        <div class="right-panel">
+          <div class="divider"></div>
+          <p class="step-body">The fastest way to make a parent friend is to offer first. Invite them to something you're already doing. It removes the awkwardness of a formal "playdate request" — and makes you the connector.</p>
+          <div class="tip-box">
+            <div class="tip-icon">💡</div>
+            <div class="tip-text">You're not asking them to commit. You're just leaving the door open. "No pressure" means it — and that's what makes people say yes.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 6: STEP 5 -->
+      <div class="slide ss v5">
+        <div class="logo-sm">Sprout<div class="dot"></div></div>
+        <div class="slide-badge">6 / 7</div>
+        <div class="left-panel">
+          <div class="step-label">Say This 05</div>
+          <div class="step-num">05</div>
+          <div class="step-headline">Follow up<br>within<br><em>48 hours</em></div>
+          <div class="quote-line">"Hey! It was great chatting — still keen for that park day?"</div>
+        </div>
+        <div class="right-panel">
+          <div class="divider"></div>
+          <p class="step-body">Most parent friendships die between "we should do something" and never doing it. The window is small — follow up while it's still fresh and the warmth from your first chat is still there.</p>
+          <div class="tip-box">
+            <div class="tip-icon">💡</div>
+            <div class="tip-text">After 48 hours it starts to feel weird. Before 48 hours it feels natural. Set a reminder if you have to — future you will thank you.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 7: CTA -->
+      <div class="slide s7">
+        <div class="slide-badge">7 / 7</div>
+        <div class="left">
+          <div class="logo-cta">Sprout<div class="dot"></div></div>
+          <h2>The <em>follow-through</em><br>is where most<br>parents give up.</h2>
+          <p>Sprout handles the logistics — so you can focus on the conversation. Find nearby families, plan meetups, and build the community your kids deserve. 🌱</p>
+        </div>
+        <div class="right">
+          <div class="right-logo">Sprout</div>
+          <div class="right-tagline">"Where parents bond<br>and childhoods flourish."</div>
+          <div class="cta-pill">🌱 Meet families nearby</div>
+        </div>
+      </div>
+
+    </div><!-- /track -->
+
+    <button class="nav-btn nav-prev hidden" id="prev" onclick="go(-1)">‹</button>
+    <button class="nav-btn nav-next" id="next" onclick="go(1)">›</button>
+
+    <div class="prog-dots" id="dots">
+      <div class="prog-dot active"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+    </div>
+  </div>
+
+  <div class="ig-footer">
+    <div class="ig-actions">
+      <span class="ig-icon">♡</span>
+      <span class="ig-icon">💬</span>
+      <span class="ig-icon">✈</span>
+      <span class="ig-icon save">🔖</span>
+    </div>
+    <div class="ig-likes">5,841 likes</div>
+    <div class="ig-caption"><strong>sprout.app</strong> 5 things to say at school pick-up that actually make friends 🏫 Save this and use #5 before you forget. (Most people skip it — that's why it works.)</div>
+    <div class="ig-comments">View all 714 comments</div>
+  </div>
+</div>
+
+<!-- Caption Panel -->
+<div class="caption-panel">
+  <h3>Post Caption + Hashtags</h3>
+  <div class="caption-text">
+    5 things to say at school pick-up that actually make parent friends 🏫<br><br>
+    Swipe through each one — and save this for Monday morning.<br><br>
+    (Number 5 is the one everyone skips. It's also the reason most school-gate friendships never happen. 👀)<br><br>
+    ——<br><br>
+    Making parent friends as an adult is genuinely awkward. Nobody tells you how to do it. But the truth is — most parents at pick-up are waiting for someone else to go first.<br><br>
+    Be that person. It takes 30 seconds and changes everything.<br><br>
+    If you want the app that handles the follow-through for you → Sprout. Link in bio 🌱<br><br>
+    Which line are you going to try first? Drop it below 👇
+    <span class="hashtags">#SchoolPickUp #ParentFriends #MomLife #DadLife #ParentCommunity #SproutApp #ParentingTips #SchoolMum #PlaydateMom #NewParent #NeighbourhoodKids #ParentHacks #FindYourVillage #GrowTogether #SproutParents</span>
+  </div>
+</div>
+
+<script>
+let cur = 0;
+const total = 7;
+const track = document.getElementById('st');
+const dots = document.querySelectorAll('.prog-dot');
+const prev = document.getElementById('prev');
+const next = document.getElementById('next');
+
+function go(dir) {
+  const n = cur + dir;
+  if (n < 0 || n >= total) return;
+  cur = n;
+  track.style.transform = `translateX(-${cur * 810}px)`;
+  dots.forEach((d,i) => d.classList.toggle('active', i === cur));
+  prev.classList.toggle('hidden', cur === 0);
+  next.classList.toggle('hidden', cur === total - 1);
+}
+
+document.getElementById('sw').addEventListener('click', e => {
+  if (e.target.closest('.nav-btn')) return;
+  const x = e.clientX - e.currentTarget.getBoundingClientRect().left;
+  go(x > 405 ? 1 : -1);
+});
+
+let sx = 0;
+document.getElementById('sw').addEventListener('touchstart', e => sx = e.touches[0].clientX);
+document.getElementById('sw').addEventListener('touchend', e => {
+  const d = sx - e.changedTouches[0].clientX;
+  if (Math.abs(d) > 40) go(d > 0 ? 1 : -1);
+});
+</script>
+</body>
+</html>

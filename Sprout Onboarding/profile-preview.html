@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Profile Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand:      #186338;
+  --brand-dark: #1e3e2b;
+  --brand-50:   #e2e9e3;
+  --brand-100:  #d0dacf;
+  --brand-200:  #77b691;
+  --bg:         #f4f1ea;
+  --s1:         #eae6db;
+  --s2:         #dbd5c8;
+  --txt:        #4d525b;
+  --txt2:       #818898;
+  --txt3:       #b3b8c1;
+  --dark:       #1a1a1a;
+  --white:      #ffffff;
+  --border:     #e6e7ea;
+  --r-full:     9999px;
+  --r-xl:       16px;
+  --r-lg:       12px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0e0e0e;
+  background-image:
+    radial-gradient(ellipse 60% 50% at 15% 0%, rgba(24,99,56,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 85% 100%, rgba(30,62,43,0.12) 0%, transparent 70%);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 40px 20px 60px;
+  gap: 28px;
+}
+
+/* ── outer chrome ── */
+.outer-label {
+  text-align: center;
+}
+.outer-label h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 700;
+  color: #d4c9b8;
+  letter-spacing: -0.01em;
+  display: flex; align-items: center; gap: 8px; justify-content: center;
+}
+.outer-label p {
+  font-size: 11px; color: #444;
+  letter-spacing: 0.09em; text-transform: uppercase;
+  font-weight: 500; margin-top: 4px;
+}
+
+/* ── phone ── */
+.phone {
+  width: 393px;
+  height: 852px;
+  background: var(--bg);
+  border-radius: 50px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 60px 140px rgba(0,0,0,0.85),
+    0 0 0 1px rgba(255,255,255,0.07),
+    inset 0 0 0 1.5px rgba(0,0,0,0.12);
+}
+
+/* ── status bar (inside green header so white) ── */
+.status-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px 0;
+  z-index: 10;
+}
+.status-time { font-size: 15px; font-weight: 600; color: white; }
+.status-icons { display: flex; align-items: center; gap: 5px; }
+
+/* ═══════════════════════════════════
+   SCROLLABLE CONTENT (full page)
+═══════════════════════════════════ */
+.page-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+}
+.page-scroll::-webkit-scrollbar { display: none; }
+
+/* ═══════════════════════════════════
+   HERO HEADER — GREEN GRADIENT
+═══════════════════════════════════ */
+.hero {
+  background: linear-gradient(160deg,
+    #071e11 0%,
+    #0d2e1a 20%,
+    var(--brand-dark) 45%,
+    var(--brand) 80%,
+    #2d9460 100%
+  );
+  padding: 56px 24px 0;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* decorative circles */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 220px; height: 220px;
+  border-radius: var(--r-full);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 30px; left: -50px;
+  width: 140px; height: 140px;
+  border-radius: var(--r-full);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.hero-deco {
+  position: absolute;
+  top: 40px; right: 30px;
+  width: 80px; height: 80px;
+  border-radius: var(--r-full);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* top bar: back + title + edit */
+.hero-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 32px;
+  position: relative; z-index: 2;
+}
+.hero-back {
+  width: 36px; height: 36px;
+  border-radius: var(--r-full);
+  background: rgba(255,255,255,0.12);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(6px);
+  transition: background 0.2s;
+}
+.hero-back:hover { background: rgba(255,255,255,0.2); }
+.hero-bar-title {
+  font-size: 15px; font-weight: 600;
+  color: rgba(255,255,255,0.88);
+  letter-spacing: 0.01em;
+}
+.hero-edit {
+  padding: 7px 16px;
+  background: rgba(255,255,255,0.12);
+  border: none; border-radius: var(--r-full);
+  font-size: 12.5px; font-weight: 600;
+  color: rgba(255,255,255,0.8);
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  backdrop-filter: blur(6px);
+  transition: background 0.2s;
+}
+.hero-edit:hover { background: rgba(255,255,255,0.2); }
+
+/* avatar zone */
+.hero-avatar-zone {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 12px;
+  padding-bottom: 32px;
+  position: relative; z-index: 2;
+}
+.avatar-ring {
+  position: relative;
+  width: 108px; height: 108px;
+}
+.avatar-ring::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, rgba(255,255,255,0.5), rgba(255,255,255,0.1));
+  z-index: 0;
+}
+.avatar {
+  width: 108px; height: 108px;
+  border-radius: var(--r-full);
+  background: rgba(255,255,255,0.18);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; font-weight: 700; color: white;
+  overflow: hidden;
+  position: relative; z-index: 1;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+  border: 2px solid rgba(255,255,255,0.25);
+}
+.avatar img { width:100%; height:100%; object-fit:cover; border-radius:var(--r-full); }
+
+/* name */
+.hero-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; font-weight: 700;
+  color: white;
+  letter-spacing: -0.01em;
+  text-align: center;
+  line-height: 1.15;
+}
+
+/* location */
+.hero-loc {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 13px; font-weight: 500;
+  color: rgba(255,255,255,0.65);
+}
+
+/* stat pills row */
+.hero-stats {
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+}
+.stat-pill {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 14px;
+  background: rgba(255,255,255,0.13);
+  border-radius: var(--r-full);
+  font-size: 12px; font-weight: 500;
+  color: rgba(255,255,255,0.85);
+  backdrop-filter: blur(4px);
+}
+
+/* curved lift into body */
+.hero-lift {
+  height: 28px;
+  background: var(--bg);
+  border-radius: 28px 28px 0 0;
+  flex-shrink: 0;
+  margin-top: -1px;
+}
+
+/* ═══════════════════════════════════
+   BODY CARDS
+═══════════════════════════════════ */
+.body {
+  background: var(--bg);
+  padding: 4px 16px 120px;
+  flex: 1;
+}
+
+.section-card {
+  background: var(--white);
+  border-radius: var(--r-xl);
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+
+.card-label {
+  font-size: 10px; font-weight: 700;
+  color: var(--txt3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 6px;
+}
+.card-label-icon {
+  width: 20px; height: 20px;
+  border-radius: 6px;
+  background: var(--brand-50);
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* bio */
+.bio-text {
+  font-size: 13.5px;
+  color: var(--txt);
+  line-height: 1.75;
+}
+
+/* kid row */
+.kid-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 0;
+}
+.kid-row + .kid-row { border-top: 1px solid var(--border); }
+.kid-av {
+  width: 46px; height: 46px;
+  border-radius: var(--r-full);
+  background: var(--brand-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; color: var(--brand);
+  flex-shrink: 0; overflow: hidden;
+  border: 1.5px solid var(--brand-100);
+}
+.kid-av img { width:100%; height:100%; object-fit:cover; }
+.kid-av-initials { font-family:'Inter',sans-serif; }
+.kid-detail {}
+.kid-detail-name { font-size: 14.5px; font-weight: 600; color: var(--txt); }
+.kid-detail-meta { font-size: 12px; color: var(--txt2); margin-top: 2px; }
+.kid-age-badge {
+  margin-left: auto;
+  padding: 4px 10px;
+  background: var(--brand-50);
+  border-radius: var(--r-full);
+  font-size: 11px; font-weight: 600;
+  color: var(--brand);
+  flex-shrink: 0;
+}
+
+/* school group */
+.school-group-row {
+  padding: 10px 0;
+}
+.school-group-row + .school-group-row { border-top: 1px solid var(--border); }
+.school-group-head {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 8px;
+}
+.school-icon-circle {
+  width: 32px; height: 32px;
+  border-radius: var(--r-full);
+  background: var(--brand-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.school-name-txt { font-size: 13.5px; font-weight: 600; color: var(--txt); }
+.school-dist { font-size: 11.5px; color: var(--txt2); margin-top: 1px; }
+.grade-chips { display:flex; flex-wrap:wrap; gap:6px; padding-left: 42px; }
+.grade-chip {
+  padding: 4px 12px;
+  background: var(--brand-50);
+  border-radius: var(--r-full);
+  font-size: 11.5px; font-weight: 600;
+  color: var(--brand);
+}
+
+/* interests */
+.interest-cloud { display:flex; flex-wrap:wrap; gap:8px; }
+.int-chip {
+  padding: 7px 15px;
+  background: var(--s1);
+  border-radius: var(--r-full);
+  font-size: 12.5px; font-weight: 500;
+  color: var(--txt);
+}
+
+/* ═══════════════════════════════════
+   FLOATING BOTTOM CTA
+═══════════════════════════════════ */
+.bottom-cta {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 16px 20px 32px;
+  background: linear-gradient(to top, var(--bg) 55%, rgba(244,241,234,0) 100%);
+  z-index: 10;
+}
+.cta-btn {
+  width: 100%;
+  padding: 17px;
+  background: var(--brand-dark);
+  color: white;
+  border: none;
+  border-radius: var(--r-full);
+  font-size: 15px; font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: background 0.2s, transform 0.1s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  box-shadow: 0 8px 24px rgba(30,62,43,0.35);
+}
+.cta-btn:hover  { background: var(--brand); }
+.cta-btn:active { transform: scale(0.98); }
+
+/* ─ home indicator ─ */
+.home-ind {
+  width: 134px; height: 5px;
+  background: var(--dark);
+  border-radius: var(--r-full);
+  margin: 8px auto 10px;
+  opacity: 0.18;
+  flex-shrink: 0;
+  position: relative; z-index: 10;
+}
+
+/* ── success overlay ── */
+.success-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--brand-dark);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+  gap: 20px;
+  z-index: 100;
+  animation: fadeIn 0.4s ease;
+}
+.success-overlay.show { display: flex; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.success-ring {
+  width: 96px; height: 96px;
+  border-radius: var(--r-full);
+  background: rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 44px;
+  animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
+}
+@keyframes popIn { from{transform:scale(0.4);opacity:0} to{transform:scale(1);opacity:1} }
+.success-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px; font-weight: 700; color: white;
+  line-height: 1.2;
+}
+.success-sub { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.7; }
+.success-cta {
+  width: 100%; padding: 17px;
+  background: white; color: var(--brand-dark);
+  border: none; border-radius: var(--r-full);
+  font-size: 15px; font-weight: 700;
+  font-family: 'Inter', sans-serif; cursor: pointer;
+  margin-top: 8px;
+}
+
+/* ══════════════════════════════════
+   SHEET SYSTEM (main + sub-panels)
+══════════════════════════════════ */
+.sheet-bg {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none; align-items: flex-end; z-index: 50;
+  border-radius: 50px;
+}
+.sheet-bg.open { display: flex; animation: bgIn 0.2s ease; }
+@keyframes bgIn { from{opacity:0} to{opacity:1} }
+
+/* every panel slides up from bottom */
+.panel {
+  background: var(--bg);
+  border-radius: 28px 28px 0 0;
+  width: 100%;
+  display: none;
+  flex-direction: column;
+  max-height: 85%;
+  animation: sheetUp 0.3s cubic-bezier(0.32,0.72,0,1);
+}
+.panel.active { display: flex; }
+@keyframes sheetUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+
+.panel-handle { width:36px; height:4px; background:var(--txt3); border-radius:var(--r-full); margin:16px auto 0; flex-shrink:0; }
+
+.panel-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 20px 12px;
+  flex-shrink: 0;
+}
+.panel-back {
+  width: 32px; height: 32px;
+  border-radius: var(--r-full);
+  background: var(--s1);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--txt);
+  flex-shrink: 0;
+}
+.panel-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px; font-weight: 700;
+  color: var(--brand-dark);
+  flex: 1;
+}
+.panel-save {
+  padding: 7px 18px;
+  background: var(--brand);
+  color: white; border: none;
+  border-radius: var(--r-full);
+  font-size: 13px; font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.panel-save:hover { background: var(--brand-dark); }
+
+.panel-body {
+  overflow-y: auto;
+  padding: 8px 20px 40px;
+  flex: 1;
+}
+.panel-body::-webkit-scrollbar { display: none; }
+
+/* ── main edit menu ── */
+.edit-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.edit-row:last-of-type { border-bottom: none; }
+.edit-row:hover { opacity: 0.75; }
+.edit-icon { width:40px; height:40px; border-radius:var(--r-lg); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.edit-row-txt strong { font-size:14px; font-weight:600; color:var(--txt); display:block; }
+.edit-row-txt small  { font-size:12px; color:var(--txt2); }
+.edit-chev { margin-left:auto; color:var(--txt3); }
+
+/* ── form inputs (shared) ── */
+.f-group { margin-bottom: 14px; }
+.f-label { display:block; font-size:11px; font-weight:600; color:var(--txt2); letter-spacing:0.07em; text-transform:uppercase; margin-bottom:6px; }
+.f-input {
+  width: 100%; background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-xl); padding: 13px 15px;
+  font-size: 14px; font-family: 'Inter', sans-serif;
+  color: var(--txt); outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+.f-input:focus { border-color: var(--brand); }
+.f-input::placeholder { color: var(--txt3); }
+.f-textarea {
+  width: 100%; background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-xl); padding: 13px 15px;
+  font-size: 13.5px; font-family: 'Inter', sans-serif;
+  color: var(--txt); outline: none; resize: none;
+  line-height: 1.65;
+  transition: border-color 0.2s;
+}
+.f-textarea:focus { border-color: var(--brand); }
+.char-count { font-size:11px; color:var(--txt3); text-align:right; margin-top:4px; }
+
+/* ── photo panel ── */
+.photo-preview-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 16px; padding: 16px 0 20px;
+}
+.photo-preview {
+  width: 110px; height: 110px;
+  border-radius: var(--r-full);
+  background: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; font-weight: 700; color: white;
+  overflow: hidden;
+  border: 3px solid var(--brand-100);
+}
+.photo-preview img { width:100%; height:100%; object-fit:cover; }
+.photo-upload-btn {
+  padding: 11px 24px;
+  background: var(--s1);
+  border: 1.5px dashed var(--txt3);
+  border-radius: var(--r-xl);
+  font-size: 13.5px; font-weight: 600;
+  color: var(--txt);
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  display: flex; align-items: center; gap: 8px;
+  transition: background 0.15s;
+}
+.photo-upload-btn:hover { background: var(--s2); }
+.photo-remove-btn {
+  font-size: 13px; color: #d64545; font-weight: 500;
+  background: none; border: none; cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  display: none;
+}
+.photo-remove-btn.visible { display: block; }
+
+/* ── kids panel ── */
+.kid-edit-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  animation: slideIn 0.2s ease;
+}
+@keyframes slideIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+.kid-edit-av {
+  width: 40px; height: 40px;
+  border-radius: var(--r-full);
+  background: var(--brand-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--brand);
+  flex-shrink: 0;
+}
+.kid-edit-info { flex: 1; }
+.kid-edit-name { font-size: 14px; font-weight: 600; color: var(--txt); }
+.kid-edit-dob  { font-size: 12px; color: var(--txt2); margin-top: 1px; }
+.kid-del-btn {
+  width: 30px; height: 30px;
+  border-radius: var(--r-full);
+  background: #fef0f0; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: #d64545; flex-shrink: 0;
+}
+.add-kid-trigger {
+  display: flex; align-items: center; gap: 10px;
+  padding: 13px 0; cursor: pointer; border: none; background: none;
+  width: 100%; text-align: left;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+.add-kid-trigger span { font-size:14px; font-weight:600; color:var(--brand); }
+
+.add-kid-form {
+  background: var(--white);
+  border-radius: var(--r-xl);
+  padding: 16px;
+  margin-top: 12px;
+  display: none;
+  animation: fadeUp 0.2s ease;
+}
+.add-kid-form.open { display: block; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.add-form-save {
+  width: 100%; padding: 14px;
+  background: var(--brand); color: white; border: none;
+  border-radius: var(--r-full); font-size: 14px; font-weight: 600;
+  font-family: 'Inter', sans-serif; cursor: pointer; margin-top: 4px;
+}
+
+/* ── grades panel ── */
+.school-edit-block { margin-bottom: 12px; }
+.school-edit-label {
+  font-size: 12px; font-weight: 700; color: var(--txt2);
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.grade-toggle-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-top: 1px solid var(--border);
+  cursor: pointer;
+}
+.grade-toggle-badge {
+  width: 28px; height: 28px;
+  border-radius: var(--r-full); background: var(--s1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--txt2);
+  flex-shrink: 0;
+}
+.grade-toggle-name { flex: 1; font-size: 14px; color: var(--txt); }
+.grade-toggle-check {
+  width: 22px; height: 22px; border-radius: 5px;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.grade-toggle-check.on { background: var(--brand); border-color: var(--brand); }
+
+/* ── interests panel ── */
+.int-grid { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 8px; }
+.int-toggle {
+  padding: 8px 16px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-full);
+  font-size: 13px; font-weight: 500;
+  color: var(--txt); cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+.int-toggle:hover  { border-color: var(--brand-100); }
+.int-toggle.on     { background: var(--brand-50); border-color: var(--brand); color: var(--brand); }
+.int-count-line    { font-size: 12px; color: var(--txt2); margin-bottom: 12px; }
+
+/* ── spouse panel ── */
+.spouse-intro {
+  text-align: center;
+  padding: 8px 0 24px;
+}
+.spouse-icon-wrap {
+  width: 72px; height: 72px;
+  border-radius: var(--r-full);
+  background: var(--brand-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 14px;
+}
+.spouse-intro-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 700;
+  color: var(--brand-dark);
+  margin-bottom: 6px;
+}
+.spouse-intro-sub {
+  font-size: 13px; color: var(--txt2);
+  line-height: 1.6;
+}
+
+/* phone input row */
+.phone-input-row {
+  display: flex; align-items: center; gap: 0;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  transition: border-color 0.2s;
+  margin-bottom: 6px;
+}
+.phone-input-row:focus-within { border-color: var(--brand); }
+.phone-flag-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 13px 12px 13px 16px;
+  border: none; background: var(--s1);
+  cursor: pointer; font-size: 14px;
+  border-right: 1.5px solid var(--border);
+  color: var(--txt2); font-family: 'Inter', sans-serif;
+  font-weight: 600; flex-shrink: 0;
+  white-space: nowrap;
+}
+.phone-number-input {
+  flex: 1; border: none; outline: none;
+  padding: 13px 14px;
+  font-size: 16px; font-family: 'Inter', sans-serif;
+  color: var(--txt); background: transparent;
+  letter-spacing: 0.04em;
+}
+.phone-number-input::placeholder { color: var(--txt3); font-size: 14px; letter-spacing: 0; }
+.phone-hint {
+  font-size: 12px; color: var(--txt3);
+  padding: 0 2px; margin-bottom: 20px;
+}
+
+/* shared-data preview card */
+.shared-preview-card {
+  background: var(--white);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.shared-preview-header {
+  background: var(--brand-50);
+  padding: 11px 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.shared-preview-header span {
+  font-size: 12px; font-weight: 700;
+  color: var(--brand); text-transform: uppercase; letter-spacing: 0.07em;
+}
+.shared-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+.shared-row-icon {
+  width: 32px; height: 32px;
+  border-radius: var(--r-lg);
+  background: var(--brand-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+  margin-top: 1px;
+}
+.shared-row-label {
+  font-size: 11px; font-weight: 700;
+  color: var(--txt2); text-transform: uppercase;
+  letter-spacing: 0.06em; margin-bottom: 3px;
+}
+.shared-row-value {
+  font-size: 13.5px; color: var(--txt); line-height: 1.5;
+}
+.shared-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+.shared-chip {
+  padding: 3px 10px;
+  background: var(--brand-50); border-radius: var(--r-full);
+  font-size: 11.5px; font-weight: 600; color: var(--brand);
+}
+
+/* send button states */
+.send-btn {
+  width: 100%; padding: 17px;
+  background: var(--brand);
+  color: white; border: none; border-radius: var(--r-full);
+  font-size: 15px; font-weight: 600;
+  font-family: 'Inter', sans-serif; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background 0.2s, transform 0.1s;
+  box-shadow: 0 6px 20px rgba(24,99,56,0.25);
+}
+.send-btn:hover  { background: var(--brand-dark); }
+.send-btn:active { transform: scale(0.98); }
+.send-btn:disabled { background: var(--brand-200); cursor: not-allowed; box-shadow: none; }
+
+/* sent / linked state */
+.spouse-linked-card {
+  background: var(--white);
+  border-radius: var(--r-xl);
+  padding: 18px 16px;
+  display: none;
+  animation: fadeUp 0.3s ease;
+  margin-bottom: 16px;
+}
+.spouse-linked-card.visible { display: block; }
+.spouse-linked-top {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
+}
+.spouse-linked-av {
+  width: 48px; height: 48px;
+  border-radius: var(--r-full);
+  background: var(--brand-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+  border: 2px solid var(--brand-100);
+}
+.spouse-linked-name { font-size: 15px; font-weight: 600; color: var(--txt); }
+.spouse-linked-num  { font-size: 12.5px; color: var(--txt2); margin-top: 2px; }
+.spouse-pending-badge {
+  margin-left: auto;
+  padding: 4px 12px;
+  background: #f6ecd1; border-radius: var(--r-full);
+  font-size: 11px; font-weight: 700;
+  color: #7f600e; flex-shrink: 0;
+}
+.spouse-pending-badge.accepted {
+  background: #dee8de; color: #375337;
+}
+.spouse-shared-summary {
+  background: var(--s1); border-radius: var(--r-lg);
+  padding: 11px 14px;
+  font-size: 12.5px; color: var(--txt2); line-height: 1.65;
+}
+.spouse-shared-summary strong { color: var(--txt); }
+
+.spouse-remove-btn {
+  width: 100%; padding: 13px;
+  background: transparent;
+  border: 1.5px solid #f7dada; border-radius: var(--r-full);
+  font-size: 13.5px; font-weight: 600; color: #d64545;
+  font-family: 'Inter', sans-serif; cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.15s;
+}
+.spouse-remove-btn:hover { background: #fef0f0; }
+
+</style>
+</head>
+<body>
+
+<!-- outer label -->
+<div class="outer-label">
+  <h1>🌱 Sprout</h1>
+  <p>Onboarding · Profile Preview</p>
+</div>
+
+<!-- ══════════ PHONE ══════════ -->
+<div class="phone" id="phone">
+
+  <!-- status bar (white, lives over hero) -->
+  <div class="status-bar">
+    <span class="status-time" id="clock">9:41</span>
+    <div class="status-icons">
+      <!-- signal -->
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+        <rect x="0" y="3" width="3" height="9" rx="1" fill="white"/>
+        <rect x="4.5" y="2" width="3" height="10" rx="1" fill="white"/>
+        <rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="white"/>
+        <rect x="13.5" y="0" width="3" height="12" rx="1" fill="white" opacity=".4"/>
+      </svg>
+      <!-- wifi -->
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <path d="M8 2.4C10.7 2.4 13.1 3.5 14.8 5.3L16 4C14 1.9 11.1.6 8 .6 4.9.6 2 1.9 0 4l1.2 1.3C2.9 3.5 5.3 2.4 8 2.4z" fill="white"/>
+        <path d="M8 5.6c1.8 0 3.4.7 4.6 1.9L14 6.1C12.5 4.6 10.4 3.7 8 3.7s-4.5.9-6 2.4l1.4 1.4C4.6 6.3 6.2 5.6 8 5.6z" fill="white"/>
+        <circle cx="8" cy="10" r="1.5" fill="white"/>
+      </svg>
+      <!-- battery -->
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+        <rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="white" stroke-opacity=".4"/>
+        <rect x="2" y="2" width="16" height="8" rx="2" fill="white"/>
+        <path d="M23 4v4a2 2 0 000-4z" fill="white" opacity=".4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ══ SCROLLABLE CONTENT ══ -->
+  <div class="page-scroll" id="pageScroll">
+
+    <!-- ── HERO ── -->
+    <div class="hero">
+      <div class="hero-deco"></div>
+
+      <!-- top bar -->
+      <div class="hero-bar">
+        <button class="hero-back" title="Back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+            <path d="M19 12H5M5 12l7-7M5 12l7 7"/>
+          </svg>
+        </button>
+        <span class="hero-bar-title">Profile Preview</span>
+        <button class="hero-edit" onclick="openEdit()">Edit</button>
+      </div>
+
+      <!-- avatar + info -->
+      <div class="hero-avatar-zone">
+
+        <div class="avatar-ring">
+          <div class="avatar" id="avatarEl">
+            <span id="avatarInitials">JM</span>
+          </div>
+        </div>
+
+        <div class="hero-name" id="heroName">James Martin</div>
+
+        <div class="hero-loc">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="rgba(255,255,255,0.65)">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+          <span id="heroLoc">Austin, TX · 73301</span>
+        </div>
+
+        <div class="hero-stats" id="heroStats">
+          <!-- filled by JS -->
+        </div>
+
+      </div>
+    </div><!-- /hero -->
+
+    <!-- curved lift -->
+    <div class="hero-lift"></div>
+
+    <!-- ── BODY ── -->
+    <div class="body">
+
+      <!-- About Me -->
+      <div class="section-card">
+        <div class="card-label">
+          <div class="card-label-icon">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#186338" stroke-width="2.5">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          About Me
+        </div>
+        <p class="bio-text" id="bioText">—</p>
+      </div>
+
+      <!-- My Kids -->
+      <div class="section-card" id="kidsCard">
+        <div class="card-label">
+          <div class="card-label-icon">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#186338" stroke-width="2.5">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+            </svg>
+          </div>
+          My Kids
+        </div>
+        <div id="kidsList"><!-- JS --></div>
+      </div>
+
+      <!-- School Groups -->
+      <div class="section-card" id="groupsCard">
+        <div class="card-label">
+          <div class="card-label-icon">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#186338" stroke-width="2.5">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+              <polyline points="9,22 9,12 15,12 15,22"/>
+            </svg>
+          </div>
+          School Groups
+        </div>
+        <div id="groupsList"><!-- JS --></div>
+      </div>
+
+      <!-- Interests -->
+      <div class="section-card" id="intCard">
+        <div class="card-label">
+          <div class="card-label-icon">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#186338" stroke-width="2.5">
+              <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+            </svg>
+          </div>
+          Interests
+        </div>
+        <div class="interest-cloud" id="intList"><!-- JS --></div>
+      </div>
+
+    </div><!-- /body -->
+
+    <!-- floating cta -->
+    <div class="bottom-cta">
+      <button class="cta-btn" onclick="showSuccess()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+        Looks great — Join Sprout
+      </button>
+    </div>
+
+  </div><!-- /page-scroll -->
+
+  <div class="home-ind"></div>
+
+  <!-- ── SUCCESS OVERLAY ── -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-ring">🌱</div>
+    <div class="success-title">Welcome to<br>Sprout!</div>
+    <p class="success-sub">Your profile is live. Start connecting with parents in your neighborhood and find the best playdates for your little ones.</p>
+    <button class="success-cta" onclick="hideSuccess()">↩ Back to Preview (Demo)</button>
+  </div>
+
+  <!-- hidden file input for photo -->
+  <input type="file" id="photoFileInput" accept="image/*" style="display:none">
+
+  <!-- ══════ SHEET SYSTEM ══════ -->
+  <div class="sheet-bg" id="sheetBg" onclick="handleBgClick(event)">
+
+    <!-- ── PANEL 0: Edit Menu ── -->
+    <div class="panel active" id="panelMenu">
+      <div class="panel-handle"></div>
+      <div class="panel-head">
+        <div class="panel-title">Edit Profile</div>
+      </div>
+      <div class="panel-body">
+        <div class="edit-row" onclick="openPanel('panelPhoto')">
+          <div class="edit-icon" style="background:#e2e9e3;">📸</div>
+          <div class="edit-row-txt"><strong>Profile Photo</strong><small>Change or upload your photo</small></div>
+          <svg class="edit-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="edit-row" onclick="openPanel('panelBio')">
+          <div class="edit-icon" style="background:#f6ecd1;">✏️</div>
+          <div class="edit-row-txt"><strong>Bio</strong><small>Update your profile description</small></div>
+          <svg class="edit-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="edit-row" onclick="openPanel('panelName')">
+          <div class="edit-icon" style="background:#dbeafe;">👤</div>
+          <div class="edit-row-txt"><strong>Name & Location</strong><small>Edit your name, city, zip</small></div>
+          <svg class="edit-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="edit-row" onclick="openPanel('panelKids')">
+          <div class="edit-icon" style="background:#fce4ec;">👶</div>
+          <div class="edit-row-txt"><strong>My Kids</strong><small>Add or remove children</small></div>
+          <svg class="edit-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="edit-row" onclick="openPanel('panelGroups')">
+          <div class="edit-icon" style="background:#e2e9e3;">🏫</div>
+          <div class="edit-row-txt"><strong>School Groups</strong><small>Change grade selections</small></div>
+          <svg class="edit-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="edit-row" onclick="openPanel('panelInterests')">
+          <div class="edit-icon" style="background:#dbd5c8;">⭐️</div>
+          <div class="edit-row-txt"><strong>Interests</strong><small>Toggle your interest tags</small></div>
+          <svg class="edit-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="edit-row" onclick="openPanel('panelSpouse')">
+          <div class="edit-icon" style="background:#fce4ec;">💑</div>
+          <div class="edit-row-txt"><strong>Add Spouse / Partner</strong><small id="spouseMenuSub">Invite them to share your family profile</small></div>
+          <svg class="edit-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PANEL 1: Photo ── -->
+    <div class="panel" id="panelPhoto">
+      <div class="panel-handle"></div>
+      <div class="panel-head">
+        <button class="panel-back" onclick="backToMenu()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+        </button>
+        <span class="panel-title">Profile Photo</span>
+        <button class="panel-save" onclick="savePhoto()">Save</button>
+      </div>
+      <div class="panel-body">
+        <div class="photo-preview-wrap">
+          <div class="photo-preview" id="photoPreviewEl">
+            <span id="photoPreviewInitials">JM</span>
+          </div>
+          <button class="photo-upload-btn" onclick="document.getElementById('photoFileInput').click()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload Photo
+          </button>
+          <button class="photo-remove-btn" id="photoRemoveBtn" onclick="removePhoto()">Remove photo</button>
+        </div>
+        <p style="font-size:12.5px;color:var(--txt2);text-align:center;line-height:1.6;">Upload a clear photo of yourself. This is how other parents will recognize you in the community.</p>
+      </div>
+    </div>
+
+    <!-- ── PANEL 2: Bio ── -->
+    <div class="panel" id="panelBio">
+      <div class="panel-handle"></div>
+      <div class="panel-head">
+        <button class="panel-back" onclick="backToMenu()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+        </button>
+        <span class="panel-title">Edit Bio</span>
+        <button class="panel-save" onclick="saveBio()">Save</button>
+      </div>
+      <div class="panel-body">
+        <div class="f-group">
+          <label class="f-label">Profile Bio</label>
+          <textarea class="f-textarea" id="bioEditTa" rows="9" oninput="updateCharCount()"></textarea>
+          <div class="char-count" id="bioCharCount">0 / 500</div>
+        </div>
+        <p style="font-size:12px;color:var(--txt2);line-height:1.6;">Tell other parents about yourself — your family, what you enjoy, and how you like to connect.</p>
+      </div>
+    </div>
+
+    <!-- ── PANEL 3: Name & Location ── -->
+    <div class="panel" id="panelName">
+      <div class="panel-handle"></div>
+      <div class="panel-head">
+        <button class="panel-back" onclick="backToMenu()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+        </button>
+        <span class="panel-title">Name & Location</span>
+        <button class="panel-save" onclick="saveName()">Save</button>
+      </div>
+      <div class="panel-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="f-group">
+            <label class="f-label">First Name</label>
+            <input class="f-input" type="text" id="editFName" placeholder="First name">
+          </div>
+          <div class="f-group">
+            <label class="f-label">Last Name</label>
+            <input class="f-input" type="text" id="editLName" placeholder="Last name">
+          </div>
+        </div>
+        <div class="f-group">
+          <label class="f-label">City / Neighborhood</label>
+          <input class="f-input" type="text" id="editCity" placeholder="e.g. Austin, TX">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="f-group">
+            <label class="f-label">State</label>
+            <input class="f-input" type="text" id="editState" placeholder="e.g. TX" maxlength="2">
+          </div>
+          <div class="f-group">
+            <label class="f-label">Zip Code</label>
+            <input class="f-input" type="text" id="editZip" placeholder="e.g. 73301" maxlength="10">
+          </div>
+        </div>
+        <div class="f-group">
+          <label class="f-label">Parenting Role</label>
+          <select class="f-input" id="editRole" style="cursor:pointer;">
+            <option>Parent</option>
+            <option>Guardian</option>
+            <option>Grandparent</option>
+            <option>Caregiver</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PANEL 4: Kids ── -->
+    <div class="panel" id="panelKids">
+      <div class="panel-handle"></div>
+      <div class="panel-head">
+        <button class="panel-back" onclick="backToMenu()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+        </button>
+        <span class="panel-title">My Kids</span>
+      </div>
+      <div class="panel-body">
+        <div id="kidsEditList"></div>
+
+        <button class="add-kid-trigger" id="addKidTrigger" onclick="toggleAddKidForm()">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          </div>
+          <span>Add a child</span>
+        </button>
+
+        <div class="add-kid-form" id="addKidForm">
+          <div class="f-group">
+            <label class="f-label">Child's Name</label>
+            <input class="f-input" type="text" id="newKidNameE" placeholder="e.g. Emma">
+          </div>
+          <div class="f-group">
+            <label class="f-label">Date of Birth</label>
+            <input class="f-input" type="date" id="newKidDobE">
+          </div>
+          <button class="add-form-save" onclick="addKidFromPanel()">Add Child</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PANEL 5: School Groups ── -->
+    <div class="panel" id="panelGroups">
+      <div class="panel-handle"></div>
+      <div class="panel-head">
+        <button class="panel-back" onclick="backToMenu()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+        </button>
+        <span class="panel-title">School Groups</span>
+        <button class="panel-save" onclick="saveGroups()">Save</button>
+      </div>
+      <div class="panel-body" id="groupsEditBody"></div>
+    </div>
+
+    <!-- ── PANEL 6: Interests ── -->
+    <div class="panel" id="panelInterests">
+      <div class="panel-handle"></div>
+      <div class="panel-head">
+        <button class="panel-back" onclick="backToMenu()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+        </button>
+        <span class="panel-title">Interests</span>
+        <button class="panel-save" onclick="saveInterests()">Save</button>
+      </div>
+      <div class="panel-body">
+        <div class="int-count-line" id="intCountLine">0 selected</div>
+        <div class="int-grid" id="intEditGrid"></div>
+      </div>
+    </div>
+
+    <!-- ── PANEL 7: Spouse ── -->
+    <div class="panel" id="panelSpouse">
+      <div class="panel-handle"></div>
+      <div class="panel-head">
+        <button class="panel-back" onclick="backToMenu()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+        </button>
+        <span class="panel-title">Add Spouse</span>
+      </div>
+      <div class="panel-body" id="spousePanelBody">
+        <!-- content injected by JS -->
+      </div>
+    </div>
+
+  </div><!-- /sheetBg -->
+
+</div><!-- /phone -->
+
+<script>
+/* ════════════════════════════════════
+   USER DATA
+════════════════════════════════════ */
+const USER = {
+  firstName: 'James',
+  lastName:  'Martin',
+  city:      'Austin',
+  state:     'TX',
+  zip:       '73301',
+  role:      'Parent',
+  avatarUrl: null,
+
+  bio: `Hi, I'm James Martin, a proud parent of three wonderful kids who attend Lincoln Elementary School in Pre-K and Kindergarten. I love connecting with other parents and creating opportunities for our children to play and grow together. Whether it's organizing playdates or just hanging out at the park, I'm all about fostering friendships and making lasting memories for our little ones. If you're interested in getting together, I'd love to chat!`,
+
+  kids: [
+    { name: 'Jesica', dob: '2022-03-04' },
+    { name: 'Liam',   dob: '2020-07-19' },
+    { name: 'Sophia', dob: '2018-11-30' },
+  ],
+
+  schoolGroups: [
+    { school: 'Lincoln Elementary School', distance: '0.8 miles away',
+      allGrades: ['Pre-K','Kinder','1st Grade','2nd Grade','3rd Grade','4th Grade','5th Grade'],
+      grades: ['Pre-K','Kinder'] },
+    { school: 'Washington Middle School',  distance: '1.2 miles away',
+      allGrades: ['6th Grade','7th Grade','8th Grade'],
+      grades: [] },
+  ],
+
+  interests: ['Traditional Finance','Technology','Start-up','AI','Web 3','Finance','Marketing'],
+};
+
+const ALL_INTERESTS = [
+  'Playdates','Outdoor Activities','Sports','Arts & Crafts','Music',
+  'Cooking','Technology','Start-up','Finance','Marketing','AI','Web 3',
+  'Traditional Finance','Venture Capital','Reading','Travel',
+  'Gardening','Photography','Yoga','Community Events',
+];
+
+/* ════════════════════════════════════
+   HELPERS
+════════════════════════════════════ */
+function calcAge(dob) {
+  if (!dob) return '?';
+  const b = new Date(dob), t = new Date();
+  let a = t.getFullYear() - b.getFullYear();
+  const m = t.getMonth() - b.getMonth();
+  if (m < 0 || (m === 0 && t.getDate() < b.getDate())) a--;
+  return a < 1 ? '<1' : a;
+}
+function fmtDob(dob) {
+  if (!dob) return '';
+  return new Date(dob).toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+}
+function ini(name) {
+  return name.trim().split(/\s+/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
+}
+function checkSvg() {
+  return `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5"><path d="M20 6L9 17l-5-5"/></svg>`;
+}
+
+/* ════════════════════════════════════
+   RENDER PROFILE
+════════════════════════════════════ */
+function render() {
+  const full = `${USER.firstName} ${USER.lastName}`;
+  const av   = ini(full);
+
+  /* avatar */
+  const avEl = document.getElementById('avatarEl');
+  avEl.innerHTML = USER.avatarUrl
+    ? `<img src="${USER.avatarUrl}" alt="${full}">`
+    : `<span>${av}</span>`;
+
+  /* name + loc */
+  document.getElementById('heroName').textContent = full;
+  document.getElementById('heroLoc').textContent  = `${USER.city}, ${USER.state} · ${USER.zip}`;
+
+  /* stat pills */
+  const totalGrades = USER.schoolGroups.reduce((s,g)=>s+g.grades.length, 0);
+  document.getElementById('heroStats').innerHTML = [
+    USER.kids.length      ? `<div class="stat-pill">👨‍👩‍👧 ${USER.kids.length} kid${USER.kids.length!==1?'s':''}</div>` : '',
+    totalGrades           ? `<div class="stat-pill">🏫 ${totalGrades} group${totalGrades!==1?'s':''}</div>` : '',
+    USER.interests.length ? `<div class="stat-pill">⭐ ${USER.interests.length} interests</div>` : '',
+    `<div class="stat-pill">📍 ${USER.role}</div>`,
+  ].join('');
+
+  /* bio */
+  document.getElementById('bioText').textContent = USER.bio || '—';
+
+  /* kids */
+  const kidsCard = document.getElementById('kidsCard');
+  if (!USER.kids.length) {
+    kidsCard.style.display = 'none';
+  } else {
+    kidsCard.style.display = '';
+    document.getElementById('kidsList').innerHTML = USER.kids.map(k => {
+      const age = calcAge(k.dob);
+      const av  = ini(k.name);
+      return `<div class="kid-row">
+        <div class="kid-av"><span class="kid-av-initials">${av}</span></div>
+        <div class="kid-detail">
+          <div class="kid-detail-name">${k.name}</div>
+          <div class="kid-detail-meta">${fmtDob(k.dob)}</div>
+        </div>
+        <div class="kid-age-badge">${age} yrs</div>
+      </div>`;
+    }).join('');
+  }
+
+  /* school groups */
+  const groupsCard = document.getElementById('groupsCard');
+  const active = USER.schoolGroups.filter(sg=>sg.grades.length>0);
+  if (!active.length) {
+    groupsCard.style.display = 'none';
+  } else {
+    groupsCard.style.display = '';
+    document.getElementById('groupsList').innerHTML = active.map(sg => `
+      <div class="school-group-row">
+        <div class="school-group-head">
+          <div class="school-icon-circle">🍀</div>
+          <div>
+            <div class="school-name-txt">${sg.school}</div>
+            <div class="school-dist">${sg.distance}</div>
+          </div>
+        </div>
+        <div class="grade-chips">${sg.grades.map(g=>`<div class="grade-chip">${g}</div>`).join('')}</div>
+      </div>`).join('');
+  }
+
+  /* interests */
+  const intCard = document.getElementById('intCard');
+  if (!USER.interests.length) {
+    intCard.style.display = 'none';
+  } else {
+    intCard.style.display = '';
+    document.getElementById('intList').innerHTML = USER.interests
+      .map(t=>`<div class="int-chip">${t}</div>`).join('');
+  }
+}
+
+/* ════════════════════════════════════
+   SHEET NAVIGATION
+════════════════════════════════════ */
+function openEdit() {
+  showPanel('panelMenu');
+  document.getElementById('sheetBg').classList.add('open');
+}
+function closeSheets() {
+  document.getElementById('sheetBg').classList.remove('open');
+}
+function handleBgClick(e) {
+  if (e.target === document.getElementById('sheetBg')) closeSheets();
+}
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function backToMenu() { showPanel('panelMenu'); }
+function openPanel(id) {
+  // populate panel before showing
+  if (id === 'panelPhoto')     populatePhoto();
+  if (id === 'panelBio')       populateBio();
+  if (id === 'panelName')      populateName();
+  if (id === 'panelKids')      populateKids();
+  if (id === 'panelGroups')    populateGroups();
+  if (id === 'panelInterests') populateInterests();
+  if (id === 'panelSpouse')    populateSpouse();
+  showPanel(id);
+}
+
+/* ════════════════════════════════════
+   PANEL: PHOTO
+════════════════════════════════════ */
+let pendingPhotoUrl = null;
+
+function populatePhoto() {
+  pendingPhotoUrl = USER.avatarUrl;
+  refreshPhotoPanel();
+}
+function refreshPhotoPanel() {
+  const el  = document.getElementById('photoPreviewEl');
+  const ini_ = ini(`${USER.firstName} ${USER.lastName}`);
+  el.innerHTML = pendingPhotoUrl
+    ? `<img src="${pendingPhotoUrl}" alt="Preview">`
+    : `<span id="photoPreviewInitials">${ini_}</span>`;
+  document.getElementById('photoRemoveBtn').classList.toggle('visible', !!pendingPhotoUrl);
+}
+function removePhoto() { pendingPhotoUrl = null; refreshPhotoPanel(); }
+function savePhoto() {
+  USER.avatarUrl = pendingPhotoUrl;
+  render(); backToMenu();
+  toast('Photo updated');
+}
+
+/* file input handler */
+document.getElementById('photoFileInput').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { pendingPhotoUrl = e.target.result; refreshPhotoPanel(); };
+  reader.readAsDataURL(file);
+  this.value = '';
+});
+
+/* ════════════════════════════════════
+   PANEL: BIO
+════════════════════════════════════ */
+function populateBio() {
+  const ta = document.getElementById('bioEditTa');
+  ta.value = USER.bio;
+  updateCharCount();
+}
+function updateCharCount() {
+  const ta  = document.getElementById('bioEditTa');
+  const len = ta.value.length;
+  document.getElementById('bioCharCount').textContent = `${len} / 500`;
+  if (len > 500) ta.value = ta.value.slice(0, 500);
+}
+function saveBio() {
+  USER.bio = document.getElementById('bioEditTa').value.trim();
+  render(); backToMenu();
+  toast('Bio saved');
+}
+
+/* ════════════════════════════════════
+   PANEL: NAME & LOCATION
+════════════════════════════════════ */
+function populateName() {
+  document.getElementById('editFName').value = USER.firstName;
+  document.getElementById('editLName').value = USER.lastName;
+  document.getElementById('editCity').value  = USER.city;
+  document.getElementById('editState').value = USER.state;
+  document.getElementById('editZip').value   = USER.zip;
+  document.getElementById('editRole').value  = USER.role;
+}
+function saveName() {
+  USER.firstName = document.getElementById('editFName').value.trim() || USER.firstName;
+  USER.lastName  = document.getElementById('editLName').value.trim() || USER.lastName;
+  USER.city      = document.getElementById('editCity').value.trim()  || USER.city;
+  USER.state     = document.getElementById('editState').value.trim() || USER.state;
+  USER.zip       = document.getElementById('editZip').value.trim()   || USER.zip;
+  USER.role      = document.getElementById('editRole').value;
+  render(); backToMenu();
+  toast('Profile updated');
+}
+
+/* ════════════════════════════════════
+   PANEL: KIDS
+════════════════════════════════════ */
+function populateKids() {
+  document.getElementById('addKidForm').classList.remove('open');
+  renderKidsEdit();
+}
+function renderKidsEdit() {
+  const list = document.getElementById('kidsEditList');
+  list.innerHTML = USER.kids.map((k,i) => `
+    <div class="kid-edit-row" id="kerow-${i}">
+      <div class="kid-edit-av">${ini(k.name)}</div>
+      <div class="kid-edit-info">
+        <div class="kid-edit-name">${k.name}</div>
+        <div class="kid-edit-dob">${fmtDob(k.dob)} · ${calcAge(k.dob)} yrs</div>
+      </div>
+      <button class="kid-del-btn" onclick="deleteKid(${i})">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+        </svg>
+      </button>
+    </div>`).join('');
+
+  // hide add trigger if maxed
+  document.getElementById('addKidTrigger').style.display = USER.kids.length >= 5 ? 'none' : 'flex';
+}
+function deleteKid(i) {
+  USER.kids.splice(i, 1);
+  renderKidsEdit();
+  render();
+}
+function toggleAddKidForm() {
+  const form = document.getElementById('addKidForm');
+  form.classList.toggle('open');
+  if (form.classList.contains('open')) {
+    document.getElementById('newKidNameE').value = '';
+    document.getElementById('newKidDobE').value  = '';
+    setTimeout(() => document.getElementById('newKidNameE').focus(), 250);
+  }
+}
+function addKidFromPanel() {
+  const name = document.getElementById('newKidNameE').value.trim();
+  const dob  = document.getElementById('newKidDobE').value;
+  if (!name) { document.getElementById('newKidNameE').focus(); return; }
+  USER.kids.push({ name, dob });
+  document.getElementById('addKidForm').classList.remove('open');
+  renderKidsEdit();
+  render();
+  toast(`${name} added`);
+}
+
+/* ════════════════════════════════════
+   PANEL: SCHOOL GROUPS
+════════════════════════════════════ */
+// temp state for editing (edit, then save)
+let tempGrades = {};
+
+function populateGroups() {
+  // deep copy current selection
+  tempGrades = {};
+  USER.schoolGroups.forEach(sg => { sg.grades.forEach(g => { tempGrades[g] = true; }); });
+  renderGroupsEdit();
+}
+function renderGroupsEdit() {
+  const body = document.getElementById('groupsEditBody');
+  body.innerHTML = USER.schoolGroups.map((sg, si) => `
+    <div class="school-edit-block">
+      <div class="school-edit-label">
+        <span>🍀</span> ${sg.school}
+        <span style="font-weight:400;color:var(--txt3);margin-left:4px;">${sg.distance}</span>
+      </div>
+      ${sg.allGrades.map(g => {
+        const abbr = g.replace(' Grade','').replace('Kinder','K').replace('Pre-K','P');
+        const on   = !!tempGrades[g];
+        return `<div class="grade-toggle-row" onclick="toggleTempGrade('${g}', this)">
+          <div class="grade-toggle-badge">${abbr}</div>
+          <div class="grade-toggle-name">${g}</div>
+          <div class="grade-toggle-check ${on?'on':''}" id="gtc-${g.replace(/\s/g,'_')}">
+            ${on ? checkSvg() : ''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+}
+function toggleTempGrade(g, row) {
+  tempGrades[g] = !tempGrades[g];
+  const chk = row.querySelector('.grade-toggle-check');
+  chk.classList.toggle('on', tempGrades[g]);
+  chk.innerHTML = tempGrades[g] ? checkSvg() : '';
+}
+function saveGroups() {
+  USER.schoolGroups.forEach(sg => {
+    sg.grades = sg.allGrades.filter(g => !!tempGrades[g]);
+  });
+  render(); backToMenu();
+  toast('Groups saved');
+}
+
+/* ════════════════════════════════════
+   PANEL: INTERESTS
+════════════════════════════════════ */
+let tempInterests = [];
+
+function populateInterests() {
+  tempInterests = [...USER.interests];
+  renderInterestsEdit();
+}
+function renderInterestsEdit() {
+  document.getElementById('intCountLine').textContent =
+    `${tempInterests.length} selected`;
+  document.getElementById('intEditGrid').innerHTML = ALL_INTERESTS.map(t => `
+    <button class="int-toggle ${tempInterests.includes(t)?'on':''}"
+            onclick="toggleTempInt(this,'${t}')">${t}</button>
+  `).join('');
+}
+function toggleTempInt(el, tag) {
+  el.classList.toggle('on');
+  if (el.classList.contains('on')) {
+    if (!tempInterests.includes(tag)) tempInterests.push(tag);
+  } else {
+    tempInterests = tempInterests.filter(t=>t!==tag);
+  }
+  document.getElementById('intCountLine').textContent =
+    `${tempInterests.length} selected`;
+}
+function saveInterests() {
+  USER.interests = [...tempInterests];
+  render(); backToMenu();
+  toast('Interests saved');
+}
+
+/* ════════════════════════════════════
+   PANEL: SPOUSE
+════════════════════════════════════ */
+// spouse state
+USER.spouse = null;
+// { phone, status: 'pending'|'accepted', linkedAt }
+
+function populateSpouse() {
+  renderSpousePanel();
+}
+
+function renderSpousePanel() {
+  const body = document.getElementById('spousePanelBody');
+
+  // Build shared-data summary values
+  const totalGrades = USER.schoolGroups.reduce((s,g)=>s+g.grades.length,0);
+  const allGrades   = USER.schoolGroups.flatMap(sg=>sg.grades);
+  const kidsNames   = USER.kids.map(k=>k.name).join(', ') || 'None added yet';
+
+  const sharedBlock = `
+    <div class="shared-preview-card">
+      <div class="shared-preview-header">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#186338" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Shared automatically with spouse</span>
+      </div>
+      <div class="shared-row">
+        <div class="shared-row-icon">📍</div>
+        <div>
+          <div class="shared-row-label">Location</div>
+          <div class="shared-row-value">${USER.city}, ${USER.state} · ${USER.zip}</div>
+        </div>
+      </div>
+      <div class="shared-row">
+        <div class="shared-row-icon">👶</div>
+        <div>
+          <div class="shared-row-label">Kids (${USER.kids.length})</div>
+          <div class="shared-row-value">${kidsNames}</div>
+        </div>
+      </div>
+      <div class="shared-row">
+        <div class="shared-row-icon">🏫</div>
+        <div>
+          <div class="shared-row-label">School Groups (${totalGrades})</div>
+          ${allGrades.length
+            ? `<div class="shared-chips">${allGrades.map(g=>`<div class="shared-chip">${g}</div>`).join('')}</div>`
+            : `<div class="shared-row-value" style="color:var(--txt3)">No groups selected</div>`
+          }
+        </div>
+      </div>
+    </div>`;
+
+  if (USER.spouse) {
+    // ── already linked state ──
+    const num = formatPhoneDisplay(USER.spouse.phone);
+    body.innerHTML = `
+      <div class="spouse-linked-card visible">
+        <div class="spouse-linked-top">
+          <div class="spouse-linked-av">💑</div>
+          <div>
+            <div class="spouse-linked-name">Spouse / Partner</div>
+            <div class="spouse-linked-num">${num}</div>
+          </div>
+          <div class="spouse-pending-badge ${USER.spouse.status === 'accepted' ? 'accepted' : ''}">
+            ${USER.spouse.status === 'accepted' ? '✓ Linked' : 'Invite Sent'}
+          </div>
+        </div>
+        <div class="spouse-shared-summary">
+          ${USER.spouse.status === 'accepted'
+            ? `<strong>Profile linked.</strong> Your spouse shares your location, kids, and school groups.`
+            : `<strong>Waiting for them to accept.</strong> Once they join Sprout with this number, your family profile will be linked automatically.`
+          }
+        </div>
+      </div>
+      ${sharedBlock}
+      ${USER.spouse.status === 'pending' ? `
+        <button class="send-btn" style="background:var(--s2);color:var(--txt);box-shadow:none;" onclick="resendInvite()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+          Resend Invite
+        </button>` : ''}
+      <button class="spouse-remove-btn" onclick="removeSpouse()">Remove spouse link</button>`;
+  } else {
+    // ── no spouse yet ──
+    body.innerHTML = `
+      <div class="spouse-intro">
+        <div class="spouse-icon-wrap">💑</div>
+        <div class="spouse-intro-title">Invite your spouse</div>
+        <div class="spouse-intro-sub">Enter their phone number — they'll get an invite to join Sprout and your family profiles will be linked automatically.</div>
+      </div>
+
+      <div class="f-group">
+        <label class="f-label">Spouse's Phone Number</label>
+        <div class="phone-input-row">
+          <button class="phone-flag-btn" onclick="cycleCountry()">
+            <span id="countryFlag">🇺🇸</span>
+            <span id="countryCode">+1</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <input class="phone-number-input" type="tel" id="spousePhoneInput"
+            placeholder="(555) 000-0000"
+            oninput="fmtPhone(this)"
+            maxlength="14">
+        </div>
+        <div class="phone-hint">We'll send them a text with a link to join Sprout.</div>
+      </div>
+
+      ${sharedBlock}
+
+      <button class="send-btn" id="sendInviteBtn" onclick="sendSpouseInvite()" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+        Send Invite
+      </button>`;
+
+    // re-attach listener for enabling button
+    setTimeout(() => {
+      const inp = document.getElementById('spousePhoneInput');
+      if (inp) inp.addEventListener('input', checkSendReady);
+    }, 50);
+  }
+}
+
+/* phone number helpers */
+const COUNTRIES = [
+  { flag:'🇺🇸', code:'+1'  },
+  { flag:'🇬🇧', code:'+44' },
+  { flag:'🇦🇺', code:'+61' },
+  { flag:'🇨🇦', code:'+1'  },
+  { flag:'🇮🇩', code:'+62' },
+  { flag:'🇸🇬', code:'+65' },
+];
+let countryIdx = 0;
+function cycleCountry() {
+  countryIdx = (countryIdx + 1) % COUNTRIES.length;
+  document.getElementById('countryFlag').textContent = COUNTRIES[countryIdx].flag;
+  document.getElementById('countryCode').textContent = COUNTRIES[countryIdx].code;
+}
+
+function fmtPhone(el) {
+  let v = el.value.replace(/\D/g,'');
+  if (v.length > 10) v = v.slice(0,10);
+  let out = '';
+  if (v.length > 0)  out = '(' + v.slice(0,3);
+  if (v.length >= 4)  out += ') ' + v.slice(3,6);
+  if (v.length >= 7)  out += '-' + v.slice(6,10);
+  el.value = out;
+  checkSendReady();
+}
+
+function checkSendReady() {
+  const inp = document.getElementById('spousePhoneInput');
+  const btn = document.getElementById('sendInviteBtn');
+  if (!inp || !btn) return;
+  const digits = inp.value.replace(/\D/g,'');
+  btn.disabled = digits.length < 10;
+}
+
+function formatPhoneDisplay(raw) {
+  const digits = raw.replace(/\D/g,'');
+  if (digits.length === 10) {
+    return `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6)}`;
+  }
+  return raw;
+}
+
+function sendSpouseInvite() {
+  const inp    = document.getElementById('spousePhoneInput');
+  const digits = inp ? inp.value.replace(/\D/g,'') : '';
+  if (digits.length < 10) return;
+
+  // Simulate a short sending delay
+  const btn = document.getElementById('sendInviteBtn');
+  btn.disabled = true;
+  btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 0.8s linear infinite"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Sending…`;
+
+  setTimeout(() => {
+    USER.spouse = {
+      phone: COUNTRIES[countryIdx].code + digits,
+      status: 'pending',
+      linkedAt: new Date().toISOString(),
+    };
+    // update edit menu subtitle
+    updateSpouseMenuSub();
+    renderSpousePanel();
+    toast('Invite sent!');
+  }, 1600);
+}
+
+function resendInvite() {
+  toast('Invite resent ↗');
+}
+
+function removeSpouse() {
+  USER.spouse = null;
+  updateSpouseMenuSub();
+  renderSpousePanel();
+  toast('Spouse removed');
+}
+
+function updateSpouseMenuSub() {
+  const el = document.getElementById('spouseMenuSub');
+  if (!el) return;
+  if (USER.spouse) {
+    const num = formatPhoneDisplay(USER.spouse.phone.replace(/^\+\d+/,''));
+    el.textContent = USER.spouse.status === 'accepted'
+      ? `Linked · ${num}`
+      : `Invite pending · ${num}`;
+  } else {
+    el.textContent = 'Invite them to share your family profile';
+  }
+}
+
+// inject CSS spin keyframe once
+const spinStyle = document.createElement('style');
+spinStyle.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+document.head.appendChild(spinStyle);
+
+/* ════════════════════════════════════
+   TOAST
+════════════════════════════════════ */
+let toastTimer;
+function toast(msg) {
+  let el = document.getElementById('toastEl');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'toastEl';
+    el.style.cssText = `
+      position:absolute; bottom:90px; left:50%; transform:translateX(-50%);
+      background:rgba(30,62,43,0.92); color:white;
+      padding:9px 20px; border-radius:999px;
+      font-size:13px; font-weight:600; font-family:Inter,sans-serif;
+      white-space:nowrap; z-index:200;
+      backdrop-filter:blur(8px);
+      transition:opacity 0.3s;
+      pointer-events:none;
+    `;
+    document.getElementById('phone').appendChild(el);
+  }
+  el.textContent = '✓  ' + msg;
+  el.style.opacity = '1';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 2000);
+}
+
+/* ════════════════════════════════════
+   SUCCESS / CLOCK
+════════════════════════════════════ */
+function showSuccess() { document.getElementById('successOverlay').classList.add('show'); }
+function hideSuccess() { document.getElementById('successOverlay').classList.remove('show'); }
+
+function tick() {
+  const n = new Date(), h = n.getHours(), m = n.getMinutes();
+  document.getElementById('clock').textContent = `${h}:${m<10?'0'+m:m}`;
+}
+tick();
+setInterval(tick, 30000);
+
+/* ── boot ── */
+render();
+</script>
+
+</body>
+</html>

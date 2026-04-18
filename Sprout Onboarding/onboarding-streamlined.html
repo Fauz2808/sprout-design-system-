@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Streamlined Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand:      #186338;
+  --brand-dark: #1e3e2b;
+  --brand-50:   #e2e9e3;
+  --brand-100:  #d0dacf;
+  --brand-200:  #77b691;
+  --bg:         #f4f1ea;
+  --s1:         #eae6db;
+  --s2:         #dbd5c8;
+  --s3:         #c2b9a6;
+  --txt:        #4d525b;
+  --txt2:       #818898;
+  --txt3:       #b3b8c1;
+  --dark:       #1a1a1a;
+  --white:      #ffffff;
+  --border:     #e6e7ea;
+  --r-full:     9999px;
+  --r-2xl:      24px;
+  --r-xl:       16px;
+  --r-lg:       12px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0c0c0c;
+  background-image:
+    radial-gradient(ellipse 55% 45% at 10% 5%,  rgba(24,99,56,0.2)  0%, transparent 65%),
+    radial-gradient(ellipse 45% 40% at 90% 95%, rgba(30,62,43,0.14) 0%, transparent 65%);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; padding: 36px 20px 60px; gap: 24px;
+}
+
+/* outer chrome */
+.outer-label { text-align: center; }
+.outer-label h1 {
+  font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700;
+  color: #d4c9b8; display: flex; align-items: center; gap: 8px; justify-content: center;
+}
+.outer-label p { font-size: 11px; color: #444; letter-spacing: 0.09em; text-transform: uppercase; font-weight: 500; margin-top: 4px; }
+
+/* before / after comparison pill */
+.compare-pill {
+  display: flex; align-items: center; gap: 0;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+  border-radius: var(--r-full); overflow: hidden; font-size: 12px; font-weight: 600;
+}
+.cp-item { padding: 7px 16px; color: #555; white-space: nowrap; }
+.cp-before { text-decoration: line-through; color: #444; }
+.cp-divider { width: 1px; background: rgba(255,255,255,0.09); height: 32px; }
+.cp-after  { color: #77b691; }
+
+/* ══════════════════════════════════════
+   PHONE FRAME
+══════════════════════════════════════ */
+.phone {
+  width: 393px; height: 852px;
+  background: var(--bg); border-radius: 50px; overflow: hidden;
+  position: relative; display: flex; flex-direction: column;
+  box-shadow: 0 60px 140px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.07), inset 0 0 0 1.5px rgba(0,0,0,0.12);
+}
+
+/* status bar */
+.status-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px 8px; flex-shrink: 0; z-index: 5; position: relative;
+}
+.status-time { font-size: 15px; font-weight: 600; color: var(--dark); }
+.status-icons { display: flex; align-items: center; gap: 5px; }
+
+/* ══════════════════════════════════════
+   SCREEN SYSTEM
+══════════════════════════════════════ */
+.screen-stack { flex: 1; position: relative; overflow: hidden; }
+.screen {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  background: var(--bg);
+  transform: translateX(100%);
+  transition: transform 0.38s cubic-bezier(0.4,0,0.2,1), opacity 0.28s ease;
+  opacity: 0;
+}
+.screen.active   { transform: translateX(0);     opacity: 1; z-index: 2; }
+.screen.exiting  { transform: translateX(-8%);   opacity: 0; z-index: 1; }
+
+/* ── PROGRESS ── */
+.progress-area {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 24px 0; flex-shrink: 0;
+}
+.back-btn {
+  width: 32px; height: 32px; border-radius: var(--r-full);
+  background: none; border: none; cursor: pointer; color: var(--txt);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s; flex-shrink: 0;
+}
+.back-btn:hover { background: var(--s1); }
+.back-btn.ghost { opacity: 0; pointer-events: none; }
+
+.step-track {
+  display: flex; gap: 6px; flex: 1; align-items: center;
+}
+.step-node {
+  height: 4px; border-radius: var(--r-full); flex: 1;
+  background: var(--s2); overflow: hidden; position: relative;
+}
+.step-node::after {
+  content: ''; position: absolute; inset: 0;
+  background: var(--brand); border-radius: var(--r-full);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.step-node.done::after  { transform: scaleX(1); }
+.step-node.active::after { transform: scaleX(1); background: var(--brand-200); animation: shimmer 1.8s ease infinite; }
+@keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.7} }
+
+.step-label { font-size: 11px; font-weight: 600; color: var(--txt3); white-space: nowrap; }
+
+/* ── SCREEN BODY ── */
+.screen-body {
+  flex: 1; overflow-y: auto; padding: 24px 24px 0;
+  display: flex; flex-direction: column;
+}
+.screen-body::-webkit-scrollbar { display: none; }
+
+/* ── TYPOGRAPHY ── */
+.eyebrow { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+.s-title { font-family: 'Playfair Display', serif; font-size: 29px; font-weight: 700; color: var(--brand-dark); line-height: 1.2; margin-bottom: 6px; letter-spacing: -0.01em; }
+.s-sub   { font-size: 13.5px; color: var(--txt2); line-height: 1.6; margin-bottom: 28px; }
+.time-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--brand-50); border-radius: var(--r-full);
+  padding: 4px 12px; font-size: 11.5px; font-weight: 600; color: var(--brand);
+  margin-bottom: 20px; align-self: flex-start;
+}
+
+/* ── FORM ELEMENTS ── */
+.f-row  { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.f-group { margin-bottom: 14px; }
+.f-label {
+  display: block; font-size: 11px; font-weight: 600; color: var(--txt2);
+  letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 6px;
+}
+.f-input {
+  width: 100%; background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--r-xl); padding: 15px 16px; font-size: 15px;
+  font-family: 'Inter', sans-serif; color: var(--txt); outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none;
+}
+.f-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(24,99,56,0.09); }
+.f-input::placeholder { color: var(--txt3); }
+
+/* ── BUTTONS ── */
+.btn-footer { padding: 16px 24px 20px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; }
+.btn-primary {
+  width: 100%; padding: 18px; background: var(--brand); color: white;
+  border: none; border-radius: var(--r-full); font-size: 15px; font-weight: 600;
+  font-family: 'Inter', sans-serif; cursor: pointer; letter-spacing: 0.01em;
+  transition: background 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-primary:hover  { background: var(--brand-dark); }
+.btn-primary:active { transform: scale(0.985); }
+.btn-primary:disabled { background: var(--brand-200); cursor: not-allowed; }
+.btn-skip {
+  background: none; border: none; cursor: pointer;
+  font-size: 13.5px; font-weight: 500; color: var(--txt2);
+  font-family: 'Inter', sans-serif; padding: 4px; text-align: center;
+  transition: color 0.15s;
+}
+.btn-skip:hover { color: var(--txt); }
+
+.home-ind { width: 134px; height: 5px; background: var(--dark); border-radius: var(--r-full); margin: 6px auto 10px; opacity: 0.18; flex-shrink: 0; }
+
+/* ══════════════════════════════════════
+   SCREEN 1 — BASICS
+══════════════════════════════════════ */
+
+/* ══════════════════════════════════════
+   SCREEN 2 — KIDS
+══════════════════════════════════════ */
+
+/* kid input card */
+.kid-input-row {
+  background: var(--white); border-radius: var(--r-xl); padding: 14px 14px;
+  border: 1.5px solid var(--border); margin-bottom: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.kid-input-row:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(24,99,56,0.09); }
+
+/* name row */
+.kid-row-name {
+  display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start;
+}
+.kid-name-input {
+  border: none; outline: none; font-size: 15px; font-family: 'Inter', sans-serif;
+  color: var(--txt); background: transparent; width: 100%; padding: 2px 0;
+}
+.kid-name-input::placeholder { color: var(--txt3); }
+
+/* gender + month row */
+.kid-row-meta {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+
+/* gender toggle */
+.gender-toggle {
+  display: flex; gap: 4px;
+}
+.gender-btn {
+  flex: 1; padding: 6px 0; border-radius: var(--r-lg);
+  border: 1.5px solid var(--border); background: transparent;
+  font-size: 11.5px; font-weight: 600; font-family: 'Inter', sans-serif;
+  color: var(--txt2); cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.gender-btn.active {
+  background: var(--brand-50); border-color: var(--brand);
+  color: var(--brand);
+}
+
+/* month select */
+.month-select {
+  border: 1.5px solid var(--border); border-radius: var(--r-lg);
+  background: transparent; font-size: 12px; font-family: 'Inter', sans-serif;
+  color: var(--txt2); padding: 6px 8px; outline: none; width: 100%;
+  cursor: pointer; transition: border-color 0.15s;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239ca3af' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+  padding-right: 24px;
+}
+.month-select:focus { border-color: var(--brand); }
+.month-select option[value=""] { color: var(--txt3); }
+
+/* year stepper */
+.year-stepper {
+  display: flex; align-items: center; gap: 4px;
+  background: var(--s1); border-radius: var(--r-lg); padding: 6px 8px;
+  flex-shrink: 0;
+}
+.yr-btn {
+  width: 26px; height: 26px; border-radius: var(--r-full);
+  border: none; background: var(--s2); cursor: pointer; color: var(--txt);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s; flex-shrink: 0;
+}
+.yr-btn:hover { background: var(--s3); }
+.yr-display {
+  font-size: 13px; font-weight: 700; color: var(--txt); min-width: 36px;
+  text-align: center; line-height: 1;
+}
+.yr-label { font-size: 10px; color: var(--txt3); text-align: center; margin-top: 2px; }
+
+/* kid pill list */
+.kids-added { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.kid-pill {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--white); border-radius: var(--r-xl); padding: 11px 14px;
+  border: 1.5px solid var(--brand-100);
+  animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn { from{transform:scale(0.88);opacity:0} to{transform:scale(1);opacity:1} }
+.kid-pill-av {
+  width: 36px; height: 36px; border-radius: var(--r-full);
+  background: var(--brand-50); display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--brand); flex-shrink: 0;
+}
+.kid-pill-name { flex: 1; font-size: 14px; font-weight: 600; color: var(--txt); }
+.kid-pill-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.kid-pill-age  { font-size: 12px; color: var(--txt2); }
+.kid-pill-gender { font-size: 11px; color: var(--txt3); }
+.kid-pill-del  {
+  width: 26px; height: 26px; border-radius: var(--r-full);
+  background: none; border: none; cursor: pointer; color: var(--txt3);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.kid-pill-del:hover { background: #fef0f0; color: #d64545; }
+
+/* add another */
+.add-another-btn {
+  display: flex; align-items: center; gap: 10px;
+  background: none; border: 1.5px dashed var(--border); border-radius: var(--r-xl);
+  padding: 12px 14px; cursor: pointer; width: 100%; text-align: left;
+  font-family: 'Inter', sans-serif; transition: all 0.15s; color: var(--txt2);
+}
+.add-another-btn:hover { border-color: var(--brand-100); color: var(--brand); background: var(--brand-50); }
+.add-another-btn span { font-size: 13.5px; font-weight: 500; }
+
+/* ══════════════════════════════════════
+   SCREEN 3 — INTERESTS
+══════════════════════════════════════ */
+.interest-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  padding-bottom: 8px;
+}
+.interest-card {
+  background: var(--white); border-radius: var(--r-xl);
+  padding: 18px 14px; border: 2px solid transparent;
+  cursor: pointer; text-align: center;
+  transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.interest-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.interest-card.selected {
+  background: var(--brand-50); border-color: var(--brand);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(24,99,56,0.15);
+}
+.interest-card.selected .ic-label { color: var(--brand); }
+.ic-emoji { font-size: 30px; line-height: 1; }
+.ic-label { font-size: 13px; font-weight: 600; color: var(--txt); line-height: 1.3; }
+.ic-sub   { font-size: 11px; color: var(--txt3); line-height: 1.3; }
+.interest-card.selected .ic-sub { color: var(--brand-200); }
+
+/* ══════════════════════════════════════
+   SCREEN 4 — BIO / AI QUESTION
+══════════════════════════════════════ */
+.question-prompt {
+  background: var(--white); border-radius: var(--r-xl);
+  padding: 16px 18px; margin-bottom: 16px;
+  border: 1.5px solid var(--border);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.question-prompt:focus-within {
+  border-color: var(--brand); box-shadow: 0 0 0 3px rgba(24,99,56,0.09);
+}
+.question-q {
+  font-size: 14px; font-weight: 600; color: var(--txt);
+  margin-bottom: 10px; line-height: 1.4;
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.question-q-icon {
+  width: 24px; height: 24px; border-radius: 8px;
+  background: var(--brand-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0; margin-top: 1px;
+}
+.bio-textarea {
+  width: 100%; border: none; outline: none; resize: none;
+  font-family: 'Inter', sans-serif; font-size: 14px;
+  color: var(--txt); background: transparent; line-height: 1.65;
+  min-height: 80px;
+}
+.bio-textarea::placeholder { color: var(--txt3); }
+.ta-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 8px; padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.char-count { font-size: 11px; color: var(--txt3); }
+.voice-hint-btn {
+  display: flex; align-items: center; gap: 5px;
+  background: none; border: 1px solid var(--border); border-radius: var(--r-full);
+  padding: 4px 12px; cursor: pointer; font-family: 'Inter', sans-serif;
+  font-size: 11.5px; font-weight: 500; color: var(--txt2);
+  transition: all 0.15s;
+}
+.voice-hint-btn:hover { border-color: var(--brand-100); color: var(--brand); background: var(--brand-50); }
+.voice-hint-btn.listening { background: var(--brand); color: white; border-color: var(--brand); animation: vPulse 1s ease infinite; }
+@keyframes vPulse { 0%,100%{opacity:1} 50%{opacity:0.75} }
+
+/* live bio preview */
+.bio-preview-wrap {
+  background: var(--white); border-radius: var(--r-xl); padding: 16px 18px;
+  margin-bottom: 8px; overflow: hidden;
+  max-height: 0; opacity: 0;
+  transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease, padding 0.3s ease;
+  padding-top: 0; padding-bottom: 0;
+}
+.bio-preview-wrap.visible {
+  max-height: 300px; opacity: 1;
+  padding-top: 16px; padding-bottom: 16px;
+}
+.bio-preview-label {
+  font-size: 10.5px; font-weight: 700; color: var(--brand);
+  text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.bio-preview-text {
+  font-size: 13px; color: var(--txt); line-height: 1.7;
+}
+.bio-preview-text .highlight,
+.bio-preview-text .bio-highlight {
+  background: var(--brand-50); border-radius: 3px;
+  padding: 0 3px; color: var(--brand); font-weight: 500;
+  animation: hlIn 0.3s ease;
+}
+@keyframes hlIn { from{opacity:0} to{opacity:1} }
+
+.typing-dots {
+  display: inline-flex; gap: 3px; align-items: center; margin-left: 4px;
+}
+.typing-dots span {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--brand-200);
+  animation: dotBounce 1s ease infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.30s; }
+@keyframes dotBounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-4px)} }
+
+/* ══════════════════════════════════════
+   SCREEN 5 — ALL SET
+══════════════════════════════════════ */
+.allset-bg {
+  flex: 1; display: flex; flex-direction: column;
+  background: linear-gradient(165deg, #071e11 0%, var(--brand-dark) 35%, var(--brand) 75%, #3aa86a 100%);
+  position: relative; overflow: hidden;
+  padding: 28px 24px 0;
+}
+.allset-bg::before { content:''; position:absolute; top:-80px; right:-60px; width:260px; height:260px; border-radius:50%; border:1px solid rgba(255,255,255,0.06); }
+.allset-bg::after  { content:''; position:absolute; bottom:80px; left:-50px; width:160px; height:160px; border-radius:50%; border:1px solid rgba(255,255,255,0.04); }
+
+.allset-top { position: relative; z-index: 1; margin-bottom: 24px; }
+.allset-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.14); border-radius: var(--r-full);
+  padding: 5px 14px; font-size: 12px; font-weight: 600;
+  color: rgba(255,255,255,0.85); margin-bottom: 14px; backdrop-filter: blur(4px);
+}
+.allset-title {
+  font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 900;
+  color: white; line-height: 1.15; letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.allset-sub { font-size: 13.5px; color: rgba(255,255,255,0.65); line-height: 1.6; }
+
+/* profile summary card */
+.profile-card {
+  background: var(--bg); border-radius: var(--r-2xl) var(--r-2xl) 0 0;
+  padding: 20px 20px 0; flex: 1;
+  position: relative; z-index: 2;
+  animation: cardRise 0.5s cubic-bezier(0.34,1.2,0.64,1) 0.15s both;
+}
+@keyframes cardRise { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+.pcard-avatar-row {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 18px;
+}
+.pcard-avatar {
+  width: 56px; height: 56px; border-radius: var(--r-full);
+  background: var(--brand); display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700; color: white; flex-shrink: 0;
+}
+.pcard-name  { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--brand-dark); }
+.pcard-loc   { font-size: 12.5px; color: var(--txt2); display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+
+.pcard-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0; border-top: 1px solid var(--border);
+}
+.pcard-icon {
+  width: 32px; height: 32px; border-radius: 10px;
+  background: var(--brand-50); display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0; margin-top: 1px;
+}
+.pcard-row-label { font-size: 10.5px; font-weight: 700; color: var(--txt3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+.pcard-row-value { font-size: 13.5px; color: var(--txt); line-height: 1.45; }
+.pcard-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.pcard-chip  { padding: 3px 10px; background: var(--brand-50); border-radius: var(--r-full); font-size: 11.5px; font-weight: 600; color: var(--brand); }
+
+.allset-footer {
+  background: var(--bg); padding: 14px 20px 28px; position: relative; z-index: 2; flex-shrink: 0;
+}
+.btn-join {
+  width: 100%; padding: 18px; background: var(--brand-dark); color: white;
+  border: none; border-radius: var(--r-full); font-size: 15px; font-weight: 600;
+  font-family: 'Inter', sans-serif; cursor: pointer; letter-spacing: 0.01em;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background 0.2s; box-shadow: 0 8px 24px rgba(30,62,43,0.3);
+}
+.btn-join:hover  { background: var(--brand); }
+.btn-join:active { transform: scale(0.985); }
+
+</style>
+</head>
+<body>
+
+<div class="outer-label">
+  <h1>🌱 Sprout</h1>
+  <p>Streamlined Onboarding — 3 Steps</p>
+</div>
+
+<div class="compare-pill">
+  <span class="cp-item cp-before">25 screens · ~5 min</span>
+  <span class="cp-divider"></span>
+  <span class="cp-item cp-after">4 steps · ~90 sec ✦</span>
+</div>
+
+<!-- ════════════════════════════ PHONE ════════════════════════════ -->
+<div class="phone" id="phone">
+
+  <div class="status-bar">
+    <span class="status-time" id="clock">9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#1a1a1a"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#1a1a1a"/><rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="#1a1a1a"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#1a1a1a" opacity=".3"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.4C10.7 2.4 13.1 3.5 14.8 5.3L16 4C14 1.9 11.1.6 8 .6 4.9.6 2 1.9 0 4l1.2 1.3C2.9 3.5 5.3 2.4 8 2.4z" fill="#1a1a1a"/><path d="M8 5.6c1.8 0 3.4.7 4.6 1.9L14 6.1C12.5 4.6 10.4 3.7 8 3.7s-4.5.9-6 2.4l1.4 1.4C4.6 6.3 6.2 5.6 8 5.6z" fill="#1a1a1a"/><circle cx="8" cy="10" r="1.5" fill="#1a1a1a"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#1a1a1a" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1a1a"/><path d="M23 4v4a2 2 0 000-4z" fill="#1a1a1a" opacity=".4"/></svg>
+    </div>
+  </div>
+
+  <div class="screen-stack">
+
+    <!-- ══════════════════════════════════
+         SCREEN 1 — BASICS
+    ══════════════════════════════════ -->
+    <div class="screen active" id="s1">
+      <div class="progress-area">
+        <button class="back-btn ghost"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg></button>
+        <div class="step-track">
+          <div class="step-node active"></div>
+          <div class="step-node"></div>
+          <div class="step-node"></div>
+          <div class="step-node"></div>
+        </div>
+        <span class="step-label">1 of 4</span>
+      </div>
+
+      <div class="screen-body">
+        <div class="time-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Ready in ~60 seconds
+        </div>
+        <div class="eyebrow">Welcome</div>
+        <h1 class="s-title">Let's set up your family profile 🌱</h1>
+        <p class="s-sub">Just the basics to get you started. You can fill in the rest once you're in.</p>
+
+        <div class="f-row">
+          <div class="f-group" style="margin:0;">
+            <label class="f-label">First Name</label>
+            <input class="f-input" type="text" id="fName" placeholder="James" oninput="checkS1()">
+          </div>
+          <div class="f-group" style="margin:0;">
+            <label class="f-label">Last Name</label>
+            <input class="f-input" type="text" id="lName" placeholder="Martin" oninput="checkS1()">
+          </div>
+        </div>
+        <div class="f-group">
+          <label class="f-label">Zip Code</label>
+          <input class="f-input" type="text" id="zip" placeholder="73301" maxlength="10" oninput="checkS1()">
+        </div>
+      </div>
+
+      <div class="btn-footer">
+        <button class="btn-primary" id="s1Btn" onclick="go(2)" disabled>
+          Continue
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+      <div class="home-ind"></div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SCREEN 2 — KIDS
+    ══════════════════════════════════ -->
+    <div class="screen" id="s2">
+      <div class="progress-area">
+        <button class="back-btn" onclick="go(1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg></button>
+        <div class="step-track">
+          <div class="step-node done"></div>
+          <div class="step-node active"></div>
+          <div class="step-node"></div>
+          <div class="step-node"></div>
+        </div>
+        <span class="step-label">2 of 4</span>
+      </div>
+
+      <div class="screen-body">
+        <div class="eyebrow">Your Family</div>
+        <h1 class="s-title">Tell us about your kids</h1>
+        <p class="s-sub">We'll find nearby families with same-age kids, events, and clubs for you.</p>
+
+        <!-- kid entry -->
+        <div class="f-group">
+          <label class="f-label">Add a child</label>
+          <div class="kid-input-row" id="kidInputRow">
+            <!-- name + year -->
+            <div class="kid-row-name">
+              <div>
+                <input class="kid-name-input" type="text" id="kidNameInput" placeholder="Child's name" oninput="checkKidReady()">
+                <div style="font-size:11px;color:var(--txt3);margin-top:4px;">Born in <span id="yrDisplay">2021</span></div>
+              </div>
+              <div class="year-stepper">
+                <button class="yr-btn" onclick="changeYear(-1)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 18l-6-6 6-6"/></svg></button>
+                <div>
+                  <div class="yr-display" id="yrNum">2021</div>
+                  <div class="yr-label" id="yrAge">3 yrs</div>
+                </div>
+                <button class="yr-btn" onclick="changeYear(1)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M9 18l6-6-6-6"/></svg></button>
+              </div>
+            </div>
+            </div><!-- /kid-row-name -->
+
+            <!-- gender + month -->
+            <div class="kid-row-meta">
+              <div>
+                <div style="font-size:10.5px;font-weight:600;color:var(--txt3);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.05em;">Gender</div>
+                <div class="gender-toggle">
+                  <button class="gender-btn" id="gBtn-boy"  onclick="setGender('Boy')"  >👦 Boy</button>
+                  <button class="gender-btn" id="gBtn-girl" onclick="setGender('Girl')" >👧 Girl</button>
+                  <button class="gender-btn" id="gBtn-other" onclick="setGender('Other')">✨</button>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:10.5px;font-weight:600;color:var(--txt3);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.05em;">Birth Month</div>
+                <select class="month-select" id="kidMonth">
+                  <option value="">Month</option>
+                  <option value="Jan">January</option>
+                  <option value="Feb">February</option>
+                  <option value="Mar">March</option>
+                  <option value="Apr">April</option>
+                  <option value="May">May</option>
+                  <option value="Jun">June</option>
+                  <option value="Jul">July</option>
+                  <option value="Aug">August</option>
+                  <option value="Sep">September</option>
+                  <option value="Oct">October</option>
+                  <option value="Nov">November</option>
+                  <option value="Dec">December</option>
+                </select>
+              </div>
+            </div>
+          </div><!-- /kid-input-row -->
+          <button class="btn-primary" id="addKidBtn" onclick="addKid()" disabled style="margin-top:2px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Add Child
+          </button>
+        </div>
+
+        <!-- added kids list -->
+        <div class="kids-added" id="kidsAdded"></div>
+
+        <!-- add another trigger -->
+        <button class="add-another-btn" id="addAnotherBtn" style="display:none;" onclick="focusKidInput()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Add another child</span>
+        </button>
+
+      </div>
+
+      <div class="btn-footer">
+        <button class="btn-primary" id="s2Btn" onclick="go(3)" disabled>
+          Continue
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <button class="btn-skip" onclick="go(3)">Skip — I'll add kids later</button>
+      </div>
+      <div class="home-ind"></div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SCREEN 3 — INTERESTS
+    ══════════════════════════════════ -->
+    <div class="screen" id="s3">
+      <div class="progress-area">
+        <button class="back-btn" onclick="go(2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg></button>
+        <div class="step-track">
+          <div class="step-node done"></div>
+          <div class="step-node done"></div>
+          <div class="step-node active"></div>
+          <div class="step-node"></div>
+        </div>
+        <span class="step-label">3 of 4</span>
+      </div>
+
+      <div class="screen-body">
+        <div class="eyebrow">Almost done</div>
+        <h1 class="s-title">What does your family enjoy?</h1>
+        <p class="s-sub" style="margin-bottom:20px;">Tap a few categories. We'll personalise your feed — you can always change these.</p>
+
+        <div class="interest-grid" id="interestGrid">
+          <div class="interest-card" data-id="active"    onclick="toggleInt(this)">
+            <div class="ic-emoji">🏃</div>
+            <div class="ic-label">Active &amp; Sports</div>
+            <div class="ic-sub">Outdoor play, sports teams</div>
+          </div>
+          <div class="interest-card" data-id="arts"      onclick="toggleInt(this)">
+            <div class="ic-emoji">🎨</div>
+            <div class="ic-label">Arts &amp; Creative</div>
+            <div class="ic-sub">Crafts, music, drawing</div>
+          </div>
+          <div class="interest-card" data-id="learning"  onclick="toggleInt(this)">
+            <div class="ic-emoji">📚</div>
+            <div class="ic-label">Learning</div>
+            <div class="ic-sub">STEM, reading, school</div>
+          </div>
+          <div class="interest-card" data-id="nature"    onclick="toggleInt(this)">
+            <div class="ic-emoji">🌿</div>
+            <div class="ic-label">Nature &amp; Outdoors</div>
+            <div class="ic-sub">Parks, hiking, gardening</div>
+          </div>
+          <div class="interest-card" data-id="community" onclick="toggleInt(this)">
+            <div class="ic-emoji">🤝</div>
+            <div class="ic-label">Community</div>
+            <div class="ic-sub">Local events, volunteering</div>
+          </div>
+          <div class="interest-card" data-id="play"      onclick="toggleInt(this)">
+            <div class="ic-emoji">🎮</div>
+            <div class="ic-label">Play &amp; Fun</div>
+            <div class="ic-sub">Games, playdates, movies</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-footer">
+        <button class="btn-primary" onclick="go(4)">
+          Get Started
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <button class="btn-skip" onclick="go(4)">Skip for now</button>
+      </div>
+      <div class="home-ind"></div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SCREEN 4 — BIO QUESTION
+    ══════════════════════════════════ -->
+    <div class="screen" id="s4">
+      <div class="progress-area">
+        <button class="back-btn" onclick="go(3)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg></button>
+        <div class="step-track">
+          <div class="step-node done"></div>
+          <div class="step-node done"></div>
+          <div class="step-node done"></div>
+          <div class="step-node active"></div>
+        </div>
+        <span class="step-label">4 of 4</span>
+      </div>
+
+      <div class="screen-body">
+        <div class="eyebrow">Almost done</div>
+        <h1 class="s-title">One quick question</h1>
+        <p class="s-sub" style="margin-bottom:20px;">Your answer helps us write your bio. We'll handle the rest — takes 10 seconds.</p>
+
+        <!-- the question -->
+        <div class="question-prompt">
+          <div class="question-q">
+            <div class="question-q-icon">💬</div>
+            What do you love most about connecting with other parents?
+          </div>
+          <textarea class="bio-textarea" id="bioAnswer" rows="4"
+            placeholder="e.g. I love organizing playdates and finding families with same-age kids nearby…"
+            oninput="onBioInput()"></textarea>
+          <div class="ta-footer">
+            <span class="char-count" id="bioCharCount">0/180</span>
+            <button class="voice-hint-btn" id="voiceBtn" onclick="toggleVoice()">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+              <span>🎙 Speak instead</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- live bio preview (appears as user types) -->
+        <div class="bio-preview-wrap" id="bioPreviewWrap">
+          <div class="bio-preview-label">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Your bio preview
+          </div>
+          <p class="bio-preview-text" id="bioPreviewText"></p>
+        </div>
+
+      </div>
+
+      <div class="btn-footer">
+        <button class="btn-primary" id="s4Btn" onclick="go(5)">
+          Looks good — Continue
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <button class="btn-skip" onclick="skipBio()">Generate from my info instead</button>
+      </div>
+      <div class="home-ind"></div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SCREEN 5 — ALL SET
+    ══════════════════════════════════ -->
+    <div class="screen" id="s5" style="background:transparent;">
+
+      <div class="allset-bg">
+        <div class="allset-top">
+          <div class="allset-tag">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+            Profile created
+          </div>
+          <h1 class="allset-title">You're in,<br><span id="allsetFirstName">James</span>!</h1>
+          <p class="allset-sub">Your Sprout profile is ready. Here's what we set up for you.</p>
+        </div>
+
+        <!-- floating profile card -->
+        <div class="profile-card" id="profileCard">
+          <!-- avatar + name row -->
+          <div class="pcard-avatar-row">
+            <div class="pcard-avatar" id="pcardAv">JM</div>
+            <div>
+              <div class="pcard-name" id="pcardName">James Martin</div>
+              <div class="pcard-loc">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="#818898"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                <span id="pcardLoc">73301</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- bio row -->
+          <div class="pcard-row" id="pcardBioRow" style="display:none;">
+            <div class="pcard-icon">✍️</div>
+            <div style="flex:1;">
+              <div class="pcard-row-label">About Me</div>
+              <div class="pcard-row-value" id="pcardBio" style="font-style:italic;line-height:1.5;">—</div>
+            </div>
+          </div>
+
+          <!-- kids row -->
+          <div class="pcard-row" id="pcardKidsRow">
+            <div class="pcard-icon">👶</div>
+            <div style="flex:1;">
+              <div class="pcard-row-label">My Kids</div>
+              <div class="pcard-row-value" id="pcardKids">—</div>
+            </div>
+          </div>
+
+          <!-- interests row -->
+          <div class="pcard-row" id="pcardIntRow">
+            <div class="pcard-icon">⭐</div>
+            <div style="flex:1;">
+              <div class="pcard-row-label">Interests</div>
+              <div class="pcard-chips" id="pcardInts"></div>
+            </div>
+          </div>
+
+          <!-- deferred nudge -->
+          <div style="background:var(--s1);border-radius:var(--r-lg);padding:11px 13px;margin-top:4px;display:flex;align-items:flex-start;gap:8px;margin-bottom:16px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3a7ca5" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01" stroke-width="2.5" stroke-linecap="round"/></svg>
+            <span style="font-size:12px;color:#234a63;line-height:1.55;">You can add a photo, bio, school groups, and your spouse anytime from your profile.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="allset-footer">
+        <button class="btn-join" onclick="window.location.href='profile-preview.html'">
+          <span>Explore Sprout</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+    </div>
+
+  </div><!-- /screen-stack -->
+</div><!-- /phone -->
+
+<script>
+/* ════════════════════════════════════
+   STATE
+════════════════════════════════════ */
+const D = {
+  firstName: '', lastName: '', zip: '',
+  kids: [],
+  interests: [],
+  bioAnswer: '',
+  bio: '',
+};
+
+let currentYear = 2021;
+let currentGender = '';
+const THIS_YEAR = new Date().getFullYear();
+
+/* ════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════ */
+let current = 1;
+function go(n) {
+  if (n > current) {
+    collectData(current);
+  }
+  const oldEl = document.getElementById('s' + current);
+  const newEl = document.getElementById('s' + n);
+  oldEl.classList.add('exiting');
+  newEl.classList.add('active');
+  setTimeout(() => oldEl.classList.remove('active', 'exiting'), 380);
+  current = n;
+  if (n === 5) buildAllSet();
+}
+
+/* ════════════════════════════════════
+   DATA COLLECTION
+════════════════════════════════════ */
+function collectData(step) {
+  if (step === 1) {
+    D.firstName = document.getElementById('fName').value.trim();
+    D.lastName  = document.getElementById('lName').value.trim();
+    D.zip       = document.getElementById('zip').value.trim();
+  }
+  if (step === 3) {
+    D.interests = Array.from(document.querySelectorAll('.interest-card.selected'))
+      .map(el => el.querySelector('.ic-label').textContent.trim());
+  }
+  if (step === 4) {
+    D.bioAnswer = document.getElementById('bioAnswer').value.trim();
+    D.bio = generateBio(D.bioAnswer);
+  }
+}
+
+/* ════════════════════════════════════
+   SCREEN 1 — VALIDATION
+════════════════════════════════════ */
+function checkS1() {
+  const ok = document.getElementById('fName').value.trim() &&
+             document.getElementById('lName').value.trim() &&
+             document.getElementById('zip').value.trim().length >= 4;
+  document.getElementById('s1Btn').disabled = !ok;
+}
+
+/* ════════════════════════════════════
+   SCREEN 2 — KIDS
+════════════════════════════════════ */
+function changeYear(delta) {
+  const min = THIS_YEAR - 13, max = THIS_YEAR;
+  currentYear = Math.min(max, Math.max(min, currentYear + delta));
+  const age = THIS_YEAR - currentYear;
+  document.getElementById('yrNum').textContent   = currentYear;
+  document.getElementById('yrDisplay').textContent = currentYear;
+  document.getElementById('yrAge').textContent   = age < 1 ? '<1 yr' : age + (age === 1 ? ' yr' : ' yrs');
+}
+changeYear(0); // init display
+
+function checkKidReady() {
+  const name = document.getElementById('kidNameInput').value.trim();
+  document.getElementById('addKidBtn').disabled = !name;
+}
+
+function setGender(g) {
+  currentGender = g;
+  ['boy','girl','other'].forEach(id => {
+    document.getElementById('gBtn-' + id).classList.toggle('active', id === g.toLowerCase());
+  });
+}
+
+function addKid() {
+  const name = document.getElementById('kidNameInput').value.trim();
+  if (!name) return;
+  const age = THIS_YEAR - currentYear;
+  const month = document.getElementById('kidMonth').value;
+  D.kids.push({ name, year: currentYear, age, gender: currentGender, month });
+  // reset inputs
+  document.getElementById('kidNameInput').value = '';
+  document.getElementById('kidMonth').value = '';
+  document.getElementById('addKidBtn').disabled = true;
+  currentGender = '';
+  ['boy','girl','other'].forEach(id => document.getElementById('gBtn-' + id).classList.remove('active'));
+  renderKids();
+  // hide form row, show add-another
+  document.getElementById('kidInputRow').style.display = 'none';
+  document.getElementById('addKidBtn').style.display    = 'none';
+  document.getElementById('addAnotherBtn').style.display = D.kids.length < 5 ? 'flex' : 'none';
+  document.getElementById('s2Btn').disabled = false;
+}
+
+function focusKidInput() {
+  document.getElementById('kidInputRow').style.display = '';
+  document.getElementById('addKidBtn').style.display    = '';
+  document.getElementById('addAnotherBtn').style.display = 'none';
+  // reset meta fields
+  currentGender = '';
+  ['boy','girl','other'].forEach(id => document.getElementById('gBtn-' + id).classList.remove('active'));
+  document.getElementById('kidMonth').value = '';
+  document.getElementById('kidNameInput').focus();
+  checkKidReady();
+}
+
+function renderKids() {
+  const genderIcon = { Boy:'👦', Girl:'👧', Other:'✨', '':'' };
+  document.getElementById('kidsAdded').innerHTML = D.kids.map((k, i) => `
+    <div class="kid-pill" id="kp${i}">
+      <div class="kid-pill-av">${k.name.slice(0,2).toUpperCase()}</div>
+      <div class="kid-pill-name">${k.name}</div>
+      <div class="kid-pill-meta">
+        <div class="kid-pill-age">${k.month ? k.month + ' ' : ''}${k.year} · ${k.age < 1 ? '<1 yr' : k.age + ' yrs'}</div>
+        ${k.gender ? `<div class="kid-pill-gender">${genderIcon[k.gender] || ''} ${k.gender}</div>` : ''}
+      </div>
+      <button class="kid-pill-del" onclick="removeKid(${i})">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>`).join('');
+}
+
+function removeKid(i) {
+  D.kids.splice(i, 1);
+  renderKids();
+  if (D.kids.length === 0) {
+    document.getElementById('kidInputRow').style.display = 'grid';
+    document.getElementById('addKidBtn').style.display    = '';
+    document.getElementById('addAnotherBtn').style.display = 'none';
+    document.getElementById('s2Btn').disabled = true;
+  }
+}
+
+/* ════════════════════════════════════
+   SCREEN 3 — INTERESTS
+════════════════════════════════════ */
+function toggleInt(el) {
+  el.classList.toggle('selected');
+}
+
+/* ════════════════════════════════════
+   SCREEN 4 — BIO QUESTION
+════════════════════════════════════ */
+function onBioInput() {
+  const ta = document.getElementById('bioAnswer');
+  const count = document.getElementById('bioCharCount');
+  const len = ta.value.length;
+  count.textContent = len + '/180';
+  count.style.color = len > 160 ? '#ef4444' : '#9ca3af';
+  // show live bio preview after 3 chars
+  const preview = document.getElementById('bioPreviewWrap');
+  const previewText = document.getElementById('bioPreviewText');
+  if (len >= 3) {
+    preview.classList.add('visible');
+    previewText.innerHTML = buildBioPreview(ta.value.trim());
+  } else {
+    preview.classList.remove('visible');
+  }
+}
+
+function buildBioPreview(answer) {
+  const name = D.firstName || 'I';
+  const kidsText = D.kids.length
+    ? 'parent to ' + D.kids.map(k => k.name).join(' & ')
+    : 'a parent';
+  const intText = D.interests.length
+    ? D.interests.slice(0, 3).join(', ').toLowerCase()
+    : 'connecting with other families';
+  const loc = D.zip ? ' in ' + D.zip : '';
+  const answerHighlighted = answer
+    ? `<span class="bio-highlight">${answer}</span>`
+    : '';
+  return `${name} is ${kidsText}${loc}. Passionate about <em>${intText}</em>. ${answerHighlighted}`.trim();
+}
+
+function generateBio(answer) {
+  const name = D.firstName || 'I';
+  const kidsText = D.kids.length
+    ? 'Parent to ' + D.kids.map(k => k.name).join(' & ')
+    : 'A parent';
+  const intText = D.interests.length
+    ? D.interests.slice(0, 3).join(', ').toLowerCase()
+    : 'connecting with other families';
+  const loc = D.zip ? ' in ' + D.zip : '';
+  const answerPart = answer ? ' ' + answer : '';
+  return `${kidsText}${loc}. Passionate about ${intText}.${answerPart}`.trim();
+}
+
+let voiceActive = false;
+function toggleVoice() {
+  const btn = document.getElementById('voiceBtn');
+  const ta = document.getElementById('bioAnswer');
+  if (voiceActive) {
+    voiceActive = false;
+    btn.classList.remove('listening');
+    btn.querySelector('span').textContent = '🎙 Speak instead';
+    return;
+  }
+  voiceActive = true;
+  btn.classList.add('listening');
+  btn.querySelector('span').textContent = '⏹ Stop listening…';
+  // simulate voice input after 2.5s
+  setTimeout(() => {
+    if (!voiceActive) return;
+    const samples = [
+      'I love the spontaneous connections — bumping into other parents at the park and realizing you have so much in common.',
+      'Watching kids make new friends while we do the same. It makes our neighborhood feel like home.',
+      'Building a real community where we look out for each other\'s families and kids grow up together.'
+    ];
+    ta.value = samples[Math.floor(Math.random() * samples.length)];
+    voiceActive = false;
+    btn.classList.remove('listening');
+    btn.querySelector('span').textContent = '🎙 Speak instead';
+    onBioInput();
+  }, 2500);
+}
+
+function skipBio() {
+  collectData(3);
+  D.bioAnswer = '';
+  D.bio = generateBio('');
+  const oldEl = document.getElementById('s4');
+  const newEl = document.getElementById('s5');
+  oldEl.classList.add('exiting');
+  newEl.classList.add('active');
+  setTimeout(() => oldEl.classList.remove('active', 'exiting'), 380);
+  current = 5;
+  buildAllSet();
+}
+
+/* ════════════════════════════════════
+   SCREEN 5 — BUILD ALL SET
+════════════════════════════════════ */
+function buildAllSet() {
+  collectData(3);
+  const ini = (D.firstName[0]||'') + (D.lastName[0]||'');
+  document.getElementById('allsetFirstName').textContent = D.firstName || 'there';
+  document.getElementById('pcardAv').textContent         = ini.toUpperCase() || '🌱';
+  document.getElementById('pcardName').textContent       = `${D.firstName} ${D.lastName}`.trim();
+  document.getElementById('pcardLoc').textContent        = D.zip;
+
+  // kids
+  const kr = document.getElementById('pcardKidsRow');
+  if (D.kids.length) {
+    document.getElementById('pcardKids').textContent =
+      D.kids.map(k => `${k.name} (${k.age < 1 ? '<1' : k.age} yrs)`).join(' · ');
+    kr.style.display = '';
+  } else {
+    kr.style.display = 'none';
+  }
+
+  // bio
+  const bioRow = document.getElementById('pcardBioRow');
+  if (bioRow) {
+    const bio = D.bio || generateBio('');
+    if (bio) {
+      document.getElementById('pcardBio').textContent = bio;
+      bioRow.style.display = '';
+    } else {
+      bioRow.style.display = 'none';
+    }
+  }
+
+  // interests
+  const ir = document.getElementById('pcardIntRow');
+  if (D.interests.length) {
+    document.getElementById('pcardInts').innerHTML =
+      D.interests.map(t => `<div class="pcard-chip">${t}</div>`).join('');
+    ir.style.display = '';
+  } else {
+    ir.style.display = 'none';
+  }
+}
+
+/* ════════════════════════════════════
+   CLOCK
+════════════════════════════════════ */
+function tick() {
+  const n=new Date(), h=n.getHours(), m=n.getMinutes();
+  document.getElementById('clock').textContent=`${h}:${m<10?'0'+m:m}`;
+}
+tick(); setInterval(tick, 30000);
+</script>
+</body>
+</html>

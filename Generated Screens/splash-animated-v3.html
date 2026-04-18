@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Splash v3 · Botanical</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #bfb9b0;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 80px;
+  padding: 80px 48px 120px;
+  font-family: 'Inter', sans-serif;
+  flex-wrap: wrap;
+}
+
+.wrap { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.label {
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.15em;
+  text-transform: uppercase; color: #48433c;
+}
+
+/* ── Phone ── */
+.phone {
+  width: 393px; height: 852px;
+  border-radius: 54px; overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 0 0 1.5px rgba(0,0,0,0.13),
+    0 4px 8px rgba(0,0,0,0.06),
+    0 20px 48px rgba(0,0,0,0.12),
+    0 70px 160px rgba(0,0,0,0.28);
+}
+.screen { width: 393px; height: 852px; position: relative; overflow: hidden; }
+
+/* Status bar */
+.sb {
+  position: absolute; top: 0; left: 0; right: 0; height: 54px;
+  display: flex; align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 28px 10px; z-index: 80;
+}
+.sb-time { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+.sb-icons { display: flex; align-items: center; gap: 6px; }
+
+/* Dynamic island */
+.di {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 34px;
+  background: #000; border-radius: 20px; z-index: 90;
+}
+
+/* Home indicator */
+.hi {
+  position: absolute; bottom: 8px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  border-radius: 3px; z-index: 90; opacity: 0.22;
+}
+
+/* ══════════════════════════════════════════════
+   GLOBAL KEYFRAMES
+══════════════════════════════════════════════ */
+
+/* Leaf unfurl — spring physics */
+@keyframes leafSpring {
+  0%   { opacity: 0; transform: scale(0) rotate(var(--twist-from, 0deg)); }
+  60%  { opacity: 1; transform: scale(1.08) rotate(var(--twist-mid, 0deg)); }
+  80%  { transform: scale(0.96) rotate(0deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* Stem draw */
+@keyframes stemGrow { to { stroke-dashoffset: 0; } }
+
+/* Vein draw */
+@keyframes veinDraw { to { stroke-dashoffset: 0; } }
+
+/* Dewdrop pop */
+@keyframes dewPop {
+  0%   { opacity: 0; transform: scale(0); }
+  65%  { opacity: 1; transform: scale(1.3); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Grass blade */
+@keyframes grassBlade {
+  from { transform: scaleY(0); opacity: 0; }
+  to   { transform: scaleY(1); opacity: 1; }
+}
+
+/* Chevron fade */
+@keyframes chevFade { to { opacity: 1; } }
+
+/* Center bloom */
+@keyframes centerBloom {
+  0%   { opacity: 0; transform: scale(0) rotate(-180deg); }
+  65%  { opacity: 1; transform: scale(1.15) rotate(10deg); }
+  80%  { transform: scale(0.92) rotate(-5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* Sway */
+@keyframes sway {
+  0%,100% { transform: rotate(0deg); }
+  28% { transform: rotate(1.4deg); }
+  70% { transform: rotate(-1.4deg); }
+}
+
+/* Text reveal (clip) */
+@keyframes clipReveal {
+  from { clip-path: inset(0 101% 0 0); }
+  to   { clip-path: inset(0 0% 0 0); }
+}
+
+/* Fade + rise */
+@keyframes fadeRise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide from right */
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(22px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Shimmer */
+@keyframes shimmer {
+  from { left: -90%; }
+  to   { left: 170%; }
+}
+
+/* Float particle */
+@keyframes floatPt {
+  0%,100% { opacity: var(--po,0.35); transform: translate(0,0) rotate(var(--pr,0deg)); }
+  50%     { opacity: var(--po2,0.6); transform: translate(var(--px,5px),var(--py,-16px)) rotate(var(--pr2,8deg)); }
+}
+
+/* Blob morph */
+@keyframes blobMorph {
+  0%,100% { border-radius: 56% 44% 38% 62% / 52% 36% 64% 48%; }
+  33%     { border-radius: 44% 56% 62% 38% / 64% 52% 48% 36%; }
+  66%     { border-radius: 62% 38% 44% 56% / 38% 64% 36% 62%; }
+}
+
+/* Firefly */
+@keyframes ff {
+  0%,100% { opacity: 0; transform: translate(0,0); }
+  15%     { opacity: var(--fo,0.55); }
+  55%     { opacity: var(--fo,0.45); transform: translate(var(--fx,18px),var(--fy,-28px)); }
+  85%     { opacity: 0; }
+}
+
+/* Sheet in */
+@keyframes sheetIn {
+  from { transform: translateY(72px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* Icon bloom */
+@keyframes iconBloom {
+  0%   { opacity: 0; transform: scale(0.2) rotate(-35deg); }
+  65%  { opacity: 1; transform: scale(1.1) rotate(5deg); }
+  80%  { transform: scale(0.94) rotate(-3deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* Glow pulse */
+@keyframes glowPulse {
+  0%,100% { transform: scale(1); opacity: 0.55; }
+  50%     { transform: scale(1.18); opacity: 0.9; }
+}
+
+/* Orbit spin */
+@keyframes orbitSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes orbitSpinR {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+/* Fade in */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+
+/* ════════════════════════════════════════════════
+   SCREEN A — Botanical Light
+════════════════════════════════════════════════ */
+.sa { background: #f4f1ea; }
+
+/* Linen dot texture */
+.sa::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(24,99,56,0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
+  z-index: 0; pointer-events: none;
+}
+
+/* Halo circle behind clover */
+.a-halo {
+  position: absolute;
+  top: 58px; left: 50%; transform: translateX(-50%);
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(226,233,227,0.85) 0%, rgba(244,241,234,0.2) 68%, transparent 100%);
+  z-index: 1;
+  opacity: 0;
+  animation: fadeIn 0.9s ease 0.1s forwards;
+}
+
+/* Dashed halo ring */
+.a-halo-ring {
+  position: absolute;
+  top: 42px; left: 50%; transform: translateX(-50%);
+  width: 292px; height: 292px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(24,99,56,0.13);
+  z-index: 1;
+  opacity: 0;
+  animation: fadeIn 0.6s ease 2.8s forwards;
+}
+
+/* Floating particles */
+.a-pt {
+  position: absolute; z-index: 2;
+  opacity: 0;
+  animation: floatPt var(--dur,6s) ease-in-out var(--delay,3s) infinite;
+}
+
+/* SVG illustration canvas */
+.a-svg {
+  position: absolute;
+  top: 54px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 5; overflow: visible;
+}
+
+/* ── Leaf CSS animations ── */
+/* NORTH leaf: bbox y:-82 to 0 → transform-origin center 100% → (0,0) */
+.ln {
+  transform-box: fill-box; transform-origin: center 100%;
+  opacity: 0; transform: scale(0);
+  --twist-from: -12deg; --twist-mid: 3deg;
+  animation: leafSpring 0.72s cubic-bezier(0.34,1.4,0.64,1) 0.82s forwards;
+}
+/* EAST leaf: bbox x:0 to 82 → origin 0% center → (0,0) */
+.le {
+  transform-box: fill-box; transform-origin: 0% center;
+  opacity: 0; transform: scale(0);
+  --twist-from: 12deg; --twist-mid: -2deg;
+  animation: leafSpring 0.72s cubic-bezier(0.34,1.4,0.64,1) 1.08s forwards;
+}
+/* SOUTH leaf: bbox y:0 to 82 → origin center 0% → (0,0) */
+.ls {
+  transform-box: fill-box; transform-origin: center 0%;
+  opacity: 0; transform: scale(0);
+  --twist-from: -10deg; --twist-mid: 2deg;
+  animation: leafSpring 0.72s cubic-bezier(0.34,1.4,0.64,1) 1.34s forwards;
+}
+/* WEST leaf: bbox x:-82 to 0 → origin 100% center → (0,0) */
+.lw {
+  transform-box: fill-box; transform-origin: 100% center;
+  opacity: 0; transform: scale(0);
+  --twist-from: 10deg; --twist-mid: -3deg;
+  animation: leafSpring 0.72s cubic-bezier(0.34,1.4,0.64,1) 1.60s forwards;
+}
+
+/* Stem */
+.c-stem { stroke-dasharray: 120; stroke-dashoffset: 120; animation: stemGrow 0.65s cubic-bezier(0.4,0,0.2,1) 0.3s forwards; }
+
+/* Grass blades */
+.grass { transform-origin: bottom center; transform: scaleY(0); opacity: 0; }
+.g1 { animation: grassBlade 0.4s cubic-bezier(0.34,1.4,0.64,1) 0.85s forwards; }
+.g2 { animation: grassBlade 0.4s cubic-bezier(0.34,1.4,0.64,1) 0.95s forwards; }
+.g3 { animation: grassBlade 0.4s cubic-bezier(0.34,1.4,0.64,1) 1.05s forwards; }
+.g4 { animation: grassBlade 0.35s cubic-bezier(0.34,1.4,0.64,1) 0.90s forwards; }
+
+/* Veins */
+.vein { stroke-dasharray: 65; stroke-dashoffset: 65; }
+.v1  { animation: veinDraw 0.45s ease 1.82s forwards; }
+.v2  { animation: veinDraw 0.4s ease 1.90s forwards; }
+.v3  { animation: veinDraw 0.4s ease 1.95s forwards; }
+.v4  { animation: veinDraw 0.45s ease 1.88s forwards; }
+.v5  { animation: veinDraw 0.4s ease 1.93s forwards; }
+.v6  { animation: veinDraw 0.4s ease 1.98s forwards; }
+.v7  { animation: veinDraw 0.45s ease 1.85s forwards; }
+.v8  { animation: veinDraw 0.4s ease 1.92s forwards; }
+.v9  { animation: veinDraw 0.4s ease 1.97s forwards; }
+.v10 { animation: veinDraw 0.45s ease 1.87s forwards; }
+.v11 { animation: veinDraw 0.4s ease 1.94s forwards; }
+.v12 { animation: veinDraw 0.4s ease 2.00s forwards; }
+
+/* Chevron marks */
+.chev { opacity: 0; animation: chevFade 0.5s ease 2.1s forwards; }
+
+/* Dewdrops */
+.dew { opacity: 0; transform-box: fill-box; transform-origin: center center; }
+.d1 { animation: dewPop 0.38s cubic-bezier(0.34,1.6,0.64,1) 2.18s forwards; }
+.d2 { animation: dewPop 0.38s cubic-bezier(0.34,1.6,0.64,1) 2.26s forwards; }
+.d3 { animation: dewPop 0.38s cubic-bezier(0.34,1.6,0.64,1) 2.34s forwards; }
+.d4 { animation: dewPop 0.38s cubic-bezier(0.34,1.6,0.64,1) 2.42s forwards; }
+.d5 { animation: dewPop 0.35s cubic-bezier(0.34,1.6,0.64,1) 2.50s forwards; }
+
+/* Center knot */
+.c-knot {
+  transform-box: fill-box; transform-origin: center center;
+  opacity: 0;
+  animation: centerBloom 0.65s cubic-bezier(0.34,1.4,0.64,1) 2.08s forwards;
+}
+
+/* Full clover sway */
+.c-sway { animation: sway 8s ease-in-out 3.8s infinite; transform-origin: 0px 85px; }
+
+/* Pulse ring on center */
+.c-pulse {
+  transform-box: fill-box; transform-origin: center center;
+  opacity: 0;
+  animation: fadeIn 0.3s ease 2.8s forwards;
+}
+.c-pulse-ring {
+  transform-box: fill-box; transform-origin: center center;
+  animation: dewPop 3.2s ease-out 3.2s infinite;
+}
+
+/* Wordmark */
+.a-wordmark {
+  opacity: 0; animation: fadeIn 0.6s ease 2.65s forwards;
+}
+
+/* ── Below-illustration content ── */
+.a-headline {
+  position: absolute;
+  top: 404px; left: 0; right: 0;
+  text-align: center; padding: 0 32px;
+  font-family: 'Playfair Display', serif;
+  font-size: 30px; font-weight: 600; font-style: italic;
+  color: #1c1c1a; letter-spacing: -0.5px; line-height: 1.25;
+  clip-path: inset(0 101% 0 0);
+  animation: clipReveal 0.88s cubic-bezier(0.22,1,0.36,1) 2.9s forwards;
+  z-index: 10;
+}
+
+.a-sub {
+  position: absolute;
+  top: 468px; left: 0; right: 0;
+  text-align: center; padding: 0 36px;
+  font-size: 14px; font-weight: 400; color: #6b6860; line-height: 1.65;
+  opacity: 0;
+  animation: fadeRise 0.65s cubic-bezier(0.22,1,0.36,1) 3.2s forwards;
+  z-index: 10;
+}
+
+/* ── Pillar cards ── */
+.a-pillars {
+  position: absolute;
+  top: 524px; left: 18px; right: 18px;
+  display: flex; flex-direction: column; gap: 9px;
+  z-index: 10;
+}
+.pillar {
+  display: flex; align-items: center; gap: 13px;
+  padding: 13px 15px;
+  background: #faf9f6;
+  border-radius: 18px;
+  border: 1px solid rgba(0,0,0,0.06);
+  opacity: 0; transform: translateX(22px);
+}
+.p1 { animation: slideRight 0.58s cubic-bezier(0.34,1.2,0.64,1) 3.4s forwards; }
+.p2 { animation: slideRight 0.58s cubic-bezier(0.34,1.2,0.64,1) 3.55s forwards; }
+.p3 { animation: slideRight 0.58s cubic-bezier(0.34,1.2,0.64,1) 3.70s forwards; }
+.p-ico {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.p-t { font-size: 13.5px; font-weight: 600; color: #1c1c1a; letter-spacing: -0.1px; }
+.p-d { font-size: 12.5px; font-weight: 400; color: #6b6860; line-height: 1.4; margin-top: 2px; }
+.p-arr { margin-left: auto; flex-shrink: 0; opacity: 0.28; }
+
+/* ── CTA ── */
+.a-cta {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 0 22px 40px;
+  display: flex; flex-direction: column; align-items: center; gap: 11px;
+  z-index: 10;
+  opacity: 0;
+  animation: fadeRise 0.78s cubic-bezier(0.34,1.2,0.64,1) 3.9s forwards;
+}
+.btn-a {
+  width: 100%; padding: 17px;
+  background: #186338; color: #f4f1ea;
+  border: none; border-radius: 99px;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px; font-weight: 600; letter-spacing: -0.2px;
+  cursor: pointer; position: relative; overflow: hidden;
+  box-shadow: 0 6px 28px rgba(24,99,56,0.30);
+}
+.btn-a::after {
+  content: ''; position: absolute;
+  top: 0; left: -90%; width: 55%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.17), transparent);
+  animation: shimmer 2.8s ease 4.5s infinite;
+}
+.sign-in {
+  font-size: 14px; font-weight: 400; color: #6b6860;
+}
+.sign-in span { color: #186338; font-weight: 600; cursor: pointer; }
+
+
+/* ════════════════════════════════════════════════
+   SCREEN B — Immersive Brand Green
+════════════════════════════════════════════════ */
+.sb { background: #186338; }
+
+/* Subtle botanical outline pattern bg */
+.sb::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23f4f1ea' stroke-width='0.8'%3E%3Cellipse cx='40' cy='28' rx='8' ry='10'/%3E%3Cellipse cx='52' cy='40' rx='10' ry='8'/%3E%3Cellipse cx='40' cy='52' rx='8' ry='10'/%3E%3Cellipse cx='28' cy='40' rx='10' ry='8'/%3E%3Ccircle cx='40' cy='40' r='7'/%3E%3Cline x1='40' y1='52' x2='40' y2='65'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 80px 80px;
+}
+
+/* Blobs */
+.b-blob {
+  position: absolute; pointer-events: none;
+  filter: blur(62px); opacity: 0.45;
+  animation: blobMorph var(--bm,14s) ease-in-out var(--bd,0s) infinite;
+}
+
+/* Grain */
+.b-grain {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* Fireflies */
+.b-ff {
+  position: absolute; border-radius: 50%; z-index: 3;
+  animation: ff var(--fd,7s) ease-in-out var(--fdelay,0s) infinite;
+}
+
+/* Orbit */
+.b-orb {
+  position: absolute; top: 88px; left: 50%; transform: translateX(-50%);
+  width: 290px; height: 290px;
+  opacity: 0; animation: fadeIn 1s ease 0.5s forwards;
+  z-index: 4; pointer-events: none;
+}
+.b-ring {
+  position: absolute; border-radius: 50%;
+  border: 1px solid rgba(208,218,207,0.13);
+}
+.r1 { inset: 0;  animation: orbitSpin 42s linear infinite; }
+.r2 { inset: 30px; border-color: rgba(208,218,207,0.08); animation: orbitSpinR 58s linear infinite; }
+.b-rdot {
+  position: absolute; border-radius: 50%;
+  width: 7px; height: 7px; margin: -3.5px;
+  background: rgba(208,218,207,0.5);
+}
+
+/* ── Hero zone ── */
+.b-hero {
+  position: absolute;
+  top: 54px; left: 0; right: 0; height: 408px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 10;
+}
+
+/* Icon box */
+.b-icon {
+  width: 94px; height: 94px;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.14);
+  border-radius: 29px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 22px; position: relative;
+  opacity: 0; transform: scale(0.3) rotate(-30deg);
+  animation: iconBloom 0.88s cubic-bezier(0.34,1.35,0.64,1) 0.4s forwards;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 55px rgba(24,99,56,0.28), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.b-icon::before {
+  content: ''; position: absolute;
+  width: 190px; height: 190px;
+  background: radial-gradient(circle, rgba(87,154,116,0.2) 0%, transparent 65%);
+  border-radius: 50%; pointer-events: none;
+  animation: glowPulse 3.4s ease-in-out 1.6s infinite;
+}
+
+/* B headline */
+.b-hl {
+  font-family: 'Playfair Display', serif;
+  font-size: 44px; font-weight: 700; color: #f4f1ea;
+  letter-spacing: -1.2px; text-align: center; line-height: 1.07;
+  margin-bottom: 14px;
+  clip-path: inset(0 101% 0 0);
+  animation: clipReveal 0.9s cubic-bezier(0.22,1,0.36,1) 0.95s forwards;
+}
+
+/* Cycling text */
+.b-cycle { height: 22px; overflow: hidden; opacity: 0; animation: fadeIn 0.6s ease 1.7s forwards; }
+.b-cycle-t {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px; font-style: italic; font-weight: 400;
+  color: rgba(244,241,234,0.52); text-align: center; line-height: 22px;
+  transition: opacity 0.36s ease, transform 0.36s ease;
+}
+
+/* ── Bottom sheet ── */
+.b-sheet {
+  position: absolute;
+  bottom: 0; left: 0; right: 0; height: 444px;
+  background: #f4f1ea;
+  border-radius: 32px 32px 0 0;
+  z-index: 20; overflow: hidden;
+  box-shadow: 0 -12px 55px rgba(0,0,0,0.22);
+  transform: translateY(72px); opacity: 0;
+  animation: sheetIn 0.88s cubic-bezier(0.34,1.12,0.64,1) 1.45s forwards;
+}
+.b-sheet::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+}
+.b-hdl {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  width: 40px; height: 4px; background: #dbd5c8; border-radius: 2px;
+}
+.b-inner { position: relative; z-index: 1; padding: 30px 22px 0; display: flex; flex-direction: column; }
+
+/* Tags */
+.b-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 18px; opacity: 0; transform: translateY(10px); animation: fadeRise 0.6s ease 2.0s forwards; }
+.b-tag { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; background: #eae6db; border-radius: 99px; font-size: 12px; font-weight: 500; color: #4d525b; }
+
+/* Sheet text */
+.b-sh { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 600; color: #1c1c1a; letter-spacing: -0.4px; line-height: 1.25; margin-bottom: 7px; opacity: 0; transform: translateY(10px); animation: fadeRise 0.6s ease 2.14s forwards; }
+.b-sb { font-size: 14px; font-weight: 400; color: #6b6860; line-height: 1.6; margin-bottom: 18px; opacity: 0; transform: translateY(10px); animation: fadeRise 0.6s ease 2.28s forwards; }
+
+/* Social proof */
+.b-proof { display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: #eae6db; border-radius: 14px; margin-bottom: 18px; opacity: 0; transform: translateY(8px); animation: fadeRise 0.55s ease 2.42s forwards; }
+.pr-avs { display: flex; }
+.pr-av { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #eae6db; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #f4f1ea; margin-left: -7px; flex-shrink: 0; }
+.pr-av:first-child { margin-left: 0; }
+.pr-txt { flex: 1; font-size: 13px; color: #4d525b; }
+.pr-cnt { font-size: 13px; font-weight: 700; color: #186338; }
+
+/* Buttons */
+.b-btns { display: flex; flex-direction: column; gap: 10px; opacity: 0; transform: translateY(12px); animation: fadeRise 0.7s cubic-bezier(0.34,1.2,0.64,1) 2.56s forwards; }
+.btn-b { width: 100%; padding: 17px; background: #186338; color: #f4f1ea; border: none; border-radius: 99px; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; letter-spacing: -0.2px; cursor: pointer; position: relative; overflow: hidden; box-shadow: 0 6px 24px rgba(24,99,56,0.26); }
+.btn-b::after { content: ''; position: absolute; top: 0; left: -90%; width: 55%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent); animation: shimmer 2.8s ease 3.2s infinite; }
+.btn-ghost { width: 100%; padding: 15px; background: transparent; color: #4d525b; border: 1.5px solid rgba(0,0,0,0.10); border-radius: 99px; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- SVG defs (shared, hidden) -->
+<svg width="0" height="0" style="position:absolute;">
+  <defs>
+    <!-- Leaf fill: Brand/500 with subtle radial highlight -->
+    <radialGradient id="lf" cx="32%" cy="28%" r="72%">
+      <stop offset="0%"  stop-color="#387f56"/>
+      <stop offset="55%" stop-color="#1e6640"/>
+      <stop offset="100%" stop-color="#186338"/>
+    </radialGradient>
+    <!-- Leaf fill for east/west (slightly different angle) -->
+    <radialGradient id="lf2" cx="28%" cy="32%" r="72%">
+      <stop offset="0%"  stop-color="#3d8559"/>
+      <stop offset="55%" stop-color="#1e6640"/>
+      <stop offset="100%" stop-color="#186338"/>
+    </radialGradient>
+    <!-- Cream clover gradient (for Screen B) -->
+    <radialGradient id="lfc" cx="30%" cy="25%" r="70%">
+      <stop offset="0%"  stop-color="rgba(244,241,234,0.98)"/>
+      <stop offset="100%" stop-color="rgba(244,241,234,0.82)"/>
+    </radialGradient>
+    <!-- Drop shadow filter for leaves -->
+    <filter id="lshadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#134f2d" flood-opacity="0.2"/>
+    </filter>
+    <!-- Soft blur -->
+    <filter id="softblur"><feGaussianBlur stdDeviation="3"/></filter>
+    <!-- Cream leaf shadow (Screen B) -->
+    <filter id="cshadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="rgba(19,79,45,0.35)" flood-opacity="1"/>
+    </filter>
+  </defs>
+</svg>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN A — Botanical Light, Clover on Warm Cream
+═══════════════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="label">Exploration A — Botanical · Warm Cream</div>
+  <div class="phone">
+    <div class="screen sa">
+
+      <div class="di"></div>
+      <div class="sb">
+        <span class="sb-time" style="color:#186338;">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="#186338"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="#186338"><path d="M8 2.4C10.4 2.4 12.6 3.4 14.1 5L15.5 3.6C13.6 1.7 11 0.5 8 0.5C5 0.5 2.4 1.7 0.5 3.6L1.9 5C3.4 3.4 5.6 2.4 8 2.4Z"/><path d="M8 5.3C9.6 5.3 11 5.9 12.1 7L13.5 5.6C12 4.2 10.1 3.3 8 3.3C5.9 3.3 4 4.2 2.5 5.6L3.9 7C5 5.9 6.4 5.3 8 5.3Z"/><circle cx="8" cy="10" r="1.5"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#186338"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#186338"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.5 24.5 6C24.5 5.5 23.8 4.8 23 4.5Z" fill="#186338"/></svg>
+        </div>
+      </div>
+
+      <!-- Halo glow -->
+      <div class="a-halo"></div>
+      <div class="a-halo-ring"></div>
+
+      <!-- Floating leaf particles -->
+      <div class="a-pt" style="top:78px;left:32px;--dur:6.5s;--delay:3.4s;--px:9px;--py:-18px;--pr:-8deg;--pr2:6deg;--po:0.3;--po2:0.55;">
+        <svg width="16" height="20" viewBox="0 0 16 20" fill="none"><path d="M8 18C8 18 1 13 1 8C1 4.1 4.1 1 8 1C11.9 1 15 4.1 15 8C15 13 8 18 8 18Z" fill="#77b691" opacity="0.6"/><line x1="8" y1="18" x2="8" y2="2" stroke="#579a74" stroke-width="0.7" opacity="0.35"/></svg>
+      </div>
+      <div class="a-pt" style="top:106px;right:26px;--dur:7.8s;--delay:4.1s;--px:-10px;--py:-14px;--pr:14deg;--pr2:-4deg;--po:0.25;--po2:0.48;">
+        <svg width="13" height="16" viewBox="0 0 13 16" fill="none"><path d="M6.5 15C6.5 15 1 11 1 6.5C1 3.5 3.5 1 6.5 1C9.5 1 12 3.5 12 6.5C12 11 6.5 15 6.5 15Z" fill="#579a74" opacity="0.5"/></svg>
+      </div>
+      <div class="a-pt" style="top:272px;left:20px;--dur:5.8s;--delay:5.2s;--px:12px;--py:-14px;--pr:5deg;--pr2:22deg;--po:0.2;--po2:0.42;">
+        <svg width="10" height="13" viewBox="0 0 10 13" fill="none"><path d="M5 12C5 12 1 9 1 5.5C1 3 3 1 5 1C7 1 9 3 9 5.5C9 9 5 12 5 12Z" fill="#d0dacf" opacity="0.75"/></svg>
+      </div>
+      <div class="a-pt" style="top:230px;right:22px;--dur:9s;--delay:3.8s;--px:-8px;--py:-18px;--pr:-14deg;--pr2:-2deg;--po:0.18;--po2:0.38;">
+        <svg width="12" height="15" viewBox="0 0 12 15" fill="none"><path d="M6 14C6 14 1 10 1 6C1 3.2 3.2 1 6 1C8.8 1 11 3.2 11 6C11 10 6 14 6 14Z" fill="#77b691" opacity="0.45"/></svg>
+      </div>
+      <!-- Sparkle dots -->
+      <div class="a-pt" style="top:105px;left:80px;--dur:4.2s;--delay:3.8s;--px:6px;--py:-10px;--po:0.28;--po2:0.55;">
+        <div style="width:4px;height:4px;border-radius:50%;background:#579a74;"></div>
+      </div>
+      <div class="a-pt" style="top:316px;right:58px;--dur:5.4s;--delay:4.5s;--px:-6px;--py:-8px;--po:0.22;--po2:0.45;">
+        <div style="width:3px;height:3px;border-radius:50%;background:#77b691;"></div>
+      </div>
+      <div class="a-pt" style="top:168px;left:46px;--dur:6s;--delay:5.8s;--px:8px;--py:-12px;--po:0.2;--po2:0.4;">
+        <div style="width:3px;height:3px;border-radius:50%;background:#d0dacf;"></div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           BOTANICAL CLOVER ILLUSTRATION
+           Center: translate(196, 218) on screen
+      ═══════════════════════════════════════ -->
+      <svg class="a-svg" width="320" height="340" viewBox="-160 -175 320 340" overflow="visible">
+
+        <g class="c-sway">
+          <!-- STEM — draws up first -->
+          <path class="c-stem"
+            d="M 0,0 C 3,26 5,52 3,88"
+            stroke="#186338" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+
+          <!-- GRASS BLADES at base (appear with stem) -->
+          <path class="grass g1" d="M 3,88 C 12,72 26,66 28,52" stroke="#579a74" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+          <path class="grass g2" d="M 3,88 C -8,74 -22,68 -24,55" stroke="#579a74" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path class="grass g3" d="M 3,88 C 16,80 30,76 34,64" stroke="#77b691" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+          <path class="grass g4" d="M 3,88 C -4,78 -16,74 -18,65" stroke="#77b691" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+
+          <!-- ═══════════════════════════
+               NORTH LEAF  (pointing up)
+               BBox: x -50 to 50, y -84 to 0
+          ══════════════════════════════ -->
+          <g class="ln" filter="url(#lshadow)">
+            <!-- Leaf body — proper obcordate heart shape -->
+            <path d="M 0,0
+              C -10,-5 -50,-18 -50,-44
+              C -50,-66 -26,-80 -10,-82
+              C -4,-84 0,-80 0,-80
+              C 0,-80 4,-84 10,-82
+              C 26,-80 50,-66 50,-44
+              C 50,-18 10,-5 0,0 Z"
+              fill="url(#lf)"/>
+            <!-- Highlight gloss (upper-left) -->
+            <path d="M -22,-20 C -34,-38 -36,-60 -22,-76"
+              stroke="#4a9468" stroke-width="4" fill="none" opacity="0.3" stroke-linecap="round"/>
+            <!-- Chevron mark (lighter V — characteristic clover marking) -->
+            <path class="chev" d="M -36,-44 C -22,-36 -8,-32 0,-32 C 8,-32 22,-36 36,-44"
+              stroke="rgba(244,241,234,0.28)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+            <!-- Central vein -->
+            <path class="vein v1" d="M 0,-2 C 0,-24 1,-52 0,-80"
+              stroke="#134f2d" stroke-width="1.2" fill="none" opacity="0.5"/>
+            <!-- Lateral veins left -->
+            <path class="vein v2" d="M -5,-26 C -16,-33 -30,-38 -38,-52"
+              stroke="#134f2d" stroke-width="0.9" fill="none" opacity="0.38"/>
+            <path class="vein v3" d="M -5,-44 C -14,-50 -24,-56 -30,-68"
+              stroke="#134f2d" stroke-width="0.8" fill="none" opacity="0.32"/>
+            <!-- Lateral veins right -->
+            <path class="vein v4" d="M 5,-26 C 16,-33 30,-38 38,-52"
+              stroke="#134f2d" stroke-width="0.9" fill="none" opacity="0.38"/>
+            <path class="vein v5" d="M 5,-44 C 14,-50 24,-56 30,-68"
+              stroke="#134f2d" stroke-width="0.8" fill="none" opacity="0.32"/>
+            <!-- Dewdrops -->
+            <circle class="dew d1" cx="-34" cy="-50" r="3.8" fill="rgba(244,241,234,0.80)"/>
+            <circle class="dew d1" cx="-34" cy="-50" r="1.8" fill="rgba(255,255,255,0.9)"/>
+            <circle class="dew d2" cx="26" cy="-66" r="2.8" fill="rgba(244,241,234,0.72)"/>
+          </g>
+
+          <!-- ═══════════════════════════
+               EAST LEAF  (pointing right)
+               BBox: x 0 to 84, y -50 to 50
+          ══════════════════════════════ -->
+          <g class="le" filter="url(#lshadow)">
+            <path d="M 0,0
+              C 5,-10 18,-50 44,-50
+              C 66,-50 80,-26 82,-10
+              C 84,-4 80,0 80,0
+              C 80,0 84,4 82,10
+              C 80,26 66,50 44,50
+              C 18,50 5,10 0,0 Z"
+              fill="url(#lf2)"/>
+            <path d="M 20,22 C 38,34 60,36 76,22"
+              stroke="#4a9468" stroke-width="4" fill="none" opacity="0.3" stroke-linecap="round"/>
+            <path class="chev" d="M 44,36 C 36,22 32,8 32,0 C 32,-8 36,-22 44,-36"
+              stroke="rgba(244,241,234,0.28)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+            <path class="vein v6" d="M 2,0 C 24,0 52,1 80,0"
+              stroke="#134f2d" stroke-width="1.2" fill="none" opacity="0.5"/>
+            <path class="vein v7" d="M 26,-5 C 33,-16 38,-30 50,-38"
+              stroke="#134f2d" stroke-width="0.9" fill="none" opacity="0.38"/>
+            <path class="vein v8" d="M 26,5 C 33,16 38,30 50,38"
+              stroke="#134f2d" stroke-width="0.9" fill="none" opacity="0.38"/>
+            <circle class="dew d3" cx="52" cy="-32" r="3.2" fill="rgba(244,241,234,0.76)"/>
+            <circle class="dew d3" cx="52" cy="-32" r="1.5" fill="rgba(255,255,255,0.88)"/>
+          </g>
+
+          <!-- ═══════════════════════════
+               SOUTH LEAF  (pointing down)
+               BBox: x -50 to 50, y 0 to 84
+          ══════════════════════════════ -->
+          <g class="ls" filter="url(#lshadow)">
+            <path d="M 0,0
+              C 10,5 50,18 50,44
+              C 50,66 26,80 10,82
+              C 4,84 0,80 0,80
+              C 0,80 -4,84 -10,82
+              C -26,80 -50,66 -50,44
+              C -50,18 -10,5 0,0 Z"
+              fill="url(#lf)"/>
+            <path d="M 22,20 C 34,38 36,60 22,76"
+              stroke="#4a9468" stroke-width="4" fill="none" opacity="0.3" stroke-linecap="round"/>
+            <path class="chev" d="M 36,44 C 22,36 8,32 0,32 C -8,32 -22,36 -36,44"
+              stroke="rgba(244,241,234,0.28)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+            <path class="vein v9" d="M 0,2 C 0,24 -1,52 0,80"
+              stroke="#134f2d" stroke-width="1.2" fill="none" opacity="0.5"/>
+            <path class="vein v10" d="M 5,26 C 16,33 30,38 38,52"
+              stroke="#134f2d" stroke-width="0.9" fill="none" opacity="0.38"/>
+            <path class="vein v11" d="M -5,26 C -16,33 -30,38 -38,52"
+              stroke="#134f2d" stroke-width="0.9" fill="none" opacity="0.38"/>
+            <circle class="dew d4" cx="30" cy="50" r="3.2" fill="rgba(244,241,234,0.74)"/>
+            <circle class="dew d5" cx="-22" cy="68" r="2.6" fill="rgba(244,241,234,0.68)"/>
+          </g>
+
+          <!-- ═══════════════════════════
+               WEST LEAF  (pointing left)
+               BBox: x -84 to 0, y -50 to 50
+          ══════════════════════════════ -->
+          <g class="lw" filter="url(#lshadow)">
+            <path d="M 0,0
+              C -5,-10 -18,-50 -44,-50
+              C -66,-50 -80,-26 -82,-10
+              C -84,-4 -80,0 -80,0
+              C -80,0 -84,4 -82,10
+              C -80,26 -66,50 -44,50
+              C -18,50 -5,10 0,0 Z"
+              fill="url(#lf2)"/>
+            <path d="M -20,22 C -38,34 -60,36 -76,22"
+              stroke="#4a9468" stroke-width="4" fill="none" opacity="0.3" stroke-linecap="round"/>
+            <path class="chev" d="M -44,36 C -36,22 -32,8 -32,0 C -32,-8 -36,-22 -44,-36"
+              stroke="rgba(244,241,234,0.28)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+            <path class="vein v12" d="M -2,0 C -24,0 -52,-1 -80,0"
+              stroke="#134f2d" stroke-width="1.2" fill="none" opacity="0.5"/>
+            <path d="M -26,-5 C -33,-16 -38,-30 -50,-38"
+              stroke="#134f2d" stroke-width="0.9" fill="none" opacity="0.38"
+              stroke-dasharray="65" stroke-dashoffset="65"
+              style="animation: veinDraw 0.4s ease 1.96s forwards;"/>
+            <path d="M -26,5 C -33,16 -38,30 -50,38"
+              stroke="#134f2d" stroke-width="0.9" fill="none" opacity="0.38"
+              stroke-dasharray="65" stroke-dashoffset="65"
+              style="animation: veinDraw 0.4s ease 2.02s forwards;"/>
+            <circle class="dew d4" cx="-50" cy="32" r="3" fill="rgba(244,241,234,0.72)"/>
+          </g>
+
+          <!-- ═══════════════════════════
+               CENTER KNOT
+          ══════════════════════════════ -->
+          <g class="c-knot">
+            <!-- Outer halo -->
+            <circle cx="0" cy="0" r="20" fill="rgba(20,79,45,0.3)" filter="url(#softblur)"/>
+            <!-- Main center disc -->
+            <circle cx="0" cy="0" r="15" fill="#134f2d"/>
+            <circle cx="0" cy="0" r="15" fill="none" stroke="rgba(208,218,207,0.3)" stroke-width="1.5"/>
+            <!-- Inner color -->
+            <circle cx="0" cy="0" r="9.5" fill="#186338"/>
+            <!-- Highlight ring -->
+            <circle cx="0" cy="0" r="6" fill="#387f56" opacity="0.55"/>
+            <!-- Specular dot -->
+            <circle cx="-3" cy="-3.5" r="2.5" fill="rgba(244,241,234,0.52)"/>
+            <circle cx="-3" cy="-3.5" r="1.2" fill="rgba(244,241,234,0.7)"/>
+          </g>
+
+          <!-- Pulse ring (fades in after center) -->
+          <circle class="c-pulse c-pulse-ring" cx="0" cy="0" r="22"
+            fill="none" stroke="rgba(24,99,56,0.3)" stroke-width="1.5"/>
+
+          <!-- SPROUT wordmark below clover -->
+          <text class="a-wordmark" x="0" y="125"
+            text-anchor="middle"
+            font-family="Playfair Display, serif"
+            font-size="14" font-weight="700"
+            fill="#186338" letter-spacing="4">SPROUT</text>
+
+        </g><!-- end c-sway -->
+      </svg>
+      <!-- end illustration SVG -->
+
+      <!-- ── Headline ── -->
+      <div class="a-headline">Your people<br>are out there.</div>
+
+      <!-- ── Sub ── -->
+      <div class="a-sub">Discover local events, join family clubs, and make connections that actually last.</div>
+
+      <!-- ── Pillars ── -->
+      <div class="a-pillars">
+        <div class="pillar p1">
+          <div class="p-ico" style="background:#e2e9e3;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="3" width="16" height="15" rx="4" stroke="#186338" stroke-width="1.6"/><path d="M6 1V4M14 1V4" stroke="#186338" stroke-width="1.6" stroke-linecap="round"/><path d="M2 8H18" stroke="#186338" stroke-width="1.4"/><circle cx="6.5" cy="12.5" r="1.5" fill="#186338"/><circle cx="10" cy="12.5" r="1.5" fill="#186338" opacity="0.4"/><circle cx="13.5" cy="12.5" r="1.5" fill="#186338" opacity="0.2"/></svg>
+          </div>
+          <div><div class="p-t">Local Family Events</div><div class="p-d">Parks, playdates &amp; activities near you</div></div>
+          <svg class="p-arr" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4L10 8L6 12" stroke="#1c1c1a" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="pillar p2">
+          <div class="p-ico" style="background:#d0dacf;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="7.5" cy="7.5" r="3" stroke="#186338" stroke-width="1.5"/><circle cx="13" cy="7.5" r="3" stroke="#186338" stroke-width="1.5"/><path d="M2 18C2 14.7 4.5 12 7.5 12C10.5 12 13 14.7 13 18" stroke="#186338" stroke-width="1.5" stroke-linecap="round"/><path d="M13 12C16 12 18 14.7 18 18" stroke="#186338" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div><div class="p-t">Parent Clubs</div><div class="p-d">Groups that match your family's world</div></div>
+          <svg class="p-arr" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4L10 8L6 12" stroke="#1c1c1a" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="pillar p3">
+          <div class="p-ico" style="background:#f4f1ea; border: 1px solid #eae6db;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 17C10 17 2.5 12 2.5 7C2.5 4.5 4.5 2.5 7 2.5C8.5 2.5 9.7 3.1 10 4.1C10.3 3.1 11.5 2.5 13 2.5C15.5 2.5 17.5 4.5 17.5 7C17.5 12 10 17 10 17Z" stroke="#186338" stroke-width="1.5" stroke-linejoin="round"/><path d="M7 9.5L9 11.5L13.5 7" stroke="#186338" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/></svg>
+          </div>
+          <div><div class="p-t">Real Connections</div><div class="p-d">Meet parents who actually get it</div></div>
+          <svg class="p-arr" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4L10 8L6 12" stroke="#1c1c1a" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+      <!-- ── CTA ── -->
+      <div class="a-cta">
+        <button class="btn-a">Get Started — It's Free</button>
+        <div class="sign-in">Already a member? <span>Sign in</span></div>
+      </div>
+
+      <div class="hi" style="background:#186338;"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN B — Immersive Brand Green · Cream Clover
+═══════════════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="label">Exploration B — Immersive · Brand Green</div>
+  <div class="phone">
+    <div class="screen sb">
+
+      <div class="di"></div>
+      <div class="sb">
+        <span class="sb-time" style="color:rgba(244,241,234,0.9);">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="rgba(244,241,234,0.85)"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="rgba(244,241,234,0.85)"><path d="M8 2.4C10.4 2.4 12.6 3.4 14.1 5L15.5 3.6C13.6 1.7 11 0.5 8 0.5C5 0.5 2.4 1.7 0.5 3.6L1.9 5C3.4 3.4 5.6 2.4 8 2.4Z"/><path d="M8 5.3C9.6 5.3 11 5.9 12.1 7L13.5 5.6C12 4.2 10.1 3.3 8 3.3C5.9 3.3 4 4.2 2.5 5.6L3.9 7C5 5.9 6.4 5.3 8 5.3Z"/><circle cx="8" cy="10" r="1.5"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="rgba(244,241,234,0.85)"/><rect x="2" y="2" width="16" height="8" rx="2" fill="rgba(244,241,234,0.85)"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.5 24.5 6C24.5 5.5 23.8 4.8 23 4.5Z" fill="rgba(244,241,234,0.85)"/></svg>
+        </div>
+      </div>
+
+      <!-- Blobs -->
+      <div class="b-blob" style="width:260px;height:260px;background:rgba(56,127,86,0.32);top:-50px;left:-80px;--bm:13s;"></div>
+      <div class="b-blob" style="width:210px;height:210px;background:rgba(19,79,45,0.38);top:200px;right:-80px;--bm:17s;--bd:3s;"></div>
+      <div class="b-blob" style="width:170px;height:170px;background:rgba(87,154,116,0.20);top:330px;left:-50px;--bm:11s;--bd:6s;"></div>
+      <div class="b-grain"></div>
+
+      <!-- Fireflies -->
+      <div class="b-ff" style="width:5px;height:5px;background:rgba(208,218,207,0.7);top:118px;left:52px;--fd:7.2s;--fdelay:1.9s;--fx:30px;--fy:-38px;--fo:0.62;"></div>
+      <div class="b-ff" style="width:4px;height:4px;background:rgba(208,218,207,0.6);top:178px;right:46px;--fd:5.8s;--fdelay:2.6s;--fx:-24px;--fy:-28px;--fo:0.52;"></div>
+      <div class="b-ff" style="width:3px;height:3px;background:rgba(226,233,227,0.65);top:145px;left:148px;--fd:8.8s;--fdelay:0.9s;--fx:12px;--fy:-36px;--fo:0.46;"></div>
+      <div class="b-ff" style="width:4px;height:4px;background:rgba(208,218,207,0.55);top:272px;right:62px;--fd:6.2s;--fdelay:3.6s;--fx:-18px;--fy:-22px;--fo:0.44;"></div>
+      <div class="b-ff" style="width:3px;height:3px;background:rgba(226,233,227,0.6);top:92px;right:105px;--fd:9.2s;--fdelay:5.2s;--fx:10px;--fy:-28px;--fo:0.38;"></div>
+      <div class="b-ff" style="width:4px;height:4px;background:rgba(208,218,207,0.6);top:328px;left:36px;--fd:7.8s;--fdelay:1.3s;--fx:22px;--fy:-16px;--fo:0.5;"></div>
+
+      <!-- Orbit rings -->
+      <div class="b-orb">
+        <div class="b-ring r1">
+          <div class="b-rdot" style="top:0;left:50%;transform:translateX(-50%) translateY(-3.5px);"></div>
+          <div class="b-rdot" style="bottom:0;left:50%;transform:translateX(-50%) translateY(3.5px);opacity:0.5;"></div>
+          <div class="b-rdot" style="left:0;top:50%;transform:translateY(-50%) translateX(-3.5px);opacity:0.7;"></div>
+          <div class="b-rdot" style="right:0;top:50%;transform:translateY(-50%) translateX(3.5px);opacity:0.45;"></div>
+        </div>
+        <div class="b-ring r2">
+          <div class="b-rdot" style="top:14%;right:14%;opacity:0.55;width:5px;height:5px;margin:-2.5px;"></div>
+          <div class="b-rdot" style="bottom:14%;left:14%;opacity:0.42;width:5px;height:5px;margin:-2.5px;"></div>
+        </div>
+      </div>
+
+      <!-- ── Hero ── -->
+      <div class="b-hero">
+        <!-- Clover icon box -->
+        <div class="b-icon">
+          <svg width="60" height="60" viewBox="-30 -32 60 62" overflow="visible" fill="none">
+            <!-- Cream clover (same obcordate shape, scaled to icon) -->
+            <!-- North -->
+            <path d="M 0,0 C -6,-3 -22,-8 -22,-20 C -22,-30 -11,-36 -4,-37 C -2,-38 0,-36 0,-36 C 0,-36 2,-38 4,-37 C 11,-36 22,-30 22,-20 C 22,-8 6,-3 0,0 Z" fill="url(#lfc)" filter="url(#cshadow)"/>
+            <path class="chev" d="M -16,-20 C -9,-16 -3,-14 0,-14 C 3,-14 9,-16 16,-20" stroke="rgba(24,99,56,0.14)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <!-- East -->
+            <path d="M 0,0 C 3,-6 8,-22 20,-22 C 30,-22 36,-11 37,-4 C 38,-2 36,0 36,0 C 36,0 38,2 37,4 C 36,11 30,22 20,22 C 8,22 3,6 0,0 Z" fill="url(#lfc)" filter="url(#cshadow)"/>
+            <!-- South -->
+            <path d="M 0,0 C 6,3 22,8 22,20 C 22,30 11,36 4,37 C 2,38 0,36 0,36 C 0,36 -2,38 -4,37 C -11,36 -22,30 -22,20 C -22,8 -6,3 0,0 Z" fill="url(#lfc)" filter="url(#cshadow)"/>
+            <!-- West -->
+            <path d="M 0,0 C -3,-6 -8,-22 -20,-22 C -30,-22 -36,-11 -37,-4 C -38,-2 -36,0 -36,0 C -36,0 -38,2 -37,4 C -36,11 -30,22 -20,22 C -8,22 -3,6 0,0 Z" fill="url(#lfc)" filter="url(#cshadow)"/>
+            <!-- Center -->
+            <circle cx="0" cy="0" r="11" fill="url(#lfc)"/>
+            <circle cx="0" cy="0" r="5" fill="rgba(24,99,56,0.2)"/>
+            <circle cx="-2" cy="-2" r="2" fill="rgba(244,241,234,0.6)"/>
+            <!-- Stem -->
+            <path d="M 0,0 L 0,26" stroke="rgba(244,241,234,0.65)" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Headline -->
+        <div class="b-hl">Find your<br>village.</div>
+
+        <!-- Cycling sub text -->
+        <div class="b-cycle">
+          <div class="b-cycle-t" id="cycleT">For parents who moved somewhere new.</div>
+        </div>
+      </div>
+
+      <!-- ── Cream bottom sheet ── -->
+      <div class="b-sheet">
+        <div class="b-hdl"></div>
+        <div class="b-inner">
+          <!-- Feature tags -->
+          <div class="b-tags">
+            <div class="b-tag"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="9" rx="2" stroke="#4d525b" stroke-width="1.3"/><path d="M4 1V3M8 1V3" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round"/><path d="M1 5H11" stroke="#4d525b" stroke-width="1.3"/></svg>Local Events</div>
+            <div class="b-tag"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="4.5" cy="4" r="2.2" stroke="#4d525b" stroke-width="1.3"/><path d="M1 11C1 8.8 2.8 7 5 7" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round"/><circle cx="8.5" cy="4" r="2.2" stroke="#4d525b" stroke-width="1.3"/><path d="M11 11C11 8.8 9.2 7 7 7" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round"/></svg>Parent Clubs</div>
+            <div class="b-tag"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2H10C10.6 2 11 2.4 11 3V8C11 8.6 10.6 9 10 9H3L1 11V3C1 2.4 1.4 2 2 2Z" stroke="#4d525b" stroke-width="1.3" stroke-linejoin="round"/></svg>Chat</div>
+            <div class="b-tag"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 10C6 10 1.5 7 1.5 4C1.5 2.6 2.6 1.5 4 1.5C4.9 1.5 5.6 2 6 2.7C6.4 2 7.1 1.5 8 1.5C9.4 1.5 10.5 2.6 10.5 4C10.5 7 6 10 6 10Z" stroke="#4d525b" stroke-width="1.3" stroke-linejoin="round"/></svg>Playdates</div>
+          </div>
+
+          <div class="b-sh">Your community<br>is waiting.</div>
+          <div class="b-sb">Thousands of parents nearby are already finding their people through Sprout.</div>
+
+          <!-- Social proof -->
+          <div class="b-proof">
+            <div class="pr-avs">
+              <div class="pr-av" style="background:#387f56;">S</div>
+              <div class="pr-av" style="background:#579a74;">M</div>
+              <div class="pr-av" style="background:#186338;">J</div>
+              <div class="pr-av" style="background:#77b691;color:#1c1c1a;">A</div>
+            </div>
+            <div class="pr-txt"><span class="pr-cnt" id="cnt">0</span> families joined</div>
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1L9.3 5.4L14 6.1L10.7 9.3L11.5 14L7.5 11.7L3.5 14L4.3 9.3L1 6.1L5.7 5.4L7.5 1Z" stroke="#d4a017" stroke-width="1.2" fill="#f6ecd1"/></svg>
+          </div>
+
+          <div class="b-btns">
+            <button class="btn-b">Create Your Family Profile</button>
+            <button class="btn-ghost">I already have an account</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hi" style="background:#f4f1ea;"></div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ── Counter ── */
+(function(){
+  const el = document.getElementById('cnt');
+  if(!el) return;
+  function easeOut(t){ return 1-Math.pow(1-t,3); }
+  setTimeout(()=>{
+    const t0=performance.now(), dur=1800, target=12400;
+    (function tick(now){
+      const p=Math.min((now-t0)/dur,1);
+      el.textContent=Math.floor(easeOut(p)*target).toLocaleString();
+      if(p<1) requestAnimationFrame(tick);
+      else el.textContent=target.toLocaleString();
+    })(t0);
+  }, 2750);
+})();
+
+/* ── Cycling text ── */
+(function(){
+  const el = document.getElementById('cycleT');
+  if(!el) return;
+  const lines=[
+    'For parents who moved somewhere new.',
+    'For families looking for their people.',
+    'For the lucky connections still ahead.',
+  ];
+  let i=0;
+  function cycle(){
+    el.style.opacity='0';
+    el.style.transform='translateY(-5px)';
+    setTimeout(()=>{
+      i=(i+1)%lines.length;
+      el.textContent=lines[i];
+      el.style.transform='translateY(5px)';
+      requestAnimationFrame(()=>{
+        el.style.opacity='1';
+        el.style.transform='translateY(0)';
+      });
+    },380);
+  }
+  setTimeout(()=>{ el.style.opacity='1'; setInterval(cycle,3400); }, 2350);
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout – App Store Screenshots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ─── Reset & Base ─── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brand:       #186338;
+    --brand-dark:  #1e3e2b;
+    --brand-bold:  #134f2d;
+    --brand-light: #e2e9e3;
+    --cream:       #f4f1ea;
+    --cream-dark:  #eae6db;
+    --cream-mid:   #dbd5c8;
+    --brand-400:   #387f56;
+    --brand-200:   #77b691;
+    --white:       #ffffff;
+    --grey-700:    #4d525b;
+    --grey-500:    #818898;
+
+    /* App Store canonical size: 1290 × 2796 */
+    --ss-w: 430px;   /* display scale (1/3 of real) */
+    --ss-h: 932px;
+  }
+
+  html, body {
+    background: #1a1a1a;
+    font-family: 'Inter', sans-serif;
+    color: var(--white);
+  }
+
+  /* ─── Gallery wrapper ─── */
+  .gallery-header {
+    text-align: center;
+    padding: 56px 24px 32px;
+  }
+  .gallery-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .gallery-header p {
+    font-size: 13px;
+    color: #888;
+    margin-top: 8px;
+  }
+  .gallery-header .dim-badge {
+    display: inline-block;
+    margin-top: 12px;
+    background: #2a2a2a;
+    border: 1px solid #333;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 11px;
+    color: #aaa;
+    letter-spacing: 0.3px;
+  }
+
+  .gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    justify-content: center;
+    padding: 16px 32px 80px;
+  }
+
+  /* ─── Screenshot frame wrapper ─── */
+  .ss-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .ss-label {
+    font-size: 11px;
+    color: #666;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .ss-export-hint {
+    font-size: 10px;
+    color: #444;
+    text-align: center;
+  }
+
+  /* ─── The screenshot canvas ─── */
+  .screenshot {
+    width: var(--ss-w);
+    height: var(--ss-h);
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 2px 0 rgba(255,255,255,0.05) inset;
+  }
+
+  /* ── Themes ── */
+  .ss-green {
+    background: linear-gradient(160deg, var(--brand) 0%, var(--brand-dark) 100%);
+  }
+  .ss-cream {
+    background: linear-gradient(160deg, var(--cream) 0%, var(--cream-dark) 100%);
+  }
+  .ss-dark {
+    background: linear-gradient(160deg, #112318 0%, var(--brand-dark) 55%, #0a1a0f 100%);
+  }
+  .ss-sage {
+    background: linear-gradient(160deg, #2d6b4a 0%, var(--brand) 50%, #1a4a30 100%);
+  }
+  .ss-warm {
+    background: linear-gradient(160deg, #f8f5ec 0%, var(--cream) 50%, #ede8de 100%);
+  }
+
+  /* Noise texture overlay */
+  .screenshot::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 128px 128px;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* ── Decorative blobs ── */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.12;
+    filter: blur(60px);
+    pointer-events: none;
+  }
+  .blob-1 { width: 260px; height: 260px; top: -60px; right: -60px; background: #fff; }
+  .blob-2 { width: 200px; height: 200px; bottom: 160px; left: -80px; background: #77b691; }
+  .blob-3 { width: 180px; height: 180px; top: 200px; left: 60px; background: #fff; opacity: 0.06; }
+
+  /* decorative arcs */
+  .arc-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.08);
+    pointer-events: none;
+  }
+
+  /* ── Text block ── */
+  .ss-text {
+    position: relative;
+    z-index: 5;
+    text-align: center;
+    padding: 0 32px;
+    flex-shrink: 0;
+  }
+  .ss-text.top { padding-top: 64px; padding-bottom: 0; }
+  .ss-text.bottom { padding-top: 0; padding-bottom: 52px; }
+
+  .ss-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.7;
+  }
+  .ss-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+  }
+  .ss-sub {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    opacity: 0.72;
+    margin-top: 12px;
+  }
+
+  /* dark text variants for cream bg */
+  .dark-text .ss-eyebrow { color: var(--brand); opacity: 1; }
+  .dark-text .ss-headline { color: var(--brand-dark); }
+  .dark-text .ss-sub { color: var(--grey-700); }
+
+  /* light text variants for green/dark bg */
+  .light-text .ss-eyebrow { color: var(--brand-light); }
+  .light-text .ss-headline { color: #ffffff; }
+  .light-text .ss-sub { color: rgba(255,255,255,0.72); }
+
+  /* ── Phone mockup ── */
+  .phone-stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 5;
+    width: 100%;
+  }
+
+  .phone {
+    position: relative;
+    width: 230px;
+    height: auto;
+    filter: drop-shadow(0 24px 48px rgba(0,0,0,0.45)) drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+  }
+
+  .phone-shell {
+    width: 230px;
+    height: 498px;
+    background: #0d0d0d;
+    border-radius: 46px;
+    position: relative;
+    padding: 12px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.12),
+      inset 0 0 0 1px rgba(255,255,255,0.06);
+  }
+
+  /* side buttons */
+  .phone-shell::before {
+    content: '';
+    position: absolute;
+    left: -3px;
+    top: 100px;
+    width: 3px;
+    height: 36px;
+    background: #1e1e1e;
+    border-radius: 2px 0 0 2px;
+    box-shadow: 0 44px 0 #1e1e1e, 0 80px 0 #1e1e1e;
+  }
+  .phone-shell::after {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: 130px;
+    width: 3px;
+    height: 60px;
+    background: #1e1e1e;
+    border-radius: 0 2px 2px 0;
+  }
+
+  .phone-screen {
+    width: 100%;
+    height: 100%;
+    border-radius: 36px;
+    overflow: hidden;
+    position: relative;
+    background: #f4f1ea;
+  }
+
+  .phone-screen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+  }
+
+  /* Dynamic island */
+  .dynamic-island {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 96px;
+    height: 30px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 10;
+  }
+
+  /* ── Floating badge / card decoration ── */
+  .float-badge {
+    position: absolute;
+    z-index: 8;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    min-width: 160px;
+  }
+  .float-badge .badge-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .float-badge .badge-text { flex: 1; }
+  .float-badge .badge-text .bt-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #1e3e2b;
+    line-height: 1.2;
+  }
+  .float-badge .badge-text .bt-sub {
+    font-size: 10px;
+    color: #818898;
+    margin-top: 1px;
+  }
+  .badge-green { background: #e2e9e3; }
+  .badge-warm  { background: #f4f1ea; }
+  .badge-blue  { background: #e8f0fe; }
+
+  /* ── Feature pill strip ── */
+  .pill-strip {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    padding: 0 24px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+  .pill-strip.top { margin-bottom: 8px; }
+  .pill-strip.bottom { margin-top: 0px; padding-bottom: 48px; }
+
+  .pill {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 99px;
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+    backdrop-filter: blur(4px);
+  }
+  .pill.dark-pill {
+    background: rgba(24,99,56,0.1);
+    border-color: rgba(24,99,56,0.2);
+    color: var(--brand);
+  }
+
+  /* ── App icon ── */
+  .app-icon-row {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .app-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .app-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .app-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  /* ── Screenshot 1 specific ── */
+  .ss1 .phone-stage { padding-top: 8px; padding-bottom: 12px; }
+  .ss1 .phone { transform: rotate(-3deg); }
+  .ss1 .float-1 {
+    bottom: 128px;
+    left: -12px;
+    animation: none;
+  }
+  .ss1 .float-2 {
+    bottom: 200px;
+    right: -20px;
+    min-width: 140px;
+    animation: none;
+  }
+
+  /* ── Screenshot 2 specific ── */
+  .ss2 .phone { transform: rotate(2deg); }
+  .ss2 .float-1 {
+    top: 60px;
+    left: -16px;
+    min-width: 148px;
+  }
+
+  /* ── Screenshot 3 specific ── */
+  .ss3 .phone-stage { padding-top: 16px; }
+
+  /* ── Screenshot 4 specific ── */
+  .ss4 .phone { transform: rotate(-2deg); }
+
+  /* ── Screenshot 5 specific ── */
+  .ss5 .phone { transform: rotate(2deg); }
+  .ss5 .float-1 {
+    bottom: 148px;
+    right: -16px;
+    min-width: 148px;
+  }
+
+  /* ── Download buttons ── */
+  .download-row {
+    text-align: center;
+    padding: 0 0 80px;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .dl-note {
+    font-size: 12px;
+    color: #555;
+    text-align: center;
+    padding: 0 24px 24px;
+  }
+
+  /* ── Section divider ── */
+  .section-label {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #444;
+    padding: 0 0 20px;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  <h1>Sprout — App Store Screenshots</h1>
+  <p>5 compositions · iPhone 6.7" format · 1290 × 2796 px</p>
+  <span class="dim-badge">Open each screenshot in a new tab → Cmd+S to save at full resolution</span>
+</div>
+
+<div class="gallery">
+
+  <!-- ═══════════════════════════════════════════
+       SCREENSHOT 1 — Discover Events (Green)
+  ═══════════════════════════════════════════ -->
+  <div class="ss-wrap">
+    <div class="ss-label">Screenshot 01</div>
+    <div class="screenshot ss-green ss1" id="ss1">
+
+      <!-- Decorative elements -->
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="arc-ring" style="width:500px;height:500px;top:-200px;right:-200px;"></div>
+      <div class="arc-ring" style="width:380px;height:380px;top:-140px;right:-140px;"></div>
+
+      <!-- App icon -->
+      <div class="app-icon-row" style="padding-top:56px;">
+        <div class="app-icon">
+          <img src="./Logo/Sprout Logo.jpeg" alt="Sprout">
+        </div>
+        <span class="app-name light-text" style="color:#fff;font-family:'Playfair Display',serif;">Sprout</span>
+      </div>
+
+      <!-- Headline -->
+      <div class="ss-text top light-text" style="padding-top:28px;">
+        <div class="ss-eyebrow">Discover</div>
+        <div class="ss-headline">Find events<br><em>your kids</em><br>will love</div>
+        <div class="ss-sub">Curated activities for every age,<br>right in your neighbourhood</div>
+      </div>
+
+      <!-- Phone -->
+      <div class="phone-stage">
+        <div class="phone">
+          <div class="phone-shell">
+            <div class="phone-screen">
+              <div class="dynamic-island"></div>
+              <img src="./Sprout UI Design Screen/PNG Format/10.2 - Home - Discover Events.png" alt="Home - Discover Events">
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating notification cards -->
+        <div class="float-badge float-1" style="position:absolute;bottom:108px;left:-8px;">
+          <div class="badge-icon badge-green">🌳</div>
+          <div class="badge-text">
+            <div class="bt-title">Park Playdate</div>
+            <div class="bt-sub">Starting in 2 hours</div>
+          </div>
+        </div>
+
+        <div class="float-badge float-2" style="position:absolute;bottom:188px;right:-16px;min-width:148px;">
+          <div class="badge-icon badge-warm">📅</div>
+          <div class="badge-text">
+            <div class="bt-title">12 families joined</div>
+            <div class="bt-sub">Near Orchard Road</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pill strip -->
+      <div class="pill-strip bottom">
+        <span class="pill">Parks & Playgrounds</span>
+        <span class="pill">Arts & Crafts</span>
+        <span class="pill">Sports</span>
+      </div>
+
+    </div>
+    <div class="ss-export-hint">Screenshot 1 of 5</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SCREENSHOT 2 — Clubs (Cream)
+  ═══════════════════════════════════════════ -->
+  <div class="ss-wrap">
+    <div class="ss-label">Screenshot 02</div>
+    <div class="screenshot ss-cream ss2 dark-text" id="ss2">
+
+      <div class="blob blob-3" style="background:#186338;opacity:0.06;width:300px;height:300px;top:-100px;right:-80px;"></div>
+      <div class="arc-ring" style="width:480px;height:480px;top:-200px;left:-180px;border-color:rgba(24,99,56,0.07);"></div>
+      <div class="arc-ring" style="width:360px;height:360px;top:-140px;left:-120px;border-color:rgba(24,99,56,0.07);"></div>
+
+      <!-- App icon -->
+      <div class="app-icon-row" style="padding-top:56px;">
+        <div class="app-icon">
+          <img src="./Logo/Sprout Logo.jpeg" alt="Sprout">
+        </div>
+        <span class="app-name" style="color:#1e3e2b;font-family:'Playfair Display',serif;">Sprout</span>
+      </div>
+
+      <!-- Headline -->
+      <div class="ss-text top dark-text" style="padding-top:28px;">
+        <div class="ss-eyebrow">Community</div>
+        <div class="ss-headline">Find your<br><em>parenting</em><br>tribe</div>
+        <div class="ss-sub">Join clubs, share moments, and<br>grow together with local families</div>
+      </div>
+
+      <!-- Phone -->
+      <div class="phone-stage">
+        <div class="phone">
+          <div class="phone-shell">
+            <div class="phone-screen">
+              <div class="dynamic-island"></div>
+              <img src="./Sprout UI Design Screen/PNG Format/17.1 - Clubs.png" alt="Clubs">
+            </div>
+          </div>
+
+          <!-- Floating badge -->
+          <div class="float-badge float-1" style="position:absolute;top:56px;left:-20px;min-width:156px;">
+            <div class="badge-icon badge-green">👶</div>
+            <div class="badge-text">
+              <div class="bt-title">Baby & Toddler Club</div>
+              <div class="bt-sub">48 members nearby</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pill strip -->
+      <div class="pill-strip bottom">
+        <span class="pill dark-pill">🏡 Local Clubs</span>
+        <span class="pill dark-pill">🤝 24k+ Families</span>
+        <span class="pill dark-pill">🌱 Free to join</span>
+      </div>
+
+    </div>
+    <div class="ss-export-hint">Screenshot 2 of 5</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SCREENSHOT 3 — Chat (Dark Green)
+  ═══════════════════════════════════════════ -->
+  <div class="ss-wrap">
+    <div class="ss-label">Screenshot 03</div>
+    <div class="screenshot ss-dark ss3" id="ss3">
+
+      <div class="blob blob-1" style="background:#77b691;opacity:0.15;width:280px;"></div>
+      <div class="blob blob-2" style="background:#186338;opacity:0.3;"></div>
+      <div class="arc-ring" style="width:520px;height:520px;bottom:-200px;right:-200px;"></div>
+      <div class="arc-ring" style="width:400px;height:400px;bottom:-140px;right:-140px;"></div>
+
+      <!-- App icon -->
+      <div class="app-icon-row" style="padding-top:56px;">
+        <div class="app-icon">
+          <img src="./Logo/Sprout Logo White Background.jpeg" alt="Sprout">
+        </div>
+        <span class="app-name light-text" style="color:#fff;font-family:'Playfair Display',serif;">Sprout</span>
+      </div>
+
+      <!-- Headline -->
+      <div class="ss-text top light-text" style="padding-top:28px;">
+        <div class="ss-eyebrow">Connect</div>
+        <div class="ss-headline">Chat with<br><em>parents</em> who<br>get it</div>
+        <div class="ss-sub">Group chats, DMs, and event threads —<br>all in one place</div>
+      </div>
+
+      <!-- Phone -->
+      <div class="phone-stage">
+        <div class="phone">
+          <div class="phone-shell">
+            <div class="phone-screen">
+              <div class="dynamic-island"></div>
+              <img src="./Sprout UI Design Screen/PNG Format/16.2 - Chat - Group.png" alt="Chat">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pill strip -->
+      <div class="pill-strip bottom">
+        <span class="pill">💬 Group Chats</span>
+        <span class="pill">📩 Direct Messages</span>
+        <span class="pill">🎉 Event Threads</span>
+      </div>
+
+    </div>
+    <div class="ss-export-hint">Screenshot 3 of 5</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SCREENSHOT 4 — Event Details (Sage Green)
+  ═══════════════════════════════════════════ -->
+  <div class="ss-wrap">
+    <div class="ss-label">Screenshot 04</div>
+    <div class="screenshot ss-sage ss4" id="ss4">
+
+      <div class="blob blob-1" style="opacity:0.1;"></div>
+      <div class="blob blob-2" style="background:#e2e9e3;opacity:0.1;"></div>
+      <div class="arc-ring" style="width:450px;height:450px;top:-160px;left:-160px;"></div>
+      <div class="arc-ring" style="width:320px;height:320px;top:-100px;left:-100px;"></div>
+
+      <!-- App icon -->
+      <div class="app-icon-row" style="padding-top:56px;">
+        <div class="app-icon">
+          <img src="./Logo/Sprout Logo.jpeg" alt="Sprout">
+        </div>
+        <span class="app-name light-text" style="color:#fff;font-family:'Playfair Display',serif;">Sprout</span>
+      </div>
+
+      <!-- Headline -->
+      <div class="ss-text top light-text" style="padding-top:28px;">
+        <div class="ss-eyebrow">Explore</div>
+        <div class="ss-headline">Plan the<br><em>perfect</em><br>family day</div>
+        <div class="ss-sub">Detailed guides, reviews, and<br>RSVP for every outing</div>
+      </div>
+
+      <!-- Phone -->
+      <div class="phone-stage">
+        <div class="phone">
+          <div class="phone-shell">
+            <div class="phone-screen">
+              <div class="dynamic-island"></div>
+              <img src="./Sprout UI Design Screen/PNG Format/12.1 - Park and Playground Details Page - As Host.png" alt="Event Details">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pill strip -->
+      <div class="pill-strip bottom">
+        <span class="pill">📍 Nearby Spots</span>
+        <span class="pill">⭐ Parent Reviews</span>
+        <span class="pill">🎟 Easy RSVP</span>
+      </div>
+
+    </div>
+    <div class="ss-export-hint">Screenshot 4 of 5</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SCREENSHOT 5 — My Events / Moments (Warm Cream)
+  ═══════════════════════════════════════════ -->
+  <div class="ss-wrap">
+    <div class="ss-label">Screenshot 05</div>
+    <div class="screenshot ss-warm ss5 dark-text" id="ss5">
+
+      <div class="blob" style="width:300px;height:300px;top:-80px;left:-80px;background:#186338;opacity:0.05;filter:blur(80px);"></div>
+      <div class="blob" style="width:220px;height:220px;bottom:100px;right:-60px;background:#77b691;opacity:0.08;filter:blur(60px);"></div>
+      <div class="arc-ring" style="width:460px;height:460px;bottom:-160px;left:-160px;border-color:rgba(24,99,56,0.06);"></div>
+      <div class="arc-ring" style="width:340px;height:340px;bottom:-100px;left:-100px;border-color:rgba(24,99,56,0.06);"></div>
+
+      <!-- App icon -->
+      <div class="app-icon-row" style="padding-top:56px;">
+        <div class="app-icon">
+          <img src="./Logo/Sprout Logo.jpeg" alt="Sprout">
+        </div>
+        <span class="app-name dark-text" style="color:#1e3e2b;font-family:'Playfair Display',serif;">Sprout</span>
+      </div>
+
+      <!-- Headline -->
+      <div class="ss-text top dark-text" style="padding-top:28px;">
+        <div class="ss-eyebrow">Memories</div>
+        <div class="ss-headline">Every moment,<br><em>beautifully</em><br>captured</div>
+        <div class="ss-sub">Upload memories, relive moments,<br>and celebrate milestones together</div>
+      </div>
+
+      <!-- Phone -->
+      <div class="phone-stage">
+        <div class="phone">
+          <div class="phone-shell">
+            <div class="phone-screen">
+              <div class="dynamic-island"></div>
+              <img src="./Sprout UI Design Screen/PNG Format/15.6 - Home - My Events - Upload Moments - Post Multiple.png" alt="Moments">
+            </div>
+          </div>
+
+          <!-- Floating badge -->
+          <div class="float-badge float-1" style="position:absolute;bottom:128px;right:-16px;min-width:152px;">
+            <div class="badge-icon badge-green">🌿</div>
+            <div class="badge-text">
+              <div class="bt-title">Memory saved!</div>
+              <div class="bt-sub">Shared with your group</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pill strip -->
+      <div class="pill-strip bottom">
+        <span class="pill dark-pill">📸 Moments</span>
+        <span class="pill dark-pill">🎉 Milestones</span>
+        <span class="pill dark-pill">💚 Family Albums</span>
+      </div>
+
+    </div>
+    <div class="ss-export-hint">Screenshot 5 of 5</div>
+  </div>
+
+</div><!-- /gallery -->
+
+<!-- Instructions -->
+<p class="dl-note">
+  To export at full resolution (1290 × 2796px): Right-click any screenshot → "Inspect" → set device to iPhone 16 Pro Max (430×932) → take screenshot, or use a screenshot tool set to 3× scale.
+</p>
+
+<div style="text-align:center;padding-bottom:80px;">
+  <div style="display:inline-flex;align-items:center;gap:8px;background:#222;border:1px solid #333;border-radius:12px;padding:12px 20px;">
+    <div style="width:32px;height:32px;border-radius:8px;overflow:hidden;">
+      <img src="./Logo/Sprout Logo.jpeg" alt="Sprout" style="width:100%;height:100%;object-fit:cover;">
+    </div>
+    <span style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#fff;">Sprout</span>
+    <span style="color:#444;font-size:13px;margin-left:4px;">· App Store Screenshots 2026</span>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — LinkedIn Carousel: Parenting Relatability</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green:      #186338;
+  --green-dark: #1E3E2B;
+  --green-light:#E2E9E3;
+  --green-200:  #77B691;
+  --cream:      #F4F1EA;
+  --cream-deep: #EAE6DB;
+  --text-dark:  #1a1a1a;
+  --text-mid:   #4D525B;
+  --text-light: #818898;
+  --white:      #ffffff;
+}
+
+body {
+  background: #1C1C1E;
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px;
+  gap: 32px;
+}
+
+.top-label {
+  color: #555;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── LINKEDIN CHROME ── */
+.li-chrome {
+  width: 560px;
+  background: #1D1D1F;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+.li-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px 12px;
+}
+.li-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 16px; font-weight: 700;
+  color: white; flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.1);
+}
+.li-profile { flex: 1; }
+.li-name { color: #e0e0e0; font-size: 14px; font-weight: 600; }
+.li-title { color: #888; font-size: 12px; margin-top: 2px; }
+.li-time  { color: #555; font-size: 11px; margin-top: 2px; }
+.li-more  { color: #555; font-size: 20px; margin-top: -2px; cursor: pointer; }
+
+/* ── SLIDE CONTAINER ── */
+.slide-wrapper {
+  position: relative;
+  width: 560px;
+  height: 560px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.slides-track {
+  display: flex;
+  width: calc(560px * 8);
+  height: 560px;
+  transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.slide {
+  width: 560px; height: 560px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── NAV ARROWS ── */
+.nav-btn {
+  position: absolute; top: 50%;
+  transform: translateY(-50%);
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 20;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.slide-wrapper:hover .nav-btn { opacity: 1; pointer-events: all; }
+.nav-btn.hidden { opacity: 0 !important; pointer-events: none !important; }
+.nav-prev { left: 12px; }
+.nav-next { right: 12px; }
+
+/* Progress bar */
+.progress-bar-wrap {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.1);
+  z-index: 20;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--green-200);
+  border-radius: 0 99px 99px 0;
+  transition: width 0.42s ease;
+}
+
+/* ── SLIDE DESIGNS ── */
+
+/* SLIDE 1 — COVER */
+.s1 {
+  background: var(--green-dark);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 52px 52px 60px;
+}
+.s1 .grid-lines {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+.s1 .top-bar {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--green), var(--green-200));
+}
+.s1 .slide-count {
+  position: absolute; top: 24px; right: 28px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 600;
+  color: rgba(244,241,234,0.4);
+  letter-spacing: 0.06em;
+}
+.s1 .logo {
+  position: absolute; top: 24px; left: 28px;
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 700;
+  color: var(--cream);
+  display: flex; align-items: center; gap: 6px;
+}
+.s1 .logo .dot {
+  width: 8px; height: 8px;
+  background: var(--green-200);
+  border-radius: 50%;
+}
+.s1 .eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 600;
+  color: var(--green-200);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  position: relative; z-index: 2;
+}
+.s1 h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px; font-weight: 700;
+  line-height: 1.12;
+  color: var(--cream);
+  position: relative; z-index: 2;
+  margin-bottom: 24px;
+}
+.s1 h1 em {
+  font-style: italic;
+  color: var(--green-200);
+}
+.s1 .swipe {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: rgba(244,241,234,0.35);
+  position: relative; z-index: 2;
+  display: flex; align-items: center; gap: 8px;
+}
+.s1 .swipe span { animation: nudge 2s ease-in-out infinite; display: inline-block; }
+@keyframes nudge { 0%,100%{transform:translateX(0)} 50%{transform:translateX(6px)} }
+
+/* SLIDES 2–7 — QUOTE SLIDES */
+.sq {
+  background: var(--cream);
+  display: flex;
+  flex-direction: column;
+  padding: 44px 52px 48px;
+  position: relative;
+}
+.sq.alt { background: var(--white); }
+.sq .top-bar {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--green), var(--green-200));
+}
+.sq .slide-count {
+  position: absolute; top: 20px; right: 28px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 600;
+  color: var(--text-light);
+  letter-spacing: 0.06em;
+}
+.sq .logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px; font-weight: 700;
+  color: var(--green);
+  margin-bottom: 32px;
+  display: flex; align-items: center; gap: 5px;
+}
+.sq .logo .dot {
+  width: 6px; height: 6px;
+  background: var(--green-200);
+  border-radius: 50%;
+}
+.sq .said-to {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 600;
+  color: var(--text-light);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.sq blockquote {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--green-dark);
+  margin-bottom: 32px;
+  flex: 1;
+  display: flex; align-items: center;
+}
+.sq blockquote em { font-style: italic; color: var(--green); }
+.sq .translation-pill {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--green-dark);
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+.sq .translation-pill .pill-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px; font-weight: 700;
+  color: var(--green-200);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  padding-top: 2px;
+}
+.sq .translation-pill .pill-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 400;
+  color: rgba(244,241,234,0.85);
+  line-height: 1.55;
+}
+.sq .pill-icon {
+  font-size: 18px;
+  padding-top: 1px;
+  flex-shrink: 0;
+}
+
+/* SLIDE 8 — CTA */
+.s8 {
+  background: var(--green);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 52px;
+  position: relative;
+}
+.s8 .top-bar {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--green-200), rgba(255,255,255,0.3));
+}
+.s8 .slide-count {
+  position: absolute; top: 20px; right: 28px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 600;
+  color: rgba(244,241,234,0.4);
+  letter-spacing: 0.06em;
+}
+.s8 .deco-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+}
+.s8 .logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 28px;
+  display: flex; align-items: center; gap: 7px;
+}
+.s8 .logo .dot { width: 9px; height: 9px; background: var(--green-200); border-radius: 50%; }
+.s8 h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 34px; font-weight: 700;
+  line-height: 1.18;
+  color: var(--cream);
+  margin-bottom: 18px;
+}
+.s8 h2 em { font-style: italic; color: var(--green-200); }
+.s8 p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 400;
+  color: rgba(244,241,234,0.72);
+  line-height: 1.65;
+  margin-bottom: 32px;
+  max-width: 420px;
+}
+.s8 .cta-pill {
+  background: var(--cream);
+  color: var(--green-dark);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 700;
+  padding: 14px 28px;
+  border-radius: 99px;
+  letter-spacing: 0.03em;
+}
+.s8 .tagline {
+  margin-top: 20px;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: rgba(244,241,234,0.35);
+}
+
+/* ── LI FOOTER ── */
+.li-footer { background: #1D1D1F; padding: 12px 18px 14px; }
+.li-reactions {
+  display: flex; align-items: center; gap: 4px;
+  margin-bottom: 6px; font-size: 14px;
+}
+.li-reactions span { color: #888; font-size: 12px; font-family: 'DM Sans', sans-serif; margin-left: 4px; }
+.li-actions {
+  display: flex; gap: 0;
+  border-top: 1px solid #2a2a2a;
+  padding-top: 10px; margin-top: 6px;
+}
+.li-action {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 8px 4px;
+  color: #666; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+  border-radius: 6px; cursor: pointer; transition: background 0.15s;
+}
+.li-action:hover { background: rgba(255,255,255,0.04); color: #aaa; }
+.li-action-icon { font-size: 16px; }
+
+/* ── CAPTION PANEL ── */
+.caption-panel {
+  width: 560px;
+  background: #1a1a1a;
+  border-radius: 16px;
+  padding: 28px;
+  border: 1px solid #2a2a2a;
+}
+.caption-panel h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: #444; margin-bottom: 14px;
+}
+.caption-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; color: #bbb;
+  line-height: 1.7;
+}
+.caption-text .hashtags { color: #4a9eff; margin-top: 12px; display: block; font-size: 13px; }
+
+</style>
+</head>
+<body>
+
+<p class="top-label">Sprout · LinkedIn Carousel · Parenting Relatability</p>
+
+<div class="li-chrome">
+
+  <!-- Header -->
+  <div class="li-header">
+    <div class="li-avatar">F</div>
+    <div class="li-profile">
+      <div class="li-name">Fauzan A. · Founder, Sprout</div>
+      <div class="li-title">Building the app where parents find their people 🌱</div>
+      <div class="li-time">2h · 🌐</div>
+    </div>
+    <div class="li-more">···</div>
+  </div>
+
+  <!-- Slides -->
+  <div class="slide-wrapper" id="sw">
+    <div class="slides-track" id="st">
+
+      <!-- SLIDE 1: COVER -->
+      <div class="slide s1">
+        <div class="grid-lines"></div>
+        <div class="top-bar"></div>
+        <div class="slide-count">1 / 8</div>
+        <div class="logo">Sprout<div class="dot"></div></div>
+        <div class="eyebrow">💡 Parenting Relatability</div>
+        <h1>Things I said to my toddler this week...<br>that I probably should've said in my <em>9am meeting.</em></h1>
+        <div class="swipe">Swipe through — this one's for the working parents <span>→</span></div>
+      </div>
+
+      <!-- SLIDE 2 -->
+      <div class="slide sq">
+        <div class="top-bar"></div>
+        <div class="slide-count">2 / 8</div>
+        <div class="logo">Sprout<div class="dot"></div></div>
+        <div class="said-to">Said to my toddler 🧒</div>
+        <blockquote>"Please stop interrupting people when they're <em>talking.</em>"</blockquote>
+        <div class="translation-pill">
+          <div class="pill-icon">💼</div>
+          <div>
+            <div class="pill-label">At work, this means →</div>
+            <div class="pill-text">For the colleague who speaks over everyone in standup. Every. Single. Week.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 3 -->
+      <div class="slide sq alt">
+        <div class="top-bar"></div>
+        <div class="slide-count">3 / 8</div>
+        <div class="logo">Sprout<div class="dot"></div></div>
+        <div class="said-to">Said to my toddler 🧒</div>
+        <blockquote>"I'm not angry.<br>I'm just... <em>disappointed.</em>"</blockquote>
+        <div class="translation-pill">
+          <div class="pill-icon">💼</div>
+          <div>
+            <div class="pill-label">At work, this means →</div>
+            <div class="pill-text">For every performance conversation you've been postponing since Q1.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 4 -->
+      <div class="slide sq">
+        <div class="top-bar"></div>
+        <div class="slide-count">4 / 8</div>
+        <div class="logo">Sprout<div class="dot"></div></div>
+        <div class="said-to">Said to my toddler 🧒</div>
+        <blockquote>"We don't grab things without <em>asking first.</em>"</blockquote>
+        <div class="translation-pill">
+          <div class="pill-icon">💼</div>
+          <div>
+            <div class="pill-label">At work, this means →</div>
+            <div class="pill-text">For every budget conversation where someone just... took the headcount.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 5 -->
+      <div class="slide sq alt">
+        <div class="top-bar"></div>
+        <div class="slide-count">5 / 8</div>
+        <div class="logo">Sprout<div class="dot"></div></div>
+        <div class="said-to">Said to my toddler 🧒</div>
+        <blockquote>"Use your words.<br>Tell me <em>what's wrong.</em>"</blockquote>
+        <div class="translation-pill">
+          <div class="pill-icon">💼</div>
+          <div>
+            <div class="pill-label">At work, this means →</div>
+            <div class="pill-text">For every passive-aggressive Slack message that could've been a 5-minute conversation.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 6 -->
+      <div class="slide sq">
+        <div class="top-bar"></div>
+        <div class="slide-count">6 / 8</div>
+        <div class="logo">Sprout<div class="dot"></div></div>
+        <div class="said-to">Said to my toddler 🧒</div>
+        <blockquote>"We're not doing that today.<br><em>Maybe tomorrow.</em>"</blockquote>
+        <div class="translation-pill">
+          <div class="pill-icon">💼</div>
+          <div>
+            <div class="pill-label">At work, this means →</div>
+            <div class="pill-text">Every product roadmap conversation since the company was founded.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 7 -->
+      <div class="slide sq alt">
+        <div class="top-bar"></div>
+        <div class="slide-count">7 / 8</div>
+        <div class="logo">Sprout<div class="dot"></div></div>
+        <div class="said-to">Said to my toddler 🧒</div>
+        <blockquote>"I know you're tired.<br>We all are.<br>But we <em>still show up.</em>"</blockquote>
+        <div class="translation-pill">
+          <div class="pill-icon">💼</div>
+          <div>
+            <div class="pill-label">At work, this means →</div>
+            <div class="pill-text">Monday morning energy, every Monday, forever. You know the one.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 8: CTA -->
+      <div class="slide s8">
+        <div class="top-bar"></div>
+        <div class="slide-count">8 / 8</div>
+        <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,0.04);top:-80px;right:-80px;"></div>
+        <div style="position:absolute;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,0.03);bottom:-60px;left:-60px;"></div>
+        <div class="logo">Sprout<div class="dot"></div></div>
+        <h2>Parenting is the leadership training <em>nobody signs you up for.</em></h2>
+        <p>The patience. The negotiation. The emotional regulation. (Mostly yours.) Sprout is where parents like you find the community that actually gets it.</p>
+        <div class="cta-pill">🌱 Find your people on Sprout</div>
+        <div class="tagline">Where parents bond and childhoods flourish.</div>
+      </div>
+
+    </div><!-- /track -->
+
+    <button class="nav-btn nav-prev hidden" id="prev" onclick="go(-1)">‹</button>
+    <button class="nav-btn nav-next" id="next" onclick="go(1)">›</button>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="pgBar" style="width:12.5%"></div>
+    </div>
+  </div>
+
+  <!-- LI Footer -->
+  <div class="li-footer">
+    <div class="li-reactions">
+      <span>👍</span><span>❤️</span><span>💡</span>
+      <span>1,284 reactions · 347 comments · 892 reposts</span>
+    </div>
+    <div class="li-actions">
+      <div class="li-action"><span class="li-action-icon">👍</span>Like</div>
+      <div class="li-action"><span class="li-action-icon">💬</span>Comment</div>
+      <div class="li-action"><span class="li-action-icon">🔁</span>Repost</div>
+      <div class="li-action"><span class="li-action-icon">✉️</span>Send</div>
+    </div>
+  </div>
+
+</div><!-- /chrome -->
+
+<!-- Caption Panel -->
+<div class="caption-panel">
+  <h3>LinkedIn Post Caption</h3>
+  <div class="caption-text">
+    Things I said to my toddler this week that I probably should've said in my 9am meeting 😅<br><br>
+    Parenting teaches you negotiation, emotional regulation, conflict resolution, and the art of saying "because I said so" with complete confidence.<br><br>
+    If you're a working parent, you already know: the skills overlap more than any leadership course will ever tell you.<br><br>
+    Swipe through — tag a fellow working parent who'll feel every single one of these. 👇<br><br>
+    ——<br><br>
+    Built Sprout for exactly this kind of parent. The ones juggling work, kids, and somehow still trying to build a community. We're making it easier to find your people 🌱<br><br>
+    What would you add to this list? Drop it in the comments.
+    <span class="hashtags">#Parenting #WorkingParents #Leadership #ParentLife #Sprout #StartupLife #ParentCommunity #WorkLifeBalance #Toddler #RelatabaleParenting #MomLife #DadLife #Founders #StartupFounder</span>
+  </div>
+</div>
+
+<script>
+let cur = 0;
+const total = 8;
+const track = document.getElementById('st');
+const bar = document.getElementById('pgBar');
+const prev = document.getElementById('prev');
+const next = document.getElementById('next');
+
+function go(dir) {
+  const n = cur + dir;
+  if (n < 0 || n >= total) return;
+  cur = n;
+  track.style.transform = `translateX(-${cur * 560}px)`;
+  bar.style.width = `${((cur + 1) / total) * 100}%`;
+  prev.classList.toggle('hidden', cur === 0);
+  next.classList.toggle('hidden', cur === total - 1);
+}
+
+// click left/right half
+document.getElementById('sw').addEventListener('click', e => {
+  if (e.target.closest('.nav-btn')) return;
+  const x = e.clientX - e.currentTarget.getBoundingClientRect().left;
+  go(x > 280 ? 1 : -1);
+});
+
+// swipe
+let sx = 0;
+document.getElementById('sw').addEventListener('touchstart', e => sx = e.touches[0].clientX);
+document.getElementById('sw').addEventListener('touchend', e => {
+  const d = sx - e.changedTouches[0].clientX;
+  if (Math.abs(d) > 40) go(d > 0 ? 1 : -1);
+});
+</script>
+</body>
+</html>

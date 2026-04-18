@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Splash Animated · Exploration v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #b8b2a8;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 72px;
+  padding: 72px 40px 100px;
+  font-family: 'Inter', sans-serif;
+  flex-wrap: wrap;
+}
+
+.variant-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.variant-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #4a4640;
+}
+
+/* ── Phone shell ── */
+.phone {
+  width: 393px; height: 852px;
+  border-radius: 54px;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 0 0 1.5px rgba(0,0,0,0.12),
+    0 12px 24px rgba(0,0,0,0.1),
+    0 60px 140px rgba(0,0,0,0.30);
+}
+
+.screen {
+  width: 393px; height: 852px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Status bar ── */
+.status-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 54px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 28px 10px;
+  z-index: 80;
+}
+.status-time { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+
+/* ── Dynamic Island ── */
+.di {
+  position: absolute;
+  top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 34px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 90;
+}
+
+/* ── Home indicator ── */
+.hi {
+  position: absolute;
+  bottom: 8px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  border-radius: 3px;
+  opacity: 0.22;
+  z-index: 90;
+}
+
+/* ══════════════════════════════════════════
+   SCREEN A — Community Constellation
+══════════════════════════════════════════ */
+.screen-a { background: #f4f1ea; }
+
+/* ── Green top hero zone ── */
+.a-hero {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 390px;
+  background: #1a3728;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Arch cutout at base */
+.a-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: -8%; right: -8%;
+  height: 90px;
+  background: #f4f1ea;
+  border-radius: 120% 120% 0 0 / 80px 80px 0 0;
+}
+
+/* Grain overlay */
+.a-grain {
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* SVG constellation canvas */
+.constellation-svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 2;
+}
+
+/* ── Constellation: connection lines ── */
+.con-line {
+  stroke: rgba(208,218,207,0.28);
+  stroke-width: 1;
+  fill: none;
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+}
+.con-line.l1 { animation: drawLine 1s cubic-bezier(0.4,0,0.2,1) 0.6s forwards; }
+.con-line.l2 { animation: drawLine 1s cubic-bezier(0.4,0,0.2,1) 0.75s forwards; }
+.con-line.l3 { animation: drawLine 1s cubic-bezier(0.4,0,0.2,1) 0.9s forwards; }
+.con-line.l4 { animation: drawLine 1s cubic-bezier(0.4,0,0.2,1) 1.0s forwards; }
+.con-line.l5 { animation: drawLine 1s cubic-bezier(0.4,0,0.2,1) 1.1s forwards; }
+.con-line.l6 { animation: drawLine 1s cubic-bezier(0.4,0,0.2,1) 1.2s forwards; }
+.con-line.l7 { animation: drawLine 0.8s cubic-bezier(0.4,0,0.2,1) 1.3s forwards; }
+.con-line.l8 { animation: drawLine 0.8s cubic-bezier(0.4,0,0.2,1) 1.4s forwards; }
+.con-line.l9 { animation: drawLine 0.8s cubic-bezier(0.4,0,0.2,1) 1.5s forwards; }
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Dashed secondary connections */
+.con-dash {
+  stroke: rgba(208,218,207,0.14);
+  stroke-width: 1;
+  stroke-dasharray: 4 6;
+  fill: none;
+  opacity: 0;
+  animation: fadeIn 0.6s ease 1.6s forwards;
+}
+@keyframes fadeIn { to { opacity: 1; } }
+
+/* ── Family nodes ── */
+.fam-node {
+  opacity: 0;
+  animation: nodeAppear 0.5s cubic-bezier(0.34,1.56,0.64,1) var(--nd, 0.8s) forwards;
+}
+@keyframes nodeAppear {
+  from { opacity: 0; transform: scale(0.4); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Pulse ring around node */
+.pulse-ring {
+  animation: pulseRing var(--pr-dur, 3s) ease-out var(--pr-delay, 2s) infinite;
+}
+@keyframes pulseRing {
+  0%   { opacity: 0.5; transform: scale(1); }
+  80%  { opacity: 0; transform: scale(2.2); }
+  100% { opacity: 0; transform: scale(2.2); }
+}
+
+/* ── Central clover bloom ── */
+.clover-central {
+  opacity: 0;
+  animation: cloverBloom 0.9s cubic-bezier(0.34,1.3,0.64,1) 0.3s forwards;
+  transform-origin: 196px 162px;
+}
+@keyframes cloverBloom {
+  from { opacity: 0; transform: scale(0) rotate(-90deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* Halo behind clover */
+.clover-halo {
+  opacity: 0;
+  animation: haloAppear 1s ease 0.6s forwards;
+}
+@keyframes haloAppear {
+  to { opacity: 1; }
+}
+
+/* ── Floating particles in green area ── */
+.a-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(208,218,207,0.35);
+  animation: floatParticle var(--fp-dur,5s) ease-in-out var(--fp-delay,0s) infinite;
+}
+@keyframes floatParticle {
+  0%,100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+  50%      { transform: translateY(var(--fp-y,-14px)) translateX(var(--fp-x,8px)); opacity: 0.7; }
+}
+
+/* ── Content zone (below arch) ── */
+.a-content {
+  position: absolute;
+  top: 348px; left: 0; right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 28px;
+  z-index: 10;
+}
+
+.a-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  font-weight: 600;
+  font-style: italic;
+  color: #1c1c1a;
+  text-align: center;
+  letter-spacing: -0.5px;
+  line-height: 1.25;
+  margin-bottom: 10px;
+  clip-path: inset(0 100% 0 0);
+  animation: revealText 0.8s cubic-bezier(0.22,1,0.36,1) 1.8s forwards;
+}
+@keyframes revealText {
+  to { clip-path: inset(0 0% 0 0); }
+}
+
+.a-sub {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6b6860;
+  text-align: center;
+  line-height: 1.65;
+  max-width: 290px;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: slideUp 0.7s cubic-bezier(0.22,1,0.36,1) 2.1s forwards;
+}
+
+/* ── Pillar cards ── */
+.a-pillars {
+  position: absolute;
+  top: 520px; left: 20px; right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10;
+}
+
+.pillar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #faf9f6;
+  border-radius: 18px;
+  border: 1px solid rgba(0,0,0,0.065);
+  opacity: 0;
+  transform: translateX(24px);
+}
+.pillar.p1 { animation: slideLeft 0.6s cubic-bezier(0.34,1.2,0.64,1) 2.3s forwards; }
+.pillar.p2 { animation: slideLeft 0.6s cubic-bezier(0.34,1.2,0.64,1) 2.5s forwards; }
+.pillar.p3 { animation: slideLeft 0.6s cubic-bezier(0.34,1.2,0.64,1) 2.7s forwards; }
+@keyframes slideLeft {
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.pillar-icon-wrap {
+  width: 42px; height: 42px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.pillar-title {
+  font-size: 13.5px; font-weight: 600;
+  color: #1c1c1a; letter-spacing: -0.1px;
+}
+.pillar-desc {
+  font-size: 12.5px; font-weight: 400;
+  color: #6b6860; line-height: 1.4;
+  margin-top: 2px;
+}
+.pillar-arrow {
+  margin-left: auto;
+  flex-shrink: 0;
+  opacity: 0.35;
+}
+
+/* ── CTA ── */
+.a-cta {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 0 24px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 10;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: slideUp 0.8s cubic-bezier(0.34,1.2,0.64,1) 3.0s forwards;
+}
+
+.btn-main {
+  width: 100%;
+  padding: 17px;
+  background: #1e3e2b;
+  color: #f4f1ea;
+  border: none;
+  border-radius: 99px;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px; font-weight: 600;
+  letter-spacing: -0.2px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(30,62,43,0.32);
+}
+/* Shimmer on button */
+.btn-main::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+  animation: shimmer 2.5s ease 3.5s infinite;
+}
+@keyframes shimmer {
+  0%   { left: -100%; }
+  100% { left: 180%; }
+}
+
+.signin-txt {
+  font-size: 14px; font-weight: 400;
+  color: #6b6860;
+}
+.signin-txt span {
+  color: #1e3e2b; font-weight: 600; cursor: pointer;
+}
+
+@keyframes slideUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ══════════════════════════════════════════
+   SCREEN B — Immersive Green + Morphing
+══════════════════════════════════════════ */
+.screen-b { background: #162d22; }
+
+/* ── Animated blob background ── */
+.blob-container {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.5;
+  animation: blobFloat var(--bf-dur,10s) ease-in-out var(--bf-delay,0s) infinite alternate;
+}
+@keyframes blobFloat {
+  0%   { transform: translate(0,0) scale(1); }
+  100% { transform: translate(var(--bf-x,30px), var(--bf-y,-20px)) scale(var(--bf-s,1.1)); }
+}
+
+/* Morphing top shape */
+.morph-shape {
+  position: absolute;
+  top: -60px; left: -60px;
+  width: 320px; height: 320px;
+  background: rgba(56,127,86,0.25);
+  animation: morph 12s ease-in-out infinite alternate;
+}
+@keyframes morph {
+  0%   { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  25%  { border-radius: 40% 60% 70% 30% / 40% 70% 30% 60%; }
+  50%  { border-radius: 70% 30% 40% 60% / 30% 60% 40% 70%; }
+  75%  { border-radius: 30% 70% 60% 40% / 70% 40% 60% 30%; }
+  100% { border-radius: 50% 50% 30% 70% / 50% 40% 60% 50%; }
+}
+
+/* Second morph shape bottom right */
+.morph-shape-2 {
+  position: absolute;
+  bottom: 300px; right: -80px;
+  width: 260px; height: 260px;
+  background: rgba(30,78,53,0.3);
+  animation: morph 16s ease-in-out 3s infinite alternate;
+}
+
+/* ── Firefly particles ── */
+.firefly {
+  position: absolute;
+  width: var(--ff-size,4px);
+  height: var(--ff-size,4px);
+  border-radius: 50%;
+  background: rgba(208,218,207,var(--ff-op,0.6));
+  animation: fireflyAnim var(--ff-dur,6s) ease-in-out var(--ff-delay,0s) infinite;
+}
+@keyframes fireflyAnim {
+  0%,100% { transform: translate(0,0); opacity: 0; }
+  20%      { opacity: var(--ff-op,0.6); }
+  50%      { transform: translate(var(--ff-x,20px), var(--ff-y,-30px)); opacity: var(--ff-op,0.6); }
+  80%      { opacity: var(--ff-op,0.3); }
+}
+
+/* ── Grain texture ── */
+.b-grain {
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.65;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ── Top hero content (green zone) ── */
+.b-hero {
+  position: absolute;
+  top: 54px; left: 0; right: 0;
+  height: 390px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* ── Rotating orbit ring ── */
+.orbit-system {
+  position: absolute;
+  top: 54px; left: 50%;
+  transform: translateX(-50%);
+  width: 260px; height: 260px;
+  opacity: 0;
+  animation: fadeIn 1s ease 0.5s forwards;
+}
+
+.orbit-ring {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(208,218,207,0.12);
+  border-radius: 50%;
+  animation: orbitSpin var(--os-dur, 30s) linear 0s infinite;
+}
+.orbit-ring.ring-2 {
+  inset: 26px;
+  border-color: rgba(208,218,207,0.08);
+  animation: orbitSpin 45s linear 0s infinite reverse;
+}
+@keyframes orbitSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Dots on orbit ring */
+.orbit-dot {
+  position: absolute;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(208,218,207,0.5);
+  margin: -4px;
+}
+
+/* ── Clover center ── */
+.b-clover-wrap {
+  width: 88px; height: 88px;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  opacity: 0;
+  transform: scale(0.5) rotate(-20deg);
+  animation: iconBloom 0.9s cubic-bezier(0.34,1.4,0.64,1) 0.4s forwards;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 0 40px rgba(87,154,116,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+@keyframes iconBloom {
+  to { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* Subtle icon glow */
+.b-clover-wrap::before {
+  content: '';
+  position: absolute;
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, rgba(87,154,116,0.22) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: glowPulse 3s ease-in-out 1s infinite;
+}
+@keyframes glowPulse {
+  0%,100% { transform: scale(1); opacity: 0.7; }
+  50%      { transform: scale(1.2); opacity: 1; }
+}
+
+/* ── B headline ── */
+.b-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: #f4f1ea;
+  letter-spacing: -1.2px;
+  text-align: center;
+  line-height: 1.1;
+  margin-bottom: 12px;
+  opacity: 0;
+  clip-path: inset(0 100% 0 0);
+  animation: revealText 0.9s cubic-bezier(0.22,1,0.36,1) 0.9s forwards;
+}
+
+/* ── Cycling value text ── */
+.b-cycle-wrap {
+  height: 24px;
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeIn 0.6s ease 1.6s forwards;
+}
+.b-cycle-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 400;
+  color: rgba(244,241,234,0.55);
+  text-align: center;
+  line-height: 24px;
+  animation: cycleText 9s ease 2.2s infinite;
+}
+@keyframes cycleText {
+  0%,22%   { transform: translateY(0);   opacity: 0; }
+  5%,18%   { opacity: 1; }
+  25%,47%  { transform: translateY(-24px); opacity: 0; }
+  30%,43%  { opacity: 1; }
+  50%,72%  { transform: translateY(-48px); opacity: 0; }
+  55%,67%  { opacity: 1; }
+  75%,100% { transform: translateY(-72px); opacity: 0; }
+}
+/* We'll manage cycling text via JS */
+
+/* ── Cream bottom sheet ── */
+.b-sheet {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 440px;
+  background: #f4f1ea;
+  border-radius: 32px 32px 0 0;
+  z-index: 20;
+  overflow: hidden;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.2);
+  transform: translateY(60px);
+  opacity: 0;
+  animation: sheetReveal 0.9s cubic-bezier(0.34,1.15,0.64,1) 1.4s forwards;
+}
+@keyframes sheetReveal {
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Sheet grain */
+.b-sheet::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Sheet handle */
+.sheet-handle {
+  position: absolute;
+  top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 40px; height: 4px;
+  background: #dbd5c8;
+  border-radius: 2px;
+}
+
+.b-sheet-inner {
+  position: relative;
+  z-index: 1;
+  padding: 30px 24px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Feature tags ── */
+.b-tags {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: slideUp 0.6s cubic-bezier(0.22,1,0.36,1) 1.9s forwards;
+}
+.b-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  background: #eae6db;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4d525b;
+}
+
+/* ── Sheet headline ── */
+.b-sheet-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: #1c1c1a;
+  letter-spacing: -0.5px;
+  line-height: 1.25;
+  margin-bottom: 8px;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: slideUp 0.6s cubic-bezier(0.22,1,0.36,1) 2.05s forwards;
+}
+
+.b-sheet-sub {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6b6860;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: slideUp 0.6s cubic-bezier(0.22,1,0.36,1) 2.2s forwards;
+}
+
+/* ── Social proof counter ── */
+.b-social-proof {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #eae6db;
+  border-radius: 14px;
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: slideUp 0.6s cubic-bezier(0.22,1,0.36,1) 2.35s forwards;
+}
+.proof-avatars {
+  display: flex;
+}
+.proof-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid #eae6db;
+  margin-left: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #f4f1ea;
+  flex-shrink: 0;
+}
+.proof-avatar:first-child { margin-left: 0; }
+.proof-text {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 400;
+  color: #4d525b;
+  line-height: 1.4;
+}
+.proof-count {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e3e2b;
+}
+
+/* ── B CTA ── */
+.b-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: slideUp 0.7s cubic-bezier(0.34,1.2,0.64,1) 2.55s forwards;
+}
+.btn-b-primary {
+  width: 100%;
+  padding: 17px;
+  background: #1e3e2b;
+  color: #f4f1ea;
+  border: none;
+  border-radius: 99px;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px; font-weight: 600;
+  letter-spacing: -0.2px;
+  cursor: pointer;
+  position: relative; overflow: hidden;
+  box-shadow: 0 6px 24px rgba(30,62,43,0.28);
+}
+.btn-b-primary::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 55%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  animation: shimmer 2.8s ease 3.0s infinite;
+}
+
+.btn-b-ghost {
+  width: 100%;
+  padding: 15px;
+  background: transparent;
+  color: #4d525b;
+  border: 1.5px solid rgba(0,0,0,0.10);
+  border-radius: 99px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px; font-weight: 500;
+  cursor: pointer;
+}
+
+</style>
+</head>
+<body>
+
+
+<!-- ════════════════════════════════════════════════════
+     EXPLORATION A — Constellation Community Network
+════════════════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <div class="variant-label">Exploration A — Community Constellation</div>
+  <div class="phone">
+    <div class="screen screen-a">
+
+      <div class="di"></div>
+      <div class="status-bar">
+        <span class="status-time" style="color:#f4f1ea;">9:41</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="#f4f1ea"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="#f4f1ea"><path d="M8 2.4C10.4 2.4 12.6 3.4 14.1 5L15.5 3.6C13.6 1.7 11 0.5 8 0.5C5 0.5 2.4 1.7 0.5 3.6L1.9 5C3.4 3.4 5.6 2.4 8 2.4Z"/><path d="M8 5.3C9.6 5.3 11 5.9 12.1 7L13.5 5.6C12 4.2 10.1 3.3 8 3.3C5.9 3.3 4 4.2 2.5 5.6L3.9 7C5 5.9 6.4 5.3 8 5.3Z"/><circle cx="8" cy="10" r="1.5"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#f4f1ea"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#f4f1ea"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.5 24.5 6C24.5 5.5 23.8 4.8 23 4.5Z" fill="#f4f1ea"/></svg>
+        </div>
+      </div>
+
+      <!-- ── Green hero zone ── -->
+      <div class="a-hero">
+        <div class="a-grain"></div>
+
+        <!-- Floating particles -->
+        <div class="a-particle" style="width:5px;height:5px;top:80px;left:42px;--fp-dur:5s;--fp-delay:0.5s;--fp-y:-18px;--fp-x:8px;"></div>
+        <div class="a-particle" style="width:3px;height:3px;top:120px;right:55px;--fp-dur:6.5s;--fp-delay:1.2s;--fp-y:-10px;--fp-x:-12px;"></div>
+        <div class="a-particle" style="width:4px;height:4px;top:200px;left:28px;--fp-dur:4.5s;--fp-delay:2.0s;--fp-y:-14px;--fp-x:6px;"></div>
+        <div class="a-particle" style="width:3px;height:3px;top:260px;right:38px;--fp-dur:7s;--fp-delay:0.8s;--fp-y:-20px;--fp-x:-8px;"></div>
+        <div class="a-particle" style="width:4px;height:4px;top:150px;left:72px;--fp-dur:5.8s;--fp-delay:1.6s;--fp-y:-12px;--fp-x:14px;background:rgba(120,180,140,0.4);"></div>
+        <div class="a-particle" style="width:3px;height:3px;top:310px;right:80px;--fp-dur:6s;--fp-delay:3.0s;--fp-y:-8px;--fp-x:-10px;"></div>
+
+        <!-- ══ CONSTELLATION SVG ══ -->
+        <svg class="constellation-svg" viewBox="0 0 393 390" xmlns="http://www.w3.org/2000/svg">
+
+          <!-- Radial glow behind center -->
+          <defs>
+            <radialGradient id="cglow" cx="50%" cy="42%" r="40%">
+              <stop offset="0%" stop-color="#3a7c55" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#1a3728" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="nglow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#579a74" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#1a3728" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="softblur">
+              <feGaussianBlur stdDeviation="2"/>
+            </filter>
+          </defs>
+
+          <!-- Background glow -->
+          <ellipse cx="196" cy="162" rx="160" ry="140" fill="url(#cglow)" class="clover-halo"/>
+
+          <!-- ── Connection lines (primary) ── -->
+          <!-- center → node upper-right -->
+          <line class="con-line l1" x1="196" y1="162" x2="298" y2="88"/>
+          <!-- center → node top-left -->
+          <line class="con-line l2" x1="196" y1="162" x2="115" y2="72"/>
+          <!-- center → node left -->
+          <line class="con-line l3" x1="196" y1="162" x2="82" y2="175"/>
+          <!-- center → node lower-left -->
+          <line class="con-line l4" x1="196" y1="162" x2="118" y2="262"/>
+          <!-- center → node lower-right -->
+          <line class="con-line l5" x1="196" y1="162" x2="285" y2="255"/>
+          <!-- center → node right-far -->
+          <line class="con-line l6" x1="196" y1="162" x2="340" y2="178"/>
+          <!-- node-to-node connections -->
+          <line class="con-line l7" x1="298" y1="88" x2="115" y2="72"/>
+          <line class="con-line l8" x1="298" y1="88" x2="340" y2="178"/>
+          <line class="con-line l9" x1="118" y1="262" x2="285" y2="255"/>
+
+          <!-- ── Dashed secondary ── -->
+          <line class="con-dash" x1="115" y1="72" x2="82" y2="175"/>
+          <line class="con-dash" x1="82" y1="175" x2="118" y2="262"/>
+          <line class="con-dash" x1="340" y1="178" x2="285" y2="255"/>
+          <line class="con-dash" x1="298" y1="88" x2="285" y2="255" stroke-opacity="0.1"/>
+          <!-- far outer nodes -->
+          <line class="con-dash" x1="298" y1="88" x2="356" y2="44" stroke-opacity="0.1"/>
+          <line class="con-dash" x1="115" y1="72" x2="50" y2="38" stroke-opacity="0.1"/>
+          <line class="con-dash" x1="82" y1="175" x2="32" y2="192" stroke-opacity="0.1"/>
+          <line class="con-dash" x1="285" y1="255" x2="355" y2="290" stroke-opacity="0.1"/>
+
+          <!-- ══ FAMILY NODES ══ -->
+
+          <!-- Node: Upper Right — family with active event -->
+          <g class="fam-node" style="--nd:0.7s;" transform="translate(298,88)">
+            <!-- Pulse ring -->
+            <circle class="pulse-ring" cx="0" cy="0" r="18" fill="none"
+              stroke="rgba(208,218,207,0.4)" stroke-width="1.5"
+              style="--pr-dur:3.2s;--pr-delay:2.0s;"
+              transform-origin="0 0"/>
+            <!-- Node bg -->
+            <circle cx="0" cy="0" r="18" fill="rgba(87,154,116,0.22)"/>
+            <circle cx="0" cy="0" r="18" fill="none" stroke="rgba(208,218,207,0.35)" stroke-width="1.2"/>
+            <!-- Avatar initials -->
+            <text x="0" y="5" text-anchor="middle" fill="rgba(244,241,234,0.85)"
+              font-family="Inter,sans-serif" font-size="12" font-weight="600">S</text>
+            <!-- Status dot: active -->
+            <circle cx="12" cy="-12" r="5" fill="#3a8a62"/>
+            <circle cx="12" cy="-12" r="2.5" fill="#f4f1ea"/>
+          </g>
+
+          <!-- Node: Top Left — new member -->
+          <g class="fam-node" style="--nd:0.85s;" transform="translate(115,72)">
+            <circle class="pulse-ring" cx="0" cy="0" r="15" fill="none"
+              stroke="rgba(208,218,207,0.4)" stroke-width="1.5"
+              style="--pr-dur:4s;--pr-delay:2.8s;"
+              transform-origin="0 0"/>
+            <circle cx="0" cy="0" r="15" fill="rgba(56,127,86,0.20)"/>
+            <circle cx="0" cy="0" r="15" fill="none" stroke="rgba(208,218,207,0.3)" stroke-width="1.2"/>
+            <text x="0" y="5" text-anchor="middle" fill="rgba(244,241,234,0.8)"
+              font-family="Inter,sans-serif" font-size="11" font-weight="600">M</text>
+            <!-- New badge -->
+            <circle cx="10" cy="-10" r="5" fill="#d4a017"/>
+            <text x="10" y="-7" text-anchor="middle" fill="#fff"
+              font-family="Inter,sans-serif" font-size="7" font-weight="700">N</text>
+          </g>
+
+          <!-- Node: Left — club host -->
+          <g class="fam-node" style="--nd:1.0s;" transform="translate(82,175)">
+            <circle class="pulse-ring" cx="0" cy="0" r="20" fill="none"
+              stroke="rgba(208,218,207,0.35)" stroke-width="1.5"
+              style="--pr-dur:3.6s;--pr-delay:3.4s;"
+              transform-origin="0 0"/>
+            <circle cx="0" cy="0" r="20" fill="rgba(30,78,53,0.35)"/>
+            <circle cx="0" cy="0" r="20" fill="none" stroke="rgba(208,218,207,0.35)" stroke-width="1.2"/>
+            <text x="0" y="5" text-anchor="middle" fill="rgba(244,241,234,0.85)"
+              font-family="Inter,sans-serif" font-size="12" font-weight="600">J</text>
+          </g>
+
+          <!-- Node: Lower Left -->
+          <g class="fam-node" style="--nd:1.15s;" transform="translate(118,262)">
+            <circle cx="0" cy="0" r="16" fill="rgba(87,154,116,0.18)"/>
+            <circle cx="0" cy="0" r="16" fill="none" stroke="rgba(208,218,207,0.28)" stroke-width="1"/>
+            <text x="0" y="5" text-anchor="middle" fill="rgba(244,241,234,0.75)"
+              font-family="Inter,sans-serif" font-size="11" font-weight="600">A</text>
+          </g>
+
+          <!-- Node: Lower Right -->
+          <g class="fam-node" style="--nd:1.25s;" transform="translate(285,255)">
+            <circle class="pulse-ring" cx="0" cy="0" r="17" fill="none"
+              stroke="rgba(208,218,207,0.4)" stroke-width="1.5"
+              style="--pr-dur:4.5s;--pr-delay:3.8s;"
+              transform-origin="0 0"/>
+            <circle cx="0" cy="0" r="17" fill="rgba(56,127,86,0.22)"/>
+            <circle cx="0" cy="0" r="17" fill="none" stroke="rgba(208,218,207,0.3)" stroke-width="1.2"/>
+            <text x="0" y="5" text-anchor="middle" fill="rgba(244,241,234,0.8)"
+              font-family="Inter,sans-serif" font-size="11" font-weight="600">L</text>
+          </g>
+
+          <!-- Node: Far Right -->
+          <g class="fam-node" style="--nd:1.35s;" transform="translate(340,178)">
+            <circle cx="0" cy="0" r="13" fill="rgba(30,62,43,0.4)"/>
+            <circle cx="0" cy="0" r="13" fill="none" stroke="rgba(208,218,207,0.22)" stroke-width="1"/>
+            <text x="0" y="4" text-anchor="middle" fill="rgba(244,241,234,0.65)"
+              font-family="Inter,sans-serif" font-size="10" font-weight="600">R</text>
+          </g>
+
+          <!-- Outer faint nodes -->
+          <g class="fam-node" style="--nd:1.5s;opacity:0;" transform="translate(356,44)">
+            <circle cx="0" cy="0" r="8" fill="rgba(87,154,116,0.12)"/>
+            <circle cx="0" cy="0" r="8" fill="none" stroke="rgba(208,218,207,0.15)" stroke-width="1"/>
+          </g>
+          <g class="fam-node" style="--nd:1.6s;" transform="translate(50,38)">
+            <circle cx="0" cy="0" r="9" fill="rgba(56,127,86,0.12)"/>
+            <circle cx="0" cy="0" r="9" fill="none" stroke="rgba(208,218,207,0.15)" stroke-width="1"/>
+          </g>
+          <g class="fam-node" style="--nd:1.7s;" transform="translate(32,192)">
+            <circle cx="0" cy="0" r="7" fill="rgba(87,154,116,0.10)"/>
+            <circle cx="0" cy="0" r="7" fill="none" stroke="rgba(208,218,207,0.12)" stroke-width="1"/>
+          </g>
+          <g class="fam-node" style="--nd:1.8s;" transform="translate(355,290)">
+            <circle cx="0" cy="0" r="8" fill="rgba(56,127,86,0.10)"/>
+            <circle cx="0" cy="0" r="8" fill="none" stroke="rgba(208,218,207,0.12)" stroke-width="1"/>
+          </g>
+
+          <!-- ══ CENTRAL CLOVER ══ -->
+          <g class="clover-central" transform="translate(196,162)">
+            <!-- Shadow / halo -->
+            <circle cx="0" cy="0" r="36" fill="rgba(87,154,116,0.18)" filter="url(#softblur)"/>
+
+            <!-- Outer ring (identity boundary) -->
+            <circle cx="0" cy="0" r="30" fill="rgba(30,62,43,0.5)"/>
+            <circle cx="0" cy="0" r="30" fill="none"
+              stroke="rgba(208,218,207,0.40)" stroke-width="1.5"/>
+
+            <!-- Clover petals -->
+            <ellipse cx="0" cy="-13" rx="9" ry="11" fill="rgba(244,241,234,0.93)"/>
+            <ellipse cx="13" cy="0"  rx="11" ry="9"  fill="rgba(244,241,234,0.93)"/>
+            <ellipse cx="0" cy="13"  rx="9" ry="11"  fill="rgba(244,241,234,0.93)"/>
+            <ellipse cx="-13" cy="0" rx="11" ry="9"  fill="rgba(244,241,234,0.93)"/>
+            <circle  cx="0" cy="0"   r="9"  fill="rgba(244,241,234,0.93)"/>
+
+            <!-- Petal shading -->
+            <ellipse cx="0"  cy="-13" rx="5" ry="6" fill="rgba(30,62,43,0.14)"/>
+            <ellipse cx="13" cy="0"   rx="6" ry="5" fill="rgba(30,62,43,0.14)"/>
+            <ellipse cx="0"  cy="13"  rx="5" ry="6" fill="rgba(30,62,43,0.14)"/>
+            <ellipse cx="-13" cy="0"  rx="6" ry="5" fill="rgba(30,62,43,0.14)"/>
+
+            <!-- Stem -->
+            <path d="M0 18 L0 28" stroke="rgba(244,241,234,0.65)" stroke-width="2" stroke-linecap="round"/>
+
+            <!-- Center jewel -->
+            <circle cx="0" cy="0" r="3.5" fill="rgba(30,62,43,0.35)"/>
+            <circle cx="0" cy="0" r="2"   fill="rgba(30,62,43,0.5)"/>
+          </g>
+
+          <!-- Brand name below clover (in SVG space) -->
+          <text x="196" y="218" text-anchor="middle"
+            font-family="Playfair Display, serif" font-size="22" font-weight="700"
+            fill="rgba(244,241,234,0.92)" letter-spacing="-0.5"
+            class="clover-halo">Sprout</text>
+
+        </svg>
+        <!-- End constellation SVG -->
+      </div>
+      <!-- End green hero -->
+
+      <!-- Content below arch -->
+      <div class="a-content">
+        <div class="a-headline">Your people<br>are out there.</div>
+        <div class="a-sub">
+          Discover local events, join family clubs, and make connections that actually last.
+        </div>
+      </div>
+
+      <!-- Three pillars -->
+      <div class="a-pillars">
+        <div class="pillar p1">
+          <div class="pillar-icon-wrap" style="background:#eae7dd;">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <rect x="2" y="4" width="18" height="16" rx="4" stroke="#1e3e2b" stroke-width="1.6"/>
+              <path d="M7 2V5M15 2V5" stroke="#1e3e2b" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M2 9H20" stroke="#1e3e2b" stroke-width="1.4"/>
+              <circle cx="7" cy="14" r="1.5" fill="#1e3e2b"/>
+              <circle cx="11" cy="14" r="1.5" fill="#1e3e2b" opacity="0.45"/>
+              <circle cx="15" cy="14" r="1.5" fill="#1e3e2b" opacity="0.2"/>
+            </svg>
+          </div>
+          <div>
+            <div class="pillar-title">Local Family Events</div>
+            <div class="pillar-desc">Parks, playdates &amp; activities near you</div>
+          </div>
+          <svg class="pillar-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4L10 8L6 12" stroke="#1c1c1a" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <div class="pillar p2">
+          <div class="pillar-icon-wrap" style="background:#d6e8dc;">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <circle cx="8" cy="8" r="3.2" stroke="#1e3e2b" stroke-width="1.5"/>
+              <circle cx="14" cy="8" r="3.2" stroke="#1e3e2b" stroke-width="1.5"/>
+              <path d="M2 19C2 15.7 4.7 13 8 13C11.3 13 14 15.7 14 19" stroke="#1e3e2b" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M14 13C17.3 13 20 15.7 20 19" stroke="#1e3e2b" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="pillar-title">Parent Clubs</div>
+            <div class="pillar-desc">Join groups that match your family's life</div>
+          </div>
+          <svg class="pillar-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4L10 8L6 12" stroke="#1c1c1a" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <div class="pillar p3">
+          <div class="pillar-icon-wrap" style="background:#f0ede6;">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M11 18C11 18 3 13 3 7.5C3 5 5 3 7.5 3C9 3 10.3 3.7 11 4.8C11.7 3.7 13 3 14.5 3C17 3 19 5 19 7.5C19 13 11 18 11 18Z"
+                stroke="#1e3e2b" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M7.5 9L10 11.5L15 7" stroke="#1e3e2b" stroke-width="1.4"
+                stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+            </svg>
+          </div>
+          <div>
+            <div class="pillar-title">Real Connections</div>
+            <div class="pillar-desc">Meet parents who actually get it</div>
+          </div>
+          <svg class="pillar-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4L10 8L6 12" stroke="#1c1c1a" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="a-cta">
+        <button class="btn-main">Get Started — It's Free</button>
+        <div class="signin-txt">Already a member? <span>Sign in</span></div>
+      </div>
+
+      <div class="hi" style="background:#1c1c1a;"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════
+     EXPLORATION B — Immersive Green + Morphing Blobs
+════════════════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <div class="variant-label">Exploration B — Immersive · Bottom Sheet</div>
+  <div class="phone">
+    <div class="screen screen-b">
+
+      <div class="di"></div>
+      <div class="status-bar">
+        <span class="status-time" style="color:rgba(244,241,234,0.85);">9:41</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="rgba(244,241,234,0.8)"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="rgba(244,241,234,0.8)"><path d="M8 2.4C10.4 2.4 12.6 3.4 14.1 5L15.5 3.6C13.6 1.7 11 0.5 8 0.5C5 0.5 2.4 1.7 0.5 3.6L1.9 5C3.4 3.4 5.6 2.4 8 2.4Z"/><path d="M8 5.3C9.6 5.3 11 5.9 12.1 7L13.5 5.6C12 4.2 10.1 3.3 8 3.3C5.9 3.3 4 4.2 2.5 5.6L3.9 7C5 5.9 6.4 5.3 8 5.3Z"/><circle cx="8" cy="10" r="1.5"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="rgba(244,241,234,0.8)"/><rect x="2" y="2" width="16" height="8" rx="2" fill="rgba(244,241,234,0.8)"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.5 24.5 6C24.5 5.5 23.8 4.8 23 4.5Z" fill="rgba(244,241,234,0.8)"/></svg>
+        </div>
+      </div>
+
+      <!-- Blobs -->
+      <div class="blob-container">
+        <div class="morph-shape"></div>
+        <div class="morph-shape-2"></div>
+        <div class="blob" style="width:200px;height:200px;background:rgba(56,127,86,0.3);top:60px;right:-40px;--bf-dur:13s;--bf-x:-20px;--bf-y:30px;--bf-s:1.15;"></div>
+        <div class="blob" style="width:160px;height:160px;background:rgba(30,62,43,0.4);top:250px;left:-50px;--bf-dur:9s;--bf-delay:2s;--bf-x:25px;--bf-y:-20px;--bf-s:1.1;"></div>
+        <div class="blob" style="width:120px;height:120px;background:rgba(87,154,116,0.18);top:350px;right:20px;--bf-dur:11s;--bf-delay:4s;--bf-x:-15px;--bf-y:10px;--bf-s:0.9;"></div>
+      </div>
+
+      <!-- Grain -->
+      <div class="b-grain"></div>
+
+      <!-- Fireflies -->
+      <div class="firefly" style="top:100px;left:60px;--ff-size:4px;--ff-dur:7s;--ff-delay:1.5s;--ff-x:30px;--ff-y:-40px;--ff-op:0.55;"></div>
+      <div class="firefly" style="top:180px;right:50px;--ff-size:3px;--ff-dur:5s;--ff-delay:2.2s;--ff-x:-20px;--ff-y:-25px;--ff-op:0.45;"></div>
+      <div class="firefly" style="top:130px;left:150px;--ff-size:3px;--ff-dur:8s;--ff-delay:0.8s;--ff-x:15px;--ff-y:-35px;--ff-op:0.4;"></div>
+      <div class="firefly" style="top:260px;right:70px;--ff-size:4px;--ff-dur:6.5s;--ff-delay:3.0s;--ff-x:-25px;--ff-y:-20px;--ff-op:0.5;"></div>
+      <div class="firefly" style="top:80px;right:100px;--ff-size:3px;--ff-dur:9s;--ff-delay:4.5s;--ff-x:10px;--ff-y:-30px;--ff-op:0.38;"></div>
+      <div class="firefly" style="top:310px;left:40px;--ff-size:3px;--ff-dur:7.5s;--ff-delay:1.0s;--ff-x:20px;--ff-y:-15px;--ff-op:0.42;"></div>
+
+      <!-- Orbit rings -->
+      <div class="orbit-system" style="top:110px;left:50%;transform:translateX(-50%);">
+        <div class="orbit-ring" style="--os-dur:40s;">
+          <!-- Orbit dots positioned on ring -->
+          <div class="orbit-dot" style="top:50%;left:0;transform:translateY(-50%);" ></div>
+          <div class="orbit-dot" style="top:0;left:50%;transform:translateX(-50%);opacity:0.5;"></div>
+          <div class="orbit-dot" style="top:50%;right:0;transform:translateY(-50%);opacity:0.7;" ></div>
+          <div class="orbit-dot" style="bottom:0;left:50%;transform:translateX(-50%);opacity:0.4;"></div>
+        </div>
+        <div class="orbit-ring ring-2">
+          <div class="orbit-dot" style="top:14%;right:14%;opacity:0.5;"></div>
+          <div class="orbit-dot" style="bottom:14%;left:14%;opacity:0.4;"></div>
+        </div>
+      </div>
+
+      <!-- Hero content -->
+      <div class="b-hero">
+        <!-- Clover icon -->
+        <div class="b-clover-wrap" style="position:relative;">
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+            <ellipse cx="28" cy="15" rx="10.5" ry="13" fill="rgba(244,241,234,0.93)"/>
+            <ellipse cx="41" cy="28" rx="13" ry="10.5" fill="rgba(244,241,234,0.93)"/>
+            <ellipse cx="28" cy="41" rx="10.5" ry="13" fill="rgba(244,241,234,0.93)"/>
+            <ellipse cx="15" cy="28" rx="13" ry="10.5" fill="rgba(244,241,234,0.93)"/>
+            <circle cx="28" cy="28" r="10.5" fill="rgba(244,241,234,0.93)"/>
+            <ellipse cx="28" cy="15" rx="6" ry="7.5" fill="rgba(22,45,34,0.14)"/>
+            <ellipse cx="41" cy="28" rx="7.5" ry="6" fill="rgba(22,45,34,0.14)"/>
+            <ellipse cx="28" cy="41" rx="6" ry="7.5" fill="rgba(22,45,34,0.14)"/>
+            <ellipse cx="15" cy="28" rx="7.5" ry="6" fill="rgba(22,45,34,0.14)"/>
+            <path d="M28 38.5 L28 50" stroke="rgba(244,241,234,0.6)" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="28" cy="28" r="4" fill="rgba(22,45,34,0.28)"/>
+            <circle cx="28" cy="28" r="2.2" fill="rgba(22,45,34,0.4)"/>
+          </svg>
+        </div>
+
+        <!-- Headline -->
+        <div class="b-headline">Find your<br>village.</div>
+
+        <!-- Cycling value text -->
+        <div class="b-cycle-wrap">
+          <div class="b-cycle-text" id="cycleText">
+            For parents who moved somewhere new
+          </div>
+        </div>
+      </div>
+
+      <!-- Cream bottom sheet -->
+      <div class="b-sheet">
+        <div class="sheet-handle"></div>
+        <div class="b-sheet-inner">
+
+          <!-- Tags -->
+          <div class="b-tags">
+            <div class="b-tag">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="9" rx="2" stroke="#4d525b" stroke-width="1.3"/><path d="M4 1V3M8 1V3" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round"/><path d="M1 5H11" stroke="#4d525b" stroke-width="1.3"/></svg>
+              Events
+            </div>
+            <div class="b-tag">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="4.5" cy="4.5" r="2.2" stroke="#4d525b" stroke-width="1.3"/><path d="M1 11C1 8.8 2.8 7 5 7" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round"/><circle cx="8.5" cy="4.5" r="2.2" stroke="#4d525b" stroke-width="1.3"/><path d="M11 11C11 8.8 9.2 7 7 7" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Parent Clubs
+            </div>
+            <div class="b-tag">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2H10C10.6 2 11 2.4 11 3V8C11 8.6 10.6 9 10 9H3L1 11V3C1 2.4 1.4 2 2 2Z" stroke="#4d525b" stroke-width="1.3" stroke-linejoin="round"/></svg>
+              Chat
+            </div>
+            <div class="b-tag">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 10C6 10 1.5 7 1.5 4C1.5 2.6 2.6 1.5 4 1.5C4.9 1.5 5.6 2 6 2.7C6.4 2 7.1 1.5 8 1.5C9.4 1.5 10.5 2.6 10.5 4C10.5 7 6 10 6 10Z" stroke="#4d525b" stroke-width="1.3" stroke-linejoin="round"/></svg>
+              Playdates
+            </div>
+          </div>
+
+          <div class="b-sheet-headline">Your community<br>is waiting.</div>
+          <div class="b-sheet-sub">Thousands of parents nearby are already finding their people through Sprout.</div>
+
+          <!-- Social proof -->
+          <div class="b-social-proof">
+            <div class="proof-avatars">
+              <div class="proof-avatar" style="background:#387f56;">S</div>
+              <div class="proof-avatar" style="background:#3a7ca5;">M</div>
+              <div class="proof-avatar" style="background:#1e3e2b;">J</div>
+              <div class="proof-avatar" style="background:#579a74;">A</div>
+            </div>
+            <div class="proof-text">
+              <span class="proof-count" id="familyCount">0</span> families already joined
+            </div>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 1L10.1 5.8L15 6.6L11.5 10L12.4 15L8 12.6L3.6 15L4.5 10L1 6.6L5.9 5.8L8 1Z"
+                stroke="#d4a017" stroke-width="1.3" fill="#f6ecd1"/>
+            </svg>
+          </div>
+
+          <!-- Buttons -->
+          <div class="b-cta">
+            <button class="btn-b-primary">Create Your Family Profile</button>
+            <button class="btn-b-ghost">I already have an account</button>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="hi" style="background:#1c1c1a;"></div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ── Counter animation (Exploration B) ── */
+(function() {
+  const el = document.getElementById('familyCount');
+  if (!el) return;
+  const target = 12400;
+  const duration = 1800;
+  const start = performance.now();
+
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+  function tick(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const value = Math.floor(easeOut(progress) * target);
+    el.textContent = value.toLocaleString();
+    if (progress < 1) requestAnimationFrame(tick);
+    else el.textContent = target.toLocaleString();
+  }
+
+  // Start after sheet animation completes
+  setTimeout(() => requestAnimationFrame(tick), 2600);
+})();
+
+/* ── Cycling text (Exploration B) ── */
+(function() {
+  const el = document.getElementById('cycleText');
+  if (!el) return;
+
+  const lines = [
+    'For parents who moved somewhere new.',
+    'For families looking for their people.',
+    'For the lucky connections you haven\'t made yet.',
+  ];
+
+  let i = 0;
+
+  function cycle() {
+    el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(-6px)';
+
+    setTimeout(() => {
+      i = (i + 1) % lines.length;
+      el.textContent = lines[i];
+      el.style.transform = 'translateY(6px)';
+
+      setTimeout(() => {
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      }, 50);
+    }, 420);
+  }
+
+  // Kick off cycling
+  setTimeout(() => {
+    el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    el.style.opacity = '1';
+    setInterval(cycle, 3200);
+  }, 2400);
+})();
+</script>
+
+</body>
+</html>

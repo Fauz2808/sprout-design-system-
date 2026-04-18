@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Instagram Landscape Carousel: Playdate Inspiration</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green:      #186338;
+  --green-dark: #1E3E2B;
+  --green-light:#E2E9E3;
+  --green-200:  #77B691;
+  --green-400:  #387F56;
+  --cream:      #F4F1EA;
+  --cream-deep: #EAE6DB;
+  --cream-darker:#DBD5C8;
+  --text-dark:  #1A1A1A;
+  --text-mid:   #4D525B;
+  --text-light: #818898;
+  --white:      #ffffff;
+}
+
+body {
+  background: #111;
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 20px;
+  gap: 28px;
+}
+
+.top-label {
+  color: #444;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.size-note {
+  color: #333;
+  font-size: 11px;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.05em;
+  margin-top: -16px;
+}
+
+/* ── IG CHROME (landscape) ── */
+.ig-chrome {
+  width: 810px; /* 1350/1.667 scaled to 60% for display */
+  background: #1a1a1a;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+.ig-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px 10px;
+}
+.ig-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700;
+  color: white; border: 2px solid rgba(255,255,255,0.1);
+}
+.ig-info { flex: 1; }
+.ig-handle { color: #e0e0e0; font-size: 13px; font-weight: 600; }
+.ig-sub { color: #555; font-size: 11px; }
+.ig-more { color: #444; font-size: 18px; }
+
+/* ── SLIDE CONTAINER ── */
+.slide-wrapper {
+  position: relative;
+  width: 810px;
+  height: 648px; /* 1080 * 0.6 */
+  overflow: hidden;
+  cursor: pointer;
+}
+.slides-track {
+  display: flex;
+  width: calc(810px * 7);
+  height: 648px;
+  transition: transform 0.44s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.slide {
+  width: 810px; height: 648px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Nav arrows */
+.nav-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 20;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.slide-wrapper:hover .nav-btn { opacity: 1; pointer-events: all; }
+.nav-btn.hidden { opacity: 0 !important; pointer-events: none !important; }
+.nav-prev { left: 12px; }
+.nav-next { right: 12px; }
+
+/* Progress dots */
+.prog-dots {
+  position: absolute; bottom: 10px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 5px; z-index: 20;
+}
+.prog-dot {
+  width: 5px; height: 5px; border-radius: 99px;
+  background: rgba(255,255,255,0.3);
+  transition: all 0.3s;
+}
+.prog-dot.active { width: 18px; background: white; }
+
+/* ─── SLIDE 1: COVER ─── */
+/* Full dark green — left: big serif number/headline, right: decorative */
+.s1 {
+  background: var(--green-dark);
+  display: grid;
+  grid-template-columns: 1fr 320px;
+}
+.s1 .left {
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  padding: 52px 56px;
+  position: relative;
+  z-index: 2;
+}
+.s1 .right {
+  position: relative;
+  background: var(--green);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.s1 .right-inner {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 20px;
+  position: relative; z-index: 2;
+}
+.s1 .right .big-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 200px; font-weight: 900; font-style: italic;
+  color: rgba(255,255,255,0.07);
+  position: absolute; bottom: -20px; right: -20px;
+  line-height: 1;
+  user-select: none;
+}
+.s1 .right .step-pills { display: flex; flex-direction: column; gap: 10px; }
+.s1 .right .step-pill {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 99px;
+  padding: 8px 18px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500;
+  color: rgba(244,241,234,0.7);
+  backdrop-filter: blur(4px);
+}
+.s1 .badge {
+  position: absolute; top: 20px; right: 20px;
+  background: rgba(0,0,0,0.3); border-radius: 99px;
+  padding: 4px 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+  color: rgba(244,241,234,0.5); z-index: 10;
+}
+.s1 .logo-mark {
+  font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
+  color: var(--cream); margin-bottom: 28px;
+  display: flex; align-items: center; gap: 6px;
+}
+.s1 .logo-mark .dot { width: 8px; height: 8px; background: var(--green-200); border-radius: 50%; }
+.s1 .tag {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--green-200); margin-bottom: 16px;
+}
+.s1 h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 48px; font-weight: 700; line-height: 1.1;
+  color: var(--cream); margin-bottom: 24px;
+}
+.s1 h1 em { font-style: italic; color: var(--green-200); }
+.s1 .swipe {
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  color: rgba(244,241,234,0.35);
+  display: flex; align-items: center; gap: 8px;
+}
+.s1 .swipe span { animation: nudge 2s ease-in-out infinite; display: inline-block; }
+@keyframes nudge { 0%,100%{transform:translateX(0)} 50%{transform:translateX(5px)} }
+
+/* ─── SLIDES 2–6: STEP SLIDES ─── */
+/* Two-column: left = colored panel (step # + headline), right = cream (body + tip) */
+.ss {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+}
+.ss .left-panel {
+  display: flex; flex-direction: column;
+  justify-content: center;
+  padding: 52px 56px;
+  position: relative; overflow: hidden;
+}
+.ss .right-panel {
+  background: var(--cream);
+  display: flex; flex-direction: column;
+  justify-content: center;
+  padding: 52px 52px;
+  position: relative;
+}
+/* Alternating left panel colors */
+.ss.v1 .left-panel { background: var(--cream); }
+.ss.v2 .left-panel { background: var(--green-light); }
+.ss.v3 .left-panel { background: var(--green-dark); }
+.ss.v4 .left-panel { background: var(--cream); }
+.ss.v5 .left-panel { background: var(--green); }
+/* Right panel also alternates slightly */
+.ss.v2 .right-panel { background: var(--white, #fff); }
+.ss.v3 .right-panel { background: var(--cream); }
+.ss.v4 .right-panel { background: var(--green-light); }
+.ss.v5 .right-panel { background: var(--cream); }
+
+.ss .step-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 120px; font-weight: 900; font-style: italic;
+  line-height: 1; margin-bottom: 12px;
+  position: relative; z-index: 2;
+}
+.ss.v1 .step-num { color: var(--green-light); }
+.ss.v2 .step-num { color: rgba(24,99,56,0.15); }
+.ss.v3 .step-num { color: rgba(255,255,255,0.08); }
+.ss.v4 .step-num { color: var(--green-light); }
+.ss.v5 .step-num { color: rgba(255,255,255,0.10); }
+
+.ss .step-label {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  margin-bottom: 12px; position: relative; z-index: 2;
+}
+.ss.v1 .step-label,.ss.v2 .step-label,.ss.v4 .step-label { color: var(--green); }
+.ss.v3 .step-label,.ss.v5 .step-label { color: var(--green-200); }
+
+.ss .step-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px; font-weight: 700; line-height: 1.15;
+  position: relative; z-index: 2;
+}
+.ss.v1 .step-headline,.ss.v2 .step-headline,.ss.v4 .step-headline { color: var(--green-dark); }
+.ss.v3 .step-headline,.ss.v5 .step-headline { color: var(--cream); }
+.ss .step-headline em { font-style: italic; }
+.ss.v1 .step-headline em,.ss.v2 .step-headline em,.ss.v4 .step-headline em { color: var(--green); }
+.ss.v3 .step-headline em,.ss.v5 .step-headline em { color: var(--green-200); }
+
+/* Right panel */
+.ss .divider {
+  width: 40px; height: 4px; border-radius: 99px;
+  background: var(--green); margin-bottom: 24px;
+}
+.ss.v3 .divider,.ss.v4 .divider { background: var(--green); }
+.ss .step-body {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 19px; line-height: 1.65;
+  color: var(--text-mid); margin-bottom: 28px;
+}
+.ss.v4 .step-body { color: var(--green-dark); }
+.ss .tip-box {
+  background: var(--green-dark);
+  border-radius: 14px; padding: 18px 22px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.ss.v2 .tip-box,.ss.v5 .tip-box { background: var(--green-dark); }
+.ss.v3 .tip-box { background: rgba(30,62,43,0.15); border: 1px solid rgba(24,99,56,0.2); }
+.ss.v4 .tip-box { background: var(--green-dark); }
+.ss .tip-icon { font-size: 20px; flex-shrink: 0; padding-top: 2px; }
+.ss .tip-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; line-height: 1.55;
+  color: rgba(244,241,234,0.85);
+}
+.ss.v3 .tip-text { color: var(--green-dark); }
+.ss .slide-badge {
+  position: absolute; top: 16px; right: 16px;
+  background: rgba(0,0,0,0.12); border-radius: 99px;
+  padding: 4px 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+  color: var(--text-light);
+}
+.ss.v3 .slide-badge,.ss.v5 .slide-badge { color: rgba(244,241,234,0.4); }
+
+/* Sprout logo on step slides */
+.ss .logo-sm {
+  position: absolute; top: 18px; left: 20px;
+  font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700;
+  display: flex; align-items: center; gap: 4px;
+}
+.ss.v1 .logo-sm,.ss.v2 .logo-sm,.ss.v4 .logo-sm { color: var(--green); }
+.ss.v3 .logo-sm,.ss.v5 .logo-sm { color: var(--cream); }
+.ss .logo-sm .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green-200); }
+
+/* ─── SLIDE 7: CTA ─── */
+.s7 {
+  background: var(--green);
+  display: grid; grid-template-columns: 1fr 380px;
+}
+.s7 .left {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 60px 64px; position: relative; z-index: 2;
+}
+.s7 .right {
+  background: var(--cream);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 52px 44px; text-align: center; gap: 0;
+  position: relative; overflow: hidden;
+}
+.s7 .right::before {
+  content: ''; position: absolute;
+  width: 300px; height: 300px; border-radius: 50%;
+  background: var(--green-light); opacity: 0.4;
+  bottom: -100px; right: -100px;
+}
+.s7 .logo-cta {
+  font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700;
+  color: var(--cream); margin-bottom: 32px;
+  display: flex; align-items: center; gap: 7px;
+}
+.s7 .logo-cta .dot { width: 9px; height: 9px; background: var(--green-200); border-radius: 50%; }
+.s7 h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px; font-weight: 700; line-height: 1.12;
+  color: var(--cream); margin-bottom: 20px;
+}
+.s7 h2 em { font-style: italic; color: var(--green-200); }
+.s7 p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px; color: rgba(244,241,234,0.72); line-height: 1.65;
+}
+.s7 .right-logo {
+  font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 900; font-style: italic;
+  color: var(--green); margin-bottom: 20px; position: relative; z-index: 2;
+}
+.s7 .right-tagline {
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: 14px; color: var(--text-mid); line-height: 1.55;
+  margin-bottom: 28px; position: relative; z-index: 2;
+}
+.s7 .cta-pill {
+  background: var(--green); color: white;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+  padding: 14px 28px; border-radius: 99px;
+  display: inline-flex; align-items: center; gap: 8px;
+  position: relative; z-index: 2;
+}
+.s7 .slide-badge {
+  position: absolute; top: 16px; right: 16px;
+  background: rgba(0,0,0,0.2); border-radius: 99px; padding: 4px 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+  color: rgba(244,241,234,0.45);
+}
+
+/* ── IG FOOTER ── */
+.ig-footer { background: #1a1a1a; padding: 10px 16px 12px; }
+.ig-actions { display: flex; align-items: center; gap: 14px; margin-bottom: 7px; }
+.ig-icon { color: #bbb; font-size: 18px; cursor: pointer; }
+.ig-icon.save { margin-left: auto; }
+.ig-likes { color: #bbb; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+.ig-caption { color: #666; font-size: 11px; line-height: 1.5; border-bottom: 1px solid #222; padding-bottom: 8px; margin-bottom: 6px; }
+.ig-caption strong { color: #bbb; }
+.ig-comments { color: #444; font-size: 11px; }
+
+/* ── CAPTION PANEL ── */
+.caption-panel {
+  width: 810px; background: #1a1a1a; border-radius: 14px;
+  padding: 24px; border: 1px solid #252525;
+}
+.caption-panel h3 { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #444; margin-bottom: 12px; }
+.caption-text { font-size: 13px; color: #bbb; line-height: 1.7; }
+.caption-text .hashtags { color: #4a9eff; margin-top: 10px; display: block; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<p class="top-label">Sprout · Instagram Landscape Carousel · Playdate Inspiration</p>
+<p class="size-note">Actual export size: 1350 × 1080px · Preview scaled to 60%</p>
+
+<div class="ig-chrome">
+  <div class="ig-header">
+    <div class="ig-avatar">S</div>
+    <div class="ig-info">
+      <div class="ig-handle">sprout.app</div>
+      <div class="ig-sub">Playdate Inspiration 🌱</div>
+    </div>
+    <div class="ig-more">···</div>
+  </div>
+
+  <div class="slide-wrapper" id="sw">
+    <div class="slides-track" id="st">
+
+      <!-- SLIDE 1: COVER -->
+      <div class="slide s1">
+        <div class="badge">1 / 7</div>
+        <div class="left">
+          <div class="logo-mark">Sprout<div class="dot"></div></div>
+          <div class="tag">🎯 Playdate Inspiration</div>
+          <h1>The 5-Step Playdate Formula<br>that kids <em>beg to come back for</em></h1>
+          <div class="swipe">Swipe for each step <span>→</span></div>
+        </div>
+        <div class="right">
+          <div class="big-num">5</div>
+          <div class="right-inner">
+            <div class="step-pills">
+              <div class="step-pill">🍎 Signature Snack</div>
+              <div class="step-pill">🎨 One Starter Activity</div>
+              <div class="step-pill">🌿 Free Play Time</div>
+              <div class="step-pill">✨ Little Tradition</div>
+              <div class="step-pill">⏰ Leave Them Wanting More</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 2: STEP 1 -->
+      <div class="slide ss v1">
+        <div class="logo-sm">Sprout<div class="dot"></div></div>
+        <div class="slide-badge">2 / 7</div>
+        <div class="left-panel">
+          <div class="step-label">Step 01</div>
+          <div class="step-num">01</div>
+          <div class="step-headline">Start with a<br><em>signature snack</em></div>
+        </div>
+        <div class="right-panel">
+          <div class="divider"></div>
+          <p class="step-body">Before the chaos begins, greet kids with one simple, consistent snack. It signals "we're welcome here" and gives everyone a calm moment to land.</p>
+          <div class="tip-box">
+            <div class="tip-icon">💡</div>
+            <div class="tip-text">Keep it the same every time — kids talk about "the house with the cinnamon popcorn." Become that house.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 3: STEP 2 -->
+      <div class="slide ss v2">
+        <div class="logo-sm">Sprout<div class="dot"></div></div>
+        <div class="slide-badge">3 / 7</div>
+        <div class="left-panel">
+          <div class="step-label">Step 02</div>
+          <div class="step-num">02</div>
+          <div class="step-headline">Have <em>one</em> activity<br>ready. Not five.</div>
+        </div>
+        <div class="right-panel">
+          <div class="divider"></div>
+          <p class="step-body">A simple starter activity — craft, LEGO, playdough — gives kids something to do while parents settle in. It's a launchpad, not a schedule.</p>
+          <div class="tip-box">
+            <div class="tip-icon">💡</div>
+            <div class="tip-text">Resist the urge to over-plan. One activity is enough to break the ice. Kids will take it from there.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 4: STEP 3 -->
+      <div class="slide ss v3">
+        <div class="logo-sm">Sprout<div class="dot"></div></div>
+        <div class="slide-badge">4 / 7</div>
+        <div class="left-panel">
+          <div class="step-label">Step 03</div>
+          <div class="step-num">03</div>
+          <div class="step-headline">Then step back<br>and let them<br><em>free-play</em></div>
+        </div>
+        <div class="right-panel">
+          <div class="divider"></div>
+          <p class="step-body">The magic moment of every playdate isn't the activity — it's what happens after. Free play builds creativity, social skills, and the friendships that last.</p>
+          <div class="tip-box">
+            <div class="tip-icon">💡</div>
+            <div class="tip-text">Your job during free play: make yourself a coffee and actually enjoy it. You've earned it.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 5: STEP 4 -->
+      <div class="slide ss v4">
+        <div class="logo-sm">Sprout<div class="dot"></div></div>
+        <div class="slide-badge">5 / 7</div>
+        <div class="left-panel">
+          <div class="step-label">Step 04</div>
+          <div class="step-num">04</div>
+          <div class="step-headline">Create a<br><em>little tradition</em><br>just for you two</div>
+        </div>
+        <div class="right-panel">
+          <div class="divider"></div>
+          <p class="step-body">A small ritual — a goodbye high-five, a special playlist, a drawing wall — turns a one-off visit into something kids look forward to every single time.</p>
+          <div class="tip-box">
+            <div class="tip-icon">💡</div>
+            <div class="tip-text">It doesn't have to be elaborate. "We always draw one picture before we leave" is enough to make it memorable.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 6: STEP 5 -->
+      <div class="slide ss v5">
+        <div class="logo-sm">Sprout<div class="dot"></div></div>
+        <div class="slide-badge">6 / 7</div>
+        <div class="left-panel">
+          <div class="step-label">Step 05</div>
+          <div class="step-num">05</div>
+          <div class="step-headline">End 15 minutes<br><em>before</em> you<br>have to</div>
+        </div>
+        <div class="right-panel">
+          <div class="divider"></div>
+          <p class="step-body">The secret weapon. Wrap up while energy is still high. Kids leave on a win — not a meltdown — and immediately start asking when they can come back.</p>
+          <div class="tip-box">
+            <div class="tip-icon">💡</div>
+            <div class="tip-text">"One more thing, then we'll go" is a trap. Set a 10-minute warning and stick to it. Future you will be grateful.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 7: CTA -->
+      <div class="slide s7">
+        <div class="slide-badge">7 / 7</div>
+        <div class="left">
+          <div class="logo-cta">Sprout<div class="dot"></div></div>
+          <h2>Now all you need is<br>the <em>right families</em><br>to try this with.</h2>
+          <p>Sprout connects parents for playdates, clubs, and real neighbourhood friendships. Find your people — and let the kids do the rest. 🌱</p>
+        </div>
+        <div class="right">
+          <div class="right-logo">Sprout</div>
+          <div class="right-tagline">"Where parents bond<br>and childhoods flourish."</div>
+          <div class="cta-pill">🌱 Find playdate families</div>
+        </div>
+      </div>
+
+    </div><!-- /track -->
+
+    <button class="nav-btn nav-prev hidden" id="prev" onclick="go(-1)">‹</button>
+    <button class="nav-btn nav-next" id="next" onclick="go(1)">›</button>
+
+    <div class="prog-dots" id="dots">
+      <div class="prog-dot active"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+    </div>
+  </div>
+
+  <div class="ig-footer">
+    <div class="ig-actions">
+      <span class="ig-icon">♡</span>
+      <span class="ig-icon">💬</span>
+      <span class="ig-icon">✈</span>
+      <span class="ig-icon save">🔖</span>
+    </div>
+    <div class="ig-likes">4,203 likes</div>
+    <div class="ig-caption"><strong>sprout.app</strong> The 5-step playdate formula that kids beg to come back for 🎯 Save this for your next one. Step 3 is the one parents always skip (don't).</div>
+    <div class="ig-comments">View all 528 comments</div>
+  </div>
+</div>
+
+<!-- Caption Panel -->
+<div class="caption-panel">
+  <h3>Post Caption + Hashtags</h3>
+  <div class="caption-text">
+    The 5-step playdate formula that kids actually beg to come back for 🎯<br><br>
+    Swipe for each step — save this before your next one.<br><br>
+    (Step 3 is the one most parents skip. It's also the most important. 👀)<br><br>
+    ——<br><br>
+    The formula works because it removes the pressure of over-planning and puts the magic back in the hands of the kids. Your job is just to set the stage.<br><br>
+    If you're still looking for the right families to try this with → that's what Sprout is for. Link in bio 🌱<br><br>
+    Which step is your favourite? Drop it in the comments 👇
+    <span class="hashtags">#PlaydateTips #ParentingTips #SproutApp #PlaydateIdeas #MomLife #DadLife #ParentCommunity #ToddlerPlay #KidsActivities #PlaydateMom #ParentHacks #ChildhoodMagic #GrowTogether #SproutParents #FamilyFun</span>
+  </div>
+</div>
+
+<script>
+let cur = 0;
+const total = 7;
+const track = document.getElementById('st');
+const dots = document.querySelectorAll('.prog-dot');
+const prev = document.getElementById('prev');
+const next = document.getElementById('next');
+
+function go(dir) {
+  const n = cur + dir;
+  if (n < 0 || n >= total) return;
+  cur = n;
+  track.style.transform = `translateX(-${cur * 810}px)`;
+  dots.forEach((d,i) => d.classList.toggle('active', i === cur));
+  prev.classList.toggle('hidden', cur === 0);
+  next.classList.toggle('hidden', cur === total - 1);
+}
+
+document.getElementById('sw').addEventListener('click', e => {
+  if (e.target.closest('.nav-btn')) return;
+  const x = e.clientX - e.currentTarget.getBoundingClientRect().left;
+  go(x > 405 ? 1 : -1);
+});
+
+let sx = 0;
+document.getElementById('sw').addEventListener('touchstart', e => sx = e.touches[0].clientX);
+document.getElementById('sw').addEventListener('touchend', e => {
+  const d = sx - e.changedTouches[0].clientX;
+  if (Math.abs(d) > 40) go(d > 0 ? 1 : -1);
+});
+</script>
+</body>
+</html>

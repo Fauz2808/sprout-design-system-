@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Spouse Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand:      #186338;
+  --brand-dark: #1e3e2b;
+  --brand-50:   #e2e9e3;
+  --brand-100:  #d0dacf;
+  --brand-200:  #77b691;
+  --bg:         #f4f1ea;
+  --s1:         #eae6db;
+  --s2:         #dbd5c8;
+  --s3:         #cfc9bc;
+  --txt:        #1a1a1a;
+  --txt2:       #4d525b;
+  --txt3:       #818898;
+  --txt4:       #b3b8c1;
+  --dark:       #1a1a1a;
+  --white:      #ffffff;
+  --border:     #e6e7ea;
+  --r-full:     9999px;
+  --r-2xl:      24px;
+  --r-xl:       16px;
+  --r-lg:       12px;
+  --r-md:       8px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0e0e0e;
+  background-image:
+    radial-gradient(ellipse 60% 50% at 15% 0%,  rgba(24,99,56,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 85% 100%, rgba(30,62,43,0.12) 0%, transparent 70%);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  padding: 40px 20px 60px; gap: 24px;
+}
+
+.outer-label { text-align: center; }
+.outer-label h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 700; color: #d4c9b8;
+  display: flex; align-items: center; gap: 8px; justify-content: center;
+}
+.outer-label p { font-size: 11px; color: #444; letter-spacing: 0.09em; text-transform: uppercase; font-weight: 500; margin-top: 4px; }
+
+/* ── PHONE ── */
+.phone {
+  width: 393px; height: 852px;
+  background: var(--bg);
+  border-radius: 50px; overflow: hidden;
+  position: relative; display: flex; flex-direction: column;
+  box-shadow: 0 60px 140px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.07), inset 0 0 0 1.5px rgba(0,0,0,0.12);
+}
+
+/* status bar */
+.status-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px 8px; flex-shrink: 0; position: relative; z-index: 10;
+}
+.status-time { font-size: 15px; font-weight: 600; color: var(--dark); }
+.status-time.light { color: white; }
+.status-icons { display: flex; align-items: center; gap: 5px; }
+.status-icons.light svg rect, .status-icons.light svg path, .status-icons.light svg circle { fill: white !important; stroke: none; }
+
+/* ── SCREENS ── */
+.screen {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--bg);
+  overflow: hidden;
+}
+.screen.active  { transform: translateX(0); }
+.screen.exiting { transform: translateX(-8%); }
+/* welcome screen starts visible */
+#s0 { transform: translateX(0); }
+
+/* progress area */
+.progress-area {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 20px 0; flex-shrink: 0;
+}
+.back-btn {
+  width: 32px; height: 32px; border-radius: var(--r-full);
+  background: none; border: none; cursor: pointer; color: var(--txt2);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: background 0.15s;
+}
+.back-btn:hover { background: var(--s1); }
+.step-track {
+  flex: 1; display: flex; align-items: center; gap: 5px;
+}
+.step-node {
+  height: 4px; flex: 1; border-radius: var(--r-full);
+  background: var(--s2); transition: background 0.4s, flex 0.4s;
+}
+.step-node.done   { background: var(--brand-200); }
+.step-node.active {
+  background: var(--brand);
+  animation: shimmer 2s ease infinite;
+  background-size: 200% 100%;
+  background-image: linear-gradient(90deg, var(--brand) 0%, var(--brand-200) 50%, var(--brand) 100%);
+}
+@keyframes shimmer { 0%{background-position:100%} 100%{background-position:-100%} }
+.step-label { font-size: 11px; font-weight: 600; color: var(--txt3); flex-shrink: 0; }
+
+/* scrollable body */
+.screen-body {
+  flex: 1; overflow-y: auto; padding: 20px 24px 0;
+  display: flex; flex-direction: column;
+  -webkit-overflow-scrolling: touch;
+}
+.screen-body::-webkit-scrollbar { display: none; }
+
+/* typography */
+.eyebrow { font-size: 11px; font-weight: 700; color: var(--brand); letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 8px; }
+.s-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--brand-dark); line-height: 1.2; margin-bottom: 8px; }
+.s-title em { font-style: italic; color: var(--brand); }
+.s-sub { font-size: 13.5px; color: var(--txt3); line-height: 1.6; margin-bottom: 24px; }
+
+/* form */
+.f-group { margin-bottom: 16px; }
+.f-label { display: block; font-size: 11px; font-weight: 600; color: var(--txt3); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 6px; }
+.f-input {
+  width: 100%; background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--r-xl); padding: 14px 16px; font-size: 15px;
+  font-family: 'Inter', sans-serif; color: var(--txt); outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none;
+}
+.f-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(24,99,56,0.08); }
+.f-input::placeholder { color: var(--txt4); }
+.f-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* role picker */
+.role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.role-btn {
+  padding: 12px 10px; border-radius: var(--r-xl);
+  background: var(--white); border: 1.5px solid var(--border);
+  font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif;
+  color: var(--txt2); cursor: pointer; text-align: center;
+  transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.role-btn .role-emoji { font-size: 22px; }
+.role-btn.selected { background: var(--brand-50); border-color: var(--brand); color: var(--brand); }
+
+/* ── FAMILY SNAPSHOT (inherited data) ── */
+.family-snapshot {
+  background: var(--white); border-radius: var(--r-xl);
+  border: 1.5px solid var(--brand-100); margin-bottom: 20px; overflow: hidden;
+}
+.snapshot-head {
+  background: linear-gradient(90deg, var(--brand-50), #eef4ef);
+  padding: 10px 16px; display: flex; align-items: center; gap: 8px;
+}
+.snapshot-head-label { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 0.07em; flex: 1; }
+.snapshot-check { font-size: 13px; color: var(--brand); font-weight: 600; }
+.snapshot-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 16px; border-top: 1px solid var(--border);
+}
+.snapshot-icon {
+  width: 32px; height: 32px; border-radius: var(--r-md);
+  background: var(--brand-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.snapshot-text { flex: 1; }
+.snapshot-label { font-size: 10.5px; font-weight: 600; color: var(--txt3); text-transform: uppercase; letter-spacing: 0.06em; }
+.snapshot-value { font-size: 13px; color: var(--txt2); margin-top: 2px; line-height: 1.4; }
+.snapshot-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+.snapshot-chip { padding: 3px 10px; background: var(--brand-50); border-radius: var(--r-full); font-size: 11px; font-weight: 600; color: var(--brand); }
+
+/* ── INTEREST CARDS ── */
+.interest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.interest-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--r-xl); padding: 16px 14px;
+  display: flex; align-items: center; gap: 11px;
+  cursor: pointer; transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1);
+}
+.interest-card:active { transform: scale(0.96); }
+.interest-card.selected { background: var(--brand-50); border-color: var(--brand); }
+.ic-icon { font-size: 22px; flex-shrink: 0; }
+.ic-label { font-size: 12.5px; font-weight: 600; color: var(--txt2); line-height: 1.3; }
+.interest-card.selected .ic-label { color: var(--brand); }
+
+/* ── FOOTER ── */
+.btn-footer { padding: 16px 24px 20px; flex-shrink: 0; display: flex; flex-direction: column; gap: 0; }
+.btn-primary {
+  width: 100%; padding: 16px; background: var(--brand); color: white;
+  border: none; border-radius: var(--r-full); font-size: 15px; font-weight: 600;
+  font-family: 'Inter', sans-serif; cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-primary:hover { background: var(--brand-dark); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { background: var(--brand-200); cursor: not-allowed; }
+.btn-skip {
+  background: none; border: none; font-size: 13px; font-weight: 500;
+  color: var(--txt3); font-family: 'Inter', sans-serif;
+  cursor: pointer; padding: 12px; text-align: center;
+  transition: color 0.15s;
+}
+.btn-skip:hover { color: var(--txt2); }
+.home-ind { width: 134px; height: 5px; background: var(--dark); border-radius: var(--r-full); margin: 6px auto 10px; opacity: 0.18; flex-shrink: 0; }
+
+/* ══════════════════════════════════
+   SCREEN 0 — WELCOME HERO
+══════════════════════════════════ */
+#s0 { background: transparent; }
+.welcome-hero {
+  background: linear-gradient(155deg, #071e11 0%, var(--brand-dark) 45%, var(--brand) 100%);
+  padding: 0 24px 36px;
+  display: flex; flex-direction: column; align-items: center;
+  flex-shrink: 0; position: relative; overflow: hidden;
+  padding-top: 20px;
+}
+.welcome-hero::before {
+  content: ''; position: absolute; top: -60px; right: -60px;
+  width: 240px; height: 240px; border-radius: var(--r-full);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.welcome-hero::after {
+  content: ''; position: absolute; bottom: 20px; left: -40px;
+  width: 140px; height: 140px; border-radius: var(--r-full);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.couple-wrap {
+  display: flex; align-items: center; gap: 0;
+  position: relative; z-index: 1; margin-bottom: 20px; margin-top: 8px;
+}
+.couple-av {
+  width: 68px; height: 68px; border-radius: var(--r-full);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 700; color: white;
+  border: 3px solid rgba(255,255,255,0.25); flex-shrink: 0;
+  font-family: 'Playfair Display', serif;
+}
+.couple-av.primary   { background: rgba(255,255,255,0.18); backdrop-filter: blur(6px); z-index: 2; }
+.couple-av.secondary { background: rgba(255,255,255,0.08); margin-left: -16px; z-index: 1; }
+.couple-link {
+  width: 26px; height: 26px; border-radius: var(--r-full);
+  background: white; position: absolute; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25); z-index: 3; bottom: -4px;
+  font-size: 12px;
+}
+.welcome-title {
+  font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700;
+  color: white; text-align: center; position: relative; z-index: 1;
+  line-height: 1.25; margin-bottom: 8px;
+}
+.welcome-title em { font-style: italic; color: var(--brand-200); }
+.welcome-sub {
+  font-size: 13px; color: rgba(255,255,255,0.6);
+  text-align: center; position: relative; z-index: 1;
+  line-height: 1.6; margin-bottom: 20px;
+}
+.invite-pill {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.1); border-radius: var(--r-full);
+  padding: 8px 18px; position: relative; z-index: 1;
+  backdrop-filter: blur(4px);
+}
+.invite-dot { width: 7px; height: 7px; border-radius: var(--r-full); background: #f6ecd1; animation: blink 1.6s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.invite-txt { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.85); }
+
+/* already-done list inside welcome body */
+.welcome-body { flex: 1; overflow-y: auto; padding: 20px 24px 0; -webkit-overflow-scrolling: touch; }
+.welcome-body::-webkit-scrollbar { display: none; }
+
+.done-section-label {
+  font-size: 10.5px; font-weight: 700; color: var(--txt3);
+  text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 10px;
+}
+.done-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.done-item {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--white); border-radius: var(--r-xl);
+  padding: 12px 14px; border: 1.5px solid var(--border);
+}
+.done-icon {
+  width: 36px; height: 36px; border-radius: var(--r-lg);
+  background: var(--brand-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.done-info { flex: 1; }
+.done-label { font-size: 10.5px; font-weight: 700; color: var(--txt3); text-transform: uppercase; letter-spacing: 0.06em; }
+.done-value { font-size: 13.5px; color: var(--txt2); margin-top: 2px; line-height: 1.4; }
+.done-check { font-size: 16px; color: var(--brand-200); }
+
+.you-need-label {
+  font-size: 10.5px; font-weight: 700; color: var(--brand);
+  text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 10px;
+}
+.you-need-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.you-need-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--brand-50); border-radius: var(--r-full);
+  padding: 7px 14px; border: 1.5px solid var(--brand-100);
+}
+.you-need-pill span { font-size: 12.5px; font-weight: 600; color: var(--brand); }
+
+/* ══════════════════════════════════
+   SCREEN 3 — ALL SET
+══════════════════════════════════ */
+.allset-hero {
+  background: linear-gradient(155deg, #071e11 0%, var(--brand-dark) 45%, var(--brand) 100%);
+  padding: 28px 24px 32px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  flex-shrink: 0; position: relative; overflow: hidden;
+}
+.allset-hero::before { content:''; position:absolute; top:-50px; right:-50px; width:200px; height:200px; border-radius:var(--r-full); border:1px solid rgba(255,255,255,0.06); }
+.allset-av {
+  width: 72px; height: 72px; border-radius: var(--r-full);
+  background: rgba(255,255,255,0.18); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 700; color: white;
+  font-family: 'Playfair Display', serif;
+  border: 3px solid rgba(255,255,255,0.25); z-index: 1;
+}
+.allset-name-hero { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: white; z-index:1; }
+.allset-tag { font-size: 12px; color: rgba(255,255,255,0.6); z-index:1; }
+.allset-badge {
+  background: rgba(255,255,255,0.12); border-radius: var(--r-full);
+  padding: 7px 18px; backdrop-filter: blur(4px); z-index:1;
+  font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,0.85);
+  display: flex; align-items: center; gap: 7px;
+}
+.allset-badge-dot { width: 7px; height: 7px; border-radius: var(--r-full); background: #86efac; }
+
+.allset-body { flex:1; overflow-y:auto; padding:16px 16px 100px; -webkit-overflow-scrolling:touch; }
+.allset-body::-webkit-scrollbar { display:none; }
+
+/* profile card */
+.pcard {
+  background: var(--white); border-radius: var(--r-xl);
+  border: 1.5px solid var(--border); overflow: hidden; margin-bottom: 12px;
+}
+.pcard-section-label {
+  font-size: 10px; font-weight: 700; color: var(--txt3);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 12px 16px 6px;
+}
+.pcard-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 16px; border-top: 1px solid var(--border);
+}
+.pcard-icon { font-size: 18px; flex-shrink:0; margin-top:1px; width:28px; text-align:center; }
+.pcard-row-label { font-size: 10.5px; font-weight: 700; color: var(--txt3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+.pcard-row-value { font-size: 13.5px; color: var(--txt2); line-height: 1.45; }
+.pcard-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+.pcard-chip { padding: 4px 11px; background: var(--brand-50); border-radius: var(--r-full); font-size: 11.5px; font-weight: 600; color: var(--brand); }
+
+.allset-bottom {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 16px 16px 28px;
+  background: linear-gradient(to top, var(--bg) 65%, transparent);
+}
+</style>
+</head>
+<body>
+
+<div class="outer-label">
+  <h1>🌱 Sprout</h1>
+  <p>Onboarding · Spouse Invite</p>
+</div>
+
+<div class="phone" id="phone">
+
+  <!-- STATUS BAR -->
+  <div class="status-bar" id="statusBar">
+    <span class="status-time" id="clock">9:41</span>
+    <div class="status-icons" id="statusIcons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#1a1a1a"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#1a1a1a"/><rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="#1a1a1a"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#1a1a1a" opacity=".3"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.4C10.7 2.4 13.1 3.5 14.8 5.3L16 4C14 1.9 11.1.6 8 .6 4.9.6 2 1.9 0 4l1.2 1.3C2.9 3.5 5.3 2.4 8 2.4z" fill="#1a1a1a"/><path d="M8 5.6c1.8 0 3.4.7 4.6 1.9L14 6.1C12.5 4.6 10.4 3.7 8 3.7s-4.5.9-6 2.4l1.4 1.4C4.6 6.3 6.2 5.6 8 5.6z" fill="#1a1a1a"/><circle cx="8" cy="10" r="1.5" fill="#1a1a1a"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#1a1a1a" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1a1a"/><path d="M23 4v4a2 2 0 000-4z" fill="#1a1a1a" opacity=".4"/></svg>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SCREEN 0 — WELCOME
+  ══════════════════════════════════ -->
+  <div class="screen active" id="s0" style="background:transparent;">
+
+    <div class="welcome-hero">
+      <div class="couple-wrap">
+        <div class="couple-av primary" id="partnerAv">JD</div>
+        <div class="couple-av secondary">?</div>
+        <div class="couple-link">🔗</div>
+      </div>
+      <div class="welcome-title">James invited you<br>to join <em>the family</em></div>
+      <div class="welcome-sub">Your family data is already set up.<br>We just need a few things about you.</div>
+      <div class="invite-pill">
+        <div class="invite-dot"></div>
+        <div class="invite-txt">Invite link · Verified ✓</div>
+      </div>
+    </div>
+
+    <div class="welcome-body">
+
+      <!-- Already set up -->
+      <div class="done-section-label">Already taken care of ✓</div>
+      <div class="done-list">
+        <div class="done-item">
+          <div class="done-icon">📍</div>
+          <div class="done-info">
+            <div class="done-label">Location</div>
+            <div class="done-value">Austin, TX · 73301</div>
+          </div>
+          <div class="done-check">✓</div>
+        </div>
+        <div class="done-item">
+          <div class="done-icon">👶</div>
+          <div class="done-info">
+            <div class="done-label">Kids</div>
+            <div class="done-value">Jesica, Liam, Sophia</div>
+          </div>
+          <div class="done-check">✓</div>
+        </div>
+        <div class="done-item">
+          <div class="done-icon">🏫</div>
+          <div class="done-info">
+            <div class="done-label">School Groups</div>
+            <div class="done-value">Pre-K · Kindergarten</div>
+          </div>
+          <div class="done-check">✓</div>
+        </div>
+      </div>
+
+      <!-- What you need to add -->
+      <div class="you-need-label">Just 3 quick steps for you</div>
+      <div class="you-need-pills">
+        <div class="you-need-pill"><span>👤 Your name</span></div>
+        <div class="you-need-pill"><span>🎭 Your role</span></div>
+        <div class="you-need-pill"><span>⭐ Interests</span></div>
+      </div>
+
+    </div>
+
+    <div class="btn-footer">
+      <button class="btn-primary" onclick="go(1)">
+        Let's go
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <div class="home-ind"></div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SCREEN 1 — YOUR NAME & ROLE
+  ══════════════════════════════════ -->
+  <div class="screen" id="s1">
+    <div class="progress-area">
+      <button class="back-btn" onclick="go(0)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg></button>
+      <div class="step-track">
+        <div class="step-node active"></div>
+        <div class="step-node"></div>
+        <div class="step-node"></div>
+      </div>
+      <span class="step-label">1 of 3</span>
+    </div>
+
+    <div class="screen-body">
+      <div class="eyebrow">About you</div>
+      <h1 class="s-title">What should we<br>call you?</h1>
+      <p class="s-sub">Your partner already set up the family — this is just your personal profile.</p>
+
+      <div class="f-row">
+        <div class="f-group" style="margin-bottom:0">
+          <label class="f-label">First name</label>
+          <input class="f-input" type="text" id="fName" placeholder="Sarah" oninput="checkS1()">
+        </div>
+        <div class="f-group" style="margin-bottom:0">
+          <label class="f-label">Last name</label>
+          <input class="f-input" type="text" id="lName" placeholder="Parker" oninput="checkS1()">
+        </div>
+      </div>
+
+      <div style="height:20px;"></div>
+
+      <div class="f-group">
+        <label class="f-label">Your role in the family</label>
+        <div class="role-grid" id="roleGrid">
+          <button class="role-btn" onclick="setRole(this,'Mom')">
+            <span class="role-emoji">👩</span>Mom
+          </button>
+          <button class="role-btn" onclick="setRole(this,'Dad')">
+            <span class="role-emoji">👨</span>Dad
+          </button>
+          <button class="role-btn" onclick="setRole(this,'Guardian')">
+            <span class="role-emoji">🧑</span>Guardian
+          </button>
+          <button class="role-btn" onclick="setRole(this,'Step-parent')">
+            <span class="role-emoji">💛</span>Step-parent
+          </button>
+        </div>
+      </div>
+
+      <!-- Family snapshot — read-only reminder -->
+      <div class="family-snapshot">
+        <div class="snapshot-head">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#186338" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span class="snapshot-head-label">Shared from James's profile</span>
+          <span class="snapshot-check">✓ Linked</span>
+        </div>
+        <div class="snapshot-row">
+          <div class="snapshot-icon">📍</div>
+          <div class="snapshot-text">
+            <div class="snapshot-label">Location</div>
+            <div class="snapshot-value">Austin, TX · 73301</div>
+          </div>
+        </div>
+        <div class="snapshot-row">
+          <div class="snapshot-icon">👶</div>
+          <div class="snapshot-text">
+            <div class="snapshot-label">Kids</div>
+            <div class="snapshot-value">Jesica · Liam · Sophia</div>
+          </div>
+        </div>
+        <div class="snapshot-row">
+          <div class="snapshot-icon">🏫</div>
+          <div class="snapshot-text">
+            <div class="snapshot-label">School Groups</div>
+            <div class="snapshot-chips">
+              <div class="snapshot-chip">Pre-K</div>
+              <div class="snapshot-chip">Kindergarten</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="btn-footer">
+      <button class="btn-primary" id="s1Btn" onclick="go(2)" disabled>
+        Continue
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <div class="home-ind"></div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SCREEN 2 — INTERESTS
+  ══════════════════════════════════ -->
+  <div class="screen" id="s2">
+    <div class="progress-area">
+      <button class="back-btn" onclick="go(1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg></button>
+      <div class="step-track">
+        <div class="step-node done"></div>
+        <div class="step-node active"></div>
+        <div class="step-node"></div>
+      </div>
+      <span class="step-label">2 of 3</span>
+    </div>
+
+    <div class="screen-body">
+      <div class="eyebrow">Your vibe</div>
+      <h1 class="s-title">What are you<br>into?</h1>
+      <p class="s-sub">Pick what fits you — we'll personalise your feed. You can always update this later.</p>
+
+      <div class="interest-grid">
+        <div class="interest-card" onclick="toggleInt(this)">
+          <div class="ic-icon">🏃</div>
+          <div class="ic-label">Active &amp; Sports</div>
+        </div>
+        <div class="interest-card" onclick="toggleInt(this)">
+          <div class="ic-icon">🎨</div>
+          <div class="ic-label">Arts &amp; Creative</div>
+        </div>
+        <div class="interest-card" onclick="toggleInt(this)">
+          <div class="ic-icon">📚</div>
+          <div class="ic-label">Learning</div>
+        </div>
+        <div class="interest-card" onclick="toggleInt(this)">
+          <div class="ic-icon">🌿</div>
+          <div class="ic-label">Nature &amp; Outdoors</div>
+        </div>
+        <div class="interest-card" onclick="toggleInt(this)">
+          <div class="ic-icon">🤝</div>
+          <div class="ic-label">Community</div>
+        </div>
+        <div class="interest-card" onclick="toggleInt(this)">
+          <div class="ic-icon">🎮</div>
+          <div class="ic-label">Play &amp; Fun</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="btn-footer">
+      <button class="btn-primary" onclick="go(3)">
+        Looks good
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <button class="btn-skip" onclick="go(3)">Skip — I'll add this later</button>
+    </div>
+    <div class="home-ind"></div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SCREEN 3 — ALL SET
+  ══════════════════════════════════ -->
+  <div class="screen" id="s3" style="background:transparent;">
+
+    <div class="allset-hero">
+      <div class="allset-av" id="allsetAv">SP</div>
+      <div class="allset-name-hero" id="allsetName">Sarah Parker</div>
+      <div class="allset-tag" id="allsetTag">Mom · Austin, TX</div>
+      <div class="allset-badge">
+        <div class="allset-badge-dot"></div>
+        Joined James's family on Sprout
+      </div>
+    </div>
+
+    <div class="allset-body">
+
+      <!-- your profile card -->
+      <div class="pcard">
+        <div class="pcard-section-label">Your profile</div>
+        <div class="pcard-row" id="pcardIntRow" style="display:none">
+          <div class="pcard-icon">⭐</div>
+          <div style="flex:1">
+            <div class="pcard-row-label">Your Interests</div>
+            <div class="pcard-chips" id="pcardInts"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- shared family card -->
+      <div class="pcard">
+        <div class="pcard-section-label">Shared family profile</div>
+        <div class="pcard-row">
+          <div class="pcard-icon">📍</div>
+          <div style="flex:1">
+            <div class="pcard-row-label">Location</div>
+            <div class="pcard-row-value">Austin, TX · 73301</div>
+          </div>
+        </div>
+        <div class="pcard-row">
+          <div class="pcard-icon">👶</div>
+          <div style="flex:1">
+            <div class="pcard-row-label">Kids</div>
+            <div class="pcard-row-value">Jesica · Liam · Sophia</div>
+          </div>
+        </div>
+        <div class="pcard-row">
+          <div class="pcard-icon">🏫</div>
+          <div style="flex:1">
+            <div class="pcard-row-label">School Groups</div>
+            <div class="pcard-chips">
+              <div class="pcard-chip">Pre-K</div>
+              <div class="pcard-chip">Kindergarten</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- deferred nudge -->
+      <div style="background:var(--s1);border-radius:var(--r-xl);padding:12px 14px;display:flex;align-items:flex-start;gap:8px;margin-bottom:16px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3a7ca5" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span style="font-size:12px;color:#234a63;line-height:1.55;">You can add a photo and bio anytime from your profile. Your partner manages kids and school groups.</span>
+      </div>
+
+    </div>
+
+    <div class="allset-bottom">
+      <button class="btn-primary" onclick="window.location.href='profile-preview.html'">
+        🌱 Explore Sprout
+      </button>
+    </div>
+  </div>
+
+</div><!-- /phone -->
+
+<script>
+/* ── DATA ── */
+const D = { firstName:'', lastName:'', role:'', interests:[] };
+let current = 0;
+
+/* ── NAVIGATION ── */
+function go(n) {
+  if (n > current) collectData(current);
+  const oldEl = document.getElementById('s' + current);
+  const newEl = document.getElementById('s' + n);
+  oldEl.classList.add('exiting');
+  newEl.classList.add('active');
+  setTimeout(() => oldEl.classList.remove('active', 'exiting'), 380);
+  current = n;
+  if (n === 0) syncStatusBar(true);
+  else syncStatusBar(false);
+  if (n === 3) buildAllSet();
+}
+
+function syncStatusBar(isDark) {
+  document.getElementById('clock').className = 'status-time' + (isDark ? ' light' : '');
+}
+
+/* ── DATA COLLECTION ── */
+function collectData(step) {
+  if (step === 1) {
+    D.firstName = document.getElementById('fName').value.trim();
+    D.lastName  = document.getElementById('lName').value.trim();
+  }
+  if (step === 2) {
+    D.interests = Array.from(document.querySelectorAll('.interest-card.selected'))
+      .map(el => el.querySelector('.ic-label').textContent.trim());
+  }
+}
+
+/* ── SCREEN 1 ── */
+function checkS1() {
+  const ok = document.getElementById('fName').value.trim() &&
+             document.getElementById('lName').value.trim();
+  document.getElementById('s1Btn').disabled = !ok;
+}
+
+function setRole(el, role) {
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  D.role = role;
+}
+
+/* ── SCREEN 2 ── */
+function toggleInt(el) { el.classList.toggle('selected'); }
+
+/* ── SCREEN 3 — ALL SET ── */
+function buildAllSet() {
+  const ini = (D.firstName[0]||'') + (D.lastName[0]||'');
+  document.getElementById('allsetAv').textContent   = ini.toUpperCase() || '🌱';
+  document.getElementById('allsetName').textContent = `${D.firstName} ${D.lastName}`.trim() || 'You';
+  document.getElementById('allsetTag').textContent  = `${D.role ? D.role + ' · ' : ''}Austin, TX`;
+
+  const ir = document.getElementById('pcardIntRow');
+  if (D.interests.length) {
+    document.getElementById('pcardInts').innerHTML =
+      D.interests.map(t => `<div class="pcard-chip">${t}</div>`).join('');
+    ir.style.display = '';
+  } else {
+    ir.style.display = 'none';
+  }
+}
+
+/* ── CLOCK ── */
+function tick() {
+  const n=new Date(), h=n.getHours(), m=n.getMinutes();
+  document.getElementById('clock').textContent=`${h}:${m<10?'0'+m:m}`;
+}
+tick(); setInterval(tick, 30000);
+</script>
+</body>
+</html>

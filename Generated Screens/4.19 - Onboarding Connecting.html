@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.19 — Connecting with Parents</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --brand-50:  #e2e9e3;
+  --brand-100: #d0dacf;
+  --brand-200: #77b691;
+  --brand-300: #579a74;
+  --brand-400: #387f56;
+  --brand-500: #186338;
+  --brand-600: #134f2d;
+  --brand-700: #1e3e2b;
+  --sec-500: #f4f1ea;
+  --sec-600: #eae6db;
+  --sec-700: #dbd5c8;
+  --sec-800: #c2b9a6;
+  --text-primary:   #4d525b;
+  --text-secondary: #818898;
+  --text-tertiary:  #b3b8c1;
+  --white: #ffffff;
+}
+html, body {
+  height: 100%; background: #d8d3c8;
+  display: flex; justify-content: center; align-items: center;
+  font-family: 'Inter', sans-serif;
+}
+.phone {
+  width: 393px; height: 852px;
+  background: var(--sec-500);
+  border-radius: 52px; overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.07), 0 40px 100px rgba(0,0,0,0.22), 0 8px 24px rgba(0,0,0,0.1);
+  display: flex; flex-direction: column;
+}
+.statusbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 28px 0; flex-shrink: 0;
+}
+.status-time { font-size: 15px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.2px; }
+.status-icons { display: flex; gap: 6px; align-items: center; color: var(--text-primary); }
+.nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px 0; flex-shrink: 0;
+}
+.nav-back {
+  width: 36px; height: 36px; border-radius: 50%; background: transparent;
+  border: none; cursor: pointer; color: var(--text-primary);
+  display: flex; align-items: center; justify-content: center; transition: background 0.15s;
+}
+.nav-back:hover { background: var(--sec-600); }
+.steps { display: flex; gap: 6px; }
+.step { width: 32px; height: 3px; border-radius: 99px; background: var(--sec-700); }
+.step.on { background: var(--brand-500); }
+.nav-ghost { width: 36px; }
+.scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  display: flex; flex-direction: column;
+  padding: 24px 24px 0; scrollbar-width: none;
+}
+.scroll::-webkit-scrollbar { display: none; }
+.eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--brand-500); margin-bottom: 10px;
+}
+.question-head {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; font-weight: 400; color: var(--text-primary);
+  line-height: 1.28; letter-spacing: -0.3px; margin-bottom: 6px;
+}
+.question-head em { font-style: italic; color: var(--brand-500); }
+.question-sub {
+  font-size: 14px; color: var(--text-secondary);
+  line-height: 1.55; margin-bottom: 24px;
+}
+.input-card {
+  background: var(--white); border: 1.5px solid var(--sec-700);
+  border-radius: 20px; overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  margin-bottom: 16px;
+}
+.input-card:focus-within {
+  border-color: var(--brand-400);
+  box-shadow: 0 0 0 3px rgba(56,127,86,0.1);
+}
+.recording-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; opacity: 0; height: 0;
+  overflow: hidden; transition: opacity 0.3s, height 0.3s;
+}
+.recording-row.show { opacity: 1; height: 44px; }
+.rec-waveform { display: flex; align-items: center; gap: 3px; }
+.rec-bar {
+  width: 3px; border-radius: 2px; background: var(--brand-400);
+  animation: waveAnim 0.6s ease-in-out infinite alternate;
+}
+.rec-bar:nth-child(1) { height: 6px;  animation-delay: 0s; }
+.rec-bar:nth-child(2) { height: 14px; animation-delay: 0.1s; }
+.rec-bar:nth-child(3) { height: 9px;  animation-delay: 0.05s; }
+.rec-bar:nth-child(4) { height: 18px; animation-delay: 0.15s; }
+.rec-bar:nth-child(5) { height: 11px; animation-delay: 0.08s; }
+.rec-bar:nth-child(6) { height: 16px; animation-delay: 0.12s; }
+@keyframes waveAnim {
+  from { transform: scaleY(0.4); opacity: 0.5; }
+  to   { transform: scaleY(1);   opacity: 1; }
+}
+.rec-label { font-size: 12px; color: var(--text-secondary); }
+.rec-stop {
+  margin-left: auto; font-size: 12px; font-weight: 500;
+  color: var(--brand-500); background: none; border: none;
+  cursor: pointer; padding: 4px 6px; border-radius: 6px;
+  transition: background 0.15s;
+}
+.rec-stop:hover { background: var(--brand-50); }
+.input-field {
+  width: 100%; border: none; outline: none;
+  padding: 16px 16px 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px; color: var(--text-primary);
+  line-height: 1.6; background: transparent;
+  resize: none; min-height: 110px; display: block;
+}
+.input-field::placeholder { color: var(--text-tertiary); }
+.input-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px 12px;
+}
+.char-count { font-size: 12px; color: var(--text-tertiary); }
+.voice-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--brand-500); border: none; border-radius: 99px;
+  padding: 7px 12px 7px 10px;
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
+  color: var(--white); cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.voice-btn:hover { background: var(--brand-600); }
+.voice-btn:active { transform: scale(0.96); }
+.voice-btn svg { width: 13px; height: 13px; }
+.voice-btn.recording {
+  background: var(--brand-600);
+  animation: breathe 1.2s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%,100% { box-shadow: 0 0 0 0 rgba(24,99,56,0.4); }
+  50%      { box-shadow: 0 0 0 6px rgba(24,99,56,0); }
+}
+.bio-preview {
+  background: var(--white); border: 1.5px solid var(--brand-100);
+  border-radius: 20px; overflow: hidden; margin-bottom: 16px;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1);
+  display: none;
+}
+.bio-preview.visible { opacity: 1; transform: translateY(0); display: block; }
+.bio-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 10px; border-bottom: 1px solid var(--sec-600);
+}
+.bio-label { display: flex; align-items: center; gap: 6px; }
+.bio-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brand-500); }
+.bio-label-text {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.6px;
+  text-transform: uppercase; color: var(--brand-500);
+}
+.bio-edit {
+  font-size: 12px; font-weight: 500; color: var(--text-secondary);
+  background: none; border: none; cursor: pointer;
+  padding: 3px 8px; border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
+}
+.bio-edit:hover { background: var(--sec-600); color: var(--text-primary); }
+.bio-skeleton { padding: 14px 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+.skeleton-line {
+  height: 14px; border-radius: 7px;
+  background: linear-gradient(90deg, var(--sec-600) 25%, var(--sec-500) 50%, var(--sec-600) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+.skeleton-line:nth-child(2) { width: 85%; }
+.skeleton-line:nth-child(3) { width: 60%; }
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.bio-body { padding: 14px 16px 18px; display: none; }
+.bio-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px; font-style: italic;
+  color: var(--text-primary); line-height: 1.65;
+}
+.bottom { padding: 8px 24px 40px; flex-shrink: 0; }
+.continue-btn {
+  width: 100%; height: 56px; border-radius: 99px; border: none;
+  background: var(--brand-500); color: var(--white);
+  font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 500;
+  cursor: pointer; letter-spacing: -0.1px;
+  transition: background 0.2s, opacity 0.3s, transform 0.15s;
+  box-shadow: 0 2px 12px rgba(24,99,56,0.2);
+}
+.continue-btn:not(:disabled):hover  { background: var(--brand-600); }
+.continue-btn:not(:disabled):active { transform: scale(0.98); }
+.continue-btn:disabled { background: var(--brand-200); cursor: not-allowed; box-shadow: none; opacity: 0.7; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="statusbar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="currentColor" opacity="0.3"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="currentColor" opacity="0.5"/><rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="currentColor" opacity="0.7"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.4C10.7 2.4 13.1 3.5 14.8 5.3L16 4.1C13.9 1.9 11.1 0.6 8 0.6C4.9 0.6 2.1 1.9 0 4.1L1.2 5.3C2.9 3.5 5.3 2.4 8 2.4Z" fill="currentColor"/><path d="M8 5.6C9.9 5.6 11.6 6.4 12.8 7.7L14 6.5C12.4 4.8 10.3 3.8 8 3.8C5.7 3.8 3.6 4.8 2 6.5L3.2 7.7C4.4 6.4 6.1 5.6 8 5.6Z" fill="currentColor" opacity="0.7"/><circle cx="8" cy="10.5" r="1.5" fill="currentColor"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="currentColor" opacity="0.4"/></svg>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-back"><svg width="9" height="16" viewBox="0 0 9 16" fill="none"><path d="M8 1L1 8L8 15" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="steps"><div class="step on"></div><div class="step on"></div><div class="step on"></div><div class="step on"></div></div>
+    <div class="nav-ghost"></div>
+  </div>
+
+  <div class="scroll" id="scroll">
+    <p class="eyebrow">Almost done</p>
+    <h2 class="question-head">What do you <em>love most</em> about connecting with other parents?</h2>
+    <p class="question-sub">Your answer helps us write your bio. Takes 10 seconds.</p>
+
+    <div class="input-card">
+      <div class="recording-row" id="recRow">
+        <div class="rec-waveform">
+          <div class="rec-bar"></div><div class="rec-bar"></div>
+          <div class="rec-bar"></div><div class="rec-bar"></div>
+          <div class="rec-bar"></div><div class="rec-bar"></div>
+        </div>
+        <span class="rec-label">Listening…</span>
+        <button class="rec-stop" onclick="stopRec()">Stop</button>
+      </div>
+      <textarea class="input-field" id="ta"
+        placeholder="e.g. I love organizing playdates and finding families with the same age kids nearby…"
+        maxlength="180" oninput="onInput()"></textarea>
+      <div class="input-toolbar">
+        <span class="char-count" id="count">0 / 180</span>
+        <button class="voice-btn" id="voiceBtn" onclick="toggleRec()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          Speak answer
+        </button>
+      </div>
+    </div>
+
+    <div class="bio-preview" id="bioCard">
+      <div class="bio-header">
+        <div class="bio-label"><div class="bio-dot"></div><span class="bio-label-text">Your bio preview</span></div>
+        <button class="bio-edit" onclick="editBio()">Edit</button>
+      </div>
+      <div class="bio-skeleton" id="bioSkeleton">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+      </div>
+      <div class="bio-body" id="bioBody">
+        <p class="bio-text" id="bioText"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <button class="continue-btn" id="contBtn" disabled>Continue</button>
+  </div>
+</div>
+
+<script>
+let recTimer = null;
+const bioOptions = [
+  'A warm and connected parent who finds real joy in building community — because those moments of genuine connection make the whole parenting journey feel less lonely.',
+  'Someone who believes the best part of raising kids is the village that forms around it — a parent always looking to grow that village, one playdate at a time.',
+  'A parent who treasures the friendships that form when families come together — not just for the kids, but for the moments adults finally get to talk to each other too.'
+];
+const transcripts = [
+  'I love the sense of community — finding parents who just get it without having to explain everything from scratch.',
+  'Honestly it\'s those moments when you realize you\'re not alone in this. Finding people who understand the chaos.',
+  'Just the feeling of being around people who are in the same season of life. It makes everything feel less overwhelming.'
+];
+
+function onInput() {
+  const ta = document.getElementById('ta');
+  document.getElementById('count').textContent = ta.value.length + ' / 180';
+  if (ta.value.trim().length >= 8) showBio();
+  else hideBio();
+  document.getElementById('contBtn').disabled = ta.value.trim().length < 8;
+}
+
+function showBio() {
+  const card = document.getElementById('bioCard');
+  card.style.display = 'block';
+  requestAnimationFrame(() => card.classList.add('visible'));
+  document.getElementById('bioSkeleton').style.display = 'flex';
+  document.getElementById('bioBody').style.display = 'none';
+  clearTimeout(card._t);
+  card._t = setTimeout(() => {
+    document.getElementById('bioText').textContent = bioOptions[Math.floor(Math.random() * bioOptions.length)];
+    document.getElementById('bioSkeleton').style.display = 'none';
+    document.getElementById('bioBody').style.display = 'block';
+    document.getElementById('scroll').scrollTo({ top: 9999, behavior: 'smooth' });
+  }, 1400);
+}
+
+function hideBio() {
+  const card = document.getElementById('bioCard');
+  card.classList.remove('visible');
+  clearTimeout(card._t);
+  setTimeout(() => { if (!card.classList.contains('visible')) card.style.display = 'none'; }, 500);
+}
+
+function editBio() {
+  const t = document.getElementById('bioText');
+  t.contentEditable = 'true'; t.focus();
+  const r = document.createRange();
+  r.selectNodeContents(t);
+  window.getSelection().removeAllRanges();
+  window.getSelection().addRange(r);
+}
+
+function toggleRec() {
+  const btn = document.getElementById('voiceBtn');
+  btn.classList.contains('recording') ? stopRec() : startRec();
+}
+
+function startRec() {
+  const btn = document.getElementById('voiceBtn');
+  btn.classList.add('recording');
+  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><rect x="6" y="6" width="12" height="12" rx="2"/></svg> Stop`;
+  document.getElementById('recRow').classList.add('show');
+  document.getElementById('ta').style.opacity = '0.4';
+  recTimer = setTimeout(() => stopRecWithAnswer(), 4000);
+}
+
+function stopRec() { clearTimeout(recTimer); stopRecWithAnswer(); }
+
+function stopRecWithAnswer() {
+  const btn = document.getElementById('voiceBtn');
+  const ta  = document.getElementById('ta');
+  btn.classList.remove('recording');
+  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg> Speak answer`;
+  document.getElementById('recRow').classList.remove('show');
+  ta.style.opacity = '1';
+  ta.value = transcripts[Math.floor(Math.random() * transcripts.length)];
+  document.getElementById('count').textContent = ta.value.length + ' / 180';
+  showBio();
+  document.getElementById('contBtn').disabled = false;
+}
+</script>
+</body>
+</html>

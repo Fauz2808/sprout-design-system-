@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Brand Guidelines</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream-base:     #F0EDE6;
+    --cream-light:    #F5F3EE;
+    --cream-lighter:  #FAF9F6;
+    --cream-card:     #EDEAE2;
+    --cream-input:    #E8E4DC;
+    --green-900:      #1A3A2A;
+    --green-800:      #1E4A35;
+    --green-700:      #245E42;
+    --green-600:      #2D6E4E;
+    --green-500:      #3A8A62;
+    --green-400:      #4FA878;
+    --green-300:      #7DC49A;
+    --green-200:      #B0DFC3;
+    --green-100:      #D8F0E5;
+    --green-50:       #EEF8F3;
+    --sage-bg:        #D6E8DC;
+    --sage-text:      #2D6E4E;
+    --text-primary:   #1C1C1A;
+    --text-secondary: #6B6860;
+    --text-tertiary:  #9E9B94;
+    --text-on-green:  #FFFFFF;
+    --border-light:   rgba(0,0,0,0.08);
+    --border-medium:  rgba(0,0,0,0.14);
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body:    'Inter', -apple-system, sans-serif;
+    --radius-sm:  8px;
+    --radius-md:  12px;
+    --radius-lg:  16px;
+    --radius-xl:  24px;
+    --radius-pill: 999px;
+  }
+
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-body); background: var(--cream-base); color: var(--text-primary); line-height: 1.6; font-size: 16px; }
+
+  .page-wrap { max-width: 900px; margin: 0 auto; padding: 0 32px 80px; }
+
+  /* COVER */
+  .cover { min-height: 420px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 80px 32px 60px; border-bottom: 1px solid var(--border-light); margin-bottom: 64px; }
+  .cover-icon { width: 72px; height: 72px; border-radius: 20px; overflow: hidden; margin-bottom: 28px; box-shadow: 0 8px 24px rgba(45,110,78,0.25); }
+  .cover-icon img { width: 72px; height: 72px; object-fit: cover; display: block; }
+  .cover h1 { font-family: var(--font-display); font-size: 56px; font-weight: 700; letter-spacing: -1px; color: var(--text-primary); margin-bottom: 12px; }
+  .cover-sub { font-size: 15px; color: var(--text-secondary); font-weight: 400; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 20px; }
+  .cover-tagline { font-family: var(--font-display); font-style: italic; font-size: 22px; color: var(--green-700); font-weight: 400; max-width: 480px; }
+  .cover-meta { margin-top: 28px; font-size: 13px; color: var(--text-tertiary); }
+
+  /* TOC */
+  .toc { background: var(--cream-lighter); border: 1px solid var(--border-light); border-radius: var(--radius-xl); padding: 28px 32px; margin-bottom: 64px; }
+  .toc h4 { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 14px; }
+  .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; }
+  .toc a { font-size: 14px; color: var(--green-700); text-decoration: none; display: flex; align-items: center; gap: 6px; padding: 4px 0; }
+  .toc a:hover { color: var(--green-500); }
+  .toc-num { font-size: 11px; color: var(--text-tertiary); min-width: 20px; font-weight: 500; }
+  .toc-new { font-size: 10px; background: var(--sage-bg); color: var(--sage-text); padding: 2px 6px; border-radius: var(--radius-pill); font-weight: 600; letter-spacing: 0.04em; }
+
+  /* SECTIONS */
+  .section { margin-bottom: 72px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px; }
+  .section-title { font-family: var(--font-display); font-size: 36px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.5px; margin-bottom: 6px; }
+  .section-intro { font-size: 15px; color: var(--text-secondary); line-height: 1.7; max-width: 600px; margin-bottom: 36px; }
+  .divider { height: 1px; background: var(--border-light); margin: 40px 0; }
+
+  /* CARDS */
+  .card { background: var(--cream-lighter); border: 1px solid var(--border-light); border-radius: var(--radius-xl); padding: 28px 32px; margin-bottom: 16px; }
+  .card-title { font-family: var(--font-display); font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+  .card-body { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+
+  /* COLOR */
+  .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 32px; }
+  .color-swatch { border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border-light); }
+  .swatch-block { height: 80px; }
+  .swatch-info { padding: 10px 12px; background: var(--cream-lighter); }
+  .swatch-name { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+  .swatch-hex { font-size: 11px; color: var(--text-tertiary); font-family: monospace; }
+  .swatch-role { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+  /* TYPOGRAPHY */
+  .type-sample { background: var(--cream-lighter); border: 1px solid var(--border-light); border-radius: var(--radius-xl); padding: 32px; margin-bottom: 16px; }
+  .type-meta { font-size: 11px; color: var(--text-tertiary); font-family: monospace; margin-bottom: 12px; }
+  .type-h1 { font-family: var(--font-display); font-size: 40px; font-weight: 700; letter-spacing: -1px; line-height: 1.15; }
+  .type-h2 { font-family: var(--font-display); font-size: 28px; font-weight: 600; letter-spacing: -0.5px; line-height: 1.25; }
+  .type-h3 { font-family: var(--font-display); font-size: 22px; font-weight: 600; line-height: 1.3; }
+  .type-sub { font-family: var(--font-body); font-size: 17px; font-weight: 500; color: var(--text-secondary); line-height: 1.5; }
+  .type-body { font-family: var(--font-body); font-size: 15px; font-weight: 400; color: var(--text-secondary); line-height: 1.7; }
+  .type-label { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); }
+  .type-caption { font-family: var(--font-body); font-size: 13px; color: var(--text-tertiary); line-height: 1.5; }
+
+  /* COMPONENTS */
+  .component-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .comp-box { background: var(--cream-lighter); border: 1px solid var(--border-light); border-radius: var(--radius-xl); padding: 28px 24px; }
+  .comp-label { font-size: 11px; color: var(--text-tertiary); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
+  .comp-demo { display: flex; flex-direction: column; gap: 10px; }
+  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--green-800); color: white; font-family: var(--font-body); font-size: 14px; font-weight: 500; padding: 12px 20px; border-radius: var(--radius-pill); border: none; cursor: pointer; }
+  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: var(--sage-bg); color: var(--sage-text); font-family: var(--font-body); font-size: 14px; font-weight: 500; padding: 12px 20px; border-radius: var(--radius-pill); border: none; cursor: pointer; }
+  .btn-ghost { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--text-secondary); font-family: var(--font-body); font-size: 14px; font-weight: 400; padding: 12px 20px; border-radius: var(--radius-pill); border: 1px solid var(--border-medium); cursor: pointer; }
+  .btn-icon { width: 40px; height: 40px; background: var(--green-800); color: white; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .btn-icon-ghost { width: 40px; height: 40px; background: var(--cream-card); border-radius: 50%; border: 1px solid var(--border-light); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip-active { background: var(--green-800); color: white; font-family: var(--font-body); font-size: 14px; font-weight: 500; padding: 8px 18px; border-radius: var(--radius-pill); border: none; }
+  .chip-idle { background: var(--sage-bg); color: var(--sage-text); font-family: var(--font-body); font-size: 14px; font-weight: 400; padding: 8px 18px; border-radius: var(--radius-pill); border: none; }
+  .input-wrap { position: relative; }
+  .input-search { width: 100%; background: var(--cream-input); border: none; outline: none; font-family: var(--font-body); font-size: 14px; color: var(--text-secondary); padding: 12px 16px 12px 40px; border-radius: var(--radius-pill); }
+  .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 14px; }
+  .event-card { background: var(--cream-lighter); border: 1px solid var(--border-light); border-radius: var(--radius-xl); overflow: hidden; display: flex; }
+  .event-img-placeholder { width: 80px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; background: linear-gradient(135deg, #c5e3d0, #8fc4a8); }
+  .event-info { padding: 14px 16px; flex: 1; }
+  .event-title { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+  .event-meta { font-size: 12px; color: var(--text-tertiary); margin-bottom: 6px; }
+  .action-reject { width: 32px; height: 32px; border-radius: 50%; background: var(--cream-card); border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--text-tertiary); cursor: pointer; }
+  .action-accept { width: 32px; height: 32px; border-radius: 50%; background: var(--green-800); border: none; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white; cursor: pointer; }
+  .nav-bar { background: var(--cream-lighter); border: 1px solid var(--border-light); border-radius: var(--radius-pill); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; color: var(--text-tertiary); cursor: pointer; min-width: 52px; }
+  .nav-item.active { color: var(--green-800); font-weight: 600; }
+  .nav-icon { font-size: 20px; }
+  .nav-badge { position: relative; display: inline-block; }
+  .badge { position: absolute; top: -4px; right: -8px; background: var(--green-800); color: white; font-size: 10px; font-weight: 600; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .member-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--cream-lighter); border: 1px solid var(--border-light); border-radius: var(--radius-lg); margin-bottom: 8px; }
+  .avatar-placeholder { width: 44px; height: 44px; border-radius: 50%; background: var(--green-200); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .member-info { flex: 1; }
+  .member-name { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  .member-role { font-size: 12px; color: var(--text-tertiary); }
+  .tag-new { background: var(--cream-card); border: 1px solid var(--border-medium); color: var(--text-secondary); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: var(--radius-pill); }
+  .tag-met { background: var(--sage-bg); color: var(--sage-text); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: var(--radius-pill); }
+  .tag-meets { background: var(--green-50); border: 1px solid var(--green-200); color: var(--green-700); font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: var(--radius-pill); }
+
+  /* VOICE */
+  .voice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .voice-card { background: var(--cream-lighter); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 20px; }
+  .voice-emoji { font-size: 24px; margin-bottom: 10px; }
+  .voice-title { font-family: var(--font-display); font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+  .voice-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+  .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px; }
+  .do-box { background: var(--green-50); border: 1px solid var(--green-200); border-radius: var(--radius-lg); padding: 18px; }
+  .dont-box { background: #FFF3F3; border: 1px solid #FFCCCC; border-radius: var(--radius-lg); padding: 18px; }
+  .dd-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+  .do-box .dd-label { color: var(--green-700); }
+  .dont-box .dd-label { color: #B03030; }
+  .dd-list { list-style: none; }
+  .dd-list li { font-size: 13px; color: var(--text-secondary); padding: 4px 0; display: flex; gap: 6px; }
+  .dd-list li::before { font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+  .do-box .dd-list li::before { content: "✓"; color: var(--green-600); }
+  .dont-box .dd-list li::before { content: "✗"; color: #B03030; }
+
+  /* COPY */
+  .copy-example { background: var(--cream-lighter); border-left: 3px solid var(--green-500); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 16px 20px; margin-bottom: 10px; }
+  .copy-context { font-size: 11px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .copy-text { font-family: var(--font-display); font-size: 17px; font-weight: 500; font-style: italic; color: var(--text-primary); line-height: 1.5; }
+
+  /* BRAND CORE */
+  .brand-statement { background: var(--green-800); color: white; border-radius: var(--radius-xl); padding: 40px 36px; margin-bottom: 24px; }
+  .brand-statement .bs-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.6; margin-bottom: 10px; }
+  .brand-statement .bs-text { font-family: var(--font-display); font-size: 24px; font-weight: 500; font-style: italic; line-height: 1.4; opacity: 0.95; }
+  .pillars { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .pillar { background: var(--cream-lighter); border: 1px solid var(--border-light); border-radius: var(--radius-xl); padding: 24px; text-align: center; }
+  .pillar-icon { font-size: 28px; margin-bottom: 12px; }
+  .pillar-title { font-family: var(--font-display); font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+  .pillar-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* LOGO */
+  .logo-variants { display: flex; gap: 16px; flex-wrap: wrap; }
+  .logo-box { flex: 1; min-width: 160px; background: var(--cream-lighter); border: 1px solid var(--border-light); border-radius: var(--radius-xl); padding: 32px 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .logo-box.dark-bg { background: var(--green-900); }
+  .logo-box.mid-bg { background: var(--cream-card); }
+  .logo-box-label { font-size: 11px; color: var(--text-tertiary); text-align: center; }
+  .logo-box.dark-bg .logo-box-label { color: rgba(255,255,255,0.4); }
+  .logo-lockup { display: flex; align-items: center; gap: 10px; }
+  .logo-name { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: var(--text-primary); }
+  .logo-name-white { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: white; }
+  .logo-img-sm { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; display: block; }
+  .logo-img-lg { width: 64px; height: 64px; border-radius: 16px; object-fit: cover; display: block; }
+
+  /* SPEC TABLE */
+  .spec-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+  .spec-table th { font-size: 11px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); }
+  .spec-table td { font-size: 13px; color: var(--text-secondary); padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-family: monospace; }
+  .spec-table td:first-child { color: var(--text-primary); font-weight: 500; }
+  .spec-table tr:last-child td { border-bottom: none; }
+
+  /* IMAGERY */
+  .photo-do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  .photo-box { border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--border-light); }
+  .photo-placeholder { height: 160px; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+  .photo-label { padding: 14px 16px; background: var(--cream-lighter); }
+  .photo-label strong { font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px; }
+  .photo-label span { font-size: 12px; color: var(--text-secondary); }
+
+  /* MOTION */
+  .motion-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .motion-card { background: var(--cream-lighter); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 18px; }
+  .motion-card h5 { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .motion-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.5; font-family: monospace; }
+
+  /* =============================================
+     NEW: SOCIAL MEDIA BRANDING (Section 09)
+  ============================================= */
+  .platform-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+  .platform-badge { display: flex; align-items: center; gap: 8px; background: var(--cream-lighter); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 12px 18px; }
+  .platform-badge-icon { font-size: 20px; }
+  .platform-badge-info { display: flex; flex-direction: column; }
+  .platform-badge-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .platform-badge-role { font-size: 11px; color: var(--text-tertiary); }
+
+  .post-formats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 32px; }
+  .post-format-card { background: var(--cream-lighter); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .post-format-preview { background: var(--cream-card); border: 1px solid var(--border-medium); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+  .post-format-preview.sq { width: 64px; height: 64px; }
+  .post-format-preview.portrait { width: 52px; height: 65px; }
+  .post-format-preview.story { width: 37px; height: 65px; }
+  .post-format-preview.banner { width: 80px; height: 45px; }
+  .post-format-preview .pf-inner { font-size: 8px; color: var(--text-tertiary); text-align: center; font-family: monospace; padding: 4px; }
+  .post-format-name { font-size: 12px; font-weight: 600; color: var(--text-primary); text-align: center; }
+  .post-format-dim { font-size: 11px; color: var(--text-tertiary); font-family: monospace; text-align: center; }
+
+  .grid-aesthetic { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-light); max-width: 280px; }
+  .grid-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .gc-photo { background: linear-gradient(135deg, #c5e3d0, #8fc4a8); }
+  .gc-quote { background: var(--green-800); color: white; font-family: var(--font-display); font-size: 9px; font-style: italic; text-align: center; padding: 8px; font-size: 8px; line-height: 1.4; }
+  .gc-cream { background: var(--cream-card); }
+  .gc-screen { background: var(--green-100); }
+
+  .hashtag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .hashtag-core { background: var(--green-800); color: white; font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: var(--radius-pill); font-family: var(--font-body); }
+  .hashtag-community { background: var(--sage-bg); color: var(--sage-text); font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: var(--radius-pill); font-family: var(--font-body); }
+
+  .highlight-covers { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+  .highlight-cover { width: 64px; height: 64px; border-radius: 50%; background: var(--cream-base); border: 2px solid var(--border-medium); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+  .hc-icon { font-size: 18px; }
+  .hc-label { font-size: 7px; font-weight: 600; color: var(--green-800); text-transform: uppercase; letter-spacing: 0.04em; text-align: center; }
+
+  /* =============================================
+     NEW: COMPANY BRANDING (Section 10)
+  ============================================= */
+  .biz-card-wrap { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
+  .biz-card { width: 280px; height: 160px; border-radius: var(--radius-lg); overflow: hidden; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.12); flex-shrink: 0; }
+  .biz-card-front { background: var(--cream-lighter); border: 1px solid var(--border-light); display: flex; flex-direction: column; justify-content: space-between; padding: 20px; height: 100%; }
+  .biz-card-back { background: var(--green-800); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; height: 100%; }
+  .biz-logo-row { display: flex; align-items: center; gap: 8px; }
+  .biz-logo-img { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; }
+  .biz-logo-name { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--text-primary); }
+  .biz-contact { display: flex; flex-direction: column; gap: 2px; }
+  .biz-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .biz-title { font-size: 11px; color: var(--text-tertiary); }
+  .biz-detail { font-size: 10px; color: var(--text-secondary); font-family: monospace; }
+  .biz-back-tagline { font-family: var(--font-display); font-style: italic; font-size: 11px; color: rgba(255,255,255,0.75); text-align: center; max-width: 200px; line-height: 1.5; }
+
+  .letterhead-preview { background: var(--cream-lighter); border: 1px solid var(--border-light); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: 24px; }
+  .lh-header { background: white; padding: 20px 28px 16px; border-bottom: 2px solid var(--green-800); display: flex; align-items: center; justify-content: space-between; }
+  .lh-body { padding: 24px 28px; }
+  .lh-line { height: 8px; background: var(--cream-card); border-radius: 4px; margin-bottom: 8px; }
+  .lh-line.short { width: 60%; }
+  .lh-line.shorter { width: 40%; }
+  .lh-footer { background: white; border-top: 1px solid var(--border-light); padding: 12px 28px; text-align: center; font-size: 10px; color: var(--text-tertiary); font-family: monospace; }
+
+  .email-sig-preview { background: var(--cream-lighter); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 16px; display: flex; gap: 16px; align-items: flex-start; max-width: 480px; }
+  .email-sig-bar { width: 3px; background: var(--green-800); border-radius: 2px; flex-shrink: 0; align-self: stretch; }
+  .email-sig-content { display: flex; flex-direction: column; gap: 2px; }
+  .email-sig-name { font-size: 14px; font-weight: 600; color: var(--text-primary); font-family: var(--font-body); }
+  .email-sig-title { font-size: 12px; color: var(--text-secondary); }
+  .email-sig-logo { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+  .email-sig-logo img { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; }
+  .email-sig-logo-name { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--green-800); }
+  .email-sig-link { font-size: 11px; color: var(--green-500); text-decoration: none; }
+
+  /* =============================================
+     NEW: PRESENTATION BRANDING (Section 11)
+  ============================================= */
+  .slide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .slide-preview { border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border-light); box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .slide-preview-inner { aspect-ratio: 16/9; position: relative; display: flex; flex-direction: column; justify-content: center; padding: 20px 24px; }
+  .slide-cover-bg { background: var(--green-800); }
+  .slide-content-bg { background: var(--cream-lighter); }
+  .slide-divider-bg { background: var(--cream-base); }
+  .slide-data-bg { background: var(--cream-lighter); }
+  .slide-preview-label { background: var(--cream-card); padding: 8px 14px; font-size: 11px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* Cover slide internals */
+  .sc-logo { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+  .sc-logo img { width: 24px; height: 24px; border-radius: 5px; object-fit: cover; }
+  .sc-logo-name { font-family: var(--font-display); font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.8); }
+  .sc-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: white; line-height: 1.2; margin-bottom: 6px; }
+  .sc-sub { font-family: var(--font-display); font-style: italic; font-size: 11px; color: rgba(255,255,255,0.65); }
+  .sc-footer { position: absolute; bottom: 12px; right: 16px; font-size: 9px; color: rgba(255,255,255,0.4); font-family: monospace; }
+
+  /* Content slide internals */
+  .sct-rule { height: 2px; width: 32px; background: var(--green-800); border-radius: 1px; margin-bottom: 8px; }
+  .sct-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+  .sct-bullets { display: flex; flex-direction: column; gap: 5px; }
+  .sct-bullet { display: flex; gap: 6px; align-items: flex-start; }
+  .sct-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--green-500); flex-shrink: 0; margin-top: 5px; }
+  .sct-text { font-size: 9px; color: var(--text-secondary); line-height: 1.4; }
+  .sct-footer-logo { position: absolute; bottom: 10px; right: 14px; display: flex; align-items: center; gap: 4px; }
+  .sct-footer-logo img { width: 14px; height: 14px; border-radius: 3px; object-fit: cover; }
+  .sct-footer-name { font-family: var(--font-display); font-size: 8px; font-weight: 700; color: var(--text-tertiary); }
+
+  /* Divider slide internals */
+  .sdiv-num { font-family: var(--font-display); font-size: 48px; font-weight: 700; color: var(--green-200); line-height: 1; margin-bottom: 4px; }
+  .sdiv-title { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text-primary); }
+  .sdiv-rule { height: 2px; width: 40px; background: var(--green-500); margin-top: 10px; border-radius: 1px; }
+
+  /* Data slide internals */
+  .sdata-title { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+  .sdata-bars { display: flex; align-items: flex-end; gap: 5px; height: 50px; }
+  .sdata-bar { border-radius: 3px 3px 0 0; flex: 1; }
+  .sdata-labels { display: flex; gap: 5px; margin-top: 4px; }
+  .sdata-label { flex: 1; font-size: 7px; color: var(--text-tertiary); text-align: center; font-family: monospace; }
+
+  .pres-type-table { background: var(--cream-lighter); border-radius: var(--radius-lg); overflow: hidden; }
+
+  /* =============================================
+     SPACING / PRINT
+  ============================================= */
+  .spacing-row { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
+  .spacing-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .spacing-block { background: var(--green-300); border-radius: 4px; width: 100%; }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .page-wrap { padding: 0 16px 60px; }
+    .pillars { grid-template-columns: 1fr; }
+    .voice-grid { grid-template-columns: 1fr; }
+    .component-grid { grid-template-columns: 1fr; }
+    .do-dont { grid-template-columns: 1fr; }
+    .toc-grid { grid-template-columns: 1fr; }
+    .motion-row { grid-template-columns: 1fr; }
+    .post-formats { grid-template-columns: 1fr 1fr; }
+    .slide-grid { grid-template-columns: 1fr; }
+    .cover h1 { font-size: 38px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <!-- COVER -->
+  <div class="cover">
+    <div class="cover-icon">
+      <img src="Logo/Sprout%20Logo.jpeg" alt="Sprout Logo">
+    </div>
+    <p class="cover-sub">Brand Guidelines · Version 2.0</p>
+    <h1>Sprout</h1>
+    <p class="cover-tagline">"Where parents bond and childhoods flourish."</p>
+    <p class="cover-meta">Confidential · For internal use and design partners · March 2026</p>
+  </div>
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <h4>Contents</h4>
+    <div class="toc-grid">
+      <a href="#brand-core"><span class="toc-num">01</span> Brand Core & Identity</a>
+      <a href="#voice-tone"><span class="toc-num">05</span> Brand Voice & Tone</a>
+      <a href="#color"><span class="toc-num">02</span> Color System</a>
+      <a href="#copy-examples"><span class="toc-num">06</span> Copy Examples</a>
+      <a href="#typography"><span class="toc-num">03</span> Typography</a>
+      <a href="#imagery"><span class="toc-num">07</span> Imagery Style</a>
+      <a href="#components"><span class="toc-num">04</span> UI Components</a>
+      <a href="#spacing"><span class="toc-num">08</span> Spacing & Motion</a>
+      <a href="#social-media"><span class="toc-num">09</span> Social Media Branding <span class="toc-new">NEW</span></a>
+      <a href="#company-branding"><span class="toc-num">10</span> Company Branding <span class="toc-new">NEW</span></a>
+      <a href="#presentation"><span class="toc-num">11</span> Presentation Branding <span class="toc-new">NEW</span></a>
+    </div>
+  </div>
+
+  <!-- 01 BRAND CORE -->
+  <div class="section" id="brand-core">
+    <p class="section-label">01 — Brand Core</p>
+    <h2 class="section-title">Who We Are</h2>
+    <p class="section-intro">Sprout is the platform where parents find their people — not just playdates, but a genuine community that grows with their family. Every design and word choice should reflect that human warmth.</p>
+
+    <div class="brand-statement">
+      <p class="bs-label">Brand Idea</p>
+      <p class="bs-text">"You got lucky when you found these people.<br>Sprout is where that luck happens."</p>
+    </div>
+
+    <div class="brand-statement" style="background: var(--green-700); margin-top: 12px;">
+      <p class="bs-label">The Party Line</p>
+      <p class="bs-text" style="font-size: 18px;">"You know how when you have kids and move somewhere new you basically have to start your whole social life over? I'm building the app that solves that."</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Brand Personality Pillars</p>
+    <div class="pillars">
+      <div class="pillar">
+        <div class="pillar-icon">🌱</div>
+        <div class="pillar-title">Warm & Human</div>
+        <div class="pillar-desc">We speak like a trusted friend, never a corporate product. The tone is always supportive, real, and never preachy.</div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">🍀</div>
+        <div class="pillar-title">Serendipitous</div>
+        <div class="pillar-desc">The best connections feel like happy accidents. Our brand celebrates the joy of finding your people — that feeling of "lucky me."</div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">🌳</div>
+        <div class="pillar-title">Grounded & Safe</div>
+        <div class="pillar-desc">Parents trust us with what matters most. We feel reliable, calm, and rooted — never flashy, never alarming.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Logo System</p>
+    <div class="logo-variants">
+      <div class="logo-box">
+        <div class="logo-lockup">
+          <img src="Logo/Sprout%20Logo%20White%20Background.jpeg" class="logo-img-sm" alt="Sprout Clover">
+          <span class="logo-name">Sprout</span>
+        </div>
+        <span class="logo-box-label">Primary — on light background</span>
+      </div>
+      <div class="logo-box dark-bg">
+        <div class="logo-lockup">
+          <img src="Logo/Sprout%20Logo%20White%20Background.jpeg" class="logo-img-sm" alt="Sprout Clover" style="border-radius:8px;opacity:0.92;">
+          <span class="logo-name-white">Sprout</span>
+        </div>
+        <span class="logo-box-label">Reversed — on dark background</span>
+      </div>
+      <div class="logo-box mid-bg">
+        <img src="Logo/Sprout%20Logo.jpeg" class="logo-img-lg" alt="Sprout App Icon">
+        <span class="logo-box-label">Icon-only — app icon, favicon</span>
+      </div>
+    </div>
+    <div class="card" style="margin-top: 16px;">
+      <p class="card-title" style="font-size: 15px;">Logo Rules</p>
+      <p class="card-body">Always maintain a clear space of at least 1× the icon height around the logo. Never stretch, rotate, recolor, or add effects to the logo. The clover icon always appears true to its original form — never replace with a generic emoji or altered version. On dark backgrounds, use the logo at natural opacity. Never use the wordmark without the clover. Minimum display size: 28px height for icon, 80px width for the full lockup.</p>
+    </div>
+  </div>
+
+  <!-- 02 COLOR SYSTEM -->
+  <div class="section" id="color">
+    <p class="section-label">02 — Color</p>
+    <h2 class="section-title">Color System</h2>
+    <p class="section-intro">Sprout's palette is rooted in nature — organic creams and deep forest greens. The warmth of cream creates safety; the depth of green signals growth and trust.</p>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Core Palette</p>
+    <div class="color-grid">
+      <div class="color-swatch"><div class="swatch-block" style="background: #1E4A35;"></div><div class="swatch-info"><div class="swatch-name">Forest</div><div class="swatch-hex">#1E4A35</div><div class="swatch-role">Primary / Buttons / Nav</div></div></div>
+      <div class="color-swatch"><div class="swatch-block" style="background: #3A8A62;"></div><div class="swatch-info"><div class="swatch-name">Sprout Green</div><div class="swatch-hex">#3A8A62</div><div class="swatch-role">Interactive / Links</div></div></div>
+      <div class="color-swatch"><div class="swatch-block" style="background: #D6E8DC;"></div><div class="swatch-info"><div class="swatch-name">Sage</div><div class="swatch-hex">#D6E8DC</div><div class="swatch-role">Chips / Tags / Accents</div></div></div>
+      <div class="color-swatch"><div class="swatch-block" style="background: #F0EDE6;"></div><div class="swatch-info"><div class="swatch-name">Cream</div><div class="swatch-hex">#F0EDE6</div><div class="swatch-role">App Background</div></div></div>
+      <div class="color-swatch"><div class="swatch-block" style="background: #FAF9F6;"></div><div class="swatch-info"><div class="swatch-name">Cream Light</div><div class="swatch-hex">#FAF9F6</div><div class="swatch-role">Card Background</div></div></div>
+      <div class="color-swatch"><div class="swatch-block" style="background: #E8E4DC;"></div><div class="swatch-info"><div class="swatch-name">Cream Input</div><div class="swatch-hex">#E8E4DC</div><div class="swatch-role">Inputs / Search bars</div></div></div>
+      <div class="color-swatch"><div class="swatch-block" style="background: #1C1C1A;"></div><div class="swatch-info"><div class="swatch-name">Ink</div><div class="swatch-hex">#1C1C1A</div><div class="swatch-role">Primary Text</div></div></div>
+      <div class="color-swatch"><div class="swatch-block" style="background: #6B6860;"></div><div class="swatch-info"><div class="swatch-name">Stone</div><div class="swatch-hex">#6B6860</div><div class="swatch-role">Secondary Text / Meta</div></div></div>
+    </div>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; margin-top: 32px;">Green Scale</p>
+    <div style="margin-bottom: 4px; display: flex; gap: 4px;">
+      <div style="flex:1; height:36px; border-radius:6px; background:#1A3A2A;"></div>
+      <div style="flex:1; height:36px; border-radius:6px; background:#1E4A35;"></div>
+      <div style="flex:1; height:36px; border-radius:6px; background:#245E42;"></div>
+      <div style="flex:1; height:36px; border-radius:6px; background:#2D6E4E;"></div>
+      <div style="flex:1; height:36px; border-radius:6px; background:#3A8A62;"></div>
+      <div style="flex:1; height:36px; border-radius:6px; background:#4FA878;"></div>
+      <div style="flex:1; height:36px; border-radius:6px; background:#7DC49A;"></div>
+      <div style="flex:1; height:36px; border-radius:6px; background:#B0DFC3;"></div>
+      <div style="flex:1; height:36px; border-radius:6px; background:#D8F0E5;"></div>
+      <div style="flex:1; height:36px; border-radius:6px; background:#EEF8F3;"></div>
+    </div>
+    <div style="display:flex; gap:4px; margin-bottom:24px;">
+      <div style="flex:1;text-align:center;font-size:9px;color:var(--text-tertiary);font-family:monospace;">900</div>
+      <div style="flex:1;text-align:center;font-size:9px;color:var(--text-tertiary);font-family:monospace;">800</div>
+      <div style="flex:1;text-align:center;font-size:9px;color:var(--text-tertiary);font-family:monospace;">700</div>
+      <div style="flex:1;text-align:center;font-size:9px;color:var(--text-tertiary);font-family:monospace;">600</div>
+      <div style="flex:1;text-align:center;font-size:9px;color:var(--text-tertiary);font-family:monospace;">500</div>
+      <div style="flex:1;text-align:center;font-size:9px;color:var(--text-tertiary);font-family:monospace;">400</div>
+      <div style="flex:1;text-align:center;font-size:9px;color:var(--text-tertiary);font-family:monospace;">300</div>
+      <div style="flex:1;text-align:center;font-size:9px;color:var(--text-tertiary);font-family:monospace;">200</div>
+      <div style="flex:1;text-align:center;font-size:9px;color:var(--text-tertiary);font-family:monospace;">100</div>
+      <div style="flex:1;text-align:center;font-size:9px;color:var(--text-tertiary);font-family:monospace;">50</div>
+    </div>
+
+    <table class="spec-table" style="background: var(--cream-lighter); border-radius: var(--radius-lg); overflow: hidden;">
+      <thead><tr><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td>--green-800</td><td>#1E4A35</td><td>Primary buttons, active nav, icon background</td></tr>
+        <tr><td>--green-500</td><td>#3A8A62</td><td>Links, "See All", interactive labels</td></tr>
+        <tr><td>--sage-bg</td><td>#D6E8DC</td><td>Filter chips (idle), badges, tag backgrounds</td></tr>
+        <tr><td>--cream-base</td><td>#F0EDE6</td><td>Global app background</td></tr>
+        <tr><td>--cream-lighter</td><td>#FAF9F6</td><td>Card surfaces, bottom nav</td></tr>
+        <tr><td>--cream-input</td><td>#E8E4DC</td><td>Search fields, input backgrounds</td></tr>
+        <tr><td>--text-primary</td><td>#1C1C1A</td><td>Headings, event titles, member names</td></tr>
+        <tr><td>--text-secondary</td><td>#6B6860</td><td>Subtitles, descriptions, metadata</td></tr>
+        <tr><td>--text-tertiary</td><td>#9E9B94</td><td>Timestamps, distance, minor labels</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 03 TYPOGRAPHY -->
+  <div class="section" id="typography">
+    <p class="section-label">03 — Typography</p>
+    <h2 class="section-title">Type System</h2>
+    <p class="section-intro">Two fonts, one purpose: Playfair Display brings warmth and personality to headings; Inter ensures clarity and readability in everything else.</p>
+
+    <div class="type-sample"><p class="type-meta">Playfair Display · 700 · Heading 1 · -1px tracking</p><p class="type-h1">Where parents bond and childhoods flourish.</p></div>
+    <div class="type-sample"><p class="type-meta">Playfair Display · 600 · Heading 2 · -0.5px tracking</p><p class="type-h2">Your Invitations</p></div>
+    <div class="type-sample"><p class="type-meta">Playfair Display · 600 · Heading 3</p><p class="type-h3">Activities this week</p></div>
+    <div class="type-sample"><p class="type-meta">Playfair Display · 600 · Event / Card Title · 16–18px</p><p style="font-family: var(--font-display); font-size: 17px; font-weight: 600; color: var(--text-primary);">Surfing at Second Point</p></div>
+    <div class="type-sample"><p class="type-meta">Inter · 500 · Subheading / UI label · 15–17px</p><p class="type-sub">Sat, Nov 9 · 6:30pm CST  ·  8/15  ·  2.1 mi</p></div>
+    <div class="type-sample"><p class="type-meta">Inter · 400 · Body text · 15px · 1.7 leading</p><p class="type-body">When you first move to a new city with kids, finding your community can feel impossible. Sprout brings families together through shared experiences — real meetups, real memories.</p></div>
+    <div class="type-sample"><p class="type-meta">Inter · 600 · Section label · 11px · 0.1em tracking · ALL CAPS</p><p class="type-label">Parks and Playgrounds</p></div>
+    <div class="type-sample"><p class="type-meta">Inter · 400 · Caption / timestamp · 13px</p><p class="type-caption">2.1 mi · 8:30 PM · 10 online</p></div>
+
+    <table class="spec-table" style="background: var(--cream-lighter); border-radius: var(--radius-lg); overflow: hidden; margin-top: 24px;">
+      <thead><tr><th>Role</th><th>Font</th><th>Size</th><th>Weight</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>App Title / Hero</td><td>Playfair Display</td><td>36–48px</td><td>700</td><td>letter-spacing: -1px</td></tr>
+        <tr><td>Screen Heading</td><td>Playfair Display</td><td>26–32px</td><td>600–700</td><td>letter-spacing: -0.5px</td></tr>
+        <tr><td>Card / Event Title</td><td>Playfair Display</td><td>16–18px</td><td>600</td><td>Natural spacing</td></tr>
+        <tr><td>Section Label</td><td>Inter</td><td>15–17px</td><td>600</td><td>Used for "Your Invitations" etc.</td></tr>
+        <tr><td>Body / Description</td><td>Inter</td><td>14–15px</td><td>400</td><td>line-height: 1.6–1.7</td></tr>
+        <tr><td>Metadata / Date</td><td>Inter</td><td>12–13px</td><td>400</td><td>color: text-tertiary</td></tr>
+        <tr><td>Section Category</td><td>Inter</td><td>11px</td><td>600</td><td>UPPERCASE, 0.1em tracking</td></tr>
+        <tr><td>Button label</td><td>Inter</td><td>14px</td><td>500</td><td>Natural spacing</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 04 UI COMPONENTS -->
+  <div class="section" id="components">
+    <p class="section-label">04 — Components</p>
+    <h2 class="section-title">UI Components</h2>
+    <p class="section-intro">Every component inherits the warmth of the color system. Pill shapes, gentle shadows, and organic textures create a tactile, welcoming interface.</p>
+
+    <div class="component-grid">
+      <div class="comp-box">
+        <p class="comp-label">Buttons</p>
+        <div class="comp-demo">
+          <button class="btn-primary">Join Event ✓</button>
+          <button class="btn-secondary">Share 🍀</button>
+          <button class="btn-ghost">See All →</button>
+          <div style="display:flex; gap:8px;"><button class="btn-icon">✓</button><button class="btn-icon-ghost">✕</button></div>
+        </div>
+      </div>
+      <div class="comp-box">
+        <p class="comp-label">Filter Chips & Input</p>
+        <div class="comp-demo">
+          <div class="chip-row"><button class="chip-active">Kids</button><button class="chip-idle">Teens</button><button class="chip-idle">Parents</button></div>
+          <div class="input-wrap"><span class="input-icon">🔍</span><input class="input-search" type="text" placeholder="Search" /></div>
+        </div>
+      </div>
+      <div class="comp-box">
+        <p class="comp-label">Event Card</p>
+        <div class="comp-demo">
+          <div class="event-card">
+            <div class="event-img-placeholder">🏄</div>
+            <div class="event-info">
+              <div class="event-title">Surfing at Second Point</div>
+              <div class="event-meta">Sat, Nov 9 · 6:30pm · 8/15 · 2.1 mi</div>
+              <div style="display:flex; gap:8px; align-items:center; margin-top:6px;"><button class="action-reject">✕</button><button class="action-accept">✓</button></div>
+            </div>
+          </div>
+          <div class="event-card">
+            <div class="event-img-placeholder">🎨</div>
+            <div class="event-info">
+              <div class="event-title">Kids Art & Craft Day</div>
+              <div class="event-meta">Mon, Feb 25 · 10:00am · Griffith Park, LA</div>
+              <div style="font-size:12px; color:var(--green-500); font-weight:500; margin-top:6px;">🍀 Share</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="comp-box">
+        <p class="comp-label">Member Row</p>
+        <div class="comp-demo">
+          <div class="member-row">
+            <div class="avatar-placeholder">👩</div>
+            <div class="member-info"><div class="member-name">Darlene Robertson</div><div class="member-role">Angel Investor at Salt Ventures</div></div>
+            <span class="tag-new">New</span>
+          </div>
+          <div class="member-row">
+            <div class="avatar-placeholder" style="background: var(--green-100);">👨</div>
+            <div class="member-info"><div class="member-name">Albert Flores</div><div class="member-role">Angel Investor</div></div>
+            <span class="tag-met">Met</span>
+            <span class="tag-meets">👥 12 meets</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <p class="comp-label">Bottom Navigation Bar</p>
+      <div class="nav-bar" style="margin-top: 12px;">
+        <div class="nav-item active"><span class="nav-icon">📍</span><span>Events</span></div>
+        <div class="nav-item"><span class="nav-icon">🖼️</span><span>Memories</span></div>
+        <div class="nav-item"><span class="nav-icon">✨</span><span>AI Assist</span></div>
+        <div class="nav-item"><div class="nav-badge"><span class="nav-icon">💬</span><span class="badge">2</span></div><span>Chat</span></div>
+        <div class="nav-item"><span class="nav-icon">👥</span><span>Clubs</span></div>
+      </div>
+    </div>
+
+    <table class="spec-table" style="background: var(--cream-lighter); border-radius: var(--radius-lg); overflow: hidden; margin-top: 32px;">
+      <thead><tr><th>Component</th><th>Border Radius</th><th>Background</th><th>Border</th></tr></thead>
+      <tbody>
+        <tr><td>App background</td><td>—</td><td>#F0EDE6</td><td>—</td></tr>
+        <tr><td>Card surface</td><td>16–24px</td><td>#FAF9F6</td><td>1px rgba(0,0,0,0.08)</td></tr>
+        <tr><td>Primary button</td><td>999px (pill)</td><td>#1E4A35</td><td>none</td></tr>
+        <tr><td>Sage chip</td><td>999px (pill)</td><td>#D6E8DC</td><td>none</td></tr>
+        <tr><td>Ghost button</td><td>999px (pill)</td><td>transparent</td><td>1px rgba(0,0,0,0.14)</td></tr>
+        <tr><td>Search input</td><td>999px (pill)</td><td>#E8E4DC</td><td>none</td></tr>
+        <tr><td>Accept action</td><td>50% (circle)</td><td>#1E4A35</td><td>none</td></tr>
+        <tr><td>Reject action</td><td>50% (circle)</td><td>#EDEAE2</td><td>1px rgba(0,0,0,0.08)</td></tr>
+        <tr><td>Bottom nav</td><td>999px (pill)</td><td>#FAF9F6</td><td>1px rgba(0,0,0,0.08)</td></tr>
+        <tr><td>Member row</td><td>16px</td><td>#FAF9F6</td><td>1px rgba(0,0,0,0.08)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 05 VOICE & TONE -->
+  <div class="section" id="voice-tone">
+    <p class="section-label">05 — Voice & Tone</p>
+    <h2 class="section-title">Brand Voice</h2>
+    <p class="section-intro">Sprout sounds like that friend who just moved to your city and immediately made everyone feel welcome. Effortlessly social, real, never trying too hard.</p>
+
+    <div class="voice-grid">
+      <div class="voice-card"><div class="voice-emoji">☕</div><div class="voice-title">Warm & Genuine</div><div class="voice-desc">We write like a real person, not a brand. Direct, sincere, and never over-polished. "You know how..." not "Our platform enables..."</div></div>
+      <div class="voice-card"><div class="voice-emoji">🎲</div><div class="voice-title">Serendipitous</div><div class="voice-desc">We celebrate the magic of unexpected connections. Language should feel like a happy coincidence — light, surprising, and lucky.</div></div>
+      <div class="voice-card"><div class="voice-emoji">🌿</div><div class="voice-title">Grounded & Calm</div><div class="voice-desc">No hype. No urgency pressure. Parents are already overwhelmed — Sprout is the exhale, not another notification to worry about.</div></div>
+      <div class="voice-card"><div class="voice-emoji">🤝</div><div class="voice-title">Community-first</div><div class="voice-desc">We always credit the community. "Patrick Collison is hosting" not "an event is available near you." Real names, real places, real people.</div></div>
+    </div>
+
+    <div class="do-dont">
+      <div class="do-box">
+        <p class="dd-label">✓ We Do Say</p>
+        <ul class="dd-list">
+          <li>"You got lucky when you found these people."</li>
+          <li>"James is hosting a surf session Saturday."</li>
+          <li>"2 Meeting Points waiting for you."</li>
+          <li>"Parks and playgrounds near you."</li>
+          <li>"Where that luck happens."</li>
+          <li>"Patrick and 4 others are going."</li>
+        </ul>
+      </div>
+      <div class="dont-box">
+        <p class="dd-label">✗ We Don't Say</p>
+        <ul class="dd-list">
+          <li>"Optimize your social network today!"</li>
+          <li>"Find events using our AI-powered engine."</li>
+          <li>"Don't miss out — limited spots!"</li>
+          <li>"Our platform connects families seamlessly."</li>
+          <li>"Sign up to unlock premium features."</li>
+          <li>"Leverage community-driven synergies."</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <p class="card-title" style="font-size: 15px;">Tone by Context</p>
+      <table class="spec-table">
+        <thead><tr><th>Context</th><th>Tone</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Onboarding</td><td>Warm, personal</td><td>"You're going to love who you meet here."</td></tr>
+          <tr><td>Empty state</td><td>Hopeful, gentle</td><td>"Your first event is waiting to happen."</td></tr>
+          <tr><td>Notifications</td><td>Direct, low-pressure</td><td>"James wants to surf Saturday — join in?"</td></tr>
+          <tr><td>Error message</td><td>Calm, helpful</td><td>"Something got tangled. Let's try that again."</td></tr>
+          <tr><td>Celebration</td><td>Joyful, human</td><td>"You met 3 new people this week. 🌱"</td></tr>
+          <tr><td>Marketing</td><td>Story-driven</td><td>Lead with the parent's feeling, not the feature.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 06 COPY EXAMPLES -->
+  <div class="section" id="copy-examples">
+    <p class="section-label">06 — Copy</p>
+    <h2 class="section-title">Copy Examples</h2>
+    <p class="section-intro">Reference copy for common UI surfaces. Always feel free to adapt — the tone matters more than the exact words.</p>
+
+    <div class="copy-example"><p class="copy-context">App tagline</p><p class="copy-text">"Where parents bond and childhoods flourish."</p></div>
+    <div class="copy-example"><p class="copy-context">Onboarding headline</p><p class="copy-text">"Your people are out there. Let's find them."</p></div>
+    <div class="copy-example"><p class="copy-context">Empty events feed</p><p class="copy-text">"No events yet — but your first one is just around the corner."</p></div>
+    <div class="copy-example"><p class="copy-context">Meeting Points prompt</p><p class="copy-text">"You've got 2 Meeting Points. These parents want to meet you."</p></div>
+    <div class="copy-example"><p class="copy-context">Invite a friend</p><p class="copy-text">"Know a parent who needs this? Share your spot."</p></div>
+    <div class="copy-example"><p class="copy-context">Post-event memory</p><p class="copy-text">"You played together at the park. That's a beginning."</p></div>
+    <div class="copy-example"><p class="copy-context">New member in club</p><p class="copy-text">"Someone new just joined Lincoln School. Say hello."</p></div>
+    <div class="copy-example"><p class="copy-context">Push notification</p><p class="copy-text">"Patrick is hosting a surf session Saturday at 6:30pm. Sound fun?"</p></div>
+  </div>
+
+  <!-- 07 IMAGERY -->
+  <div class="section" id="imagery">
+    <p class="section-label">07 — Imagery</p>
+    <h2 class="section-title">Photography & Visual Style</h2>
+    <p class="section-intro">Sprout imagery should feel documentary, not staged. Real families, natural light, genuine moments. The camera is a witness to joy, not a director of it.</p>
+
+    <div class="photo-do-dont">
+      <div class="photo-box">
+        <div class="photo-placeholder" style="background: linear-gradient(135deg, #c8dfc4, #8fbf9a);">🏞️</div>
+        <div class="photo-label" style="border-top: 2px solid var(--green-400);">
+          <strong style="color: var(--green-700);">✓ Use: Natural & Candid</strong>
+          <span>Kids playing, parents laughing, outdoor activities in natural light. Warm tones, real moments, community gatherings.</span>
+        </div>
+      </div>
+      <div class="photo-box">
+        <div class="photo-placeholder" style="background: linear-gradient(135deg, #e8d8d0, #d0b8b0);">📸</div>
+        <div class="photo-label" style="border-top: 2px solid #E57373;">
+          <strong style="color: #B03030;">✗ Avoid: Over-produced</strong>
+          <span>Stock photo smiles, studio lighting, perfect outfits, overly bright & saturated edits. Never sterile or corporate.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <p class="card-title" style="font-size: 15px;">Image Treatment</p>
+      <p class="card-body">Event thumbnails use a 1:1 crop at 80×80px with 12–16px border radius. Hero images use a 16:9 or 3:2 ratio with slight warm overlay (rgba(240,237,230,0.1)). Images in cards always pair with Playfair Display titles overlaid below, never on top. Always maintain cream/warm color harmony — cool-tinted or blue-cast photography should be avoided or warmed up.</p>
+    </div>
+  </div>
+
+  <!-- 08 SPACING & MOTION -->
+  <div class="section" id="spacing">
+    <p class="section-label">08 — Spacing & Motion</p>
+    <h2 class="section-title">Spacing & Motion</h2>
+    <p class="section-intro">Consistent spatial rhythm creates calm and clarity. Motion should feel organic — like leaves settling, not like a notification alarm.</p>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">Spacing Scale</p>
+    <div style="display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; margin-bottom:32px;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:4px;height:4px;background:var(--green-400);border-radius:2px;"></div><span style="font-size:10px;color:var(--text-tertiary);font-family:monospace;">4</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:8px;height:8px;background:var(--green-400);border-radius:2px;"></div><span style="font-size:10px;color:var(--text-tertiary);font-family:monospace;">8</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:12px;height:12px;background:var(--green-400);border-radius:2px;"></div><span style="font-size:10px;color:var(--text-tertiary);font-family:monospace;">12</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:16px;height:16px;background:var(--green-400);border-radius:2px;"></div><span style="font-size:10px;color:var(--text-tertiary);font-family:monospace;">16</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:24px;height:24px;background:var(--green-400);border-radius:2px;"></div><span style="font-size:10px;color:var(--text-tertiary);font-family:monospace;">24</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:32px;height:32px;background:var(--green-400);border-radius:2px;"></div><span style="font-size:10px;color:var(--text-tertiary);font-family:monospace;">32</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:40px;height:40px;background:var(--green-400);border-radius:2px;"></div><span style="font-size:10px;color:var(--text-tertiary);font-family:monospace;">40</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:48px;height:48px;background:var(--green-400);border-radius:2px;"></div><span style="font-size:10px;color:var(--text-tertiary);font-family:monospace;">48</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:64px;height:64px;background:var(--green-400);border-radius:2px;"></div><span style="font-size:10px;color:var(--text-tertiary);font-family:monospace;">64</span></div>
+    </div>
+
+    <div class="motion-row">
+      <div class="motion-card"><h5>Micro interactions</h5><p>duration: 150ms<br>easing: ease-out<br>Use for: button tap, chip select, icon state</p></div>
+      <div class="motion-card"><h5>Card transitions</h5><p>duration: 240ms<br>easing: ease-in-out<br>Use for: card appear, list items, modals</p></div>
+      <div class="motion-card"><h5>Screen transitions</h5><p>duration: 320ms<br>easing: cubic-bezier(0.4,0,0.2,1)<br>Use for: page navigation, tab switch</p></div>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <p class="card-title" style="font-size: 15px;">Motion Principles</p>
+      <p class="card-body">Motion in Sprout should feel like nature — a leaf settling, not a loading spinner. Use spring physics for card interactions (slight overshoot then settle). Never use jarring cuts or aggressive bounces. Celebration moments (joining an event, meeting someone new) deserve a gentle scale + fade. Keep all animations under 400ms. Respect prefers-reduced-motion at all times.</p>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       09 SOCIAL MEDIA BRANDING
+  ====================================================== -->
+  <div class="section" id="social-media">
+    <p class="section-label">09 — Social Media</p>
+    <h2 class="section-title">Social Media Branding</h2>
+    <p class="section-intro">Sprout's social presence should feel like scrolling through a close friend's feed — warm, real, and never promotional. Every post should make someone think "I want to be in that community."</p>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Platform Strategy</p>
+    <div class="platform-row">
+      <div class="platform-badge">
+        <span class="platform-badge-icon">📸</span>
+        <div class="platform-badge-info">
+          <span class="platform-badge-name">Instagram</span>
+          <span class="platform-badge-role">Primary — community moments & event recaps</span>
+        </div>
+      </div>
+      <div class="platform-badge">
+        <span class="platform-badge-icon">👥</span>
+        <div class="platform-badge-info">
+          <span class="platform-badge-name">Facebook</span>
+          <span class="platform-badge-role">Groups, local parent networks, event sharing</span>
+        </div>
+      </div>
+      <div class="platform-badge">
+        <span class="platform-badge-icon">💼</span>
+        <div class="platform-badge-info">
+          <span class="platform-badge-name">LinkedIn</span>
+          <span class="platform-badge-role">Founder-mode content, product milestones, press</span>
+        </div>
+      </div>
+      <div class="platform-badge">
+        <span class="platform-badge-icon">🎵</span>
+        <div class="platform-badge-info">
+          <span class="platform-badge-name">TikTok</span>
+          <span class="platform-badge-role">Relatable parent content, behind-the-scenes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Post Format Specs</p>
+    <div class="post-formats">
+      <div class="post-format-card">
+        <div class="post-format-preview sq"><div class="pf-inner">1:1</div></div>
+        <div class="post-format-name">Feed Square</div>
+        <div class="post-format-dim">1080 × 1080px</div>
+      </div>
+      <div class="post-format-card">
+        <div class="post-format-preview portrait"><div class="pf-inner">4:5</div></div>
+        <div class="post-format-name">Feed Portrait</div>
+        <div class="post-format-dim">1080 × 1350px</div>
+      </div>
+      <div class="post-format-card">
+        <div class="post-format-preview story"><div class="pf-inner">9:16</div></div>
+        <div class="post-format-name">Story / Reel</div>
+        <div class="post-format-dim">1080 × 1920px</div>
+      </div>
+      <div class="post-format-card">
+        <div class="post-format-preview banner"><div class="pf-inner">16:9</div></div>
+        <div class="post-format-name">Cover / Banner</div>
+        <div class="post-format-dim">1920 × 1080px</div>
+      </div>
+    </div>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Profile Image Specs</p>
+    <div class="card">
+      <p class="card-body">Use the Sprout clover logo (app icon version) as the profile photo across all platforms. Minimum source size: <strong>400 × 400px</strong>. The logo must sit on a Forest Green (#1E4A35) background — never on white alone or cream for the profile picture, as it disappears at small sizes. Display size: 110px (Instagram), 170px (Facebook), 400px (LinkedIn). Never use a person's photo or a text-only graphic as the brand profile.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Instagram Grid Aesthetic</p>
+    <div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 24px;">
+      <div>
+        <div class="grid-aesthetic">
+          <div class="grid-cell gc-photo">🌳</div>
+          <div class="grid-cell gc-quote">"You got lucky when you found these people."</div>
+          <div class="grid-cell gc-photo">🏄</div>
+          <div class="grid-cell gc-cream" style="background:var(--green-50);"></div>
+          <div class="grid-cell gc-photo">🎨</div>
+          <div class="grid-cell gc-quote" style="background:var(--cream-card);color:var(--green-800);">"Where that luck happens."</div>
+          <div class="grid-cell gc-photo">🍃</div>
+          <div class="grid-cell gc-screen"></div>
+          <div class="grid-cell gc-photo">☕</div>
+        </div>
+        <p style="font-size: 11px; color: var(--text-tertiary); margin-top: 8px; text-align: center; max-width: 280px;">Alternating: community photo → quote card → photo → app screen</p>
+      </div>
+      <div style="flex: 1; min-width: 220px;">
+        <div class="card" style="margin-bottom: 12px;">
+          <p class="card-title" style="font-size: 14px;">Grid Rules</p>
+          <p class="card-body" style="font-size: 13px;">Maintain a warm, earthy tone — no cold blue casts. Alternate between real community moments, Forest Green quote cards, Cream quote cards, and app screen previews. Every 3rd post should feature a branded graphic with Playfair Display italic quote on Forest Green. Add the Sprout clover watermark (bottom-right, 10% opacity overlay) to all original content posts.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">Caption Voice</p>
+    <div class="do-dont">
+      <div class="do-box">
+        <p class="dd-label">✓ Caption Do's</p>
+        <ul class="dd-list">
+          <li>Lead with a human moment, not a product feature</li>
+          <li>Keep under 150 words for feed posts</li>
+          <li>Soft CTA: "Join us →" or "Sound like your people?"</li>
+          <li>Use first-person plural: "we", "our community"</li>
+          <li>Name real people and real places when possible</li>
+          <li>End with 5–8 targeted hashtags on a separate line</li>
+        </ul>
+      </div>
+      <div class="dont-box">
+        <p class="dd-label">✗ Caption Don'ts</p>
+        <ul class="dd-list">
+          <li>"SIGN UP NOW" or "LIMITED TIME OFFER"</li>
+          <li>More than 8 hashtags — looks spammy</li>
+          <li>Generic mega-tags like #parenting (too broad)</li>
+          <li>Emoji spam — max 3 emojis per caption</li>
+          <li>Promotional language about features or pricing</li>
+          <li>Tagging unrelated accounts for reach</li>
+        </ul>
+      </div>
+    </div>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 28px; margin-bottom: 12px;">Hashtag Strategy</p>
+    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;">Core brand hashtags (always include):</p>
+    <div class="hashtag-row">
+      <span class="hashtag-core">#SproutApp</span>
+      <span class="hashtag-core">#WhereParentsBond</span>
+      <span class="hashtag-core">#ChildhoodsFlourish</span>
+    </div>
+    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 14px; margin-bottom: 10px;">Community hashtags (choose 2–4 relevant per post):</p>
+    <div class="hashtag-row">
+      <span class="hashtag-community">#ParentCommunity</span>
+      <span class="hashtag-community">#MomFriends</span>
+      <span class="hashtag-community">#DadFriends</span>
+      <span class="hashtag-community">#NewToTown</span>
+      <span class="hashtag-community">#PlaydateIdeas</span>
+      <span class="hashtag-community">#FamilyEvents</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Story Highlight Covers</p>
+    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">Highlight covers use Cream (#F0EDE6) background with the category icon and label in Forest Green. Source size: 1080 × 1920px; display crop: 161 × 161px circle.</p>
+    <div class="highlight-covers">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <div class="highlight-cover"><span class="hc-icon">📍</span><span class="hc-label">Events</span></div>
+        <span style="font-size:11px;color:var(--text-tertiary);">Events</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <div class="highlight-cover"><span class="hc-icon">📷</span><span class="hc-label">Stories</span></div>
+        <span style="font-size:11px;color:var(--text-tertiary);">Stories</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <div class="highlight-cover"><span class="hc-icon">💡</span><span class="hc-label">Tips</span></div>
+        <span style="font-size:11px;color:var(--text-tertiary);">Tips</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <div class="highlight-cover"><span class="hc-icon">🌱</span><span class="hc-label">About</span></div>
+        <span style="font-size:11px;color:var(--text-tertiary);">About</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <div class="highlight-cover"><span class="hc-icon">👋</span><span class="hc-label">Team</span></div>
+        <span style="font-size:11px;color:var(--text-tertiary);">Team</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 24px;">
+      <p class="card-title" style="font-size: 15px;">Content Cadence</p>
+      <table class="spec-table">
+        <thead><tr><th>Platform</th><th>Frequency</th><th>Content Mix</th></tr></thead>
+        <tbody>
+          <tr><td>Instagram Feed</td><td>3–4× per week</td><td>60% community photos · 25% branded graphics · 15% app screens</td></tr>
+          <tr><td>Instagram Stories</td><td>Daily (5–7 frames)</td><td>Event previews, behind-the-scenes, polls, community shoutouts</td></tr>
+          <tr><td>Facebook</td><td>3× per week</td><td>Event announcements, group community posts, parent tips</td></tr>
+          <tr><td>LinkedIn</td><td>1–2× per week</td><td>Founder updates, milestones, product thinking, press coverage</td></tr>
+          <tr><td>TikTok / Reels</td><td>2× per week</td><td>Relatable parent moments, event recaps, community highlights</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       10 COMPANY BRANDING
+  ====================================================== -->
+  <div class="section" id="company-branding">
+    <p class="section-label">10 — Company Branding</p>
+    <h2 class="section-title">Company Branding</h2>
+    <p class="section-intro">Every touchpoint — from the business card to the email footer — should feel like the same person handed it to you. Consistent, warm, and quietly confident.</p>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Business Card</p>
+    <div class="biz-card-wrap">
+      <div>
+        <div class="biz-card">
+          <div class="biz-card-front">
+            <div class="biz-logo-row">
+              <img src="Logo/Sprout%20Logo%20White%20Background.jpeg" class="biz-logo-img" alt="Sprout">
+              <span class="biz-logo-name">Sprout</span>
+            </div>
+            <div class="biz-contact">
+              <span class="biz-name">Alex Rivera</span>
+              <span class="biz-title">Co-Founder & CEO</span>
+              <span class="biz-detail" style="margin-top:6px;">alex@sproutapp.com</span>
+              <span class="biz-detail">sproutapp.com</span>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--text-tertiary);margin-top:8px;text-align:center;">Front — Cream background</p>
+      </div>
+      <div>
+        <div class="biz-card">
+          <div class="biz-card-back">
+            <img src="Logo/Sprout%20Logo%20White%20Background.jpeg" style="width:48px;height:48px;border-radius:12px;object-fit:cover;opacity:0.9;" alt="Sprout">
+            <span class="biz-back-tagline">"Where parents bond and childhoods flourish."</span>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--text-tertiary);margin-top:8px;text-align:center;">Back — Forest Green background</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card-title" style="font-size: 15px;">Business Card Specs</p>
+      <table class="spec-table">
+        <thead><tr><th>Property</th><th>Spec</th></tr></thead>
+        <tbody>
+          <tr><td>Size (US)</td><td>3.5" × 2" (88.9 × 50.8mm)</td></tr>
+          <tr><td>Size (International)</td><td>85 × 55mm</td></tr>
+          <tr><td>Front background</td><td>Cream Light #FAF9F6</td></tr>
+          <tr><td>Back background</td><td>Forest Green #1E4A35</td></tr>
+          <tr><td>Name font</td><td>Playfair Display 600, 13px</td></tr>
+          <tr><td>Contact font</td><td>Inter 400, 10px, monospace details</td></tr>
+          <tr><td>Paper stock</td><td>16pt matte or soft-touch laminate</td></tr>
+          <tr><td>Safe margin</td><td>3mm bleed on all edges</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Letterhead</p>
+    <div class="letterhead-preview">
+      <div class="lh-header">
+        <div class="biz-logo-row">
+          <img src="Logo/Sprout%20Logo%20White%20Background.jpeg" style="width:32px;height:32px;border-radius:7px;object-fit:cover;" alt="Sprout">
+          <span style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text-primary);">Sprout</span>
+        </div>
+        <span style="font-size:11px;color:var(--text-tertiary);font-family:monospace;">sproutapp.com</span>
+      </div>
+      <div class="lh-body">
+        <div class="lh-line short" style="margin-bottom:16px;height:10px;background:var(--text-primary);opacity:0.15;"></div>
+        <div class="lh-line"></div>
+        <div class="lh-line"></div>
+        <div class="lh-line short"></div>
+        <div style="height:12px;"></div>
+        <div class="lh-line"></div>
+        <div class="lh-line"></div>
+        <div class="lh-line shorter"></div>
+      </div>
+      <div class="lh-footer">Sprout · sproutapp.com · hello@sproutapp.com · New York, NY</div>
+    </div>
+
+    <div class="card">
+      <p class="card-title" style="font-size: 15px;">Letterhead Specs</p>
+      <p class="card-body">Logo sits top-left at 48px height with 1" left margin. A 2px Forest Green (#1E4A35) rule spans full width below the header. Footer contains company name, website, email, and city — centered, Inter 10px, Stone color. Body text: Inter 400 11pt, line-height 1.6, Ink color. Margins: 1" all sides (25.4mm). Paper: A4 or US Letter, 100gsm minimum. Always export as PDF for sending; share editable source files internally only.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Email Signature</p>
+    <div class="email-sig-preview">
+      <div class="email-sig-bar"></div>
+      <div class="email-sig-content">
+        <span class="email-sig-name">Alex Rivera</span>
+        <span class="email-sig-title">Co-Founder & CEO, Sprout</span>
+        <span style="font-size:11px;color:var(--text-tertiary);margin-top:2px;font-family:monospace;">+1 (555) 000-0000</span>
+        <div class="email-sig-logo">
+          <img src="Logo/Sprout%20Logo%20White%20Background.jpeg" alt="Sprout">
+          <span class="email-sig-logo-name">Sprout</span>
+          <span style="color:var(--text-tertiary);font-size:11px;margin: 0 4px;">·</span>
+          <a href="#" class="email-sig-link">sproutapp.com</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card-title" style="font-size: 15px;">Email Signature Specs</p>
+      <table class="spec-table">
+        <thead><tr><th>Element</th><th>Style</th></tr></thead>
+        <tbody>
+          <tr><td>Left accent bar</td><td>3px wide · Forest Green #1E4A35 · full height</td></tr>
+          <tr><td>Name</td><td>Inter 600 · 14px · Ink #1C1C1A</td></tr>
+          <tr><td>Title</td><td>Inter 400 · 13px · Stone #6B6860</td></tr>
+          <tr><td>Phone</td><td>Inter 400 · 11px · monospace · Stone</td></tr>
+          <tr><td>Logo lockup</td><td>Sprout icon (20px) + wordmark · Playfair 700 13px · Forest Green</td></tr>
+          <tr><td>Website link</td><td>Inter 400 · 11px · Sprout Green #3A8A62 · no underline</td></tr>
+          <tr><td>Max width</td><td>480px (prevents wrapping in email clients)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Branded Documents</p>
+    <div class="card">
+      <p class="card-title" style="font-size: 15px;">Document System</p>
+      <table class="spec-table">
+        <thead><tr><th>Document Type</th><th>Cover Treatment</th><th>Internal Pages</th></tr></thead>
+        <tbody>
+          <tr><td>Investor deck / Report</td><td>Full-bleed Forest Green header · white Playfair title · clover watermark 8% opacity</td><td>Cream header bar · logo top-right · Forest Green page number footer</td></tr>
+          <tr><td>Contract / Proposal</td><td>Letterhead format · title in Playfair Display 24px</td><td>Standard letterhead headers and footers · no color blocks</td></tr>
+          <tr><td>Internal memo</td><td>Minimal header: logo + date + subject in Inter</td><td>Clean white · Inter 11pt body · Forest Green subheadings</td></tr>
+          <tr><td>Event brief</td><td>Cream background · Forest Green accent strip left · Playfair event title</td><td>Cream card blocks for each section · sage tag labels</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card" style="margin-top: 12px;">
+      <p class="card-title" style="font-size: 15px;">Branded Asset Checklist</p>
+      <p class="card-body">Every piece of company collateral must include: the Sprout clover logo (never emoji substitution), at minimum one brand color (Forest Green or Cream), Playfair Display for any headline or title, and the website URL. Documents sent externally must be exported as PDF. Editable source files (Figma, Google Docs, Keynote) are for internal use only and should live in the shared brand asset folder.</p>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       11 PRESENTATION BRANDING
+  ====================================================== -->
+  <div class="section" id="presentation">
+    <p class="section-label">11 — Presentations</p>
+    <h2 class="section-title">Presentation Branding</h2>
+    <p class="section-intro">A Sprout deck should feel like the brand itself — warm, grounded, and human. Slides should breathe. One idea per slide. Let the content do the work, not the decorations.</p>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Slide Templates</p>
+    <div class="slide-grid">
+
+      <!-- Cover Slide -->
+      <div class="slide-preview">
+        <div class="slide-preview-inner slide-cover-bg">
+          <div class="sc-logo">
+            <img src="Logo/Sprout%20Logo%20White%20Background.jpeg" alt="Sprout" style="width:20px;height:20px;border-radius:4px;object-fit:cover;opacity:0.9;">
+            <span class="sc-logo-name">Sprout</span>
+          </div>
+          <p class="sc-title">Where Parents Bond</p>
+          <p class="sc-sub">"Where parents bond and childhoods flourish."</p>
+          <p class="sc-footer">March 2026 · Confidential</p>
+        </div>
+        <div class="slide-preview-label">Cover Slide</div>
+      </div>
+
+      <!-- Content Slide -->
+      <div class="slide-preview">
+        <div class="slide-preview-inner slide-content-bg">
+          <div class="sct-rule"></div>
+          <p class="sct-title">How Sprout Works</p>
+          <div class="sct-bullets">
+            <div class="sct-bullet"><div class="sct-dot"></div><p class="sct-text">Parents create or discover events in their area</p></div>
+            <div class="sct-bullet"><div class="sct-dot"></div><p class="sct-text">Invite neighbors, school parents, or nearby families</p></div>
+            <div class="sct-bullet"><div class="sct-dot"></div><p class="sct-text">Show up, connect, and build your community</p></div>
+          </div>
+          <div class="sct-footer-logo">
+            <img src="Logo/Sprout%20Logo%20White%20Background.jpeg" alt="Sprout">
+            <span class="sct-footer-name">Sprout</span>
+          </div>
+        </div>
+        <div class="slide-preview-label">Content Slide</div>
+      </div>
+
+      <!-- Section Divider -->
+      <div class="slide-preview">
+        <div class="slide-preview-inner slide-divider-bg" style="justify-content:flex-end;padding-bottom:24px;">
+          <div>
+            <p class="sdiv-num">02</p>
+            <p class="sdiv-title">The Opportunity</p>
+            <div class="sdiv-rule"></div>
+          </div>
+          <div class="sct-footer-logo">
+            <img src="Logo/Sprout%20Logo%20White%20Background.jpeg" alt="Sprout">
+            <span class="sct-footer-name">Sprout</span>
+          </div>
+        </div>
+        <div class="slide-preview-label">Section Divider</div>
+      </div>
+
+      <!-- Data Slide -->
+      <div class="slide-preview">
+        <div class="slide-preview-inner slide-data-bg">
+          <div class="sct-rule"></div>
+          <p class="sdata-title">Parent Social Isolation — By the Numbers</p>
+          <div class="sdata-bars">
+            <div class="sdata-bar" style="height:80%;background:var(--green-800);"></div>
+            <div class="sdata-bar" style="height:55%;background:var(--green-500);"></div>
+            <div class="sdata-bar" style="height:40%;background:var(--green-300);"></div>
+            <div class="sdata-bar" style="height:65%;background:var(--sage-bg);border:1px solid var(--green-200);"></div>
+          </div>
+          <div class="sdata-labels">
+            <span class="sdata-label">Lonely</span>
+            <span class="sdata-label">New city</span>
+            <span class="sdata-label">No time</span>
+            <span class="sdata-label">Want connection</span>
+          </div>
+          <div class="sct-footer-logo">
+            <img src="Logo/Sprout%20Logo%20White%20Background.jpeg" alt="Sprout">
+            <span class="sct-footer-name">Sprout</span>
+          </div>
+        </div>
+        <div class="slide-preview-label">Data Slide</div>
+      </div>
+
+    </div>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; margin-top: 32px;">Typography in Slides</p>
+    <table class="spec-table pres-type-table">
+      <thead><tr><th>Slide Element</th><th>Font</th><th>Size</th><th>Weight</th><th>Color</th></tr></thead>
+      <tbody>
+        <tr><td>Cover title</td><td>Playfair Display</td><td>48–60px</td><td>700</td><td>White</td></tr>
+        <tr><td>Cover tagline</td><td>Playfair Display Italic</td><td>22–26px</td><td>400</td><td>White 70%</td></tr>
+        <tr><td>Slide headline</td><td>Playfair Display</td><td>32–42px</td><td>600</td><td>Ink #1C1C1A</td></tr>
+        <tr><td>Body / bullet text</td><td>Inter</td><td>18–22px</td><td>400</td><td>Stone #6B6860</td></tr>
+        <tr><td>Data label</td><td>Inter</td><td>14–16px</td><td>600</td><td>Ink #1C1C1A</td></tr>
+        <tr><td>Caption / source</td><td>Inter</td><td>11–13px</td><td>400</td><td>Stone #9E9B94</td></tr>
+        <tr><td>Footer logo name</td><td>Playfair Display</td><td>11px</td><td>700</td><td>Stone</td></tr>
+      </tbody>
+    </table>
+
+    <div class="divider"></div>
+
+    <p style="font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Slide Color System</p>
+    <div class="card">
+      <table class="spec-table">
+        <thead><tr><th>Slide Type</th><th>Background</th><th>Headline Color</th><th>Body Color</th><th>Accent</th></tr></thead>
+        <tbody>
+          <tr><td>Cover / Closing</td><td>#1E4A35 Forest</td><td>White</td><td>White 70%</td><td>Sage #D6E8DC</td></tr>
+          <tr><td>Section Divider</td><td>#F0EDE6 Cream</td><td>Ink #1C1C1A</td><td>Stone #6B6860</td><td>Green 200 #B0DFC3</td></tr>
+          <tr><td>Content</td><td>#FAF9F6 Cream Light</td><td>Ink #1C1C1A</td><td>Stone #6B6860</td><td>Forest Green rule</td></tr>
+          <tr><td>Data / Charts</td><td>#FAF9F6 Cream Light</td><td>Ink #1C1C1A</td><td>Stone #6B6860</td><td>Full green scale</td></tr>
+          <tr><td>Quote</td><td>#1E4A35 Forest</td><td>White Playfair italic</td><td>White 65%</td><td>Sage #D6E8DC</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="do-dont">
+      <div class="do-box">
+        <p class="dd-label">✓ Deck Do's</p>
+        <ul class="dd-list">
+          <li>One clear idea per slide — no cramming</li>
+          <li>Generous white/cream space on every slide</li>
+          <li>Sprout logo bottom-right on every content slide (28px height)</li>
+          <li>Playfair Display for emotional headlines and quotes</li>
+          <li>Natural, candid photos only (never stock smiles)</li>
+          <li>Charts in Sprout green palette exclusively</li>
+          <li>Section divider slides between major chapters</li>
+        </ul>
+      </div>
+      <div class="dont-box">
+        <p class="dd-label">✗ Deck Don'ts</p>
+        <ul class="dd-list">
+          <li>More than 5 bullet points on any slide</li>
+          <li>Drop shadows or gradients on slide backgrounds</li>
+          <li>Off-brand colors (purple, blue, red, orange)</li>
+          <li>More than 2 typefaces in a single deck</li>
+          <li>Cluttered data slides — simplify your charts first</li>
+          <li>Centering body text (left-align always)</li>
+          <li>Comic Sans, Papyrus, or decorative fonts</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <p class="card-title" style="font-size: 15px;">Recommended Deck Structure</p>
+      <table class="spec-table">
+        <thead><tr><th>Slide</th><th>Type</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Cover</td><td>Company name, tagline, date, audience context</td></tr>
+          <tr><td>2</td><td>Content</td><td>The problem — told as a parent's story</td></tr>
+          <tr><td>3</td><td>Content</td><td>The solution — one sentence, then show it</td></tr>
+          <tr><td>4</td><td>Section Divider</td><td>"The Opportunity" or "Why Now"</td></tr>
+          <tr><td>5–6</td><td>Data</td><td>Market size, key stats — visual, not tabular</td></tr>
+          <tr><td>7</td><td>Content</td><td>Product walkthrough or screenshots</td></tr>
+          <tr><td>8</td><td>Content</td><td>Traction, social proof, or community moments</td></tr>
+          <tr><td>9</td><td>Content</td><td>Team slide — photos, Playfair names</td></tr>
+          <tr><td>10</td><td>Cover (closing)</td><td>The ask + contact + tagline</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CLOSING -->
+  <div class="divider"></div>
+  <div style="text-align: center; padding: 40px 0 20px;">
+    <div style="display:inline-block;margin-bottom:16px;width:48px;height:48px;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(45,110,78,0.2);">
+      <img src="Logo/Sprout%20Logo.jpeg" alt="Sprout" style="width:48px;height:48px;object-fit:cover;display:block;">
+    </div>
+    <p style="font-family: var(--font-display); font-size: 20px; font-weight: 500; font-style: italic; color: var(--green-800); margin-bottom: 8px;">"You got lucky when you found these people.<br>Sprout is where that luck happens."</p>
+    <p style="font-size: 13px; color: var(--text-tertiary); margin-top: 16px;">Sprout Brand Guidelines v2.0 · March 2026 · For internal use</p>
+  </div>
+
+</div>
+</body>
+</html>

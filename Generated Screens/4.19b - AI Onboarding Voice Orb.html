@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — AI Onboarding 4.19b</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brand-50:  #e2e9e3;
+    --brand-100: #d0dacf;
+    --brand-200: #77b691;
+    --brand-300: #579a74;
+    --brand-400: #387f56;
+    --brand-500: #186338;
+    --brand-600: #134f2d;
+    --brand-700: #1e3e2b;
+    --sec-500: #f4f1ea;
+    --sec-600: #eae6db;
+    --sec-700: #dbd5c8;
+    --sec-800: #c2b9a6;
+    --sec-900: #aa9e83;
+    --text-primary:   #4d525b;
+    --text-secondary: #818898;
+    --text-tertiary:  #b3b8c1;
+    --text-brand:     #186338;
+  }
+
+  html, body {
+    height: 100%;
+    background: #e0dbd0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* ─── Phone Frame ─── */
+  .phone {
+    width: 393px;
+    height: 852px;
+    background: var(--sec-500);
+    border-radius: 52px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.08),
+      0 40px 100px rgba(0,0,0,0.25),
+      0 8px 24px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── Status Bar ─── */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 28px 0;
+    flex-shrink: 0;
+  }
+  .status-time {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.2px;
+  }
+  .status-icons { display: flex; gap: 6px; align-items: center; color: var(--text-primary); }
+
+  /* ─── Nav ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px 0;
+    flex-shrink: 0;
+  }
+  .nav-back {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: transparent; border: none; cursor: pointer;
+    color: var(--text-primary); transition: background 0.15s;
+  }
+  .nav-back:hover { background: var(--sec-600); }
+  .progress-steps { display: flex; gap: 6px; align-items: center; }
+  .step {
+    height: 3px; border-radius: 99px;
+    background: var(--sec-700); width: 32px;
+    transition: background 0.3s;
+  }
+  .step.done { background: var(--brand-500); }
+  .nav-spacer { width: 36px; }
+
+  /* ─── Screen ─── */
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 28px;
+    overflow: hidden;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    padding-top: 28px;
+    padding-bottom: 0;
+    flex-shrink: 0;
+  }
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--brand-50);
+    border: 1px solid var(--brand-100);
+    border-radius: 99px;
+    padding: 5px 10px 5px 7px;
+    margin-bottom: 18px;
+  }
+  .ai-badge-dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--brand-500);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .ai-badge-dot svg { width: 10px; height: 10px; color: white; }
+  .ai-badge-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--brand-600);
+    text-transform: uppercase;
+  }
+
+  .question-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+  }
+
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--text-primary);
+    line-height: 1.32;
+    letter-spacing: -0.3px;
+  }
+  .question-text em {
+    font-style: italic;
+    color: var(--brand-500);
+  }
+
+  /* ─── Answer Card ─── */
+  .answer-card {
+    margin-top: 20px;
+    background: white;
+    border-radius: 16px;
+    padding: 16px 18px;
+    border: 1.5px solid var(--brand-100);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    flex-shrink: 0;
+    display: none;
+  }
+  .answer-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+    display: block;
+  }
+  .answer-card-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--brand-400);
+    margin-bottom: 8px;
+  }
+  .answer-card-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-style: italic;
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+
+  /* ─── Orb Zone ─── */
+  .orb-zone {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding-bottom: 8px;
+  }
+
+  /* Instruction text above orb */
+  .orb-instruction {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.1px;
+    margin-bottom: 28px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    text-align: center;
+  }
+  .orb-instruction.fade { opacity: 0; transform: translateY(-4px); }
+
+  /* The orb container */
+  .orb-container {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  /* Soft ambient rings (idle breathing) */
+  .ambient-ring {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(24,99,56,0.1) 0%, rgba(24,99,56,0) 70%);
+    animation: ambientBreath 3.2s ease-in-out infinite;
+  }
+  .ambient-ring:nth-child(1) { width: 160px; height: 160px; animation-delay: 0s; }
+  .ambient-ring:nth-child(2) { width: 160px; height: 160px; animation-delay: 1.6s; }
+
+  @keyframes ambientBreath {
+    0%, 100% { transform: scale(1);    opacity: 0.6; }
+    50%       { transform: scale(1.35); opacity: 0; }
+  }
+
+  /* Listening rings */
+  .listen-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1.5px solid rgba(24,99,56,0.25);
+    width: 120px; height: 120px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .orb-container.listening .listen-ring {
+    animation: listenExpand 1.1s ease-out infinite;
+  }
+  .listen-ring:nth-child(3) { animation-delay: 0s !important; }
+  .listen-ring:nth-child(4) { animation-delay: 0.37s !important; }
+  .listen-ring:nth-child(5) { animation-delay: 0.74s !important; }
+
+  @keyframes listenExpand {
+    0%   { transform: scale(1);   opacity: 0.7; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  /* Pause ambient when listening/done */
+  .orb-container.listening .ambient-ring,
+  .orb-container.done .ambient-ring {
+    animation-play-state: paused;
+    opacity: 0;
+  }
+
+  /* The orb itself */
+  .orb {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: var(--brand-500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease;
+    box-shadow:
+      0 8px 32px rgba(24,99,56,0.3),
+      0 2px 8px rgba(24,99,56,0.2),
+      inset 0 1px 0 rgba(255,255,255,0.1);
+    z-index: 1;
+  }
+  .orb::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.18) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .orb:hover { transform: scale(1.04); }
+  .orb:active { transform: scale(0.97); }
+
+  /* Listening state */
+  .orb-container.listening .orb {
+    background: var(--brand-600);
+    box-shadow:
+      0 8px 40px rgba(24,99,56,0.45),
+      0 2px 8px rgba(24,99,56,0.3),
+      inset 0 1px 0 rgba(255,255,255,0.1);
+    animation: orbListenPulse 1.4s ease-in-out infinite;
+  }
+  @keyframes orbListenPulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.06); }
+  }
+
+  /* Done state */
+  .orb-container.done .orb {
+    background: var(--brand-700);
+    box-shadow: 0 4px 20px rgba(24,99,56,0.25);
+    animation: none;
+    transform: scale(0.88);
+  }
+  .orb-container.done .listen-ring { animation: none; opacity: 0; }
+
+  /* Icons inside orb */
+  .orb-icon-mic, .orb-icon-stop, .orb-icon-check {
+    position: absolute;
+    width: 32px; height: 32px;
+    color: white;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .orb-icon-stop  { opacity: 0; transform: scale(0.7); }
+  .orb-icon-check { opacity: 0; transform: scale(0.7); }
+
+  .orb-container.listening .orb-icon-mic   { opacity: 0; transform: scale(0.7); }
+  .orb-container.listening .orb-icon-stop  { opacity: 1; transform: scale(1); }
+
+  .orb-container.done .orb-icon-mic   { opacity: 0; transform: scale(0.7); }
+  .orb-container.done .orb-icon-stop  { opacity: 0; }
+  .orb-container.done .orb-icon-check { opacity: 1; transform: scale(1); }
+
+  /* Waveform bars (below orb, listening only) */
+  .waveform {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 32px;
+    margin-top: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .waveform.show { opacity: 1; }
+  .wave-bar {
+    width: 3px;
+    border-radius: 3px;
+    background: var(--brand-300);
+    animation: waveAnim 0.7s ease-in-out infinite alternate;
+  }
+  .wave-bar:nth-child(1)  { height: 6px;  animation-delay: 0s; }
+  .wave-bar:nth-child(2)  { height: 18px; animation-delay: 0.08s; }
+  .wave-bar:nth-child(3)  { height: 10px; animation-delay: 0.16s; }
+  .wave-bar:nth-child(4)  { height: 26px; animation-delay: 0.06s; }
+  .wave-bar:nth-child(5)  { height: 14px; animation-delay: 0.14s; }
+  .wave-bar:nth-child(6)  { height: 22px; animation-delay: 0.22s; }
+  .wave-bar:nth-child(7)  { height: 8px;  animation-delay: 0.1s; }
+  .wave-bar:nth-child(8)  { height: 16px; animation-delay: 0.18s; }
+  .wave-bar:nth-child(9)  { height: 4px;  animation-delay: 0.04s; }
+  @keyframes waveAnim {
+    from { transform: scaleY(0.35); opacity: 0.5; }
+    to   { transform: scaleY(1);    opacity: 1; }
+  }
+
+  /* Status label below orb */
+  .orb-status {
+    margin-top: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-align: center;
+    transition: opacity 0.3s, transform 0.3s;
+    min-height: 18px;
+  }
+  .orb-status.hide { opacity: 0; }
+
+  /* Prefer to type */
+  .type-link {
+    margin-top: 12px;
+    background: none; border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: var(--sec-800);
+    text-underline-offset: 2px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.15s;
+  }
+  .type-link:hover { color: var(--text-secondary); background: var(--sec-600); }
+  .type-link.hide { opacity: 0; pointer-events: none; }
+
+  /* ─── Inline Type Zone ─── */
+  .type-zone {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+    flex-shrink: 0;
+  }
+  .type-zone.show { display: flex; }
+
+  .type-wrap {
+    background: white;
+    border: 1.5px solid var(--sec-700);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.2s;
+  }
+  .type-wrap:focus-within { border-color: var(--brand-400); }
+  .type-textarea {
+    border: none; outline: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--text-primary);
+    line-height: 1.55;
+    background: transparent;
+    resize: none;
+    min-height: 80px;
+  }
+  .type-textarea::placeholder { color: var(--text-tertiary); }
+  .type-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .char-count { font-size: 12px; color: var(--text-tertiary); }
+  .back-to-voice {
+    display: flex; align-items: center; gap: 5px;
+    background: none; border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px; font-weight: 500;
+    color: var(--brand-500);
+    cursor: pointer;
+    padding: 4px 8px; border-radius: 8px;
+    transition: background 0.15s;
+  }
+  .back-to-voice:hover { background: var(--brand-50); }
+  .back-to-voice svg { width: 13px; height: 13px; }
+
+  /* ─── Bottom ─── */
+  .bottom {
+    padding: 16px 0 40px;
+    flex-shrink: 0;
+  }
+  .continue-btn {
+    width: 100%; height: 56px;
+    border-radius: 99px; border: none;
+    background: var(--brand-500);
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px; font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.3s, transform 0.15s;
+    letter-spacing: -0.1px;
+  }
+  .continue-btn:not(:disabled):hover  { background: var(--brand-600); }
+  .continue-btn:not(:disabled):active { transform: scale(0.98); }
+  .continue-btn:disabled {
+    background: var(--brand-200);
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+
+  /* ─── Keyframes ─── */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+        <rect x="0" y="3" width="3" height="9" rx="1" fill="currentColor" opacity="0.3"/>
+        <rect x="4.5" y="2" width="3" height="10" rx="1" fill="currentColor" opacity="0.5"/>
+        <rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="currentColor" opacity="0.7"/>
+        <rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/>
+      </svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <path d="M8 2.4C10.7 2.4 13.1 3.5 14.8 5.3L16 4.1C13.9 1.9 11.1 0.6 8 0.6C4.9 0.6 2.1 1.9 0 4.1L1.2 5.3C2.9 3.5 5.3 2.4 8 2.4Z" fill="currentColor"/>
+        <path d="M8 5.6C9.9 5.6 11.6 6.4 12.8 7.7L14 6.5C12.4 4.8 10.3 3.8 8 3.8C5.7 3.8 3.6 4.8 2 6.5L3.2 7.7C4.4 6.4 6.1 5.6 8 5.6Z" fill="currentColor" opacity="0.7"/>
+        <circle cx="8" cy="10.5" r="1.5" fill="currentColor"/>
+      </svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+        <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/>
+        <rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/>
+        <path d="M23 4v4a2 2 0 0 0 0-4z" fill="currentColor" opacity="0.4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <div class="nav">
+    <button class="nav-back">
+      <svg width="9" height="16" viewBox="0 0 9 16" fill="none">
+        <path d="M8 1L1 8L8 15" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="progress-steps">
+      <div class="step done"></div>
+      <div class="step done"></div>
+      <div class="step done"></div>
+      <div class="step done"></div>
+    </div>
+    <div class="nav-spacer"></div>
+  </div>
+
+  <!-- Screen -->
+  <div class="screen">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="ai-badge">
+        <div class="ai-badge-dot">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
+            <circle cx="9" cy="14" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="15" cy="14" r="1" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <span class="ai-badge-label">Sprout AI</span>
+      </div>
+
+      <p class="question-label">One quick question</p>
+      <h2 class="question-text">What do you love most about <em>connecting with other parents?</em></h2>
+    </div>
+
+    <!-- Answer Card (shown after response) -->
+    <div class="answer-card" id="answerCard">
+      <p class="answer-card-label">Your answer</p>
+      <p class="answer-card-text" id="answerText"></p>
+    </div>
+
+    <!-- Type zone (opt-in fallback) -->
+    <div class="type-zone" id="typeZone">
+      <div class="type-wrap">
+        <textarea
+          class="type-textarea"
+          id="typeInput"
+          placeholder="e.g. I love organizing playdates and finding families with same age kids nearby…"
+          maxlength="180"
+          oninput="onTypeInput()"
+        ></textarea>
+        <div class="type-footer">
+          <span class="char-count" id="charCount">0/180</span>
+          <button class="back-to-voice" onclick="switchToVoice()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="23"/>
+              <line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+            Use voice instead
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orb Zone -->
+    <div class="orb-zone" id="orbZone">
+      <p class="orb-instruction" id="orbInstruction">Tap and speak your answer</p>
+
+      <div class="orb-container" id="orbContainer" onclick="handleOrbTap()">
+        <!-- Ambient rings (idle) -->
+        <div class="ambient-ring"></div>
+        <div class="ambient-ring"></div>
+        <!-- Listen rings -->
+        <div class="listen-ring"></div>
+        <div class="listen-ring"></div>
+        <div class="listen-ring"></div>
+
+        <!-- Orb -->
+        <div class="orb" id="orb">
+          <!-- Mic -->
+          <svg class="orb-icon-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+          <!-- Stop -->
+          <svg class="orb-icon-stop" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="6" width="12" height="12" rx="2"/>
+          </svg>
+          <!-- Check -->
+          <svg class="orb-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Waveform -->
+      <div class="waveform" id="waveform">
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+      </div>
+
+      <p class="orb-status" id="orbStatus">Almost done</p>
+      <button class="type-link" id="typeLink" onclick="switchToType()">Prefer to type instead?</button>
+    </div>
+
+    <!-- Bottom -->
+    <div class="bottom">
+      <button class="continue-btn" id="continueBtn" disabled>Continue</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let state = 'idle'; // idle | listening | processing | done
+  let timer = null;
+
+  const orbContainer  = document.getElementById('orbContainer');
+  const orbInstruction = document.getElementById('orbInstruction');
+  const orbStatus     = document.getElementById('orbStatus');
+  const waveform      = document.getElementById('waveform');
+  const typeLink      = document.getElementById('typeLink');
+  const answerCard    = document.getElementById('answerCard');
+  const answerText    = document.getElementById('answerText');
+  const continueBtn   = document.getElementById('continueBtn');
+  const typeZone      = document.getElementById('typeZone');
+  const typeInput     = document.getElementById('typeInput');
+  const orbZone       = document.getElementById('orbZone');
+
+  const responses = [
+    "I love the sense of community — finding parents who just get it without needing to explain everything.",
+    "Honestly, it's the playdate moments. Seeing my kids bond with other kids while I finally get to talk to an adult!",
+    "I love organizing little meetups and building real friendships, not just nodding at the school gate.",
+    "The shared experiences. Parenting can feel so isolating sometimes — connecting with others who get it is everything."
+  ];
+
+  function handleOrbTap() {
+    if (state === 'idle')      startListening();
+    else if (state === 'listening') stopListening();
+  }
+
+  function startListening() {
+    state = 'listening';
+    orbContainer.classList.add('listening');
+    orbInstruction.classList.add('fade');
+    orbStatus.textContent = 'Listening…';
+    waveform.classList.add('show');
+    typeLink.classList.add('hide');
+    timer = setTimeout(stopListening, 3500);
+  }
+
+  function stopListening() {
+    if (timer) clearTimeout(timer);
+    state = 'processing';
+    orbContainer.classList.remove('listening');
+    waveform.classList.remove('show');
+    orbStatus.textContent = 'Writing your bio…';
+    // Subtle processing shimmer on orb
+    document.getElementById('orb').style.opacity = '0.7';
+
+    setTimeout(() => {
+      const resp = responses[Math.floor(Math.random() * responses.length)];
+
+      // Show answer card
+      answerText.textContent = '"' + resp + '"';
+      answerCard.style.display = 'block';
+      // Force reflow for transition
+      answerCard.offsetHeight;
+      answerCard.classList.add('visible');
+
+      // Restore orb, go to done
+      document.getElementById('orb').style.opacity = '';
+      orbContainer.classList.add('done');
+      orbStatus.textContent = 'Your answer is captured';
+      orbInstruction.style.display = 'none';
+      continueBtn.disabled = false;
+      state = 'done';
+    }, 2000);
+  }
+
+  function switchToType() {
+    orbZone.style.display = 'none';
+    typeZone.classList.add('show');
+    typeInput.focus();
+  }
+
+  function switchToVoice() {
+    typeZone.classList.remove('show');
+    orbZone.style.display = '';
+  }
+
+  function onTypeInput() {
+    const val = typeInput.value.trim();
+    document.getElementById('charCount').textContent = typeInput.value.length + '/180';
+    continueBtn.disabled = val.length < 10;
+  }
+</script>
+</body>
+</html>

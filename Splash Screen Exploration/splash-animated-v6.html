@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Splash v6 · The Invitation</title>
+<!-- Playfair Display + Inter — brand mandated -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+
+/* ── Brand Tokens ── */
+:root {
+  --forest:   #1E4A35;
+  --forest-d: #152e22;
+  --sprout:   #3A8A62;
+  --sage:     #D6E8DC;
+  --sage-d:   #b6d4bf;
+  --cream:    #F0EDE6;
+  --cream-lt: #FAF9F6;
+  --ink:      #1C1C1A;
+  --stone:    #6B6860;
+  --stone-lt: #9E9B94;
+  --white:    #ffffff;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #b8b2a8;
+  min-height: 100vh;
+  display: flex; align-items: flex-start; justify-content: center;
+  gap: 60px; padding: 60px 40px 100px;
+  font-family: 'Inter', sans-serif;
+  flex-wrap: wrap;
+}
+.wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.wrap-label {
+  font-size: 9.5px; font-weight: 600; letter-spacing: 0.15em;
+  text-transform: uppercase; color: #54504a;
+}
+.phone {
+  width: 393px; height: 852px;
+  border-radius: 54px; overflow: hidden; position: relative;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.1),
+    0 4px 12px rgba(0,0,0,0.06),
+    0 20px 56px rgba(0,0,0,0.12),
+    0 64px 140px rgba(0,0,0,0.22);
+}
+.screen { width: 393px; height: 852px; position: relative; overflow: hidden; }
+.status-bar {
+  position: absolute; top: 0; left: 0; right: 0; height: 54px;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 0 28px 10px; z-index: 80;
+}
+.status-time { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+.status-icons { display: flex; align-items: center; gap: 5px; }
+.dynamic-island {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 34px; background: #000; border-radius: 20px; z-index: 90;
+}
+.home-bar {
+  position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+  width: 134px; height: 5px; border-radius: 3px; z-index: 90;
+}
+
+/* ════════════════════════════════════════════════════
+   KEYFRAMES — all timing hardcoded, no CSS var() in
+   animation shorthand (fixes v4 bug)
+════════════════════════════════════════════════════ */
+
+/* Clover path outline draw — stroke-dashoffset → 0 */
+@keyframes drawOutline {
+  from { stroke-dashoffset: var(--dl, 340); }
+  to   { stroke-dashoffset: 0; }
+}
+/* Leaf fill flood in after draw */
+@keyframes fillIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+/* Stroke dissolve as fill appears */
+@keyframes strokeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* Center boss spring */
+@keyframes bossBloom {
+  0%   { opacity: 0; transform: scale(0) rotate(-90deg); }
+  65%  { opacity: 1; transform: scale(1.15) rotate(8deg); }
+  82%  { transform: scale(0.93) rotate(-3deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* Stem draw */
+@keyframes stemDraw {
+  from { stroke-dashoffset: var(--dl, 80); }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* Grass grow up */
+@keyframes grassUp {
+  from { transform: scaleY(0); transform-origin: 50% 100%; opacity: 0; }
+  to   { transform: scaleY(1); transform-origin: 50% 100%; opacity: 1; }
+}
+
+/* Fade + rise (text, UI) */
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Clip wipe left→right */
+@keyframes wipeIn {
+  from { clip-path: inset(0 100% 0 0 round 2px); }
+  to   { clip-path: inset(0 0% 0 0 round 2px); }
+}
+
+/* Simple fade */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Sheet slides up */
+@keyframes sheetUp {
+  from { transform: translateY(56px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Card fan-out — Screen B */
+@keyframes fanLeft {
+  from { transform: rotate(0deg) translateY(0px) scale(1); }
+  to   { transform: rotate(-16deg) translateX(-72px) translateY(12px) scale(0.95); }
+}
+@keyframes fanRight {
+  from { transform: rotate(0deg) translateY(0px) scale(1); }
+  to   { transform: rotate(14deg) translateX(68px) translateY(8px) scale(0.94); }
+}
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* Pollen float */
+@keyframes pollen {
+  0%,100% { transform: translate(0,0) scale(1); opacity: var(--po,0.2); }
+  50%      { transform: translate(var(--px,4px),var(--py,-14px)) scale(1.1); opacity: var(--po2,.38); }
+}
+
+/* Ambient glow pulse */
+@keyframes glowPulse {
+  0%,100% { opacity: 0.4; transform: scale(1); }
+  50%      { opacity: 0.7; transform: scale(1.1); }
+}
+
+/* Sway loop */
+@keyframes sway {
+  0%,100% { transform: rotate(0deg); }
+  30%      { transform: rotate(1deg); }
+  70%      { transform: rotate(-1deg); }
+}
+
+/* Dot pulse (Screen B community dots) */
+@keyframes dotPop {
+  0%,100% { transform: scale(1); opacity: var(--op1,.5); }
+  50%      { transform: scale(1.35); opacity: var(--op2,.9); }
+}
+
+/* Shimmer on CTA */
+@keyframes shimmer {
+  from { transform: translateX(-200%); }
+  to   { transform: translateX(200%); }
+}
+
+
+/* ════════════════════════════════════════════
+   SCREEN A — Forest Green / The Invitation
+════════════════════════════════════════════ */
+.sa { background: var(--forest); }
+
+/* Layered depth gradients */
+.sa::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 38%, rgba(58,138,98,0.25) 0%, transparent 70%),
+    linear-gradient(175deg, rgba(8,26,16,0.5) 0%, transparent 45%),
+    linear-gradient(5deg, rgba(8,26,16,0.35) 0%, transparent 50%);
+}
+
+/* Subtle noise/texture */
+.sa::after {
+  content: '';
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23f)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.6;
+}
+
+/* Ambient glow bloom behind clover */
+.a-bloom {
+  position: absolute;
+  top: 50px; left: 50%; transform: translateX(-50%);
+  width: 320px; height: 320px; border-radius: 50%;
+  background: radial-gradient(ellipse,
+    rgba(90,160,120,0.18) 0%,
+    rgba(58,138,98,0.08) 40%,
+    transparent 68%);
+  z-index: 2;
+  animation: glowPulse 5s ease-in-out 2s infinite;
+  opacity: 0;
+  /* fadeIn before glowPulse takes over */
+  animation: fadeIn 1s ease-out 0.1s forwards, glowPulse 5s ease-in-out 2.2s infinite;
+}
+
+/* Wordmark — cream on green */
+.a-mark {
+  position: absolute;
+  top: 62px; left: 50%; transform: translateX(-50%);
+  z-index: 70; white-space: nowrap;
+  display: flex; align-items: center; gap: 7px;
+  opacity: 0;
+  animation: riseIn 0.3s ease-out 0.2s forwards;
+}
+.a-mark-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(240,237,230,0.9);
+}
+
+/* SVG illustration */
+.a-svg {
+  position: absolute;
+  top: 44px; left: 50%; transform: translateX(-50%);
+  z-index: 10; overflow: visible;
+}
+
+/* Sway group — pivots at stem base */
+.clover-group {
+  transform-origin: 0px 68px;
+  animation: sway 10s ease-in-out 3s infinite;
+}
+
+/* ── Outline strokes (cream) — all 4 leaves draw simultaneously ── */
+.leaf-outline {
+  fill: none;
+  stroke: rgba(240,237,230,0.75);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 340;
+  stroke-dashoffset: 340;
+  animation: drawOutline 0.58s ease-out 0.55s forwards;
+}
+/* Outline dissolves as fill appears */
+.leaf-outline-fade {
+  fill: none;
+  stroke: rgba(240,237,230,0.75);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 1;
+  animation: strokeOut 0.4s ease-in 1.05s forwards;
+}
+
+/* ── Filled leaves (cream gradient) — flood in after draw ── */
+.leaf-fill {
+  opacity: 0;
+  animation: fillIn 0.4s ease-out 1.05s forwards;
+}
+
+/* Bottom copy panel */
+.a-bottom {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 24px 24px 0;
+  z-index: 30;
+}
+
+/* Dashed separator line */
+.a-sep {
+  width: 40px; height: 1.5px;
+  background: rgba(214,232,220,0.5);
+  border-radius: 1px; margin-bottom: 16px;
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out 2.0s forwards;
+}
+
+/* Hero headline — cream Playfair 700 */
+.a-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 40px; font-weight: 700;
+  line-height: 1.08; letter-spacing: -1px;
+  color: var(--cream);
+  opacity: 0;
+  clip-path: inset(0 100% 0 0 round 2px);
+  animation: wipeIn 0.38s ease-out 1.75s forwards;
+}
+
+/* Sub — sage italic Playfair */
+.a-sub {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px; font-weight: 400; font-style: italic;
+  color: rgba(214,232,220,0.85);
+  margin-top: 4px; line-height: 1.35;
+  opacity: 0;
+  animation: riseIn 0.3s ease-out 2.05s forwards;
+}
+
+/* Feature chips — sage pill */
+.a-chips {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-top: 20px;
+  opacity: 0;
+  animation: riseIn 0.3s ease-out 2.3s forwards;
+}
+.a-chip {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px; font-weight: 500;
+  color: rgba(30,74,53,0.9);
+  background: rgba(214,232,220,0.92);
+  border-radius: 999px;
+  padding: 6px 14px;
+  letter-spacing: 0.01em;
+}
+
+/* Primary CTA — cream pill */
+.a-cta {
+  margin-top: 20px;
+  height: 52px; border-radius: 999px;
+  background: var(--cream);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 600;
+  color: var(--forest);
+  position: relative; overflow: hidden; cursor: pointer;
+  opacity: 0;
+  animation: sheetUp 0.32s ease-out 2.52s forwards;
+}
+.a-cta::after {
+  content: '';
+  position: absolute; top: 0; bottom: 0; width: 50%;
+  background: linear-gradient(90deg,transparent,rgba(30,74,53,0.08),transparent);
+  transform: translateX(-200%);
+  animation: shimmer 1.6s ease 3.0s;
+}
+
+/* Ghost sign-in link */
+.a-ghost {
+  text-align: center; margin-top: 12px; margin-bottom: 36px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; color: rgba(214,232,220,0.65);
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out 2.7s forwards;
+  cursor: pointer;
+}
+.a-ghost span { color: rgba(214,232,220,0.9); font-weight: 500; }
+
+/* Pollen floats */
+.a-pollen {
+  position: absolute; z-index: 6; pointer-events: none;
+  opacity: 0;
+  animation: pollen var(--dur,8s) ease-in-out var(--d,3s) infinite,
+             fadeIn 0.8s ease var(--d,3s) forwards;
+}
+
+
+/* ════════════════════════════════════════════
+   SCREEN B — Cream / Cards from Inside the App
+════════════════════════════════════════════ */
+.sb { background: var(--cream); }
+
+/* Warm grain */
+.sb::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image:
+    radial-gradient(ellipse 55% 40% at 50% 25%, rgba(58,138,98,0.07) 0%, transparent 65%),
+    radial-gradient(circle, rgba(30,74,53,0.04) 1px, transparent 1px);
+  background-size: auto, 20px 20px;
+}
+
+/* ── WORDMARK (forest on cream) ── */
+.b-mark {
+  position: absolute;
+  top: 62px; left: 50%; transform: translateX(-50%);
+  z-index: 70; white-space: nowrap;
+  display: flex; align-items: center; gap: 7px;
+  opacity: 0;
+  animation: riseIn 0.3s ease-out 0.2s forwards;
+}
+.b-mark-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--forest);
+}
+
+/* ── Card fan section ── */
+.b-cards {
+  position: absolute;
+  top: 120px; left: 50%; transform: translateX(-50%);
+  width: 290px; height: 280px;
+  z-index: 20;
+}
+
+/* Base card style — mimics Sprout event card from brand guide */
+.b-card {
+  position: absolute;
+  width: 270px;
+  border-radius: 20px;
+  padding: 18px 20px 16px;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.06),
+    0 8px 24px rgba(0,0,0,0.08),
+    0 24px 48px rgba(0,0,0,0.05);
+  left: 50%; transform: translateX(-50%);
+  opacity: 0;
+}
+
+/* Card 1 — back — club card — sage bg */
+.b-card-1 {
+  background: var(--sage);
+  top: 20px;
+  animation: cardReveal 0.36s ease-out 0.35s forwards,
+             fanLeft 0.38s cubic-bezier(0.34,1.3,0.64,1) 0.7s forwards;
+}
+/* Card 2 — middle — event card — cream light */
+.b-card-2 {
+  background: var(--cream-lt);
+  top: 14px;
+  animation: cardReveal 0.36s ease-out 0.5s forwards,
+             fanRight 0.38s cubic-bezier(0.34,1.3,0.64,1) 0.85s forwards;
+}
+/* Card 3 — front — member card — white */
+.b-card-3 {
+  background: var(--white);
+  top: 8px;
+  animation: cardReveal 0.36s ease-out 0.65s forwards;
+}
+
+/* Card internals */
+.card-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; font-weight: 600;
+  color: var(--ink); line-height: 1.2;
+}
+.card-meta {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px; color: var(--stone);
+  margin-top: 6px;
+}
+.card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 14px;
+}
+.card-pill {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 500;
+  padding: 5px 12px; border-radius: 999px;
+  cursor: pointer;
+}
+.card-pill-green {
+  background: var(--forest); color: var(--cream);
+}
+.card-pill-outline {
+  border: 1px solid rgba(30,74,53,0.2); color: var(--forest);
+}
+.card-avatars { display: flex; }
+.card-av {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--white);
+  font-family: 'Inter', sans-serif;
+  font-size: 7.5px; font-weight: 700; color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  margin-left: -5px;
+}
+.card-av:first-child { margin-left: 0; }
+
+/* Small location badge on card */
+.card-loc {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(30,74,53,0.08);
+  border-radius: 999px; padding: 3px 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 10.5px; color: var(--forest);
+  margin-top: 8px;
+}
+
+/* ── Bottom section ── */
+.b-bottom {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 0 24px;
+  z-index: 30;
+}
+
+/* Eyebrow */
+.b-eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--sprout);
+  opacity: 0;
+  animation: riseIn 0.3s ease-out 1.32s forwards;
+}
+
+/* Brand idea — Playfair Display 700 */
+.b-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 34px; font-weight: 700;
+  line-height: 1.1; letter-spacing: -0.8px;
+  color: var(--ink);
+  margin-top: 6px;
+  opacity: 0;
+  clip-path: inset(0 100% 0 0 round 2px);
+  animation: wipeIn 0.38s ease-out 1.55s forwards;
+}
+.b-headline em {
+  font-style: italic; color: var(--sprout);
+}
+
+/* Sub */
+.b-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 400;
+  line-height: 1.6; color: var(--stone);
+  margin-top: 8px;
+  opacity: 0;
+  animation: riseIn 0.3s ease-out 1.8s forwards;
+}
+
+/* Divider */
+.b-div {
+  height: 1px; margin: 18px 0 16px;
+  background: linear-gradient(90deg,transparent,rgba(30,74,53,0.12),transparent);
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out 1.95s forwards;
+}
+
+/* Stats row */
+.b-stats {
+  display: flex; justify-content: space-between; align-items: center;
+  opacity: 0;
+  animation: riseIn 0.3s ease-out 2.1s forwards;
+}
+.b-stat { text-align: center; }
+.b-stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 700; color: var(--ink); line-height: 1;
+}
+.b-stat-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 10.5px; color: var(--stone); margin-top: 2px;
+}
+.b-stat-sep { width: 1px; height: 32px; background: rgba(30,74,53,0.1); }
+
+/* Primary CTA — forest pill */
+.b-cta {
+  margin-top: 18px;
+  height: 52px; border-radius: 999px;
+  background: var(--forest);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 600; color: var(--cream);
+  position: relative; overflow: hidden; cursor: pointer;
+  opacity: 0;
+  animation: sheetUp 0.32s ease-out 2.32s forwards;
+}
+.b-cta::after {
+  content: '';
+  position: absolute; top: 0; bottom: 0; width: 50%;
+  background: linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);
+  transform: translateX(-200%);
+  animation: shimmer 1.6s ease 2.8s;
+}
+
+.b-ghost {
+  text-align: center; margin-top: 10px; margin-bottom: 36px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; color: var(--stone);
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out 2.5s forwards;
+  cursor: pointer;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     SCREEN A · Forest Green / The Invitation
+══════════════════════════════════════════ -->
+<div class="wrap">
+  <span class="wrap-label">Screen A · Forest Immersive</span>
+  <div class="phone">
+    <div class="screen sa">
+
+      <!-- Ambient glow -->
+      <div class="a-bloom"></div>
+
+      <!-- Status bar — cream on forest -->
+      <div class="status-bar" style="color:rgba(240,237,230,0.82);">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+            <rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/>
+            <rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/>
+            <rect x="9" y="2" width="3" height="10" rx="1" fill="currentColor"/>
+            <rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/>
+          </svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+            <path d="M8 9.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" fill="currentColor"/>
+            <path d="M4.5 7C5.7 5.8 6.8 5.2 8 5.2s2.3.6 3.5 1.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+            <path d="M2 4.5C3.8 2.7 5.8 1.8 8 1.8s4.2.9 6 2.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+          </svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+            <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.45"/>
+            <rect x="22.5" y="3.5" width="2" height="5" rx="1" fill="currentColor" fill-opacity="0.35"/>
+            <rect x="2" y="2" width="16" height="8" rx="2" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="dynamic-island"></div>
+
+      <!-- Wordmark -->
+      <div class="a-mark">
+        <!-- Clover icon — cream on green -->
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+          <path d="M7.5 7.5C7.5 7.5 5 5.2 5 3C5 1.6 6.2.4 7.5.4S10 1.6 10 3C10 5.2 7.5 7.5 7.5 7.5Z" fill="rgba(240,237,230,0.88)"/>
+          <path d="M7.5 7.5C7.5 7.5 9.8 5 12 5C13.4 5 14.6 6.2 14.6 7.5S13.4 10 12 10C9.8 10 7.5 7.5 7.5 7.5Z" fill="rgba(240,237,230,0.72)"/>
+          <path d="M7.5 7.5C7.5 7.5 10 9.8 10 12C10 13.4 8.8 14.6 7.5 14.6S5 13.4 5 12C5 9.8 7.5 7.5 7.5 7.5Z" fill="rgba(240,237,230,0.88)"/>
+          <path d="M7.5 7.5C7.5 7.5 5.2 10 3 10C1.6 10 .4 8.8 .4 7.5S1.6 5 3 5C5.2 5 7.5 7.5 7.5 7.5Z" fill="rgba(240,237,230,0.72)"/>
+        </svg>
+        <span class="a-mark-text">Sprout</span>
+      </div>
+
+      <!-- ════════════════════════════════════
+           BOTANICAL SVG — outline draw then fill
+      ════════════════════════════════════ -->
+      <svg class="a-svg" width="393" height="370"
+           viewBox="0 0 393 370" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Cream gradient for filled leaves -->
+          <radialGradient id="gCN" cx="42%" cy="65%" r="65%">
+            <stop offset="0%"  stop-color="rgba(250,248,244,0.90)"/>
+            <stop offset="45%" stop-color="rgba(210,232,220,0.78)"/>
+            <stop offset="85%" stop-color="rgba(162,205,182,0.58)"/>
+            <stop offset="100%" stop-color="rgba(130,180,155,0.42)"/>
+          </radialGradient>
+          <radialGradient id="gCE" cx="28%" cy="44%" r="65%">
+            <stop offset="0%"  stop-color="rgba(248,246,242,0.88)"/>
+            <stop offset="45%" stop-color="rgba(205,228,216,0.76)"/>
+            <stop offset="85%" stop-color="rgba(158,202,178,0.55)"/>
+            <stop offset="100%" stop-color="rgba(126,178,152,0.40)"/>
+          </radialGradient>
+          <radialGradient id="gCS" cx="55%" cy="32%" r="65%">
+            <stop offset="0%"  stop-color="rgba(250,248,244,0.90)"/>
+            <stop offset="45%" stop-color="rgba(212,233,222,0.78)"/>
+            <stop offset="85%" stop-color="rgba(164,206,184,0.58)"/>
+            <stop offset="100%" stop-color="rgba(130,180,155,0.42)"/>
+          </radialGradient>
+          <radialGradient id="gCW" cx="68%" cy="52%" r="65%">
+            <stop offset="0%"  stop-color="rgba(248,246,242,0.88)"/>
+            <stop offset="45%" stop-color="rgba(206,228,218,0.76)"/>
+            <stop offset="85%" stop-color="rgba(158,202,178,0.55)"/>
+            <stop offset="100%" stop-color="rgba(125,178,152,0.40)"/>
+          </radialGradient>
+
+          <!-- Specular highlight on filled leaf -->
+          <radialGradient id="specN" cx="38%" cy="72%" r="50%">
+            <stop offset="0%"  stop-color="rgba(255,255,255,0.3)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+          </radialGradient>
+          <radialGradient id="specE" cx="20%" cy="44%" r="50%">
+            <stop offset="0%"  stop-color="rgba(255,255,255,0.25)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+          </radialGradient>
+          <radialGradient id="specS" cx="54%" cy="26%" r="50%">
+            <stop offset="0%"  stop-color="rgba(255,255,255,0.28)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+          </radialGradient>
+          <radialGradient id="specW" cx="78%" cy="48%" r="50%">
+            <stop offset="0%"  stop-color="rgba(255,255,255,0.24)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+          </radialGradient>
+
+          <!-- Shadow filter for filled leaves -->
+          <filter id="leafShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="rgba(4,14,8,0.28)"/>
+          </filter>
+          <filter id="centerShadow">
+            <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="rgba(4,14,8,0.35)"/>
+          </filter>
+          <filter id="stemGlow">
+            <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="rgba(200,230,215,0.4)"/>
+          </filter>
+        </defs>
+
+        <!-- Sway pivot group — translate to clover center first -->
+        <g class="clover-group" transform="translate(196,212)">
+
+          <!-- Ground shadow -->
+          <ellipse cx="0" cy="66" rx="26" ry="5.5"
+            fill="rgba(4,20,10,0.15)"
+            style="opacity:0; animation: fadeIn 0.5s ease-out 1.6s forwards;"/>
+
+          <!-- Stem — cream glow line -->
+          <line x1="0" y1="4" x2="0" y2="72"
+            stroke="rgba(214,232,220,0.7)" stroke-width="3"
+            stroke-linecap="round"
+            stroke-dasharray="72" stroke-dashoffset="72"
+            filter="url(#stemGlow)"
+            style="--dl:72; animation: stemDraw 0.28s ease-out 0.38s forwards;"/>
+
+          <!-- Grass blades — cream/sage -->
+          <g style="opacity:0; animation: grassUp 0.24s ease-out 0.58s forwards;">
+            <line x1="-15" y1="72" x2="-24" y2="55" stroke="rgba(200,228,212,0.5)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="-7"  y1="72" x2="-8"  y2="50" stroke="rgba(214,232,220,0.45)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1=" 7"  y1="72" x2=" 9"  y2="52" stroke="rgba(200,228,212,0.45)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1=" 15" y1="72" x2=" 24" y2="56" stroke="rgba(214,232,220,0.5)" stroke-width="2" stroke-linecap="round"/>
+          </g>
+
+          <!-- ──────────────────────────────────────────────────────
+               NORTH LEAF
+               Obcordate (heart-notched) path. BBox: x:-50→50, y:-82→0
+          ────────────────────────────────────────────────────── -->
+
+          <!-- Phase 1: OUTLINE ONLY — all 4 draw simultaneously at 0.55s -->
+          <path class="leaf-outline"
+            d="M 0,0 C -10,-5 -50,-18 -50,-44 C -50,-66 -26,-80 -10,-82 C -4,-84 0,-80 0,-80 C 0,-80 4,-84 10,-82 C 26,-80 50,-66 50,-44 C 50,-18 10,-5 0,0 Z"/>
+          <!-- Phase 1b: Same path — will dissolve as fill comes in -->
+          <path class="leaf-outline-fade"
+            d="M 0,0 C -10,-5 -50,-18 -50,-44 C -50,-66 -26,-80 -10,-82 C -4,-84 0,-80 0,-80 C 0,-80 4,-84 10,-82 C 26,-80 50,-66 50,-44 C 50,-18 10,-5 0,0 Z"/>
+
+          <!-- Phase 2: FILL — floods in at 1.05s -->
+          <g class="leaf-fill" filter="url(#leafShadow)">
+            <path d="M 0,0 C -10,-5 -50,-18 -50,-44 C -50,-66 -26,-80 -10,-82 C -4,-84 0,-80 0,-80 C 0,-80 4,-84 10,-82 C 26,-80 50,-66 50,-44 C 50,-18 10,-5 0,0 Z"
+              fill="url(#gCN)"/>
+            <!-- Specular -->
+            <path d="M 0,0 C -10,-5 -50,-18 -50,-44 C -50,-66 -26,-80 -10,-82 C -4,-84 0,-80 0,-80 C 0,-80 4,-84 10,-82 C 26,-80 50,-66 50,-44 C 50,-18 10,-5 0,0 Z"
+              fill="url(#specN)" opacity="0.9"/>
+            <!-- Primary vein -->
+            <line x1="0" y1="-2" x2="0" y2="-76"
+              stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-linecap="round"
+              stroke-dasharray="76" stroke-dashoffset="76"
+              style="--dl:76; animation: drawOutline 0.32s ease-out 1.28s forwards;"/>
+            <!-- Side veins -->
+            <path d="M 0,-26 C -14,-34 -30,-32 -42,-23"
+              stroke="rgba(255,255,255,0.12)" stroke-width="0.8" fill="none" stroke-linecap="round"
+              stroke-dasharray="46" stroke-dashoffset="46"
+              style="--dl:46; animation: drawOutline 0.26s ease-out 1.38s forwards;"/>
+            <path d="M 0,-26 C 14,-34 30,-32 42,-23"
+              stroke="rgba(255,255,255,0.12)" stroke-width="0.8" fill="none" stroke-linecap="round"
+              stroke-dasharray="46" stroke-dashoffset="46"
+              style="--dl:46; animation: drawOutline 0.26s ease-out 1.40s forwards;"/>
+            <!-- Chevron V -->
+            <path d="M -34,-41 C -20,-33 -8,-29 0,-29 C 8,-29 20,-33 34,-41"
+              stroke="rgba(255,255,255,0.18)" stroke-width="1.1" fill="none" stroke-linecap="round"
+              opacity="0"
+              style="animation: fadeIn 0.24s ease-out 1.48s forwards;"/>
+          </g>
+
+          <!-- ── EAST LEAF ── BBox x:0→82, y:-50→50 -->
+          <path class="leaf-outline"
+            d="M 0,0 C 5,-10 18,-50 44,-50 C 66,-50 80,-26 82,-10 C 84,-4 80,0 80,0 C 80,0 84,4 82,10 C 80,26 66,50 44,50 C 18,50 5,10 0,0 Z"/>
+          <path class="leaf-outline-fade"
+            d="M 0,0 C 5,-10 18,-50 44,-50 C 66,-50 80,-26 82,-10 C 84,-4 80,0 80,0 C 80,0 84,4 82,10 C 80,26 66,50 44,50 C 18,50 5,10 0,0 Z"/>
+          <g class="leaf-fill" filter="url(#leafShadow)">
+            <path d="M 0,0 C 5,-10 18,-50 44,-50 C 66,-50 80,-26 82,-10 C 84,-4 80,0 80,0 C 80,0 84,4 82,10 C 80,26 66,50 44,50 C 18,50 5,10 0,0 Z" fill="url(#gCE)"/>
+            <path d="M 0,0 C 5,-10 18,-50 44,-50 C 66,-50 80,-26 82,-10 C 84,-4 80,0 80,0 C 80,0 84,4 82,10 C 80,26 66,50 44,50 C 18,50 5,10 0,0 Z" fill="url(#specE)" opacity="0.9"/>
+            <line x1="2" y1="0" x2="78" y2="0" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-linecap="round"
+              stroke-dasharray="78" stroke-dashoffset="78"
+              style="--dl:78; animation: drawOutline 0.32s ease-out 1.30s forwards;"/>
+            <path d="M 26,0 C 32,14 30,28 22,40" stroke="rgba(255,255,255,0.12)" stroke-width="0.8" fill="none" stroke-linecap="round"
+              stroke-dasharray="44" stroke-dashoffset="44"
+              style="--dl:44; animation: drawOutline 0.26s ease-out 1.40s forwards;"/>
+            <path d="M 26,0 C 32,-14 30,-28 22,-40" stroke="rgba(255,255,255,0.12)" stroke-width="0.8" fill="none" stroke-linecap="round"
+              stroke-dasharray="44" stroke-dashoffset="44"
+              style="--dl:44; animation: drawOutline 0.26s ease-out 1.42s forwards;"/>
+            <path d="M 42,34 C 36,22 32,8 32,0 C 32,-8 36,-22 42,-34"
+              stroke="rgba(255,255,255,0.18)" stroke-width="1.1" fill="none" stroke-linecap="round"
+              opacity="0" style="animation: fadeIn 0.24s ease-out 1.50s forwards;"/>
+          </g>
+
+          <!-- ── SOUTH LEAF ── BBox x:-50→50, y:0→82 -->
+          <path class="leaf-outline"
+            d="M 0,0 C 10,5 50,18 50,44 C 50,66 26,80 10,82 C 4,84 0,80 0,80 C 0,80 -4,84 -10,82 C -26,80 -50,66 -50,44 C -50,18 -10,5 0,0 Z"/>
+          <path class="leaf-outline-fade"
+            d="M 0,0 C 10,5 50,18 50,44 C 50,66 26,80 10,82 C 4,84 0,80 0,80 C 0,80 -4,84 -10,82 C -26,80 -50,66 -50,44 C -50,18 -10,5 0,0 Z"/>
+          <g class="leaf-fill" filter="url(#leafShadow)">
+            <path d="M 0,0 C 10,5 50,18 50,44 C 50,66 26,80 10,82 C 4,84 0,80 0,80 C 0,80 -4,84 -10,82 C -26,80 -50,66 -50,44 C -50,18 -10,5 0,0 Z" fill="url(#gCS)"/>
+            <path d="M 0,0 C 10,5 50,18 50,44 C 50,66 26,80 10,82 C 4,84 0,80 0,80 C 0,80 -4,84 -10,82 C -26,80 -50,66 -50,44 C -50,18 -10,5 0,0 Z" fill="url(#specS)" opacity="0.9"/>
+            <line x1="0" y1="2" x2="0" y2="78" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-linecap="round"
+              stroke-dasharray="78" stroke-dashoffset="78"
+              style="--dl:78; animation: drawOutline 0.32s ease-out 1.32s forwards;"/>
+            <path d="M 0,26 C 14,34 30,32 42,23" stroke="rgba(255,255,255,0.12)" stroke-width="0.8" fill="none" stroke-linecap="round"
+              stroke-dasharray="44" stroke-dashoffset="44"
+              style="--dl:44; animation: drawOutline 0.26s ease-out 1.42s forwards;"/>
+            <path d="M 0,26 C -14,34 -30,32 -42,23" stroke="rgba(255,255,255,0.12)" stroke-width="0.8" fill="none" stroke-linecap="round"
+              stroke-dasharray="44" stroke-dashoffset="44"
+              style="--dl:44; animation: drawOutline 0.26s ease-out 1.44s forwards;"/>
+            <path d="M 34,41 C 20,33 8,29 0,29 C -8,29 -20,33 -34,41"
+              stroke="rgba(255,255,255,0.18)" stroke-width="1.1" fill="none" stroke-linecap="round"
+              opacity="0" style="animation: fadeIn 0.24s ease-out 1.52s forwards;"/>
+          </g>
+
+          <!-- ── WEST LEAF ── BBox x:-82→0, y:-50→50 -->
+          <path class="leaf-outline"
+            d="M 0,0 C -5,-10 -18,-50 -44,-50 C -66,-50 -80,-26 -82,-10 C -84,-4 -80,0 -80,0 C -80,0 -84,4 -82,10 C -80,26 -66,50 -44,50 C -18,50 -5,10 0,0 Z"/>
+          <path class="leaf-outline-fade"
+            d="M 0,0 C -5,-10 -18,-50 -44,-50 C -66,-50 -80,-26 -82,-10 C -84,-4 -80,0 -80,0 C -80,0 -84,4 -82,10 C -80,26 -66,50 -44,50 C -18,50 -5,10 0,0 Z"/>
+          <g class="leaf-fill" filter="url(#leafShadow)">
+            <path d="M 0,0 C -5,-10 -18,-50 -44,-50 C -66,-50 -80,-26 -82,-10 C -84,-4 -80,0 -80,0 C -80,0 -84,4 -82,10 C -80,26 -66,50 -44,50 C -18,50 -5,10 0,0 Z" fill="url(#gCW)"/>
+            <path d="M 0,0 C -5,-10 -18,-50 -44,-50 C -66,-50 -80,-26 -82,-10 C -84,-4 -80,0 -80,0 C -80,0 -84,4 -82,10 C -80,26 -66,50 -44,50 C -18,50 -5,10 0,0 Z" fill="url(#specW)" opacity="0.9"/>
+            <line x1="-2" y1="0" x2="-78" y2="0" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-linecap="round"
+              stroke-dasharray="78" stroke-dashoffset="78"
+              style="--dl:78; animation: drawOutline 0.32s ease-out 1.34s forwards;"/>
+            <path d="M -26,0 C -32,-14 -30,-28 -22,-40" stroke="rgba(255,255,255,0.12)" stroke-width="0.8" fill="none" stroke-linecap="round"
+              stroke-dasharray="44" stroke-dashoffset="44"
+              style="--dl:44; animation: drawOutline 0.26s ease-out 1.44s forwards;"/>
+            <path d="M -26,0 C -32, 14 -30, 28 -22, 40" stroke="rgba(255,255,255,0.12)" stroke-width="0.8" fill="none" stroke-linecap="round"
+              stroke-dasharray="44" stroke-dashoffset="44"
+              style="--dl:44; animation: drawOutline 0.26s ease-out 1.46s forwards;"/>
+            <path d="M -42,34 C -36,22 -32,8 -32,0 C -32,-8 -36,-22 -42,-34"
+              stroke="rgba(255,255,255,0.18)" stroke-width="1.1" fill="none" stroke-linecap="round"
+              opacity="0" style="animation: fadeIn 0.24s ease-out 1.54s forwards;"/>
+          </g>
+
+          <!-- ── CENTER BOSS ── cream on green, blooms after fill -->
+          <g style="opacity:0; animation: bossBloom 0.32s cubic-bezier(0.34,1.4,0.64,1) 1.42s forwards;"
+             filter="url(#centerShadow)">
+            <circle r="13" fill="rgba(50,100,70,0.6)"/>
+            <circle r="9.5" fill="rgba(180,220,200,0.75)"/>
+            <circle r="6" fill="rgba(240,237,230,0.9)"/>
+            <circle r="2.5" fill="rgba(255,255,255,0.75)"/>
+          </g>
+
+          <!-- ── DEW DROPS — cream beads ── -->
+          <g style="opacity:0; animation: bossBloom 0.24s cubic-bezier(0.34,1.4,0.64,1) 1.58s forwards;">
+            <circle cx="-22" cy="-54" r="4.5" fill="rgba(240,237,230,0.6)"/>
+            <circle cx="-20" cy="-52" r="1.5" fill="rgba(255,255,255,0.85)"/>
+            <circle cx=" 54" cy="-14" r="3.5" fill="rgba(240,237,230,0.55)"/>
+            <circle cx=" 52" cy="-12" r="1.2" fill="rgba(255,255,255,0.8)"/>
+            <circle cx=" 16" cy=" 56" r="4"   fill="rgba(240,237,230,0.58)"/>
+            <circle cx="-52" cy=" 18" r="3.2" fill="rgba(240,237,230,0.52)"/>
+          </g>
+
+        </g><!-- /clover-group -->
+      </svg>
+
+      <!-- Floating pollen -->
+      <div class="a-pollen" style="left:68px;top:118px;--dur:9s;--d:3.0s;--px:6px;--py:-16px;--po:0.25;--po2:.42;">
+        <svg width="7" height="7"><circle cx="3.5" cy="3.5" r="2.2" fill="rgba(214,232,220,0.5)"/></svg>
+      </div>
+      <div class="a-pollen" style="left:312px;top:100px;--dur:11s;--d:3.5s;--px:-5px;--py:-14px;--po:0.18;--po2:.34;">
+        <svg width="6" height="6"><circle cx="3" cy="3" r="2" fill="rgba(214,232,220,0.45)"/></svg>
+      </div>
+      <div class="a-pollen" style="left:340px;top:196px;--dur:8s;--d:4.0s;--px:4px;--py:-12px;--po:0.15;--po2:.3;">
+        <svg width="8" height="8"><circle cx="4" cy="4" r="2.5" fill="rgba(240,237,230,0.3)"/></svg>
+      </div>
+      <div class="a-pollen" style="left:52px;top:230px;--dur:10s;--d:3.8s;--px:5px;--py:-10px;--po:0.2;--po2:.36;">
+        <svg width="6" height="6"><circle cx="3" cy="3" r="1.8" fill="rgba(200,226,212,0.4)"/></svg>
+      </div>
+
+      <!-- ── Bottom content ── -->
+      <div class="a-bottom">
+        <div class="a-sep"></div>
+
+        <div class="a-headline">Your people<br>are out there.</div>
+        <div class="a-sub">Let's find them.</div>
+
+        <div class="a-chips">
+          <span class="a-chip">🏡 Events nearby</span>
+          <span class="a-chip">👨‍👩‍👧 Local clubs</span>
+          <span class="a-chip">💬 Parent chat</span>
+        </div>
+
+        <div class="a-cta" role="button">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M7 7C7 7 4.5 4.8 4.5 2.8C4.5 1.6 5.5.6 6.7.6 6.9.6 7 .75 7 .9 7 .75 7.1.6 7.3.6 8.5.6 9.5 1.6 9.5 2.8 9.5 4.8 7 7 7 7Z" fill="currentColor"/>
+            <path d="M7 7C7 7 9.2 4.5 11.2 4.5 12.4 4.5 13.4 5.5 13.4 6.7 13.4 6.9 13.25 7 13.1 7 13.25 7 13.4 7.1 13.4 7.3 13.4 8.5 12.4 9.5 11.2 9.5 9.2 9.5 7 7 7 7Z" fill="currentColor" opacity=".65"/>
+            <path d="M7 7C7 7 9.5 9.2 9.5 11.2 9.5 12.4 8.5 13.4 7.3 13.4 7.1 13.4 7 13.25 7 13.1 7 13.25 6.9 13.4 6.7 13.4 5.5 13.4 4.5 12.4 4.5 11.2 4.5 9.2 7 7 7 7Z" fill="currentColor"/>
+            <path d="M7 7C7 7 4.8 9.5 2.8 9.5 1.6 9.5.6 8.5.6 7.3.6 7.1.75 7 .9 7 .75 7 .6 6.9.6 6.7.6 5.5 1.6 4.5 2.8 4.5 4.8 4.5 7 7 7 7Z" fill="currentColor" opacity=".65"/>
+          </svg>
+          Find my village
+        </div>
+        <div class="a-ghost">Already a member? <span>Sign in</span></div>
+      </div>
+
+      <div class="home-bar" style="background:rgba(240,237,230,0.35);"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SCREEN B · Cream / App Card Preview
+══════════════════════════════════════════ -->
+<div class="wrap">
+  <span class="wrap-label">Screen B · Inside the App</span>
+  <div class="phone">
+    <div class="screen sb">
+
+      <!-- Status bar — forest on cream -->
+      <div class="status-bar" style="color:#2a3a30;">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+            <rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/>
+            <rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/>
+            <rect x="9" y="2" width="3" height="10" rx="1" fill="currentColor"/>
+            <rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/>
+          </svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+            <path d="M8 9.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" fill="currentColor"/>
+            <path d="M4.5 7C5.7 5.8 6.8 5.2 8 5.2s2.3.6 3.5 1.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+            <path d="M2 4.5C3.8 2.7 5.8 1.8 8 1.8s4.2.9 6 2.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+          </svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+            <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/>
+            <rect x="22.5" y="3.5" width="2" height="5" rx="1" fill="currentColor" fill-opacity="0.4"/>
+            <rect x="2" y="2" width="16" height="8" rx="2" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="dynamic-island"></div>
+
+      <!-- Wordmark -->
+      <div class="b-mark">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+          <path d="M7.5 7.5C7.5 7.5 5 5.2 5 3 5 1.6 6.2.4 7.5.4S10 1.6 10 3C10 5.2 7.5 7.5 7.5 7.5Z" fill="#1E4A35"/>
+          <path d="M7.5 7.5C7.5 7.5 9.8 5 12 5 13.4 5 14.6 6.2 14.6 7.5S13.4 10 12 10C9.8 10 7.5 7.5 7.5 7.5Z" fill="#1E4A35" opacity=".7"/>
+          <path d="M7.5 7.5C7.5 7.5 10 9.8 10 12 10 13.4 8.8 14.6 7.5 14.6S5 13.4 5 12C5 9.8 7.5 7.5 7.5 7.5Z" fill="#1E4A35"/>
+          <path d="M7.5 7.5C7.5 7.5 5.2 10 3 10 1.6 10 .4 8.8 .4 7.5S1.6 5 3 5C5.2 5 7.5 7.5 7.5 7.5Z" fill="#1E4A35" opacity=".7"/>
+        </svg>
+        <span class="b-mark-text">Sprout</span>
+      </div>
+
+      <!-- ── Fan of 3 app cards ── -->
+      <div class="b-cards">
+
+        <!-- Card 1 — Back — Club card (sage background) -->
+        <div class="b-card b-card-1">
+          <div class="card-label" style="color:rgba(30,74,53,0.65);">Parks &amp; Outdoors</div>
+          <div class="card-title">Lincoln Park<br>Families Club</div>
+          <div class="card-loc">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <circle cx="5" cy="4" r="2.5" stroke="#1E4A35" stroke-width="1.2"/>
+              <path d="M5 9C5 9 2 6.5 2 4a3 3 0 016 0C8 6.5 5 9 5 9Z" stroke="#1E4A35" stroke-width="1.2" fill="none"/>
+            </svg>
+            0.6 mi · 47 members
+          </div>
+          <div class="card-footer">
+            <div class="card-avatars">
+              <div class="card-av" style="background:#2e7a52;">MK</div>
+              <div class="card-av" style="background:#3a8a62;">SR</div>
+              <div class="card-av" style="background:#1e4a35;">JP</div>
+              <div class="card-av" style="background:#4a9a72; font-size:6.5px;">+44</div>
+            </div>
+            <span class="card-pill card-pill-outline">Join club</span>
+          </div>
+        </div>
+
+        <!-- Card 2 — Middle — Event card (cream-light) -->
+        <div class="b-card b-card-2">
+          <div class="card-label" style="color:var(--stone-lt);">This Saturday · Free</div>
+          <div class="card-title">Morning Park Picnic<br>at Griffith Park</div>
+          <div class="card-loc">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <circle cx="5" cy="4" r="2.5" stroke="#1E4A35" stroke-width="1.2"/>
+              <path d="M5 9C5 9 2 6.5 2 4a3 3 0 016 0C8 6.5 5 9 5 9Z" stroke="#1E4A35" stroke-width="1.2" fill="none"/>
+            </svg>
+            0.4 mi · 12 families going
+          </div>
+          <div class="card-footer">
+            <div class="card-avatars">
+              <div class="card-av" style="background:#3a8a62;">AL</div>
+              <div class="card-av" style="background:#1e4a35;">DT</div>
+              <div class="card-av" style="background:#2e7a52; font-size:6.5px;">+10</div>
+            </div>
+            <span class="card-pill card-pill-green">Join event ✓</span>
+          </div>
+        </div>
+
+        <!-- Card 3 — Front — Member/connection card (white) -->
+        <div class="b-card b-card-3">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <!-- Avatar -->
+            <div style="width:48px;height:48px;border-radius:50%;background:var(--sage);
+              display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <span style="font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:var(--forest);">SM</span>
+            </div>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--ink);">Sarah M.</div>
+              <div style="font-family:'Inter',sans-serif;font-size:12px;color:var(--stone);margin-top:2px;">Mum of 2 · Silverlake</div>
+            </div>
+            <!-- New badge -->
+            <div style="margin-left:auto;background:var(--sage);color:var(--forest);
+              font-family:'Inter',sans-serif;font-size:10px;font-weight:600;
+              padding:4px 10px;border-radius:999px;letter-spacing:0.04em;">New</div>
+          </div>
+          <div class="card-loc" style="margin-top:10px;">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <circle cx="5" cy="4" r="2.5" stroke="#1E4A35" stroke-width="1.2"/>
+              <path d="M5 9C5 9 2 6.5 2 4a3 3 0 016 0C8 6.5 5 9 5 9Z" stroke="#1E4A35" stroke-width="1.2" fill="none"/>
+            </svg>
+            0.2 mi away · 3 clubs in common
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <span class="card-pill card-pill-green" style="flex:1;text-align:center;">Say hello 👋</span>
+            <span class="card-pill card-pill-outline">View profile</span>
+          </div>
+        </div>
+
+      </div><!-- /b-cards -->
+
+      <!-- Bottom text section -->
+      <div class="b-bottom">
+        <div class="b-eyebrow">Your neighbourhood</div>
+        <div class="b-headline">You got lucky<br>when you found<br><em>these people.</em></div>
+        <div class="b-sub">Sprout is where that luck happens — events, clubs, and parents who just get it, right around the corner.</div>
+
+        <div class="b-div"></div>
+
+        <div class="b-stats">
+          <div class="b-stat">
+            <div class="b-stat-num" id="cnt">2,400+</div>
+            <div class="b-stat-label">Families nearby</div>
+          </div>
+          <div class="b-stat-sep"></div>
+          <div class="b-stat">
+            <div class="b-stat-num">140+</div>
+            <div class="b-stat-label">Cities</div>
+          </div>
+          <div class="b-stat-sep"></div>
+          <div class="b-stat">
+            <div class="b-stat-num">4.9★</div>
+            <div class="b-stat-label">App Store</div>
+          </div>
+        </div>
+
+        <div class="b-cta" role="button">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M7 7C7 7 4.5 4.8 4.5 2.8 4.5 1.6 5.5.6 6.7.6 6.9.6 7 .75 7 .9 7 .75 7.1.6 7.3.6 8.5.6 9.5 1.6 9.5 2.8 9.5 4.8 7 7 7 7Z" fill="currentColor"/>
+            <path d="M7 7C7 7 9.5 9.2 9.5 11.2 9.5 12.4 8.5 13.4 7.3 13.4 7.1 13.4 7 13.25 7 13.1 7 13.25 6.9 13.4 6.7 13.4 5.5 13.4 4.5 12.4 4.5 11.2 4.5 9.2 7 7 7 7Z" fill="currentColor"/>
+          </svg>
+          Join Sprout — it's free
+        </div>
+        <div class="b-ghost">Already a member? Sign in</div>
+      </div>
+
+      <div class="home-bar" style="background:rgba(30,74,53,0.4);"></div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* Counter on Screen B */
+(function () {
+  const el = document.getElementById('cnt');
+  if (!el) return;
+  setTimeout(() => {
+    const dur = 1600, t0 = performance.now();
+    (function tick(now) {
+      const p = Math.min((now - t0) / dur, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.floor(ease * 2400).toLocaleString() + '+';
+      if (p < 1) requestAnimationFrame(tick);
+      else el.textContent = '2,400+';
+    })(t0);
+  }, 2400);
+})();
+</script>
+
+</body>
+</html>

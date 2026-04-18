@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Customize Profile (Kids Section Redesign v2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #dbd7cf;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 56px;
+    padding: 56px 32px;
+    font-family: 'Inter', sans-serif;
+    flex-wrap: wrap;
+  }
+
+  .variant-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .variant-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6b6355;
+  }
+
+  /* ─── Phone Shell ───────────────────────────────── */
+  .phone {
+    width: 393px;
+    height: 852px;
+    background: #f4f1ea;
+    border-radius: 54px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.1),
+      0 8px 16px rgba(0,0,0,0.06),
+      0 40px 100px rgba(0,0,0,0.22);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── Status Bar ────────────────────────────────── */
+  .status-bar {
+    height: 54px;
+    background: #f4f1ea;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px 0;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 5;
+  }
+  .status-time {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    letter-spacing: -0.3px;
+  }
+  .status-icons { display: flex; align-items: center; gap: 6px; }
+  .dynamic-island {
+    width: 120px;
+    height: 34px;
+    background: #000;
+    border-radius: 20px;
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* ─── Nav Bar ───────────────────────────────────── */
+  .nav-bar {
+    height: 52px;
+    background: #f4f1ea;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 5;
+  }
+  .nav-back {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #eae6db;
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .nav-title {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    font-size: 17px; font-weight: 600;
+    color: #1e3e2b;
+    white-space: nowrap;
+    letter-spacing: -0.3px;
+  }
+
+  /* ─── Scroll Content ────────────────────────────── */
+  .scroll-content {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+    padding-bottom: 108px;
+  }
+  .scroll-content::-webkit-scrollbar { display: none; }
+
+  /* ─── Profile Photo ─────────────────────────────── */
+  .profile-photo-section {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 20px 0 4px;
+  }
+  .avatar-ring {
+    position: relative; width: 100px; height: 100px;
+  }
+  .avatar-circle {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #c2b9a6;
+  }
+  .avatar-circle svg { width: 100%; height: 100%; }
+  .avatar-edit-btn {
+    position: absolute; bottom: 2px; right: 2px;
+    width: 28px; height: 28px;
+    background: #fff; border-radius: 50%; border: none;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+    cursor: pointer;
+  }
+
+  .profile-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; font-weight: 600;
+    color: #1e3e2b;
+    margin-top: 12px;
+    letter-spacing: -0.4px;
+  }
+  .profile-subtitle {
+    font-size: 14px; font-weight: 400;
+    color: #818898;
+    margin-top: 4px;
+  }
+
+  /* ════════════════════════════════════════════════
+     KIDS SECTION — REDESIGNED
+  ════════════════════════════════════════════════ */
+  .kids-section {
+    margin-top: 24px;
+  }
+
+  .kids-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px;
+    margin-bottom: 14px;
+  }
+  .kids-title {
+    font-size: 15px; font-weight: 600;
+    color: #4d525b;
+    letter-spacing: -0.1px;
+  }
+  .kids-edit-btn {
+    font-size: 13px; font-weight: 500;
+    color: #186338;
+    background: none; border: none;
+    cursor: pointer;
+    padding: 4px 0;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* Horizontal scroll row */
+  .kids-scroll {
+    display: flex; gap: 12px;
+    padding: 4px 20px 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .kids-scroll::-webkit-scrollbar { display: none; }
+
+  /* ── Kid Card ── */
+  .kid-card {
+    flex-shrink: 0;
+    width: 108px;
+    background: #ffffff;
+    border-radius: 22px;
+    border: 1px solid rgba(234,230,219,0.9);
+    box-shadow:
+      0 2px 12px rgba(24,99,56,0.07),
+      0 1px 3px rgba(0,0,0,0.04);
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 16px 10px 14px;
+    gap: 10px;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease;
+  }
+  .kid-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(24,99,56,0.12), 0 2px 6px rgba(0,0,0,0.06);
+  }
+  .kid-card:active { transform: scale(0.97); }
+
+  .kid-avatar-wrap {
+    width: 68px; height: 68px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    /* subtle ring */
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.8), 0 0 0 4px rgba(24,99,56,0.1);
+  }
+  .kid-avatar-wrap svg { width: 100%; height: 100%; display: block; }
+
+  .kid-info {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 6px;
+    width: 100%;
+  }
+  .kid-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px; font-weight: 600;
+    color: #1e3e2b;
+    letter-spacing: -0.2px;
+    text-align: center;
+  }
+  .kid-age {
+    background: #e2e9e3;
+    color: #186338;
+    font-size: 11px; font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    letter-spacing: 0.02em;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* ── Add Child Card ── */
+  .kid-add-card {
+    flex-shrink: 0;
+    width: 108px;
+    min-height: 152px;
+    background: transparent;
+    border-radius: 22px;
+    border: 1.5px dashed #c8d5c6;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px;
+    padding: 16px 10px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .kid-add-card:hover {
+    background: rgba(24,99,56,0.04);
+    border-color: #579a74;
+  }
+  .kid-add-icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: #e2e9e3;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .kid-add-label {
+    font-size: 12px; font-weight: 500;
+    color: #186338; text-align: center;
+    line-height: 1.3;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* ─── Profile Bio ────────────────────────────── */
+  .bio-section {
+    margin: 4px 20px 0;
+    background: #fff;
+    border-radius: 18px;
+    padding: 16px;
+    border: 1px solid #eae6db;
+  }
+  .bio-label {
+    font-size: 13px; font-weight: 600;
+    color: #186338; margin-bottom: 8px;
+  }
+  .bio-text {
+    font-size: 13px; line-height: 1.65;
+    color: #4d525b;
+  }
+
+  /* ─── Interests ──────────────────────────────── */
+  .interests-section { margin: 20px 20px 0; }
+  .interests-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .interests-title { font-size: 15px; font-weight: 600; color: #4d525b; }
+  .interests-add {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #eae6db; border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    background: #fff;
+    border: 1px solid #dbd5c8;
+    border-radius: 99px;
+    padding: 7px 14px;
+    font-size: 13px; font-weight: 500;
+    color: #4d525b;
+  }
+
+  /* ─── Bottom Bar ─────────────────────────────── */
+  .bottom-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 12px 20px 36px;
+    background: linear-gradient(to top, #f4f1ea 65%, rgba(244,241,234,0));
+    pointer-events: none;
+  }
+  .btn-next {
+    width: 100%;
+    padding: 17px;
+    background: #186338;
+    color: #fff;
+    border: none;
+    border-radius: 99px;
+    font-size: 16px; font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    letter-spacing: -0.2px;
+    pointer-events: all;
+    box-shadow: 0 4px 20px rgba(24,99,56,0.3);
+    transition: background 0.15s;
+  }
+  .btn-next:hover { background: #134f2d; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     BEFORE (Original)
+══════════════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <div class="variant-label">Before — Original</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="#1a1a1a"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="#1a1a1a"><path d="M8 2.4C10.4 2.4 12.6 3.4 14.1 5L15.5 3.6C13.6 1.7 11 0.5 8 0.5C5 0.5 2.4 1.7 0.5 3.6L1.9 5C3.4 3.4 5.6 2.4 8 2.4Z"/><path d="M8 5.3C9.6 5.3 11 5.9 12.1 7L13.5 5.6C12 4.2 10.1 3.3 8 3.3C5.9 3.3 4 4.2 2.5 5.6L3.9 7C5 5.9 6.4 5.3 8 5.3Z"/><circle cx="8" cy="10" r="1.5"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1a1a"/><rect x="2" y="2" width="17" height="8" rx="2" fill="#1a1a1a"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.5 24.5 6C24.5 5.5 23.8 4.8 23 4.5Z" fill="#1a1a1a"/></svg>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="nav-back">
+        <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8.5 1L1.5 8L8.5 15" stroke="#1e3e2b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="nav-title">Customize Your Profile</span>
+    </div>
+
+    <div class="scroll-content">
+      <div class="profile-photo-section">
+        <div class="avatar-ring">
+          <div class="avatar-circle">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="50" fill="#c2b9a6"/>
+              <circle cx="50" cy="38" r="20" fill="#8a7a6a"/>
+              <path d="M 10 100 C 10 70 25 62 50 62 C 75 62 90 70 90 100" fill="#8a7a6a"/>
+            </svg>
+          </div>
+          <button class="avatar-edit-btn">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="#186338"><path d="M1 9.5V11h1.5l4.4-4.4-1.5-1.5L1 9.5zm7.1-4.9c.2-.2.2-.5 0-.7L7 2.8c-.2-.2-.5-.2-.7 0l-.9.9 1.7 1.7.9-.9-.9.9z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:10px;">
+        <div class="profile-name">James Martin</div>
+        <div class="profile-subtitle">Father of 3 kids</div>
+      </div>
+
+      <!-- ORIGINAL KIDS — emoji row -->
+      <div style="display:flex; justify-content:center; gap:24px; margin-top:20px; padding:0 20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <span style="font-size:32px;">😊</span>
+          <span style="font-size:13px;font-weight:600;color:#4d525b;">Etan</span>
+          <span style="font-size:12px;color:#818898;">2 yrs</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <span style="font-size:32px;">😢</span>
+          <span style="font-size:13px;font-weight:600;color:#4d525b;">Olivia</span>
+          <span style="font-size:12px;color:#818898;">1 yrs</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <span style="font-size:32px;">😊</span>
+          <span style="font-size:13px;font-weight:600;color:#4d525b;">Erick</span>
+          <span style="font-size:12px;color:#818898;">6 yrs</span>
+        </div>
+      </div>
+
+      <div class="bio-section" style="margin-top:20px;">
+        <div class="bio-label">Profile Bio</div>
+        <div class="bio-text">Hi, I'm James Martin, a proud parent of three wonderful kids who attend Lincoln Elementary School in Pre-K and Kindergarten. I love connecting with other parents and creating opportunities for our children to play and grow together. Whether it's organizing playdates or just hanging out at the park, I'm all about fostering friendships and making lasting memories for our little ones.</div>
+      </div>
+
+      <div class="interests-section">
+        <div class="interests-header">
+          <span class="interests-title">Interests</span>
+          <button class="interests-add">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="#4d525b"><path d="M7 1v12M1 7h12" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div class="chips">
+          <span class="chip">Traditional Finance</span>
+          <span class="chip">Technology</span>
+          <span class="chip">Start-up</span>
+          <span class="chip">AI</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <button class="btn-next">Next</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     AFTER (Redesigned Kids Section)
+══════════════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <div class="variant-label">After — Redesigned ✦</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="#1a1a1a"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="#1a1a1a"><path d="M8 2.4C10.4 2.4 12.6 3.4 14.1 5L15.5 3.6C13.6 1.7 11 0.5 8 0.5C5 0.5 2.4 1.7 0.5 3.6L1.9 5C3.4 3.4 5.6 2.4 8 2.4Z"/><path d="M8 5.3C9.6 5.3 11 5.9 12.1 7L13.5 5.6C12 4.2 10.1 3.3 8 3.3C5.9 3.3 4 4.2 2.5 5.6L3.9 7C5 5.9 6.4 5.3 8 5.3Z"/><circle cx="8" cy="10" r="1.5"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1a1a"/><rect x="2" y="2" width="17" height="8" rx="2" fill="#1a1a1a"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.5 24.5 6C24.5 5.5 23.8 4.8 23 4.5Z" fill="#1a1a1a"/></svg>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="nav-back">
+        <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8.5 1L1.5 8L8.5 15" stroke="#1e3e2b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="nav-title">Customize Your Profile</span>
+    </div>
+
+    <div class="scroll-content">
+      <!-- Profile Photo -->
+      <div class="profile-photo-section">
+        <div class="avatar-ring">
+          <div class="avatar-circle">
+            <!-- User profile illustration -->
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="50" fill="#c2b9a6"/>
+              <circle cx="50" cy="37" r="20" fill="#8a7a6a"/>
+              <path d="M 8 100 C 8 68 24 60 50 60 C 76 60 92 68 92 100" fill="#6e5c4e"/>
+            </svg>
+          </div>
+          <button class="avatar-edit-btn">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 8.5V10h1.5l4.4-4.4-1.5-1.5L2 8.5zm7.1-4.9c.2-.2.2-.5 0-.7L7.9 2.2c-.2-.2-.5-.2-.7 0l-.9.9 1.7 1.7.9-.9z" fill="#186338"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:10px;">
+        <div class="profile-name">James Martin</div>
+        <div class="profile-subtitle">Father of 3 kids</div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           REDESIGNED KIDS SECTION
+      ══════════════════════════════════════ -->
+      <div class="kids-section">
+        <div class="kids-header">
+          <span class="kids-title">Your Children</span>
+          <button class="kids-edit-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 10.5V12h1.5l4.4-4.4-1.5-1.5L2 10.5zm7.1-4.9c.2-.2.2-.5 0-.7L7.9 3.7c-.2-.2-.5-.2-.7 0l-.9.9 1.7 1.7.9-.9z" fill="#186338"/>
+            </svg>
+            Edit
+          </button>
+        </div>
+
+        <div class="kids-scroll">
+
+          <!-- ── Kid Card: Etan (boy, 2yrs) ── -->
+          <div class="kid-card">
+            <div class="kid-avatar-wrap">
+              <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background -->
+                <circle cx="40" cy="40" r="40" fill="#C8D9C4"/>
+                <!-- Torso/shirt -->
+                <path d="M 0 80 C 0 58 14 52 40 52 C 66 52 80 58 80 80" fill="#579a74"/>
+                <!-- Collar -->
+                <path d="M 34 52 L 40 58 L 46 52" fill="#4a8463" opacity="0.7"/>
+                <!-- Face -->
+                <circle cx="40" cy="38" r="21" fill="#FFDBAC"/>
+                <!-- Hair — messy boys hair -->
+                <path d="M 19 38 C 19 20 28 12 40 12 C 52 12 61 20 61 38" fill="#3D2308"/>
+                <path d="M 19 32 C 22 26 30 20 40 19 C 50 20 58 26 61 32 C 58 25 50 17 40 16 C 30 17 22 25 19 32Z" fill="#5C3520"/>
+                <!-- Ears -->
+                <ellipse cx="19" cy="38" rx="3.5" ry="4.5" fill="#F0C995"/>
+                <ellipse cx="61" cy="38" rx="3.5" ry="4.5" fill="#F0C995"/>
+                <!-- Eyes -->
+                <circle cx="32" cy="38" r="3.8" fill="#2C1810"/>
+                <circle cx="48" cy="38" r="3.8" fill="#2C1810"/>
+                <!-- Eye shine -->
+                <circle cx="33.5" cy="36.5" r="1.3" fill="white"/>
+                <circle cx="49.5" cy="36.5" r="1.3" fill="white"/>
+                <!-- Eyebrows -->
+                <path d="M 29 33 Q 32 31.5 35 33" stroke="#3D2308" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <path d="M 45 33 Q 48 31.5 51 33" stroke="#3D2308" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <!-- Nose -->
+                <ellipse cx="40" cy="44" rx="2.5" ry="2" fill="#e8a870" opacity="0.6"/>
+                <!-- Smile -->
+                <path d="M 33 48 Q 40 54 47 48" stroke="#C4845A" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <!-- Cheeks -->
+                <circle cx="27" cy="44" r="5.5" fill="#FFB6A3" opacity="0.45"/>
+                <circle cx="53" cy="44" r="5.5" fill="#FFB6A3" opacity="0.45"/>
+              </svg>
+            </div>
+            <div class="kid-info">
+              <span class="kid-name">Etan</span>
+              <span class="kid-age">2 yrs</span>
+            </div>
+          </div>
+
+          <!-- ── Kid Card: Olivia (girl, 1yr) ── -->
+          <div class="kid-card">
+            <div class="kid-avatar-wrap">
+              <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background -->
+                <circle cx="40" cy="40" r="40" fill="#E9DBD5"/>
+                <!-- Torso/dress -->
+                <path d="M 0 80 C 0 57 14 50 40 50 C 66 50 80 57 80 80" fill="#C48E6A"/>
+                <!-- Neckline -->
+                <path d="M 33 50 Q 40 56 47 50" fill="#B07D5B"/>
+                <!-- Face -->
+                <circle cx="40" cy="38" r="21" fill="#FFD5B8"/>
+                <!-- Hair base (dark, covers top) -->
+                <path d="M 19 38 C 19 20 28 11 40 11 C 52 11 61 20 61 38" fill="#1A0A00"/>
+                <!-- Hair swoosh detail -->
+                <path d="M 21 30 C 24 22 32 15 40 14 C 48 15 56 22 59 30" fill="#2C1206" opacity="0.6"/>
+                <!-- Pigtail left -->
+                <circle cx="15" cy="30" r="7" fill="#1A0A00"/>
+                <circle cx="10" cy="26" r="4.5" fill="#e9dbd5" opacity="0.9"/>
+                <!-- Pigtail right -->
+                <circle cx="65" cy="30" r="7" fill="#1A0A00"/>
+                <circle cx="70" cy="26" r="4.5" fill="#e9dbd5" opacity="0.9"/>
+                <!-- Ears -->
+                <ellipse cx="19" cy="38" rx="3.5" ry="4.5" fill="#FFC9A0"/>
+                <ellipse cx="61" cy="38" rx="3.5" ry="4.5" fill="#FFC9A0"/>
+                <!-- Eyes (bigger, more expressive) -->
+                <circle cx="32" cy="38" r="4.2" fill="#2C1810"/>
+                <circle cx="48" cy="38" r="4.2" fill="#2C1810"/>
+                <!-- Eye shine -->
+                <circle cx="33.5" cy="36.2" r="1.5" fill="white"/>
+                <circle cx="49.5" cy="36.2" r="1.5" fill="white"/>
+                <!-- Lashes suggestion -->
+                <path d="M 28.5 35 C 29.5 33 31 32 32 33" stroke="#1A0A00" stroke-width="1" fill="none"/>
+                <path d="M 44.5 35 C 45.5 33 47 32 48 33" stroke="#1A0A00" stroke-width="1" fill="none"/>
+                <!-- Eyebrows (arched) -->
+                <path d="M 28.5 33 Q 32 31 35.5 32.5" stroke="#3D2308" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <path d="M 44.5 32.5 Q 48 31 51.5 33" stroke="#3D2308" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <!-- Nose (tiny) -->
+                <ellipse cx="40" cy="44" rx="2" ry="1.5" fill="#e8a870" opacity="0.5"/>
+                <!-- Smile / baby mouth -->
+                <path d="M 35 49 Q 40 53 45 49" stroke="#C4845A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                <!-- Cheeks (rosy) -->
+                <circle cx="26" cy="44" r="6" fill="#FFB6A3" opacity="0.5"/>
+                <circle cx="54" cy="44" r="6" fill="#FFB6A3" opacity="0.5"/>
+              </svg>
+            </div>
+            <div class="kid-info">
+              <span class="kid-name">Olivia</span>
+              <span class="kid-age">1 yr</span>
+            </div>
+          </div>
+
+          <!-- ── Kid Card: Erick (boy, 6yrs) ── -->
+          <div class="kid-card">
+            <div class="kid-avatar-wrap">
+              <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background -->
+                <circle cx="40" cy="40" r="40" fill="#D8E5ED"/>
+                <!-- Torso/shirt -->
+                <path d="M 0 80 C 0 57 14 51 40 51 C 66 51 80 57 80 80" fill="#3A7CA5"/>
+                <!-- Collar detail -->
+                <path d="M 33 51 L 40 57 L 47 51" fill="#2d6388" opacity="0.8"/>
+                <!-- Face (slightly darker warm skin) -->
+                <circle cx="40" cy="38" r="21" fill="#D4935A"/>
+                <!-- Hair (short, neat — Black curly) -->
+                <path d="M 19 35 C 19 18 27 10 40 10 C 53 10 61 18 61 35" fill="#1A0A00"/>
+                <!-- Curly hair texture bumps -->
+                <circle cx="26" cy="18" r="5" fill="#1A0A00"/>
+                <circle cx="35" cy="13" r="5.5" fill="#1A0A00"/>
+                <circle cx="45" cy="13" r="5.5" fill="#1A0A00"/>
+                <circle cx="54" cy="18" r="5" fill="#1A0A00"/>
+                <!-- Hair hairline -->
+                <path d="M 20 34 C 22 26 28 18 40 16 C 52 18 58 26 60 34" fill="#2C1206" opacity="0.4"/>
+                <!-- Ears -->
+                <ellipse cx="19" cy="38" rx="3.5" ry="5" fill="#C07A3A"/>
+                <ellipse cx="61" cy="38" rx="3.5" ry="5" fill="#C07A3A"/>
+                <!-- Eyes (confident, slightly narrower) -->
+                <circle cx="32" cy="38" r="3.5" fill="#1A0A00"/>
+                <circle cx="48" cy="38" r="3.5" fill="#1A0A00"/>
+                <!-- Eye shine -->
+                <circle cx="33.5" cy="36.5" r="1.2" fill="white"/>
+                <circle cx="49.5" cy="36.5" r="1.2" fill="white"/>
+                <!-- Eyebrows (strong) -->
+                <path d="M 28.5 34 Q 32 32 35.5 33.5" stroke="#1A0A00" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M 44.5 33.5 Q 48 32 51.5 34" stroke="#1A0A00" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <!-- Nose -->
+                <ellipse cx="40" cy="44" rx="3" ry="2.5" fill="#b87030" opacity="0.5"/>
+                <!-- Confident smile -->
+                <path d="M 32 49 Q 40 56 48 49" stroke="#8B4513" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                <!-- Cheeks (subtle) -->
+                <circle cx="26" cy="45" r="5" fill="#FF9A7A" opacity="0.3"/>
+                <circle cx="54" cy="45" r="5" fill="#FF9A7A" opacity="0.3"/>
+              </svg>
+            </div>
+            <div class="kid-info">
+              <span class="kid-name">Erick</span>
+              <span class="kid-age">6 yrs</span>
+            </div>
+          </div>
+
+          <!-- ── Add Child Card ── -->
+          <div class="kid-add-card">
+            <div class="kid-add-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M10 4v12M4 10h12" stroke="#186338" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="kid-add-label">Add Child</span>
+          </div>
+
+        </div>
+      </div>
+      <!-- END KIDS SECTION -->
+
+      <!-- Profile Bio -->
+      <div class="bio-section">
+        <div class="bio-label">Profile Bio</div>
+        <div class="bio-text">Hi, I'm James Martin, a proud parent of three wonderful kids who attend Lincoln Elementary School in Pre-K and Kindergarten. I love connecting with other parents and creating opportunities for our children to play and grow together. Whether it's organizing playdates or just hanging out at the park, I'm all about fostering friendships and making lasting memories for our little ones.</div>
+      </div>
+
+      <!-- Interests -->
+      <div class="interests-section">
+        <div class="interests-header">
+          <span class="interests-title">Interests</span>
+          <button class="interests-add">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M7 2v10M2 7h10" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="chips">
+          <span class="chip">Traditional Finance</span>
+          <span class="chip">Technology</span>
+          <span class="chip">Start-up</span>
+          <span class="chip">AI</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <button class="btn-next">Next</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

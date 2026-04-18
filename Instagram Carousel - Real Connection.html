@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Instagram Carousel: Real Connection</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #186338;
+    --green-dark: #1E3E2B;
+    --green-light: #E2E9E3;
+    --green-200: #77b691;
+    --cream: #F4F1EA;
+    --cream-deep: #EAE6DB;
+    --cream-darker: #DBD5C8;
+    --text-dark: #1a1a1a;
+    --text-mid: #4D525B;
+    --text-light: #818898;
+    --white: #ffffff;
+  }
+
+  body {
+    background: #2a2a2a;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    gap: 32px;
+  }
+
+  /* ── TOP LABEL ── */
+  .label {
+    color: #888;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── INSTAGRAM CHROME ── */
+  .ig-chrome {
+    width: 420px;
+    background: #111;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05);
+  }
+
+  .ig-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px 10px;
+    background: #111;
+  }
+  .ig-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--green), var(--green-dark));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    border: 2px solid rgba(255,255,255,0.15);
+  }
+  .ig-handle-block { flex: 1; }
+  .ig-handle { color: #fff; font-size: 12px; font-weight: 600; }
+  .ig-sub { color: #666; font-size: 10px; margin-top: 1px; }
+  .ig-more { color: #666; font-size: 18px; line-height: 1; }
+
+  /* ── SLIDE CONTAINER ── */
+  .slide-wrapper {
+    position: relative;
+    width: 420px;
+    height: 420px;
+    overflow: hidden;
+  }
+
+  .slides-track {
+    display: flex;
+    width: calc(420px * 7);
+    height: 420px;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .slide {
+    width: 420px;
+    height: 420px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 36px 32px;
+  }
+
+  /* Slide counter badge */
+  .slide-badge {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(8px);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    padding: 4px 10px;
+    border-radius: 99px;
+    letter-spacing: 0.04em;
+    z-index: 10;
+  }
+
+  /* ─── SLIDE 1: COVER ─── */
+  .slide-1 {
+    background: var(--green-dark);
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 40px 36px;
+  }
+  .slide-1 .bg-circle-1 {
+    position: absolute; top: -60px; right: -60px;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(24,99,56,0.6) 0%, transparent 70%);
+  }
+  .slide-1 .bg-circle-2 {
+    position: absolute; bottom: 20px; left: -80px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(119,182,145,0.15) 0%, transparent 70%);
+  }
+  .slide-1 .leaf-pattern {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background-image: radial-gradient(circle at 85% 15%, rgba(119,182,145,0.12) 0%, transparent 40%),
+                      radial-gradient(circle at 10% 80%, rgba(226,233,227,0.06) 0%, transparent 35%);
+  }
+  .slide-1 .tag {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--green-200);
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 2;
+  }
+  .slide-1 h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--cream);
+    position: relative;
+    z-index: 2;
+    margin-bottom: 20px;
+  }
+  .slide-1 h1 em {
+    font-style: italic;
+    color: var(--green-200);
+  }
+  .slide-1 .swipe-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: rgba(226,233,227,0.5);
+    font-family: 'DM Sans', sans-serif;
+    position: relative;
+    z-index: 2;
+  }
+  .slide-1 .swipe-hint .arrow {
+    font-size: 16px;
+    animation: nudge 2s ease-in-out infinite;
+  }
+  @keyframes nudge {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
+  }
+  .slide-1 .logo-mark {
+    position: absolute;
+    top: 28px;
+    left: 32px;
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+    z-index: 2;
+  }
+  .slide-1 .logo-mark span {
+    display: inline-block;
+    width: 7px; height: 7px;
+    background: var(--green-200);
+    border-radius: 50%;
+    margin-left: 3px;
+    vertical-align: middle;
+    position: relative;
+    top: -2px;
+  }
+
+  /* ─── SLIDES 2–6: CONTENT ─── */
+  .slide-content {
+    background: var(--cream);
+    align-items: flex-start;
+    justify-content: center;
+    padding: 44px 40px;
+  }
+  .slide-content .bg-blob {
+    position: absolute;
+    bottom: -40px; right: -40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: var(--green-light);
+    opacity: 0.6;
+  }
+  .slide-content .bg-blob-2 {
+    position: absolute;
+    top: -30px; left: -30px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: var(--cream-deep);
+  }
+  .slide-content .number {
+    font-family: 'Playfair Display', serif;
+    font-size: 80px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--green-light);
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    z-index: 1;
+    user-select: none;
+  }
+  .slide-content .icon {
+    font-size: 28px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+  }
+  .slide-content h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 27px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--green-dark);
+    position: relative;
+    z-index: 2;
+    margin-bottom: 16px;
+  }
+  .slide-content h2 em {
+    font-style: italic;
+    color: var(--green);
+  }
+  .slide-content p {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text-mid);
+    line-height: 1.65;
+    position: relative;
+    z-index: 2;
+  }
+  .slide-content .divider {
+    width: 40px;
+    height: 3px;
+    background: var(--green);
+    border-radius: 99px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+  }
+  /* Alternating bg for variety */
+  .slide-alt { background: var(--green-light); }
+  .slide-alt .bg-blob { background: var(--cream); }
+  .slide-alt .bg-blob-2 { background: rgba(255,255,255,0.5); }
+  .slide-alt .number { color: rgba(24,99,56,0.12); }
+
+  /* ─── SLIDE 7: CTA ─── */
+  .slide-cta {
+    background: var(--green);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 36px;
+  }
+  .slide-cta .cta-blob {
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .slide-cta .cta-blob-2 {
+    position: absolute;
+    bottom: -60px; left: -60px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .slide-cta .sprout-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .slide-cta .sprout-logo .dot {
+    width: 8px; height: 8px;
+    background: var(--green-200);
+    border-radius: 50%;
+  }
+  .slide-cta h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--cream);
+    line-height: 1.2;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 2;
+  }
+  .slide-cta h2 em {
+    font-style: italic;
+    color: var(--green-200);
+  }
+  .slide-cta p {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: rgba(244,241,234,0.75);
+    line-height: 1.6;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 2;
+  }
+  .slide-cta .cta-pill {
+    background: var(--cream);
+    color: var(--green-dark);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 12px 24px;
+    border-radius: 99px;
+    letter-spacing: 0.04em;
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .slide-cta .tagline {
+    margin-top: 20px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: rgba(244,241,234,0.45);
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ── PROGRESS DOTS ── */
+  .progress-dots {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 5px;
+    z-index: 20;
+  }
+  .dot {
+    width: 5px; height: 5px;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.35);
+    transition: all 0.3s ease;
+  }
+  .dot.active {
+    width: 18px;
+    background: white;
+  }
+
+  /* ── NAV ARROWS ── */
+  .nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(6px);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    font-size: 14px;
+    z-index: 20;
+    transition: background 0.2s;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .slide-wrapper:hover .nav-arrow { opacity: 1; pointer-events: all; }
+  .nav-arrow:hover { background: rgba(0,0,0,0.65); }
+  .nav-prev { left: 10px; }
+  .nav-next { right: 10px; }
+  .nav-arrow.hidden { opacity: 0 !important; pointer-events: none !important; }
+
+  /* ── IG FOOTER ── */
+  .ig-footer {
+    background: #111;
+    padding: 12px 16px 6px;
+  }
+  .ig-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+  .ig-icon { color: #ccc; font-size: 20px; cursor: pointer; transition: color 0.2s; }
+  .ig-icon:hover { color: white; }
+  .ig-icon.save { margin-left: auto; }
+  .ig-likes {
+    color: #ccc;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    margin-bottom: 5px;
+  }
+  .ig-caption {
+    color: #888;
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.5;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #222;
+    margin-bottom: 8px;
+  }
+  .ig-caption strong { color: #ccc; }
+  .ig-comments {
+    color: #555;
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+    padding-bottom: 8px;
+  }
+
+  /* ── CAPTION PANEL ── */
+  .caption-panel {
+    width: 420px;
+    background: #1a1a1a;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid #2a2a2a;
+  }
+  .caption-panel h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 12px;
+  }
+  .caption-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #ccc;
+    line-height: 1.7;
+  }
+  .caption-text .hashtags {
+    color: #4a9eff;
+    margin-top: 10px;
+    display: block;
+    font-size: 12px;
+  }
+
+</style>
+</head>
+<body>
+
+<p class="label">Sprout · Instagram Carousel · Real Connection</p>
+
+<!-- IG CHROME -->
+<div class="ig-chrome">
+
+  <!-- Header -->
+  <div class="ig-header">
+    <div class="ig-avatar">S</div>
+    <div class="ig-handle-block">
+      <div class="ig-handle">sprout.app</div>
+      <div class="ig-sub">Sponsored</div>
+    </div>
+    <div class="ig-more">···</div>
+  </div>
+
+  <!-- Slide Container -->
+  <div class="slide-wrapper" id="slideWrapper">
+
+    <div class="slides-track" id="slidesTrack">
+
+      <!-- SLIDE 1: COVER -->
+      <div class="slide slide-1">
+        <div class="bg-circle-1"></div>
+        <div class="bg-circle-2"></div>
+        <div class="leaf-pattern"></div>
+        <div class="logo-mark">Sprout<span></span></div>
+        <div class="tag">🌱 Real Connection</div>
+        <h1>Signs you've found your <em>parent crew</em></h1>
+        <div class="swipe-hint">
+          <span>Swipe to see if this is you</span>
+          <span class="arrow">→</span>
+        </div>
+        <div class="slide-badge">1 / 7</div>
+      </div>
+
+      <!-- SLIDE 2 -->
+      <div class="slide slide-content">
+        <div class="bg-blob"></div>
+        <div class="bg-blob-2"></div>
+        <div class="number">01</div>
+        <div class="icon">🍎</div>
+        <div class="divider"></div>
+        <h2>They know your kid's snack preferences better than <em>some relatives.</em></h2>
+        <p>No nut allergy forgotten. No "but they seemed fine with it last time" moments. They just know.</p>
+        <div class="slide-badge">2 / 7</div>
+      </div>
+
+      <!-- SLIDE 3 -->
+      <div class="slide slide-content slide-alt">
+        <div class="bg-blob"></div>
+        <div class="bg-blob-2"></div>
+        <div class="number">02</div>
+        <div class="icon">💬</div>
+        <div class="divider"></div>
+        <h2>The 11pm "is this <em>normal</em>??" text gets answered within minutes.</h2>
+        <p>Because they're also awake, also spiraling, and have probably been through the exact same thing.</p>
+        <div class="slide-badge">3 / 7</div>
+      </div>
+
+      <!-- SLIDE 4 -->
+      <div class="slide slide-content">
+        <div class="bg-blob"></div>
+        <div class="bg-blob-2"></div>
+        <div class="number">03</div>
+        <div class="icon">🏡</div>
+        <div class="divider"></div>
+        <h2>They show up to the playground without needing a <em>formal invite.</em></h2>
+        <p>"We were in the area" is code for "we missed you guys." And honestly, same.</p>
+        <div class="slide-badge">4 / 7</div>
+      </div>
+
+      <!-- SLIDE 5 -->
+      <div class="slide slide-content slide-alt">
+        <div class="bg-blob"></div>
+        <div class="bg-blob-2"></div>
+        <div class="number">04</div>
+        <div class="icon">😭</div>
+        <div class="divider"></div>
+        <h2>Your kids cry when it's time to leave. <em>So do you.</em> (secretly)</h2>
+        <p>You say "we'll do this again soon" and you both know you mean it this time.</p>
+        <div class="slide-badge">5 / 7</div>
+      </div>
+
+      <!-- SLIDE 6 -->
+      <div class="slide slide-content">
+        <div class="bg-blob"></div>
+        <div class="bg-blob-2"></div>
+        <div class="number">05</div>
+        <div class="icon">⏰</div>
+        <div class="divider"></div>
+        <h2>You've accidentally stayed <em>3 hours</em> past "we should really get going."</h2>
+        <p>Turns out time flies when you're with people who genuinely get it.</p>
+        <div class="slide-badge">6 / 7</div>
+      </div>
+
+      <!-- SLIDE 7: CTA -->
+      <div class="slide slide-cta">
+        <div class="cta-blob"></div>
+        <div class="cta-blob-2"></div>
+        <div class="sprout-logo">Sprout<div class="dot"></div></div>
+        <h2>That kind of lucky doesn't happen <em>by accident.</em></h2>
+        <p>Sprout helps parents find playdates, clubs, and genuine connection — right in their neighbourhood.</p>
+        <div class="cta-pill">🌱 Find your people</div>
+        <div class="tagline">Where parents bond and childhoods flourish.</div>
+        <div class="slide-badge">7 / 7</div>
+      </div>
+
+    </div><!-- /slides-track -->
+
+    <!-- Nav Arrows -->
+    <button class="nav-arrow nav-prev hidden" id="prevBtn" onclick="changeSlide(-1)">‹</button>
+    <button class="nav-arrow nav-next" id="nextBtn" onclick="changeSlide(1)">›</button>
+
+    <!-- Progress Dots -->
+    <div class="progress-dots" id="progressDots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+
+  </div><!-- /slide-wrapper -->
+
+  <!-- IG Footer -->
+  <div class="ig-footer">
+    <div class="ig-actions">
+      <span class="ig-icon">♡</span>
+      <span class="ig-icon">💬</span>
+      <span class="ig-icon">✈</span>
+      <span class="ig-icon save">🔖</span>
+    </div>
+    <div class="ig-likes">2,847 likes</div>
+    <div class="ig-caption">
+      <strong>sprout.app</strong> Signs you've found your parent crew 🌱 Save this and tag the parent who just gets it. 👇
+    </div>
+    <div class="ig-comments">View all 312 comments</div>
+  </div>
+
+</div><!-- /ig-chrome -->
+
+<!-- Caption Panel -->
+<div class="caption-panel">
+  <h3>Post Caption + Hashtags</h3>
+  <div class="caption-text">
+    Signs you've found your parent crew 🌱<br><br>
+    You know when you've found the right ones. The ones who text back at 11pm. Who show up without being asked. Who somehow remember that your kid won't eat anything green — except peas.<br><br>
+    That kind of friendship is rare. And it's exactly what Sprout is built for.<br><br>
+    Tag the parent who just gets it 👇 And if you're still looking for your crew — link in bio.
+    <span class="hashtags">#SproutApp #ParentCommunity #FindYourVillage #PlaydateMom #MomFriends #DadCommunity #ParentLife #GrowTogether #RealConnection #ParentingTogether #MomTribe #NewParent #PlaydateLife #ParentFriends #SproutParents</span>
+  </div>
+</div>
+
+<script>
+  let current = 0;
+  const total = 7;
+  const track = document.getElementById('slidesTrack');
+  const dots = document.querySelectorAll('.progress-dots .dot');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  function changeSlide(dir) {
+    const next = current + dir;
+    if (next < 0 || next >= total) return;
+    current = next;
+    track.style.transform = `translateX(-${current * 420}px)`;
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    prevBtn.classList.toggle('hidden', current === 0);
+    nextBtn.classList.toggle('hidden', current === total - 1);
+  }
+
+  // Swipe support
+  let startX = 0;
+  const wrapper = document.getElementById('slideWrapper');
+  wrapper.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+  wrapper.addEventListener('touchend', e => {
+    const diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) changeSlide(diff > 0 ? 1 : -1);
+  });
+
+  // Click to advance
+  wrapper.addEventListener('click', e => {
+    if (e.target.closest('.nav-arrow')) return;
+    const rect = wrapper.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    changeSlide(x > rect.width / 2 ? 1 : -1);
+  });
+</script>
+
+</body>
+</html>

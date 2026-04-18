@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Customize Profile Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── Reset ───────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Page canvas ─────────────────────────── */
+body {
+  background: #ddd9d0;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 40px;
+  padding: 48px 32px 80px;
+  font-family: 'Inter', sans-serif;
+  flex-wrap: wrap;
+}
+
+/* ── Variant labels ──────────────────────── */
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.col-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7a7060;
+}
+
+/* ── iPhone shell ────────────────────────── */
+.phone {
+  width: 393px;
+  height: 852px;
+  background: #f4f1ea;
+  border-radius: 54px;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.1),
+    0 8px 32px rgba(0,0,0,0.16),
+    0 40px 100px rgba(0,0,0,0.14);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+/* Dynamic Island */
+.dyn-island {
+  width: 120px; height: 34px;
+  background: #000;
+  border-radius: 20px;
+  position: absolute;
+  top: 12px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+}
+
+/* Status bar */
+.status {
+  height: 52px;
+  background: #f4f1ea;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 26px 10px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+.status-time { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+.status-icons { display: flex; align-items: center; gap: 5px; }
+.status-icons svg { width: 16px; height: 16px; }
+
+/* Nav */
+.nav {
+  height: 52px;
+  background: #f4f1ea;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  flex-shrink: 0;
+  position: relative;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.nav-back {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: #eae6db;
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.nav-back svg { width: 18px; height: 18px; }
+.nav-title {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  font-size: 15px; font-weight: 600; color: #1a1a1a;
+}
+.nav-save {
+  margin-left: auto;
+  font-size: 14px; font-weight: 600;
+  color: #186338;
+  background: none; border: none; cursor: pointer;
+}
+
+/* Progress */
+.progress-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 5px; padding: 12px 0 4px;
+  flex-shrink: 0;
+  background: #f4f1ea;
+}
+.prog-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #ccc8be;
+}
+.prog-dot.active {
+  width: 22px; border-radius: 3px;
+  background: #186338;
+}
+
+/* Scrollable body */
+.screen-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #f4f1ea;
+}
+.screen-body::-webkit-scrollbar { display: none; }
+
+/* ── SECTION BLOCKS ──────────────────────── */
+.section-block {
+  background: #fff;
+  border-radius: 20px;
+  margin: 8px 16px;
+  overflow: hidden;
+}
+.section-header {
+  padding: 14px 16px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #9e9485;
+}
+.section-edit-btn {
+  font-size: 12px;
+  font-weight: 600;
+  color: #186338;
+  background: none; border: none; cursor: pointer;
+  padding: 2px 8px;
+  background: #edf6f1;
+  border-radius: 20px;
+}
+
+/* ── PROFILE BLOCK ───────────────────────── */
+.profile-block {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.avatar-ring {
+  width: 72px; height: 72px;
+  border-radius: 22px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #186338, #2a9459);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  font-family: 'Playfair Display', serif;
+  border: 2.5px solid rgba(24,99,56,0.15);
+}
+.avatar-ring img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.avatar-edit-btn {
+  position: absolute;
+  bottom: -4px; right: -4px;
+  width: 24px; height: 24px;
+  border-radius: 8px;
+  background: #186338;
+  border: 2px solid #f4f1ea;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.avatar-edit-btn svg { width: 12px; height: 12px; fill: #fff; }
+
+.profile-info { flex: 1; }
+.profile-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 3px;
+}
+.profile-role {
+  font-size: 13px; color: #9e9485;
+  display: flex; align-items: center; gap: 4px;
+}
+.profile-role svg { width: 14px; height: 14px; fill: #186338; }
+
+/* ── BIO FIELD ───────────────────────────── */
+.bio-field {
+  margin: 0 16px 16px;
+  background: #f9f8f5;
+  border-radius: 14px;
+  padding: 12px 14px;
+  border: 1.5px solid #e6e2d8;
+  cursor: text;
+  transition: border-color 0.2s;
+}
+.bio-field:focus-within { border-color: #186338; }
+.bio-text {
+  font-size: 13px;
+  color: #4d525b;
+  line-height: 1.6;
+  outline: none;
+  width: 100%;
+  resize: none;
+  background: none;
+  border: none;
+  font-family: 'Inter', sans-serif;
+}
+.bio-char-count {
+  font-size: 10px; color: #c5beaf;
+  text-align: right; margin-top: 4px;
+}
+
+/* ── DIVIDER ─────────────────────────────── */
+.divider {
+  height: 1px; background: #f2efe8;
+  margin: 0 16px;
+}
+
+/* ── KIDS SECTION ────────────────────────── */
+.kids-section {
+  padding: 0 0 8px;
+}
+
+/* Kid card row */
+.kid-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  transition: background 0.15s;
+  cursor: pointer;
+  position: relative;
+}
+.kid-card:active { background: #f9f8f5; }
+.kid-card + .kid-card { border-top: 1px solid #f2efe8; }
+
+.kid-avatar {
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  position: relative;
+}
+.kid-avatar.green { background: linear-gradient(135deg, #d4eddf, #a8d5b5); }
+.kid-avatar.blue  { background: linear-gradient(135deg, #dce8fd, #adc8f5); }
+.kid-avatar.pink  { background: linear-gradient(135deg, #fce8f4, #f5b8e0); }
+
+.kid-info { flex: 1; }
+.kid-name {
+  font-size: 14px; font-weight: 600;
+  color: #1a1a1a; margin-bottom: 3px;
+}
+.kid-meta {
+  display: flex; align-items: center; gap: 6px;
+}
+.kid-age {
+  font-size: 11px; font-weight: 600;
+  color: #186338; background: #d4eddf;
+  padding: 2px 7px; border-radius: 20px;
+}
+.kid-dob { font-size: 11px; color: #9e9485; }
+
+.kid-chevron svg {
+  width: 16px; height: 16px;
+  stroke: #c5beaf;
+}
+
+/* Add child button */
+.add-kid-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px 4px;
+  cursor: pointer;
+  border-top: 1px solid #f2efe8;
+}
+.add-kid-icon {
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  background: #edf6f1;
+  border: 1.5px dashed #a8c9b5;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.add-kid-row:hover .add-kid-icon {
+  background: #d4eddf;
+  border-color: #186338;
+}
+.add-kid-icon svg { width: 20px; height: 20px; fill: #186338; }
+.add-kid-label { font-size: 14px; font-weight: 600; color: #186338; }
+
+/* ── INTERESTS SECTION ───────────────────── */
+.interests-section {
+  padding: 8px 16px 16px;
+}
+.tags-wrap {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 6px;
+}
+.tag {
+  font-size: 12px; font-weight: 500;
+  color: #4d525b;
+  background: #f2efe8;
+  border-radius: 20px;
+  padding: 5px 12px;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: all 0.15s;
+}
+.tag.active {
+  background: #edf6f1;
+  color: #186338;
+  border-color: #a8c9b5;
+  font-weight: 600;
+}
+.tag-add {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: #edf6f1;
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.tag-add svg { width: 14px; height: 14px; fill: #186338; }
+
+/* ── BOTTOM BAR ──────────────────────────── */
+.bottom-bar {
+  padding: 12px 20px 32px;
+  background: #f4f1ea;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  flex-shrink: 0;
+}
+.next-btn {
+  width: 100%;
+  height: 54px;
+  border-radius: 16px;
+  background: #186338;
+  color: #fff;
+  font-size: 16px; font-weight: 700;
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  box-shadow: 0 6px 20px rgba(24,99,56,0.28);
+  transition: all 0.2s;
+}
+.next-btn:hover { background: #1e7a46; transform: translateY(-1px); }
+.next-btn svg { width: 18px; height: 18px; fill: #fff; }
+
+/* Home indicator */
+.home-bar-wrap {
+  height: 32px; background: #f4f1ea;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.home-bar {
+  width: 134px; height: 5px;
+  background: #000; border-radius: 3px; opacity: 0.18;
+}
+
+/* ── COMPARISON: ORIGINAL ────────────────── */
+.original-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #fde8e8; color: #c0392b;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 20px;
+  margin-bottom: 8px;
+}
+.redesign-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #d4eddf; color: #186338;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+/* ── ANNOTATION PANEL ────────────────────── */
+.annotation-panel {
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 64px;
+}
+.anno {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  position: relative;
+}
+.anno::before {
+  content: '';
+  position: absolute;
+  left: -8px; top: 16px;
+  border: 6px solid transparent;
+  border-right-color: #fff;
+  border-left: none;
+}
+.anno-num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #186338; color: #fff;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 6px;
+}
+.anno-title { font-size: 12px; font-weight: 700; color: #1a1a1a; margin-bottom: 3px; }
+.anno-body { font-size: 11px; color: #7a7060; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     ORIGINAL (for comparison)
+═══════════════════════════════════ -->
+<div class="col">
+  <span class="original-chip">⚠ Original</span>
+  <div class="phone">
+    <div class="dyn-island"></div>
+    <div class="status">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 17 12" fill="#000"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+        <svg viewBox="0 0 25 12" fill="none"><rect x="0" y="1" width="22" height="10" rx="3" stroke="#000" stroke-width="1.5"/><rect x="22.5" y="3.5" width="2" height="5" rx="1" fill="#000"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="#000"/></svg>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nav-back"><svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <span class="nav-title">Customize Your Profile</span>
+    </div>
+
+    <!-- Original body approximation -->
+    <div class="screen-body" style="background:#f4f1ea; display:flex; flex-direction:column; align-items:center; padding:20px 24px;">
+      <!-- Profile photo -->
+      <div style="position:relative; margin-bottom:12px;">
+        <div style="width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#ccc,#999);overflow:hidden;border:3px solid #fff;">
+          <div style="width:100%;height:100%;background:#8b7355;display:flex;align-items:center;justify-content:center;font-size:32px;color:white;">👨</div>
+        </div>
+        <div style="position:absolute;bottom:0;right:0;width:26px;height:26px;border-radius:50%;background:#e8e4db;border:2px solid #f4f1ea;display:flex;align-items:center;justify-content:center;font-size:13px;">+</div>
+      </div>
+      <!-- Name -->
+      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#1a1a1a;margin-bottom:4px;">James Martin</div>
+      <div style="font-size:13px;color:#9e9485;margin-bottom:16px;">Father of 3 kids</div>
+      <!-- Kids row — original tiny style -->
+      <div style="display:flex;gap:16px;margin-bottom:20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:#e8e0d0;display:flex;align-items:center;justify-content:center;font-size:20px;">😊</div>
+          <div style="font-size:11px;font-weight:600;color:#1a1a1a;">Etan</div>
+          <div style="font-size:10px;color:#9e9485;">2 yrs</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:#fce8f4;display:flex;align-items:center;justify-content:center;font-size:20px;">😊</div>
+          <div style="font-size:11px;font-weight:600;color:#1a1a1a;">Olivia</div>
+          <div style="font-size:10px;color:#9e9485;">1 yrs</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:#dce8fd;display:flex;align-items:center;justify-content:center;font-size:20px;">😊</div>
+          <div style="font-size:11px;font-weight:600;color:#1a1a1a;">Erick</div>
+          <div style="font-size:10px;color:#9e9485;">6 yrs</div>
+        </div>
+      </div>
+      <!-- Bio -->
+      <div style="width:100%;background:#fff;border-radius:12px;padding:12px;margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:600;color:#186338;margin-bottom:6px;">Profile Bio</div>
+        <div style="font-size:12px;color:#4d525b;line-height:1.6;">James Martin is parent to Kenedy's in 73301. Passionate about active & sports, nature & outdoors, community. I love the spontaneous connections — bumping into other parents at the park.</div>
+      </div>
+      <!-- Interests -->
+      <div style="width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:13px;font-weight:500;color:#1a1a1a;">Interests (7/7)</div>
+        <div style="width:24px;height:24px;border-radius:50%;background:#edf6f1;display:flex;align-items:center;justify-content:center;font-size:14px;color:#186338;">+</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;width:100%;margin-bottom:8px;">
+        <span style="font-size:11px;background:#edf6f1;color:#186338;padding:4px 10px;border-radius:20px;font-weight:500;">Traditional Finance</span>
+        <span style="font-size:11px;background:#edf6f1;color:#186338;padding:4px 10px;border-radius:20px;font-weight:500;">Technology</span>
+        <span style="font-size:11px;background:#edf6f1;color:#186338;padding:4px 10px;border-radius:20px;font-weight:500;">Start-up</span>
+        <span style="font-size:11px;background:#edf6f1;color:#186338;padding:4px 10px;border-radius:20px;font-weight:500;">AI</span>
+        <span style="font-size:11px;background:#edf6f1;color:#186338;padding:4px 10px;border-radius:20px;font-weight:500;">Web 3</span>
+        <span style="font-size:11px;background:#edf6f1;color:#186338;padding:4px 10px;border-radius:20px;font-weight:500;">Finance</span>
+        <span style="font-size:11px;background:#edf6f1;color:#186338;padding:4px 10px;border-radius:20px;font-weight:500;">Marketing</span>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <button class="next-btn">Next <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+    </div>
+    <div class="home-bar-wrap"><div class="home-bar"></div></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════
+     REDESIGN — CARD SECTIONS
+═══════════════════════════════════ -->
+<div class="col">
+  <span class="redesign-chip">✦ Redesign</span>
+  <div class="phone" id="phone-redesign">
+    <div class="dyn-island"></div>
+
+    <div class="status">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 17 12" fill="#000"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+        <svg viewBox="0 0 25 12" fill="none"><rect x="0" y="1" width="22" height="10" rx="3" stroke="#000" stroke-width="1.5"/><rect x="22.5" y="3.5" width="2" height="5" rx="1" fill="#000"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="#000"/></svg>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="nav-back"><svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <span class="nav-title">My Profile</span>
+      <button class="nav-save">Save</button>
+    </div>
+
+    <div class="progress-row">
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot active"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+    </div>
+
+    <div class="screen-body">
+
+      <!-- ── Section 1: About You ── -->
+      <div style="padding: 12px 16px 0;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#9e9485;margin-bottom:8px;">About You</div>
+      </div>
+
+      <div class="section-block" style="margin-top:0;">
+        <div class="profile-block">
+          <div class="avatar-wrap">
+            <div class="avatar-ring" style="font-size:26px;">👨</div>
+            <div class="avatar-edit-btn">
+              <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+            </div>
+          </div>
+          <div class="profile-info">
+            <div class="profile-name">James Martin</div>
+            <div class="profile-role">
+              <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+              Austin, TX · Father of 3
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Bio editable -->
+        <div style="padding: 10px 16px 14px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#9e9485;margin-bottom:8px;">Bio</div>
+          <div class="bio-field">
+            <textarea class="bio-text" rows="3" oninput="updateCount(this)">Passionate about active & sports, nature & outdoors, community. Love bumping into other parents at the park.</textarea>
+            <div class="bio-char-count" id="bio-count">108 / 200</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Section 2: Your Kids ── -->
+      <div style="padding: 16px 16px 0;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#9e9485;margin-bottom:8px;">Your Children</div>
+      </div>
+
+      <div class="section-block" style="margin-top:0;">
+        <div class="kids-section">
+
+          <!-- Kid 1 -->
+          <div class="kid-card" onclick="openEdit('Etan')">
+            <div class="kid-avatar green">🦁</div>
+            <div class="kid-info">
+              <div class="kid-name">Etan</div>
+              <div class="kid-meta">
+                <span class="kid-age">2 yrs</span>
+                <span class="kid-dob">Born Mar 2022</span>
+              </div>
+            </div>
+            <div class="kid-chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
+          </div>
+
+          <!-- Kid 2 -->
+          <div class="kid-card" onclick="openEdit('Olivia')">
+            <div class="kid-avatar pink">🐰</div>
+            <div class="kid-info">
+              <div class="kid-name">Olivia</div>
+              <div class="kid-meta">
+                <span class="kid-age">1 yr</span>
+                <span class="kid-dob">Born Sep 2023</span>
+              </div>
+            </div>
+            <div class="kid-chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
+          </div>
+
+          <!-- Kid 3 -->
+          <div class="kid-card" onclick="openEdit('Erick')">
+            <div class="kid-avatar blue">🚀</div>
+            <div class="kid-info">
+              <div class="kid-name">Erick</div>
+              <div class="kid-meta">
+                <span class="kid-age">6 yrs</span>
+                <span class="kid-dob">Born Jan 2018</span>
+              </div>
+            </div>
+            <div class="kid-chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
+          </div>
+
+          <!-- Add child -->
+          <div class="add-kid-row" onclick="openAddSheet()">
+            <div class="add-kid-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+            <div class="add-kid-label">Add another child</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── Section 3: Interests ── -->
+      <div style="padding: 16px 16px 0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#9e9485;">Interests</div>
+          <div style="font-size:11px;color:#186338;font-weight:600;">7 selected</div>
+        </div>
+      </div>
+
+      <div class="section-block" style="margin-top:0;">
+        <div class="interests-section">
+          <div class="tags-wrap">
+            <span class="tag active">🏃 Active</span>
+            <span class="tag active">🌿 Nature</span>
+            <span class="tag active">🎨 Arts & Crafts</span>
+            <span class="tag active">⚽ Sports</span>
+            <span class="tag active">🎭 Community</span>
+            <span class="tag">🍕 Food & Dining</span>
+            <span class="tag">🎵 Music</span>
+            <span class="tag active">📚 Education</span>
+            <span class="tag">🎮 Gaming</span>
+            <span class="tag active">🌍 Outdoors</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:12px;"></div>
+    </div>
+
+    <div class="bottom-bar">
+      <button class="next-btn">
+        Save & Continue
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <div class="home-bar-wrap"><div class="home-bar"></div></div>
+
+    <!-- ── Edit Kid Sheet ── -->
+    <div id="edit-sheet-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity 0.3s;">
+      <div id="edit-sheet" style="width:100%;background:#fff;border-radius:28px 28px 0 0;padding:0 20px 32px;transform:translateY(100%);transition:transform 0.4s cubic-bezier(0.32,0.72,0,1);">
+        <div style="width:40px;height:4px;background:#e0dbd0;border-radius:2px;margin:12px auto 20px;"></div>
+        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#1a1a1a;margin-bottom:4px;" id="edit-sheet-title">Edit Etan</div>
+        <div style="font-size:13px;color:#9e9485;margin-bottom:20px;">Tap to edit your child's details</div>
+
+        <div style="display:flex;align-items:center;gap:16px;padding:14px;background:#f9f8f5;border-radius:16px;margin-bottom:16px;">
+          <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#d4eddf,#a8d5b5);display:flex;align-items:center;justify-content:center;font-size:26px;">🦁</div>
+          <div>
+            <div style="font-size:15px;font-weight:600;color:#1a1a1a;" id="sheet-kid-name">Etan</div>
+            <div style="font-size:12px;color:#9e9485;">Tap avatar to change</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#9e9485;margin-bottom:6px;">Name</div>
+          <input style="width:100%;height:48px;border-radius:12px;border:1.5px solid #e6e2d8;background:#faf9f6;padding:0 14px;font-size:15px;font-family:Inter,sans-serif;outline:none;" value="Etan" id="sheet-name-input">
+        </div>
+        <div style="margin-bottom:20px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#9e9485;margin-bottom:6px;">Date of Birth</div>
+          <input style="width:100%;height:48px;border-radius:12px;border:1.5px solid #e6e2d8;background:#faf9f6;padding:0 14px;font-size:15px;font-family:Inter,sans-serif;outline:none;" value="March 15, 2022">
+        </div>
+
+        <div style="display:flex;gap:10px;">
+          <button onclick="closeEdit()" style="flex:1;height:50px;border-radius:14px;background:#f2efe8;border:none;font-size:15px;font-weight:600;color:#7a7060;cursor:pointer;">Cancel</button>
+          <button onclick="closeEdit()" style="flex:2;height:50px;border-radius:14px;background:#186338;border:none;font-size:15px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 4px 16px rgba(24,99,56,0.25);">Save changes</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════
+     ANNOTATIONS
+═══════════════════════════════════ -->
+<div class="annotation-panel">
+  <div class="anno">
+    <div class="anno-num">1</div>
+    <div class="anno-title">Compact profile header</div>
+    <div class="anno-body">Name + location in a single horizontal row beside the avatar. Reduces vertical sprawl and feels more native iOS.</div>
+  </div>
+  <div class="anno">
+    <div class="anno-num">2</div>
+    <div class="anno-title">Editable bio field</div>
+    <div class="anno-body">Clearly a tappable text area with a visible border and character counter — not a passive display block.</div>
+  </div>
+  <div class="anno">
+    <div class="anno-num">3</div>
+    <div class="anno-title">Kids as interactive rows</div>
+    <div class="anno-body">Each child is a full-width tappable row with avatar, name, age badge, birthdate, and a chevron — clearly editable.</div>
+  </div>
+  <div class="anno">
+    <div class="anno-num">4</div>
+    <div class="anno-title">Clear "Add child" action</div>
+    <div class="anno-body">Dashed icon + labelled text at the bottom of the kids list. Unmissable, with a bottom sheet form on tap.</div>
+  </div>
+  <div class="anno">
+    <div class="anno-num">5</div>
+    <div class="anno-title">Section separation</div>
+    <div class="anno-body">Three white cards group: About You, Your Children, Interests. No visual ambiguity between parent vs. kids info.</div>
+  </div>
+  <div class="anno">
+    <div class="anno-num">6</div>
+    <div class="anno-title">Parenting-relevant interests</div>
+    <div class="anno-body">Tags are family-activity-oriented (Nature, Sports, Arts) not generic (Finance, Web3). Context-appropriate options.</div>
+  </div>
+</div>
+
+<script>
+function updateCount(el) {
+  const count = el.value.length;
+  document.getElementById('bio-count').textContent = count + ' / 200';
+}
+
+function openEdit(name) {
+  const overlay = document.getElementById('edit-sheet-overlay');
+  const sheet = document.getElementById('edit-sheet');
+  document.getElementById('edit-sheet-title').textContent = 'Edit ' + name;
+  document.getElementById('sheet-kid-name').textContent = name;
+  document.getElementById('sheet-name-input').value = name;
+  overlay.style.opacity = '1';
+  overlay.style.pointerEvents = 'all';
+  sheet.style.transform = 'translateY(0)';
+}
+
+function closeEdit() {
+  const overlay = document.getElementById('edit-sheet-overlay');
+  const sheet = document.getElementById('edit-sheet');
+  overlay.style.opacity = '0';
+  overlay.style.pointerEvents = 'none';
+  sheet.style.transform = 'translateY(100%)';
+}
+
+function openAddSheet() {
+  document.getElementById('edit-sheet-title').textContent = 'Add a child';
+  document.getElementById('sheet-kid-name').textContent = '';
+  document.getElementById('sheet-name-input').value = '';
+  const overlay = document.getElementById('edit-sheet-overlay');
+  const sheet = document.getElementById('edit-sheet');
+  overlay.style.opacity = '1';
+  overlay.style.pointerEvents = 'all';
+  sheet.style.transform = 'translateY(0)';
+}
+
+// Tag toggle
+document.querySelectorAll('.tag').forEach(tag => {
+  tag.addEventListener('click', () => tag.classList.toggle('active'));
+});
+</script>
+
+</body>
+</html>

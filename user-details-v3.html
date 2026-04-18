@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprout – Member Profile v3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #c9c0ae;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 52px 0 80px;
+      font-family: 'Inter', -apple-system, sans-serif;
+    }
+
+    /* ── Sprout tokens ── */
+    :root {
+      --brand-700: #1e3e2b;
+      --brand-600: #134f2d;
+      --brand-500: #186338;
+      --brand-100: #d0dacf;
+
+      --bg:     #f4f1ea;
+      --s1:     #eae6db;
+      --s2:     #dbd5c8;
+      --s3:     #c2b9a6;
+
+      --tp:  #4d525b;   /* primary   */
+      --ts:  #818898;   /* secondary */
+      --tt:  #b3b8c1;   /* tertiary  */
+      --tb:  #1e3e2b;   /* brand     */
+
+      --hr:  #eae6db;   /* hairline  */
+    }
+
+    /* ══════════════════════════════════════════ */
+    /*  PHONE SHELL                              */
+    /* ══════════════════════════════════════════ */
+    .phone {
+      width: 393px;
+      min-height: 852px;
+      background: var(--bg);
+      border-radius: 54px;
+      overflow: hidden;
+      position: relative;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.08),
+        0 0 0 10px #1c1c1e,
+        0 0 0 12px #2c2c2e,
+        0 60px 120px rgba(0,0,0,0.50),
+        0 24px 48px rgba(0,0,0,0.22);
+    }
+
+    .phone::before {
+      content: '';
+      position: absolute;
+      left: -13px; top: 118px;
+      width: 4px; height: 32px;
+      background: #2a2a2a; border-radius: 2px 0 0 2px;
+      box-shadow: 0 44px 0 #2a2a2a, 0 88px 0 #2a2a2a;
+    }
+    .phone::after {
+      content: '';
+      position: absolute;
+      right: -13px; top: 148px;
+      width: 4px; height: 66px;
+      background: #2a2a2a; border-radius: 0 2px 2px 0;
+    }
+
+    .island {
+      position: absolute;
+      top: 14px; left: 50%;
+      transform: translateX(-50%);
+      width: 120px; height: 34px;
+      background: #080808;
+      border-radius: 18px;
+      z-index: 100;
+    }
+
+    /* ══════════════════════════════════════════ */
+    /*  STATUS BAR                               */
+    /* ══════════════════════════════════════════ */
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px 0;
+    }
+
+    .s-time {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--tp);
+      letter-spacing: 0.1px;
+    }
+
+    .s-icons { display: flex; align-items: center; gap: 6px; }
+
+    /* ══════════════════════════════════════════ */
+    /*  TOP NAV                                  */
+    /* ══════════════════════════════════════════ */
+    .nav {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px 0;
+    }
+
+    .back {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--s1);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+
+    /* ══════════════════════════════════════════ */
+    /*  PROFILE AREA                             */
+    /* ══════════════════════════════════════════ */
+    .profile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 32px 20px;
+      text-align: center;
+    }
+
+    /* Photo */
+    .photo {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      border: 1.5px solid var(--s2);
+      background: var(--s2);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 16px;
+      flex-shrink: 0;
+    }
+
+    .photo::before {
+      content: '';
+      position: absolute;
+      top: 21%; left: 50%;
+      transform: translateX(-50%);
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: var(--s3);
+    }
+    .photo::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 50%;
+      transform: translateX(-50%);
+      width: 70px; height: 44px;
+      border-radius: 50% 50% 0 0;
+      background: var(--s3);
+    }
+
+    /* Name */
+    .name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--tb);
+      letter-spacing: -0.4px;
+      line-height: 1.2;
+      margin-bottom: 5px;
+    }
+
+    /* Relationship line */
+    .relation {
+      font-size: 14px;
+      color: var(--ts);
+      margin-bottom: 5px;
+    }
+
+    /* Location */
+    .location {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 12.5px;
+      color: var(--tt);
+      margin-bottom: 16px;
+    }
+
+    /* Met row */
+    .status-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .met {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--brand-500);
+      color: #fff;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 4px 11px 4px 8px;
+      border-radius: 99px;
+      letter-spacing: 0.05px;
+    }
+
+    .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--tt); }
+
+    .meets {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 12.5px; font-weight: 500; color: var(--ts);
+    }
+
+    /* ══════════════════════════════════════════ */
+    /*  HAIRLINE DIVIDER                         */
+    /* ══════════════════════════════════════════ */
+    .hr { height: 1px; background: var(--hr); margin: 0 24px; }
+
+    /* ══════════════════════════════════════════ */
+    /*  SECTION PATTERN                          */
+    /* ══════════════════════════════════════════ */
+    .sect { padding: 20px 24px; }
+
+    /* Micro-label — uppercase, spaced, tertiary */
+    .lbl {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--tt);
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      margin-bottom: 12px;
+    }
+
+    /* ══════════════════════════════════════════ */
+    /*  CHILDREN  — card style (matches ref)     */
+    /* ══════════════════════════════════════════ */
+    .kids {
+      display: flex;
+      gap: 8px;
+    }
+
+    .kid {
+      flex: 1;
+      background: var(--s1);
+      border-radius: 14px;
+      padding: 14px 8px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Emoji circle — sits inside the card */
+    .kid-face {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--s2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      margin-bottom: 8px;
+    }
+
+    .kid-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--tp);
+      margin-bottom: 3px;
+    }
+
+    .kid-age {
+      font-size: 11.5px;
+      color: var(--ts);
+    }
+
+    /* ══════════════════════════════════════════ */
+    /*  BIO  — plain text, no card               */
+    /* ══════════════════════════════════════════ */
+    .bio {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--ts);
+    }
+
+    .bio em {
+      font-style: italic;
+      color: var(--tt);
+    }
+
+    /* ══════════════════════════════════════════ */
+    /*  INTERESTS  — thin-border chips           */
+    /* ══════════════════════════════════════════ */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .chip {
+      border: 1px solid var(--s2);
+      border-radius: 99px;
+      padding: 5px 13px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--tp);
+      background: transparent;
+    }
+
+    /* ══════════════════════════════════════════ */
+    /*  EVENT  — minimal row, no card            */
+    /* ══════════════════════════════════════════ */
+    .event {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    /* Small thumbnail */
+    .ev-thumb {
+      width: 64px; height: 64px;
+      border-radius: 12px;
+      background: var(--s1);
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ev-thumb::before {
+      content: '';
+      position: absolute;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: 2px solid var(--s3);
+      top: 10px; left: 8px;
+    }
+    .ev-thumb::after {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid var(--s3);
+      bottom: 10px; right: 8px;
+    }
+
+    .ev-info { flex: 1; }
+
+    .ev-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--tp);
+      margin-bottom: 5px;
+      line-height: 1.3;
+    }
+
+    .ev-row {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 12px; color: var(--ts);
+      margin-bottom: 3px;
+    }
+    .ev-row:last-child { margin-bottom: 0; }
+
+    .ev-footer {
+      display: flex; justify-content: flex-end;
+      margin-top: 8px;
+    }
+
+    .dist {
+      font-size: 11px; font-weight: 500;
+      color: var(--ts);
+      background: var(--s1);
+      padding: 3px 10px;
+      border-radius: 99px;
+    }
+
+    /* ══════════════════════════════════════════ */
+    /*  CTA                                      */
+    /* ══════════════════════════════════════════ */
+    .cta {
+      padding: 0 24px 24px;
+      margin-top: 8px;
+    }
+
+    .btn {
+      width: 100%;
+      height: 54px;
+      background: var(--brand-500);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 99px;
+      cursor: pointer;
+      letter-spacing: -0.1px;
+      transition: background 0.14s, transform 0.1s;
+    }
+    .btn:hover  { background: var(--brand-600); }
+    .btn:active { transform: scale(0.98); background: var(--brand-700); }
+
+    .home {
+      width: 89px; height: 5px;
+      background: rgba(30,62,43,0.11);
+      border-radius: 3px;
+      margin: 14px auto 0;
+    }
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="island"></div>
+
+  <!-- STATUS BAR -->
+  <div class="status">
+    <span class="s-time">9:41</span>
+    <div class="s-icons">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
+        <rect x="0"  y="6"  width="3" height="6"  rx="1" fill="#4d525b"/>
+        <rect x="5"  y="4"  width="3" height="8"  rx="1" fill="#4d525b"/>
+        <rect x="10" y="2"  width="3" height="10" rx="1" fill="#4d525b"/>
+        <rect x="15" y="0"  width="3" height="12" rx="1" fill="#4d525b"/>
+      </svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <path d="M0.5 4.4 Q8 -1.2 15.5 4.4"  stroke="#4d525b" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M3.2 7.1 Q8  3.1 12.8 7.1"   stroke="#4d525b" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M5.8 9.8 Q8  7.9 10.2 9.8"   stroke="#4d525b" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="8" cy="11.5" r="1.5" fill="#4d525b"/>
+      </svg>
+      <svg width="27" height="13" viewBox="0 0 27 13" fill="none">
+        <rect x="0.5"  y="1"   width="23" height="11" rx="3"   stroke="#4d525b" stroke-width="1.5"/>
+        <rect x="23.5" y="4"   width="3"  height="5"  rx="1.5" fill="#4d525b" opacity="0.4"/>
+        <rect x="2"    y="2.5" width="17" height="8"  rx="1.5" fill="#4d525b"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav">
+    <div class="back">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+           stroke="#4d525b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 3 L5 8 L10 13"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="profile">
+    <div class="photo"></div>
+    <h1 class="name">Ronald Richard</h1>
+    <p class="relation">Etan, Olivia, and Erick&#8217;s dad</p>
+    <div class="location">
+      <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
+        <path d="M5 0C2.794 0 1 1.794 1 4C1 7 5 11 5 11C5 11 9 7 9 4C9 1.794 7.206 0 5 0ZM5 5.5C4.172 5.5 3.5 4.828 3.5 4C3.5 3.172 4.172 2.5 5 2.5C5.828 2.5 6.5 3.172 6.5 4C6.5 4.828 5.828 5.5 5 5.5Z"
+              fill="#b3b8c1"/>
+      </svg>
+      Texas, USA
+    </div>
+    <div class="status-row">
+      <div class="met">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+             stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1.5 6 L4.5 9 L10.5 3"/>
+        </svg>
+        Met
+      </div>
+      <div class="dot"></div>
+      <div class="meets">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
+             stroke="#818898" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="6.5" cy="4" r="2.5"/>
+          <path d="M1 12 C1.5 8.5 11.5 8.5 12 12"/>
+        </svg>
+        12 meets
+      </div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <!-- CHILDREN -->
+  <div class="sect">
+    <div class="lbl">Children</div>
+    <div class="kids">
+      <div class="kid">
+        <div class="kid-face">🧒</div>
+        <span class="kid-name">Etan</span>
+        <span class="kid-age">2 yrs</span>
+      </div>
+      <div class="kid">
+        <div class="kid-face">👧</div>
+        <span class="kid-name">Olivia</span>
+        <span class="kid-age">1 yr</span>
+      </div>
+      <div class="kid">
+        <div class="kid-face">🧒</div>
+        <span class="kid-name">Erick</span>
+        <span class="kid-age">6 yrs</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <!-- BIO -->
+  <div class="sect">
+    <div class="lbl">About</div>
+    <p class="bio">
+      James Martin is parent to Kenedy&#8217;s in 73301. Passionate about
+      active &amp; sports, nature &amp; outdoors, community.
+      <em>I love the spontaneous connections — bumping into other parents
+      at the park and realizing you have so much in common.</em>
+    </p>
+  </div>
+
+  <div class="hr"></div>
+
+  <!-- INTERESTS -->
+  <div class="sect">
+    <div class="lbl">Interests</div>
+    <div class="chips">
+      <span class="chip">Sports &amp; Outdoors</span>
+      <span class="chip">Community</span>
+      <span class="chip">Nature</span>
+      <span class="chip">Parenting</span>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <!-- EVENT HISTORY -->
+  <div class="sect">
+    <div class="lbl">Event History</div>
+    <div class="event">
+      <div class="ev-thumb"></div>
+      <div class="ev-info">
+        <div class="ev-title">Kids Art &amp; Craft Day</div>
+        <div class="ev-row">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+               stroke="#818898" stroke-width="1.2" stroke-linecap="round">
+            <rect x="1" y="2" width="10" height="9" rx="2" fill="none"/>
+            <line x1="3.5" y1="1"   x2="3.5" y2="3.5"/>
+            <line x1="8.5" y1="1"   x2="8.5" y2="3.5"/>
+            <line x1="1"   y1="4.8" x2="11"  y2="4.8" stroke-opacity="0.35"/>
+          </svg>
+          Mon, Feb 25 · 10:00am
+        </div>
+        <div class="ev-row">
+          <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
+            <path d="M5 0.5C2.794 0.5 1 2.238 1 4.375C1 7.563 5 11.5 5 11.5C5 11.5 9 7.563 9 4.375C9 2.238 7.206 0.5 5 0.5Z"
+                  stroke="#818898" stroke-width="1.1" fill="none"/>
+            <circle cx="5" cy="4.375" r="1.5" fill="#818898"/>
+          </svg>
+          Griffith Park, LA
+        </div>
+        <div class="ev-footer">
+          <span class="dist">2.1 mi</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <button class="btn">Continue</button>
+    <div class="home"></div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Splash v10 · Logo Motion Explorations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ─────────────────────────────────────
+   BRAND TOKENS — Sprout v2
+───────────────────────────────────── */
+:root {
+  --forest:   #1E4A35;
+  --sprout:   #3A8A62;
+  --sprout-d: #2D6E4E;
+  --sage:     #D6E8DC;
+  --cream:    #F0EDE6;
+  --cream-lt: #FAF9F6;
+  --cream-cd: #E3DDD6;
+  --ink:      #1C1C1A;
+  --stone:    #6B6860;
+  --stone-lt: #9E9B94;
+  --white:    #ffffff;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ─────────────────────────────────────
+   PRESENTATION LAYOUT
+───────────────────────────────────── */
+body {
+  background: #c8c3b8;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 52px;
+  padding: 64px 40px 100px;
+  font-family: 'Inter', sans-serif;
+  flex-wrap: wrap;
+}
+
+.wrap {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 14px;
+}
+.wrap-label {
+  font-size: 9.5px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: #5a5550;
+}
+
+.phone {
+  width: 393px; height: 852px;
+  border-radius: 54px; overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.09),
+    0 2px 6px rgba(0,0,0,0.05),
+    0 18px 48px rgba(0,0,0,0.11),
+    0 56px 120px rgba(0,0,0,0.20);
+}
+
+.screen {
+  width: 393px; height: 852px;
+  position: relative; overflow: hidden;
+  background: var(--cream);
+}
+
+/* Warm grain texture */
+.screen::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image:
+    radial-gradient(ellipse at 28% 16%, rgba(58,138,98,0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 72% 80%, rgba(30,74,53,0.04) 0%, transparent 50%);
+}
+
+/* ─────────────────────────────────────
+   CHROME — Status Bar, Island, Home
+───────────────────────────────────── */
+.status {
+  position: absolute; top: 0; left: 0; right: 0; height: 54px;
+  display: flex; align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 28px 10px;
+  z-index: 80; color: #2d3e35;
+}
+.st-time { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+.st-icons { display: flex; align-items: center; gap: 5px; }
+
+.di {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 34px;
+  background: #000; border-radius: 20px; z-index: 90;
+}
+
+.hi {
+  position: absolute; bottom: 8px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px; border-radius: 3px;
+  background: rgba(30,74,53,0.4); z-index: 90;
+}
+
+/* ─────────────────────────────────────
+   WORDMARK
+───────────────────────────────────── */
+.wordmark {
+  position: absolute;
+  top: 64px; left: 50%; transform: translateX(-50%);
+  z-index: 70; white-space: nowrap;
+  display: flex; align-items: center; gap: 6px;
+  opacity: 0;
+  animation: riseIn 0.35s ease-out 0.2s both;
+}
+.wm-label {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--forest);
+}
+
+/* ─────────────────────────────────────
+   LOGO ZONE
+───────────────────────────────────── */
+.logo-zone {
+  position: absolute;
+  top: 106px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex; flex-direction: column;
+  align-items: center;
+}
+
+/* ── App icon container (used in Var A & C) ── */
+.icon-wrap {
+  width: 172px; height: 172px;
+  border-radius: 38px;
+  overflow: hidden; flex-shrink: 0;
+  opacity: 0;
+  box-shadow:
+    0 14px 36px rgba(30,74,53,0.22),
+    0 4px 10px rgba(30,74,53,0.12),
+    0 1px 3px rgba(0,0,0,0.07);
+}
+
+/* ── Bare clover wrap (Var B) ── */
+.clover-wrap {
+  width: 224px; height: 224px;
+  display: flex; align-items: center;
+  justify-content: center; position: relative;
+  opacity: 0;
+}
+
+/* ─────────────────────────────────────
+   AMBIENT ELEMENTS
+───────────────────────────────────── */
+
+/* Glow aura — Variant A */
+.glow-aura {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 280px; height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse,
+    rgba(58,138,98,0.12) 0%,
+    rgba(214,232,220,0.08) 50%,
+    transparent 72%);
+  z-index: -1;
+  opacity: 0;
+}
+
+/* Dashed orbit ring — Variant B */
+.orbit-ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 290px; height: 290px;
+  border-radius: 50%;
+  border: 1.2px dashed rgba(30,74,53,0.13);
+  z-index: -1;
+  opacity: 0;
+}
+
+/* Floating shadow beneath icon — Variant C */
+.float-shadow {
+  position: absolute;
+  bottom: -20px; left: 50%;
+  transform: translateX(-50%);
+  width: 130px; height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(30,74,53,0.24) 0%, transparent 70%);
+  z-index: -1;
+  opacity: 0;
+}
+
+/* Botanical speck particles (all variants) */
+.speck {
+  position: absolute; z-index: 5;
+  border-radius: 50%;
+  opacity: 0;
+  animation: float var(--dur,8s) ease-in-out var(--del,3s) infinite,
+             fadeIn 0.8s ease var(--del,3s) forwards;
+}
+
+/* ─────────────────────────────────────
+   BOTTOM CONTENT PANEL
+───────────────────────────────────── */
+.bottom {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 22px 24px 0;
+  z-index: 30;
+}
+
+.eyebrow {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.11em; text-transform: uppercase;
+  color: var(--sprout);
+  opacity: 0;
+  animation: riseIn 0.3s ease-out 1.05s both;
+}
+
+.headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 38px; font-weight: 700;
+  line-height: 1.08; letter-spacing: -1px;
+  color: var(--ink);
+  margin-top: 6px;
+  opacity: 0;
+  clip-path: inset(0 100% 0 0 round 2px);
+  animation: wipeIn 0.36s ease-out 1.22s both;
+}
+
+.sub {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 400; font-style: italic;
+  line-height: 1.35; letter-spacing: -0.2px;
+  color: var(--sprout-d);
+  margin-top: 4px;
+  opacity: 0;
+  animation: riseIn 0.3s ease-out 1.46s both;
+}
+
+.divider {
+  height: 1px; margin: 14px 0 12px;
+  background: linear-gradient(90deg, transparent, rgba(30,74,53,0.11), transparent);
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out 1.6s both;
+}
+
+.features { display: flex; flex-direction: column; gap: 8px; }
+
+.feat {
+  display: flex; align-items: center; gap: 11px;
+  opacity: 0;
+  animation: riseIn 0.28s ease-out var(--fd, 1.64s) both;
+}
+.feat-icon {
+  width: 32px; height: 32px; border-radius: 9px;
+  background: var(--sage);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.feat-title { font-size: 12.5px; font-weight: 600; color: var(--ink); line-height: 1.2; }
+.feat-desc  { font-size: 11.5px; color: var(--stone); margin-top: 1px; }
+
+.cta {
+  margin-top: 16px; height: 52px; border-radius: 999px;
+  background: var(--forest);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 600; color: var(--white);
+  letter-spacing: 0.01em;
+  position: relative; overflow: hidden;
+  opacity: 0; cursor: pointer;
+  animation: riseIn 0.3s ease-out 1.82s both;
+}
+.cta::after {
+  content: '';
+  position: absolute; top: 0; bottom: 0; width: 60%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  transform: translateX(-180%);
+  animation: shimmer 1.4s ease 2.4s;
+}
+
+.signin {
+  text-align: center; margin-top: 10px; margin-bottom: 36px;
+  font-size: 12.5px; color: var(--stone);
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out 1.97s both;
+}
+.signin span { color: var(--forest); font-weight: 500; }
+
+/* ─────────────────────────────────────
+   EDITORIAL COPY — screenshot-style
+───────────────────────────────────── */
+.hl-wrap {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.8px;
+  margin-top: 6px;
+  opacity: 0;
+  clip-path: inset(0 100% 0 0 round 2px);
+  animation: wipeIn 0.42s ease-out 1.08s both;
+}
+.hl-reg {
+  font-size: 34px;
+  color: var(--ink);
+  font-style: normal;
+  display: block;
+}
+.hl-italic {
+  font-size: 34px;
+  color: var(--forest);
+  font-style: italic;
+  display: block;
+}
+
+.brand-quote {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px; font-weight: 400; font-style: italic;
+  line-height: 1.62; color: var(--stone);
+  margin-top: 13px;
+  opacity: 0;
+  animation: riseIn 0.3s ease-out 1.42s both;
+}
+
+.body-copy {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 400;
+  line-height: 1.7; color: var(--stone);
+  margin-top: 10px;
+  opacity: 0;
+  animation: riseIn 0.3s ease-out 1.62s both;
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   KEYFRAMES
+   CRITICAL: ALL timing functions hardcoded — never var()
+═══════════════════════════════════════════════════════ */
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes wipeIn {
+  from { clip-path: inset(0 100% 0 0 round 2px); opacity: 0.4; }
+  to   { clip-path: inset(0 0% 0 0 round 2px); opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes shimmer {
+  from { transform: translateX(-180%); }
+  to   { transform: translateX(180%); }
+}
+@keyframes float {
+  0%, 100% { transform: translate(0,0) rotate(0deg); }
+  50%       { transform: translate(var(--fx,4px), var(--fy,-12px)) rotate(var(--fr,5deg)); }
+}
+
+/* Icon spring entry */
+@keyframes iconEntry {
+  0%   { opacity: 0; transform: scale(0) translateY(0); }
+  62%  { opacity: 1; transform: scale(1.09) translateY(0); }
+  80%  { transform: scale(0.95) translateY(0); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ─────────────────────────────────────
+   VARIANT A — BREATHE & GLOW
+───────────────────────────────────── */
+@keyframes breathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50%       { transform: scale(1.046) translateY(0); }
+}
+@keyframes auraExpand {
+  0%, 100% { opacity: 0.28; transform: translate(-50%, -50%) scale(1); }
+  50%       { opacity: 0.52; transform: translate(-50%, -50%) scale(1.08); }
+}
+
+.var-a .clover-wrap {
+  animation:
+    iconEntry 0.46s cubic-bezier(0.34, 1.4, 0.64, 1) 0.42s both,
+    breathe 4.4s ease-in-out 0.88s infinite;
+}
+.var-a .glow-aura {
+  animation:
+    fadeIn 0.5s ease 0.55s both,
+    auraExpand 4.4s ease-in-out 0.88s infinite;
+}
+
+/* ─────────────────────────────────────
+   VARIANT B — LIVING LEAVES
+───────────────────────────────────── */
+
+/* Per-leaf entry keyframes */
+@keyframes leafN {
+  0%   { opacity: 0; transform: scale(0) rotate(-12deg); }
+  62%  { opacity: 1; transform: scale(1.08) rotate(2deg); }
+  80%  { transform: scale(0.96) rotate(0deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes leafE {
+  0%   { opacity: 0; transform: scale(0) rotate(12deg); }
+  62%  { opacity: 1; transform: scale(1.08) rotate(-2deg); }
+  80%  { transform: scale(0.96) rotate(0deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes leafS {
+  0%   { opacity: 0; transform: scale(0) rotate(-10deg); }
+  62%  { opacity: 1; transform: scale(1.08) rotate(2deg); }
+  80%  { transform: scale(0.96) rotate(0deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes leafW {
+  0%   { opacity: 0; transform: scale(0) rotate(10deg); }
+  62%  { opacity: 1; transform: scale(1.08) rotate(-2deg); }
+  80%  { transform: scale(0.96) rotate(0deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* Per-leaf sway — each leaf pivots from its junction at (0,0) */
+@keyframes swayN {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  35%  { transform: scale(1.026) rotate(2.2deg); }
+  68%  { transform: scale(1.012) rotate(-1.5deg); }
+}
+@keyframes swayE {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  42%  { transform: scale(1.026) rotate(-2.4deg); }
+  74%  { transform: scale(1.014) rotate(1.6deg); }
+}
+@keyframes swayS {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  28%  { transform: scale(1.026) rotate(-2.0deg); }
+  64%  { transform: scale(1.012) rotate(2.2deg); }
+}
+@keyframes swayW {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  46%  { transform: scale(1.026) rotate(2.4deg); }
+  78%  { transform: scale(1.014) rotate(-1.4deg); }
+}
+@keyframes centerBreathe {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.1); }
+}
+
+/* Var B clover wrapper becomes visible after leaves animate in */
+.var-b .clover-wrap {
+  animation: fadeIn 0.01s ease 0.45s both;
+}
+
+/* Leaves: entry animation → sway loop, seamlessly */
+.var-b .ln {
+  transform-box: fill-box; transform-origin: center 100%;
+  opacity: 0; transform: scale(0) rotate(-12deg);
+  animation:
+    leafN 0.38s cubic-bezier(0.34, 1.4, 0.64, 1) 0.52s both,
+    swayN 7.2s ease-in-out 0.90s infinite;
+}
+.var-b .le {
+  transform-box: fill-box; transform-origin: 0% center;
+  opacity: 0; transform: scale(0) rotate(12deg);
+  animation:
+    leafE 0.38s cubic-bezier(0.34, 1.4, 0.64, 1) 0.72s both,
+    swayE 8.4s ease-in-out 1.10s infinite;
+}
+.var-b .ls {
+  transform-box: fill-box; transform-origin: center 0%;
+  opacity: 0; transform: scale(0) rotate(-10deg);
+  animation:
+    leafS 0.38s cubic-bezier(0.34, 1.4, 0.64, 1) 0.92s both,
+    swayS 7.8s ease-in-out 1.30s infinite;
+}
+.var-b .lw {
+  transform-box: fill-box; transform-origin: 100% center;
+  opacity: 0; transform: scale(0) rotate(10deg);
+  animation:
+    leafW 0.38s cubic-bezier(0.34, 1.4, 0.64, 1) 1.12s both,
+    swayW 6.6s ease-in-out 1.50s infinite;
+}
+.var-b .cb {
+  transform-origin: center center;
+  opacity: 0;
+  animation:
+    fadeIn 0.32s cubic-bezier(0.34, 1.4, 0.64, 1) 1.28s both,
+    centerBreathe 5.2s ease-in-out 1.60s infinite;
+}
+
+/* Orbit ring fades in after leaves */
+.var-b .orbit-ring {
+  animation: fadeIn 0.5s ease 1.4s both;
+}
+
+/* ─────────────────────────────────────
+   VARIANT C — FLOAT & DRIFT
+───────────────────────────────────── */
+
+/* Organic float: vertical + subtle rotation = alive */
+@keyframes iconFloat {
+  0%, 100% { transform: scale(1) translateY(0px) rotate(0deg); }
+  25%       { transform: scale(1) translateY(-10px) rotate(1.8deg); }
+  50%       { transform: scale(1) translateY(-16px) rotate(0deg); }
+  75%       { transform: scale(1) translateY(-9px) rotate(-1.6deg); }
+}
+/* Ground shadow breathes inversely to float */
+@keyframes shadowBreathe {
+  0%, 100% { transform: translateX(-50%) scale(1);  opacity: 0.42; }
+  25%       { transform: translateX(-50%) scale(0.88); opacity: 0.28; }
+  50%       { transform: translateX(-50%) scale(0.74); opacity: 0.16; }
+  75%       { transform: translateX(-50%) scale(0.86); opacity: 0.26; }
+}
+/* Slow clockwise drift of the inner clover */
+@keyframes innerDrift {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.var-c .clover-wrap {
+  animation:
+    iconEntry 0.46s cubic-bezier(0.34, 1.4, 0.64, 1) 0.42s both,
+    iconFloat 6s ease-in-out 0.88s infinite;
+}
+.var-c .float-shadow {
+  animation:
+    fadeIn 0.4s ease 0.6s both,
+    shadowBreathe 6s ease-in-out 0.88s infinite;
+}
+/* Inner clover group drifts slowly */
+.var-c .c-inner {
+  animation: innerDrift 50s linear 1.2s infinite;
+  transform-origin: center center;
+  transform-box: fill-box;
+}
+
+</style>
+</head>
+<body>
+
+
+<!-- ════════════════════════════════════════════════════
+     VARIANT A · BREATHE & GLOW
+════════════════════════════════════════════════════ -->
+<div class="wrap">
+  <span class="wrap-label">A · Breathe &amp; Glow</span>
+  <div class="phone">
+    <div class="screen var-a">
+
+      <!-- Status bar -->
+      <div class="status">
+        <span class="st-time">9:41</span>
+        <div class="st-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none" aria-hidden="true">
+            <rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/>
+            <rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/>
+            <rect x="9" y="2" width="3" height="10" rx="1" fill="currentColor"/>
+            <rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/>
+          </svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true">
+            <path d="M8 10a1.5 1.5 0 100 2.5A1.5 1.5 0 008 10z" fill="currentColor"/>
+            <path d="M4.8 7.2A4.6 4.6 0 018 6a4.6 4.6 0 013.2 1.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+            <path d="M1.8 4.5A8 8 0 018 2.2a8 8 0 016.2 2.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+          </svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none" aria-hidden="true">
+            <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/>
+            <rect x="22.5" y="3.5" width="2" height="5" rx="1" fill="currentColor" fill-opacity="0.4"/>
+            <rect x="2" y="2" width="16" height="8" rx="2" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="di"></div>
+
+      <!-- Wordmark -->
+      <div class="wordmark">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-label="Sprout">
+          <path d="M8 8C8 8 5 5.5 5 3.2C5 1.7 6.2.5 7.5.5C7.78.5 8 .72 8 1C8 .72 8.22.5 8.5.5C9.8.5 11 1.7 11 3.2C11 5.5 8 8 8 8Z" fill="#1E4A35"/>
+          <path d="M8 8C8 8 10.5 5 12.8 5C14.3 5 15.5 6.2 15.5 7.5C15.5 7.78 15.28 8 15 8C15.28 8 15.5 8.22 15.5 8.5C15.5 9.8 14.3 11 12.8 11C10.5 11 8 8 8 8Z" fill="#1E4A35" opacity="0.7"/>
+          <path d="M8 8C8 8 11 10.5 11 12.8C11 14.3 9.8 15.5 8.5 15.5C8.22 15.5 8 15.28 8 15C8 15.28 7.78 15.5 7.5 15.5C6.2 15.5 5 14.3 5 12.8C5 10.5 8 8 8 8Z" fill="#1E4A35"/>
+          <path d="M8 8C8 8 5.5 11 3.2 11C1.7 11 .5 9.8 .5 8.5C.5 8.22 .72 8 1 8C.72 8 .5 7.78 .5 7.5C.5 6.2 1.7 5 3.2 5C5.5 5 8 8 8 8Z" fill="#1E4A35" opacity="0.7"/>
+        </svg>
+        <span class="wm-label">Sprout</span>
+      </div>
+
+      <!-- LOGO ZONE A: bare botanical clover with breathe + glow -->
+      <div class="logo-zone" style="position:absolute; top:92px; left:50%; transform:translateX(-50%); z-index:20; display:flex; flex-direction:column; align-items:center;">
+        <!-- Glow aura behind clover -->
+        <div class="glow-aura" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:300px; height:300px; border-radius:50%; background:radial-gradient(ellipse, rgba(58,138,98,0.13) 0%, rgba(214,232,220,0.08) 50%, transparent 72%); z-index:-1; opacity:0;"></div>
+        <!-- Bare botanical clover -->
+        <div class="clover-wrap">
+          <svg width="220" height="220" viewBox="-110 -110 220 220" fill="none" overflow="visible">
+            <defs>
+              <radialGradient id="gN-a" cx="38%" cy="65%" r="68%"><stop offset="0%" stop-color="#68be90"/><stop offset="32%" stop-color="#3a8a62"/><stop offset="66%" stop-color="#257248"/><stop offset="100%" stop-color="#1e4a35"/></radialGradient>
+              <radialGradient id="gE-a" cx="30%" cy="40%" r="66%"><stop offset="0%" stop-color="#62b888"/><stop offset="32%" stop-color="#347f5c"/><stop offset="68%" stop-color="#206944"/><stop offset="100%" stop-color="#1e4a35"/></radialGradient>
+              <radialGradient id="gS-a" cx="58%" cy="35%" r="65%"><stop offset="0%" stop-color="#6ac192"/><stop offset="28%" stop-color="#3c8c64"/><stop offset="66%" stop-color="#22704a"/><stop offset="100%" stop-color="#1e4a35"/></radialGradient>
+              <radialGradient id="gW-a" cx="62%" cy="58%" r="66%"><stop offset="0%" stop-color="#64ba8a"/><stop offset="30%" stop-color="#368660"/><stop offset="66%" stop-color="#1f6a42"/><stop offset="100%" stop-color="#1e4a35"/></radialGradient>
+              <filter id="lDrop-a" x="-18%" y="-18%" width="136%" height="136%">
+                <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="rgba(8,24,14,0.18)"/>
+              </filter>
+              <filter id="cDrop-a"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(8,24,14,0.26)"/></filter>
+            </defs>
+            <g transform="scale(1.1)">
+              <g filter="url(#lDrop-a)">
+                <path d="M 0,0 C -10,-5 -50,-18 -50,-44 C -50,-66 -26,-80 -10,-82 C -4,-84 0,-80 0,-80 C 0,-80 4,-84 10,-82 C 26,-80 50,-66 50,-44 C 50,-18 10,-5 0,0 Z" fill="url(#gN-a)"/>
+                <path d="M -36,-42 C -20,-33 -7,-29 0,-29 C 7,-29 20,-33 36,-42" stroke="rgba(255,255,255,0.16)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              </g>
+              <g filter="url(#lDrop-a)">
+                <path d="M 0,0 C 5,-10 18,-50 44,-50 C 66,-50 80,-26 82,-10 C 84,-4 80,0 80,0 C 80,0 84,4 82,10 C 80,26 66,50 44,50 C 18,50 5,10 0,0 Z" fill="url(#gE-a)"/>
+                <path d="M 42,36 C 36,22 32,8 32,0 C 32,-8 36,-22 42,-36" stroke="rgba(255,255,255,0.16)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              </g>
+              <g filter="url(#lDrop-a)">
+                <path d="M 0,0 C 10,5 50,18 50,44 C 50,66 26,80 10,82 C 4,84 0,80 0,80 C 0,80 -4,84 -10,82 C -26,80 -50,66 -50,44 C -50,18 -10,5 0,0 Z" fill="url(#gS-a)"/>
+                <path d="M 36,42 C 20,33 7,29 0,29 C -7,29 -20,33 -36,42" stroke="rgba(255,255,255,0.16)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              </g>
+              <g filter="url(#lDrop-a)">
+                <path d="M 0,0 C -5,-10 -18,-50 -44,-50 C -66,-50 -80,-26 -82,-10 C -84,-4 -80,0 -80,0 C -80,0 -84,4 -82,10 C -80,26 -66,50 -44,50 C -18,50 -5,10 0,0 Z" fill="url(#gW-a)"/>
+                <path d="M -42,36 C -36,22 -32,8 -32,0 C -32,-8 -36,-22 -42,-36" stroke="rgba(255,255,255,0.16)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              </g>
+              <g filter="url(#cDrop-a)">
+                <circle r="14" fill="#1e4a35"/>
+                <circle r="10" fill="#2e7a52"/>
+                <circle r="6.5" fill="#5aaa80"/>
+                <circle r="2.8" fill="rgba(255,255,255,0.6)"/>
+              </g>
+              <g opacity="0" style="animation: fadeIn 0.3s ease 1.1s both;">
+                <circle cx="-22" cy="-54" r="4.5" fill="rgba(255,255,255,0.55)"/>
+                <circle cx="-20" cy="-52" r="1.6" fill="rgba(255,255,255,0.82)"/>
+                <circle cx="54" cy="-14" r="3.5" fill="rgba(255,255,255,0.5)"/>
+                <circle cx="16" cy="56" r="4" fill="rgba(255,255,255,0.52)"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <!-- Ambient specks -->
+        <div class="speck" style="width:7px;height:7px;background:rgba(30,74,53,0.14);top:-30px;left:-110px;--dur:8s;--del:2.8s;--fx:5px;--fy:-10px;--fr:6deg;"></div>
+        <div class="speck" style="width:5px;height:5px;background:rgba(58,138,98,0.18);top:20px;right:-100px;--dur:11s;--del:3.4s;--fx:-4px;--fy:-14px;--fr:-5deg;"></div>
+        <div class="speck" style="width:6px;height:6px;background:rgba(30,74,53,0.11);top:160px;left:-80px;--dur:9s;--del:3.8s;--fx:6px;--fy:-8px;--fr:8deg;"></div>
+      </div>
+
+      <!-- Bottom content -->
+      <div class="bottom">
+        <div class="hl-wrap">
+          <span class="hl-reg">Where parents bond,</span>
+          <span class="hl-italic">childhoods flourish.</span>
+        </div>
+        <div class="brand-quote">"You got lucky when you found these people. Sprout is where that luck happens."</div>
+        <div class="body-copy">Find events, join clubs, and build the friendships your family deserves — all in the neighborhood your kids call home.</div>
+        <div class="cta" role="button">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 7C7 7 4.5 4.8 4.5 2.8C4.5 1.6 5.5.6 6.7.6C6.9.6 7 .75 7 .9C7 .75 7.1.6 7.3.6C8.5.6 9.5 1.6 9.5 2.8C9.5 4.8 7 7 7 7Z" fill="white"/><path d="M7 7C7 7 9.2 4.5 11.2 4.5C12.4 4.5 13.4 5.5 13.4 6.7C13.4 6.9 13.25 7 13.1 7C13.25 7 13.4 7.1 13.4 7.3C13.4 8.5 12.4 9.5 11.2 9.5C9.2 9.5 7 7 7 7Z" fill="white" opacity="0.7"/><path d="M7 7C7 7 9.5 9.2 9.5 11.2C9.5 12.4 8.5 13.4 7.3 13.4C7.1 13.4 7 13.25 7 13.1C7 13.25 6.9 13.4 6.7 13.4C5.5 13.4 4.5 12.4 4.5 11.2C4.5 9.2 7 7 7 7Z" fill="white"/><path d="M7 7C7 7 4.8 9.5 2.8 9.5C1.6 9.5.6 8.5.6 7.3C.6 7.1.75 7 .9 7C.75 7 .6 6.9.6 6.7C.6 5.5 1.6 4.5 2.8 4.5C4.8 4.5 7 7 7 7Z" fill="white" opacity="0.7"/></svg>
+          Find my village
+        </div>
+        <div class="signin">Already a member? <span>Sign in</span></div>
+      </div>
+
+      <div class="hi"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════
+     VARIANT B · LIVING LEAVES
+════════════════════════════════════════════════════ -->
+<div class="wrap">
+  <span class="wrap-label">B · Living Leaves</span>
+  <div class="phone">
+    <div class="screen var-b">
+
+      <!-- Status bar -->
+      <div class="status">
+        <span class="st-time">9:41</span>
+        <div class="st-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/><rect x="9" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 10a1.5 1.5 0 100 2.5A1.5 1.5 0 008 10z" fill="currentColor"/><path d="M4.8 7.2A4.6 4.6 0 018 6a4.6 4.6 0 013.2 1.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/><path d="M1.8 4.5A8 8 0 018 2.2a8 8 0 016.2 2.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="22.5" y="3.5" width="2" height="5" rx="1" fill="currentColor" fill-opacity="0.4"/><rect x="2" y="2" width="16" height="8" rx="2" fill="currentColor"/></svg>
+        </div>
+      </div>
+      <div class="di"></div>
+
+      <!-- Wordmark -->
+      <div class="wordmark">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 8C8 8 5 5.5 5 3.2C5 1.7 6.2.5 7.5.5C7.78.5 8 .72 8 1C8 .72 8.22.5 8.5.5C9.8.5 11 1.7 11 3.2C11 5.5 8 8 8 8Z" fill="#1E4A35"/><path d="M8 8C8 8 10.5 5 12.8 5C14.3 5 15.5 6.2 15.5 7.5C15.5 7.78 15.28 8 15 8C15.28 8 15.5 8.22 15.5 8.5C15.5 9.8 14.3 11 12.8 11C10.5 11 8 8 8 8Z" fill="#1E4A35" opacity="0.7"/><path d="M8 8C8 8 11 10.5 11 12.8C11 14.3 9.8 15.5 8.5 15.5C8.22 15.5 8 15.28 8 15C8 15.28 7.78 15.5 7.5 15.5C6.2 15.5 5 14.3 5 12.8C5 10.5 8 8 8 8Z" fill="#1E4A35"/><path d="M8 8C8 8 5.5 11 3.2 11C1.7 11 .5 9.8 .5 8.5C.5 8.22 .72 8 1 8C.72 8 .5 7.78 .5 7.5C.5 6.2 1.7 5 3.2 5C5.5 5 8 8 8 8Z" fill="#1E4A35" opacity="0.7"/></svg>
+        <span class="wm-label">Sprout</span>
+      </div>
+
+      <!-- LOGO ZONE B: bare botanical clover, leaves animate independently -->
+      <div style="position:absolute; top:92px; left:50%; transform:translateX(-50%); z-index:20; display:flex; flex-direction:column; align-items:center;">
+        <!-- Dashed orbit ring -->
+        <div class="orbit-ring" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:290px;height:290px;border-radius:50%;border:1.2px dashed rgba(30,74,53,0.13);z-index:-1;opacity:0;"></div>
+        <!-- Bare clover SVG - larger, botanical feel -->
+        <div class="clover-wrap">
+          <svg width="220" height="220" viewBox="-110 -110 220 220"
+               fill="none" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+            <defs>
+              <!-- Leaf gradients for botanical depth -->
+              <radialGradient id="gN-b" cx="38%" cy="65%" r="68%">
+                <stop offset="0%"   stop-color="#68be90"/>
+                <stop offset="32%"  stop-color="#3a8a62"/>
+                <stop offset="66%"  stop-color="#257248"/>
+                <stop offset="100%" stop-color="#1e4a35"/>
+              </radialGradient>
+              <radialGradient id="gE-b" cx="30%" cy="40%" r="66%">
+                <stop offset="0%"   stop-color="#62b888"/>
+                <stop offset="32%"  stop-color="#347f5c"/>
+                <stop offset="68%"  stop-color="#206944"/>
+                <stop offset="100%" stop-color="#1e4a35"/>
+              </radialGradient>
+              <radialGradient id="gS-b" cx="58%" cy="35%" r="65%">
+                <stop offset="0%"   stop-color="#6ac192"/>
+                <stop offset="28%"  stop-color="#3c8c64"/>
+                <stop offset="66%"  stop-color="#22704a"/>
+                <stop offset="100%" stop-color="#1e4a35"/>
+              </radialGradient>
+              <radialGradient id="gW-b" cx="62%" cy="58%" r="66%">
+                <stop offset="0%"   stop-color="#64ba8a"/>
+                <stop offset="30%"  stop-color="#368660"/>
+                <stop offset="66%"  stop-color="#1f6a42"/>
+                <stop offset="100%" stop-color="#1e4a35"/>
+              </radialGradient>
+              <filter id="lDrop-b" x="-18%" y="-18%" width="136%" height="136%">
+                <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="rgba(8,24,14,0.18)"/>
+              </filter>
+              <filter id="cDrop-b">
+                <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(8,24,14,0.26)"/>
+              </filter>
+            </defs>
+
+            <!-- Clover at scale(1.1) for editorial size -->
+            <g transform="scale(1.1)">
+
+              <!-- N leaf -->
+              <g class="ln" filter="url(#lDrop-b)">
+                <path d="M 0,0 C -10,-5 -50,-18 -50,-44 C -50,-66 -26,-80 -10,-82 C -4,-84 0,-80 0,-80 C 0,-80 4,-84 10,-82 C 26,-80 50,-66 50,-44 C 50,-18 10,-5 0,0 Z" fill="url(#gN-b)"/>
+                <!-- Chevron marking -->
+                <path d="M -36,-42 C -20,-33 -7,-29 0,-29 C 7,-29 20,-33 36,-42" stroke="rgba(255,255,255,0.16)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              </g>
+
+              <!-- E leaf -->
+              <g class="le" filter="url(#lDrop-b)">
+                <path d="M 0,0 C 5,-10 18,-50 44,-50 C 66,-50 80,-26 82,-10 C 84,-4 80,0 80,0 C 80,0 84,4 82,10 C 80,26 66,50 44,50 C 18,50 5,10 0,0 Z" fill="url(#gE-b)"/>
+                <path d="M 42,36 C 36,22 32,8 32,0 C 32,-8 36,-22 42,-36" stroke="rgba(255,255,255,0.16)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              </g>
+
+              <!-- S leaf -->
+              <g class="ls" filter="url(#lDrop-b)">
+                <path d="M 0,0 C 10,5 50,18 50,44 C 50,66 26,80 10,82 C 4,84 0,80 0,80 C 0,80 -4,84 -10,82 C -26,80 -50,66 -50,44 C -50,18 -10,5 0,0 Z" fill="url(#gS-b)"/>
+                <path d="M 36,42 C 20,33 7,29 0,29 C -7,29 -20,33 -36,42" stroke="rgba(255,255,255,0.16)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              </g>
+
+              <!-- W leaf -->
+              <g class="lw" filter="url(#lDrop-b)">
+                <path d="M 0,0 C -5,-10 -18,-50 -44,-50 C -66,-50 -80,-26 -82,-10 C -84,-4 -80,0 -80,0 C -80,0 -84,4 -82,10 C -80,26 -66,50 -44,50 C -18,50 -5,10 0,0 Z" fill="url(#gW-b)"/>
+                <path d="M -42,36 C -36,22 -32,8 -32,0 C -32,-8 -36,-22 -42,-36" stroke="rgba(255,255,255,0.16)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              </g>
+
+              <!-- Center boss -->
+              <g class="cb" filter="url(#cDrop-b)">
+                <circle r="14" fill="#1e4a35"/>
+                <circle r="10" fill="#2e7a52"/>
+                <circle r="6.5" fill="#5aaa80"/>
+                <circle r="2.8" fill="rgba(255,255,255,0.6)"/>
+              </g>
+
+              <!-- Dew drops -->
+              <g opacity="0" style="animation: fadeIn 0.3s ease 1.5s both;">
+                <circle cx="-22" cy="-54" r="4.5" fill="rgba(255,255,255,0.58)"/>
+                <circle cx="-20" cy="-52" r="1.6" fill="rgba(255,255,255,0.85)"/>
+                <circle cx="54" cy="-14" r="3.8" fill="rgba(255,255,255,0.52)"/>
+                <circle cx="16" cy="56" r="4" fill="rgba(255,255,255,0.55)"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <!-- Floating particles -->
+        <div class="speck" style="width:6px;height:6px;background:rgba(30,74,53,0.14);top:-20px;left:-120px;--dur:8s;--del:2.6s;--fx:5px;--fy:-12px;--fr:7deg;"></div>
+        <div class="speck" style="width:5px;height:5px;background:rgba(58,138,98,0.18);top:30px;right:-110px;--dur:10s;--del:3.2s;--fx:-3px;--fy:-15px;--fr:-6deg;"></div>
+        <div class="speck" style="width:4px;height:4px;background:rgba(30,74,53,0.11);top:190px;left:-95px;--dur:9s;--del:3.8s;--fx:4px;--fy:-8px;--fr:9deg;"></div>
+      </div>
+
+      <!-- Bottom content — same as A -->
+      <div class="bottom">
+        <div class="hl-wrap">
+          <span class="hl-reg">Where parents bond,</span>
+          <span class="hl-italic">childhoods flourish.</span>
+        </div>
+        <div class="brand-quote">"You got lucky when you found these people. Sprout is where that luck happens."</div>
+        <div class="body-copy">Find events, join clubs, and build the friendships your family deserves — all in the neighborhood your kids call home.</div>
+        <div class="cta" role="button">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 7C7 7 4.5 4.8 4.5 2.8C4.5 1.6 5.5.6 6.7.6C6.9.6 7 .75 7 .9C7 .75 7.1.6 7.3.6C8.5.6 9.5 1.6 9.5 2.8C9.5 4.8 7 7 7 7Z" fill="white"/><path d="M7 7C7 7 9.2 4.5 11.2 4.5C12.4 4.5 13.4 5.5 13.4 6.7C13.4 6.9 13.25 7 13.1 7C13.25 7 13.4 7.1 13.4 7.3C13.4 8.5 12.4 9.5 11.2 9.5C9.2 9.5 7 7 7 7Z" fill="white" opacity="0.7"/><path d="M7 7C7 7 9.5 9.2 9.5 11.2C9.5 12.4 8.5 13.4 7.3 13.4C7.1 13.4 7 13.25 7 13.1C7 13.25 6.9 13.4 6.7 13.4C5.5 13.4 4.5 12.4 4.5 11.2C4.5 9.2 7 7 7 7Z" fill="white"/><path d="M7 7C7 7 4.8 9.5 2.8 9.5C1.6 9.5.6 8.5.6 7.3C.6 7.1.75 7 .9 7C.75 7 .6 6.9.6 6.7C.6 5.5 1.6 4.5 2.8 4.5C4.8 4.5 7 7 7 7Z" fill="white" opacity="0.7"/></svg>
+          Find my village
+        </div>
+        <div class="signin">Already a member? <span>Sign in</span></div>
+      </div>
+
+      <div class="hi"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════
+     VARIANT C · FLOAT & DRIFT
+════════════════════════════════════════════════════ -->
+<div class="wrap">
+  <span class="wrap-label">C · Float &amp; Drift</span>
+  <div class="phone">
+    <div class="screen var-c">
+
+      <!-- Status bar -->
+      <div class="status">
+        <span class="st-time">9:41</span>
+        <div class="st-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/><rect x="9" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 10a1.5 1.5 0 100 2.5A1.5 1.5 0 008 10z" fill="currentColor"/><path d="M4.8 7.2A4.6 4.6 0 018 6a4.6 4.6 0 013.2 1.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/><path d="M1.8 4.5A8 8 0 018 2.2a8 8 0 016.2 2.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="22.5" y="3.5" width="2" height="5" rx="1" fill="currentColor" fill-opacity="0.4"/><rect x="2" y="2" width="16" height="8" rx="2" fill="currentColor"/></svg>
+        </div>
+      </div>
+      <div class="di"></div>
+
+      <!-- Wordmark -->
+      <div class="wordmark">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 8C8 8 5 5.5 5 3.2C5 1.7 6.2.5 7.5.5C7.78.5 8 .72 8 1C8 .72 8.22.5 8.5.5C9.8.5 11 1.7 11 3.2C11 5.5 8 8 8 8Z" fill="#1E4A35"/><path d="M8 8C8 8 10.5 5 12.8 5C14.3 5 15.5 6.2 15.5 7.5C15.5 7.78 15.28 8 15 8C15.28 8 15.5 8.22 15.5 8.5C15.5 9.8 14.3 11 12.8 11C10.5 11 8 8 8 8Z" fill="#1E4A35" opacity="0.7"/><path d="M8 8C8 8 11 10.5 11 12.8C11 14.3 9.8 15.5 8.5 15.5C8.22 15.5 8 15.28 8 15C8 15.28 7.78 15.5 7.5 15.5C6.2 15.5 5 14.3 5 12.8C5 10.5 8 8 8 8Z" fill="#1E4A35"/><path d="M8 8C8 8 5.5 11 3.2 11C1.7 11 .5 9.8 .5 8.5C.5 8.22 .72 8 1 8C.72 8 .5 7.78 .5 7.5C.5 6.2 1.7 5 3.2 5C5.5 5 8 8 8 8Z" fill="#1E4A35" opacity="0.7"/></svg>
+        <span class="wm-label">Sprout</span>
+      </div>
+
+      <!-- LOGO ZONE C: bare botanical clover, floats + inner slow drift -->
+      <div style="position:absolute; top:92px; left:50%; transform:translateX(-50%); z-index:20; display:flex; flex-direction:column; align-items:center;">
+        <!-- Ground shadow -->
+        <div class="float-shadow" style="position:absolute; bottom:-20px; left:50%; transform:translateX(-50%); width:130px; height:20px; border-radius:50%; background:radial-gradient(ellipse, rgba(30,74,53,0.22) 0%, transparent 70%); z-index:-1; opacity:0;"></div>
+        <!-- Bare botanical clover — inner group drifts slowly -->
+        <div class="clover-wrap">
+          <svg width="220" height="220" viewBox="-110 -110 220 220" fill="none" overflow="visible">
+            <defs>
+              <radialGradient id="gN-c" cx="38%" cy="65%" r="68%"><stop offset="0%" stop-color="#68be90"/><stop offset="32%" stop-color="#3a8a62"/><stop offset="66%" stop-color="#257248"/><stop offset="100%" stop-color="#1e4a35"/></radialGradient>
+              <radialGradient id="gE-c" cx="30%" cy="40%" r="66%"><stop offset="0%" stop-color="#62b888"/><stop offset="32%" stop-color="#347f5c"/><stop offset="68%" stop-color="#206944"/><stop offset="100%" stop-color="#1e4a35"/></radialGradient>
+              <radialGradient id="gS-c" cx="58%" cy="35%" r="65%"><stop offset="0%" stop-color="#6ac192"/><stop offset="28%" stop-color="#3c8c64"/><stop offset="66%" stop-color="#22704a"/><stop offset="100%" stop-color="#1e4a35"/></radialGradient>
+              <radialGradient id="gW-c" cx="62%" cy="58%" r="66%"><stop offset="0%" stop-color="#64ba8a"/><stop offset="30%" stop-color="#368660"/><stop offset="66%" stop-color="#1f6a42"/><stop offset="100%" stop-color="#1e4a35"/></radialGradient>
+              <filter id="lDrop-c" x="-18%" y="-18%" width="136%" height="136%">
+                <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="rgba(8,24,14,0.18)"/>
+              </filter>
+              <filter id="cDrop-c"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(8,24,14,0.26)"/></filter>
+            </defs>
+            <!-- c-inner group rotates very slowly for a subtle drift -->
+            <g class="c-inner" transform="scale(1.1)">
+              <g filter="url(#lDrop-c)">
+                <path d="M 0,0 C -10,-5 -50,-18 -50,-44 C -50,-66 -26,-80 -10,-82 C -4,-84 0,-80 0,-80 C 0,-80 4,-84 10,-82 C 26,-80 50,-66 50,-44 C 50,-18 10,-5 0,0 Z" fill="url(#gN-c)"/>
+                <path d="M -36,-42 C -20,-33 -7,-29 0,-29 C 7,-29 20,-33 36,-42" stroke="rgba(255,255,255,0.16)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              </g>
+              <g filter="url(#lDrop-c)">
+                <path d="M 0,0 C 5,-10 18,-50 44,-50 C 66,-50 80,-26 82,-10 C 84,-4 80,0 80,0 C 80,0 84,4 82,10 C 80,26 66,50 44,50 C 18,50 5,10 0,0 Z" fill="url(#gE-c)"/>
+                <path d="M 42,36 C 36,22 32,8 32,0 C 32,-8 36,-22 42,-36" stroke="rgba(255,255,255,0.16)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              </g>
+              <g filter="url(#lDrop-c)">
+                <path d="M 0,0 C 10,5 50,18 50,44 C 50,66 26,80 10,82 C 4,84 0,80 0,80 C 0,80 -4,84 -10,82 C -26,80 -50,66 -50,44 C -50,18 -10,5 0,0 Z" fill="url(#gS-c)"/>
+                <path d="M 36,42 C 20,33 7,29 0,29 C -7,29 -20,33 -36,42" stroke="rgba(255,255,255,0.16)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              </g>
+              <g filter="url(#lDrop-c)">
+                <path d="M 0,0 C -5,-10 -18,-50 -44,-50 C -66,-50 -80,-26 -82,-10 C -84,-4 -80,0 -80,0 C -80,0 -84,4 -82,10 C -80,26 -66,50 -44,50 C -18,50 -5,10 0,0 Z" fill="url(#gW-c)"/>
+                <path d="M -42,36 C -36,22 -32,8 -32,0 C -32,-8 -36,-22 -42,-36" stroke="rgba(255,255,255,0.16)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              </g>
+              <g filter="url(#cDrop-c)">
+                <circle r="14" fill="#1e4a35"/>
+                <circle r="10" fill="#2e7a52"/>
+                <circle r="6.5" fill="#5aaa80"/>
+                <circle r="2.8" fill="rgba(255,255,255,0.6)"/>
+              </g>
+              <g opacity="0" style="animation: fadeIn 0.3s ease 1.1s both;">
+                <circle cx="-22" cy="-54" r="4.5" fill="rgba(255,255,255,0.55)"/>
+                <circle cx="-20" cy="-52" r="1.6" fill="rgba(255,255,255,0.82)"/>
+                <circle cx="54" cy="-14" r="3.5" fill="rgba(255,255,255,0.5)"/>
+                <circle cx="16" cy="56" r="4" fill="rgba(255,255,255,0.52)"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <!-- Ambient specks -->
+        <div class="speck" style="width:6px;height:6px;background:rgba(30,74,53,0.13);top:-25px;left:-115px;--dur:9s;--del:2.9s;--fx:4px;--fy:-11px;--fr:6deg;"></div>
+        <div class="speck" style="width:5px;height:5px;background:rgba(58,138,98,0.17);top:25px;right:-105px;--dur:12s;--del:3.5s;--fx:-4px;--fy:-13px;--fr:-7deg;"></div>
+        <div class="speck" style="width:7px;height:7px;background:rgba(30,74,53,0.10);top:170px;left:-90px;--dur:8s;--del:4.0s;--fx:5px;--fy:-9px;--fr:8deg;"></div>
+      </div>
+
+      <!-- Bottom content — same as A & B -->
+      <div class="bottom">
+        <div class="hl-wrap">
+          <span class="hl-reg">Where parents bond,</span>
+          <span class="hl-italic">childhoods flourish.</span>
+        </div>
+        <div class="brand-quote">"You got lucky when you found these people. Sprout is where that luck happens."</div>
+        <div class="body-copy">Find events, join clubs, and build the friendships your family deserves — all in the neighborhood your kids call home.</div>
+        <div class="cta" role="button">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 7C7 7 4.5 4.8 4.5 2.8C4.5 1.6 5.5.6 6.7.6C6.9.6 7 .75 7 .9C7 .75 7.1.6 7.3.6C8.5.6 9.5 1.6 9.5 2.8C9.5 4.8 7 7 7 7Z" fill="white"/><path d="M7 7C7 7 9.2 4.5 11.2 4.5C12.4 4.5 13.4 5.5 13.4 6.7C13.4 6.9 13.25 7 13.1 7C13.25 7 13.4 7.1 13.4 7.3C13.4 8.5 12.4 9.5 11.2 9.5C9.2 9.5 7 7 7 7Z" fill="white" opacity="0.7"/><path d="M7 7C7 7 9.5 9.2 9.5 11.2C9.5 12.4 8.5 13.4 7.3 13.4C7.1 13.4 7 13.25 7 13.1C7 13.25 6.9 13.4 6.7 13.4C5.5 13.4 4.5 12.4 4.5 11.2C4.5 9.2 7 7 7 7Z" fill="white"/><path d="M7 7C7 7 4.8 9.5 2.8 9.5C1.6 9.5.6 8.5.6 7.3C.6 7.1.75 7 .9 7C.75 7 .6 6.9.6 6.7C.6 5.5 1.6 4.5 2.8 4.5C4.8 4.5 7 7 7 7Z" fill="white" opacity="0.7"/></svg>
+          Find my village
+        </div>
+        <div class="signin">Already a member? <span>Sign in</span></div>
+      </div>
+
+      <div class="hi"></div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Onboarding Profile Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS — SPROUT DESIGN SYSTEM
+═══════════════════════════════════════════ */
+:root {
+  --brand:           #186338;
+  --brand-dark:      #1e3e2b;
+  --brand-bold:      #1e3e2b;
+  --brand-50:        #e2e9e3;
+  --brand-100:       #d0dacf;
+  --brand-200:       #77b691;
+  --brand-600:       #134f2d;
+
+  --bg:              #f4f1ea;
+  --surface-1:       #eae6db;
+  --surface-2:       #dbd5c8;
+  --surface-3:       #c2b9a6;
+  --surface-4:       #aa9e83;
+
+  --text-primary:    #4d525b;
+  --text-secondary:  #818898;
+  --text-tertiary:   #b3b8c1;
+  --text-dark:       #1a1a1a;
+  --white:           #ffffff;
+
+  --border-primary:  #b3b8c1;
+  --border-secondary:#cdcfd6;
+  --border-tertiary: #e6e7ea;
+  --border-brand:    #186338;
+  --border-brand-lt: #d0dacf;
+
+  --info-bg:         #d8e5ed;
+  --info-text:       #234a63;
+  --error:           #d64545;
+  --error-bg:        #f7dada;
+
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --r-2xl: 24px;
+  --r-3xl: 32px;
+  --r-full: 9999px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #111;
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(24,99,56,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(30,62,43,0.08) 0%, transparent 60%);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 20px 60px;
+  gap: 24px;
+}
+
+/* ── PAGE HEADER ── */
+.page-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.page-brand-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #e8e0d4;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.page-brand-sub {
+  font-size: 11px;
+  color: #555;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ── STEP NAVIGATOR ── */
+.step-nav {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--r-full);
+  padding: 6px;
+}
+.step-btn {
+  padding: 6px 14px;
+  border-radius: var(--r-full);
+  font-size: 11.5px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: #555;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.step-btn:hover { color: #999; }
+.step-btn.active {
+  background: var(--brand);
+  color: white;
+}
+.step-btn.done {
+  color: var(--brand-200);
+}
+
+/* ═══════════════════════════════════════════
+   PHONE FRAME
+═══════════════════════════════════════════ */
+.phone-wrap {
+  position: relative;
+}
+.phone-notch {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 34px;
+  background: #0a0a0a;
+  border-radius: var(--r-full);
+  z-index: 10;
+}
+.phone {
+  width: 393px;
+  height: 852px;
+  background: var(--bg);
+  border-radius: 50px;
+  overflow: hidden;
+  box-shadow:
+    0 60px 140px rgba(0,0,0,0.9),
+    0 0 0 1px rgba(255,255,255,0.08),
+    inset 0 0 0 1.5px rgba(0,0,0,0.15);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── STATUS BAR ── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 28px 8px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 5;
+}
+.status-time {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-dark);
+  font-variant-numeric: tabular-nums;
+}
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ═══════════════════════════════════════════
+   SCREENS
+═══════════════════════════════════════════ */
+.screen {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  animation: screenIn 0.3s ease;
+}
+.screen.active { display: flex; }
+
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  display: flex;
+  align-items: center;
+  padding: 4px 24px 0;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.back-btn {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none; cursor: pointer;
+  color: var(--text-primary);
+  border-radius: var(--r-full);
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.back-btn:hover { background: var(--surface-1); }
+.back-btn.invisible { opacity: 0; pointer-events: none; }
+.progress-dots {
+  display: flex;
+  gap: 5px;
+  flex: 1;
+}
+.p-dot {
+  height: 4px;
+  border-radius: var(--r-full);
+  flex: 1;
+  background: var(--surface-2);
+  transition: background 0.4s;
+}
+.p-dot.active { background: var(--brand); }
+.p-dot.done   { background: var(--brand-200); }
+
+/* ── SCROLLABLE CONTENT ── */
+.screen-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px 0;
+  display: flex;
+  flex-direction: column;
+  -webkit-overflow-scrolling: touch;
+}
+.screen-body::-webkit-scrollbar { display: none; }
+
+/* ── TYPOGRAPHY ── */
+.screen-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 27px;
+  font-weight: 700;
+  color: var(--brand-dark);
+  line-height: 1.25;
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+.screen-sub {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+/* ── FORM ── */
+.form-group { margin-bottom: 16px; }
+.form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-input {
+  width: 100%;
+  background: var(--white);
+  border: 1.5px solid var(--border-tertiary);
+  border-radius: var(--r-xl);
+  padding: 14px 16px;
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+.form-input:focus {
+  border-color: var(--border-brand);
+  box-shadow: 0 0 0 3px rgba(24,99,56,0.08);
+}
+.form-input::placeholder { color: var(--text-tertiary); }
+
+/* ── BUTTONS ── */
+.btn-footer {
+  padding: 16px 24px 20px;
+  flex-shrink: 0;
+}
+.btn-primary {
+  width: 100%;
+  padding: 17px;
+  background: var(--brand);
+  color: white;
+  border: none;
+  border-radius: var(--r-full);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: background 0.2s, transform 0.1s;
+}
+.btn-primary:hover  { background: var(--brand-dark); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { background: var(--brand-200); cursor: not-allowed; }
+
+/* ── HOME INDICATOR ── */
+.home-indicator {
+  width: 134px;
+  height: 5px;
+  background: var(--text-dark);
+  border-radius: var(--r-full);
+  margin: 6px auto 10px;
+  opacity: 0.18;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════
+   SCREEN 1 — PERSONAL DETAILS
+═══════════════════════════════════════════ */
+/* nothing extra */
+
+/* ═══════════════════════════════════════════
+   SCREEN 2 — ADD KIDS
+═══════════════════════════════════════════ */
+.kid-card {
+  background: var(--white);
+  border-radius: var(--r-xl);
+  padding: 13px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  animation: slideIn 0.25s ease;
+}
+@keyframes slideIn {
+  from { opacity:0; transform:translateY(-8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.kid-avatar {
+  width: 46px; height: 46px;
+  border-radius: var(--r-full);
+  background: var(--brand-50);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 15px;
+  color: var(--brand);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.kid-avatar img { width:100%; height:100%; object-fit:cover; }
+.kid-info { flex: 1; }
+.kid-name-line { display:flex; align-items:baseline; gap:6px; }
+.kid-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+.kid-age  { font-size: 12px; color: var(--text-secondary); }
+.kid-dob  { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.kid-del  {
+  width: 32px; height: 32px;
+  border-radius: var(--r-full);
+  background: var(--error-bg);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--error);
+  flex-shrink: 0;
+}
+
+.add-kid-row {
+  background: var(--surface-1);
+  border-radius: var(--r-xl);
+  padding: 13px 14px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; border: none; width: 100%;
+}
+.add-kid-icon {
+  width: 46px; height: 46px;
+  border-radius: var(--r-lg);
+  background: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.add-kid-text { flex:1; text-align:left; }
+.add-kid-text strong { font-size:14px; color:var(--text-primary); display:block; }
+.add-kid-text small  { font-size:12px; color:var(--text-secondary); }
+.add-kid-chevron { color:var(--text-tertiary); }
+
+.info-chip {
+  background: var(--info-bg);
+  border-radius: var(--r-lg);
+  padding: 11px 13px;
+  font-size: 12.5px;
+  color: var(--info-text);
+  display: flex; gap: 8px;
+  align-items: flex-start;
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+/* ── BOTTOM SHEET MODAL ── */
+.sheet-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none; align-items: flex-end;
+  z-index: 50;
+  border-radius: 50px;
+}
+.sheet-overlay.open { display: flex; animation: overlayIn 0.2s ease; }
+@keyframes overlayIn { from{opacity:0} to{opacity:1} }
+.sheet {
+  background: var(--bg);
+  border-radius: var(--r-2xl) var(--r-2xl) 0 0;
+  padding: 20px 24px 36px;
+  width: 100%;
+  animation: sheetIn 0.28s cubic-bezier(0.32,0.72,0,1);
+}
+@keyframes sheetIn {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.sheet-handle {
+  width: 36px; height: 4px;
+  background: var(--text-tertiary);
+  border-radius: var(--r-full);
+  margin: 0 auto 18px;
+}
+.sheet-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 21px; font-weight: 700;
+  color: var(--brand-dark);
+  margin-bottom: 20px;
+}
+
+/* ═══════════════════════════════════════════
+   SCREEN 3 — SCHOOL GROUPS
+═══════════════════════════════════════════ */
+.zip-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+
+.school-card {
+  background: var(--white);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.school-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+}
+.school-emoji {
+  width: 42px; height: 42px;
+  border-radius: var(--r-full);
+  background: var(--brand-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.school-info strong { font-size: 14px; font-weight: 600; color: var(--text-primary); display:block; }
+.school-info small  { font-size: 12px; color: var(--text-secondary); }
+.school-grades { padding: 0 16px 10px; }
+.grade-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border-tertiary);
+  cursor: pointer;
+}
+.grade-badge {
+  width: 28px; height: 28px;
+  border-radius: var(--r-full);
+  background: var(--surface-1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.grade-name { flex:1; font-size: 14px; color: var(--text-primary); }
+.grade-check {
+  width: 22px; height: 22px;
+  border-radius: var(--r-sm);
+  border: 2px solid var(--border-secondary);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s;
+}
+.grade-check.on { background: var(--brand); border-color: var(--brand); }
+
+/* ═══════════════════════════════════════════
+   SCREEN 4 — AI ONBOARDING
+═══════════════════════════════════════════ */
+.ai-stage {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 24px 32px;
+  gap: 36px;
+}
+.ai-heading { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--brand-dark); line-height: 1.3; }
+.ai-sub { font-size: 13px; color: var(--text-secondary); }
+.mic-wrap { position: relative; }
+.mic-rings {
+  position: absolute; inset: -20px;
+  border-radius: var(--r-full);
+  border: 2px solid rgba(24,99,56,0.15);
+  animation: ringPulse 2s ease-out infinite;
+  display: none;
+}
+.mic-rings.r2 { inset: -36px; animation-delay: 0.4s; }
+.mic-rings.r3 { inset: -52px; animation-delay: 0.8s; }
+.mic-rings.active { display: block; }
+@keyframes ringPulse {
+  0%   { opacity:1; transform:scale(0.85); }
+  100% { opacity:0; transform:scale(1); }
+}
+.mic-btn {
+  width: 130px; height: 130px;
+  border-radius: var(--r-full);
+  background: var(--brand-50);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s;
+  position: relative;
+  z-index: 1;
+}
+.mic-btn:hover   { background: var(--brand-100); transform: scale(1.04); }
+.mic-btn.on      { background: var(--brand); }
+.mic-btn.on svg  { stroke: white; }
+@keyframes micPulse {
+  0%,100% { transform: scale(1); }
+  50%     { transform: scale(1.06); }
+}
+.mic-btn.on { animation: micPulse 1.2s ease infinite; }
+.mic-label { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--brand-dark); }
+
+.ai-wave {
+  display: none; align-items: center; gap: 4px; justify-content: center;
+}
+.ai-wave.visible { display: flex; }
+.wave-bar {
+  width: 4px; border-radius: 2px;
+  background: var(--brand);
+  animation: waveAnim 0.9s ease-in-out infinite;
+}
+.wave-bar:nth-child(1) { height: 14px; animation-delay: 0s; }
+.wave-bar:nth-child(2) { height: 22px; animation-delay: 0.1s; }
+.wave-bar:nth-child(3) { height: 30px; animation-delay: 0.2s; }
+.wave-bar:nth-child(4) { height: 22px; animation-delay: 0.3s; }
+.wave-bar:nth-child(5) { height: 14px; animation-delay: 0.4s; }
+@keyframes waveAnim {
+  0%,100% { transform: scaleY(1); opacity:0.6; }
+  50%      { transform: scaleY(1.6); opacity:1; }
+}
+.ai-done-badge {
+  display: none; align-items: center; gap: 8px;
+  background: #dee8de; border-radius: var(--r-full);
+  padding: 8px 18px;
+  font-size: 13px; font-weight: 600; color: #375337;
+}
+.ai-done-badge.visible { display: flex; }
+
+/* ═══════════════════════════════════════════
+   SCREEN 5 — CUSTOMIZE PROFILE
+═══════════════════════════════════════════ */
+.screen5-header {
+  display: flex; align-items: center;
+  padding: 10px 24px 0;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.screen5-title { flex:1; text-align:center; font-size:16px; font-weight:600; color:var(--text-primary); }
+
+.avatar-zone {
+  display: flex; flex-direction: column; align-items: center;
+  margin-bottom: 22px; gap: 8px;
+}
+.prof-avatar {
+  width: 88px; height: 88px;
+  border-radius: var(--r-full);
+  background: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 700; color: white;
+  position: relative; overflow: visible;
+}
+.avatar-inner { border-radius: var(--r-full); overflow: hidden; width: 100%; height: 100%; display:flex; align-items:center; justify-content:center; background:inherit; }
+.avatar-inner img { width:100%; height:100%; object-fit:cover; }
+.avatar-cam-badge {
+  position: absolute; bottom: 2px; right: 2px;
+  width: 26px; height: 26px;
+  border-radius: var(--r-full);
+  background: var(--surface-2);
+  border: 2px solid var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.avatar-link { font-size: 12.5px; color: var(--error); font-weight: 500; cursor: pointer; }
+
+.bio-block {
+  background: var(--white);
+  border-radius: var(--r-xl);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+.bio-block-label { font-size: 11px; font-weight: 700; color: var(--text-secondary); letter-spacing:0.07em; text-transform:uppercase; margin-bottom:8px; }
+.bio-ta {
+  width: 100%;
+  border: none; outline: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px; color: var(--text-primary);
+  line-height: 1.65; resize: none;
+  background: transparent; min-height: 130px;
+}
+
+.interests-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.interests-hd-left { display:flex; align-items:baseline; gap:6px; }
+.interests-hd-left span { font-size:14px; font-weight:600; color:var(--text-primary); }
+.interests-hd-left small { font-size:12px; color:var(--text-secondary); }
+.add-int-btn {
+  width:28px; height:28px;
+  border-radius:var(--r-full);
+  border:1.5px solid var(--border-secondary);
+  background:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text-secondary);
+}
+
+.tags-wrap { display:flex; flex-wrap:wrap; gap:8px; padding-bottom:24px; }
+.tag-chip {
+  padding: 7px 14px;
+  background: var(--white);
+  border-radius: var(--r-full);
+  font-size: 13px; font-weight: 500;
+  color: var(--text-primary);
+  border: 1.5px solid var(--border-tertiary);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.tag-chip:hover  { border-color: var(--border-brand-lt); }
+.tag-chip.on     { background: var(--brand-50); border-color: var(--brand); color: var(--brand); }
+
+/* ═══════════════════════════════════════════
+   SCREEN 6 — FULL PROFILE PREVIEW  ★ HERO ★
+═══════════════════════════════════════════ */
+.preview-wrap {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex; flex-direction: column;
+}
+.preview-wrap::-webkit-scrollbar { display: none; }
+
+/* Green gradient hero header */
+.pv-header {
+  background: linear-gradient(155deg, #0d2e1a 0%, var(--brand-dark) 30%, var(--brand) 80%, #2d8a5a 100%);
+  padding: 16px 20px 0;
+  position: relative;
+  overflow: hidden;
+}
+.pv-header::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 180px; height: 180px;
+  border-radius: var(--r-full);
+  background: rgba(255,255,255,0.04);
+}
+.pv-header::after {
+  content: '';
+  position: absolute;
+  bottom: 20px; left: -20px;
+  width: 100px; height: 100px;
+  border-radius: var(--r-full);
+  background: rgba(255,255,255,0.03);
+}
+
+.pv-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px; position:relative; z-index:1;
+}
+.pv-back {
+  width: 36px; height: 36px;
+  border-radius: var(--r-full);
+  background: rgba(255,255,255,0.12);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.pv-topbar-title { font-size:15px; font-weight:600; color:rgba(255,255,255,0.9); letter-spacing:0.01em; }
+.pv-edit-btn {
+  font-size:12px; color:rgba(255,255,255,0.75);
+  background:rgba(255,255,255,0.12);
+  border:none; border-radius:var(--r-full);
+  padding:6px 14px; cursor:pointer;
+  font-family:'Inter',sans-serif;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s;
+}
+.pv-edit-btn:hover { background: rgba(255,255,255,0.2); }
+
+.pv-avatar-zone {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px; padding-bottom: 28px;
+  position: relative; z-index: 1;
+}
+.pv-avatar {
+  width: 100px; height: 100px;
+  border-radius: var(--r-full);
+  border: 3px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px; font-weight: 700; color: white;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  backdrop-filter: blur(8px);
+}
+.pv-avatar img { width:100%; height:100%; object-fit:cover; }
+.pv-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px; font-weight: 700;
+  color: white;
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+.pv-loc {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12.5px; color: rgba(255,255,255,0.65);
+}
+.pv-meta-chips {
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+}
+.pv-meta-chip {
+  padding: 4px 12px;
+  background: rgba(255,255,255,0.14);
+  border-radius: var(--r-full);
+  font-size: 11.5px; font-weight: 500;
+  color: rgba(255,255,255,0.85);
+  backdrop-filter: blur(4px);
+}
+
+/* Curved transition */
+.pv-curve {
+  width: 100%;
+  height: 28px;
+  background: var(--bg);
+  border-radius: 28px 28px 0 0;
+  margin-top: -1px;
+  flex-shrink: 0;
+}
+
+/* Body cards */
+.pv-body {
+  background: var(--bg);
+  padding: 0 16px;
+  flex: 1;
+  padding-bottom: 110px;
+}
+
+.pv-card {
+  background: var(--white);
+  border-radius: var(--r-xl);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.pv-card-label {
+  font-size: 10.5px; font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  margin-bottom: 10px;
+}
+.pv-bio-text {
+  font-size: 13.5px;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+/* Kid rows */
+.pv-kid-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 0;
+}
+.pv-kid-row + .pv-kid-row { border-top: 1px solid var(--border-tertiary); }
+.pv-kid-av {
+  width: 42px; height: 42px;
+  border-radius: var(--r-full);
+  background: var(--brand-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: var(--brand);
+  flex-shrink: 0; overflow: hidden;
+}
+.pv-kid-av img { width:100%; height:100%; object-fit:cover; }
+.pv-kid-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.pv-kid-meta { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+
+/* Group chips */
+.pv-chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.pv-group-chip {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 12px;
+  background: var(--brand-50);
+  border-radius: var(--r-full);
+  font-size: 12px; font-weight: 500; color: var(--brand);
+}
+.pv-int-chip {
+  padding: 6px 13px;
+  background: var(--surface-1);
+  border-radius: var(--r-full);
+  font-size: 12px; font-weight: 500; color: var(--text-primary);
+}
+
+/* Floating CTA */
+.pv-cta {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 16px 16px 30px;
+  background: linear-gradient(to top, var(--bg) 60%, transparent);
+}
+
+/* ═══════════════════════════════════════════
+   SCREEN 7 — SUCCESS
+═══════════════════════════════════════════ */
+.success-stage {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 32px 32px 24px;
+  gap: 18px;
+}
+.success-ring {
+  width: 88px; height: 88px;
+  border-radius: var(--r-full);
+  background: var(--brand-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px;
+  animation: successPop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes successPop {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.success-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px; font-weight: 700;
+  color: var(--brand-dark); line-height: 1.2;
+}
+.success-sub {
+  font-size: 14px; color: var(--text-secondary);
+  line-height: 1.65; max-width: 290px;
+}
+.btn-outline {
+  width: 100%; padding: 16px;
+  background: transparent;
+  color: var(--brand); border: 1.5px solid var(--brand-100);
+  border-radius: var(--r-full);
+  font-size: 14px; font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-outline:hover { background: var(--brand-50); }
+
+</style>
+</head>
+<body>
+
+<!-- ── PAGE HEADER ── -->
+<div class="page-brand">
+  <div class="page-brand-name">🌱 Sprout</div>
+  <div class="page-brand-sub">Onboarding · Profile Preview Prototype</div>
+</div>
+
+<!-- ── STEP NAVIGATOR ── -->
+<div class="step-nav" id="stepNav">
+  <button class="step-btn active" onclick="nav(1)">1 · Details</button>
+  <button class="step-btn"        onclick="nav(2)">2 · Kids</button>
+  <button class="step-btn"        onclick="nav(3)">3 · Groups</button>
+  <button class="step-btn"        onclick="nav(4)">4 · AI Bio</button>
+  <button class="step-btn"        onclick="nav(5)">5 · Profile</button>
+  <button class="step-btn"        onclick="nav(6)">6 · Preview ✦</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     PHONE FRAME
+══════════════════════════════════════ -->
+<div class="phone-wrap">
+<div class="phone" id="phone">
+
+  <!-- STATUS BAR -->
+  <div class="status-bar" id="statusBar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#1a1a1a"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#1a1a1a"/><rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="#1a1a1a"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#1a1a1a" opacity=".3"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.4C10.7 2.4 13.1 3.5 14.8 5.3L16 4C14 1.9 11.1.6 8 .6 4.9.6 2 1.9 0 4l1.2 1.3C2.9 3.5 5.3 2.4 8 2.4z" fill="#1a1a1a"/><path d="M8 5.6c1.8 0 3.4.7 4.6 1.9L14 6.1C12.5 4.6 10.4 3.7 8 3.7s-4.5.9-6 2.4l1.4 1.4C4.6 6.3 6.2 5.6 8 5.6z" fill="#1a1a1a"/><circle cx="8" cy="10" r="1.5" fill="#1a1a1a"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1a1a" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1a1a"/><path d="M23 4v4a2 2 0 000-4z" fill="#1a1a1a" opacity=".4"/></svg>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 1: DETAILS ═══ -->
+  <div class="screen active" id="screen1">
+    <div class="progress-bar">
+      <button class="back-btn invisible">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+      </button>
+      <div class="progress-dots">
+        <div class="p-dot active"></div>
+        <div class="p-dot"></div>
+        <div class="p-dot"></div>
+        <div class="p-dot"></div>
+      </div>
+    </div>
+    <div class="screen-body">
+      <h1 class="screen-title">Welcome to Sprout 🌱</h1>
+      <p class="screen-sub">Tell us a little about yourself to get started and connect with parents near you.</p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input class="form-input" type="text" id="fName" value="James" placeholder="e.g. James">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input class="form-input" type="text" id="lName" value="Martin" placeholder="e.g. Martin">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">City / Neighborhood</label>
+        <input class="form-input" type="text" id="city" value="Austin, TX" placeholder="e.g. Austin, TX">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Zip Code</label>
+        <input class="form-input" type="text" id="zip" value="73301" placeholder="e.g. 73301" maxlength="10">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Parenting Role</label>
+        <select class="form-input" id="role" style="cursor:pointer;">
+          <option value="Parent">Parent</option>
+          <option value="Guardian">Guardian</option>
+          <option value="Grandparent">Grandparent</option>
+          <option value="Caregiver">Caregiver</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-footer">
+      <button class="btn-primary" onclick="nav(2)">Continue</button>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ═══ SCREEN 2: ADD KIDS ═══ -->
+  <div class="screen" id="screen2">
+    <div class="progress-bar">
+      <button class="back-btn" onclick="nav(1)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+      </button>
+      <div class="progress-dots">
+        <div class="p-dot done"></div>
+        <div class="p-dot active"></div>
+        <div class="p-dot"></div>
+        <div class="p-dot"></div>
+      </div>
+    </div>
+    <div class="screen-body">
+      <h1 class="screen-title">Add your little ones 🌱</h1>
+      <p class="screen-sub">We'll personalize events, clubs, and activities to match each of your child's information.</p>
+
+      <div id="kidsList"></div>
+
+      <button class="add-kid-row" onclick="openKidSheet()" id="addKidRow">
+        <div class="add-kid-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <div class="add-kid-text">
+          <strong>Add another child</strong>
+          <small>You can add up to 5 children</small>
+        </div>
+        <svg class="add-kid-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
+      <div class="info-chip">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="#3a7ca5" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>Sprout will suggest family-friendly events and clubs tailored to your children's ages.</span>
+      </div>
+    </div>
+    <div class="btn-footer">
+      <button class="btn-primary" onclick="nav(3)">Continue</button>
+    </div>
+    <div class="home-indicator"></div>
+
+    <!-- ADD KID SHEET -->
+    <div class="sheet-overlay" id="kidSheet" onclick="closeKidSheet(event)">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">Add a child</div>
+        <div class="form-group">
+          <label class="form-label">Child's Name</label>
+          <input class="form-input" type="text" id="nKidName" placeholder="e.g. Jesica">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date of Birth</label>
+          <input class="form-input" type="date" id="nKidDob">
+        </div>
+        <div style="margin-top:18px;">
+          <button class="btn-primary" onclick="addKid()">Add Child</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 3: SCHOOL GROUPS ═══ -->
+  <div class="screen" id="screen3">
+    <div class="progress-bar">
+      <button class="back-btn" onclick="nav(2)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+      </button>
+      <div class="progress-dots">
+        <div class="p-dot done"></div>
+        <div class="p-dot done"></div>
+        <div class="p-dot active"></div>
+        <div class="p-dot"></div>
+      </div>
+    </div>
+    <div class="screen-body">
+      <div class="zip-label" id="zipDisplay">Zip Code: 73301</div>
+      <h1 class="screen-title" style="font-size:24px;">Join your kids<br>school groups</h1>
+      <p class="screen-sub">Select the grades your children are in at nearby schools.</p>
+
+      <div class="school-card">
+        <div class="school-head">
+          <div class="school-emoji">🍀</div>
+          <div class="school-info">
+            <strong>Lincoln Elementary School</strong>
+            <small>0.8 miles away</small>
+          </div>
+        </div>
+        <div class="school-grades" id="lincolnGrades"></div>
+      </div>
+
+      <div class="school-card">
+        <div class="school-head">
+          <div class="school-emoji">🍀</div>
+          <div class="school-info">
+            <strong>Washington Middle School</strong>
+            <small>1.2 miles away</small>
+          </div>
+        </div>
+        <div class="school-grades" id="washingtonGrades"></div>
+      </div>
+    </div>
+    <div class="btn-footer">
+      <button class="btn-primary" onclick="nav(4)">Next — Create Profile</button>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ═══ SCREEN 4: AI ONBOARDING ═══ -->
+  <div class="screen" id="screen4">
+    <div class="progress-bar">
+      <button class="back-btn" onclick="nav(3)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+      </button>
+      <div class="progress-dots">
+        <div class="p-dot done"></div>
+        <div class="p-dot done"></div>
+        <div class="p-dot done"></div>
+        <div class="p-dot active"></div>
+      </div>
+    </div>
+
+    <div class="ai-stage">
+      <div>
+        <div class="ai-heading" id="aiHeading">We're ready to create<br>your parent profile</div>
+        <div class="ai-sub" style="margin-top:10px;" id="aiSub">Answer one question and you're in!</div>
+      </div>
+
+      <div class="mic-wrap">
+        <div class="mic-rings" id="ring1"></div>
+        <div class="mic-rings r2" id="ring2"></div>
+        <div class="mic-rings r3" id="ring3"></div>
+        <button class="mic-btn" id="micBtn" onclick="toggleAI()">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#186338" stroke-width="1.6">
+            <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+            <path d="M19 10v2a7 7 0 01-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </button>
+      </div>
+
+      <div>
+        <div id="micLabel" class="mic-label">Tap to Talk with AI</div>
+        <div class="ai-wave" id="aiWave">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+        <div class="ai-done-badge" id="aiDone">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+          Bio generated successfully!
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-footer" id="aiBtnWrap" style="display:none">
+      <button class="btn-primary" onclick="nav(5)">Continue with Generated Bio</button>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ═══ SCREEN 5: CUSTOMIZE PROFILE ═══ -->
+  <div class="screen" id="screen5">
+    <div class="screen5-header">
+      <button class="back-btn" onclick="nav(4)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+      </button>
+      <span class="screen5-title">Customize Your Profile</span>
+      <div style="width:32px;"></div>
+    </div>
+
+    <div class="screen-body">
+      <div class="avatar-zone">
+        <div class="prof-avatar">
+          <div class="avatar-inner" id="custAvatarInner">
+            <span id="custInitials">JM</span>
+          </div>
+          <div class="avatar-cam-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4d525b" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+        </div>
+        <span class="avatar-link">*Add Photo Profile</span>
+      </div>
+
+      <div class="bio-block">
+        <div class="bio-block-label">Profile Bio</div>
+        <textarea class="bio-ta" id="bioTa" rows="7"></textarea>
+      </div>
+
+      <div>
+        <div class="interests-hd">
+          <div class="interests-hd-left">
+            <span>Interests</span>
+            <small id="intCount">(0 / 7)</small>
+          </div>
+          <button class="add-int-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+        <div class="tags-wrap" id="tagCloud"></div>
+      </div>
+    </div>
+
+    <div class="btn-footer">
+      <button class="btn-primary" onclick="buildAndNav()">Next — Preview My Profile</button>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ═══ SCREEN 6: FULL PROFILE PREVIEW ═══ -->
+  <div class="screen" id="screen6">
+    <!-- we also need the status bar in green context -->
+    <div class="preview-wrap">
+
+      <div class="pv-header">
+        <div class="pv-topbar">
+          <button class="pv-back" onclick="nav(5)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+          </button>
+          <span class="pv-topbar-title">Profile Preview</span>
+          <button class="pv-edit-btn" onclick="nav(5)">Edit</button>
+        </div>
+
+        <div class="pv-avatar-zone">
+          <div class="pv-avatar" id="pvAvatar"><span id="pvInitials">JM</span></div>
+          <div class="pv-name"  id="pvName">James Martin</div>
+          <div class="pv-loc">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="rgba(255,255,255,0.65)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            <span id="pvLoc">Austin, TX · 73301</span>
+          </div>
+          <div class="pv-meta-chips" id="pvMetaChips"></div>
+        </div>
+      </div>
+
+      <div class="pv-curve"></div>
+
+      <div class="pv-body" style="position:relative;">
+
+        <!-- About Me -->
+        <div class="pv-card">
+          <div class="pv-card-label">About Me</div>
+          <p class="pv-bio-text" id="pvBio">—</p>
+        </div>
+
+        <!-- My Kids -->
+        <div class="pv-card" id="pvKidsCard">
+          <div class="pv-card-label">My Kids</div>
+          <div id="pvKidsList"></div>
+        </div>
+
+        <!-- School Groups -->
+        <div class="pv-card" id="pvGroupsCard">
+          <div class="pv-card-label">School Groups</div>
+          <div class="pv-chip-grid" id="pvGroupChips"></div>
+        </div>
+
+        <!-- Interests -->
+        <div class="pv-card" id="pvIntCard">
+          <div class="pv-card-label">Interests</div>
+          <div class="pv-chip-grid" id="pvIntChips"></div>
+        </div>
+
+        <!-- CTA -->
+        <div class="pv-cta">
+          <button class="btn-primary" onclick="nav(7)" style="background:var(--brand-dark);font-size:15px;">
+            Looks great — Join Sprout 🌱
+          </button>
+        </div>
+      </div>
+
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ═══ SCREEN 7: SUCCESS ═══ -->
+  <div class="screen" id="screen7">
+    <div class="success-stage">
+      <div class="success-ring">🌱</div>
+      <h1 class="success-title">Welcome to<br>Sprout!</h1>
+      <p class="success-sub">Your profile is all set. Time to connect with parents in your neighborhood and find the best playdates for your little ones.</p>
+    </div>
+    <div class="btn-footer" style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn-primary">Explore Sprout</button>
+      <button class="btn-outline" onclick="resetAndNav()">↩ Start Over (Demo)</button>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+</div><!-- /phone -->
+</div><!-- /phone-wrap -->
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
+<script>
+// ── STATE ──────────────────────────────
+const S = {
+  firstName: 'James',
+  lastName:  'Martin',
+  city:      'Austin, TX',
+  zip:       '73301',
+  role:      'Parent',
+  kids: [
+    { name: 'Jesica', dob: '2022-03-04' }
+  ],
+  grades: { 'Pre-K': true, 'Kinder': true },
+  bio: '',
+  interests: ['Traditional Finance','Technology','Start-up','AI','Web 3','Finance','Marketing'],
+};
+
+const LINCOLN    = ['Pre-K','Kinder','1st Grade','2nd Grade','3rd Grade','4th Grade','5th Grade'];
+const WASHINGTON = ['6th Grade','7th Grade','8th Grade'];
+const ALL_TAGS   = [
+  'Playdates','Outdoor Activities','Sports','Arts & Crafts','Music',
+  'Cooking','Technology','Start-up','Finance','Marketing','AI','Web 3',
+  'Traditional Finance','Venture Capital','Reading','Travel','Gardening',
+  'Photography','Yoga','Community Events'
+];
+
+// ── NAVIGATION ────────────────────────
+let currentScreen = 1;
+function nav(n) {
+  flushForm();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const sc = document.getElementById('screen' + n);
+  if (!sc) return;
+  sc.classList.add('active');
+  sc.querySelector('.screen-body')?.scrollTo(0, 0);
+  currentScreen = n;
+  updateStepNav(n);
+  // status bar color for preview screen
+  const sb = document.getElementById('statusBar');
+  if (n === 6) {
+    sb.style.display = 'none';
+  } else {
+    sb.style.display = '';
+  }
+  if (n === 5) refreshScreen5();
+}
+
+function updateStepNav(n) {
+  document.querySelectorAll('.step-btn').forEach((b, i) => {
+    b.classList.remove('active','done');
+    if (i + 1 === n) b.classList.add('active');
+    else if (i + 1 < n) b.classList.add('done');
+  });
+}
+
+// ── FORM FLUSH ─────────────────────────
+function flushForm() {
+  const get = id => document.getElementById(id);
+  if (get('fName'))  S.firstName  = get('fName').value  || S.firstName;
+  if (get('lName'))  S.lastName   = get('lName').value  || S.lastName;
+  if (get('city'))   S.city       = get('city').value   || S.city;
+  if (get('zip'))    S.zip        = get('zip').value    || S.zip;
+  if (get('role'))   S.role       = get('role').value   || S.role;
+  if (get('bioTa'))  S.bio        = get('bioTa').value  || S.bio;
+  // interests
+  const sel = document.querySelectorAll('#tagCloud .tag-chip.on');
+  if (sel.length > 0) S.interests = Array.from(sel).map(t => t.dataset.tag);
+  // zip display
+  const zd = document.getElementById('zipDisplay');
+  if (zd) zd.textContent = 'Zip Code: ' + S.zip;
+}
+
+// ── INIT ───────────────────────────────
+function init() {
+  renderKids();
+  renderGrades('lincolnGrades',    LINCOLN,    true);
+  renderGrades('washingtonGrades', WASHINGTON, false);
+  renderTagCloud();
+  generateBio();
+}
+
+// ── KIDS ───────────────────────────────
+function renderKids() {
+  const list = document.getElementById('kidsList');
+  list.innerHTML = S.kids.map((k, i) => {
+    const age = calcAge(k.dob);
+    const ini = k.name.slice(0,2).toUpperCase();
+    return `
+    <div class="kid-card">
+      <div class="kid-avatar">${ini}</div>
+      <div class="kid-info">
+        <div class="kid-name-line">
+          <span class="kid-name">${k.name}</span>
+          <span class="kid-age">${age} yrs</span>
+        </div>
+        <div class="kid-dob">${fmtDob(k.dob)}</div>
+      </div>
+      <button class="kid-del" onclick="delKid(${i})">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+  const row = document.getElementById('addKidRow');
+  if (row) row.style.display = S.kids.length >= 5 ? 'none' : 'flex';
+}
+
+function delKid(i) {
+  S.kids.splice(i, 1);
+  renderKids();
+  regenerateBio();
+}
+
+function openKidSheet() {
+  document.getElementById('nKidName').value = '';
+  document.getElementById('nKidDob').value  = '';
+  document.getElementById('kidSheet').classList.add('open');
+  setTimeout(() => document.getElementById('nKidName').focus(), 300);
+}
+function closeKidSheet(e) {
+  if (e.target === document.getElementById('kidSheet')) {
+    document.getElementById('kidSheet').classList.remove('open');
+  }
+}
+function addKid() {
+  const name = document.getElementById('nKidName').value.trim();
+  const dob  = document.getElementById('nKidDob').value;
+  if (!name) { document.getElementById('nKidName').focus(); return; }
+  S.kids.push({ name, dob });
+  document.getElementById('kidSheet').classList.remove('open');
+  renderKids();
+  regenerateBio();
+}
+
+function calcAge(dob) {
+  if (!dob) return '?';
+  const b = new Date(dob), t = new Date();
+  let a = t.getFullYear() - b.getFullYear();
+  if (t.getMonth() - b.getMonth() < 0 || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--;
+  return a < 1 ? '<1' : a;
+}
+function fmtDob(dob) {
+  if (!dob) return '';
+  return new Date(dob).toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric' });
+}
+
+// ── GRADES ─────────────────────────────
+function renderGrades(containerId, grades, school1) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = grades.map(g => {
+    const abbr = g.replace(' Grade','').replace('Kinder','K').replace('Pre-K','P');
+    const checked = !!S.grades[g];
+    return `
+    <div class="grade-row" onclick="toggleGrade('${g}', this)">
+      <div class="grade-badge">${abbr}</div>
+      <div class="grade-name">${g}</div>
+      <div class="grade-check ${checked ? 'on' : ''}" id="chk-${g.replace(/\s/g,'-')}">
+        ${checked ? checkSvg() : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+function checkSvg() {
+  return `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5"><path d="M20 6L9 17l-5-5"/></svg>`;
+}
+function toggleGrade(g, row) {
+  S.grades[g] = !S.grades[g];
+  const chk = row.querySelector('.grade-check');
+  chk.classList.toggle('on', S.grades[g]);
+  chk.innerHTML = S.grades[g] ? checkSvg() : '';
+}
+
+// ── AI BIO ─────────────────────────────
+let aiRunning = false, aiComplete = false;
+
+function generateBio() {
+  const fn = S.firstName, ln = S.lastName;
+  const k  = S.kids;
+  const groups = Object.keys(S.grades).filter(g => S.grades[g]);
+  const kidStr = k.length === 0 ? 'wonderful kids' :
+                 k.length === 1 ? `a wonderful child named ${k[0].name}` :
+                 k.map(c=>c.name).join(', ');
+  const groupStr = groups.length > 0 ? ` in ${groups.join(' and ')}` : '';
+  S.bio = `Hi, I'm ${fn} ${ln}, a proud ${S.role.toLowerCase()} of ${kidStr} who attend Lincoln Elementary School${groupStr}. I love connecting with other parents and creating opportunities for our children to play and grow together. Whether it's organizing playdates or just hanging out at the park, I'm all about fostering friendships and making lasting memories for our little ones. If you're interested in getting together, I'd love to chat and see how we can make playtime fun for our kids!`;
+}
+function regenerateBio() {
+  if (!aiComplete) generateBio();
+  const ta = document.getElementById('bioTa');
+  if (ta) ta.value = S.bio;
+}
+
+function toggleAI() {
+  if (aiComplete) return;
+  if (aiRunning) return;
+  aiRunning = true;
+
+  const btn   = document.getElementById('micBtn');
+  const lbl   = document.getElementById('micLabel');
+  const wave  = document.getElementById('aiWave');
+  const done  = document.getElementById('aiDone');
+  const wrap  = document.getElementById('aiBtnWrap');
+  const r1    = document.getElementById('ring1');
+  const r2    = document.getElementById('ring2');
+  const r3    = document.getElementById('ring3');
+  const head  = document.getElementById('aiHeading');
+  const sub   = document.getElementById('aiSub');
+
+  btn.classList.add('on');
+  btn.querySelector('svg').setAttribute('stroke','white');
+  r1.classList.add('active');
+  r2.classList.add('active');
+  r3.classList.add('active');
+  lbl.style.display  = 'none';
+  wave.classList.add('visible');
+  head.textContent = 'Listening…';
+  sub.textContent  = 'Tell us about yourself as a parent';
+
+  setTimeout(() => {
+    // generating state
+    head.textContent = 'Generating your bio…';
+    wave.classList.remove('visible');
+    btn.classList.remove('on');
+    btn.querySelector('svg').setAttribute('stroke','#186338');
+    r1.classList.remove('active');
+    r2.classList.remove('active');
+    r3.classList.remove('active');
+    sub.textContent  = 'Our AI is crafting your profile';
+  }, 3000);
+
+  setTimeout(() => {
+    generateBio();
+    aiComplete = true;
+    head.textContent = "Your bio's ready! ✨";
+    sub.textContent  = '';
+    done.classList.add('visible');
+    wrap.style.display = 'block';
+    aiRunning = false;
+  }, 5000);
+}
+
+// ── TAG CLOUD ──────────────────────────
+function renderTagCloud() {
+  const cont = document.getElementById('tagCloud');
+  cont.innerHTML = ALL_TAGS.map(t => `
+    <div class="tag-chip ${S.interests.includes(t)?'on':''}" data-tag="${t}" onclick="toggleTag(this,'${t}')">${t}</div>
+  `).join('');
+  updateIntCount();
+}
+function toggleTag(el, tag) {
+  const isOn = el.classList.toggle('on');
+  if (isOn && !S.interests.includes(tag)) S.interests.push(tag);
+  else S.interests = S.interests.filter(t => t !== tag);
+  updateIntCount();
+}
+function updateIntCount() {
+  const n = S.interests.length;
+  document.getElementById('intCount').textContent = `(${n} / 7)`;
+}
+
+// ── REFRESH SCREEN 5 ──────────────────
+function refreshScreen5() {
+  const ini = (S.firstName[0]||'') + (S.lastName[0]||'');
+  document.getElementById('custInitials').textContent = ini.toUpperCase();
+  const ta = document.getElementById('bioTa');
+  if (ta && !ta.value) ta.value = S.bio;
+  else if (ta) S.bio = ta.value; // keep edits
+  renderTagCloud();
+}
+
+// ── BUILD PREVIEW ──────────────────────
+function buildAndNav() {
+  flushForm();
+  // finalize interests from DOM
+  S.interests = Array.from(document.querySelectorAll('#tagCloud .tag-chip.on')).map(t => t.dataset.tag);
+  // update bio from textarea
+  const ta = document.getElementById('bioTa');
+  if (ta) S.bio = ta.value;
+
+  const ini  = (S.firstName[0]||'') + (S.lastName[0]||'');
+  const full = `${S.firstName} ${S.lastName}`;
+
+  // header
+  document.getElementById('pvInitials').textContent = ini.toUpperCase();
+  document.getElementById('pvName').textContent     = full;
+  document.getElementById('pvLoc').textContent      = `${S.city} · ${S.zip}`;
+
+  // meta chips
+  const mc = document.getElementById('pvMetaChips');
+  mc.innerHTML = '';
+  if (S.kids.length) mc.innerHTML += `<div class="pv-meta-chip">👨‍👩‍👧 ${S.kids.length} kid${S.kids.length!==1?'s':''}</div>`;
+  const selGroups = Object.keys(S.grades).filter(g => S.grades[g]);
+  if (selGroups.length) mc.innerHTML += `<div class="pv-meta-chip">🏫 ${selGroups.length} group${selGroups.length!==1?'s':''}</div>`;
+  if (S.role) mc.innerHTML += `<div class="pv-meta-chip">${S.role}</div>`;
+
+  // bio
+  document.getElementById('pvBio').textContent = S.bio || 'No bio added yet.';
+
+  // kids
+  const kc = document.getElementById('pvKidsCard');
+  const kl = document.getElementById('pvKidsList');
+  if (!S.kids.length) { kc.style.display='none'; } else {
+    kc.style.display='block';
+    kl.innerHTML = S.kids.map(k => {
+      const age = calcAge(k.dob);
+      const ini = k.name.slice(0,2).toUpperCase();
+      return `<div class="pv-kid-row">
+        <div class="pv-kid-av">${ini}</div>
+        <div>
+          <div class="pv-kid-name">${k.name}</div>
+          <div class="pv-kid-meta">${age} yrs old · ${fmtDob(k.dob)}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // groups
+  const gc = document.getElementById('pvGroupsCard');
+  const gch = document.getElementById('pvGroupChips');
+  if (!selGroups.length) { gc.style.display='none'; } else {
+    gc.style.display='block';
+    gch.innerHTML = selGroups.map(g => `<div class="pv-group-chip">🏫 ${g}</div>`).join('');
+  }
+
+  // interests
+  const ic = document.getElementById('pvIntCard');
+  const ich = document.getElementById('pvIntChips');
+  if (!S.interests.length) { ic.style.display='none'; } else {
+    ic.style.display='block';
+    ich.innerHTML = S.interests.map(t => `<div class="pv-int-chip">${t}</div>`).join('');
+  }
+
+  nav(6);
+}
+
+// ── RESET ──────────────────────────────
+function resetAndNav() {
+  S.firstName = 'James'; S.lastName = 'Martin';
+  S.city = 'Austin, TX'; S.zip = '73301'; S.role = 'Parent';
+  S.kids = [{ name:'Jesica', dob:'2022-03-04' }];
+  S.grades = { 'Pre-K': true, 'Kinder': true };
+  S.bio = ''; S.interests = ['Traditional Finance','Technology','Start-up','AI','Web 3','Finance','Marketing'];
+  aiComplete = false; aiRunning = false;
+  // reset AI screen
+  const micBtn = document.getElementById('micBtn');
+  if (micBtn) { micBtn.classList.remove('on'); micBtn.querySelector('svg').setAttribute('stroke','#186338'); }
+  ['ring1','ring2','ring3'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  const lbl = document.getElementById('micLabel'); if (lbl) { lbl.style.display=''; lbl.textContent='Tap to Talk with AI'; }
+  const wave = document.getElementById('aiWave'); if (wave) wave.classList.remove('visible');
+  const done = document.getElementById('aiDone'); if (done) done.classList.remove('visible');
+  const wrap = document.getElementById('aiBtnWrap'); if (wrap) wrap.style.display='none';
+  const head = document.getElementById('aiHeading'); if (head) head.textContent = "We're ready to create\nyour parent profile";
+  const sub = document.getElementById('aiSub'); if (sub) sub.textContent = 'Answer one question and you\'re in!';
+  // re-init
+  init();
+  const fName = document.getElementById('fName'); if (fName) fName.value = S.firstName;
+  const lName = document.getElementById('lName'); if (lName) lName.value = S.lastName;
+  const cityEl = document.getElementById('city'); if (cityEl) cityEl.value = S.city;
+  const zipEl = document.getElementById('zip'); if (zipEl) zipEl.value = S.zip;
+  nav(1);
+}
+
+// ── LIVE CLOCK ─────────────────────────
+function updateClock() {
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes();
+  const t = `${h}:${m < 10 ? '0' + m : m}`;
+  document.querySelector('.status-time').textContent = t;
+}
+updateClock();
+setInterval(updateClock, 30000);
+
+// ── START ──────────────────────────────
+init();
+</script>
+
+</body>
+</html>
