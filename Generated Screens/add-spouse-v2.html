@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Add Spouse v2 (5.6 & 5.7)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand-500: #186338;
+    --brand-600: #134f2d;
+    --brand-700: #1e3e2b;
+    --brand-50:  #e2e9e3;
+    --brand-100: #d0dacf;
+    --brand-200: #77b691;
+    --sec-500: #f4f1ea;
+    --sec-600: #eae6db;
+    --sec-700: #dbd5c8;
+    --grey-100: #e6e7ea;
+    --grey-200: #cdcfd6;
+    --grey-300: #b3b8c1;
+    --grey-400: #9aa0ad;
+    --grey-500: #818898;
+    --grey-600: #676d7a;
+    --grey-700: #4d525b;
+    --white: #ffffff;
+    --r-sm: 4px; --r-md: 8px; --r-lg: 12px;
+    --r-xl: 16px; --r-full: 9999px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1a1b1e;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 40px 48px 80px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    color: #dbd5c8; font-size: 22px; font-weight: 400;
+    margin-bottom: 6px;
+  }
+  .subtitle { color: #676d7a; font-size: 13px; margin-bottom: 40px; }
+
+  .section-label {
+    color: #676d7a; font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 18px;
+  }
+
+  .comparison-row {
+    display: flex; gap: 40px; align-items: flex-start; margin-bottom: 60px;
+  }
+
+  /* ── Phone shell ── */
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .screen-label { color: #676d7a; font-size: 11px; font-weight: 500; text-align: center; }
+  .phone {
+    width: 300px; height: 650px;
+    background: var(--sec-500);
+    border-radius: 44px;
+    border: 2px solid #2a2c32;
+    overflow: hidden; position: relative; flex-shrink: 0;
+    display: flex; flex-direction: column;
+    box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+  }
+  .phone.new {
+    border-color: var(--brand-500);
+    box-shadow: 0 0 0 2.5px var(--brand-500), 0 24px 48px rgba(0,0,0,0.5);
+  }
+
+  .di {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 92px; height: 27px;
+    background: #000; border-radius: var(--r-full); z-index: 30;
+  }
+
+  .status-bar {
+    height: 48px; flex-shrink: 0;
+    display: flex; align-items: flex-end;
+    justify-content: space-between; padding: 0 20px 6px;
+    position: relative; z-index: 10;
+  }
+  .status-time { font-size: 12px; font-weight: 600; color: var(--grey-700); }
+  .status-icons { display: flex; gap: 5px; align-items: center; }
+
+  .home-bar-wrap {
+    height: 30px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .home-bar { width: 120px; height: 4px; background: var(--grey-700); border-radius: var(--r-full); opacity: 0.2; }
+
+  /* ──────────────────────────────────── */
+  /*  5.6 v2 — input screen              */
+  /* ──────────────────────────────────── */
+  .nav-row {
+    padding: 6px 16px 0;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .back-btn {
+    width: 30px; height: 30px; border-radius: var(--r-full);
+    background: var(--sec-600);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-pill {
+    background: var(--sec-600); border-radius: var(--r-full);
+    padding: 4px 10px; font-size: 10px; font-weight: 600; color: var(--grey-500);
+  }
+
+  /* botanical sprig — small, top-right decorative only */
+  .sprig-wrap {
+    position: relative; height: 96px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* main content */
+  .screen-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .body-pad {
+    flex: 1; padding: 0 18px;
+    display: flex; flex-direction: column; gap: 20px;
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
+
+  .headline-block { display: flex; flex-direction: column; gap: 5px; }
+  .headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 500; color: var(--brand-700); line-height: 1.2;
+  }
+  .headline em { font-style: italic; color: var(--brand-500); }
+  .headline-hint { font-size: 12px; color: var(--grey-500); line-height: 1.5; }
+
+  /* Phone input — large, prominent */
+  .input-field {
+    background: var(--white);
+    border: 1.5px solid var(--grey-200);
+    border-radius: var(--r-lg);
+    height: 52px; display: flex; align-items: center;
+    padding: 0 14px; gap: 10px;
+  }
+  .input-field.active { border-color: var(--brand-500); box-shadow: 0 0 0 3px rgba(24,99,56,0.1); }
+  .country-seg {
+    display: flex; align-items: center; gap: 5px;
+    border-right: 1px solid var(--grey-100); padding-right: 10px; flex-shrink: 0;
+    font-size: 13px; font-weight: 500; color: var(--grey-600);
+  }
+  .country-seg .caret { color: var(--grey-400); font-size: 9px; margin-left: 1px; }
+  .input-placeholder { font-size: 14px; color: var(--grey-400); flex: 1; }
+
+  /* sharing chips — compact, horizontal */
+  .share-preview {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .share-label {
+    font-size: 10px; font-weight: 600; color: var(--grey-400);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .share-chips { display: flex; gap: 7px; }
+  .share-chip {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--brand-50); border: 1px solid var(--brand-100);
+    border-radius: var(--r-full); padding: 5px 10px;
+    font-size: 11px; font-weight: 500; color: var(--brand-700);
+  }
+  .share-chip .chip-icon { font-size: 13px; }
+
+  /* bottom bar */
+  .bottom-bar {
+    padding: 10px 18px 12px;
+    border-top: 1px solid var(--grey-100);
+    background: var(--sec-500);
+    display: flex; gap: 10px; flex-shrink: 0;
+  }
+  .btn-primary {
+    flex: 1; height: 46px; background: var(--brand-500);
+    border-radius: var(--r-full); display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600; color: var(--white);
+    font-family: 'Playfair Display', serif; gap: 6px;
+  }
+  .btn-secondary {
+    height: 46px; padding: 0 20px;
+    background: transparent; border-radius: var(--r-full);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 500; color: var(--grey-500);
+  }
+  .btn-full {
+    width: 100%; height: 46px; background: var(--brand-500);
+    border-radius: var(--r-full); display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600; color: var(--white);
+    font-family: 'Playfair Display', serif; gap: 6px;
+  }
+
+  /* ──────────────────────────────────── */
+  /*  5.7 v2 — success screen             */
+  /* ──────────────────────────────────── */
+  .success-body {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 0 20px 4px; gap: 14px; text-align: center;
+  }
+
+  /* big check mark — the hero of this screen */
+  .big-check {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--brand-50); border: 3px solid var(--brand-100);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  /* subtle ring pulse */
+  .big-check::before {
+    content: '';
+    position: absolute; inset: -8px;
+    border-radius: 50%; border: 1.5px solid var(--brand-100);
+    opacity: 0.5;
+  }
+  .big-check::after {
+    content: '';
+    position: absolute; inset: -16px;
+    border-radius: 50%; border: 1px solid var(--brand-100);
+    opacity: 0.25;
+  }
+
+  .success-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; font-weight: 500; color: var(--brand-700); line-height: 1.2;
+  }
+  .success-title em { font-style: italic; color: var(--brand-500); }
+  .success-hint { font-size: 12px; color: var(--grey-500); line-height: 1.55; max-width: 200px; }
+
+  /* number confirmation — minimal */
+  .number-confirm {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--white); border: 1px solid var(--grey-100);
+    border-radius: var(--r-lg); padding: 12px 14px; width: 100%;
+  }
+  .num-icon {
+    width: 36px; height: 36px; border-radius: var(--r-md);
+    background: var(--brand-50);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .num-val { font-size: 14px; font-weight: 600; color: var(--brand-700); flex: 1; text-align: left; }
+  .re-enter-link { font-size: 11px; color: var(--brand-500); font-weight: 500; }
+
+  /* decorative botanical accent for 5.7 — just a small sprig bottom-right */
+  .corner-sprig {
+    position: absolute; bottom: 88px; right: 0;
+    width: 64px; opacity: 0.18; pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>Add Spouse — v2</h1>
+<p class="subtitle">Less illustration · less text · UX-first</p>
+
+<div class="section-label">5.6 &amp; 5.7 — redesigned</div>
+
+<div class="comparison-row">
+
+  <!-- ══════════════════════════════ -->
+  <!--  5.6 v2                       -->
+  <!-- ══════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone new">
+      <div class="di"></div>
+
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="14" height="10" viewBox="0 0 14 10"><rect x="0" y="3" width="3" height="7" rx="1" fill="#4d525b"/><rect x="4" y="2" width="3" height="8" rx="1" fill="#4d525b"/><rect x="8" y="0" width="3" height="10" rx="1" fill="#4d525b"/><rect x="12" y="0" width="2" height="10" rx="1" fill="#b3b8c1"/></svg>
+          <svg width="12" height="10" viewBox="0 0 12 10"><path d="M6 2C8.2 2 10.2 3 11.5 4.6L12 5l-.5.4C10.2 7 8.2 8 6 8s-4.2-1-5.5-2.6L0 5l.5-.4C1.8 3 3.8 2 6 2z" fill="#4d525b"/><circle cx="6" cy="5" r="1.5" fill="#f4f1ea"/></svg>
+          <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2.5" stroke="#4d525b" stroke-width="1.2" fill="none"/><rect x="1.5" y="2.5" width="13" height="6" rx="1.5" fill="#4d525b"/><path d="M20 4v3a1.5 1.5 0 000-3z" fill="#4d525b"/></svg>
+        </div>
+      </div>
+
+      <!-- nav -->
+      <div class="nav-row">
+        <div class="back-btn">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="#4d525b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="step-pill">5 of 6</div>
+      </div>
+
+      <!-- small botanical sprig — decorative only, doesn't dominate -->
+      <div class="sprig-wrap">
+        <svg width="220" height="90" viewBox="0 0 220 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Central stem -->
+          <path d="M110 80 Q110 50 110 20" stroke="#186338" stroke-width="1.8" stroke-linecap="round" opacity="0.25"/>
+          <!-- Left branches -->
+          <path d="M110 55 Q90 45 75 48" stroke="#186338" stroke-width="1.5" stroke-linecap="round" opacity="0.2"/>
+          <ellipse cx="68" cy="45" rx="10" ry="7" fill="#186338" opacity="0.15"/>
+          <path d="M110 40 Q86 28 70 32" stroke="#186338" stroke-width="1.3" stroke-linecap="round" opacity="0.18"/>
+          <ellipse cx="63" cy="29" rx="9" ry="6" fill="#186338" opacity="0.13"/>
+          <!-- Right branches -->
+          <path d="M110 55 Q130 44 145 47" stroke="#186338" stroke-width="1.5" stroke-linecap="round" opacity="0.2"/>
+          <ellipse cx="152" cy="44" rx="10" ry="7" fill="#186338" opacity="0.15"/>
+          <path d="M110 40 Q134 28 150 31" stroke="#186338" stroke-width="1.3" stroke-linecap="round" opacity="0.18"/>
+          <ellipse cx="157" cy="28" rx="9" ry="6" fill="#186338" opacity="0.13"/>
+          <!-- Top leaf -->
+          <ellipse cx="110" cy="14" rx="8" ry="10" fill="#186338" opacity="0.16"/>
+          <!-- Small heart -->
+          <path d="M110 62 C110 62 106 58 106 55.5 C106 53.2 108 52 110 53.8 C112 52 114 53.2 114 55.5 C114 58 110 62 110 62Z" fill="#d64545" opacity="0.3"/>
+        </svg>
+      </div>
+
+      <!-- body -->
+      <div class="screen-body">
+        <div class="body-pad">
+
+          <div class="headline-block">
+            <div class="headline">Add your <em>spouse</em></div>
+            <div class="headline-hint">We'll send them a text to join Sprout.</div>
+          </div>
+
+          <!-- input — prominent, centre of attention -->
+          <div class="input-field active">
+            <div class="country-seg">
+              <span style="font-size:16px;">🇦🇺</span>
+              <span style="font-size:13px;font-weight:500;color:var(--grey-600);">+61</span>
+              <span class="caret">▾</span>
+            </div>
+            <span class="input-placeholder">Phone number</span>
+          </div>
+
+          <!-- sharing preview — chips only, no verbose list -->
+          <div class="share-preview">
+            <div class="share-label">They'll see</div>
+            <div class="share-chips">
+              <div class="share-chip"><span class="chip-icon">📍</span> Location</div>
+              <div class="share-chip"><span class="chip-icon">👦</span> Kids</div>
+              <div class="share-chip"><span class="chip-icon">🏫</span> Schools</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <div class="btn-secondary">Skip</div>
+        <div class="btn-primary">Send invite</div>
+      </div>
+      <div class="home-bar-wrap"><div class="home-bar"></div></div>
+    </div>
+    <div class="screen-label">5.6 v2 — enter number</div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!--  5.7 v2                       -->
+  <!-- ══════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone new" style="position:relative;">
+      <div class="di"></div>
+
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="14" height="10" viewBox="0 0 14 10"><rect x="0" y="3" width="3" height="7" rx="1" fill="#4d525b"/><rect x="4" y="2" width="3" height="8" rx="1" fill="#4d525b"/><rect x="8" y="0" width="3" height="10" rx="1" fill="#4d525b"/><rect x="12" y="0" width="2" height="10" rx="1" fill="#b3b8c1"/></svg>
+          <svg width="12" height="10" viewBox="0 0 12 10"><path d="M6 2C8.2 2 10.2 3 11.5 4.6L12 5l-.5.4C10.2 7 8.2 8 6 8s-4.2-1-5.5-2.6L0 5l.5-.4C1.8 3 3.8 2 6 2z" fill="#4d525b"/><circle cx="6" cy="5" r="1.5" fill="#f4f1ea"/></svg>
+          <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2.5" stroke="#4d525b" stroke-width="1.2" fill="none"/><rect x="1.5" y="2.5" width="13" height="6" rx="1.5" fill="#4d525b"/><path d="M20 4v3a1.5 1.5 0 000-3z" fill="#4d525b"/></svg>
+        </div>
+      </div>
+
+      <!-- success body — centred, minimal -->
+      <div class="success-body">
+
+        <!-- THE hero: big check, takes visual focus -->
+        <div class="big-check">
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+            <path d="M7 15.5l5.5 5.5 10.5-10.5" stroke="#186338" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <!-- headline — short, confident -->
+        <div class="success-title"><em>Invite sent!</em></div>
+
+        <!-- one line only — tells them what happens next -->
+        <div class="success-hint">We'll link your profiles as soon as they join.</div>
+
+        <!-- number chip — confirm + undo in one row -->
+        <div class="number-confirm">
+          <div class="num-icon">📱</div>
+          <div class="num-val">+61 400 123 456</div>
+          <div class="re-enter-link">Wrong?</div>
+        </div>
+
+      </div>
+
+      <!-- subtle corner botanical — barely visible, not a feature -->
+      <svg class="corner-sprig" viewBox="0 0 64 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 115 Q32 70 32 10" stroke="#186338" stroke-width="2" stroke-linecap="round"/>
+        <path d="M32 80 Q16 68 6 72" stroke="#186338" stroke-width="1.5" stroke-linecap="round"/>
+        <ellipse cx="3" cy="69" rx="8" ry="6" fill="#186338"/>
+        <path d="M32 60 Q48 48 58 52" stroke="#186338" stroke-width="1.5" stroke-linecap="round"/>
+        <ellipse cx="61" cy="49" rx="8" ry="6" fill="#186338"/>
+        <path d="M32 40 Q18 28 10 30" stroke="#186338" stroke-width="1.3" stroke-linecap="round"/>
+        <ellipse cx="7" cy="27" rx="7" ry="5" fill="#186338"/>
+        <ellipse cx="32" cy="6" rx="7" ry="9" fill="#186338"/>
+      </svg>
+
+      <div class="bottom-bar" style="padding-top:10px; padding-bottom:12px;">
+        <div class="btn-full">
+          Explore Sprout
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7.5h9M8.5 3.5l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="home-bar-wrap"><div class="home-bar"></div></div>
+    </div>
+    <div class="screen-label">5.7 v2 — invite sent</div>
+  </div>
+
+  <!-- annotation -->
+  <div style="align-self:center; max-width:220px; display:flex; flex-direction:column; gap:14px;">
+    <div style="background:rgba(24,99,56,0.1); border:1px solid rgba(24,99,56,0.22); border-radius:14px; padding:18px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#77b691;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">v2 changes</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <div style="background:rgba(24,99,56,0.2);border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;color:#77b691;flex-shrink:0;margin-top:1px;">5.6</div>
+          <div style="font-size:11px;color:#c2b9a6;line-height:1.65;">Sprig replaces the full scene — decorative, not dominant. Headline shrinks to 3 words. Sharing info goes from 3 verbose rows → 3 chips. One hint line instead of a paragraph.</div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <div style="background:rgba(24,99,56,0.2);border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;color:#77b691;flex-shrink:0;margin-top:1px;">5.7</div>
+          <div style="font-size:11px;color:#c2b9a6;line-height:1.65;">No illustration. Big check mark is the hero. One headline, one line of body copy. Sharing permissions removed (user already saw them). "Wrong?" lives inline with the number — no full button.</div>
+        </div>
+
+        <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;font-size:11px;color:#818898;line-height:1.65;">
+          Both screens do one thing. User reads less, acts faster.
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

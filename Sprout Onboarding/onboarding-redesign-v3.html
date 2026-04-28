@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sprout — Onboarding Redesign v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   SPROUT ONBOARDING — V3
+   Faithfully recreates the current design screen-by-screen.
+   Only font sizes have been corrected based on pixel audit.
+
+   FONT SIZE CHANGES (current → v3):
+   ─────────────────────────────────────────────────────────
+   Section label  (WELCOME / YOUR FAMILY)  11px  → 13px
+   Main headline                           24px  → 30px
+   Headline line-height                    1.2   → 1.15
+   Subtitle / description copy             13px  → 17px
+   Input field labels                      12px  → 15px
+   Input placeholder / typed text          15px  → 17px
+   Role card name                          14px  → 16px
+   Role card emoji label (Mom/Dad)         13px  → 15px
+   Empty state title                       16px  → 19px
+   Empty state description                 12px  → 15px
+   Add-child CTA main text                 14px  → 17px
+   Add-child hint text                     12px  → 15px
+   Info / disclaimer box text              12px  → 14px
+   School list item name                   15px  → 17px
+   School list item distance               12px  → 15px
+   AI screen centred headline              20px  → 26px
+   AI screen sub-text                      13px  → 16px
+   AI screen "Tap to Talk" label           22px  → 26px
+   Nav bar header                          16px  → 18px
+   Profile name (large)                    24px  → 28px
+   Profile role sub-text                   14px  → 16px
+   Profile Bio / Interests label           11px  → 14px
+   Bio body text                           12px  → 16px
+   Interest chip text                      13px  → 15px
+   Kid chip name                           12px  → 14px
+   Kid chip age                            11px  → 13px
+   Continue / primary button               16px  → 18px
+   Secondary / skip link                   15px  → 16px
+   Already-taken-care row label            14px  → 16px
+   Already-taken-care row sub-text         12px  → 15px
+═══════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --brand:          #186338;
+  --brand-bold:     #1e3e2b;
+  --brand-light:    #e2e9e3;
+  --brand-mid:      #579a74;
+  --bg:             #f4f1ea;
+  --surface-1:      #eae6db;
+  --surface-2:      #dbd5c8;
+  --text-pri:       #4d525b;
+  --text-sec:       #818898;
+  --text-ter:       #b3b8c1;
+  --border:         #dbd5c8;
+  --border-pri:     #b3b8c1;
+  --white:          #ffffff;
+  --info-bg:        #d8e5ed;
+  --info-text:      #234a63;
+}
+
+html, body {
+  height: 100%;
+  min-height: 100vh;
+  background: #1a1a1a;
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+/* ── LAYOUT ── */
+.page-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.page-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 4px;
+}
+.page-title span { color: rgba(255,255,255,0.75); }
+
+/* ── PHONE FRAME ── */
+.phone {
+  width: 393px;
+  height: 852px;
+  background: var(--bg);
+  border-radius: 52px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.07);
+  flex-shrink: 0;
+}
+
+/* ── SCREEN TRANSITIONS ── */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(24px);
+  transition: opacity .28s cubic-bezier(.4,0,.2,1), transform .28s cubic-bezier(.4,0,.2,1);
+}
+.screen.active   { opacity: 1; pointer-events: all; transform: translateX(0); }
+.screen.past     { opacity: 0; transform: translateX(-24px); pointer-events: none; }
+
+/* ── HOME INDICATOR ── */
+.home-bar {
+  position: absolute;
+  bottom: 8px; left: 50%;
+  transform: translateX(-50%);
+  width: 130px; height: 5px;
+  background: #1a1a1a; opacity: .18;
+  border-radius: 5px;
+  pointer-events: none; z-index: 200;
+}
+
+/* ── STATUS BAR ── */
+.status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 28px 6px;
+  flex-shrink: 0;
+}
+.status .time { font-size: 15px; font-weight: 600; color: var(--text-pri); }
+.status .icons { display: flex; gap: 5px; align-items: center; }
+.status .icons svg { width: 16px; height: 16px; fill: var(--text-pri); }
+
+/* ── TOP NAV ── */
+.topnav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 2px 24px 0;
+  flex-shrink: 0;
+}
+.back-btn {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none; cursor: pointer; padding: 0;
+  flex-shrink: 0;
+}
+.back-btn svg { width: 20px; height: 20px; fill: none; stroke: var(--text-pri); stroke-width: 2; stroke-linecap: round; }
+.progress-track {
+  flex: 1;
+  display: flex;
+  gap: 5px;
+}
+.prog-seg {
+  flex: 1; height: 3px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  transition: background .4s;
+}
+.prog-seg.done   { background: var(--brand); }
+.prog-seg.active { background: var(--brand-mid); }
+
+/* ── SCROLL BODY ── */
+.body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px 12px;
+  scrollbar-width: none;
+}
+.body::-webkit-scrollbar { display: none; }
+
+/* ── SECTION LABEL ── */
+.sec-label {
+  font-size: 13px;           /* was 11px */
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brand);
+  margin-bottom: 8px;
+}
+
+/* ── HEADLINE ── */
+.headline {
+  font-family: 'Lora', serif;
+  font-size: 30px;           /* was 24px */
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--brand-bold);
+  margin-bottom: 8px;
+  letter-spacing: -0.3px;
+}
+
+/* ── SUBTITLE ── */
+.subtitle {
+  font-size: 17px;           /* was 13px */
+  font-weight: 400;
+  color: var(--text-sec);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+/* ── INPUTS ── */
+.field-row { display: flex; gap: 10px; margin-bottom: 12px; }
+.field-row .field { flex: 1; }
+.field { margin-bottom: 12px; }
+.field label {
+  display: block;
+  font-size: 15px;           /* was 12px */
+  font-weight: 500;
+  color: var(--text-sec);
+  margin-bottom: 7px;
+}
+.field input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-1);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 17px;           /* was 15px */
+  font-weight: 400;
+  color: var(--text-pri);
+  outline: none;
+  -webkit-appearance: none;
+  transition: border-color .2s;
+}
+.field input::placeholder { color: var(--text-ter); }
+.field input:focus { border-color: var(--brand); }
+
+/* ── "I'm a…" ROLE GRID ── */
+.role-label {
+  font-size: 15px;           /* was 12px */
+  font-weight: 500;
+  color: var(--text-pri);
+  margin-bottom: 10px;
+}
+.role-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.role-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px 8px;
+  border-radius: 16px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-1);
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.role-tile .emoji { font-size: 28px; line-height: 1; }
+.role-tile .name {
+  font-size: 16px;           /* was 14px */
+  font-weight: 600;
+  color: var(--brand-bold);
+}
+.role-tile.selected {
+  border-color: var(--brand);
+  background: var(--white);
+  box-shadow: 0 0 0 1px var(--brand);
+}
+
+/* ── EMPTY STATE (Add Kids) ── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 28px 16px 24px;
+  margin-bottom: 12px;
+}
+.empty-state .es-emoji { font-size: 52px; margin-bottom: 10px; }
+.empty-state .es-title {
+  font-size: 19px;           /* was 16px */
+  font-weight: 600;
+  color: var(--brand-bold);
+  margin-bottom: 6px;
+}
+.empty-state .es-sub {
+  font-size: 15px;           /* was 12px */
+  color: var(--text-sec);
+  line-height: 1.5;
+  max-width: 260px;
+}
+
+/* ── ADD CHILD ROW BUTTON ── */
+.add-child-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--brand-bold);
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  transition: opacity .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.add-child-row:active { opacity: .85; }
+.add-child-row .ac-thumb {
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,.15);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.add-child-row .ac-text { text-align: left; }
+.add-child-row .ac-main {
+  font-size: 17px;           /* was 14px */
+  font-weight: 600;
+  color: white;
+}
+.add-child-row .ac-hint {
+  font-size: 15px;           /* was 12px */
+  color: rgba(255,255,255,.7);
+}
+.add-child-row .ac-arrow {
+  margin-left: auto;
+  color: rgba(255,255,255,.6);
+  font-size: 18px;
+}
+
+/* ── INFO BOX ── */
+.info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--info-bg);
+  border-radius: 12px;
+  margin-top: 12px;
+}
+.info-box .ib-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.info-box .ib-text {
+  font-size: 14px;           /* was 12px */
+  color: var(--info-text);
+  line-height: 1.5;
+}
+
+/* ── SEARCH BAR ── */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--surface-1);
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  margin-bottom: 14px;
+}
+.search-bar input {
+  flex: 1;
+  border: none; outline: none; background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: var(--text-pri);
+}
+.search-bar input::placeholder { color: var(--text-sec); }
+
+/* ── SCHOOL LIST ITEM ── */
+.school-list { display: flex; flex-direction: column; gap: 0; }
+.school-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--surface-1);
+  cursor: pointer;
+}
+.school-item:last-child { border-bottom: none; }
+.school-item .si-icon {
+  width: 36px; height: 36px;
+  background: var(--brand-light);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.school-item .si-info .si-name {
+  font-size: 17px;           /* was 15px */
+  font-weight: 600;
+  color: var(--brand-bold);
+}
+.school-item .si-info .si-dist {
+  font-size: 15px;           /* was 12px */
+  color: var(--text-sec);
+}
+.school-item .si-caret {
+  margin-left: auto;
+  color: var(--text-ter);
+  font-size: 18px;
+}
+.school-item.expanded .si-caret { transform: rotate(180deg); }
+.school-sub {
+  font-size: 14px;
+  color: var(--text-sec);
+  padding: 0 0 12px 50px;
+  display: none;
+}
+
+/* ── AI SCREEN ── */
+.ai-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 56px;
+}
+.ai-headline {
+  font-family: 'Lora', serif;
+  font-size: 26px;           /* was 20px */
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--brand-bold);
+  margin-bottom: 8px;
+  max-width: 280px;
+}
+.ai-sub {
+  font-size: 16px;           /* was 13px */
+  color: var(--text-sec);
+  margin-bottom: 48px;
+}
+.ai-mic-ring {
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  background: var(--surface-1);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 32px;
+}
+.ai-mic-ring svg { width: 44px; height: 44px; stroke: var(--text-sec); fill: none; stroke-width: 1.5; stroke-linecap: round; }
+.ai-tap-label {
+  font-family: 'Lora', serif;
+  font-size: 26px;           /* was 22px */
+  font-weight: 600;
+  color: var(--brand-bold);
+}
+
+/* ── AI INTRO / ALEX ── */
+.alex-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 48px;
+  flex: 1;
+}
+.alex-aura {
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #e2e9e3, #dbd5c8);
+  margin-bottom: 32px;
+  position: relative;
+}
+.alex-name {
+  font-family: 'Lora', serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--brand-bold);
+  margin-bottom: 8px;
+}
+.alex-intro {
+  font-size: 16px;
+  color: var(--text-sec);
+  line-height: 1.55;
+  max-width: 280px;
+}
+.alex-controls {
+  display: flex;
+  gap: 20px;
+  margin-top: auto;
+  padding-bottom: 48px;
+  align-items: center;
+}
+.ctrl-btn {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+}
+.ctrl-btn.secondary { background: #3d3d3d; }
+.ctrl-btn.primary   { background: #e05b5b; width: 62px; height: 62px; }
+
+/* ── PROFILE SCREEN ── */
+.profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px 4px;
+  position: relative;
+  flex-shrink: 0;
+}
+.profile-header .ph-back {
+  position: absolute; left: 24px;
+  background: none; border: none; cursor: pointer;
+  font-size: 20px; color: var(--text-pri);
+  padding: 4px;
+}
+.profile-header .ph-title {
+  font-size: 18px;           /* was 16px */
+  font-weight: 600;
+  color: var(--brand-bold);
+}
+.profile-avatar-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0 12px;
+}
+.profile-avatar {
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  background: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  margin-bottom: 8px;
+}
+.profile-avatar .initials {
+  font-family: 'Lora', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+}
+.profile-avatar .upload-badge {
+  position: absolute; bottom: 0; right: 0;
+  width: 26px; height: 26px;
+  background: var(--surface-1);
+  border: 2px solid var(--bg);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+}
+.add-photo-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: #d64545;
+  margin-bottom: 12px;
+}
+.profile-name {
+  font-family: 'Lora', serif;
+  font-size: 28px;           /* was 24px */
+  font-weight: 600;
+  color: var(--brand-bold);
+  margin-bottom: 4px;
+}
+.profile-role-sub {
+  font-size: 16px;           /* was 14px */
+  color: var(--text-sec);
+  margin-bottom: 14px;
+}
+.kids-chips { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+.kid-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--surface-1);
+  border-radius: 14px;
+  gap: 4px;
+}
+.kid-chip .kc-emoji { font-size: 22px; }
+.kid-chip .kc-name {
+  font-size: 14px;           /* was 12px */
+  font-weight: 600;
+  color: var(--brand-bold);
+}
+.kid-chip .kc-age {
+  font-size: 13px;           /* was 11px */
+  color: var(--text-sec);
+}
+.bio-card {
+  background: var(--surface-1);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.bio-card .bc-label {
+  font-size: 14px;           /* was 11px */
+  font-weight: 700;
+  color: var(--text-pri);
+  margin-bottom: 6px;
+  letter-spacing: 0.01em;
+}
+.bio-card .bc-text {
+  font-size: 16px;           /* was 12px */
+  color: var(--text-pri);
+  line-height: 1.55;
+}
+.interests-section { margin-bottom: 20px; }
+.interests-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.interests-header .int-label {
+  font-size: 14px;           /* was 11px → 14px */
+  font-weight: 600;
+  color: var(--text-pri);
+}
+.interests-header .int-add {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-pri);
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--text-sec);
+}
+.interest-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.int-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  background: var(--surface-1);
+  border-radius: 100px;
+  font-size: 15px;           /* was 13px */
+  font-weight: 500;
+  color: var(--text-pri);
+}
+.int-chip .x { color: var(--text-sec); font-size: 12px; cursor: pointer; }
+
+/* ── SPOUSE SCREEN ── */
+.done-card {
+  background: var(--surface-1);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.done-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--brand-light);
+  font-size: 14px;           /* already 14 → keep */
+  font-weight: 600;
+  color: var(--brand);
+}
+.done-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--white);
+}
+.done-row .dr-icon { font-size: 20px; }
+.done-row .dr-title {
+  font-size: 16px;           /* was 14px → 16px */
+  font-weight: 600;
+  color: var(--brand-bold);
+}
+.done-row .dr-sub {
+  font-size: 15px;           /* was 12px → 15px */
+  color: var(--text-sec);
+}
+
+/* ── BOTTOM ACTIONS ── */
+.actions {
+  padding: 12px 24px 30px;
+  flex-shrink: 0;
+}
+.btn-continue {
+  width: 100%;
+  padding: 17px;
+  border-radius: 100px;
+  background: var(--brand);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 18px;           /* was 16px */
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background .2s, transform .15s;
+  -webkit-tap-highlight-color: transparent;
+  letter-spacing: 0.01em;
+}
+.btn-continue:active { background: var(--brand-bold); transform: scale(0.98); }
+.btn-skip {
+  width: 100%;
+  padding: 12px;
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;           /* was 15px */
+  font-weight: 500;
+  color: var(--text-sec);
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+/* ── BOTTOM SHEET ── */
+.overlay {
+  position: absolute; inset: 0;
+  background: rgba(30,62,43,.4);
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s; z-index: 50;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+.sheet {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: var(--bg);
+  border-radius: 28px 28px 0 0;
+  padding: 20px 24px 36px;
+  transform: translateY(100%);
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+  z-index: 51;
+  max-height: 88%;
+  overflow-y: auto;
+}
+.sheet.open { transform: translateY(0); }
+.sheet-handle {
+  width: 40px; height: 4px;
+  background: var(--surface-2);
+  border-radius: 4px;
+  margin: 0 auto 20px;
+}
+.sheet h2 {
+  font-family: 'Lora', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--brand-bold);
+  margin-bottom: 5px;
+}
+.sheet .sheet-sub {
+  font-size: 16px;
+  color: var(--text-sec);
+  margin-bottom: 20px;
+}
+.gender-row { display: flex; gap: 10px; margin-bottom: 14px; }
+.gender-btn {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 14px 6px;
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-1);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;           /* was 14px */
+  font-weight: 500;
+  color: var(--text-pri);
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color .2s, background .2s;
+}
+.gender-btn .ge { font-size: 26px; }
+.gender-btn.sel { border-color: var(--brand); background: var(--white); }
+.sheet-btns { display: flex; gap: 10px; margin-top: 4px; }
+.sheet-cancel {
+  flex: 1;
+  padding: 16px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border-pri);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-sec);
+  cursor: pointer;
+}
+.sheet-add {
+  flex: 2;
+  padding: 16px;
+  border-radius: 100px;
+  background: var(--brand);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+/* ── OUTER CONTROLS ── */
+.outer-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+.dots { display: flex; gap: 7px; }
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.22);
+  cursor: pointer;
+  transition: background .2s, width .2s;
+}
+.dot.active { background: rgba(255,255,255,.82); width: 22px; border-radius: 4px; }
+.arrows { display: flex; gap: 10px; }
+.arrow-btn {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.18);
+  color: rgba(255,255,255,.75);
+  font-size: 17px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background .2s;
+}
+.arrow-btn:hover { background: rgba(255,255,255,.18); }
+.arrow-btn:disabled { opacity: .25; cursor: default; }
+
+/* ── CHANGE LOG ── */
+.changelog {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 16px;
+  padding: 20px 24px;
+  width: 393px;
+  font-family: 'DM Sans', sans-serif;
+}
+.changelog h3 {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.45);
+  margin-bottom: 14px;
+}
+.cl-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  font-size: 13px;
+}
+.cl-row:last-child { border-bottom: none; }
+.cl-elem { color: rgba(255,255,255,.6); }
+.cl-sizes { display: flex; gap: 6px; align-items: center; }
+.cl-before { color: rgba(255,80,80,.7); text-decoration: line-through; }
+.cl-after  { color: rgba(80,220,130,.9); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <div class="page-title">Sprout Onboarding — <span>v3 · Font Size Correction</span></div>
+
+  <!-- ════════════════════ PHONE ════════════════════ -->
+  <div class="phone" id="phone">
+    <div class="home-bar"></div>
+
+    <!-- ─── SCREEN 0: 4.1 Details Information ─── -->
+    <div class="screen active" id="s0">
+      <div class="status">
+        <span class="time">9:41</span>
+        <div class="icons">
+          <svg viewBox="0 0 24 24"><path d="M1 6l5.5 5.5L12 6l5.5 5.5L23 6"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg>
+          <svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+        </div>
+      </div>
+      <div class="topnav">
+        <button class="back-btn" style="opacity:.3;pointer-events:none">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="progress-track">
+          <div class="prog-seg active"></div>
+          <div class="prog-seg"></div>
+          <div class="prog-seg"></div>
+          <div class="prog-seg"></div>
+        </div>
+      </div>
+      <div class="body">
+        <div style="margin-top:14px;">
+          <div class="sec-label">WELCOME</div>
+          <h1 class="headline">Let's set up your<br/>family profile 🌱</h1>
+          <p class="subtitle">Just the basics to get you started. You can fill in the rest once you're in.</p>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>First Name</label>
+            <input type="text" placeholder=""/>
+          </div>
+          <div class="field">
+            <label>Last Name</label>
+            <input type="text" placeholder=""/>
+          </div>
+        </div>
+        <div class="field">
+          <label>Zip Code</label>
+          <input type="tel" placeholder=""/>
+        </div>
+        <div class="role-label">I'm a..</div>
+        <div class="role-grid">
+          <div class="role-tile" onclick="sel(this)">
+            <span class="emoji">🤱</span>
+            <span class="name">Mom</span>
+          </div>
+          <div class="role-tile" onclick="sel(this)">
+            <span class="emoji">😎</span>
+            <span class="name">Dad</span>
+          </div>
+          <div class="role-tile" onclick="sel(this)">
+            <span class="emoji">🥰</span>
+            <span class="name">Guardian</span>
+          </div>
+          <div class="role-tile" onclick="sel(this)">
+            <span class="emoji">💛</span>
+            <span class="name">Step Parent</span>
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-continue" onclick="go(1)">Continue</button>
+      </div>
+    </div>
+
+    <!-- ─── SCREEN 1: 4.3 Add Kids – Empty State ─── -->
+    <div class="screen" id="s1">
+      <div class="status">
+        <span class="time">9:41</span>
+        <div class="icons">
+          <svg viewBox="0 0 24 24"><path d="M1 6l5.5 5.5L12 6l5.5 5.5L23 6"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg>
+          <svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+        </div>
+      </div>
+      <div class="topnav">
+        <button class="back-btn" onclick="go(0)">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="progress-track">
+          <div class="prog-seg done"></div>
+          <div class="prog-seg active"></div>
+          <div class="prog-seg"></div>
+          <div class="prog-seg"></div>
+        </div>
+      </div>
+      <div class="body">
+        <div style="margin-top:14px;">
+          <div class="sec-label">YOUR FAMILY</div>
+          <h1 class="headline">Add your little ones 🌱</h1>
+          <p class="subtitle">We'll personalize events, clubs, and activities to match each of your child's information.</p>
+        </div>
+        <div class="empty-state" id="empty-state">
+          <div class="es-emoji">🧒</div>
+          <div class="es-title">No kids added yet</div>
+          <div class="es-sub">Add your children so Sprout can find age-perfect activities, playdates, and local events for your family.</div>
+        </div>
+        <div id="kids-added"></div>
+        <button class="add-child-row" onclick="openSheet()">
+          <div class="ac-thumb"></div>
+          <div class="ac-text">
+            <div class="ac-main">Add your child</div>
+            <div class="ac-hint">Take less than a minute</div>
+          </div>
+          <div class="ac-arrow">›</div>
+        </button>
+        <div class="info-box">
+          <span class="ib-icon">ℹ️</span>
+          <span class="ib-text">We use your kids' info just to make your Sprout experience more personal!</span>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-continue" onclick="go(2)">Continue</button>
+      </div>
+
+      <!-- Add Child Sheet -->
+      <div class="overlay" id="overlay" onclick="closeSheet()"></div>
+      <div class="sheet" id="sheet">
+        <div class="sheet-handle"></div>
+        <h2>Add a Child</h2>
+        <div class="sheet-sub">Tell us a little about your kid so we can find the right activities.</div>
+        <div class="field">
+          <label>Child's Name</label>
+          <input id="child-name" type="text" placeholder="e.g. James"/>
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:15px;font-weight:500;color:var(--text-sec);display:block;margin-bottom:8px;">Gender</label>
+          <div class="gender-row">
+            <button class="gender-btn" onclick="selG(this)"><span class="ge">👦</span>Boy</button>
+            <button class="gender-btn" onclick="selG(this)"><span class="ge">👧</span>Girl</button>
+            <button class="gender-btn" onclick="selG(this)"><span class="ge">👀</span>Other</button>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:20px;">
+          <label>Birth Date</label>
+          <input type="text" placeholder="dd/mm/yyyy"/>
+        </div>
+        <div class="sheet-btns">
+          <button class="sheet-cancel" onclick="closeSheet()">Cancel</button>
+          <button class="sheet-add" onclick="addKid()">Add Child</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SCREEN 2: 4.16 School Groups ─── -->
+    <div class="screen" id="s2">
+      <div class="status">
+        <span class="time">9:41</span>
+        <div class="icons">
+          <svg viewBox="0 0 24 24"><path d="M1 6l5.5 5.5L12 6l5.5 5.5L23 6"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg>
+          <svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+        </div>
+      </div>
+      <div class="topnav">
+        <button class="back-btn" onclick="go(1)">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="progress-track">
+          <div class="prog-seg done"></div>
+          <div class="prog-seg done"></div>
+          <div class="prog-seg active"></div>
+          <div class="prog-seg"></div>
+        </div>
+      </div>
+      <div class="body">
+        <div style="margin-top:14px;">
+          <div class="sec-label">JOIN GROUP</div>
+          <h1 class="headline">Join your kids school groups</h1>
+          <p class="subtitle" style="margin-bottom:16px;">Zip Code: 73301</p>
+        </div>
+        <div class="search-bar">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#818898" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search"/>
+        </div>
+        <div class="school-list">
+          <div class="school-item">
+            <div class="si-icon">🍀</div>
+            <div class="si-info">
+              <div class="si-name">Lincoln Elementary School</div>
+              <div class="si-dist">0.8 miles away</div>
+            </div>
+            <div class="si-caret">›</div>
+          </div>
+          <div class="school-item">
+            <div class="si-icon">🍀</div>
+            <div class="si-info">
+              <div class="si-name">Washington Middle School</div>
+              <div class="si-dist">1.2 miles away</div>
+            </div>
+            <div class="si-caret">›</div>
+          </div>
+          <div class="school-item">
+            <div class="si-icon">🍀</div>
+            <div class="si-info">
+              <div class="si-name">Jefferson High School</div>
+              <div class="si-dist">1.5 miles away</div>
+            </div>
+            <div class="si-caret">›</div>
+          </div>
+          <div class="school-item">
+            <div class="si-icon">🍀</div>
+            <div class="si-info">
+              <div class="si-name">Roosevelt Elementary</div>
+              <div class="si-dist">2.1 miles away</div>
+            </div>
+            <div class="si-caret">›</div>
+          </div>
+          <div class="school-item">
+            <div class="si-icon">🍀</div>
+            <div class="si-info">
+              <div class="si-name">Kennedy Preparatory</div>
+              <div class="si-dist">2.8 miles away</div>
+            </div>
+            <div class="si-caret">›</div>
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-continue" onclick="go(3)" style="opacity:.6;background:var(--brand-light);color:var(--brand);">Continue</button>
+      </div>
+    </div>
+
+    <!-- ─── SCREEN 3: 4.19 AI Onboarding ─── -->
+    <div class="screen" id="s3">
+      <div class="status">
+        <span class="time">9:41</span>
+        <div class="icons">
+          <svg viewBox="0 0 24 24"><path d="M1 6l5.5 5.5L12 6l5.5 5.5L23 6"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg>
+          <svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+        </div>
+      </div>
+      <div class="topnav">
+        <button class="back-btn" onclick="go(2)">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="progress-track">
+          <div class="prog-seg done"></div>
+          <div class="prog-seg done"></div>
+          <div class="prog-seg done"></div>
+          <div class="prog-seg active"></div>
+        </div>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;">
+        <div class="ai-center">
+          <div class="ai-headline">We're ready to create your parent profile</div>
+          <div class="ai-sub">Answer one question and you're in!</div>
+          <div class="ai-mic-ring">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="2" width="6" height="11" rx="3"/>
+              <path d="M5 10a7 7 0 0014 0"/>
+              <line x1="12" y1="21" x2="12" y2="17"/>
+              <line x1="9" y1="21" x2="15" y2="21"/>
+            </svg>
+          </div>
+          <div class="ai-tap-label">Tap to Talk with AI</div>
+        </div>
+      </div>
+      <div class="actions" style="padding-bottom:36px;">
+      </div>
+    </div>
+
+    <!-- ─── SCREEN 4: 5.1 Customize Profile ─── -->
+    <div class="screen" id="s4">
+      <div class="status">
+        <span class="time">9:41</span>
+        <div class="icons">
+          <svg viewBox="0 0 24 24"><path d="M1 6l5.5 5.5L12 6l5.5 5.5L23 6"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg>
+          <svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+        </div>
+      </div>
+      <div class="profile-header">
+        <button class="ph-back" onclick="go(3)">‹</button>
+        <div class="ph-title">Customize Your Profile</div>
+      </div>
+      <div class="body">
+        <div class="profile-avatar-area">
+          <div class="profile-avatar">
+            <span class="initials">JM</span>
+            <div class="upload-badge">📷</div>
+          </div>
+          <div class="add-photo-link">*Add Photo Profile</div>
+          <div class="profile-name">James Martin</div>
+          <div class="profile-role-sub">Father of 3 kids</div>
+          <div class="kids-chips">
+            <div class="kid-chip"><span class="kc-emoji">😊</span><span class="kc-name">Etan</span><span class="kc-age">2 yrs</span></div>
+            <div class="kid-chip"><span class="kc-emoji">😊</span><span class="kc-name">Olivia</span><span class="kc-age">1 yrs</span></div>
+            <div class="kid-chip"><span class="kc-emoji">😊</span><span class="kc-name">Erick</span><span class="kc-age">6 yrs</span></div>
+          </div>
+        </div>
+        <div class="bio-card">
+          <div class="bc-label">Profile Bio</div>
+          <div class="bc-text">James Martin is parent to Kenedy's in 73301. Passionate about active &amp; sports, nature &amp; outdoors, community. I love the spontaneous connections — bumping into other parents at the park and realizing you have so much in common.</div>
+        </div>
+        <div class="interests-section">
+          <div class="interests-header">
+            <span class="int-label">Interests</span>
+            <button class="int-add">＋</button>
+          </div>
+          <div class="interest-chips">
+            <div class="int-chip">Traditional Finance <span class="x">✕</span></div>
+            <div class="int-chip">Technology <span class="x">✕</span></div>
+            <div class="int-chip">Start-up <span class="x">✕</span></div>
+            <div class="int-chip">AI <span class="x">✕</span></div>
+            <div class="int-chip">Web 3 <span class="x">✕</span></div>
+            <div class="int-chip">Finance <span class="x">✕</span></div>
+            <div class="int-chip">Marketing <span class="x">✕</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-continue" onclick="go(5)">Next</button>
+      </div>
+    </div>
+
+    <!-- ─── SCREEN 5: 6.1 Spouse Onboarding Landing ─── -->
+    <div class="screen" id="s5">
+      <div class="status">
+        <span class="time">9:41</span>
+        <div class="icons">
+          <svg viewBox="0 0 24 24"><path d="M1 6l5.5 5.5L12 6l5.5 5.5L23 6"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg>
+          <svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+        </div>
+      </div>
+      <div class="topnav">
+        <button class="back-btn" onclick="go(4)">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+      </div>
+      <div class="body">
+        <div style="margin-top:14px;">
+          <div class="sec-label">WELCOME</div>
+          <h1 class="headline">James invited you to join the family</h1>
+          <p class="subtitle">Your family data is already set up.<br/>We just need a few things about you.</p>
+        </div>
+        <div class="done-card">
+          <div class="done-card-header">
+            <span>✓</span> Already taken care of
+          </div>
+          <div class="done-row">
+            <span class="dr-icon">📍</span>
+            <div>
+              <div class="dr-title">Location</div>
+              <div class="dr-sub">Austin, TX · 73301</div>
+            </div>
+          </div>
+          <div class="done-row">
+            <span class="dr-icon">😊</span>
+            <div>
+              <div class="dr-title">Kids</div>
+              <div class="dr-sub">Jesica, Liam, Sophia</div>
+            </div>
+          </div>
+          <div class="done-row">
+            <span class="dr-icon">🏫</span>
+            <div>
+              <div class="dr-title">School Groups</div>
+              <div class="dr-sub">Lincoln Elementary School</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-continue" onclick="go(0)">Continue</button>
+      </div>
+    </div>
+
+  </div><!-- /phone -->
+
+  <!-- ── OUTER NAV ── -->
+  <div class="outer-controls">
+    <div class="dots" id="dots"></div>
+    <div class="arrows">
+      <button class="arrow-btn" id="btn-prev" onclick="prev()">←</button>
+      <button class="arrow-btn" id="btn-next" onclick="next()">→</button>
+    </div>
+  </div>
+
+  <!-- ── CHANGELOG ── -->
+  <div class="changelog">
+    <h3>Font size corrections — current design → v3</h3>
+    <div class="cl-row"><span class="cl-elem">Section label (WELCOME)</span><span class="cl-sizes"><span class="cl-before">11px</span>→<span class="cl-after">13px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Main headline</span><span class="cl-sizes"><span class="cl-before">24px</span>→<span class="cl-after">30px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Subtitle / description</span><span class="cl-sizes"><span class="cl-before">13px</span>→<span class="cl-after">17px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Input field labels</span><span class="cl-sizes"><span class="cl-before">12px</span>→<span class="cl-after">15px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Input placeholder text</span><span class="cl-sizes"><span class="cl-before">15px</span>→<span class="cl-after">17px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Role card name</span><span class="cl-sizes"><span class="cl-before">14px</span>→<span class="cl-after">16px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Empty state title</span><span class="cl-sizes"><span class="cl-before">16px</span>→<span class="cl-after">19px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Empty state description</span><span class="cl-sizes"><span class="cl-before">12px</span>→<span class="cl-after">15px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Add-child CTA text</span><span class="cl-sizes"><span class="cl-before">14px</span>→<span class="cl-after">17px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Hint / secondary text</span><span class="cl-sizes"><span class="cl-before">12px</span>→<span class="cl-after">15px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">School name</span><span class="cl-sizes"><span class="cl-before">15px</span>→<span class="cl-after">17px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">School distance text</span><span class="cl-sizes"><span class="cl-before">12px</span>→<span class="cl-after">15px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">AI centred headline</span><span class="cl-sizes"><span class="cl-before">20px</span>→<span class="cl-after">26px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">"Tap to Talk with AI"</span><span class="cl-sizes"><span class="cl-before">22px</span>→<span class="cl-after">26px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Nav bar header</span><span class="cl-sizes"><span class="cl-before">16px</span>→<span class="cl-after">18px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Profile name</span><span class="cl-sizes"><span class="cl-before">24px</span>→<span class="cl-after">28px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Profile Bio label</span><span class="cl-sizes"><span class="cl-before">11px</span>→<span class="cl-after">14px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Bio body text</span><span class="cl-sizes"><span class="cl-before">12px</span>→<span class="cl-after">16px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Interest chip text</span><span class="cl-sizes"><span class="cl-before">13px</span>→<span class="cl-after">15px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Kid chip name / age</span><span class="cl-sizes"><span class="cl-before">12/11px</span>→<span class="cl-after">14/13px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Continue button</span><span class="cl-sizes"><span class="cl-before">16px</span>→<span class="cl-after">18px</span></span></div>
+    <div class="cl-row"><span class="cl-elem">Already-taken-care row</span><span class="cl-sizes"><span class="cl-before">14/12px</span>→<span class="cl-after">16/15px</span></span></div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<script>
+const TOTAL = 6;
+let cur = 0;
+const screens = Array.from({length: TOTAL}, (_, i) => document.getElementById('s'+i));
+const dotsEl  = document.getElementById('dots');
+
+for (let i = 0; i < TOTAL; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' active':'');
+  d.onclick = () => go(i);
+  dotsEl.appendChild(d);
+}
+
+function render() {
+  screens.forEach((s, i) => {
+    s.classList.remove('active','past');
+    if (i === cur) s.classList.add('active');
+    else if (i < cur) s.classList.add('past');
+  });
+  dotsEl.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===cur));
+  document.getElementById('btn-prev').disabled = cur === 0;
+  document.getElementById('btn-next').disabled = cur === TOTAL-1;
+}
+
+function go(n)  { cur = Math.max(0, Math.min(TOTAL-1, n)); render(); }
+function prev() { go(cur-1); }
+function next() { go(cur+1); }
+
+function sel(tile) {
+  document.querySelectorAll('.role-tile').forEach(t=>t.classList.remove('selected'));
+  tile.classList.add('selected');
+}
+function selG(btn) {
+  document.querySelectorAll('.gender-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function openSheet()  { document.getElementById('overlay').classList.add('open'); document.getElementById('sheet').classList.add('open'); }
+function closeSheet() { document.getElementById('overlay').classList.remove('open'); document.getElementById('sheet').classList.remove('open'); }
+
+const emojis = ['🧒','👦','👧'];
+let kidIdx = 0;
+function addKid() {
+  const name = document.getElementById('child-name').value.trim() || 'Child';
+  const list  = document.getElementById('kids-added');
+  const empty = document.getElementById('empty-state');
+  empty.style.display = 'none';
+  const card = document.createElement('div');
+  card.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--white);border-radius:14px;margin-bottom:10px;border:1.5px solid var(--border);';
+  card.innerHTML = `
+    <div style="width:40px;height:40px;background:var(--brand-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;">${emojis[kidIdx%3]}</div>
+    <div>
+      <div style="font-size:17px;font-weight:600;color:var(--brand-bold);">${name}</div>
+      <div style="font-size:15px;color:var(--text-sec);">Added just now</div>
+    </div>
+    <button onclick="this.parentElement.remove();if(!document.getElementById('kids-added').children.length)document.getElementById('empty-state').style.display='';"
+      style="margin-left:auto;background:var(--surface-1);border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:12px;color:var(--text-sec);">✕</button>
+  `;
+  list.appendChild(card);
+  kidIdx++;
+  document.getElementById('child-name').value = '';
+  document.querySelectorAll('.gender-btn').forEach(b=>b.classList.remove('sel'));
+  closeSheet();
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #18181b;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --accent: #248f40;
+    --accent-hover: #1f7a37;
+    --panel: #f8fafc;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  }
+  .wrap { padding: 16px; }
+  h1 {
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  .sub {
+    color: var(--muted);
+    margin: 0 0 14px;
+    font-size: 12px;
+  }
+  .group {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel);
+    padding: 10px 10px 12px;
+    margin-bottom: 12px;
+  }
+  .group h2 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin: 0 0 8px;
+    font-weight: 600;
+  }
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    text-align: left;
+    background: #fff;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 6px;
+  }
+  button:last-child { margin-bottom: 0; }
+  button:hover { border-color: #9ca3af; background: #fafafa; }
+  button .meta {
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 12px;
+  }
+  button.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  button.primary:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+  }
+  button.primary .meta { color: rgba(255,255,255,0.8); }
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .link {
+    background: none;
+    border: none;
+    color: var(--muted);
+    text-decoration: underline;
+    padding: 0;
+    cursor: pointer;
+    font-size: 11px;
+    width: auto;
+    display: inline;
+  }
+  #status {
+    font-size: 12px;
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    display: none;
+  }
+  #status.ok { display: block; background: #ecfdf5; color: #065f46; border: 1px solid #bbf7d0; }
+  #status.err { display: block; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Sprout Component Generator</h1>
+    <p class="sub">Scaffolds component sets near the viewport center. Placeholders for icons / avatars — swap after generation. Cmd/Ctrl+Z to undo.</p>
+
+    <div class="group">
+      <h2>Primitives</h2>
+      <button data-action="avatar">
+        <span>Avatar</span>
+        <span class="meta">5 sizes (xs / sm / md / lg / xl)</span>
+      </button>
+      <button data-action="iconbutton">
+        <span>IconButton</span>
+        <span class="meta">2 sizes × 3 states = 6 variants</span>
+      </button>
+    </div>
+
+    <div class="group">
+      <h2>Headers</h2>
+      <button data-action="header-standard">
+        <span>Header / Standard</span>
+        <span class="meta">56h · back + title + action</span>
+      </button>
+      <button data-action="header-user">
+        <span>Header / User</span>
+        <span class="meta">75h · back + avatar + menu</span>
+      </button>
+      <button data-action="header-event">
+        <span>Header / Event Preview</span>
+        <span class="meta">91h · back + thumb + directions</span>
+      </button>
+    </div>
+
+    <div class="group">
+      <h2>Build everything</h2>
+      <button class="primary" data-action="all">
+        <span>Generate all components</span>
+        <span class="meta">All 5 above</span>
+      </button>
+    </div>
+
+    <div id="status"></div>
+
+    <div class="footer">
+      <span>Tip: run on an empty page first to see layout clearly.</span>
+      <button class="link" data-action="close">Close</button>
+    </div>
+  </div>
+
+<script>
+  const status = document.getElementById('status');
+
+  function setStatus(text, kind) {
+    status.textContent = text;
+    status.className = kind || '';
+  }
+
+  document.querySelectorAll('button[data-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const action = btn.getAttribute('data-action');
+      if (action === 'close') {
+        parent.postMessage({ pluginMessage: { type: 'close' } }, '*');
+        return;
+      }
+      setStatus('Generating…', '');
+      parent.postMessage({ pluginMessage: { type: action } }, '*');
+    });
+  });
+
+  window.onmessage = (e) => {
+    const msg = e.data.pluginMessage;
+    if (!msg) return;
+    if (msg.type === 'done') {
+      setStatus('Created ' + msg.count + ' component set(s). Check your canvas.', 'ok');
+    } else if (msg.type === 'error') {
+      setStatus('Error: ' + msg.error, 'err');
+    }
+  };
+</script>
+</body>
+</html>

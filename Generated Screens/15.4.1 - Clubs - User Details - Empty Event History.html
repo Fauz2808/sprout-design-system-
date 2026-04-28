@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprout – 15.4.1 User Details – Empty Event History</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #b8b0a0;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 52px 0 80px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* ── Sprout Design Tokens ── */
+    :root {
+      --brand-700:  #1e3e2b;
+      --brand-600:  #134f2d;
+      --brand-500:  #186338;
+      --brand-200:  #77b691;
+      --brand-100:  #d0dacf;
+      --brand-50:   #e2e9e3;
+
+      --bg:         #f4f1ea;
+      --surf-1:     #eae6db;
+      --surf-2:     #dbd5c8;
+      --surf-3:     #c2b9a6;
+
+      --text-primary:    #4d525b;
+      --text-secondary:  #818898;
+      --text-tertiary:   #b3b8c1;
+      --text-brand:      #186338;
+      --text-brand-bold: #1e3e2b;
+
+      --border: #e6e7ea;
+    }
+
+    /* ═══════════════════════════ PHONE SHELL ════════════════════════════ */
+    .phone {
+      width: 393px;
+      height: 852px;
+      background: var(--bg);
+      border-radius: 54px;
+      overflow: hidden;
+      position: relative;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.10),
+        0 0 0 10px #1c1c1e,
+        0 0 0 12px #2c2c2e,
+        0 50px 100px rgba(0,0,0,0.48),
+        0 24px 48px  rgba(0,0,0,0.22);
+    }
+    .phone::before {
+      content: '';
+      position: absolute;
+      left: -13px; top: 120px;
+      width: 4px; height: 32px;
+      background: #2a2a2a;
+      border-radius: 2px 0 0 2px;
+      box-shadow: 0 44px 0 #2a2a2a, 0 88px 0 #2a2a2a;
+    }
+    .phone::after {
+      content: '';
+      position: absolute;
+      right: -13px; top: 148px;
+      width: 4px; height: 66px;
+      background: #2a2a2a;
+      border-radius: 0 2px 2px 0;
+    }
+
+    .island {
+      position: absolute;
+      top: 14px; left: 50%;
+      transform: translateX(-50%);
+      width: 120px; height: 34px;
+      background: #0a0a0a;
+      border-radius: 18px;
+      z-index: 100;
+    }
+
+    /* ═══════════════════════════ SCROLLABLE CONTENT ═════════════════════ */
+    .scroll {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+      padding-bottom: 80px;
+    }
+    .scroll::-webkit-scrollbar { display: none; }
+
+    /* ═══════════════════════════ STATUS BAR ═════════════════════════════ */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 26px 0;
+      height: 52px;
+    }
+    .s-time { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .s-icons { display: flex; align-items: center; gap: 6px; }
+
+    /* ═══════════════════════════ BACK NAV ═══════════════════════════════ */
+    .back-nav {
+      padding: 8px 20px 0;
+    }
+    .back-btn {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--surf-1);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+
+    /* ═══════════════════════════ PROFILE BLOCK ══════════════════════════ */
+    .profile-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 24px 12px;
+      text-align: center;
+    }
+
+    /* Avatar */
+    .avatar-wrap {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      background: var(--surf-2);
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+      border: 2.5px solid var(--surf-3);
+    }
+    .avatar-wrap::before {
+      content: '';
+      position: absolute;
+      top: 20%; left: 50%;
+      transform: translateX(-50%);
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: var(--surf-3);
+    }
+    .avatar-wrap::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 50%;
+      transform: translateX(-50%);
+      width: 68px; height: 44px;
+      border-radius: 50% 50% 0 0;
+      background: var(--surf-3);
+    }
+    /* Hat */
+    .hat {
+      position: absolute;
+      top: -4px; left: 50%;
+      transform: translateX(-50%);
+      width: 52px; height: 22px;
+      background: #3a7ca5;
+      border-radius: 24px 24px 0 0;
+      z-index: 2;
+    }
+
+    .profile-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-brand-bold);
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .profile-role {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .club-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 24px;
+      padding: 0 10px;
+      border-radius: 99px;
+      background: var(--brand-50);
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-brand);
+    }
+
+    /* ═══════════════════════════ KIDS ROW ═══════════════════════════════ */
+    .kids-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      padding: 12px 20px 4px;
+      flex-wrap: wrap;
+    }
+
+    .kid-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .kid-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--surf-1);
+      border: 2px solid var(--surf-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .kid-name {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .kid-age {
+      font-size: 10px;
+      color: var(--text-secondary);
+      margin-top: -2px;
+    }
+
+    /* ═══════════════════════════ DIVIDER ════════════════════════════════ */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 14px 20px;
+    }
+
+    /* ═══════════════════════════ SECTION ════════════════════════════════ */
+    .section {
+      padding: 0 20px 4px;
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.1px;
+      margin-bottom: 8px;
+    }
+
+    .section-body {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ═══════════════════════════ INTERESTS ══════════════════════════════ */
+    .interests-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .interest-chip {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 99px;
+      background: var(--surf-1);
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* ═══════════════════════════ EMPTY EVENT HISTORY ════════════════════ */
+    .event-history-section {
+      padding: 0 20px 24px;
+    }
+
+    .empty-event-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 24px 20px;
+      text-align: center;
+    }
+
+    .empty-event-icon {
+      width: 72px; height: 72px;
+      border-radius: 22px;
+      background: var(--brand-50);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .empty-event-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .empty-event-body {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      max-width: 220px;
+    }
+
+    /* ═══════════════════════════ NEXT BUTTON ════════════════════════════ */
+    .bottom-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 12px 20px 28px;
+      background: linear-gradient(to bottom, transparent, var(--bg) 30%);
+    }
+
+    .next-btn {
+      width: 100%;
+      height: 52px;
+      border-radius: 99px;
+      background: var(--brand-500);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="island"></div>
+
+    <div class="scroll">
+
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <span class="s-time">9:41</span>
+        <div class="s-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+            <rect x="0"    y="7"   width="3" height="5"   rx="0.6" fill="#4d525b"/>
+            <rect x="4.5"  y="5"   width="3" height="7"   rx="0.6" fill="#4d525b"/>
+            <rect x="9"    y="2.5" width="3" height="9.5" rx="0.6" fill="#4d525b"/>
+            <rect x="13.5" y="0"   width="3" height="12"  rx="0.6" fill="#4d525b" opacity="0.35"/>
+          </svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+            <circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/>
+            <path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+            <path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+          </svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+            <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity="0.35"/>
+            <rect x="2"   y="2"   width="16" height="8"  rx="2"   fill="#4d525b"/>
+            <path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity="0.4"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Back Nav -->
+      <div class="back-nav">
+        <div class="back-btn">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M11 4L6 9l5 5" stroke="#4d525b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Profile Block -->
+      <div class="profile-block">
+        <div class="avatar-wrap">
+          <div class="hat"></div>
+        </div>
+        <div class="profile-name">Ronald Richard</div>
+        <div class="profile-role">Erick's dad</div>
+        <div class="club-badge">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <circle cx="5" cy="5" r="4" stroke="#186338" stroke-width="1.2"/>
+            <path d="M5 3v2.5l1.5 1" stroke="#186338" stroke-width="1.1" stroke-linecap="round"/>
+          </svg>
+          Circle O Ranch
+        </div>
+      </div>
+
+      <!-- Kids Row -->
+      <div class="kids-row">
+        <div class="kid-item">
+          <div class="kid-avatar">😊</div>
+          <span class="kid-name">Erick</span>
+          <span class="kid-age">6 yrs</span>
+        </div>
+        <div class="kid-item">
+          <div class="kid-avatar">🧒</div>
+          <span class="kid-name">Etan</span>
+          <span class="kid-age">2 yrs</span>
+        </div>
+        <div class="kid-item">
+          <div class="kid-avatar">👶</div>
+          <span class="kid-name">Olivia</span>
+          <span class="kid-age">1 yrs</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- About -->
+      <div class="section">
+        <div class="section-label">About</div>
+        <div class="section-body">
+          James Martin is parent to Kenedy's in 73301. Passionate about active &amp; sports, nature &amp; outdoors, community. I love the spontaneous connections — bumping into other parents at the park and realizing you have so much in common.
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Interests -->
+      <div class="section">
+        <div class="section-label">Interests</div>
+        <div class="interests-wrap">
+          <span class="interest-chip">Traditional Finance</span>
+          <span class="interest-chip">Technology</span>
+          <span class="interest-chip">Start-up</span>
+          <span class="interest-chip">AI</span>
+          <span class="interest-chip">Web 3</span>
+          <span class="interest-chip">Finance</span>
+          <span class="interest-chip">Marketing</span>
+          <span class="interest-chip">Venture Capital</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- User Event History — Empty State -->
+      <div class="event-history-section">
+        <div class="section-label">User Event History</div>
+
+        <div class="empty-event-wrap">
+
+          <!-- Calendar illustration -->
+          <div class="empty-event-icon">
+            <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Calendar body -->
+              <rect x="3" y="6" width="32" height="28" rx="5" fill="#d0dacf"/>
+              <rect x="3" y="6" width="32" height="28" rx="5" stroke="#186338" stroke-width="1.6" fill="none"/>
+              <!-- Top bar -->
+              <rect x="3" y="6" width="32" height="10" rx="5" fill="#186338"/>
+              <rect x="3" y="11" width="32" height="5" fill="#186338"/>
+              <!-- Pin lines -->
+              <line x1="12" y1="3" x2="12" y2="10" stroke="#186338" stroke-width="2" stroke-linecap="round"/>
+              <line x1="26" y1="3" x2="26" y2="10" stroke="#186338" stroke-width="2" stroke-linecap="round"/>
+              <!-- Empty grid dots -->
+              <circle cx="12" cy="22" r="1.5" fill="#b3b8c1"/>
+              <circle cx="19" cy="22" r="1.5" fill="#b3b8c1"/>
+              <circle cx="26" cy="22" r="1.5" fill="#b3b8c1"/>
+              <circle cx="12" cy="29" r="1.5" fill="#b3b8c1"/>
+              <circle cx="19" cy="29" r="1.5" fill="#b3b8c1"/>
+              <circle cx="26" cy="29" r="1.5" fill="#b3b8c1"/>
+            </svg>
+          </div>
+
+          <div class="empty-event-title">No events attended yet</div>
+          <div class="empty-event-body">
+            Events Ronald attends with your club will show up here.
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /scroll -->
+
+    <!-- Next Button -->
+    <div class="bottom-bar">
+      <button class="next-btn">Next</button>
+    </div>
+
+  </div>
+</body>
+</html>

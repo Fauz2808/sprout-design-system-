@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Inter", "Helvetica", sans-serif; font-size: 12px; margin: 0; padding: 12px; background: #fff; color: #111; }
+  h2 { margin: 0 0 8px; font-size: 14px; }
+  p.note { color: #555; margin: 0 0 10px; line-height: 1.45; }
+  textarea { width: 100%; height: 200px; font: 11px/1.4 ui-monospace, Menlo, Consolas, monospace; padding: 8px; box-sizing: border-box; border: 1px solid #e0e0e0; border-radius: 4px; resize: vertical; }
+  .row { display: flex; gap: 8px; margin: 10px 0; }
+  button { flex: 1; padding: 8px 10px; border: 0; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 12px; }
+  .primary { background: #18a0fb; color: #fff; }
+  .secondary { background: #efefef; color: #111; }
+  .danger   { background: #e85151; color: #fff; }
+  .results { background: #fafafa; border: 1px solid #eee; border-radius: 4px; padding: 10px; max-height: 180px; overflow: auto; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11px; }
+  .stat { display: inline-block; margin-right: 10px; padding: 2px 6px; background: #eef; border-radius: 3px; }
+  .stat.ok { background: #e6f7e6; }
+  .stat.warn { background: #fff0d6; }
+  .stat.err { background: #ffe6e6; }
+  .sample { color: #666; margin-top: 6px; font-size: 11px; }
+  .disabled { opacity: 0.4; pointer-events: none; }
+</style>
+</head>
+<body>
+<h2>Sprout Batch Renamer</h2>
+<p class="note">Paste your <code>rename-map.json</code> below (an array of <code>{id, to}</code> entries). Click <b>Preview</b> to see how many layers will change, then <b>Apply</b> to rename them all in one undoable action (Cmd/Ctrl+Z to revert).</p>
+
+<textarea id="json" placeholder='[ { "id": "1744:68984", "to": "Avatar / lg" }, ... ]'></textarea>
+
+<div class="row">
+  <button class="secondary" id="btn-preview">Preview</button>
+  <button class="primary" id="btn-apply">Apply</button>
+  <button class="danger" id="btn-close">Close</button>
+</div>
+
+<div id="results" class="results" style="display:none;"></div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const results = $('#results');
+const jsonArea = $('#json');
+
+function showResults(html) { results.style.display = 'block'; results.innerHTML = html; }
+
+$('#btn-preview').addEventListener('click', () => {
+  parent.postMessage({ pluginMessage: { type: 'preview', json: jsonArea.value } }, '*');
+});
+$('#btn-apply').addEventListener('click', () => {
+  if (!confirm('Rename layers now? This is one undoable action.')) return;
+  parent.postMessage({ pluginMessage: { type: 'apply', json: jsonArea.value } }, '*');
+});
+$('#btn-close').addEventListener('click', () => {
+  parent.postMessage({ pluginMessage: { type: 'close' } }, '*');
+});
+
+window.addEventListener('message', (evt) => {
+  const msg = evt.data.pluginMessage;
+  if (!msg) return;
+  if (msg.type === 'error') {
+    showResults('<span class="stat err">Error</span> ' + escapeHtml(msg.error));
+    return;
+  }
+  if (msg.type === 'preview-result') {
+    const r = msg.result;
+    let html = '<div>' +
+      '<span class="stat ok">' + r.willRename.length + ' will rename</span>' +
+      '<span class="stat warn">' + r.skipped.length + ' already correct</span>' +
+      '<span class="stat err">' + r.missing.length + ' missing</span>' +
+      '<span class="stat">' + msg.total + ' total in payload</span>' +
+    '</div>';
+    if (r.willRename.length) {
+      html += '<div class="sample"><b>Sample (first 6):</b></div>';
+      html += '<pre>' + escapeHtml(r.willRename.slice(0,6).map(e => e.id + '  ' + (e.currentName || '?') + '  →  ' + e.to).join('\n')) + '</pre>';
+    }
+    if (r.missing.length) {
+      html += '<div class="sample"><b>Missing node IDs (first 6):</b></div>';
+      html += '<pre>' + escapeHtml(r.missing.slice(0,6).map(e => e.id + '  →  ' + e.to).join('\n')) + '</pre>';
+    }
+    showResults(html);
+    return;
+  }
+  if (msg.type === 'apply-result') {
+    const r = msg.result;
+    let html = '<div>' +
+      '<span class="stat ok">' + r.renamed + ' renamed</span>' +
+      '<span class="stat warn">' + r.unchanged + ' unchanged</span>' +
+      '<span class="stat err">' + r.missing + ' missing</span>' +
+      '<span class="stat">' + msg.total + ' total</span>' +
+    '</div>';
+    if (r.errors && r.errors.length) {
+      html += '<div class="sample"><b>Errors:</b></div><pre>' + escapeHtml(JSON.stringify(r.errors.slice(0,6), null, 2)) + '</pre>';
+    }
+    html += '<div class="sample">Undo with Cmd/Ctrl+Z if needed.</div>';
+    showResults(html);
+  }
+});
+
+function escapeHtml(s){return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+</script>
+</body>
+</html>

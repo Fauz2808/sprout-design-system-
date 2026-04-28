@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprout – 10.10 Memories Empty State</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      background:#b8b0a0; min-height:100vh;
+      display:flex; align-items:flex-start; justify-content:center; padding:52px 0 80px;
+      font-family:'Inter',sans-serif;
+    }
+    :root {
+      --brand-500:#186338; --brand-700:#1e3e2b; --brand-50:#e2e9e3; --brand-100:#d0dacf;
+      --bg:#f4f1ea; --surf-1:#eae6db; --surf-2:#dbd5c8; --surf-3:#c2b9a6;
+      --text-primary:#4d525b; --text-secondary:#818898; --text-tertiary:#b3b8c1;
+      --text-brand:#186338; --text-brand-bold:#1e3e2b; --border:#e6e7ea;
+    }
+    .phone {
+      width:393px; height:852px; background:var(--bg); border-radius:54px; overflow:hidden;
+      position:relative; display:flex; flex-direction:column;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),0 0 0 10px #1c1c1e,0 0 0 12px #2c2c2e,0 50px 100px rgba(0,0,0,.48);
+    }
+    .phone::before{content:'';position:absolute;left:-13px;top:120px;width:4px;height:32px;background:#2a2a2a;border-radius:2px 0 0 2px;box-shadow:0 44px 0 #2a2a2a,0 88px 0 #2a2a2a;}
+    .phone::after{content:'';position:absolute;right:-13px;top:148px;width:4px;height:66px;background:#2a2a2a;border-radius:0 2px 2px 0;}
+    .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#0a0a0a;border-radius:18px;z-index:100;}
+
+    .status-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 26px 0;height:52px;flex-shrink:0;}
+    .s-time{font-size:15px;font-weight:600;color:var(--text-primary);}
+    .s-icons{display:flex;align-items:center;gap:6px;}
+
+    /* Memories top tabs */
+    .mem-header{display:flex;align-items:center;justify-content:space-between;padding:10px 20px 0;flex-shrink:0;}
+    .mem-tabs{display:flex;gap:20px;}
+    .mem-tab{font-size:15px;font-weight:500;color:var(--text-tertiary);padding-bottom:6px;cursor:pointer;}
+    .mem-tab.active{color:var(--text-brand-bold);font-weight:700;border-bottom:2.5px solid var(--brand-500);}
+    .mem-action{width:34px;height:34px;border-radius:50%;background:var(--surf-1);display:flex;align-items:center;justify-content:center;}
+
+    /* Club context bar */
+    .club-bar{display:flex;align-items:center;gap:8px;padding:10px 20px 0;flex-shrink:0;}
+    .club-chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:99px;background:var(--surf-1);font-size:12px;font-weight:500;color:var(--text-secondary);}
+
+    /* Empty state — fills the feed area */
+    .empty-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 36px 80px;text-align:center;}
+    .empty-icon{width:96px;height:96px;border-radius:28px;background:var(--brand-50);display:flex;align-items:center;justify-content:center;margin-bottom:22px;animation:float 3.2s ease-in-out infinite;}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    .empty-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text-brand-bold);margin-bottom:10px;line-height:1.2;}
+    .empty-body{font-size:13.5px;color:var(--text-secondary);line-height:1.6;max-width:240px;margin-bottom:28px;}
+    .cta-btn{display:inline-flex;align-items:center;gap:7px;height:48px;padding:0 28px;border-radius:99px;background:var(--brand-500);color:#fff;font-size:15px;font-weight:600;border:none;cursor:pointer;}
+
+    .bottom-nav{position:absolute;bottom:0;left:0;right:0;height:82px;background:var(--bg);border-top:1px solid var(--border);display:flex;align-items:flex-start;padding-top:10px;}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
+    .nav-label{font-size:9.5px;font-weight:500;color:var(--text-tertiary);}
+    .nav-item.active .nav-label{color:var(--brand-500);}
+  </style>
+</head>
+<body>
+<div class="phone">
+  <div class="island"></div>
+
+  <div class="status-bar">
+    <span class="s-time">9:41</span>
+    <div class="s-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".35"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+    </div>
+  </div>
+
+  <div class="mem-header">
+    <div class="mem-tabs">
+      <span class="mem-tab active">For You</span>
+      <span class="mem-tab">Find Duo</span>
+    </div>
+    <div class="mem-action">
+      <svg width="17" height="17" viewBox="0 0 17 17" fill="none"><circle cx="8.5" cy="8.5" r="6.5" stroke="#818898" stroke-width="1.4"/><path d="M8.5 5.5v3l2 1.5" stroke="#818898" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+
+  <div class="club-bar">
+    <div class="club-chip">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#818898" stroke-width="1.2"/><path d="M4 7h6M7 4v6" stroke="#818898" stroke-width="1.2" stroke-linecap="round"/></svg>
+      All Clubs
+    </div>
+  </div>
+
+  <div class="empty-wrap">
+    <div class="empty-icon">
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+        <!-- Photo frame -->
+        <rect x="6" y="10" width="40" height="32" rx="6" fill="#d0dacf"/>
+        <rect x="6" y="10" width="40" height="32" rx="6" stroke="#186338" stroke-width="1.8" fill="none"/>
+        <!-- Mountain scene (placeholder) -->
+        <path d="M6 34 L16 22 L24 30 L30 24 L46 34" stroke="#186338" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <!-- Sun -->
+        <circle cx="38" cy="18" r="4" fill="#186338" opacity=".3"/>
+        <!-- Sprout overlay -->
+        <path d="M26 38 C26 33 29 31 32 32 C29 32 26 35 26 38Z" fill="#77b691"/>
+        <path d="M26 38 C26 33 23 31 20 32 C23 32 26 35 26 38Z" fill="#77b691"/>
+        <line x1="26" y1="32" x2="26" y2="38" stroke="#77b691" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="empty-title">No memories yet</div>
+    <div class="empty-body">Photos and moments from your clubs and events will appear here.</div>
+    <button class="cta-btn">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1" y="3" width="13" height="10" rx="2.5" stroke="#fff" stroke-width="1.4"/><circle cx="7.5" cy="8" r="2.5" stroke="#fff" stroke-width="1.4"/><path d="M5 3l1-2h3l1 2" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Upload a Moment
+    </button>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item">
+      <svg width="23" height="23" viewBox="0 0 23 23" fill="none"><rect x="2.5" y="4.5" width="18" height="16" rx="3" stroke="#b3b8c1" stroke-width="1.5"/><path d="M7.5 2.5v3M15.5 2.5v3M2.5 9.5h18" stroke="#b3b8c1" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span class="nav-label">Events</span>
+    </div>
+    <div class="nav-item active">
+      <svg width="23" height="23" viewBox="0 0 23 23" fill="none"><rect x="2.5" y="4.5" width="18" height="14" rx="3" stroke="#186338" stroke-width="1.5"/><circle cx="8.5" cy="10" r="2" stroke="#186338" stroke-width="1.5"/><path d="M2.5 15.5l5-4.5 4 3 3-2.5 6.5 5" stroke="#186338" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="nav-label" style="color:#186338">Memories</span>
+    </div>
+    <div class="nav-item">
+      <svg width="23" height="23" viewBox="0 0 23 23" fill="none"><path d="M11.5 2L13.4 8.6H20.3L14.9 12.6L16.8 19.2L11.5 15.2L6.2 19.2L8.1 12.6L2.7 8.6H9.6Z" stroke="#b3b8c1" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      <span class="nav-label">AI Assist</span>
+    </div>
+    <div class="nav-item">
+      <svg width="23" height="23" viewBox="0 0 23 23" fill="none"><path d="M4 3.5h15a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H7.5l-5.5 4V5.5a2 2 0 0 1 2-2Z" stroke="#b3b8c1" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      <span class="nav-label">Chat</span>
+    </div>
+    <div class="nav-item">
+      <svg width="23" height="23" viewBox="0 0 23 23" fill="none"><circle cx="8.5" cy="8" r="4" stroke="#b3b8c1" stroke-width="1.5"/><circle cx="14.5" cy="8" r="4" stroke="#b3b8c1" stroke-width="1.5"/><path d="M2 20c0-3.59 2.91-6.5 6.5-6.5S15 16.41 15 20" stroke="#b3b8c1" stroke-width="1.5" stroke-linecap="round"/><path d="M9 20c0-3.59 2.91-6.5 6.5-6.5s6.5 2.91 6.5 6.5" stroke="#b3b8c1" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span class="nav-label">Clubs</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

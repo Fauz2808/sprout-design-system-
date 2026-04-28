@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Create Event Flow (Option A)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand-500: #186338;
+    --brand-600: #134f2d;
+    --brand-700: #1e3e2b;
+    --brand-50:  #e2e9e3;
+    --brand-100: #d0dacf;
+    --brand-200: #77b691;
+
+    --sec-500: #f4f1ea;
+    --sec-600: #eae6db;
+    --sec-700: #dbd5c8;
+    --sec-800: #c2b9a6;
+    --sec-900: #aa9e83;
+
+    --grey-100: #e6e7ea;
+    --grey-200: #cdcfd6;
+    --grey-300: #b3b8c1;
+    --grey-400: #9aa0ad;
+    --grey-500: #818898;
+    --grey-600: #676d7a;
+    --grey-700: #4d525b;
+    --grey-800: #34363d;
+    --grey-900: #1a1b1e;
+
+    --error-100: #f7dada;
+    --error-500: #d64545;
+    --success-100: #dee8de;
+    --success-500: #5c8a5c;
+    --warning-100: #f6ecd1;
+    --warning-500: #d4a017;
+
+    --white: #ffffff;
+
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #1a1b1e;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 40px 48px 80px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    color: var(--sec-600);
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+  }
+  .subtitle {
+    color: var(--grey-500);
+    font-size: 13px;
+    margin-bottom: 40px;
+  }
+
+  .section-label {
+    color: var(--grey-600);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    margin-top: 48px;
+  }
+  .section-label:first-of-type { margin-top: 0; }
+
+  .row {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+
+  .arrow {
+    align-self: center;
+    margin-top: -80px;
+    color: var(--grey-700);
+    font-size: 20px;
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  .phone-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .screen-label {
+    color: var(--grey-500);
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+  }
+  .phone {
+    width: 300px;
+    height: 650px;
+    background: var(--sec-500);
+    border-radius: 44px;
+    border: 2px solid #2a2c32;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    box-shadow: 0 24px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .phone.highlight {
+    border-color: var(--brand-500);
+    box-shadow: 0 0 0 2.5px var(--brand-500), 0 24px 48px rgba(0,0,0,0.5);
+  }
+  .phone-inner {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .di {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 92px;
+    height: 27px;
+    background: #000;
+    border-radius: var(--radius-full);
+    z-index: 30;
+  }
+
+  .status-bar {
+    height: 48px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 20px 6px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+  }
+  .status-time {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--grey-700);
+  }
+  .status-time.white { color: var(--white); }
+  .status-icons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .screen-content {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Chat UI ── */
+  .chat-header {
+    padding: 12px 16px 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--grey-100);
+    background: var(--white);
+  }
+  .chat-back {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    background: var(--sec-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .chat-header-title { font-size: 14px; font-weight: 600; color: var(--grey-700); }
+  .chat-header-sub { font-size: 10px; color: var(--grey-500); margin-top: 1px; }
+  .chat-spark {
+    margin-left: auto;
+    width: 28px; height: 28px;
+    border-radius: var(--radius-full);
+    background: var(--brand-50);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  .chat-body {
+    flex: 1; overflow: hidden;
+    padding: 16px 14px 10px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+
+  .ai-welcome-bubble {
+    background: var(--white);
+    border-radius: 4px 16px 16px 16px;
+    padding: 12px 14px;
+    max-width: 85%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    border: 1px solid var(--grey-100);
+  }
+  .ai-welcome-bubble p { font-size: 12px; line-height: 1.6; color: var(--grey-700); }
+  .ai-name {
+    font-size: 10px; font-weight: 600; color: var(--brand-500);
+    margin-bottom: 5px; display: flex; align-items: center; gap: 4px;
+  }
+
+  .suggestions-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .suggestion-pill {
+    background: var(--sec-600); border: 1px solid var(--grey-200);
+    border-radius: var(--radius-full); padding: 5px 10px;
+    font-size: 10px; color: var(--grey-700); font-weight: 500;
+  }
+
+  .chat-input-area {
+    padding: 8px 12px 10px; background: var(--white);
+    border-top: 1px solid var(--grey-100);
+    display: flex; align-items: flex-end; gap: 8px;
+  }
+  .chat-input-box {
+    flex: 1; background: var(--sec-600);
+    border: 1.5px solid var(--grey-200); border-radius: 20px;
+    padding: 9px 12px; font-size: 12px; color: var(--grey-400);
+    min-height: 36px; display: flex; align-items: center;
+  }
+  .chat-input-box.active { border-color: var(--brand-500); color: var(--grey-700); }
+  .chat-send-btn {
+    width: 34px; height: 34px; border-radius: var(--radius-full);
+    background: var(--brand-500);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .chat-send-btn.dim { background: var(--grey-300); }
+
+  .user-bubble {
+    background: var(--brand-500);
+    border-radius: 16px 4px 16px 16px;
+    padding: 10px 13px; max-width: 82%; align-self: flex-end;
+  }
+  .user-bubble p { font-size: 12px; line-height: 1.55; color: var(--white); }
+
+  .ai-thinking {
+    display: flex; gap: 4px; align-items: center;
+    padding: 10px 14px; background: var(--white);
+    border-radius: 4px 16px 16px 16px; width: fit-content;
+    border: 1px solid var(--grey-100);
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--grey-400); }
+  .dot:nth-child(2) { background: var(--grey-300); }
+  .dot:nth-child(3) { background: var(--grey-200); }
+
+  /* ── Loading screen ── */
+  .loading-screen {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 20px; padding: 24px; background: var(--sec-500);
+  }
+  .loading-icon {
+    width: 56px; height: 56px; border-radius: var(--radius-2xl);
+    background: var(--brand-50);
+    display: flex; align-items: center; justify-content: center; font-size: 24px;
+  }
+  .loading-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--grey-700); text-align: center; line-height: 1.4; }
+  .loading-sub { font-size: 11px; color: var(--grey-500); text-align: center; }
+  .shimmer-card { width: 100%; background: var(--white); border-radius: var(--radius-xl); overflow: hidden; }
+  .shimmer-img { width: 100%; height: 80px; background: linear-gradient(90deg, var(--grey-100) 25%, var(--grey-200) 50%, var(--grey-100) 75%); background-size: 200% 100%; }
+  .shimmer-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .shimmer-line { height: 10px; border-radius: var(--radius-full); background: linear-gradient(90deg, var(--grey-100) 25%, var(--grey-200) 50%, var(--grey-100) 75%); background-size: 200% 100%; }
+  .shimmer-line.wide { width: 70%; }
+  .shimmer-line.narrow { width: 45%; }
+  .shimmer-line.xnarrow { width: 30%; }
+
+  /* ── Review & Edit screen ── */
+  .review-screen {
+    flex: 1; overflow-y: auto;
+    display: flex; flex-direction: column;
+    background: var(--sec-500);
+  }
+  .review-nav {
+    padding: 10px 16px 8px;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--sec-500);
+    position: sticky; top: 0; z-index: 10;
+    border-bottom: 1px solid var(--grey-100);
+  }
+  .review-nav-title { font-size: 14px; font-weight: 600; color: var(--grey-700); flex: 1; }
+  .review-nav-step { font-size: 11px; color: var(--grey-400); }
+
+  .cover-block {
+    position: relative; width: 100%; height: 160px;
+    flex-shrink: 0; overflow: hidden;
+  }
+  .cover-block svg.cover-bg {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  }
+  .cover-gradient { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.4) 100%); }
+  .cover-change-btn {
+    position: absolute; bottom: 10px; right: 12px;
+    background: rgba(255,255,255,0.18); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.35); border-radius: var(--radius-full);
+    padding: 5px 11px; font-size: 10px; font-weight: 600; color: var(--white);
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .form-section {
+    padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 4px; }
+  .form-label {
+    font-size: 10px; font-weight: 600; color: var(--grey-500);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .form-input {
+    background: var(--white); border: 1.5px solid var(--grey-200);
+    border-radius: var(--radius-lg); padding: 10px 12px;
+    font-size: 13px; color: var(--grey-700); font-family: 'Inter', sans-serif;
+  }
+  .form-input.title-input {
+    font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 500;
+    border-color: var(--brand-200);
+  }
+  .desc-wrap { position: relative; }
+  .form-input.textarea {
+    min-height: 72px; line-height: 1.55;
+    font-size: 11.5px; color: var(--grey-600); padding-top: 28px;
+  }
+  .ai-badge-inline {
+    position: absolute; top: 8px; left: 10px;
+    background: var(--brand-50); border: 1px solid var(--brand-100);
+    border-radius: var(--radius-full); padding: 3px 8px;
+    font-size: 9px; font-weight: 600; color: var(--brand-600);
+    display: flex; align-items: center; gap: 3px;
+  }
+
+  .field-icon-row {
+    background: var(--white); border: 1.5px solid var(--grey-200);
+    border-radius: var(--radius-lg); padding: 10px 12px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--grey-700);
+  }
+  .field-icon-row .icon { font-size: 14px; flex-shrink: 0; }
+  .field-icon-row .field-val { flex: 1; }
+  .field-icon-row .field-sub { font-size: 10px; color: var(--grey-400); display: block; margin-top: 1px; }
+  .field-icon-row .chev { color: var(--grey-400); font-size: 12px; }
+
+  .divider { height: 1px; background: var(--grey-100); margin: 2px 0; }
+
+  .whos-going {
+    background: var(--white); border: 1.5px solid var(--grey-200);
+    border-radius: var(--radius-lg); padding: 10px 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .avatar-stack { display: flex; align-items: center; }
+  .avatar-sm {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 1.5px solid var(--white); background: var(--sec-700);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 600; color: var(--grey-700);
+    margin-left: -6px; flex-shrink: 0;
+  }
+  .avatar-sm:first-child { margin-left: 0; }
+  .avatar-sm.add-more { background: var(--brand-50); color: var(--brand-500); font-size: 13px; font-weight: 700; }
+  .whos-going-label { flex: 1; font-size: 11px; color: var(--grey-600); }
+  .whos-going-link { font-size: 10px; font-weight: 600; color: var(--brand-500); }
+
+  .settings-row {
+    background: var(--white); border: 1.5px solid var(--grey-200);
+    border-radius: var(--radius-lg); overflow: hidden;
+  }
+  .settings-item {
+    padding: 10px 12px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--grey-100);
+  }
+  .settings-item:last-child { border-bottom: none; }
+  .settings-item-icon { font-size: 14px; flex-shrink: 0; }
+  .settings-item-text { flex: 1; }
+  .settings-item-label { font-size: 11px; font-weight: 500; color: var(--grey-700); }
+  .settings-item-sub { font-size: 9.5px; color: var(--grey-400); margin-top: 1px; }
+  .toggle {
+    width: 32px; height: 18px; border-radius: var(--radius-full);
+    background: var(--brand-500); position: relative; flex-shrink: 0;
+  }
+  .toggle::after {
+    content: ''; position: absolute; top: 2px; right: 2px;
+    width: 14px; height: 14px; border-radius: 50%; background: var(--white);
+  }
+  .toggle.off { background: var(--grey-200); }
+  .toggle.off::after { right: auto; left: 2px; }
+  .stepper { display: flex; align-items: center; gap: 8px; }
+  .stepper-btn {
+    width: 22px; height: 22px; border-radius: var(--radius-full);
+    background: var(--sec-600); border: 1px solid var(--grey-200);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--grey-600); font-weight: 600;
+  }
+  .stepper-val { font-size: 12px; font-weight: 600; color: var(--grey-700); min-width: 20px; text-align: center; }
+
+  .sticky-cta {
+    padding: 10px 14px 14px; background: var(--sec-500);
+    border-top: 1px solid var(--grey-100); flex-shrink: 0;
+  }
+  .btn-primary {
+    width: 100%; height: 44px; background: var(--brand-500);
+    border-radius: var(--radius-xl);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-size: 13px; font-weight: 600; color: var(--white);
+  }
+  .btn-primary.sm { height: 38px; font-size: 12px; }
+  .btn-secondary {
+    width: 100%; height: 38px; background: transparent;
+    border: 1.5px solid var(--brand-500); border-radius: var(--radius-xl);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-size: 12px; font-weight: 600; color: var(--brand-500); margin-top: 8px;
+  }
+
+  /* ── Invite screen ── */
+  .invite-screen { flex: 1; display: flex; flex-direction: column; background: var(--sec-500); overflow: hidden; }
+  .invite-header { padding: 10px 14px 8px; border-bottom: 1px solid var(--grey-100); background: var(--sec-500); }
+  .invite-title { font-size: 14px; font-weight: 600; color: var(--grey-700); }
+  .invite-sub { font-size: 10px; color: var(--grey-500); margin-top: 2px; }
+  .search-bar {
+    margin: 8px 0 0; background: var(--white);
+    border: 1.5px solid var(--grey-200); border-radius: var(--radius-lg);
+    padding: 8px 12px; display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--grey-400);
+  }
+  .contact-list { flex: 1; overflow: hidden; padding: 10px 0; }
+  .contact-group-label {
+    font-size: 10px; font-weight: 600; color: var(--grey-500);
+    text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 14px 6px;
+  }
+  .contact-row { display: flex; align-items: center; gap: 10px; padding: 8px 14px; }
+  .contact-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--sec-700);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--grey-600); flex-shrink: 0;
+  }
+  .contact-info { flex: 1; }
+  .contact-name { font-size: 12px; font-weight: 500; color: var(--grey-700); }
+  .contact-handle { font-size: 10px; color: var(--grey-400); margin-top: 1px; }
+  .contact-check {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 1.5px solid var(--grey-300);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .contact-check.checked { background: var(--brand-500); border-color: var(--brand-500); font-size: 10px; color: var(--white); }
+
+  /* ── Final review & success ── */
+  .event-preview-card {
+    margin: 12px 14px; background: var(--white);
+    border-radius: var(--radius-xl); overflow: hidden;
+    border: 1.5px solid var(--grey-100);
+  }
+  .event-preview-cover { width: 100%; height: 110px; position: relative; overflow: hidden; }
+  .event-preview-body { padding: 12px; }
+  .event-preview-category {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--brand-50); border-radius: var(--radius-full);
+    padding: 3px 9px; font-size: 9.5px; font-weight: 600; color: var(--brand-600); margin-bottom: 6px;
+  }
+  .event-preview-title { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 500; color: var(--grey-700); margin-bottom: 8px; line-height: 1.3; }
+  .event-detail-row { display: flex; align-items: flex-start; gap: 7px; margin-bottom: 5px; }
+  .event-detail-icon { font-size: 11px; flex-shrink: 0; margin-top: 1px; }
+  .event-detail-text { font-size: 10.5px; color: var(--grey-600); line-height: 1.45; }
+
+  .review-confirm-section { padding: 4px 14px 8px; display: flex; flex-direction: column; gap: 5px; }
+  .confirm-label { font-size: 10px; font-weight: 600; color: var(--grey-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .confirm-line {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; color: var(--grey-600); padding: 6px 10px;
+    background: var(--white); border-radius: var(--radius-md); border: 1px solid var(--grey-100);
+  }
+  .confirm-line .key { font-weight: 500; color: var(--grey-700); }
+  .confirm-line .val { color: var(--grey-500); }
+
+  .success-screen {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 24px 20px; background: var(--sec-500); gap: 14px;
+  }
+  .success-circle {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--brand-50);
+    display: flex; align-items: center; justify-content: center;
+    border: 3px solid var(--brand-200);
+  }
+  .success-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 500; color: var(--grey-700); text-align: center; line-height: 1.3; }
+  .success-title em { font-style: italic; color: var(--brand-500); }
+  .success-sub { font-size: 12px; color: var(--grey-500); text-align: center; line-height: 1.55; max-width: 220px; }
+  .success-event-pill {
+    background: var(--white); border: 1.5px solid var(--grey-100);
+    border-radius: var(--radius-xl); padding: 12px 16px; width: 100%;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .success-event-thumb {
+    width: 40px; height: 40px; border-radius: var(--radius-md);
+    background: var(--brand-100); overflow: hidden; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .success-event-info { flex: 1; }
+  .success-event-name { font-size: 12px; font-weight: 600; color: var(--grey-700); }
+  .success-event-meta { font-size: 10px; color: var(--grey-400); margin-top: 2px; }
+  .confetti-row { display: flex; gap: 6px; font-size: 18px; }
+</style>
+</head>
+<body>
+
+<h1>Create Event — Option A</h1>
+<p class="subtitle">AI chat → loading → Review & Edit (AI pre-filled, all editable) → Invite → Confirm → Published</p>
+
+<!-- ═══════════════════════════════════════ -->
+<!--  ROW 1: Talk to AI + Loading           -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section-label">Step 1 — Tell the AI about your event</div>
+<div class="row">
+
+  <!-- 12.1 — AI Chat Empty -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="di"></div>
+        <div class="status-bar">
+          <span class="status-time">9:41</span>
+          <div class="status-icons">
+            <svg width="14" height="10" viewBox="0 0 14 10"><rect x="0" y="3" width="3" height="7" rx="1" fill="#4d525b"/><rect x="4" y="2" width="3" height="8" rx="1" fill="#4d525b"/><rect x="8" y="0" width="3" height="10" rx="1" fill="#4d525b"/><rect x="12" y="0" width="2" height="10" rx="1" fill="#b3b8c1"/></svg>
+            <svg width="12" height="10" viewBox="0 0 12 10"><path d="M6 2C8.2 2 10.2 3 11.5 4.6L12 5l-.5.4C10.2 7 8.2 8 6 8s-4.2-1-5.5-2.6L0 5l.5-.4C1.8 3 3.8 2 6 2z" fill="#4d525b"/><circle cx="6" cy="5" r="1.5" fill="#f4f1ea"/></svg>
+            <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2.5" stroke="#4d525b" stroke-width="1.2" fill="none"/><rect x="1.5" y="2.5" width="13" height="6" rx="1.5" fill="#4d525b"/><path d="M20 4v3a1.5 1.5 0 000-3z" fill="#4d525b"/></svg>
+          </div>
+        </div>
+        <div class="screen-content" style="background:#fff;">
+          <div class="chat-header">
+            <div class="chat-back">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="#4d525b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="chat-header-title">✦ Create with AI</div>
+              <div class="chat-header-sub">Tell me about your event</div>
+            </div>
+            <div class="chat-spark">✦</div>
+          </div>
+          <div class="chat-body" style="background:var(--sec-500);">
+            <div class="ai-welcome-bubble">
+              <div class="ai-name">✦ Sprout AI</div>
+              <p>Hey! Tell me about the event you'd like to create. I'll handle the details — just describe it naturally.</p>
+            </div>
+            <div class="suggestions-row">
+              <div class="suggestion-pill">🌳 Park playdate</div>
+              <div class="suggestion-pill">☕ Coffee catch-up</div>
+              <div class="suggestion-pill">🎨 Art class</div>
+              <div class="suggestion-pill">🏊 Swimming group</div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <div class="chat-input-box">Describe your event…</div>
+            <div class="chat-send-btn dim">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">12.1 — Chat: empty</div>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <!-- 12.2 — AI Chat Filled -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="di"></div>
+        <div class="status-bar">
+          <span class="status-time">9:41</span>
+          <div class="status-icons">
+            <svg width="14" height="10" viewBox="0 0 14 10"><rect x="0" y="3" width="3" height="7" rx="1" fill="#4d525b"/><rect x="4" y="2" width="3" height="8" rx="1" fill="#4d525b"/><rect x="8" y="0" width="3" height="10" rx="1" fill="#4d525b"/><rect x="12" y="0" width="2" height="10" rx="1" fill="#b3b8c1"/></svg>
+            <svg width="12" height="10" viewBox="0 0 12 10"><path d="M6 2C8.2 2 10.2 3 11.5 4.6L12 5l-.5.4C10.2 7 8.2 8 6 8s-4.2-1-5.5-2.6L0 5l.5-.4C1.8 3 3.8 2 6 2z" fill="#4d525b"/><circle cx="6" cy="5" r="1.5" fill="#f4f1ea"/></svg>
+            <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2.5" stroke="#4d525b" stroke-width="1.2" fill="none"/><rect x="1.5" y="2.5" width="13" height="6" rx="1.5" fill="#4d525b"/><path d="M20 4v3a1.5 1.5 0 000-3z" fill="#4d525b"/></svg>
+          </div>
+        </div>
+        <div class="screen-content" style="background:#fff;">
+          <div class="chat-header">
+            <div class="chat-back">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="#4d525b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="chat-header-title">✦ Create with AI</div>
+              <div class="chat-header-sub">Tell me about your event</div>
+            </div>
+            <div class="chat-spark">✦</div>
+          </div>
+          <div class="chat-body" style="background:var(--sec-500);">
+            <div class="ai-welcome-bubble">
+              <div class="ai-name">✦ Sprout AI</div>
+              <p>Hey! Tell me about the event you'd like to create.</p>
+            </div>
+            <div class="user-bubble">
+              <p>Morning playdate at Centennial Park this Saturday at 10am. Toddlers welcome, maybe 10–15 families. Casual, bring a picnic blanket!</p>
+            </div>
+            <div class="ai-thinking">
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <div class="chat-input-box active">Morning playdate at Centennial Park…</div>
+            <div class="chat-send-btn">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">12.2 — Chat: message sent</div>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <!-- 12.3 — Loading -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="di"></div>
+        <div class="status-bar">
+          <span class="status-time">9:41</span>
+          <div class="status-icons">
+            <svg width="14" height="10" viewBox="0 0 14 10"><rect x="0" y="3" width="3" height="7" rx="1" fill="#4d525b"/><rect x="4" y="2" width="3" height="8" rx="1" fill="#4d525b"/><rect x="8" y="0" width="3" height="10" rx="1" fill="#4d525b"/><rect x="12" y="0" width="2" height="10" rx="1" fill="#b3b8c1"/></svg>
+            <svg width="12" height="10" viewBox="0 0 12 10"><path d="M6 2C8.2 2 10.2 3 11.5 4.6L12 5l-.5.4C10.2 7 8.2 8 6 8s-4.2-1-5.5-2.6L0 5l.5-.4C1.8 3 3.8 2 6 2z" fill="#4d525b"/><circle cx="6" cy="5" r="1.5" fill="#f4f1ea"/></svg>
+            <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2.5" stroke="#4d525b" stroke-width="1.2" fill="none"/><rect x="1.5" y="2.5" width="13" height="6" rx="1.5" fill="#4d525b"/><path d="M20 4v3a1.5 1.5 0 000-3z" fill="#4d525b"/></svg>
+          </div>
+        </div>
+        <div class="screen-content">
+          <div class="loading-screen">
+            <div class="loading-icon">✦</div>
+            <div>
+              <div class="loading-title">Building your event…</div>
+              <div class="loading-sub" style="margin-top:6px;">Writing description · sourcing cover · filling details</div>
+            </div>
+            <div class="shimmer-card">
+              <div class="shimmer-img"></div>
+              <div class="shimmer-body">
+                <div class="shimmer-line wide"></div>
+                <div class="shimmer-line narrow"></div>
+                <div class="shimmer-line" style="width:90%;"></div>
+                <div class="shimmer-line xnarrow"></div>
+              </div>
+            </div>
+            <div class="loading-sub">Usually takes a few seconds</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">12.3 — AI generating</div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  ROW 2: Review & Edit — the key screen         -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="section-label" style="margin-top:48px;">Step 2 — Review & Edit (AI pre-filled, everything editable)</div>
+<div class="row">
+
+  <!-- 12.4 — Review & Edit: top of form -->
+  <div class="phone-wrap">
+    <div class="phone highlight" style="height:680px;">
+      <div class="phone-inner">
+        <div class="di"></div>
+        <div class="status-bar">
+          <span class="status-time">9:42</span>
+          <div class="status-icons">
+            <svg width="14" height="10" viewBox="0 0 14 10"><rect x="0" y="3" width="3" height="7" rx="1" fill="#4d525b"/><rect x="4" y="2" width="3" height="8" rx="1" fill="#4d525b"/><rect x="8" y="0" width="3" height="10" rx="1" fill="#4d525b"/><rect x="12" y="0" width="2" height="10" rx="1" fill="#b3b8c1"/></svg>
+            <svg width="12" height="10" viewBox="0 0 12 10"><path d="M6 2C8.2 2 10.2 3 11.5 4.6L12 5l-.5.4C10.2 7 8.2 8 6 8s-4.2-1-5.5-2.6L0 5l.5-.4C1.8 3 3.8 2 6 2z" fill="#4d525b"/><circle cx="6" cy="5" r="1.5" fill="#f4f1ea"/></svg>
+            <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2.5" stroke="#4d525b" stroke-width="1.2" fill="none"/><rect x="1.5" y="2.5" width="13" height="6" rx="1.5" fill="#4d525b"/><path d="M20 4v3a1.5 1.5 0 000-3z" fill="#4d525b"/></svg>
+          </div>
+        </div>
+        <div class="screen-content">
+          <div class="review-screen">
+            <div class="review-nav">
+              <div class="chat-back">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="#4d525b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="review-nav-title">Review your event</div>
+              <div class="review-nav-step">Step 1 of 3</div>
+            </div>
+
+            <div class="cover-block">
+              <svg class="cover-bg" viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                <defs><linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c8e6d4"/><stop offset="100%" stop-color="#e2f0e8"/></linearGradient></defs>
+                <rect width="300" height="160" fill="url(#skyG)"/>
+                <ellipse cx="150" cy="148" rx="200" ry="28" fill="#a8d5b5"/>
+                <ellipse cx="40" cy="96" rx="28" ry="36" fill="#186338" opacity="0.72"/>
+                <rect x="36" y="118" width="8" height="18" fill="#1e3e2b" opacity="0.6"/>
+                <ellipse cx="262" cy="90" rx="32" ry="40" fill="#186338" opacity="0.82"/>
+                <rect x="257" y="116" width="9" height="20" fill="#1e3e2b" opacity="0.6"/>
+                <ellipse cx="198" cy="102" rx="20" ry="26" fill="#77b691" opacity="0.9"/>
+                <rect x="194" y="118" width="7" height="14" fill="#1e3e2b" opacity="0.5"/>
+                <circle cx="238" cy="28" r="18" fill="#f9e79f" opacity="0.8"/>
+                <circle cx="120" cy="126" r="6" fill="#4d525b" opacity="0.45"/>
+                <ellipse cx="120" cy="137" rx="10" ry="5" fill="#4d525b" opacity="0.35"/>
+                <circle cx="150" cy="123" r="5" fill="#4d525b" opacity="0.45"/>
+                <ellipse cx="135" cy="139" rx="22" ry="7" fill="#f4c2a1" opacity="0.65"/>
+              </svg>
+              <div class="cover-gradient"></div>
+              <div class="cover-change-btn">
+                <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 7.5V9h1.5l4.4-4.4-1.5-1.5L1 7.5zM8.7 3.3a.4.4 0 000-.6L7.3 1.3a.4.4 0 00-.6 0L5.8 2.2l1.5 1.5.9-.4z" fill="white"/></svg>
+                Change cover
+              </div>
+            </div>
+
+            <div class="form-section" style="flex:1; overflow-y:auto; padding-bottom:4px;">
+              <div class="form-group">
+                <div class="form-label">Event name</div>
+                <div class="form-input title-input">Morning Playdate at Centennial Park</div>
+              </div>
+              <div class="form-group">
+                <div class="form-label">Description</div>
+                <div class="desc-wrap">
+                  <div class="ai-badge-inline">✦ AI written · tap to edit</div>
+                  <div class="form-input textarea">A relaxed morning playdate for families with toddlers at Centennial Park. Bring a picnic blanket and let the little ones explore the open fields and playground. Perfect for meeting local families!</div>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-label">Date & Time</div>
+                <div class="field-icon-row">
+                  <span class="icon">📅</span>
+                  <div class="field-val">Saturday, 26 Apr<span class="field-sub">10:00 AM → 12:00 PM</span></div>
+                  <span class="chev">›</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-label">Location</div>
+                <div class="field-icon-row">
+                  <span class="icon">📍</span>
+                  <div class="field-val">Centennial Park<span class="field-sub">Paddington, NSW 2021</span></div>
+                  <span class="chev">›</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="sticky-cta">
+              <div class="btn-primary">Continue <span style="font-size:15px;">→</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">12.4 — Review & Edit <span style="color:var(--brand-200);">★</span></div>
+  </div>
+
+  <div class="arrow" style="margin-top:-40px;">scroll ↓</div>
+
+  <!-- 12.4 scrolled — settings section -->
+  <div class="phone-wrap">
+    <div class="phone highlight" style="height:680px;">
+      <div class="phone-inner">
+        <div class="di"></div>
+        <div class="status-bar">
+          <span class="status-time">9:42</span>
+          <div class="status-icons">
+            <svg width="14" height="10" viewBox="0 0 14 10"><rect x="0" y="3" width="3" height="7" rx="1" fill="#4d525b"/><rect x="4" y="2" width="3" height="8" rx="1" fill="#4d525b"/><rect x="8" y="0" width="3" height="10" rx="1" fill="#4d525b"/><rect x="12" y="0" width="2" height="10" rx="1" fill="#b3b8c1"/></svg>
+            <svg width="12" height="10" viewBox="0 0 12 10"><path d="M6 2C8.2 2 10.2 3 11.5 4.6L12 5l-.5.4C10.2 7 8.2 8 6 8s-4.2-1-5.5-2.6L0 5l.5-.4C1.8 3 3.8 2 6 2z" fill="#4d525b"/><circle cx="6" cy="5" r="1.5" fill="#f4f1ea"/></svg>
+            <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2.5" stroke="#4d525b" stroke-width="1.2" fill="none"/><rect x="1.5" y="2.5" width="13" height="6" rx="1.5" fill="#4d525b"/><path d="M20 4v3a1.5 1.5 0 000-3z" fill="#4d525b"/></svg>
+          </div>
+        </div>
+        <div class="screen-content">
+          <div class="review-screen">
+            <div class="review-nav">
+              <div class="chat-back">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="#4d525b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="review-nav-title">Review your event</div>
+              <div class="review-nav-step">Step 1 of 3</div>
+            </div>
+            <div class="form-section" style="flex:1; overflow-y:auto; padding-top:10px;">
+              <div class="form-group">
+                <div class="form-label">Invite guests</div>
+                <div class="whos-going">
+                  <div class="avatar-stack">
+                    <div class="avatar-sm">Y</div>
+                    <div class="avatar-sm" style="background:var(--warning-100);color:var(--warning-500);">S</div>
+                    <div class="avatar-sm" style="background:var(--brand-50);color:var(--brand-500);">L</div>
+                    <div class="avatar-sm add-more">+</div>
+                  </div>
+                  <div class="whos-going-label">3 invited · up to 15 families</div>
+                  <div class="whos-going-link">Manage →</div>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="form-group">
+                <div class="form-label">Settings</div>
+                <div class="settings-row">
+                  <div class="settings-item">
+                    <span class="settings-item-icon">✅</span>
+                    <div class="settings-item-text">
+                      <div class="settings-item-label">Approval required</div>
+                      <div class="settings-item-sub">You approve each RSVP manually</div>
+                    </div>
+                    <div class="toggle"></div>
+                  </div>
+                  <div class="settings-item">
+                    <span class="settings-item-icon">👥</span>
+                    <div class="settings-item-text">
+                      <div class="settings-item-label">Max guests</div>
+                      <div class="settings-item-sub">Including host family</div>
+                    </div>
+                    <div class="stepper">
+                      <div class="stepper-btn">−</div>
+                      <div class="stepper-val">15</div>
+                      <div class="stepper-btn">+</div>
+                    </div>
+                  </div>
+                  <div class="settings-item">
+                    <span class="settings-item-icon">🔒</span>
+                    <div class="settings-item-text">
+                      <div class="settings-item-label">Privacy</div>
+                      <div class="settings-item-sub">Who can see this event</div>
+                    </div>
+                    <div style="font-size:11px;color:var(--grey-500);">Club only ›</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="sticky-cta">
+              <div class="btn-primary">Continue <span style="font-size:15px;">→</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">12.4 scrolled — guests & settings</div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  ROW 3: Invite → Confirm → Published           -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="section-label" style="margin-top:48px;">Step 3 — Invite, confirm & publish</div>
+<div class="row">
+
+  <!-- 12.5 — Invite Guests -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="di"></div>
+        <div class="status-bar">
+          <span class="status-time">9:43</span>
+          <div class="status-icons">
+            <svg width="14" height="10" viewBox="0 0 14 10"><rect x="0" y="3" width="3" height="7" rx="1" fill="#4d525b"/><rect x="4" y="2" width="3" height="8" rx="1" fill="#4d525b"/><rect x="8" y="0" width="3" height="10" rx="1" fill="#4d525b"/><rect x="12" y="0" width="2" height="10" rx="1" fill="#b3b8c1"/></svg>
+            <svg width="12" height="10" viewBox="0 0 12 10"><path d="M6 2C8.2 2 10.2 3 11.5 4.6L12 5l-.5.4C10.2 7 8.2 8 6 8s-4.2-1-5.5-2.6L0 5l.5-.4C1.8 3 3.8 2 6 2z" fill="#4d525b"/><circle cx="6" cy="5" r="1.5" fill="#f4f1ea"/></svg>
+            <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2.5" stroke="#4d525b" stroke-width="1.2" fill="none"/><rect x="1.5" y="2.5" width="13" height="6" rx="1.5" fill="#4d525b"/><path d="M20 4v3a1.5 1.5 0 000-3z" fill="#4d525b"/></svg>
+          </div>
+        </div>
+        <div class="screen-content">
+          <div class="invite-screen">
+            <div class="invite-header">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="chat-back">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="#4d525b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div>
+                  <div class="invite-title">Invite guests</div>
+                  <div class="invite-sub">Step 2 of 3</div>
+                </div>
+                <div style="margin-left:auto;font-size:11px;color:var(--brand-500);font-weight:600;">Skip</div>
+              </div>
+              <div class="search-bar">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="5" cy="5" r="4" stroke="#818898" stroke-width="1.3"/><path d="M9 9l2 2" stroke="#818898" stroke-width="1.3" stroke-linecap="round"/></svg>
+                Search contacts…
+              </div>
+            </div>
+            <div class="contact-list">
+              <div class="contact-group-label">Suggested — from your club</div>
+              <div class="contact-row">
+                <div class="contact-avatar" style="background:var(--success-100);color:var(--success-500);">S</div>
+                <div class="contact-info">
+                  <div class="contact-name">Sarah Miller</div>
+                  <div class="contact-handle">Toddler · Sprout member</div>
+                </div>
+                <div class="contact-check checked">✓</div>
+              </div>
+              <div class="contact-row">
+                <div class="contact-avatar" style="background:var(--warning-100);color:var(--warning-500);">L</div>
+                <div class="contact-info">
+                  <div class="contact-name">Lena Kovac</div>
+                  <div class="contact-handle">Twins · Sprout member</div>
+                </div>
+                <div class="contact-check checked">✓</div>
+              </div>
+              <div class="contact-row">
+                <div class="contact-avatar">M</div>
+                <div class="contact-info">
+                  <div class="contact-name">Mia Chen</div>
+                  <div class="contact-handle">Newborn · Sprout member</div>
+                </div>
+                <div class="contact-check"></div>
+              </div>
+              <div class="contact-row">
+                <div class="contact-avatar" style="background:var(--brand-50);color:var(--brand-500);">J</div>
+                <div class="contact-info">
+                  <div class="contact-name">James O'Brien</div>
+                  <div class="contact-handle">Preschooler · Sprout member</div>
+                </div>
+                <div class="contact-check"></div>
+              </div>
+              <div class="contact-row">
+                <div class="contact-avatar" style="background:var(--error-100);color:var(--error-500);">R</div>
+                <div class="contact-info">
+                  <div class="contact-name">Rachel Tan</div>
+                  <div class="contact-handle">Toddler · Sprout member</div>
+                </div>
+                <div class="contact-check"></div>
+              </div>
+            </div>
+            <div class="sticky-cta">
+              <div class="btn-primary sm">Continue with 2 invited →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">12.5 — Invite guests</div>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <!-- 12.6 — Confirm & Publish -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="di"></div>
+        <div class="status-bar">
+          <span class="status-time">9:44</span>
+          <div class="status-icons">
+            <svg width="14" height="10" viewBox="0 0 14 10"><rect x="0" y="3" width="3" height="7" rx="1" fill="#4d525b"/><rect x="4" y="2" width="3" height="8" rx="1" fill="#4d525b"/><rect x="8" y="0" width="3" height="10" rx="1" fill="#4d525b"/><rect x="12" y="0" width="2" height="10" rx="1" fill="#b3b8c1"/></svg>
+            <svg width="12" height="10" viewBox="0 0 12 10"><path d="M6 2C8.2 2 10.2 3 11.5 4.6L12 5l-.5.4C10.2 7 8.2 8 6 8s-4.2-1-5.5-2.6L0 5l.5-.4C1.8 3 3.8 2 6 2z" fill="#4d525b"/><circle cx="6" cy="5" r="1.5" fill="#f4f1ea"/></svg>
+            <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2.5" stroke="#4d525b" stroke-width="1.2" fill="none"/><rect x="1.5" y="2.5" width="13" height="6" rx="1.5" fill="#4d525b"/><path d="M20 4v3a1.5 1.5 0 000-3z" fill="#4d525b"/></svg>
+          </div>
+        </div>
+        <div class="screen-content">
+          <div style="flex:1;display:flex;flex-direction:column;background:var(--sec-500);overflow:hidden;">
+            <div style="padding:10px 14px 8px;border-bottom:1px solid var(--grey-100);display:flex;align-items:center;gap:10px;background:var(--sec-500);">
+              <div class="chat-back"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="#4d525b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div style="font-size:14px;font-weight:600;color:var(--grey-700);flex:1;">Confirm & Publish</div>
+              <div style="font-size:11px;color:var(--grey-400);">Step 3 of 3</div>
+            </div>
+
+            <div class="event-preview-card">
+              <div class="event-preview-cover">
+                <svg viewBox="0 0 270 110" style="width:100%;height:100%;" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="270" height="110" fill="#c8e6d4"/>
+                  <ellipse cx="135" cy="98" rx="180" ry="22" fill="#a8d5b5"/>
+                  <ellipse cx="35" cy="66" rx="22" ry="28" fill="#186338" opacity="0.72"/>
+                  <rect x="31" y="80" width="7" height="14" fill="#1e3e2b" opacity="0.6"/>
+                  <ellipse cx="230" cy="60" rx="26" ry="32" fill="#186338" opacity="0.82"/>
+                  <rect x="225" y="78" width="8" height="16" fill="#1e3e2b" opacity="0.6"/>
+                  <circle cx="215" cy="18" r="14" fill="#f9e79f" opacity="0.8"/>
+                </svg>
+                <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,0.35) 100%);"></div>
+                <div style="position:absolute;bottom:8px;left:10px;" class="event-preview-category">🌳 Parks & Playgrounds</div>
+              </div>
+              <div class="event-preview-body">
+                <div class="event-preview-title">Morning Playdate at Centennial Park</div>
+                <div class="event-detail-row"><span class="event-detail-icon">📅</span><span class="event-detail-text">Saturday, 26 Apr · 10:00 AM – 12:00 PM</span></div>
+                <div class="event-detail-row"><span class="event-detail-icon">📍</span><span class="event-detail-text">Centennial Park, Paddington NSW</span></div>
+                <div class="event-detail-row"><span class="event-detail-icon">👥</span><span class="event-detail-text">2 invited · max 15 · approval on</span></div>
+              </div>
+            </div>
+
+            <div class="review-confirm-section">
+              <div class="confirm-label">Summary</div>
+              <div class="confirm-line"><span class="key">Cover</span><span class="val">✦ AI generated</span></div>
+              <div class="confirm-line"><span class="key">Description</span><span class="val">✦ AI written</span></div>
+              <div class="confirm-line"><span class="key">Guests invited</span><span class="val">2 of 15 max</span></div>
+              <div class="confirm-line"><span class="key">Privacy</span><span class="val">Club only</span></div>
+            </div>
+
+            <div class="sticky-cta" style="margin-top:auto;">
+              <div class="btn-primary">Publish Event 🌱</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">12.6 — Confirm & Publish</div>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <!-- 12.7 — Success -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="di"></div>
+        <div class="status-bar">
+          <span class="status-time">9:44</span>
+          <div class="status-icons">
+            <svg width="14" height="10" viewBox="0 0 14 10"><rect x="0" y="3" width="3" height="7" rx="1" fill="#4d525b"/><rect x="4" y="2" width="3" height="8" rx="1" fill="#4d525b"/><rect x="8" y="0" width="3" height="10" rx="1" fill="#4d525b"/><rect x="12" y="0" width="2" height="10" rx="1" fill="#b3b8c1"/></svg>
+            <svg width="12" height="10" viewBox="0 0 12 10"><path d="M6 2C8.2 2 10.2 3 11.5 4.6L12 5l-.5.4C10.2 7 8.2 8 6 8s-4.2-1-5.5-2.6L0 5l.5-.4C1.8 3 3.8 2 6 2z" fill="#4d525b"/><circle cx="6" cy="5" r="1.5" fill="#f4f1ea"/></svg>
+            <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2.5" stroke="#4d525b" stroke-width="1.2" fill="none"/><rect x="1.5" y="2.5" width="13" height="6" rx="1.5" fill="#4d525b"/><path d="M20 4v3a1.5 1.5 0 000-3z" fill="#4d525b"/></svg>
+          </div>
+        </div>
+        <div class="screen-content">
+          <div class="success-screen">
+            <div class="confetti-row">🎉 🌱 🎊</div>
+            <div class="success-circle">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="16" r="15" stroke="#186338" stroke-width="2"/>
+                <path d="M9 16.5l4.5 4.5 9-9" stroke="#186338" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="success-title">Your event is<br><em>live!</em></div>
+            <div class="success-sub">Invites sent. You'll be notified when families RSVP.</div>
+            <div class="success-event-pill">
+              <div class="success-event-thumb">🌳</div>
+              <div class="success-event-info">
+                <div class="success-event-name">Morning Playdate at Centennial Park</div>
+                <div class="success-event-meta">Sat 26 Apr · 10:00 AM · Centennial Park</div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="width:100%;display:flex;flex-direction:column;gap:8px;">
+              <div class="btn-primary">View event page</div>
+              <div class="btn-secondary">Back to home</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">12.7 — Published!</div>
+  </div>
+
+</div>
+
+<!-- Flow diagram -->
+<div style="margin-top:56px;padding:20px 24px;background:rgba(24,99,56,0.08);border:1px solid rgba(24,99,56,0.2);border-radius:16px;max-width:900px;">
+  <div style="font-size:11px;font-weight:700;color:#77b691;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Option A — What changed</div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+    <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:8px 12px;font-size:11px;color:#dbd5c8;">
+      <div style="font-weight:600;color:#f4f1ea;margin-bottom:2px;">12.1</div>AI chat — empty
+    </div>
+    <span style="color:#676d7a;font-size:18px;">→</span>
+    <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:8px 12px;font-size:11px;color:#dbd5c8;">
+      <div style="font-weight:600;color:#f4f1ea;margin-bottom:2px;">12.2</div>User describes
+    </div>
+    <span style="color:#676d7a;font-size:18px;">→</span>
+    <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:8px 12px;font-size:11px;color:#dbd5c8;">
+      <div style="font-weight:600;color:#f4f1ea;margin-bottom:2px;">12.3</div>AI generates
+    </div>
+    <span style="color:#676d7a;font-size:18px;">→</span>
+    <div style="background:rgba(24,99,56,0.25);border-radius:8px;padding:8px 12px;font-size:11px;color:#dbd5c8;border:1px solid rgba(24,99,56,0.5);">
+      <div style="font-weight:700;color:#77b691;margin-bottom:2px;">12.4 ★ new</div>Review & Edit<br><span style="color:#818898;font-size:10px;">all fields editable · ✦ AI badges</span>
+    </div>
+    <span style="color:#676d7a;font-size:18px;">→</span>
+    <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:8px 12px;font-size:11px;color:#dbd5c8;">
+      <div style="font-weight:600;color:#f4f1ea;margin-bottom:2px;">12.5</div>Invite guests
+    </div>
+    <span style="color:#676d7a;font-size:18px;">→</span>
+    <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:8px 12px;font-size:11px;color:#dbd5c8;">
+      <div style="font-weight:600;color:#f4f1ea;margin-bottom:2px;">12.6</div>Confirm
+    </div>
+    <span style="color:#676d7a;font-size:18px;">→</span>
+    <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:8px 12px;font-size:11px;color:#dbd5c8;">
+      <div style="font-weight:600;color:#f4f1ea;margin-bottom:2px;">12.7</div>🌱 Live!
+    </div>
+  </div>
+  <div style="margin-top:14px;font-size:11px;color:#818898;line-height:1.75;">
+    <span style="color:#dbd5c8;font-weight:600;">Removed:</span> read-only preview screen · separate change-cover bottom sheet · dual Edit/Looks Good CTA split<br>
+    <span style="color:#dbd5c8;font-weight:600;">Added:</span> AI output lands directly in editable form · <span style="background:rgba(24,99,56,0.2);padding:1px 6px;border-radius:4px;color:#77b691;font-size:10px;">✦ AI written · tap to edit</span> badge on generated fields · "Change cover" stays as overlay button on the cover image
+  </div>
+</div>
+
+</body>
+</html>

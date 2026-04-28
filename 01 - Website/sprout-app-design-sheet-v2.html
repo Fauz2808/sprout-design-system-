@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprout — App Design Sheet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --forest:      #1E4A35;
+      --green-500:   #3A8A62;
+      --green-300:   #7DC49A;
+      --green-100:   #D8F0E5;
+      --sage:        #D6E8DC;
+      --cream:       #F0EDE6;
+      --cream-light: #FAF9F6;
+      --ink:         #1C1C1A;
+      --stone:       #6B6860;
+      --pebble:      #9E9B94;
+      --border:      rgba(0,0,0,0.08);
+    }
+
+    html { background: var(--cream); }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--cream);
+      min-height: 100vh;
+      padding: 56px 56px 80px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ── Ambient glows ── */
+    .glow-tr {
+      position: fixed; top: -160px; right: -160px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(58,138,98,0.10) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    .glow-bl {
+      position: fixed; bottom: -180px; left: -120px;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(214,232,220,0.50) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── Decorative leaves (SVG) ── */
+    .leaf { position: fixed; pointer-events: none; z-index: 0; opacity: 0.09; }
+
+    /* ── Page ── */
+    .page {
+      position: relative; z-index: 1;
+      max-width: 1240px; margin: 0 auto;
+    }
+
+    /* ════════════════════════════
+       HEADER
+    ════════════════════════════ */
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 64px;
+    }
+
+    .logo-block {
+      display: flex; align-items: center; gap: 16px;
+    }
+
+    .logo-icon {
+      width: 58px; height: 58px;
+      border-radius: 18px;
+      background: var(--forest);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px;
+      box-shadow: 0 8px 28px rgba(30,74,53,0.30);
+      flex-shrink: 0;
+    }
+
+    .logo-text {}
+
+    .logo-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 36px; font-weight: 700;
+      color: var(--ink); letter-spacing: -0.7px;
+      line-height: 1; margin-bottom: 5px;
+    }
+
+    .logo-tagline {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic; font-size: 14.5px;
+      color: var(--forest); font-weight: 400;
+      max-width: 300px; line-height: 1.4;
+    }
+
+    .header-meta {
+      text-align: right; padding-top: 4px;
+    }
+
+    .meta-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--pebble); margin-bottom: 4px;
+    }
+
+    .meta-value {
+      font-size: 13px; color: var(--stone);
+    }
+
+    /* ════════════════════════════
+       PHONES ROW
+    ════════════════════════════ */
+    .phones {
+      display: flex;
+      gap: 22px;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .phone-col {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 24px;
+      flex: 1;
+    }
+
+    /* ── iPhone frame ── */
+    .iphone {
+      width: 262px;
+      height: 568px;   /* ~2.17:1 ratio matching iPhone 15 */
+      background: #141414;
+      border-radius: 54px;
+      position: relative;
+      flex-shrink: 0;
+      box-shadow:
+        inset 0 0 0 1px #2a2a2a,
+        inset 0 0 0 3.5px #0e0e0e,
+        0 2px 6px  rgba(0,0,0,0.12),
+        0 12px 28px rgba(0,0,0,0.20),
+        0 36px 60px rgba(0,0,0,0.22),
+        0 52px 80px rgba(0,0,0,0.10);
+    }
+
+    /* Power button */
+    .iphone::before {
+      content: '';
+      position: absolute; right: -3px; top: 122px;
+      width: 3.5px; height: 66px;
+      background: #1c1c1c; border-radius: 0 2px 2px 0;
+    }
+
+    /* Volume buttons */
+    .iphone::after {
+      content: '';
+      position: absolute; left: -3px; top: 90px;
+      width: 3.5px; height: 34px;
+      background: #1c1c1c; border-radius: 2px 0 0 2px;
+      box-shadow: 0 50px 0 #1c1c1c, 0 92px 0 #1c1c1c;
+    }
+
+    /* Screen area */
+    .iphone-screen {
+      position: absolute;
+      top: 7px; left: 7px; right: 7px; bottom: 7px;
+      border-radius: 47px;
+      overflow: hidden;
+      background: #000;
+    }
+
+    /* Subtle glass highlight */
+    .iphone-screen::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 45%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.055) 0%, transparent 100%);
+      border-radius: 47px 47px 0 0;
+      pointer-events: none; z-index: 10;
+    }
+
+    /* Dynamic island */
+    .island {
+      position: absolute;
+      top: 13px; left: 50%; transform: translateX(-50%);
+      width: 88px; height: 11px;
+      background: #141414;
+      border-radius: 6px; z-index: 20;
+    }
+
+    /* Screen image */
+    .screen-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+    }
+
+    /* ── Phone caption ── */
+    .caption { text-align: center; }
+
+    .cap-num {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--pebble); margin-bottom: 5px;
+    }
+
+    .cap-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; font-weight: 600;
+      color: var(--ink); margin-bottom: 5px;
+      letter-spacing: -0.2px;
+    }
+
+    .cap-desc {
+      font-size: 12.5px; color: var(--stone);
+      line-height: 1.45;
+    }
+
+    /* ════════════════════════════
+       BOTTOM NAV ICONS ROW
+    ════════════════════════════ */
+    .nav-icons-row {
+      margin-top: 64px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .nav-icon-pill {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--cream-light);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 9px 18px;
+      transition: none;
+    }
+
+    .nav-icon-pill.active {
+      background: var(--forest);
+    }
+
+    .ni-emoji { font-size: 16px; line-height: 1; }
+
+    .ni-label {
+      font-size: 12px; font-weight: 500;
+      color: var(--stone);
+    }
+
+    .nav-icon-pill.active .ni-label {
+      color: white; font-weight: 600;
+    }
+
+    .ni-badge {
+      background: white;
+      color: var(--forest);
+      font-size: 9px; font-weight: 700;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ════════════════════════════
+       COLOR SWATCHES
+    ════════════════════════════ */
+    .swatches {
+      margin-top: 40px;
+      display: flex; gap: 8px; justify-content: center;
+    }
+
+    .sw {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--cream-light);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 14px 6px 8px;
+    }
+
+    .sw-dot {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.10);
+      flex-shrink: 0;
+    }
+
+    .sw-name { font-size: 11px; font-weight: 600; color: var(--ink); }
+    .sw-hex  { font-size: 10px; color: var(--pebble); font-family: monospace; }
+
+    /* ════════════════════════════
+       FOOTER
+    ════════════════════════════ */
+    .footer {
+      margin-top: 56px;
+      display: flex; align-items: center; gap: 18px;
+    }
+
+    .footer-rule { height: 1px; flex: 1; background: var(--border); }
+
+    .footer-text {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--pebble); white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient background glows -->
+  <div class="glow-tr"></div>
+  <div class="glow-bl"></div>
+
+  <!-- Leaf — top-left -->
+  <svg class="leaf" style="top:-20px;left:-20px;width:240px;height:240px;" viewBox="0 0 240 240">
+    <path d="M120 18 Q178 62 164 120 Q150 178 90 190 Q30 202 18 142 Q6 82 66 54 Q92 42 120 18Z" fill="#1E4A35"/>
+    <path d="M120 18 Q120 104 90 190" stroke="#3A8A62" stroke-width="1.8" fill="none"/>
+    <path d="M120 18 Q66 96 18 142" stroke="#4FA878" stroke-width="1" fill="none"/>
+  </svg>
+
+  <!-- Leaf — bottom-right -->
+  <svg class="leaf" style="bottom:-30px;right:-30px;width:300px;height:300px;" viewBox="0 0 300 300">
+    <path d="M150 22 Q222 74 206 150 Q190 226 112 240 Q34 254 22 174 Q10 94 88 62 Q118 48 150 22Z" fill="#1E4A35"/>
+    <path d="M150 22 Q150 130 112 240" stroke="#3A8A62" stroke-width="2" fill="none"/>
+    <path d="M150 22 Q84 114 22 174" stroke="#4FA878" stroke-width="1.2" fill="none"/>
+  </svg>
+
+  <!-- Leaf — right edge -->
+  <svg class="leaf" style="top:42%;right:4px;transform:translateY(-50%);width:72px;height:260px;" viewBox="0 0 72 260">
+    <path d="M36 10 Q58 32 52 58 Q46 84 22 88 Q-2 92 2 66 Q6 40 26 28 Q36 22 36 10Z" fill="#3A8A62"/>
+    <path d="M36 10 Q36 54 22 88" stroke="#4FA878" stroke-width="1.2" fill="none"/>
+    <path d="M36 120 Q58 142 52 168 Q46 194 22 198 Q-2 202 2 176 Q6 150 26 138 Q36 132 36 120Z" fill="#1E4A35"/>
+    <path d="M36 120 Q36 164 22 198" stroke="#3A8A62" stroke-width="1.2" fill="none"/>
+  </svg>
+
+  <!-- Sparkle dots -->
+  <svg style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.13;" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid slice">
+    <circle cx="180"  cy="120" r="3" fill="#3A8A62"/>
+    <circle cx="340"  cy="60"  r="2" fill="#3A8A62"/>
+    <circle cx="1100" cy="80"  r="2.5" fill="#1E4A35"/>
+    <circle cx="1260" cy="160" r="2" fill="#3A8A62"/>
+    <circle cx="80"   cy="400" r="2" fill="#3A8A62"/>
+    <circle cx="1340" cy="400" r="3" fill="#1E4A35"/>
+    <circle cx="220"  cy="820" r="2.5" fill="#3A8A62"/>
+    <circle cx="1200" cy="780" r="2" fill="#3A8A62"/>
+    <text x="1050" y="50"  font-size="14" fill="#1E4A35" opacity="0.5">🍀</text>
+    <text x="120"  y="780" font-size="12" fill="#3A8A62" opacity="0.5">🌱</text>
+    <text x="1280" y="500" font-size="10" fill="#3A8A62" opacity="0.4">✦</text>
+    <text x="60"   y="250" font-size="10" fill="#1E4A35" opacity="0.4">✦</text>
+  </svg>
+
+  <div class="page">
+
+    <!-- ═══ HEADER ═══ -->
+    <header class="header">
+      <div class="logo-block">
+        <div class="logo-icon">🍀</div>
+        <div class="logo-text">
+          <div class="logo-name">Sprout</div>
+          <div class="logo-tagline">"Where parents bond and childhoods flourish."</div>
+        </div>
+      </div>
+      <div class="header-meta">
+        <div class="meta-label">App Design Sheet</div>
+        <div class="meta-value">iOS &nbsp;·&nbsp; Version 1.0 &nbsp;·&nbsp; April 2026</div>
+      </div>
+    </header>
+
+    <!-- ═══ 4 iPHONE MOCKUPS ═══ -->
+    <div class="phones">
+
+      <!-- 01 — Home / Dashboard -->
+      <div class="phone-col">
+        <div class="iphone">
+          <div class="iphone-screen">
+            <div class="island"></div>
+            <img
+              class="screen-img"
+              src="../Sprout UI Design Directory/PNG/7.2 - Home - Discover Events.png"
+              alt="Home – Discover Events"
+            >
+          </div>
+        </div>
+        <div class="caption">
+          <div class="cap-num">01</div>
+          <div class="cap-name">Home</div>
+          <div class="cap-desc">Discover events near you,<br>filtered by age &amp; interest</div>
+        </div>
+      </div>
+
+      <!-- 02 — Main Action: Event Details -->
+      <div class="phone-col">
+        <div class="iphone">
+          <div class="iphone-screen">
+            <div class="island"></div>
+            <img
+              class="screen-img"
+              src="../Sprout UI Design Directory/PNG/9.1 - Park and Playground Details Page - As Host.png"
+              alt="Event Details – Park"
+            >
+          </div>
+        </div>
+        <div class="caption">
+          <div class="cap-num">02</div>
+          <div class="cap-name">Event Details</div>
+          <div class="cap-desc">View the event, see who's going,<br>and create your own</div>
+        </div>
+      </div>
+
+      <!-- 03 — Results / Community -->
+      <div class="phone-col">
+        <div class="iphone">
+          <div class="iphone-screen">
+            <div class="island"></div>
+            <img
+              class="screen-img"
+              src="../Sprout UI Design Directory/PNG/15.1 - Clubs.png"
+              alt="Clubs – Member Directory"
+            >
+          </div>
+        </div>
+        <div class="caption">
+          <div class="cap-num">03</div>
+          <div class="cap-name">Your Community</div>
+          <div class="cap-desc">Meet members of your school,<br>track connections made</div>
+        </div>
+      </div>
+
+      <!-- 04 — Progress / My Events -->
+      <div class="phone-col">
+        <div class="iphone">
+          <div class="iphone-screen">
+            <div class="island"></div>
+            <img
+              class="screen-img"
+              src="../Sprout UI Design Directory/PNG/8.1 - Home - My Events.png"
+              alt="My Events"
+            >
+          </div>
+        </div>
+        <div class="caption">
+          <div class="cap-num">04</div>
+          <div class="cap-name">My Events</div>
+          <div class="cap-desc">All your upcoming plans<br>in one place</div>
+        </div>
+      </div>
+
+    </div><!-- /phones -->
+
+    <!-- ═══ BOTTOM NAV ICONS ═══ -->
+    <div class="nav-icons-row">
+      <div class="nav-icon-pill active">
+        <span class="ni-emoji">📍</span>
+        <span class="ni-label">Events</span>
+      </div>
+      <div class="nav-icon-pill">
+        <span class="ni-emoji">🖼️</span>
+        <span class="ni-label">Memories</span>
+      </div>
+      <div class="nav-icon-pill">
+        <span class="ni-emoji">✨</span>
+        <span class="ni-label">AI Assist</span>
+      </div>
+      <div class="nav-icon-pill">
+        <span class="ni-emoji">💬</span>
+        <span class="ni-label">Chat</span>
+        <span class="ni-badge">2</span>
+      </div>
+      <div class="nav-icon-pill">
+        <span class="ni-emoji">👥</span>
+        <span class="ni-label">Clubs</span>
+      </div>
+    </div>
+
+    <!-- ═══ COLOR SWATCHES ═══ -->
+    <div class="swatches">
+      <div class="sw">
+        <div class="sw-dot" style="background:#1E4A35;"></div>
+        <div><div class="sw-name">Forest</div><div class="sw-hex">#1E4A35</div></div>
+      </div>
+      <div class="sw">
+        <div class="sw-dot" style="background:#3A8A62;"></div>
+        <div><div class="sw-name">Sprout</div><div class="sw-hex">#3A8A62</div></div>
+      </div>
+      <div class="sw">
+        <div class="sw-dot" style="background:#D6E8DC;border-color:rgba(0,0,0,0.12);"></div>
+        <div><div class="sw-name">Sage</div><div class="sw-hex">#D6E8DC</div></div>
+      </div>
+      <div class="sw">
+        <div class="sw-dot" style="background:#F0EDE6;border-color:rgba(0,0,0,0.12);"></div>
+        <div><div class="sw-name">Cream</div><div class="sw-hex">#F0EDE6</div></div>
+      </div>
+      <div class="sw">
+        <div class="sw-dot" style="background:#FAF9F6;border-color:rgba(0,0,0,0.12);"></div>
+        <div><div class="sw-name">Cream Light</div><div class="sw-hex">#FAF9F6</div></div>
+      </div>
+      <div class="sw">
+        <div class="sw-dot" style="background:#1C1C1A;"></div>
+        <div><div class="sw-name">Ink</div><div class="sw-hex">#1C1C1A</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="footer">
+      <div class="footer-rule"></div>
+      <span style="font-size:15px;">🍀</span>
+      <div class="footer-text">Sprout &nbsp;·&nbsp; Brand &amp; Design &nbsp;·&nbsp; Confidential &nbsp;·&nbsp; 2026</div>
+      <span style="font-size:15px;">🍀</span>
+      <div class="footer-rule"></div>
+    </footer>
+
+  </div>
+</body>
+</html>

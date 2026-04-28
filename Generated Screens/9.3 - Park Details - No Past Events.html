@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprout – 9.3 Park Details No Past Events</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { background:#b8b0a0; min-height:100vh; display:flex; align-items:flex-start; justify-content:center; padding:52px 0 80px; font-family:'Inter',sans-serif; }
+    :root {
+      --brand-500:#186338; --brand-700:#1e3e2b; --brand-50:#e2e9e3; --brand-100:#d0dacf;
+      --bg:#f4f1ea; --surf-1:#eae6db; --surf-2:#dbd5c8; --surf-3:#c2b9a6;
+      --text-primary:#4d525b; --text-secondary:#818898; --text-tertiary:#b3b8c1;
+      --text-brand:#186338; --text-brand-bold:#1e3e2b; --border:#e6e7ea;
+    }
+    .phone { width:393px; height:852px; background:var(--bg); border-radius:54px; overflow:hidden; position:relative; box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),0 0 0 10px #1c1c1e,0 0 0 12px #2c2c2e,0 50px 100px rgba(0,0,0,.48); }
+    .phone::before { content:''; position:absolute; left:-13px; top:120px; width:4px; height:32px; background:#2a2a2a; border-radius:2px 0 0 2px; box-shadow:0 44px 0 #2a2a2a,0 88px 0 #2a2a2a; }
+    .phone::after  { content:''; position:absolute; right:-13px; top:148px; width:4px; height:66px; background:#2a2a2a; border-radius:0 2px 2px 0; }
+    .island { position:absolute; top:14px; left:50%; transform:translateX(-50%); width:120px; height:34px; background:#0a0a0a; border-radius:18px; z-index:100; }
+
+    .scroll { position:absolute; inset:0; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; padding-bottom:100px; }
+    .scroll::-webkit-scrollbar { display:none; }
+
+    .status-bar { display:flex; align-items:center; justify-content:space-between; padding:16px 26px 0; height:52px; }
+    .s-time { font-size:15px; font-weight:600; color:var(--text-primary); }
+    .s-icons { display:flex; align-items:center; gap:6px; }
+
+    /* Hero */
+    .hero { height:200px; background:linear-gradient(160deg, #77b691 0%, #186338 100%); position:relative; display:flex; align-items:flex-end; }
+    .hero-overlay { position:absolute; inset:0; background:linear-gradient(to bottom, transparent 40%, rgba(0,0,0,.35)); }
+    .hero-back { position:absolute; top:12px; left:20px; width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; }
+    .hero-title { position:relative; z-index:1; padding:0 20px 16px; font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:#fff; }
+
+    /* Meta row */
+    .meta-row { display:flex; align-items:center; gap:12px; padding:14px 20px 0; flex-wrap:wrap; }
+    .meta-chip { display:inline-flex; align-items:center; gap:5px; font-size:12.5px; color:var(--text-secondary); }
+
+    /* Event row */
+    .event-row { display:flex; align-items:center; gap:12px; padding:12px 20px; border-bottom:1px solid var(--border); }
+    .event-dot { width:8px; height:8px; border-radius:50%; background:var(--brand-500); flex-shrink:0; }
+
+    /* Request row */
+    .request-section { padding:12px 20px; }
+    .request-label { font-size:12px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; }
+    .request-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); }
+    .req-avatar { width:40px; height:40px; border-radius:50%; background:var(--surf-2); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+    .req-name { font-size:14px; font-weight:600; color:var(--text-primary); }
+    .req-sub { font-size:12px; color:var(--text-secondary); }
+    .btn-pair { display:flex; gap:8px; margin-left:auto; }
+    .btn-deny { width:32px; height:32px; border-radius:50%; background:var(--surf-1); border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+    .btn-accept { width:32px; height:32px; border-radius:50%; background:var(--brand-500); border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+    /* Divider */
+    .section-divider { height:1px; background:var(--border); margin:8px 20px; }
+
+    /* Past events section */
+    .past-events-section { padding:12px 20px 0; }
+    .past-label { font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:2px; }
+    .past-count { font-size:12px; color:var(--text-secondary); margin-bottom:12px; }
+
+    /* Empty state (inline section) */
+    .empty-inline { display:flex; flex-direction:column; align-items:center; padding:28px 20px 20px; text-align:center; }
+    .empty-inline-icon { width:64px; height:64px; border-radius:18px; background:var(--brand-50); display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
+    .empty-inline-title { font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:6px; }
+    .empty-inline-body { font-size:13px; color:var(--text-secondary); line-height:1.55; max-width:220px; }
+
+    /* Create event bottom bar */
+    .bottom-bar { position:absolute; bottom:0; left:0; right:0; padding:12px 20px 28px; background:linear-gradient(to bottom, transparent, var(--bg) 30%); }
+    .create-btn { width:100%; height:52px; border-radius:99px; background:var(--brand-500); color:#fff; font-size:16px; font-weight:600; border:none; cursor:pointer; }
+  </style>
+</head>
+<body>
+<div class="phone">
+  <div class="island"></div>
+  <div class="scroll">
+    <div class="status-bar">
+      <span class="s-time">9:41</span>
+      <div class="s-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".35"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-overlay"></div>
+      <div class="hero-back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="hero-title">Zilker Park</div>
+    </div>
+
+    <div class="meta-row">
+      <div class="meta-chip"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#818898" stroke-width="1.2"/><path d="M6.5 3.5v3l2 1.5" stroke="#818898" stroke-width="1.2" stroke-linecap="round"/></svg>10:00 – 4:00 PM</div>
+      <div class="meta-chip"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1C4.29 1 2.5 2.79 2.5 5c0 3 4 7 4 7s4-4 4-7c0-2.21-1.79-4-4-4Z" stroke="#818898" stroke-width="1.2"/><circle cx="6.5" cy="5" r="1.5" stroke="#818898" stroke-width="1.2"/></svg>2.1 mi</div>
+      <div class="meta-chip">⭐ 4.8</div>
+    </div>
+
+    <div class="event-row">
+      <div class="event-dot"></div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text-primary);">Sunday, March 6</div>
+        <div style="font-size:12px;color:var(--text-secondary);">Front Back Center · Sherman, Texas</div>
+      </div>
+    </div>
+
+    <div class="request-section">
+      <div class="request-label">Request to Join · 2</div>
+      <div class="request-row">
+        <div class="req-avatar">👩</div>
+        <div><div class="req-name">Janet Spaulton</div><div class="req-sub">Mom of 2</div></div>
+        <div class="btn-pair">
+          <button class="btn-deny"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2L2 10" stroke="#818898" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+          <button class="btn-accept"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+      <div class="request-row">
+        <div class="req-avatar">👨</div>
+        <div><div class="req-name">Violet Williams</div><div class="req-sub">Dad of 1</div></div>
+        <div class="btn-pair">
+          <button class="btn-deny"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2L2 10" stroke="#818898" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+          <button class="btn-accept"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Past Events — Empty State -->
+    <div class="past-events-section">
+      <div class="past-label">Past Events</div>
+      <div class="past-count">0 events</div>
+      <div class="empty-inline">
+        <div class="empty-inline-icon">
+          <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+            <rect x="2" y="5" width="30" height="26" rx="5" fill="#d0dacf"/>
+            <rect x="2" y="5" width="30" height="26" rx="5" stroke="#186338" stroke-width="1.6" fill="none"/>
+            <rect x="2" y="5" width="30" height="9" rx="5" fill="#186338"/>
+            <rect x="2" y="10" width="30" height="4" fill="#186338"/>
+            <line x1="10" y1="2.5" x2="10" y2="9" stroke="#186338" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="24" y1="2.5" x2="24" y2="9" stroke="#186338" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="10" cy="19" r="1.5" fill="#b3b8c1"/>
+            <circle cx="17" cy="19" r="1.5" fill="#b3b8c1"/>
+            <circle cx="24" cy="19" r="1.5" fill="#b3b8c1"/>
+            <circle cx="10" cy="26" r="1.5" fill="#b3b8c1"/>
+            <circle cx="17" cy="26" r="1.5" fill="#b3b8c1"/>
+            <circle cx="24" cy="26" r="1.5" fill="#b3b8c1"/>
+          </svg>
+        </div>
+        <div class="empty-inline-title">No past events here yet</div>
+        <div class="empty-inline-body">Be the first to host an event at this location.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="create-btn">Create Event</button>
+  </div>
+</div>
+</body>
+</html>

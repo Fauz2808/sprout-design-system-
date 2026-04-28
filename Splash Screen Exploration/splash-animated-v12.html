@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Splash v12 · Design Animation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────
+   BRAND TOKENS
+───────────────────────────────────── */
+:root {
+  --forest:   #1E4A35;
+  --sprout:   #3A8A62;
+  --sage:     #D6E8DC;
+  --cream:    #F4F1EA;  /* Exact SVG background */
+  --ink:      #1C1C1A;
+  --stone:    #6B6860;
+  --stone-lt: #9E9B94;
+  --white:    #ffffff;
+  --icon-bg1: #F2EDEA;  /* Icon gradient start (SVG spec) */
+  --icon-bg2: #E7D8D2;  /* Icon gradient end (SVG spec) */
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ─────────────────────────────────────
+   PRESENTATION LAYOUT
+───────────────────────────────────── */
+body {
+  background: #c8c3b8;
+  min-height: 100vh;
+  display: flex; align-items: flex-start; justify-content: center;
+  gap: 52px; padding: 64px 40px 100px;
+  font-family: 'Inter', sans-serif; flex-wrap: wrap;
+}
+.wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.wrap-label { font-size: 9.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #5a5550; }
+
+.phone {
+  width: 393px; height: 852px; border-radius: 54px; overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.09), 0 2px 6px rgba(0,0,0,0.05),
+              0 18px 48px rgba(0,0,0,0.11), 0 56px 120px rgba(0,0,0,0.20);
+}
+.screen {
+  width: 393px; height: 852px; position: relative; overflow: hidden;
+  background: var(--cream);
+}
+/* Subtle warm grain */
+.screen::before {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image: radial-gradient(ellipse at 50% 20%, rgba(58,138,98,0.04) 0%, transparent 60%);
+}
+
+/* ─────────────────────────────────────
+   STATUS BAR & CHROME
+───────────────────────────────────── */
+.status {
+  position: absolute; top: 0; left: 0; right: 0; height: 54px;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 0 28px 10px; z-index: 80; color: #1e3e2b;
+}
+.st-time { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+.st-icons { display: flex; align-items: center; gap: 5px; }
+.di { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 120px; height: 34px; background: #000; border-radius: 20px; z-index: 90; }
+.hi { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: rgba(30,74,53,0.35); z-index: 90; }
+
+/* ─────────────────────────────────────
+   APP ICON ZONE
+   Logo.svg is 90×90 (84×84 visual + 3px shadow inset each side)
+   Centre on 393px screen: left = (393/2) - 45 = 151.5px
+───────────────────────────────────── */
+.icon-zone {
+  position: absolute;
+  top: 72px; left: 151.5px;
+  z-index: 20;
+  display: flex; flex-direction: column; align-items: center;
+  width: 90px;
+}
+/* icon-wrap: rounded-rect container with pink gradient, clover floats inside */
+.icon-wrap {
+  width: 90px; height: 90px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #F2EDEA 0%, #E7D8D2 100%);
+  box-shadow:
+    2.6px 2.6px 6px rgba(14,14,16,0.07),
+    -2.6px -2.6px 6px rgba(14,14,16,0.07);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.icon-wrap img {
+  width: 56px; height: 56px;
+  display: block;
+  object-fit: contain;
+}
+.app-name {
+  margin-top: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14.5px; font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ─────────────────────────────────────
+   CONTENT ZONE
+   Starts at y=390, padding 24px
+───────────────────────────────────── */
+.content-zone {
+  position: absolute;
+  top: 390px; left: 24px; right: 24px;
+  z-index: 30;
+}
+
+/* Headline */
+.hl-group {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  line-height: 1.10;
+  letter-spacing: -0.6px;
+}
+.hl-reg {
+  font-size: 34px;
+  color: var(--ink);
+  display: block;
+}
+.hl-italic {
+  font-size: 34px;
+  color: var(--forest);
+  font-style: italic;
+  display: block;
+}
+
+/* Body copy */
+.body-copy {
+  font-size: 13px; font-weight: 400;
+  line-height: 1.70; color: var(--stone);
+  margin-top: 12px;
+}
+
+/* Feature list */
+.features {
+  margin-top: 18px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.feat {
+  display: flex; align-items: center; gap: 12px;
+  min-height: 44px;
+}
+.feat-icon-wrap {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--sage);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.feat-title {
+  font-size: 13px; font-weight: 600;
+  color: var(--ink); line-height: 1.25;
+}
+.feat-desc {
+  font-size: 12px; font-weight: 400;
+  color: var(--stone); margin-top: 1px; line-height: 1.35;
+}
+
+/* CTA */
+.cta {
+  margin-top: 18px; height: 52px;
+  border-radius: 999px; border: none;
+  background: var(--forest);
+  width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px; font-weight: 600; color: var(--white);
+  letter-spacing: 0.01em;
+  cursor: pointer; position: relative; overflow: hidden;
+}
+.cta::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 55%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.13), transparent);
+  transform: translateX(-180%);
+}
+
+/* Legal text */
+.legal {
+  margin-top: 12px;
+  font-size: 11.5px; font-weight: 400;
+  line-height: 1.55; color: var(--stone-lt);
+  text-align: center;
+}
+.legal strong { font-weight: 600; color: var(--stone); }
+
+
+/* ═══════════════════════════════════════════════════════
+   KEYFRAMES — all timing functions hardcoded
+═══════════════════════════════════════════════════════ */
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes riseInFast {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes wipeIn {
+  from { clip-path: inset(0 100% 0 0 round 2px); opacity: 0.4; }
+  to   { clip-path: inset(0 0% 0 0 round 2px);   opacity: 1;   }
+}
+@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes shimmerOnce {
+  from { transform: translateX(-180%); }
+  to   { transform: translateX(180%); }
+}
+@keyframes iconSpring {
+  0%   { opacity: 0; transform: scale(0) translateY(0); }
+  60%  { opacity: 1; transform: scale(1.10) translateY(0); }
+  78%  { transform: scale(0.94) translateY(0); }
+  90%  { transform: scale(1.04) translateY(0); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ─── Shared initial states ─── */
+.icon-wrap, .app-name,
+.hl-group, .body-copy,
+.feat, .cta, .legal { opacity: 0; }
+
+
+/* ═══════════════════════════════════════════════════════
+   VARIANT G — SPRING POP
+   Classic spring entry for icon, clean cascade downward.
+   Idle: icon gently floats up and down.
+═══════════════════════════════════════════════════════ */
+@keyframes gIconFloat {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50%       { transform: scale(1) translateY(-7px); }
+}
+
+.var-g .icon-wrap {
+  animation: iconSpring 0.50s cubic-bezier(0.34, 1.4, 0.64, 1) 0.38s both,
+             gIconFloat 3.6s ease-in-out 1.2s infinite;
+}
+.var-g .app-name    { animation: riseIn 0.32s ease-out 0.72s both; }
+.var-g .hl-group    {
+  clip-path: inset(0 100% 0 0 round 2px);
+  animation: wipeIn  0.40s ease-out  1.00s both;
+}
+.var-g .body-copy   { animation: riseIn 0.30s ease-out 1.26s both; }
+.var-g .feat:nth-child(1) { animation: riseIn 0.28s ease-out 1.44s both; }
+.var-g .feat:nth-child(2) { animation: riseIn 0.28s ease-out 1.56s both; }
+.var-g .feat:nth-child(3) { animation: riseIn 0.28s ease-out 1.68s both; }
+.var-g .cta         { animation: riseIn 0.30s ease-out 1.84s both; }
+.var-g .cta::after  { animation: shimmerOnce 1.4s ease 2.5s; }
+.var-g .legal       { animation: fadeIn 0.28s ease-out 2.00s both; }
+
+
+/* ═══════════════════════════════════════════════════════
+   VARIANT H — FLOAT DOWN
+   Icon swoops in from above. Content rises as one unit.
+   Feels premium and calm — like settling into place.
+   Idle: icon slow breathe.
+═══════════════════════════════════════════════════════ */
+@keyframes hIconDrop {
+  0%   { opacity: 0; transform: translateY(-44px) scale(0.88); }
+  60%  { opacity: 1; transform: translateY(4px) scale(1.02); }
+  80%  { transform: translateY(-2px) scale(0.99); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes hNamePop {
+  0%   { opacity: 0; transform: translateY(-10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes hContentRise {
+  0%   { opacity: 0; transform: translateY(22px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes hBreathe {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.028); }
+}
+
+.var-h .icon-wrap {
+  animation: hIconDrop  0.68s cubic-bezier(0.22, 0.68, 0.36, 1.02) 0.30s both,
+             hBreathe   5.2s ease-in-out 1.6s infinite;
+}
+.var-h .app-name    { animation: hNamePop  0.36s ease-out 0.80s both; }
+/* headline as block fade, not wipe */
+.var-h .hl-group    { animation: hContentRise 0.50s ease-out 1.02s both; }
+.var-h .body-copy   { animation: hContentRise 0.50s ease-out 1.18s both; }
+.var-h .feat:nth-child(1) { animation: hContentRise 0.46s ease-out 1.34s both; }
+.var-h .feat:nth-child(2) { animation: hContentRise 0.46s ease-out 1.48s both; }
+.var-h .feat:nth-child(3) { animation: hContentRise 0.46s ease-out 1.62s both; }
+.var-h .cta         { animation: hContentRise 0.46s ease-out 1.78s both; }
+.var-h .cta::after  { animation: shimmerOnce 1.4s ease 2.6s; }
+.var-h .legal       { animation: hContentRise 0.42s ease-out 1.92s both; }
+
+
+/* ═══════════════════════════════════════════════════════
+   VARIANT I — ELASTIC SLAM
+   Icon has an overshooting elastic bounce. Features slam in
+   from the left with spring. CTA snaps in with scale.
+   Kinetic energy — feels alive and lively.
+   Idle: CTA repeating shimmer sheen.
+═══════════════════════════════════════════════════════ */
+@keyframes iIconElastic {
+  0%   { opacity: 0; transform: scale(0); }
+  50%  { opacity: 1; transform: scale(1.22); }
+  68%  { transform: scale(0.87); }
+  82%  { transform: scale(1.08); }
+  92%  { transform: scale(0.97); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes iFeatureSlam {
+  0%   { opacity: 0; transform: translateX(-18px); }
+  60%  { opacity: 1; transform: translateX(3px); }
+  80%  { transform: translateX(-1px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes iCtaPop {
+  0%   { opacity: 0; transform: scale(0.88); }
+  60%  { opacity: 1; transform: scale(1.04); }
+  80%  { transform: scale(0.97); }
+  100% { opacity: 1; transform: scale(1); }
+}
+/* Repeating sheen on CTA: shines every ~5s (animation 1.3s, pause = 5s - 1.3s = 3.7s)
+   26% of 5s = 1.3s, so motion happens in 0%→26%, then invisible 26%→100% */
+@keyframes iCtaSheen {
+  0%   { transform: translateX(-180%); opacity: 1; }
+  26%  { transform: translateX(180%);  opacity: 1; }
+  26.1%{ opacity: 0; }
+  99.9%{ opacity: 0; }
+  100% { transform: translateX(-180%); opacity: 0; }
+}
+
+.var-i .icon-wrap {
+  animation: iIconElastic 0.62s cubic-bezier(0.34, 1.56, 0.64, 1) 0.34s both;
+}
+.var-i .app-name {
+  animation: riseInFast 0.26s cubic-bezier(0.34, 1.4, 0.64, 1) 0.72s both;
+}
+.var-i .hl-group {
+  clip-path: inset(0 100% 0 0 round 2px);
+  animation: wipeIn 0.36s cubic-bezier(0.22, 0.68, 0, 1.2) 0.96s both;
+}
+.var-i .body-copy   { animation: riseInFast 0.26s ease-out 1.18s both; }
+.var-i .feat:nth-child(1) {
+  animation: iFeatureSlam 0.38s cubic-bezier(0.34, 1.4, 0.64, 1) 1.30s both;
+}
+.var-i .feat:nth-child(2) {
+  animation: iFeatureSlam 0.38s cubic-bezier(0.34, 1.4, 0.64, 1) 1.42s both;
+}
+.var-i .feat:nth-child(3) {
+  animation: iFeatureSlam 0.38s cubic-bezier(0.34, 1.4, 0.64, 1) 1.54s both;
+}
+.var-i .cta {
+  animation: iCtaPop 0.40s cubic-bezier(0.34, 1.4, 0.64, 1) 1.70s both;
+}
+.var-i .cta::after {
+  /* First shine + repeating every 5s */
+  animation: shimmerOnce 1.3s ease 2.4s,
+             iCtaSheen   5.0s linear  7.4s infinite;
+}
+.var-i .legal { animation: fadeIn 0.28s ease-out 1.86s both; }
+</style>
+</head>
+<body>
+
+
+<!-- ════════════════════════════════════════════════════
+     VARIANT G · SPRING POP
+════════════════════════════════════════════════════ -->
+<div class="wrap">
+  <span class="wrap-label">G · Spring Pop</span>
+  <div class="phone">
+    <div class="screen var-g">
+
+      <!-- Status bar -->
+      <div class="status">
+        <span class="st-time">9:41</span>
+        <div class="st-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none" aria-hidden="true"><rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/><rect x="9" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M8 10a1.5 1.5 0 100 2.5A1.5 1.5 0 008 10z" fill="currentColor"/><path d="M4.8 7.2A4.6 4.6 0 018 6a4.6 4.6 0 013.2 1.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/><path d="M1.8 4.5A8 8 0 018 2.2a8 8 0 016.2 2.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none" aria-hidden="true"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="22.5" y="3.5" width="2" height="5" rx="1" fill="currentColor" fill-opacity="0.4"/><rect x="2" y="2" width="16" height="8" rx="2" fill="currentColor"/></svg>
+        </div>
+      </div>
+      <div class="di"></div>
+
+      <!-- App icon zone -->
+      <div class="icon-zone">
+        <div class="icon-wrap">
+          <img src="Clover.png" width="90" height="90" alt="Sprout">
+        </div>
+        <div class="app-name">Sprout</div>
+      </div>
+
+      <!-- Content -->
+      <div class="content-zone">
+        <div class="hl-group">
+          <span class="hl-reg">Where parents bond,</span>
+          <span class="hl-italic">childhoods flourish.</span>
+        </div>
+        <p class="body-copy">Find events, join clubs, and build the friendships your family deserves — all in the neighborhood your kids call home.</p>
+        <div class="features">
+          <div class="feat">
+            <div class="feat-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><rect x="2.5" y="3.5" width="13" height="12" rx="2.5" stroke="#3A8A62" stroke-width="1.35" fill="none"/><path d="M2.5 7.5h13" stroke="#3A8A62" stroke-width="1.35"/><path d="M6 1.5v2.5M12 1.5v2.5" stroke="#3A8A62" stroke-width="1.35" stroke-linecap="round"/><rect x="5" y="10" width="2.2" height="1.8" rx="0.5" fill="#3A8A62"/><rect x="8.9" y="10" width="2.2" height="1.8" rx="0.5" fill="#3A8A62"/></svg>
+            </div>
+            <div>
+              <div class="feat-title">Events this weekend</div>
+              <div class="feat-desc">Find perfect event for you and family</div>
+            </div>
+          </div>
+          <div class="feat">
+            <div class="feat-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="6.5" cy="6" r="2.5" stroke="#3A8A62" stroke-width="1.3" fill="none"/><path d="M1.5 15.5c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="#3A8A62" stroke-width="1.3" stroke-linecap="round" fill="none"/><circle cx="13.5" cy="5.5" r="2" stroke="#3A8A62" stroke-width="1.3" fill="none"/><path d="M11.5 15.5c.3-2.2 2-3.8 3.5-3.8" stroke="#3A8A62" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+            </div>
+            <div>
+              <div class="feat-title">Local clubs for families</div>
+              <div class="feat-desc">Your neighbourhood community</div>
+            </div>
+          </div>
+          <div class="feat">
+            <div class="feat-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 3.5h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H6.5L3 15.5V4.5a1 1 0 0 1 1-1Z" stroke="#3A8A62" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M6 8h6M6 10.5h4" stroke="#3A8A62" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="feat-title">Parents who just get it</div>
+              <div class="feat-desc">Real people, real conversations</div>
+            </div>
+          </div>
+        </div>
+        <div class="cta" role="button">Get Started</div>
+        <p class="legal">By tapping "Get Started", you agree to our <strong>Opt-in</strong> and <strong>Privacy Policy</strong></p>
+      </div>
+
+      <div class="hi"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════
+     VARIANT H · FLOAT DOWN
+════════════════════════════════════════════════════ -->
+<div class="wrap">
+  <span class="wrap-label">H · Float Down</span>
+  <div class="phone">
+    <div class="screen var-h">
+
+      <div class="status">
+        <span class="st-time">9:41</span>
+        <div class="st-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/><rect x="9" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 10a1.5 1.5 0 100 2.5A1.5 1.5 0 008 10z" fill="currentColor"/><path d="M4.8 7.2A4.6 4.6 0 018 6a4.6 4.6 0 013.2 1.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/><path d="M1.8 4.5A8 8 0 018 2.2a8 8 0 016.2 2.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="22.5" y="3.5" width="2" height="5" rx="1" fill="currentColor" fill-opacity="0.4"/><rect x="2" y="2" width="16" height="8" rx="2" fill="currentColor"/></svg>
+        </div>
+      </div>
+      <div class="di"></div>
+
+      <div class="icon-zone">
+        <div class="icon-wrap">
+          <img src="Clover.png" width="90" height="90" alt="Sprout">
+        </div>
+        <div class="app-name">Sprout</div>
+      </div>
+
+      <div class="content-zone">
+        <div class="hl-group">
+          <span class="hl-reg">Where parents bond,</span>
+          <span class="hl-italic">childhoods flourish.</span>
+        </div>
+        <p class="body-copy">Find events, join clubs, and build the friendships your family deserves — all in the neighborhood your kids call home.</p>
+        <div class="features">
+          <div class="feat">
+            <div class="feat-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="3.5" width="13" height="12" rx="2.5" stroke="#3A8A62" stroke-width="1.35" fill="none"/><path d="M2.5 7.5h13" stroke="#3A8A62" stroke-width="1.35"/><path d="M6 1.5v2.5M12 1.5v2.5" stroke="#3A8A62" stroke-width="1.35" stroke-linecap="round"/><rect x="5" y="10" width="2.2" height="1.8" rx="0.5" fill="#3A8A62"/><rect x="8.9" y="10" width="2.2" height="1.8" rx="0.5" fill="#3A8A62"/></svg>
+            </div>
+            <div><div class="feat-title">Events this weekend</div><div class="feat-desc">Find perfect event for you and family</div></div>
+          </div>
+          <div class="feat">
+            <div class="feat-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="6.5" cy="6" r="2.5" stroke="#3A8A62" stroke-width="1.3" fill="none"/><path d="M1.5 15.5c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="#3A8A62" stroke-width="1.3" stroke-linecap="round" fill="none"/><circle cx="13.5" cy="5.5" r="2" stroke="#3A8A62" stroke-width="1.3" fill="none"/><path d="M11.5 15.5c.3-2.2 2-3.8 3.5-3.8" stroke="#3A8A62" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+            </div>
+            <div><div class="feat-title">Local clubs for families</div><div class="feat-desc">Your neighbourhood community</div></div>
+          </div>
+          <div class="feat">
+            <div class="feat-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 3.5h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H6.5L3 15.5V4.5a1 1 0 0 1 1-1Z" stroke="#3A8A62" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M6 8h6M6 10.5h4" stroke="#3A8A62" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+            <div><div class="feat-title">Parents who just get it</div><div class="feat-desc">Real people, real conversations</div></div>
+          </div>
+        </div>
+        <div class="cta" role="button">Get Started</div>
+        <p class="legal">By tapping "Get Started", you agree to our <strong>Opt-in</strong> and <strong>Privacy Policy</strong></p>
+      </div>
+
+      <div class="hi"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════
+     VARIANT I · ELASTIC SLAM
+════════════════════════════════════════════════════ -->
+<div class="wrap">
+  <span class="wrap-label">I · Elastic Slam</span>
+  <div class="phone">
+    <div class="screen var-i">
+
+      <div class="status">
+        <span class="st-time">9:41</span>
+        <div class="st-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/><rect x="9" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 10a1.5 1.5 0 100 2.5A1.5 1.5 0 008 10z" fill="currentColor"/><path d="M4.8 7.2A4.6 4.6 0 018 6a4.6 4.6 0 013.2 1.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/><path d="M1.8 4.5A8 8 0 018 2.2a8 8 0 016.2 2.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="22.5" y="3.5" width="2" height="5" rx="1" fill="currentColor" fill-opacity="0.4"/><rect x="2" y="2" width="16" height="8" rx="2" fill="currentColor"/></svg>
+        </div>
+      </div>
+      <div class="di"></div>
+
+      <div class="icon-zone">
+        <div class="icon-wrap">
+          <img src="Clover.png" width="90" height="90" alt="Sprout">
+        </div>
+        <div class="app-name">Sprout</div>
+      </div>
+
+      <div class="content-zone">
+        <div class="hl-group">
+          <span class="hl-reg">Where parents bond,</span>
+          <span class="hl-italic">childhoods flourish.</span>
+        </div>
+        <p class="body-copy">Find events, join clubs, and build the friendships your family deserves — all in the neighborhood your kids call home.</p>
+        <div class="features">
+          <div class="feat">
+            <div class="feat-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="3.5" width="13" height="12" rx="2.5" stroke="#3A8A62" stroke-width="1.35" fill="none"/><path d="M2.5 7.5h13" stroke="#3A8A62" stroke-width="1.35"/><path d="M6 1.5v2.5M12 1.5v2.5" stroke="#3A8A62" stroke-width="1.35" stroke-linecap="round"/><rect x="5" y="10" width="2.2" height="1.8" rx="0.5" fill="#3A8A62"/><rect x="8.9" y="10" width="2.2" height="1.8" rx="0.5" fill="#3A8A62"/></svg>
+            </div>
+            <div><div class="feat-title">Events this weekend</div><div class="feat-desc">Find perfect event for you and family</div></div>
+          </div>
+          <div class="feat">
+            <div class="feat-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="6.5" cy="6" r="2.5" stroke="#3A8A62" stroke-width="1.3" fill="none"/><path d="M1.5 15.5c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="#3A8A62" stroke-width="1.3" stroke-linecap="round" fill="none"/><circle cx="13.5" cy="5.5" r="2" stroke="#3A8A62" stroke-width="1.3" fill="none"/><path d="M11.5 15.5c.3-2.2 2-3.8 3.5-3.8" stroke="#3A8A62" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+            </div>
+            <div><div class="feat-title">Local clubs for families</div><div class="feat-desc">Your neighbourhood community</div></div>
+          </div>
+          <div class="feat">
+            <div class="feat-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 3.5h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H6.5L3 15.5V4.5a1 1 0 0 1 1-1Z" stroke="#3A8A62" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M6 8h6M6 10.5h4" stroke="#3A8A62" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+            <div><div class="feat-title">Parents who just get it</div><div class="feat-desc">Real people, real conversations</div></div>
+          </div>
+        </div>
+        <div class="cta" role="button">Get Started</div>
+        <p class="legal">By tapping "Get Started", you agree to our <strong>Opt-in</strong> and <strong>Privacy Policy</strong></p>
+      </div>
+
+      <div class="hi"></div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>

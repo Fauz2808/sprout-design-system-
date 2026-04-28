@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Permission Required (3.1 & 3.2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand-500: #186338;
+    --brand-600: #134f2d;
+    --brand-700: #1e3e2b;
+    --brand-50:  #e2e9e3;
+    --brand-100: #d0dacf;
+    --brand-200: #77b691;
+    --sec-500: #f4f1ea;
+    --sec-600: #eae6db;
+    --sec-700: #dbd5c8;
+    --grey-100: #e6e7ea;
+    --grey-200: #cdcfd6;
+    --grey-300: #b3b8c1;
+    --grey-400: #9aa0ad;
+    --grey-500: #818898;
+    --grey-600: #676d7a;
+    --grey-700: #4d525b;
+    --white: #ffffff;
+    --r-sm: 4px; --r-md: 8px; --r-lg: 12px;
+    --r-xl: 16px; --r-2xl: 20px; --r-full: 9999px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1a1b1e;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 40px 48px 80px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    color: #dbd5c8; font-size: 22px; font-weight: 400;
+    margin-bottom: 6px;
+  }
+  .subtitle { color: #676d7a; font-size: 13px; margin-bottom: 40px; }
+
+  .section-label {
+    color: #676d7a; font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 18px;
+  }
+
+  .comparison-row {
+    display: flex; gap: 40px; align-items: flex-start; margin-bottom: 60px;
+  }
+
+  /* ── Phone shell ── */
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .screen-label { color: #676d7a; font-size: 11px; font-weight: 500; text-align: center; }
+  .phone {
+    width: 300px; height: 650px;
+    background: var(--sec-500);
+    border-radius: 44px;
+    border: 2px solid #2a2c32;
+    overflow: hidden; position: relative; flex-shrink: 0;
+    display: flex; flex-direction: column;
+    box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+  }
+  .phone.new {
+    border-color: var(--brand-500);
+    box-shadow: 0 0 0 2.5px var(--brand-500), 0 24px 48px rgba(0,0,0,0.5);
+  }
+
+  /* Dynamic Island */
+  .di {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 92px; height: 27px;
+    background: #000; border-radius: var(--r-full); z-index: 30;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 48px; flex-shrink: 0;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 22px 8px; position: relative; z-index: 10;
+  }
+  .status-time { font-size: 11px; font-weight: 600; color: var(--grey-700); }
+  .status-icons { display: flex; gap: 5px; align-items: center; }
+  .status-icons svg { opacity: 0.7; }
+
+  /* Nav bar */
+  .nav-bar {
+    height: 48px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px;
+  }
+  .nav-back {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--grey-700);
+  }
+  .nav-skip {
+    font-size: 13px; font-weight: 500;
+    color: var(--grey-500); background: none; border: none;
+    font-family: 'Inter', sans-serif; cursor: pointer;
+  }
+
+  /* Content area */
+  .content {
+    flex: 1; display: flex; flex-direction: column;
+    padding: 0 20px 24px; position: relative; overflow: hidden;
+  }
+
+  /* Subtle sprig — bottom-right texture */
+  .corner-sprig {
+    position: absolute; bottom: 80px; right: -10px;
+    width: 100px; height: 110px;
+    opacity: 0.12; pointer-events: none; z-index: 0;
+  }
+
+  /* Headline block */
+  .headline-block {
+    position: relative; z-index: 1;
+    margin-bottom: 22px; margin-top: 4px;
+  }
+  .headline-block h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 500; line-height: 1.25;
+    color: var(--brand-700); margin-bottom: 6px;
+  }
+  .headline-block p {
+    font-size: 13px; color: var(--grey-500); line-height: 1.5;
+  }
+
+  /* Permission cards */
+  .perm-list {
+    display: flex; flex-direction: column; gap: 10px;
+    position: relative; z-index: 1; margin-bottom: 14px;
+  }
+
+  .perm-card {
+    background: var(--white);
+    border-radius: var(--r-xl);
+    padding: 14px 14px;
+    border: 1.5px solid var(--grey-100);
+    display: flex; align-items: flex-start; gap: 12px;
+    transition: border-color 0.2s;
+  }
+  .perm-card.allowed {
+    border-color: var(--brand-200);
+    background: linear-gradient(135deg, #fff 0%, #f3faf5 100%);
+  }
+
+  .perm-icon {
+    width: 40px; height: 40px; flex-shrink: 0;
+    border-radius: var(--r-lg);
+    display: flex; align-items: center; justify-content: center;
+    background: var(--brand-50);
+  }
+  .perm-card.allowed .perm-icon { background: #d4edda; }
+
+  .perm-body { flex: 1; }
+  .perm-name {
+    font-size: 13px; font-weight: 600; color: var(--grey-700);
+    margin-bottom: 2px;
+  }
+  .perm-why {
+    font-size: 11px; color: var(--grey-400); line-height: 1.4;
+  }
+
+  .perm-action { flex-shrink: 0; margin-top: 2px; }
+  .perm-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 600;
+    padding: 5px 12px; border-radius: var(--r-full);
+    cursor: pointer; border: none;
+  }
+  .perm-btn.pending {
+    background: var(--brand-500); color: #fff;
+  }
+  .perm-btn.done {
+    background: transparent; color: var(--brand-500);
+    border: 1.5px solid var(--brand-200);
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* Trust note */
+  .trust-note {
+    display: flex; align-items: center; gap: 7px;
+    padding: 10px 12px;
+    background: rgba(24, 99, 56, 0.05);
+    border-radius: var(--r-lg);
+    border: 1px solid rgba(24, 99, 56, 0.1);
+    position: relative; z-index: 1;
+    margin-bottom: 20px;
+  }
+  .trust-note svg { flex-shrink: 0; }
+  .trust-note span {
+    font-size: 11px; color: var(--brand-600); line-height: 1.4;
+  }
+
+  /* Spacer */
+  .spacer { flex: 1; }
+
+  /* CTA block */
+  .cta-block {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .btn-primary {
+    width: 100%; height: 48px;
+    background: var(--brand-500); color: #fff;
+    border: none; border-radius: var(--r-full);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn-primary.muted { background: var(--grey-200); color: var(--grey-500); }
+  .btn-secondary {
+    width: 100%; height: 40px;
+    background: transparent; color: var(--brand-500);
+    border: 1.5px solid var(--brand-200); border-radius: var(--r-full);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* ── Annotation ── */
+  .annotation-row {
+    display: flex; gap: 40px; align-items: flex-start;
+    margin-bottom: 60px;
+  }
+  .annotation {
+    width: 300px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .ann-item {
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .ann-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--brand-500); flex-shrink: 0; margin-top: 4px;
+  }
+  .ann-text { font-size: 12px; color: #676d7a; line-height: 1.5; }
+  .ann-text strong { color: #dbd5c8; font-weight: 600; }
+
+  /* ── Summary panel ── */
+  .summary {
+    background: #212226; border-radius: 16px;
+    padding: 28px 32px; max-width: 900px;
+    border: 1px solid #2a2c32;
+  }
+  .summary h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 400;
+    color: #dbd5c8; margin-bottom: 16px;
+  }
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 32px; }
+  .summary-item {
+    font-size: 12px; color: #676d7a; line-height: 1.5;
+    padding: 8px 0; border-bottom: 1px solid #2a2c32;
+  }
+  .summary-item strong { color: #9aa0ad; display: block; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+
+<h1>Permission Required</h1>
+<p class="subtitle">Screens 3.1 & 3.2 — v2 redesign · trust-first, text-minimal</p>
+
+<div class="section-label">Screens</div>
+
+<div class="comparison-row">
+
+  <!-- ── 3.1 Default (nothing allowed yet) ── -->
+  <div class="phone-wrap">
+    <div class="screen-label">3.1 · Default</div>
+    <div class="phone new">
+      <div class="di"></div>
+
+      <!-- Status bar -->
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+            <rect x="0" y="4" width="3" height="6" rx="0.5" fill="#4d525b"/>
+            <rect x="4" y="2.5" width="3" height="7.5" rx="0.5" fill="#4d525b"/>
+            <rect x="8" y="1" width="3" height="9" rx="0.5" fill="#4d525b"/>
+            <rect x="12" y="0" width="2" height="10" rx="0.5" fill="#4d525b"/>
+          </svg>
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+            <path d="M7 2C9.2 2 11.2 2.9 12.6 4.4L13.8 3.2C12.1 1.2 9.7 0 7 0C4.3 0 1.9 1.2 0.2 3.2L1.4 4.4C2.8 2.9 4.8 2 7 2Z" fill="#4d525b"/>
+            <path d="M7 5C8.4 5 9.6 5.6 10.5 6.5L11.7 5.3C10.5 4.1 8.8 3.3 7 3.3C5.2 3.3 3.5 4.1 2.3 5.3L3.5 6.5C4.4 5.6 5.6 5 7 5Z" fill="#4d525b"/>
+            <circle cx="7" cy="9" r="1.5" fill="#4d525b"/>
+          </svg>
+          <svg width="24" height="12" viewBox="0 0 24 12" fill="none">
+            <rect x="0.5" y="0.5" width="20" height="11" rx="3.5" stroke="#4d525b"/>
+            <rect x="2" y="2" width="15" height="8" rx="2" fill="#4d525b"/>
+            <path d="M22 4V8C23.1 7.5 23.1 4.5 22 4Z" fill="#4d525b"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Nav -->
+      <div class="nav-bar">
+        <div class="nav-back">
+          <svg width="9" height="15" viewBox="0 0 9 15" fill="none">
+            <path d="M7.5 1.5L1.5 7.5L7.5 13.5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="nav-skip">Skip</span>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+
+        <!-- Corner sprig (subtle texture) -->
+        <svg class="corner-sprig" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M80 100 Q60 80 40 60 Q30 50 20 30" stroke="#186338" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          <ellipse cx="50" cy="72" rx="12" ry="7" transform="rotate(-35 50 72)" fill="#186338"/>
+          <ellipse cx="35" cy="55" rx="10" ry="6" transform="rotate(-45 35 55)" fill="#186338"/>
+          <ellipse cx="25" cy="40" rx="9" ry="5.5" transform="rotate(-50 25 40)" fill="#186338"/>
+          <ellipse cx="65" cy="83" rx="10" ry="6" transform="rotate(-25 65 83)" fill="#186338"/>
+          <ellipse cx="55" cy="60" rx="8" ry="5" transform="rotate(-40 55 60)" fill="#186338"/>
+          <ellipse cx="18" cy="28" rx="7" ry="4" transform="rotate(-55 18 28)" fill="#186338"/>
+          <ellipse cx="72" cy="92" rx="8" ry="5" transform="rotate(-20 72 92)" fill="#186338"/>
+        </svg>
+
+        <!-- Headline -->
+        <div class="headline-block">
+          <h2>Just two quick<br><em>things</em></h2>
+          <p>Sprout needs these to connect your&nbsp;family.</p>
+        </div>
+
+        <!-- Permission cards -->
+        <div class="perm-list">
+
+          <!-- Local Network (pending) -->
+          <div class="perm-card">
+            <div class="perm-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="8" stroke="#186338" stroke-width="1.5"/>
+                <path d="M10 2 Q13 6 13 10 Q13 14 10 18" stroke="#186338" stroke-width="1.5" fill="none"/>
+                <path d="M10 2 Q7 6 7 10 Q7 14 10 18" stroke="#186338" stroke-width="1.5" fill="none"/>
+                <line x1="2.5" y1="7.5" x2="17.5" y2="7.5" stroke="#186338" stroke-width="1.5"/>
+                <line x1="2.5" y1="12.5" x2="17.5" y2="12.5" stroke="#186338" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div class="perm-body">
+              <div class="perm-name">Local Network</div>
+              <div class="perm-why">Find family members nearby &amp; sync events</div>
+            </div>
+            <div class="perm-action">
+              <button class="perm-btn pending">Allow</button>
+            </div>
+          </div>
+
+          <!-- Microphone (pending) -->
+          <div class="perm-card">
+            <div class="perm-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <rect x="7" y="2" width="6" height="10" rx="3" stroke="#186338" stroke-width="1.5"/>
+                <path d="M4 10 C4 14.4 7.6 18 10 18 C12.4 18 16 14.4 16 10" stroke="#186338" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                <line x1="10" y1="18" x2="10" y2="20" stroke="#186338" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="7" y1="20" x2="13" y2="20" stroke="#186338" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="perm-body">
+              <div class="perm-name">Microphone</div>
+              <div class="perm-why">Voice messages &amp; event check-ins</div>
+            </div>
+            <div class="perm-action">
+              <button class="perm-btn pending">Allow</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Trust note -->
+        <div class="trust-note">
+          <svg width="14" height="16" viewBox="0 0 14 16" fill="none">
+            <path d="M7 1L13 3.5V8C13 11.5 10.4 14.7 7 16C3.6 14.7 1 11.5 1 8V3.5L7 1Z" stroke="#186338" stroke-width="1.2" fill="none"/>
+            <path d="M4.5 8L6.5 10L9.5 7" stroke="#186338" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Your data never leaves your device or is sold.</span>
+        </div>
+
+        <div class="spacer"></div>
+
+        <!-- CTA -->
+        <div class="cta-block">
+          <button class="btn-primary">
+            Allow all &amp; continue
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M3 7H11M8 4L11 7L8 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+      </div><!-- /content -->
+    </div>
+    <div class="screen-label">Nothing allowed yet · Allow All as primary CTA</div>
+  </div>
+
+  <!-- ── 3.2 Partial (Network pending, Mic allowed) ── -->
+  <div class="phone-wrap">
+    <div class="screen-label">3.2 · One allowed</div>
+    <div class="phone new">
+      <div class="di"></div>
+
+      <!-- Status bar -->
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+            <rect x="0" y="4" width="3" height="6" rx="0.5" fill="#4d525b"/>
+            <rect x="4" y="2.5" width="3" height="7.5" rx="0.5" fill="#4d525b"/>
+            <rect x="8" y="1" width="3" height="9" rx="0.5" fill="#4d525b"/>
+            <rect x="12" y="0" width="2" height="10" rx="0.5" fill="#4d525b"/>
+          </svg>
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+            <path d="M7 2C9.2 2 11.2 2.9 12.6 4.4L13.8 3.2C12.1 1.2 9.7 0 7 0C4.3 0 1.9 1.2 0.2 3.2L1.4 4.4C2.8 2.9 4.8 2 7 2Z" fill="#4d525b"/>
+            <path d="M7 5C8.4 5 9.6 5.6 10.5 6.5L11.7 5.3C10.5 4.1 8.8 3.3 7 3.3C5.2 3.3 3.5 4.1 2.3 5.3L3.5 6.5C4.4 5.6 5.6 5 7 5Z" fill="#4d525b"/>
+            <circle cx="7" cy="9" r="1.5" fill="#4d525b"/>
+          </svg>
+          <svg width="24" height="12" viewBox="0 0 24 12" fill="none">
+            <rect x="0.5" y="0.5" width="20" height="11" rx="3.5" stroke="#4d525b"/>
+            <rect x="2" y="2" width="15" height="8" rx="2" fill="#4d525b"/>
+            <path d="M22 4V8C23.1 7.5 23.1 4.5 22 4Z" fill="#4d525b"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Nav -->
+      <div class="nav-bar">
+        <div class="nav-back">
+          <svg width="9" height="15" viewBox="0 0 9 15" fill="none">
+            <path d="M7.5 1.5L1.5 7.5L7.5 13.5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="nav-skip">Skip</span>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+
+        <!-- Corner sprig -->
+        <svg class="corner-sprig" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M80 100 Q60 80 40 60 Q30 50 20 30" stroke="#186338" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          <ellipse cx="50" cy="72" rx="12" ry="7" transform="rotate(-35 50 72)" fill="#186338"/>
+          <ellipse cx="35" cy="55" rx="10" ry="6" transform="rotate(-45 35 55)" fill="#186338"/>
+          <ellipse cx="25" cy="40" rx="9" ry="5.5" transform="rotate(-50 25 40)" fill="#186338"/>
+          <ellipse cx="65" cy="83" rx="10" ry="6" transform="rotate(-25 65 83)" fill="#186338"/>
+          <ellipse cx="55" cy="60" rx="8" ry="5" transform="rotate(-40 55 60)" fill="#186338"/>
+          <ellipse cx="18" cy="28" rx="7" ry="4" transform="rotate(-55 18 28)" fill="#186338"/>
+          <ellipse cx="72" cy="92" rx="8" ry="5" transform="rotate(-20 72 92)" fill="#186338"/>
+        </svg>
+
+        <!-- Headline — progress-aware -->
+        <div class="headline-block">
+          <h2>One more to<br><em>go</em></h2>
+          <p>Allow network access and you're&nbsp;all set.</p>
+        </div>
+
+        <!-- Permission cards -->
+        <div class="perm-list">
+
+          <!-- Local Network (pending) -->
+          <div class="perm-card">
+            <div class="perm-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="8" stroke="#186338" stroke-width="1.5"/>
+                <path d="M10 2 Q13 6 13 10 Q13 14 10 18" stroke="#186338" stroke-width="1.5" fill="none"/>
+                <path d="M10 2 Q7 6 7 10 Q7 14 10 18" stroke="#186338" stroke-width="1.5" fill="none"/>
+                <line x1="2.5" y1="7.5" x2="17.5" y2="7.5" stroke="#186338" stroke-width="1.5"/>
+                <line x1="2.5" y1="12.5" x2="17.5" y2="12.5" stroke="#186338" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div class="perm-body">
+              <div class="perm-name">Local Network</div>
+              <div class="perm-why">Find family members nearby &amp; sync events</div>
+            </div>
+            <div class="perm-action">
+              <button class="perm-btn pending">Allow</button>
+            </div>
+          </div>
+
+          <!-- Microphone (allowed) -->
+          <div class="perm-card allowed">
+            <div class="perm-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <rect x="7" y="2" width="6" height="10" rx="3" stroke="#186338" stroke-width="1.5"/>
+                <path d="M4 10 C4 14.4 7.6 18 10 18 C12.4 18 16 14.4 16 10" stroke="#186338" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                <line x1="10" y1="18" x2="10" y2="20" stroke="#186338" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="7" y1="20" x2="13" y2="20" stroke="#186338" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="perm-body">
+              <div class="perm-name">Microphone</div>
+              <div class="perm-why">Voice messages &amp; event check-ins</div>
+            </div>
+            <div class="perm-action">
+              <button class="perm-btn done">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 5L4 7L8 3" stroke="#186338" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Done
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Trust note -->
+        <div class="trust-note">
+          <svg width="14" height="16" viewBox="0 0 14 16" fill="none">
+            <path d="M7 1L13 3.5V8C13 11.5 10.4 14.7 7 16C3.6 14.7 1 11.5 1 8V3.5L7 1Z" stroke="#186338" stroke-width="1.2" fill="none"/>
+            <path d="M4.5 8L6.5 10L9.5 7" stroke="#186338" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Your data never leaves your device or is sold.</span>
+        </div>
+
+        <div class="spacer"></div>
+
+        <!-- CTA — network pending so Get Started is available but muted -->
+        <div class="cta-block">
+          <button class="btn-primary">
+            Allow &amp; get started
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M3 7H11M8 4L11 7L8 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="btn-secondary">Get started without it</button>
+        </div>
+
+      </div><!-- /content -->
+    </div>
+    <div class="screen-label">Mic allowed · Network pending · Two-button CTA</div>
+  </div>
+
+</div><!-- /comparison-row -->
+
+<!-- ── Design decisions ── -->
+<div class="section-label">Design decisions</div>
+
+<div class="annotation-row">
+  <div class="annotation">
+    <div class="ann-item">
+      <div class="ann-dot"></div>
+      <div class="ann-text"><strong>Headline reframed</strong> — "Permission Required" (cold &amp; clinical) → "Just two quick things" / "One more to go" (warm, progress-oriented). Changes the emotional register from demand to guidance.</div>
+    </div>
+    <div class="ann-item">
+      <div class="ann-dot"></div>
+      <div class="ann-text"><strong>288px void resolved</strong> — Permission rows grew into cards with names, reasons, and actions. Cards + trust note + CTA fill the space purposefully; no padding hacks needed.</div>
+    </div>
+    <div class="ann-item">
+      <div class="ann-dot"></div>
+      <div class="ann-text"><strong>Inline "Why"</strong> — Each permission shows a one-line reason directly beneath the name. Users don't need to parse the subtitle to understand what each permission does.</div>
+    </div>
+    <div class="ann-item">
+      <div class="ann-dot"></div>
+      <div class="ann-text"><strong>"Allow All" surfaced</strong> — Moved from a low-opacity top-right pill to the full-width primary CTA. Confident users take one tap; cautious users allow individually from each card.</div>
+    </div>
+    <div class="ann-item">
+      <div class="ann-dot"></div>
+      <div class="ann-text"><strong>Trust note</strong> — Single line with shield icon: "Your data never leaves your device or is sold." Addresses the unstated fear without adding a second paragraph of copy.</div>
+    </div>
+    <div class="ann-item">
+      <div class="ann-dot"></div>
+      <div class="ann-text"><strong>Context-aware headline on 3.2</strong> — When one permission is done, the headline shifts to "One more to go" — acknowledging progress and reducing cognitive load for the remaining step.</div>
+    </div>
+    <div class="ann-item">
+      <div class="ann-dot"></div>
+      <div class="ann-text"><strong>Botanical texture only</strong> — Corner sprig at 12% opacity. No full-width illustration scene. Permissions is a trust moment; the design stays clean and focused, not decorative.</div>
+    </div>
+  </div>
+
+  <!-- Summary panel -->
+  <div class="summary">
+    <h3>v2 changes at a glance</h3>
+    <div class="summary-grid">
+      <div class="summary-item"><strong>Was</strong> "Permission Required" (Playfair 24, top-left)</div>
+      <div class="summary-item"><strong>Now</strong> "Just two quick things" — warm, non-clinical</div>
+      <div class="summary-item"><strong>Was</strong> 2-paragraph subtitle (overload)</div>
+      <div class="summary-item"><strong>Now</strong> 1 line: "Sprout needs these to connect your family."</div>
+      <div class="summary-item"><strong>Was</strong> 288px void below two tiny rows</div>
+      <div class="summary-item"><strong>Now</strong> Full-height cards fill space purposefully</div>
+      <div class="summary-item"><strong>Was</strong> "Allow All" low-opacity pill, top-right</div>
+      <div class="summary-item"><strong>Now</strong> Primary full-width green CTA at bottom</div>
+      <div class="summary-item"><strong>Was</strong> No explanation of why each permission matters</div>
+      <div class="summary-item"><strong>Now</strong> Inline "Why" on each card (1 line)</div>
+      <div class="summary-item"><strong>Was</strong> No trust signal</div>
+      <div class="summary-item"><strong>Now</strong> Shield icon + privacy statement (10px, subtle)</div>
+      <div class="summary-item"><strong>Was</strong> Same headline regardless of state</div>
+      <div class="summary-item"><strong>Now</strong> "One more to go" on 3.2 — progress-aware</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

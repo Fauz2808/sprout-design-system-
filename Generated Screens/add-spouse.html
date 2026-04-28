@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Add Spouse (5.6 & 5.7)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand-500: #186338;
+    --brand-600: #134f2d;
+    --brand-700: #1e3e2b;
+    --brand-50:  #e2e9e3;
+    --brand-100: #d0dacf;
+    --brand-200: #77b691;
+    --sec-500: #f4f1ea;
+    --sec-600: #eae6db;
+    --sec-700: #dbd5c8;
+    --sec-800: #c2b9a6;
+    --grey-100: #e6e7ea;
+    --grey-200: #cdcfd6;
+    --grey-300: #b3b8c1;
+    --grey-400: #9aa0ad;
+    --grey-500: #818898;
+    --grey-600: #676d7a;
+    --grey-700: #4d525b;
+    --grey-800: #34363d;
+    --error-500: #d64545;
+    --success-500: #5c8a5c;
+    --white: #ffffff;
+    --r-sm: 4px; --r-md: 8px; --r-lg: 12px;
+    --r-xl: 16px; --r-2xl: 24px; --r-full: 9999px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1a1b1e;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 40px 48px 80px;
+  }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    color: #dbd5c8;
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 6px;
+  }
+  .subtitle { color: #676d7a; font-size: 13px; margin-bottom: 40px; }
+
+  .section-label {
+    color: #676d7a; font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .row { display: flex; gap: 32px; align-items: flex-start; }
+
+  /* ── Phone Shell ── */
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .screen-label { color: #676d7a; font-size: 11px; font-weight: 500; text-align: center; }
+  .phone {
+    width: 300px; height: 650px;
+    background: var(--sec-500);
+    border-radius: 44px;
+    border: 2px solid #2a2c32;
+    overflow: hidden; position: relative; flex-shrink: 0;
+    box-shadow: 0 24px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+    display: flex; flex-direction: column;
+  }
+  .phone.highlight {
+    border-color: var(--brand-500);
+    box-shadow: 0 0 0 2.5px var(--brand-500), 0 24px 48px rgba(0,0,0,0.5);
+  }
+
+  /* Dynamic Island */
+  .di {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 92px; height: 27px;
+    background: #000; border-radius: var(--r-full); z-index: 30;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 48px; display: flex; align-items: flex-end;
+    justify-content: space-between; padding: 0 20px 6px;
+    flex-shrink: 0; position: relative; z-index: 10;
+  }
+  .status-time { font-size: 12px; font-weight: 600; color: var(--grey-700); }
+  .status-time.white { color: var(--white); }
+  .status-icons { display: flex; gap: 5px; align-items: center; }
+
+  /* ── ILLUSTRATION PANEL ── */
+  .illus-panel {
+    position: relative; flex-shrink: 0;
+    overflow: hidden;
+  }
+  .illus-panel svg { display: block; width: 100%; }
+  /* gradient fade at bottom of illustration */
+  .illus-fade {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 56px;
+    background: linear-gradient(to bottom, transparent, var(--sec-500));
+    pointer-events: none;
+  }
+  /* wordmark overlay */
+  .wordmark {
+    position: absolute; bottom: 18px; left: 0; right: 0;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 500; font-style: italic;
+    color: var(--brand-700);
+    letter-spacing: -0.3px;
+    z-index: 5;
+  }
+
+  /* ── SCROLLABLE CONTENT ── */
+  .screen-body {
+    flex: 1; overflow-y: auto; display: flex; flex-direction: column;
+  }
+  .content-pad { padding: 0 14px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+
+  /* Header row inside screen */
+  .screen-nav {
+    padding: 8px 14px 0;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .back-btn {
+    width: 28px; height: 28px; border-radius: var(--r-full);
+    background: var(--sec-600);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Heading block */
+  .heading-block { display: flex; flex-direction: column; gap: 5px; }
+  .heading-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px; font-weight: 500; color: var(--brand-700);
+    line-height: 1.35;
+  }
+  .heading-sub { font-size: 11.5px; color: var(--grey-500); line-height: 1.6; }
+
+  /* Phone input */
+  .form-group { display: flex; flex-direction: column; gap: 4px; }
+  .form-label { font-size: 11px; font-weight: 600; color: var(--brand-700); }
+  .phone-input-wrap {
+    background: var(--sec-600); border: 1.5px solid var(--grey-200);
+    border-radius: var(--r-lg); padding: 0 12px;
+    height: 48px; display: flex; align-items: center; gap: 8px;
+  }
+  .phone-input-wrap.focused { border-color: var(--brand-500); box-shadow: 0 0 0 3px rgba(24,99,56,0.1); }
+  .country-sel {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 13px; font-weight: 500; color: var(--grey-600);
+    border-right: 1px solid var(--grey-200); padding-right: 10px; flex-shrink: 0;
+  }
+  .country-sel .flag { font-size: 16px; }
+  .country-sel .caret { font-size: 9px; color: var(--grey-400); }
+  .phone-input-val { flex: 1; font-size: 13px; color: var(--grey-400); }
+  .phone-input-val.filled { color: var(--grey-700); }
+  .form-hint { font-size: 10.5px; color: var(--grey-500); }
+
+  /* Info card — "Shared with your spouse" */
+  .info-card {
+    background: var(--white);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: 1px 4px 25px 2px rgba(13,13,18,0.05);
+  }
+  .info-card-header {
+    background: var(--brand-50);
+    padding: 8px 12px;
+    display: flex; align-items: center; gap: 6px;
+    border-bottom: 1px solid var(--brand-100);
+  }
+  .info-card-header-text { font-size: 11px; font-weight: 500; color: var(--brand-700); }
+  .info-row {
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--grey-100);
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-icon {
+    width: 36px; height: 36px; border-radius: var(--r-sm);
+    background: var(--sec-600);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .info-text { flex: 1; }
+  .info-name { font-family: 'Playfair Display', serif; font-size: 12px; font-weight: 500; color: var(--brand-700); }
+  .info-val { font-size: 10px; color: var(--grey-500); margin-top: 1px; }
+
+  /* Bottom CTA */
+  .bottom-cta {
+    padding: 10px 14px 14px;
+    background: var(--sec-500);
+    border-top: 1px solid var(--grey-100);
+    flex-shrink: 0;
+    display: flex; gap: 10px;
+  }
+  .btn-primary {
+    flex: 1; height: 44px;
+    background: var(--brand-500); border-radius: var(--r-full);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-size: 13px; font-weight: 600; color: var(--white);
+    font-family: 'Playfair Display', serif;
+  }
+  .btn-secondary {
+    flex: 1; height: 44px;
+    background: var(--brand-50); border: 1.5px solid var(--brand-100);
+    border-radius: var(--r-full);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: var(--brand-700);
+    font-family: 'Playfair Display', serif;
+  }
+  .btn-full {
+    width: 100%; height: 44px;
+    background: var(--brand-500); border-radius: var(--r-full);
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    font-size: 13px; font-weight: 600; color: var(--white);
+    font-family: 'Playfair Display', serif;
+  }
+  .btn-ghost {
+    width: 100%; height: 44px;
+    background: var(--brand-50); border: 1.5px solid var(--brand-100);
+    border-radius: var(--r-full);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500; color: var(--brand-600);
+  }
+
+  /* Home indicator */
+  .home-indicator {
+    height: 30px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .home-bar {
+    width: 120px; height: 4px; background: var(--grey-700);
+    border-radius: var(--r-full); opacity: 0.25;
+  }
+
+  /* ── 5.7 SUCCESS STATE ── */
+  .success-illus-panel {
+    position: relative; flex-shrink: 0; overflow: hidden;
+  }
+  .success-illus-panel svg { display: block; width: 100%; }
+  .success-illus-fade {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+    background: linear-gradient(to bottom, transparent, var(--sec-500));
+    pointer-events: none;
+  }
+
+  .success-center {
+    padding: 4px 14px 0;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 6px; text-align: center;
+  }
+  .success-check {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--brand-50); border: 3px solid var(--brand-200);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-bottom: 2px;
+  }
+  .success-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 500; color: var(--brand-700);
+    line-height: 1.3;
+  }
+  .success-title em { font-style: italic; color: var(--brand-500); }
+  .success-sub { font-size: 11.5px; color: var(--grey-500); line-height: 1.6; max-width: 220px; }
+
+  /* sent-to chip */
+  .sent-to-chip {
+    background: var(--white); border: 1.5px solid var(--grey-100);
+    border-radius: var(--r-lg); padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 1px 4px 25px 2px rgba(13,13,18,0.05);
+    width: 100%;
+  }
+  .sent-to-icon {
+    width: 36px; height: 36px; border-radius: var(--r-sm);
+    background: var(--brand-50);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; flex-shrink: 0;
+  }
+  .sent-to-label { font-size: 10px; color: var(--grey-500); margin-bottom: 2px; }
+  .sent-to-num { font-size: 13px; font-weight: 600; color: var(--brand-700); }
+
+  /* sparkle row */
+  .sparkle-row {
+    display: flex; gap: 6px; justify-content: center; margin-bottom: 2px;
+  }
+  .spark { font-size: 14px; opacity: 0.85; }
+</style>
+</head>
+<body>
+
+<h1>Add Spouse — Screens 5.6 & 5.7</h1>
+<p class="subtitle">Redesigned with Sprout branding · botanical illustration fills the dead space</p>
+
+<div class="section-label" style="margin-bottom:20px;">5.6 — Enter number &nbsp;·&nbsp; 5.7 — Invite sent</div>
+
+<div class="row">
+
+  <!-- ══════════════════════════════════ -->
+  <!--  5.6  ADD SPOUSE  (input state)   -->
+  <!-- ══════════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone highlight">
+      <div class="di"></div>
+
+      <!-- status bar -->
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="14" height="10" viewBox="0 0 14 10"><rect x="0" y="3" width="3" height="7" rx="1" fill="#4d525b"/><rect x="4" y="2" width="3" height="8" rx="1" fill="#4d525b"/><rect x="8" y="0" width="3" height="10" rx="1" fill="#4d525b"/><rect x="12" y="0" width="2" height="10" rx="1" fill="#b3b8c1"/></svg>
+          <svg width="12" height="10" viewBox="0 0 12 10"><path d="M6 2C8.2 2 10.2 3 11.5 4.6L12 5l-.5.4C10.2 7 8.2 8 6 8s-4.2-1-5.5-2.6L0 5l.5-.4C1.8 3 3.8 2 6 2z" fill="#4d525b"/><circle cx="6" cy="5" r="1.5" fill="#f4f1ea"/></svg>
+          <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2.5" stroke="#4d525b" stroke-width="1.2" fill="none"/><rect x="1.5" y="2.5" width="13" height="6" rx="1.5" fill="#4d525b"/><path d="M20 4v3a1.5 1.5 0 000-3z" fill="#4d525b"/></svg>
+        </div>
+      </div>
+
+      <!-- back nav -->
+      <div class="screen-nav">
+        <div class="back-btn">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="#4d525b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <span style="font-size:10px;color:var(--grey-400);font-weight:500;">Step 5 of 6</span>
+      </div>
+
+      <!-- botanical illustration -->
+      <div class="illus-panel" style="height:198px; margin-top:4px;">
+        <svg viewBox="0 0 300 198" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="height:198px;">
+          <defs>
+            <linearGradient id="bgGrad56" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#d8ece0"/>
+              <stop offset="100%" stop-color="#eaf3ed"/>
+            </linearGradient>
+          </defs>
+          <!-- sky bg -->
+          <rect width="300" height="198" fill="url(#bgGrad56)"/>
+
+          <!-- ground -->
+          <ellipse cx="150" cy="190" rx="200" ry="28" fill="#b8d9c4" opacity="0.6"/>
+
+          <!-- large tree center -->
+          <rect x="146" y="100" width="8" height="70" rx="3" fill="#1e3e2b" opacity="0.55"/>
+          <ellipse cx="150" cy="90" rx="42" ry="50" fill="#186338" opacity="0.55"/>
+          <ellipse cx="150" cy="80" rx="30" ry="36" fill="#186338" opacity="0.65"/>
+          <ellipse cx="150" cy="70" rx="20" ry="26" fill="#186338" opacity="0.75"/>
+
+          <!-- left branch -->
+          <path d="M146 110 Q120 95 105 100" stroke="#1e3e2b" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.5"/>
+          <ellipse cx="102" cy="97" rx="12" ry="9" fill="#77b691" opacity="0.8"/>
+
+          <!-- right branch -->
+          <path d="M154 115 Q178 98 193 104" stroke="#1e3e2b" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.5"/>
+          <ellipse cx="196" cy="101" rx="12" ry="9" fill="#77b691" opacity="0.8"/>
+
+          <!-- small tree left -->
+          <rect x="54" y="130" width="6" height="40" rx="2" fill="#1e3e2b" opacity="0.4"/>
+          <ellipse cx="57" cy="122" rx="18" ry="22" fill="#186338" opacity="0.45"/>
+
+          <!-- small tree right -->
+          <rect x="238" y="128" width="6" height="42" rx="2" fill="#1e3e2b" opacity="0.4"/>
+          <ellipse cx="241" cy="120" rx="18" ry="22" fill="#186338" opacity="0.45"/>
+
+          <!-- figure LEFT — person A -->
+          <!-- body -->
+          <ellipse cx="118" cy="162" rx="10" ry="14" fill="#f4c2a1" opacity="0.9"/>
+          <!-- head -->
+          <circle cx="118" cy="145" r="9" fill="#f0b896" opacity="0.95"/>
+          <!-- hair -->
+          <ellipse cx="118" cy="139" rx="9" ry="5" fill="#4d3520" opacity="0.7"/>
+          <!-- arm reaching right -->
+          <path d="M126 158 Q136 154 140 155" stroke="#f4c2a1" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.9"/>
+
+          <!-- figure RIGHT — person B -->
+          <!-- body -->
+          <ellipse cx="182" cy="162" rx="10" ry="14" fill="#c8e0f0" opacity="0.9"/>
+          <!-- head -->
+          <circle cx="182" cy="145" r="9" fill="#e8c9a0" opacity="0.95"/>
+          <!-- hair -->
+          <ellipse cx="182" cy="139" rx="9" ry="5" fill="#2a1a0a" opacity="0.7"/>
+          <!-- arm reaching left -->
+          <path d="M174 158 Q164 154 160 155" stroke="#c8e0f0" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.9"/>
+
+          <!-- HEART between hands -->
+          <path d="M150 149 C150 149 144 143 144 139 C144 135.5 147 133 150 136 C153 133 156 135.5 156 139 C156 143 150 149 150 149Z" fill="#d64545" opacity="0.75"/>
+
+          <!-- small leaves / flowers scattered -->
+          <circle cx="80" cy="108" r="3" fill="#77b691" opacity="0.6"/>
+          <circle cx="88" cy="100" r="2" fill="#77b691" opacity="0.5"/>
+          <circle cx="215" cy="105" r="3" fill="#77b691" opacity="0.6"/>
+          <circle cx="225" cy="112" r="2" fill="#77b691" opacity="0.5"/>
+
+          <!-- sparkle stars -->
+          <text x="65" y="76" font-size="10" opacity="0.5" fill="#186338">✦</text>
+          <text x="228" y="82" font-size="8" opacity="0.45" fill="#186338">✦</text>
+          <text x="136" y="48" font-size="7" opacity="0.4" fill="#186338">✦</text>
+        </svg>
+        <div class="illus-fade"></div>
+        <div class="wordmark">Sprout</div>
+      </div>
+
+      <!-- scrollable body -->
+      <div class="screen-body">
+        <div class="content-pad" style="padding-top:4px;">
+
+          <div class="heading-block">
+            <div class="heading-title">Add your spouse</div>
+            <div class="heading-sub">Enter their number — once they join, your family profile (location, kids, school groups) will sync automatically.</div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">Spouse's phone number</div>
+            <div class="phone-input-wrap focused">
+              <div class="country-sel">
+                <span class="flag">🇦🇺</span>
+                <span>+61</span>
+                <span class="caret">▾</span>
+              </div>
+              <span class="phone-input-val">Phone number</span>
+            </div>
+            <div class="form-hint">We'll send them a text invite to join Sprout.</div>
+          </div>
+
+          <div class="info-card">
+            <div class="info-card-header">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#186338" stroke-width="1.2"/><path d="M6.5 5.5v4M6.5 4h.01" stroke="#186338" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span class="info-card-header-text">Shared with your spouse</span>
+            </div>
+            <div class="info-row">
+              <div class="info-icon">📍</div>
+              <div class="info-text">
+                <div class="info-name">Location</div>
+                <div class="info-val">Sydney, NSW · 2000</div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-icon">👦</div>
+              <div class="info-text">
+                <div class="info-name">Kids</div>
+                <div class="info-val">Jessica, Liam, Sophia</div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-icon">🏫</div>
+              <div class="info-text">
+                <div class="info-name">School Groups</div>
+                <div class="info-val">Paddington Public School</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- bottom CTAs -->
+      <div class="bottom-cta">
+        <div class="btn-secondary">Skip</div>
+        <div class="btn-primary">Send Invite</div>
+      </div>
+      <div class="home-indicator"><div class="home-bar"></div></div>
+
+    </div>
+    <div class="screen-label">5.6 — Enter spouse's number</div>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <!--  5.7  INVITE SENT  (success)      -->
+  <!-- ══════════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone highlight">
+      <div class="di"></div>
+
+      <!-- status bar -->
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="14" height="10" viewBox="0 0 14 10"><rect x="0" y="3" width="3" height="7" rx="1" fill="#4d525b"/><rect x="4" y="2" width="3" height="8" rx="1" fill="#4d525b"/><rect x="8" y="0" width="3" height="10" rx="1" fill="#4d525b"/><rect x="12" y="0" width="2" height="10" rx="1" fill="#b3b8c1"/></svg>
+          <svg width="12" height="10" viewBox="0 0 12 10"><path d="M6 2C8.2 2 10.2 3 11.5 4.6L12 5l-.5.4C10.2 7 8.2 8 6 8s-4.2-1-5.5-2.6L0 5l.5-.4C1.8 3 3.8 2 6 2z" fill="#4d525b"/><circle cx="6" cy="5" r="1.5" fill="#f4f1ea"/></svg>
+          <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="1" width="19" height="9" rx="2.5" stroke="#4d525b" stroke-width="1.2" fill="none"/><rect x="1.5" y="2.5" width="13" height="6" rx="1.5" fill="#4d525b"/><path d="M20 4v3a1.5 1.5 0 000-3z" fill="#4d525b"/></svg>
+        </div>
+      </div>
+
+      <!-- back nav -->
+      <div class="screen-nav">
+        <div class="back-btn">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="#4d525b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+
+      <!-- celebration illustration -->
+      <div class="success-illus-panel" style="height:180px; margin-top:4px;">
+        <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="height:180px;">
+          <defs>
+            <linearGradient id="bgGrad57" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#d0e8d8"/>
+              <stop offset="100%" stop-color="#e8f2eb"/>
+            </linearGradient>
+          </defs>
+          <rect width="300" height="180" fill="url(#bgGrad57)"/>
+
+          <!-- ground -->
+          <ellipse cx="150" cy="175" rx="200" ry="22" fill="#b8d9c4" opacity="0.5"/>
+
+          <!-- large celebratory tree -->
+          <rect x="146" y="90" width="8" height="70" rx="3" fill="#1e3e2b" opacity="0.5"/>
+          <ellipse cx="150" cy="80" rx="46" ry="52" fill="#186338" opacity="0.5"/>
+          <ellipse cx="150" cy="68" rx="32" ry="38" fill="#186338" opacity="0.62"/>
+          <ellipse cx="150" cy="56" rx="22" ry="28" fill="#186338" opacity="0.72"/>
+
+          <!-- linked rings / chain representing connection -->
+          <!-- ring A -->
+          <circle cx="126" cy="115" r="11" stroke="#186338" stroke-width="3" fill="none" opacity="0.7"/>
+          <!-- ring B (overlapping) -->
+          <circle cx="142" cy="115" r="11" stroke="#186338" stroke-width="3" fill="none" opacity="0.7"/>
+          <!-- connecting fill -->
+          <circle cx="134" cy="115" r="5" fill="#186338" opacity="0.25"/>
+
+          <!-- big heart above rings -->
+          <path d="M150 88 C150 88 138 78 138 70 C138 63 143 59 150 65 C157 59 162 63 162 70 C162 78 150 88 150 88Z" fill="#d64545" opacity="0.65"/>
+
+          <!-- confetti dots -->
+          <circle cx="52" cy="38" r="4" fill="#186338" opacity="0.45"/>
+          <circle cx="248" cy="44" r="3" fill="#d64545" opacity="0.4"/>
+          <circle cx="72" cy="62" r="3" fill="#d4a017" opacity="0.45"/>
+          <circle cx="228" cy="58" r="4" fill="#186338" opacity="0.35"/>
+          <circle cx="40" cy="80" r="2.5" fill="#d64545" opacity="0.35"/>
+          <circle cx="258" cy="78" r="2.5" fill="#d4a017" opacity="0.35"/>
+          <circle cx="88" cy="28" r="2" fill="#186338" opacity="0.3"/>
+          <circle cx="210" cy="30" r="2" fill="#d64545" opacity="0.3"/>
+
+          <!-- confetti streaks -->
+          <rect x="62" y="45" width="2" height="8" rx="1" fill="#186338" opacity="0.4" transform="rotate(-20 62 45)"/>
+          <rect x="234" y="50" width="2" height="8" rx="1" fill="#d4a017" opacity="0.4" transform="rotate(15 234 50)"/>
+          <rect x="44" y="68" width="2" height="7" rx="1" fill="#d64545" opacity="0.35" transform="rotate(-35 44 68)"/>
+          <rect x="252" y="65" width="2" height="7" rx="1" fill="#186338" opacity="0.35" transform="rotate(25 252 65)"/>
+
+          <!-- sparkles -->
+          <text x="30" y="55" font-size="11" opacity="0.55" fill="#186338">✦</text>
+          <text x="256" y="40" font-size="9" opacity="0.5" fill="#186338">✦</text>
+          <text x="110" y="38" font-size="7" opacity="0.4" fill="#186338">✦</text>
+          <text x="185" y="42" font-size="8" opacity="0.4" fill="#186338">✦</text>
+
+          <!-- birds / dots as flying elements -->
+          <path d="M80 52 Q84 48 88 52" stroke="#186338" stroke-width="1.5" fill="none" opacity="0.45" stroke-linecap="round"/>
+          <path d="M210 48 Q214 44 218 48" stroke="#186338" stroke-width="1.5" fill="none" opacity="0.45" stroke-linecap="round"/>
+        </svg>
+        <div class="success-illus-fade"></div>
+      </div>
+
+      <!-- scrollable body -->
+      <div class="screen-body">
+        <div style="padding: 0 14px; flex:1; display:flex; flex-direction:column; gap:12px;">
+
+          <!-- success center -->
+          <div class="success-center">
+            <div class="sparkle-row">
+              <span class="spark">🎉</span>
+              <span class="spark">🌱</span>
+              <span class="spark">🎉</span>
+            </div>
+            <div class="success-check">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M5 12.5l4.5 4.5 9.5-9.5" stroke="#186338" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="success-title">Invite <em>sent!</em></div>
+            <div class="success-sub">Once your spouse joins Sprout with this number, your family profiles will be linked automatically.</div>
+          </div>
+
+          <!-- sent to -->
+          <div class="sent-to-chip">
+            <div class="sent-to-icon">📱</div>
+            <div style="flex:1;">
+              <div class="sent-to-label">Invite sent to</div>
+              <div class="sent-to-num">+61 400 123 456</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="#b3b8c1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+
+          <!-- shared access card -->
+          <div class="info-card">
+            <div class="info-card-header">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#186338" stroke-width="1.2"/><path d="M6.5 5.5v4M6.5 4h.01" stroke="#186338" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span class="info-card-header-text">Your spouse will have access to</span>
+            </div>
+            <div class="info-row">
+              <div class="info-icon">📍</div>
+              <div class="info-text">
+                <div class="info-name">Location</div>
+                <div class="info-val">Sydney, NSW · 2000</div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-icon">👦</div>
+              <div class="info-text">
+                <div class="info-name">Kids</div>
+                <div class="info-val">Jessica, Liam, Sophia</div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-icon">🏫</div>
+              <div class="info-text">
+                <div class="info-name">School Groups</div>
+                <div class="info-val">Paddington Public School</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- wrong number -->
+          <div class="btn-ghost">Wrong number? Tap to re-enter</div>
+
+        </div>
+      </div>
+
+      <!-- bottom CTA -->
+      <div class="bottom-cta" style="gap:0;">
+        <div class="btn-full">
+          Explore Sprout
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7.5h9M8 3.5l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="home-indicator"><div class="home-bar"></div></div>
+
+    </div>
+    <div class="screen-label">5.7 — Invite sent!</div>
+  </div>
+
+  <!-- ── Comparison / annotation ── -->
+  <div style="align-self:center; max-width:240px; margin-left:8px;">
+    <div style="background:rgba(24,99,56,0.1); border:1px solid rgba(24,99,56,0.25); border-radius:14px; padding:20px 18px;">
+      <div style="font-size:10px;font-weight:700;color:#77b691;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">What changed</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:11px;color:#dbd5c8;line-height:1.65;">
+          <span style="color:#77b691;font-weight:600;">5.6 ·</span> Botanical couple illustration fills the dead space — two figures reaching toward each other, heart between their hands. Warm & personal.
+        </div>
+        <div style="font-size:11px;color:#dbd5c8;line-height:1.65;">
+          <span style="color:#77b691;font-weight:600;">5.7 ·</span> Celebratory illustration with confetti, sparkles and linked-rings motif replaces the tiny check circle. Success moment feels like an occasion.
+        </div>
+        <div style="font-size:11px;color:#dbd5c8;line-height:1.65;">
+          <span style="color:#77b691;font-weight:600;">Both ·</span> Playfair italic wordmark anchor, shared info cards rebranded with brand-50 header, Sprout green throughout.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

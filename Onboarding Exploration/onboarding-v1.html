@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sprout — Onboarding Exploration v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+
+/* ═══════════════════════════════════════════════════
+   SPROUT — ONBOARDING EXPLORATION v1
+   ───────────────────────────────────────────────────
+   Direction: Warm Editorial · Typography-first
+   Key changes from previous versions:
+   ▸ Display headlines 40–52px (was 24–30px)
+   ▸ Body copy 17–18px (was 13–15px)
+   ▸ Full-bleed illustrated hero zone on welcome
+   ▸ Vertical slide transitions (intimate, not lateral)
+   ▸ Spring animations on selections
+   ▸ Generous whitespace + breathing room
+   ▸ All Sprout design tokens faithfully applied
+   Screen: 393 × 852px (iPhone Pro frame)
+═══════════════════════════════════════════════════ */
+
+/* ─── DESIGN TOKENS (from SPROUT_DESIGN_REFERENCE.md) ─── */
+:root {
+  /* Brand Green */
+  --brand-50:     #e2e9e3;
+  --brand-100:    #d0dacf;
+  --brand-200:    #77b691;
+  --brand-300:    #579a74;
+  --brand-400:    #387f56;
+  --brand:        #186338;
+  --brand-bold:   #1e3e2b;
+  --brand-800:    #071e11;
+
+  /* Secondary / Warm Cream */
+  --bg:           #f4f1ea;
+  --surface-1:    #eae6db;
+  --surface-2:    #dbd5c8;
+  --surface-3:    #c2b9a6;
+  --surface-4:    #aa9e83;
+
+  /* Content */
+  --text-pri:     #4d525b;
+  --text-sec:     #818898;
+  --text-ter:     #b3b8c1;
+  --text-dis:     #9aa0ad;
+  --text-brand:   #186338;
+  --text-white:   #ffffff;
+
+  /* Neutral */
+  --white:        #ffffff;
+  --black:        #1a1a1a;
+
+  /* Semantic */
+  --info-bg:      #d8e5ed;
+  --info-text:    #234a63;
+
+  /* Radius (from tokens) */
+  --r-sm:   4px;
+  --r-md:   8px;
+  --r-lg:   12px;
+  --r-xl:   16px;
+  --r-2xl:  24px;
+  --r-3xl:  32px;
+  --r-full: 9999px;
+
+  /* Typography */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ─── PAGE CHROME ─── */
+html, body {
+  min-height: 100vh;
+  background: #0e0e0e;
+  background-image:
+    radial-gradient(ellipse 55% 40% at 12% 8%,  rgba(24,99,56,0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 35% at 88% 92%, rgba(30,62,43,0.15) 0%, transparent 60%);
+  font-family: var(--font-body);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 44px 20px 80px;
+  gap: 28px;
+}
+
+.page-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.page-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.8);
+}
+.page-sub {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+}
+
+.version-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(24,99,56,0.18);
+  border: 1px solid rgba(24,99,56,0.3);
+  border-radius: var(--r-full);
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #77b691;
+  letter-spacing: 0.04em;
+}
+.version-pill::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #77b691;
+  flex-shrink: 0;
+}
+
+/* ─── PHONE FRAME ─── */
+.phone {
+  width: 393px;
+  height: 852px;
+  background: var(--bg);
+  border-radius: 52px;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.07),
+    0 48px 140px rgba(0,0,0,0.85),
+    0 8px 24px rgba(0,0,0,0.5);
+  flex-shrink: 0;
+}
+
+/* Dynamic island */
+.dynamic-island {
+  position: absolute;
+  top: 14px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 34px;
+  background: var(--black);
+  border-radius: 20px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+/* Home indicator */
+.home-bar {
+  position: absolute;
+  bottom: 8px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--black);
+  opacity: 0.18;
+  border-radius: var(--r-full);
+  pointer-events: none;
+  z-index: 300;
+}
+
+/* ─── SCREEN SYSTEM ─── */
+.screen-stack {
+  position: absolute;
+  inset: 0;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  transform: translateY(100%);
+  opacity: 0;
+  transition:
+    transform 0.44s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity   0.30s ease;
+  will-change: transform, opacity;
+}
+.screen.active {
+  transform: translateY(0);
+  opacity: 1;
+  z-index: 2;
+}
+.screen.past {
+  transform: translateY(-5%);
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ════════════════════════════════════════════════
+   SCREEN 1 — WELCOME
+════════════════════════════════════════════════ */
+#s1 { flex-direction: column; }
+
+/* Hero zone — rich illustrated top half */
+.welcome-hero {
+  height: 440px;
+  background: var(--brand-bold);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Layered organic shapes */
+.hero-shape-1 {
+  position: absolute;
+  width: 280px; height: 280px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.03);
+  top: -100px; left: -80px;
+}
+.hero-shape-2 {
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.035);
+  bottom: -60px; right: -50px;
+}
+.hero-shape-3 {
+  /* Organic leaf top-right */
+  position: absolute;
+  top: 30px; right: 16px;
+  width: 150px; height: 150px;
+  background: rgba(87,154,116,0.22);
+  border-radius: 70% 30% 70% 30% / 50% 50% 50% 50%;
+  transform: rotate(-22deg);
+}
+.hero-shape-4 {
+  /* Organic leaf bottom-left */
+  position: absolute;
+  bottom: 80px; left: 20px;
+  width: 110px; height: 110px;
+  background: rgba(119,182,145,0.18);
+  border-radius: 40% 60% 30% 70% / 70% 30% 70% 30%;
+  transform: rotate(12deg);
+}
+.hero-shape-5 {
+  /* Mid leaf */
+  position: absolute;
+  top: 150px; left: 170px;
+  width: 90px; height: 90px;
+  background: rgba(56,127,86,0.28);
+  border-radius: 60% 40% 60% 40% / 40% 60% 40% 60%;
+  transform: rotate(50deg);
+}
+.hero-dots {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle 2.5px at 75px 195px, rgba(255,255,255,0.18) 0%, transparent 100%),
+    radial-gradient(circle 2px   at 315px  95px, rgba(255,255,255,0.13) 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 185px 335px, rgba(255,255,255,0.10) 0%, transparent 100%),
+    radial-gradient(circle 2px   at 355px 270px, rgba(255,255,255,0.10) 0%, transparent 100%),
+    radial-gradient(circle 1.5px at  42px  88px, rgba(255,255,255,0.08) 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 240px 200px, rgba(255,255,255,0.07) 0%, transparent 100%);
+}
+
+/* Sprout mark centered in hero */
+.hero-mark {
+  position: absolute;
+  top: 58px;
+  left: 0; right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.hero-mark-icon {
+  width: 56px; height: 56px;
+  background: rgba(119,182,145,0.25);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.hero-mark-name {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.88);
+  letter-spacing: -0.02em;
+}
+
+/* Illustrated family scene at hero bottom */
+.hero-scene {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 230px;
+}
+.hero-scene svg { width: 100%; height: 100%; }
+
+/* Welcome copy */
+.welcome-copy {
+  flex: 1;
+  padding: 28px 28px 0;
+  display: flex;
+  flex-direction: column;
+}
+.welcome-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-brand);
+  margin-bottom: 10px;
+}
+.welcome-headline {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--brand-bold);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+.welcome-body {
+  font-size: 17px;
+  color: var(--text-sec);
+  line-height: 1.65;
+  flex: 1;
+}
+
+.welcome-footer {
+  padding: 16px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.signin-hint {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-sec);
+}
+.signin-hint button {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-brand);
+  cursor: pointer;
+  font-family: var(--font-body);
+  padding: 0;
+}
+
+/* ════════════════════════════════════════════════
+   SHARED COMPONENTS
+════════════════════════════════════════════════ */
+
+/* Status bar */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 56px 28px 0;
+  flex-shrink: 0;
+}
+.status-time {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-pri);
+}
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-pri);
+}
+
+/* Progress nav */
+.progress-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px 0;
+  flex-shrink: 0;
+}
+.back-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--surface-1);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-pri);
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.back-btn:hover { background: var(--surface-2); }
+.back-btn.hidden { opacity: 0; pointer-events: none; }
+
+.step-dots {
+  display: flex;
+  gap: 5px;
+  flex: 1;
+  align-items: center;
+}
+.step-dot {
+  height: 5px;
+  border-radius: var(--r-full);
+  background: var(--surface-2);
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  flex: 1;
+}
+.step-dot.done   { background: var(--brand-200); }
+.step-dot.active { background: var(--brand); flex: 2.5; }
+
+.step-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-ter);
+  white-space: nowrap;
+}
+
+/* Screen body scroll */
+.screen-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px 0;
+  display: flex;
+  flex-direction: column;
+  -webkit-overflow-scrolling: touch;
+}
+.screen-body::-webkit-scrollbar { display: none; }
+
+/* Headlines */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  color: var(--text-brand);
+  margin-bottom: 10px;
+}
+.screen-headline {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--brand-bold);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+}
+.screen-sub {
+  font-size: 17px;
+  color: var(--text-sec);
+  line-height: 1.65;
+  margin-bottom: 28px;
+}
+
+/* Buttons */
+.btn-footer {
+  padding: 14px 28px 24px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.btn-primary {
+  width: 100%;
+  padding: 18px 24px;
+  background: var(--brand);
+  color: var(--white);
+  border: none;
+  border-radius: var(--r-full);
+  font-size: 17px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  letter-spacing: 0.01em;
+}
+.btn-primary:hover  { background: var(--brand-bold); }
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary:disabled {
+  background: var(--brand-100);
+  color: var(--brand-200);
+  cursor: not-allowed;
+}
+.btn-ghost {
+  background: none;
+  border: none;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-sec);
+  font-family: var(--font-body);
+  cursor: pointer;
+  padding: 8px;
+  text-align: center;
+  transition: color 0.15s;
+}
+.btn-ghost:hover { color: var(--text-pri); }
+
+/* ════════════════════════════════════════════════
+   SCREEN 2 — ROLE
+════════════════════════════════════════════════ */
+.role-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+.role-card {
+  background: var(--white);
+  border: 2px solid var(--surface-2);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.34, 1.2, 0.64, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+.role-card:active { transform: scale(0.98); }
+.role-card.selected {
+  border-color: var(--brand);
+  background: var(--brand-50);
+  transform: scale(1.01);
+  box-shadow: 0 4px 20px rgba(24,99,56,0.12);
+}
+.role-icon {
+  width: 58px; height: 58px;
+  border-radius: var(--r-xl);
+  background: var(--surface-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.role-card.selected .role-icon { background: var(--brand-100); }
+.role-text { flex: 1; }
+.role-name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--brand-bold);
+  margin-bottom: 3px;
+  line-height: 1.2;
+}
+.role-desc {
+  font-size: 14px;
+  color: var(--text-sec);
+  line-height: 1.45;
+}
+.role-radio {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--surface-2);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.role-card.selected .role-radio {
+  background: var(--brand);
+  border-color: var(--brand);
+}
+
+/* ════════════════════════════════════════════════
+   SCREEN 3 — ABOUT YOU
+════════════════════════════════════════════════ */
+.photo-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--white);
+  border: 2px dashed var(--surface-2);
+  border-radius: 20px;
+  padding: 16px 18px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.photo-row:hover { border-color: var(--brand-200); background: var(--brand-50); }
+.photo-circle {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--surface-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.photo-copy { flex: 1; }
+.photo-copy-main {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-pri);
+  margin-bottom: 3px;
+}
+.photo-copy-hint {
+  font-size: 13px;
+  color: var(--text-sec);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.form-group { margin-bottom: 14px; }
+.form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-sec);
+  margin-bottom: 7px;
+}
+.form-label .opt {
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-ter);
+}
+.form-input {
+  width: 100%;
+  background: var(--white);
+  border: 2px solid var(--surface-2);
+  border-radius: var(--r-xl);
+  padding: 16px 18px;
+  font-size: 17px;
+  font-family: var(--font-body);
+  color: var(--text-pri);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+.form-input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px rgba(24,99,56,0.08);
+}
+.form-input::placeholder { color: var(--text-ter); }
+textarea.form-input { resize: none; line-height: 1.6; font-size: 16px; }
+
+/* ════════════════════════════════════════════════
+   SCREEN 4 — YOUR KIDS
+════════════════════════════════════════════════ */
+.kids-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.kid-card {
+  background: var(--white);
+  border: 2px solid var(--brand-100);
+  border-radius: 18px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes popIn {
+  from { transform: scale(0.84); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+.kid-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--brand-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--brand);
+  flex-shrink: 0;
+}
+.kid-info { flex: 1; }
+.kid-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-pri);
+  margin-bottom: 2px;
+}
+.kid-meta { font-size: 13px; color: var(--text-sec); }
+.kid-remove {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--surface-1);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-sec);
+  font-size: 13px;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.kid-remove:hover { background: var(--surface-2); color: var(--text-pri); }
+
+/* Inline add form */
+.kid-form {
+  background: var(--white);
+  border: 2px solid var(--brand);
+  border-radius: 20px;
+  padding: 18px;
+  margin-bottom: 12px;
+  display: none;
+  flex-direction: column;
+  gap: 11px;
+  animation: expandDown 0.22s cubic-bezier(0.32,0.72,0,1);
+}
+.kid-form.open { display: flex; }
+@keyframes expandDown {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+.kid-form-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--brand-bold);
+}
+.kid-form-input {
+  background: var(--surface-1);
+  border: 1.5px solid transparent;
+  border-radius: var(--r-lg);
+  padding: 13px 15px;
+  font-size: 16px;
+  font-family: var(--font-body);
+  color: var(--text-pri);
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  -webkit-appearance: none;
+}
+.kid-form-input:focus { border-color: var(--brand-200); }
+.kid-form-input::placeholder { color: var(--text-ter); }
+.kid-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+select.kid-form-input {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239aa0ad' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 30px;
+  appearance: none;
+}
+.kid-form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+.kid-form-save {
+  flex: 1;
+  padding: 13px;
+  background: var(--brand);
+  color: var(--white);
+  border: none;
+  border-radius: var(--r-lg);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.kid-form-save:hover { background: var(--brand-bold); }
+.kid-form-cancel {
+  padding: 13px 20px;
+  background: var(--surface-1);
+  color: var(--text-sec);
+  border: none;
+  border-radius: var(--r-lg);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.kid-form-cancel:hover { background: var(--surface-2); }
+
+/* Add child trigger */
+.add-kid-trigger {
+  background: var(--white);
+  border: 2px dashed var(--brand-100);
+  border-radius: 18px;
+  padding: 15px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  font-family: var(--font-body);
+  -webkit-tap-highlight-color: transparent;
+}
+.add-kid-trigger:hover {
+  border-color: var(--brand);
+  background: var(--brand-50);
+}
+.add-kid-plus {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--brand-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: var(--brand);
+  flex-shrink: 0;
+  font-weight: 300;
+  transition: background 0.2s;
+}
+.add-kid-trigger:hover .add-kid-plus { background: var(--brand-100); }
+.add-kid-copy { text-align: left; }
+.add-kid-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-brand);
+  margin-bottom: 2px;
+}
+.add-kid-hint { font-size: 13px; color: var(--text-sec); }
+
+/* ════════════════════════════════════════════════
+   SCREEN 5 — COMMUNITY / SCHOOL
+════════════════════════════════════════════════ */
+.search-wrap {
+  position: relative;
+  margin-bottom: 20px;
+}
+.search-icon-pos {
+  position: absolute;
+  left: 16px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-ter);
+  pointer-events: none;
+  display: flex;
+}
+.search-field {
+  width: 100%;
+  background: var(--white);
+  border: 2px solid var(--surface-2);
+  border-radius: var(--r-xl);
+  padding: 16px 18px 16px 48px;
+  font-size: 17px;
+  font-family: var(--font-body);
+  color: var(--text-pri);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+.search-field:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px rgba(24,99,56,0.08);
+}
+.search-field::placeholder { color: var(--text-ter); }
+
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-ter);
+  margin-bottom: 10px;
+}
+.school-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.school-item {
+  background: var(--white);
+  border: 2px solid var(--surface-2);
+  border-radius: var(--r-xl);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  cursor: pointer;
+  transition: all 0.18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.school-item:hover { border-color: var(--brand-200); background: var(--brand-50); }
+.school-item.selected { border-color: var(--brand); background: var(--brand-50); }
+.school-icon {
+  width: 40px; height: 40px;
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  transition: background 0.18s;
+}
+.school-item.selected .school-icon { background: var(--brand-100); }
+.school-info { flex: 1; }
+.school-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-pri);
+  margin-bottom: 2px;
+}
+.school-dist { font-size: 13px; color: var(--text-sec); }
+.school-radio {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--surface-2);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s;
+}
+.school-item.selected .school-radio {
+  background: var(--brand);
+  border-color: var(--brand);
+}
+
+/* ════════════════════════════════════════════════
+   SCREEN 6 — COMPLETE
+════════════════════════════════════════════════ */
+.complete-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 32px;
+  text-align: center;
+}
+.complete-bloom {
+  width: 100px; height: 100px;
+  border-radius: 28px;
+  background: var(--brand-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  margin-bottom: 24px;
+  animation: bloomIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+}
+@keyframes bloomIn {
+  from { transform: scale(0.4) rotate(-15deg); opacity: 0; }
+  to   { transform: scale(1)   rotate(0deg);   opacity: 1; }
+}
+.complete-headline {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--brand-bold);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+.complete-sub {
+  font-size: 17px;
+  color: var(--text-sec);
+  line-height: 1.65;
+  margin-bottom: 36px;
+  max-width: 300px;
+}
+
+.unlocks-card {
+  width: 100%;
+  background: var(--white);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.unlock-row {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 14px 18px;
+  animation: slideFromLeft 0.4s ease both;
+}
+.unlock-row:nth-child(1) { animation-delay: 0.4s; }
+.unlock-row:nth-child(2) { animation-delay: 0.58s; }
+.unlock-row:nth-child(3) { animation-delay: 0.76s; }
+.unlock-row + .unlock-row { border-top: 1px solid var(--surface-1); }
+@keyframes slideFromLeft {
+  from { opacity: 0; transform: translateX(-14px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.unlock-icon {
+  font-size: 22px;
+  width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.unlock-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-pri);
+  line-height: 1.4;
+  text-align: left;
+}
+
+.complete-footer {
+  padding: 0 28px 28px;
+  flex-shrink: 0;
+}
+
+/* ─── PAGE CAPTION ─── */
+.page-caption {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255,255,255,0.18);
+  max-width: 400px;
+  line-height: 1.7;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ─── PAGE HEADER ─── -->
+<div class="page-header">
+  <div class="page-logo">🌱 Sprout</div>
+  <div class="page-sub">Onboarding Exploration · v1</div>
+</div>
+
+<div class="version-pill">Fresh Direction — Typography-first · Immersive</div>
+
+<!-- ╔══════════════════════════════════╗
+     ║           PHONE FRAME            ║
+     ╚══════════════════════════════════╝ -->
+<div class="phone">
+  <div class="dynamic-island"></div>
+  <div class="home-bar"></div>
+
+  <div class="screen-stack">
+
+    <!-- ══════════════════════════════
+         SCREEN 1 — WELCOME
+    ══════════════════════════════ -->
+    <div class="screen active" id="s1">
+
+      <!-- Hero zone -->
+      <div class="welcome-hero">
+        <div class="hero-shape-1"></div>
+        <div class="hero-shape-2"></div>
+        <div class="hero-shape-3"></div>
+        <div class="hero-shape-4"></div>
+        <div class="hero-shape-5"></div>
+        <div class="hero-dots"></div>
+
+        <div class="hero-mark">
+          <div class="hero-mark-icon">🌱</div>
+          <div class="hero-mark-name">Sprout</div>
+        </div>
+
+        <!-- Illustrated family scene -->
+        <div class="hero-scene">
+          <svg viewBox="0 0 393 230" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
+            <!-- Sky glow -->
+            <ellipse cx="196" cy="230" rx="240" ry="50" fill="rgba(30,62,43,0.5)"/>
+            <!-- Trees left -->
+            <ellipse cx="72" cy="112" rx="34" ry="44" fill="rgba(56,127,86,0.32)"/>
+            <rect x="68" y="152" width="8" height="44" rx="4" fill="rgba(30,62,43,0.35)"/>
+            <ellipse cx="58" cy="128" rx="20" ry="28" fill="rgba(87,154,116,0.22)"/>
+            <!-- Trees right -->
+            <ellipse cx="326" cy="118" rx="30" ry="40" fill="rgba(56,127,86,0.28)"/>
+            <rect x="322" y="154" width="8" height="42" rx="4" fill="rgba(30,62,43,0.3)"/>
+            <ellipse cx="340" cy="132" rx="18" ry="25" fill="rgba(87,154,116,0.18)"/>
+            <!-- Ground -->
+            <ellipse cx="196" cy="220" rx="200" ry="24" fill="rgba(24,99,56,0.3)"/>
+            <!-- Parent 1 (left) -->
+            <circle cx="148" cy="120" r="19" fill="rgba(255,255,255,0.2)"/>
+            <path d="M134 142 Q148 138 162 142 L166 192 H130 Z" fill="rgba(255,255,255,0.14)" rx="4"/>
+            <!-- Parent 2 (right) -->
+            <circle cx="248" cy="120" r="19" fill="rgba(255,255,255,0.2)"/>
+            <path d="M234 142 Q248 138 262 142 L266 192 H230 Z" fill="rgba(255,255,255,0.14)"/>
+            <!-- Kid 1 (centre-left) -->
+            <circle cx="180" cy="132" r="13" fill="rgba(119,182,145,0.5)"/>
+            <path d="M170 148 Q180 145 190 148 L193 188 H167 Z" fill="rgba(119,182,145,0.35)"/>
+            <!-- Kid 2 (centre-right) -->
+            <circle cx="216" cy="134" r="11" fill="rgba(87,154,116,0.5)"/>
+            <path d="M207 148 Q216 145 225 148 L228 188 H204 Z" fill="rgba(87,154,116,0.35)"/>
+            <!-- Flowers / ground details -->
+            <circle cx="196" cy="213" r="3.5" fill="rgba(119,182,145,0.7)"/>
+            <circle cx="172" cy="216" r="2.5" fill="rgba(87,154,116,0.6)"/>
+            <circle cx="220" cy="215" r="2.5" fill="rgba(119,182,145,0.6)"/>
+            <circle cx="140" cy="200" r="2" fill="rgba(56,127,86,0.5)"/>
+            <circle cx="260" cy="200" r="2" fill="rgba(56,127,86,0.5)"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Welcome copy -->
+      <div class="welcome-copy">
+        <div class="welcome-eyebrow">For parents, by parents</div>
+        <div class="welcome-headline">Where your village begins.</div>
+        <div class="welcome-body">Connect with parents nearby. Find your people. Build a community where childhoods can flourish.</div>
+      </div>
+
+      <div class="welcome-footer">
+        <button class="btn-primary" onclick="goTo(2)">
+          Get started — it's free
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <div class="signin-hint">Already a member? <button onclick="goTo(2)">Sign in</button></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         SCREEN 2 — YOUR ROLE
+    ══════════════════════════════ -->
+    <div class="screen" id="s2">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1.5"/><rect x="4.5" y="2" width="3" height="10" rx="1.5"/><rect x="9" y="0" width="3" height="12" rx="1.5"/><rect x="13.5" y="0" width="3" height="12" rx="1.5" opacity="0.25"/></svg>
+          <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="9" rx="2" fill="currentColor"/><path d="M23.5 4.5v4a2 2 0 0 0 0-4z" fill="currentColor" fill-opacity="0.4"/></svg>
+        </div>
+      </div>
+
+      <div class="progress-nav">
+        <button class="back-btn hidden">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="step-dots">
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+          <div class="step-dot"></div>
+          <div class="step-dot"></div>
+          <div class="step-dot"></div>
+        </div>
+        <span class="step-count">1 of 5</span>
+      </div>
+
+      <div class="screen-body">
+        <div class="eyebrow">Your role</div>
+        <div class="screen-headline">Who are you in this family?</div>
+        <div class="screen-sub">This helps us personalise your experience right from the start.</div>
+
+        <div class="role-cards">
+          <div class="role-card" onclick="selectRole(this)">
+            <div class="role-icon">👩</div>
+            <div class="role-text">
+              <div class="role-name">Mom</div>
+              <div class="role-desc">The heart of the home — and the village.</div>
+            </div>
+            <div class="role-radio">
+              <svg width="12" height="9" viewBox="0 0 12 9" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="check-svg" style="opacity:0"><polyline points="1 4.5 4.5 8 11 1"/></svg>
+            </div>
+          </div>
+          <div class="role-card" onclick="selectRole(this)">
+            <div class="role-icon">👨</div>
+            <div class="role-text">
+              <div class="role-name">Dad</div>
+              <div class="role-desc">Every family thrives with a great dad.</div>
+            </div>
+            <div class="role-radio">
+              <svg width="12" height="9" viewBox="0 0 12 9" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="check-svg" style="opacity:0"><polyline points="1 4.5 4.5 8 11 1"/></svg>
+            </div>
+          </div>
+          <div class="role-card" onclick="selectRole(this)">
+            <div class="role-icon">🤝</div>
+            <div class="role-text">
+              <div class="role-name">Guardian</div>
+              <div class="role-desc">It takes a village — and you're part of it.</div>
+            </div>
+            <div class="role-radio">
+              <svg width="12" height="9" viewBox="0 0 12 9" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="check-svg" style="opacity:0"><polyline points="1 4.5 4.5 8 11 1"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-footer">
+        <button class="btn-primary" id="roleNextBtn" disabled onclick="goTo(3)">
+          Continue
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         SCREEN 3 — ABOUT YOU
+    ══════════════════════════════ -->
+    <div class="screen" id="s3">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1.5"/><rect x="4.5" y="2" width="3" height="10" rx="1.5"/><rect x="9" y="0" width="3" height="12" rx="1.5"/></svg>
+          <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="20" height="9" rx="2" fill="currentColor"/><path d="M23.5 4.5v4a2 2 0 0 0 0-4z" fill="currentColor" fill-opacity="0.4"/></svg>
+        </div>
+      </div>
+
+      <div class="progress-nav">
+        <button class="back-btn" onclick="goTo(2)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="step-dots">
+          <div class="step-dot done"></div>
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+          <div class="step-dot"></div>
+          <div class="step-dot"></div>
+        </div>
+        <span class="step-count">2 of 5</span>
+      </div>
+
+      <div class="screen-body">
+        <div class="eyebrow">About you</div>
+        <div class="screen-headline">Nice to meet you.</div>
+        <div class="screen-sub">Help others in your village find and recognise you.</div>
+
+        <div class="photo-row" onclick="void(0)">
+          <div class="photo-circle">📷</div>
+          <div class="photo-copy">
+            <div class="photo-copy-main">Add a profile photo</div>
+            <div class="photo-copy-hint">Tap to choose from your library</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label class="form-label">First name</label>
+            <input class="form-input" type="text" placeholder="Sarah" id="firstNameInput" autocomplete="given-name"/>
+          </div>
+          <div>
+            <label class="form-label">Last name</label>
+            <input class="form-input" type="text" placeholder="Chen" autocomplete="family-name"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Your neighbourhood</label>
+          <input class="form-input" type="text" placeholder="e.g. Bondi Beach, NSW" autocomplete="postal-address"/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">About you <span class="opt">— optional</span></label>
+          <textarea class="form-input" rows="3" placeholder="What brings you to Sprout? Anything you'd like other parents to know…"></textarea>
+        </div>
+      </div>
+
+      <div class="btn-footer">
+        <button class="btn-primary" onclick="goTo(4)">
+          Continue
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         SCREEN 4 — YOUR KIDS
+    ══════════════════════════════ -->
+    <div class="screen" id="s4">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1.5"/><rect x="4.5" y="2" width="3" height="10" rx="1.5"/><rect x="9" y="0" width="3" height="12" rx="1.5"/></svg>
+          <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="18" height="9" rx="2" fill="currentColor"/><path d="M23.5 4.5v4a2 2 0 0 0 0-4z" fill="currentColor" fill-opacity="0.4"/></svg>
+        </div>
+      </div>
+
+      <div class="progress-nav">
+        <button class="back-btn" onclick="goTo(3)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="step-dots">
+          <div class="step-dot done"></div>
+          <div class="step-dot done"></div>
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+          <div class="step-dot"></div>
+        </div>
+        <span class="step-count">3 of 5</span>
+      </div>
+
+      <div class="screen-body">
+        <div class="eyebrow">Your little ones</div>
+        <div class="screen-headline">Tell us about your kids.</div>
+        <div class="screen-sub">We'll match you with nearby families and activities suited to your children.</div>
+
+        <!-- Kids added here -->
+        <div class="kids-list" id="kidsList"></div>
+
+        <!-- Inline add form -->
+        <div class="kid-form" id="kidForm">
+          <div class="kid-form-title">Add a child</div>
+          <input class="kid-form-input" id="kidName" type="text" placeholder="Child's name" autocomplete="off"/>
+          <div class="kid-form-row">
+            <select class="kid-form-input" id="kidAge">
+              <option value="">Age</option>
+              <option>Under 1</option>
+              <option>1 year</option>
+              <option>2 years</option>
+              <option>3 years</option>
+              <option>4 years</option>
+              <option>5 years</option>
+              <option>6 years</option>
+              <option>7 years</option>
+              <option>8 years</option>
+              <option>9 years</option>
+              <option>10 years</option>
+              <option>11 years</option>
+              <option>12+ years</option>
+            </select>
+            <select class="kid-form-input" id="kidGender">
+              <option value="">Gender</option>
+              <option>Girl</option>
+              <option>Boy</option>
+              <option>Non-binary</option>
+              <option>Prefer not to say</option>
+            </select>
+          </div>
+          <div class="kid-form-actions">
+            <button class="kid-form-save" onclick="saveKid()">Add child</button>
+            <button class="kid-form-cancel" onclick="closeKidForm()">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Add trigger -->
+        <button class="add-kid-trigger" id="addKidTrigger" onclick="openKidForm()">
+          <div class="add-kid-plus">+</div>
+          <div class="add-kid-copy">
+            <div class="add-kid-label">Add a child</div>
+            <div class="add-kid-hint">Name, age, and a little more</div>
+          </div>
+        </button>
+      </div>
+
+      <div class="btn-footer">
+        <button class="btn-primary" onclick="goTo(5)">
+          Continue
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <button class="btn-ghost" onclick="goTo(5)">Skip for now</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         SCREEN 5 — COMMUNITY
+    ══════════════════════════════ -->
+    <div class="screen" id="s5">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1.5"/><rect x="4.5" y="2" width="3" height="10" rx="1.5"/><rect x="9" y="0" width="3" height="12" rx="1.5"/></svg>
+          <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="22" height="9" rx="2" fill="currentColor"/></svg>
+        </div>
+      </div>
+
+      <div class="progress-nav">
+        <button class="back-btn" onclick="goTo(4)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="step-dots">
+          <div class="step-dot done"></div>
+          <div class="step-dot done"></div>
+          <div class="step-dot done"></div>
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+        </div>
+        <span class="step-count">4 of 5</span>
+      </div>
+
+      <div class="screen-body">
+        <div class="eyebrow">Your community</div>
+        <div class="screen-headline">Where does your village live?</div>
+        <div class="screen-sub">Connect with parents at your kids' school and in your neighbourhood.</div>
+
+        <div class="search-wrap">
+          <div class="search-icon-pos">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <input class="search-field" type="text" placeholder="Search schools or suburbs…"/>
+        </div>
+
+        <div class="section-label">Schools nearby</div>
+        <div class="school-list">
+          <div class="school-item" onclick="selectSchool(this)">
+            <div class="school-icon">🏫</div>
+            <div class="school-info">
+              <div class="school-name">Bondi Public School</div>
+              <div class="school-dist">0.4 km · 24 Sprout parents</div>
+            </div>
+            <div class="school-radio">
+              <svg width="10" height="8" viewBox="0 0 12 9" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="sch-check" style="opacity:0"><polyline points="1 4.5 4.5 8 11 1"/></svg>
+            </div>
+          </div>
+          <div class="school-item" onclick="selectSchool(this)">
+            <div class="school-icon">🏫</div>
+            <div class="school-info">
+              <div class="school-name">Rose Bay Public School</div>
+              <div class="school-dist">1.2 km · 18 Sprout parents</div>
+            </div>
+            <div class="school-radio">
+              <svg width="10" height="8" viewBox="0 0 12 9" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="sch-check" style="opacity:0"><polyline points="1 4.5 4.5 8 11 1"/></svg>
+            </div>
+          </div>
+          <div class="school-item" onclick="selectSchool(this)">
+            <div class="school-icon">🏫</div>
+            <div class="school-info">
+              <div class="school-name">Waverley College</div>
+              <div class="school-dist">1.8 km · 31 Sprout parents</div>
+            </div>
+            <div class="school-radio">
+              <svg width="10" height="8" viewBox="0 0 12 9" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="sch-check" style="opacity:0"><polyline points="1 4.5 4.5 8 11 1"/></svg>
+            </div>
+          </div>
+          <div class="school-item" onclick="selectSchool(this)">
+            <div class="school-icon">🏫</div>
+            <div class="school-info">
+              <div class="school-name">St Catherine's School</div>
+              <div class="school-dist">2.1 km · 12 Sprout parents</div>
+            </div>
+            <div class="school-radio">
+              <svg width="10" height="8" viewBox="0 0 12 9" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="sch-check" style="opacity:0"><polyline points="1 4.5 4.5 8 11 1"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-footer">
+        <button class="btn-primary" onclick="goTo(6)">
+          Continue
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <button class="btn-ghost" onclick="goTo(6)">Skip for now</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         SCREEN 6 — ALL SET
+    ══════════════════════════════ -->
+    <div class="screen" id="s6">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1.5"/><rect x="4.5" y="2" width="3" height="10" rx="1.5"/><rect x="9" y="0" width="3" height="12" rx="1.5"/></svg>
+          <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="22" height="9" rx="2" fill="currentColor"/></svg>
+        </div>
+      </div>
+
+      <div class="progress-nav">
+        <button class="back-btn hidden"></button>
+        <div class="step-dots">
+          <div class="step-dot done"></div>
+          <div class="step-dot done"></div>
+          <div class="step-dot done"></div>
+          <div class="step-dot done"></div>
+          <div class="step-dot active"></div>
+        </div>
+        <span class="step-count">5 of 5</span>
+      </div>
+
+      <div class="complete-body">
+        <div class="complete-bloom">🌱</div>
+        <div class="complete-headline">You're in,<br><span id="completeName">friend</span>.</div>
+        <div class="complete-sub">Welcome to Sprout. Your village is waiting — and we think you're going to love the people you meet here.</div>
+
+        <div class="unlocks-card">
+          <div class="unlock-row">
+            <div class="unlock-icon">🏘️</div>
+            <div class="unlock-text">Parents in your neighbourhood ready to connect</div>
+          </div>
+          <div class="unlock-row">
+            <div class="unlock-icon">🎉</div>
+            <div class="unlock-text">Playdate events and activities for your family</div>
+          </div>
+          <div class="unlock-row">
+            <div class="unlock-icon">🤝</div>
+            <div class="unlock-text">Groups matched to your kids' ages and interests</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="complete-footer">
+        <button class="btn-primary" onclick="alert('Welcome to Sprout! 🌱')">
+          Explore Sprout
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /screen-stack -->
+</div><!-- /phone -->
+
+<div class="page-caption">
+  Onboarding Exploration v1 · 393 × 852px · Sprout Design System tokens<br>
+  Display type: 40–52px Playfair Display · Body: 17–18px Inter · Fully interactive prototype
+</div>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT — SCREEN LOGIC
+══════════════════════════════════════ -->
+<script>
+let currentScreen = 1;
+
+/* ─── Navigation ─── */
+function goTo(n) {
+  const fromEl = document.getElementById('s' + currentScreen);
+  const toEl   = document.getElementById('s' + n);
+  if (!toEl || n === currentScreen) return;
+
+  if (n > currentScreen) {
+    /* Forward: from slides up-out, to slides up-in */
+    fromEl.classList.remove('active');
+    fromEl.classList.add('past');
+
+    toEl.style.transform = 'translateY(100%)';
+    toEl.style.opacity   = '0';
+    toEl.classList.add('active');
+    void toEl.offsetHeight; /* reflow */
+    toEl.style.transform = '';
+    toEl.style.opacity   = '';
+  } else {
+    /* Back: from slides down-out, to reveals from top */
+    fromEl.style.transform = 'translateY(100%)';
+    fromEl.style.opacity   = '0';
+    setTimeout(() => {
+      fromEl.classList.remove('active');
+      fromEl.style.transform = '';
+      fromEl.style.opacity   = '';
+    }, 440);
+
+    toEl.classList.remove('past');
+    toEl.style.transform = 'translateY(-4%)';
+    toEl.style.opacity   = '0';
+    toEl.classList.add('active');
+    void toEl.offsetHeight;
+    toEl.style.transform = '';
+    toEl.style.opacity   = '';
+  }
+
+  currentScreen = n;
+
+  /* Populate complete screen with name */
+  if (n === 6) {
+    const firstName = document.getElementById('firstNameInput').value.trim();
+    document.getElementById('completeName').textContent = firstName || 'friend';
+  }
+}
+
+/* ─── Role selection ─── */
+function selectRole(card) {
+  document.querySelectorAll('.role-card').forEach(c => {
+    c.classList.remove('selected');
+    c.querySelector('.check-svg').style.opacity = '0';
+  });
+  card.classList.add('selected');
+  card.querySelector('.check-svg').style.opacity = '1';
+  document.getElementById('roleNextBtn').disabled = false;
+}
+
+/* ─── School selection ─── */
+function selectSchool(item) {
+  document.querySelectorAll('.school-item').forEach(s => {
+    s.classList.remove('selected');
+    s.querySelector('.sch-check').style.opacity = '0';
+  });
+  item.classList.add('selected');
+  item.querySelector('.sch-check').style.opacity = '1';
+}
+
+/* ─── Kids ─── */
+let kids = [];
+
+function openKidForm() {
+  document.getElementById('kidForm').classList.add('open');
+  document.getElementById('addKidTrigger').style.display = 'none';
+  setTimeout(() => document.getElementById('kidName').focus(), 50);
+}
+
+function closeKidForm() {
+  document.getElementById('kidForm').classList.remove('open');
+  document.getElementById('addKidTrigger').style.display = 'flex';
+  document.getElementById('kidName').value  = '';
+  document.getElementById('kidAge').value   = '';
+  document.getElementById('kidGender').value = '';
+}
+
+function saveKid() {
+  const name   = document.getElementById('kidName').value.trim();
+  const age    = document.getElementById('kidAge').value;
+  const gender = document.getElementById('kidGender').value;
+  if (!name) {
+    document.getElementById('kidName').style.borderColor = '#d64545';
+    document.getElementById('kidName').focus();
+    setTimeout(() => document.getElementById('kidName').style.borderColor = '', 1600);
+    return;
+  }
+  kids.push({ name, age, gender });
+  renderKids();
+  closeKidForm();
+}
+
+function removeKid(i) {
+  kids.splice(i, 1);
+  renderKids();
+}
+
+function renderKids() {
+  const list = document.getElementById('kidsList');
+  list.innerHTML = kids.map((k, i) => `
+    <div class="kid-card">
+      <div class="kid-avatar">${k.name.charAt(0).toUpperCase()}</div>
+      <div class="kid-info">
+        <div class="kid-name">${escHtml(k.name)}</div>
+        <div class="kid-meta">${k.age ? escHtml(k.age) : 'Age not set'}${k.gender ? ' · ' + escHtml(k.gender) : ''}</div>
+      </div>
+      <button class="kid-remove" onclick="removeKid(${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function escHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+
+</body>
+</html>

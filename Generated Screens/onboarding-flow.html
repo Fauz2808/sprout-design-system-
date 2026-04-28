@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Onboarding Flow 4.1–4.20 v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --br: #186338; --br6: #134f2d; --br7: #1e3e2b;
+  --br0: #e2e9e3; --br1: #d0dacf; --br2: #77b691;
+  --s5: #f4f1ea; --s6: #eae6db; --s7: #dbd5c8;
+  --g1: #e6e7ea; --g2: #cdcfd6; --g3: #b3b8c1;
+  --g4: #9aa0ad; --g5: #818898; --g6: #676d7a; --g7: #4d525b;
+  --rf: 9999px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #1a1b1e; font-family: 'Inter', sans-serif; padding: 40px 48px 80px; }
+
+h1 { font-family: 'Playfair Display', serif; color: #dbd5c8; font-size: 22px; font-weight: 400; margin-bottom: 6px; }
+.pg-sub { color: #676d7a; font-size: 13px; margin-bottom: 36px; }
+
+.sec-lbl {
+  color: #676d7a; font-size: 11px; font-weight: 600; letter-spacing: 1px;
+  text-transform: uppercase; margin-bottom: 20px; margin-top: 52px;
+  display: flex; align-items: center; gap: 12px;
+}
+.sec-lbl::after { content: ''; flex: 1; height: 1px; background: #2a2c32; }
+.sec-lbl:first-of-type { margin-top: 0; }
+
+.phones-row { display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 6px; }
+.pw { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.slbl { color: #676d7a; font-size: 10px; font-weight: 500; text-align: center; max-width: 200px; line-height: 1.5; }
+
+/* ── Phone shell ── */
+.phone {
+  width: 300px; height: 650px; background: var(--s5); border-radius: 44px;
+  border: 2px solid #2a2c32; overflow: hidden; position: relative;
+  flex-shrink: 0; display: flex; flex-direction: column;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+}
+.phone.hi { border-color: var(--br); box-shadow: 0 0 0 2.5px var(--br), 0 24px 48px rgba(0,0,0,0.5); }
+.di { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 92px; height: 27px; background: #000; border-radius: var(--rf); z-index: 30; }
+
+/* Status bar */
+.sb { height: 48px; flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 22px 8px; position: relative; z-index: 10; }
+.sb-t { font-size: 11px; font-weight: 600; color: var(--g7); }
+.sb-i { display: flex; gap: 5px; align-items: center; }
+
+/* Nav row */
+.nav { height: 48px; flex-shrink: 0; display: flex; align-items: center; padding: 0 16px; gap: 12px; }
+.back { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.prog { display: flex; gap: 14px; flex: 1; }
+.ps { flex: 1; height: 2px; border-radius: 100px; background: rgba(24,99,56,0.18); }
+.ps.on { background: var(--br); }
+.nav-r { width: 30px; flex-shrink: 0; }
+.nav-skip { font-size: 12px; color: var(--g5); font-weight: 500; }
+
+/* Content */
+.ct { flex: 1; display: flex; flex-direction: column; padding: 4px 18px 16px; position: relative; overflow: hidden; }
+
+/* Background warm overlay for details screens */
+.bg-warm {
+  position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(160deg, rgba(244,241,234,0.92) 0%, rgba(234,228,215,0.88) 100%);
+}
+.bg-photo {
+  position: absolute; inset: 0; z-index: -1;
+  background: radial-gradient(ellipse at 70% 25%, rgba(195,168,135,0.45) 0%, rgba(244,241,234,0) 65%);
+}
+
+/* Sprig accent */
+.sprig { position: absolute; opacity: 0.12; pointer-events: none; z-index: 0; }
+
+/* Headline block */
+.hl { position: relative; z-index: 1; margin-bottom: 18px; }
+.hl h2 { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 500; line-height: 1.3; color: var(--br7); margin-bottom: 5px; }
+.hl p { font-size: 12px; color: var(--g5); line-height: 1.5; }
+.hl h2 em { font-style: italic; }
+
+/* Form inputs */
+.inp-row { display: flex; gap: 10px; margin-bottom: 11px; position: relative; z-index: 1; }
+.inp { flex: 1; background: var(--s6); border: 1px solid var(--g1); border-radius: 10px; padding: 8px 10px; }
+.inp.f { border-color: var(--br2); box-shadow: 0 0 0 3px rgba(24,99,56,0.12); }
+.inp-lbl { font-size: 10px; color: var(--br7); font-weight: 500; margin-bottom: 2px; }
+.inp-val { font-family: 'Playfair Display', serif; font-size: 13px; color: var(--br7); font-weight: 500; }
+.inp-ph { font-family: 'Playfair Display', serif; font-size: 13px; color: var(--g4); font-weight: 500; }
+.cursor { display: inline-block; width: 1.5px; height: 13px; background: var(--br); vertical-align: middle; margin-left: 1px; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* Parent selector */
+.p-lbl { font-size: 11px; color: var(--g7); margin-bottom: 7px; position: relative; z-index: 1; }
+.p-sel { display: flex; gap: 10px; margin-bottom: 11px; position: relative; z-index: 1; }
+.p-btn { flex: 1; display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--g1); background: var(--s6); cursor: pointer; }
+.p-btn.sel { border-color: var(--br); background: rgba(24,99,56,0.05); }
+.p-chk { width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid var(--br1); background: var(--s5); flex-shrink: 0; }
+.p-btn.sel .p-chk { background: var(--br); border-color: var(--br); }
+.p-txt { font-size: 13px; font-weight: 500; color: var(--g6); }
+
+/* Keyboard */
+.kbd {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 218px;
+  background: #dfe1e7; z-index: 20;
+  display: grid; grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(4,1fr) 26px;
+}
+.k { display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 0.5px solid rgba(0,0,0,0.09); border-bottom: 0.5px solid rgba(0,0,0,0.09); background: white; cursor: pointer; gap: 1px; font-size: 20px; font-weight: 300; color: #0d0d12; }
+.k .s { font-size: 7px; font-weight: 700; letter-spacing: 1.5px; }
+.k.dk { background: #acb4bb; }
+.kb-hi { grid-column: 1/-1; background: #dfe1e7; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; }
+.hp { width: 110px; height: 4px; background: rgba(0,0,0,0.25); border-radius: 100px; }
+
+/* CTA area */
+.cta-area { background: var(--s5); box-shadow: -2px 0 25px rgba(0,0,0,0.03); padding: 10px 18px 0; flex-shrink: 0; position: relative; z-index: 10; }
+.cta-area.over-kbd { position: absolute; left: 0; right: 0; bottom: 218px; z-index: 25; }
+.btn { width: 100%; height: 46px; background: var(--br); color: white; border: none; border-radius: var(--rf); font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn.dis { background: var(--br2); }
+.btn.sec { background: transparent; border: 1.5px solid var(--br1); color: var(--br); font-size: 13px; height: 40px; }
+.hi-bar { height: 30px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 7px; }
+.hi-pill { width: 110px; height: 4px; background: rgba(13,13,18,0.15); border-radius: 100px; }
+
+/* Spacer */
+.sp { flex: 1; }
+
+/* Empty state */
+.es { display: flex; flex-direction: column; align-items: center; gap: 9px; text-align: center; position: relative; z-index: 1; margin-bottom: 14px; }
+.es-av { width: 56px; height: 56px; background: linear-gradient(150deg, var(--br2) 0%, var(--br0) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 1px 4px 20px rgba(13,13,18,0.1); }
+.es-t { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--br7); font-weight: 500; }
+.es-d { font-size: 11px; color: var(--g5); line-height: 1.5; max-width: 200px; }
+
+/* Action card */
+.ac { display: flex; align-items: center; justify-content: space-between; background: var(--br); border-radius: 14px; padding: 11px 14px; margin-bottom: 10px; cursor: pointer; position: relative; z-index: 1; box-shadow: 1px 4px 20px rgba(13,13,18,0.12); }
+.ac.lt { background: var(--br0); border: 1px solid var(--br1); }
+.ac.dis-lt { background: var(--br0); border: 1px solid var(--g2); opacity: 0.65; }
+.ac-l { display: flex; align-items: center; gap: 10px; }
+.ac-ico { width: 36px; height: 36px; background: rgba(255,255,255,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.ac.lt .ac-ico, .ac.dis-lt .ac-ico { background: var(--br1); }
+.ac-t { font-family: 'Playfair Display', serif; font-size: 12px; color: white; font-weight: 500; }
+.ac-s { font-size: 10px; color: rgba(255,255,255,0.62); margin-top: 1px; }
+.ac.lt .ac-t, .ac.dis-lt .ac-t { color: var(--br7); }
+.ac.lt .ac-s, .ac.dis-lt .ac-s { color: var(--g5); }
+
+/* Info banner */
+.ib { display: flex; gap: 7px; align-items: flex-start; background: var(--br0); border-radius: 10px; padding: 9px 11px; position: relative; z-index: 1; border: 1px solid var(--br1); margin-bottom: 10px; }
+.ib span { font-size: 10px; color: var(--br); line-height: 1.5; }
+
+/* Tip card */
+.tip { display: flex; gap: 8px; align-items: flex-start; background: rgba(24,99,56,0.06); border-radius: 10px; padding: 10px 12px; position: relative; z-index: 1; border: 1px solid rgba(24,99,56,0.13); margin-top: 4px; }
+.tip span { font-size: 10px; color: var(--br6); line-height: 1.5; }
+
+/* Kid card */
+.kc { display: flex; align-items: center; background: white; border-radius: 12px; padding: 9px 12px; margin-bottom: 8px; border: 1px solid var(--g1); box-shadow: 1px 3px 16px rgba(13,13,18,0.04); position: relative; z-index: 1; }
+.kc-av { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(150deg, var(--br2) 0%, var(--br0) 100%); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.kc-info { flex: 1; margin-left: 10px; }
+.kc-nr { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+.kc-n { font-family: 'Playfair Display', serif; font-size: 12px; color: var(--br7); font-weight: 500; }
+.kc-age { background: var(--br0); border: 1px solid var(--br1); border-radius: 6px; padding: 1px 6px; font-size: 10px; color: var(--br7); }
+.kc-d { font-size: 10px; color: var(--g4); }
+.kc-del { width: 26px; height: 26px; background: #fdf0f0; border-radius: 7px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+
+/* ── Bottom sheet ── */
+.overlay { position: absolute; inset: 0; background: rgba(28,29,32,0.55); z-index: 40; }
+.sheet { position: absolute; bottom: 0; left: 0; right: 0; background: var(--s5); z-index: 50; border-radius: 14px 14px 0 0; padding: 14px 16px 0; display: flex; flex-direction: column; }
+.sh-handle { width: 36px; height: 4px; background: var(--g2); border-radius: 100px; margin: 0 auto 12px; }
+.sh-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 500; color: var(--br7); text-align: center; margin-bottom: 12px; }
+.sh-step { font-size: 10px; color: var(--g5); text-align: center; margin-top: -8px; margin-bottom: 12px; letter-spacing: 0.5px; }
+
+/* Avatar picker in sheet */
+.av-pick { display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 14px; }
+.av-circle { width: 52px; height: 52px; border-radius: 50%; background: var(--s6); display: flex; align-items: center; justify-content: center; font-size: 28px; position: relative; cursor: pointer; }
+.av-cam { position: absolute; bottom: -4px; right: -4px; width: 18px; height: 18px; border-radius: 50%; background: var(--br); display: flex; align-items: center; justify-content: center; border: 2px solid var(--s5); }
+.av-nm { font-family: 'Playfair Display', serif; font-size: 13px; color: var(--g5); }
+.av-gdr { font-size: 11px; color: var(--g4); }
+
+/* Gender selector */
+.g-lbl { font-size: 11px; color: var(--br7); font-weight: 500; margin-bottom: 7px; }
+.g-row { display: flex; gap: 9px; margin-bottom: 12px; }
+.g-opt { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 9px 6px; border-radius: 10px; border: 1.5px solid var(--g1); background: var(--s6); cursor: pointer; }
+.g-opt.on { border-color: var(--br); }
+.g-em { font-size: 20px; }
+.g-tx { font-family: 'Playfair Display', serif; font-size: 11px; color: var(--br7); }
+
+/* Sheet buttons */
+.sh-btns { display: flex; gap: 10px; padding: 10px 0 12px; }
+.sh-cancel { flex: 1; height: 42px; background: var(--br0); border: 1px solid var(--br1); border-radius: var(--rf); font-family: 'Playfair Display', serif; font-size: 13px; color: var(--br7); cursor: pointer; font-weight: 500; }
+.sh-add { flex: 1; height: 42px; background: var(--br); border: none; border-radius: var(--rf); font-family: 'Playfair Display', serif; font-size: 13px; color: white; cursor: pointer; font-weight: 500; }
+.sh-add.dis { background: var(--br2); }
+
+/* Gallery grid */
+.gal-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: var(--s5); z-index: 50; border-radius: 14px 14px 0 0; padding: 14px 0 0; }
+.gal-hdr { padding: 0 16px 12px; }
+.gal-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; }
+.gi { aspect-ratio: 1; cursor: pointer; position: relative; }
+.gi svg { width: 100%; height: 100%; display: block; }
+.gi.on::after { content: ''; position: absolute; inset: 3px; border: 2.5px solid var(--br); border-radius: 4px; }
+.gal-foot { padding: 12px 16px 0; }
+
+/* School rows */
+.sc-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--g1); background: var(--s5); margin-bottom: 8px; cursor: pointer; position: relative; z-index: 1; }
+.sc-row.exp { border-color: var(--br1); border-bottom-left-radius: 0; border-bottom-right-radius: 0; margin-bottom: 0; background: rgba(24,99,56,0.04); }
+.sc-av { width: 34px; height: 34px; border-radius: 50%; background: #e9dcd7; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; margin-right: 10px; }
+.sc-info { flex: 1; }
+.sc-n { font-family: 'Playfair Display', serif; font-size: 12px; color: var(--br7); font-weight: 500; }
+.sc-d { font-size: 10px; color: var(--g5); margin-top: 1px; }
+
+/* Grade panel */
+.gr-panel { border: 1px solid var(--br1); border-top: none; border-radius: 0 0 10px 10px; padding: 6px 12px 6px; margin-bottom: 8px; background: rgba(24,99,56,0.03); position: relative; z-index: 1; }
+.gr-row { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid rgba(0,0,0,0.04); cursor: pointer; }
+.gr-row:last-child { border-bottom: none; }
+.gr-chk { width: 15px; height: 15px; border-radius: 4px; border: 1.5px solid var(--g2); background: white; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.gr-chk.on { background: var(--br); border-color: var(--br); }
+.gr-lbl { font-size: 11px; color: var(--br7); }
+
+/* Zip badge */
+.zip-b { display: inline-flex; align-items: center; gap: 5px; background: var(--br0); border: 1px solid var(--br1); border-radius: var(--rf); padding: 3px 10px; font-size: 11px; color: var(--br6); margin-bottom: 7px; position: relative; z-index: 1; }
+
+/* Mic button */
+.mic-wrap { display: flex; align-items: center; justify-content: center; margin: 18px 0 12px; position: relative; z-index: 1; }
+.mic-btn { position: relative; width: 150px; height: 150px; display: flex; align-items: center; justify-content: center; }
+.mic-r { position: absolute; border-radius: 50%; border: 1.5px solid var(--br1); animation: pulse 2.5s ease-in-out infinite; }
+.mic-r1 { width: 150px; height: 150px; opacity: 0.25; animation-delay: 0s; }
+.mic-r2 { width: 126px; height: 126px; opacity: 0.45; animation-delay: 0.5s; }
+.mic-c { width: 104px; height: 104px; border-radius: 50%; background: var(--br0); border: 1px solid var(--br1); display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; }
+@keyframes pulse { 0%,100%{transform:scale(0.96);opacity:0.25} 50%{transform:scale(1.04);opacity:0.55} }
+
+/* Dotted sphere (AI voice) */
+.dot-sphere { width: 150px; height: 150px; margin: 8px auto 10px; position: relative; z-index: 1; }
+.dot-sphere canvas { display: none; }
+
+/* AI controls */
+.ai-ctrl { display: flex; align-items: center; justify-content: center; gap: 36px; margin-bottom: 12px; position: relative; z-index: 1; }
+.ai-b { width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1.5px solid rgba(255,255,255,0.35); cursor: pointer; }
+.ai-b.dark { background: rgba(55,58,65,0.88); }
+.ai-b.red { background: rgba(223,28,65,0.88); }
+
+/* ── Annotation panel ── */
+.ann-row { display: flex; gap: 36px; margin-top: 56px; flex-wrap: wrap; }
+.ann-col { width: 340px; display: flex; flex-direction: column; gap: 12px; }
+.ann-item { display: flex; gap: 10px; }
+.ann-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--br); flex-shrink: 0; margin-top: 4px; }
+.ann-t { font-size: 12px; color: #676d7a; line-height: 1.55; }
+.ann-t strong { color: #dbd5c8; font-weight: 600; }
+
+.summ { background: #212226; border-radius: 16px; padding: 28px 32px; flex: 1; min-width: 300px; border: 1px solid #2a2c32; }
+.summ h3 { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 400; color: #dbd5c8; margin-bottom: 16px; }
+.sg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 28px; }
+.si { font-size: 11px; color: #676d7a; line-height: 1.55; padding: 7px 0; border-bottom: 1px solid #2a2c32; }
+.si strong { color: #9aa0ad; display: block; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 1px; }
+</style>
+</head>
+<body>
+
+<h1>Onboarding Flow</h1>
+<p class="pg-sub">Screens 4.1–4.20 · v2 redesign · 5 sections · 13 key states</p>
+
+<!-- ═══════════════════════════════════
+     A · PROFILE DETAILS  4.1 & 4.2
+════════════════════════════════════ -->
+<div class="sec-lbl">A · Profile Details — 4.1 & 4.2</div>
+<div class="phones-row">
+
+  <!-- 4.1 Default -->
+  <div class="pw">
+    <div class="phone hi">
+      <div class="di"></div>
+      <div class="sb">
+        <span class="sb-t">9:41</span>
+        <div class="sb-i">
+          <svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="4.5" width="3" height="6.5" rx="0.5" fill="#4d525b"/><rect x="4.5" y="3" width="3" height="8" rx="0.5" fill="#4d525b"/><rect x="9" y="1.5" width="3" height="9.5" rx="0.5" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="#4d525b"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.5C10 2.5 11.8 3.3 13.1 4.6L14.2 3.5C12.6 1.8 10.4 0.8 8 0.8C5.6 0.8 3.4 1.8 1.8 3.5L2.9 4.6C4.2 3.3 6 2.5 8 2.5Z" fill="#4d525b"/><path d="M8 5.5C9.3 5.5 10.5 6 11.3 6.9L12.4 5.8C11.3 4.7 9.7 4 8 4C6.3 4 4.7 4.7 3.6 5.8L4.7 6.9C5.5 6 6.7 5.5 8 5.5Z" fill="#4d525b"/><circle cx="8" cy="10" r="1.5" fill="#4d525b"/></svg>
+          <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#4d525b"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#4d525b"/><path d="M24 5V8C25.1 7.5 25.1 5.5 24 5Z" fill="#4d525b"/></svg>
+        </div>
+      </div>
+      <div class="nav">
+        <div class="back"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M7.5 1.5L1.5 7.5L7.5 13.5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="prog">
+          <div class="ps on"></div><div class="ps"></div><div class="ps"></div><div class="ps"></div>
+        </div>
+        <div class="nav-r"></div>
+      </div>
+      <div class="ct" style="padding-top:10px">
+        <div class="bg-photo"></div><div class="bg-warm"></div>
+        <!-- subtle sprig top-right -->
+        <svg class="sprig" style="top:-10px;right:-8px;width:90px;height:100px" viewBox="0 0 90 100" fill="none">
+          <path d="M75 90 Q55 68 35 48 Q22 36 12 18" stroke="#186338" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+          <ellipse cx="44" cy="62" rx="11" ry="6.5" transform="rotate(-38 44 62)" fill="#186338"/>
+          <ellipse cx="30" cy="46" rx="9" ry="5.5" transform="rotate(-48 30 46)" fill="#186338"/>
+          <ellipse cx="20" cy="32" rx="8" ry="5" transform="rotate(-52 20 32)" fill="#186338"/>
+          <ellipse cx="58" cy="74" rx="9" ry="5.5" transform="rotate(-28 58 74)" fill="#186338"/>
+          <ellipse cx="14" cy="20" rx="6.5" ry="4" transform="rotate(-58 14 20)" fill="#186338"/>
+        </svg>
+        <div class="hl" style="margin-top:2px;margin-bottom:14px">
+          <h2>Welcome to Sprout</h2>
+          <p>Tell us a bit about yourself.</p>
+        </div>
+        <div class="inp-row">
+          <div class="inp f">
+            <div class="inp-lbl">First Name</div>
+            <div class="inp-val"><span class="cursor"></span></div>
+          </div>
+          <div class="inp">
+            <div class="inp-lbl">Last Name</div>
+            <div class="inp-ph">​</div>
+          </div>
+        </div>
+        <div class="p-lbl">I'm a…</div>
+        <div class="p-sel">
+          <div class="p-btn"><div class="p-chk"></div><span class="p-txt">Mother</span></div>
+          <div class="p-btn"><div class="p-chk"></div><span class="p-txt">Father</span></div>
+        </div>
+        <div class="inp" style="position:relative;z-index:1">
+          <div class="inp-lbl">Zip Code</div>
+          <div class="inp-ph">​</div>
+        </div>
+      </div>
+      <!-- CTA above keyboard -->
+      <div class="cta-area over-kbd"><button class="btn dis">Continue</button></div>
+      <div class="kbd">
+        <div class="k">1</div><div class="k">2<span class="s">ABC</span></div><div class="k">3<span class="s">DEF</span></div>
+        <div class="k">4<span class="s">GHI</span></div><div class="k">5<span class="s">JKL</span></div><div class="k">6<span class="s">MNO</span></div>
+        <div class="k">7<span class="s">PQRS</span></div><div class="k">8<span class="s">TUV</span></div><div class="k">9<span class="s">WXYZ</span></div>
+        <div class="k dk"></div><div class="k">0</div><div class="k dk" style="font-size:14px">⌫</div>
+        <div class="kb-hi"><div class="hp"></div></div>
+      </div>
+    </div>
+    <div class="slbl">4.1 · Empty form · keyboard open</div>
+  </div>
+
+  <!-- 4.2 Filled -->
+  <div class="pw">
+    <div class="phone hi">
+      <div class="di"></div>
+      <div class="sb"><span class="sb-t">9:41</span><div class="sb-i"><svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="4.5" width="3" height="6.5" rx="0.5" fill="#4d525b"/><rect x="4.5" y="3" width="3" height="8" rx="0.5" fill="#4d525b"/><rect x="9" y="1.5" width="3" height="9.5" rx="0.5" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="#4d525b"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.5C10 2.5 11.8 3.3 13.1 4.6L14.2 3.5C12.6 1.8 10.4 0.8 8 0.8C5.6 0.8 3.4 1.8 1.8 3.5L2.9 4.6C4.2 3.3 6 2.5 8 2.5Z" fill="#4d525b"/><path d="M8 5.5C9.3 5.5 10.5 6 11.3 6.9L12.4 5.8C11.3 4.7 9.7 4 8 4C6.3 4 4.7 4.7 3.6 5.8L4.7 6.9C5.5 6 6.7 5.5 8 5.5Z" fill="#4d525b"/><circle cx="8" cy="10" r="1.5" fill="#4d525b"/></svg><svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#4d525b"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#4d525b"/><path d="M24 5V8C25.1 7.5 25.1 5.5 24 5Z" fill="#4d525b"/></svg></div></div>
+      <div class="nav">
+        <div class="back"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M7.5 1.5L1.5 7.5L7.5 13.5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="prog"><div class="ps on"></div><div class="ps"></div><div class="ps"></div><div class="ps"></div></div>
+        <div class="nav-r"></div>
+      </div>
+      <div class="ct" style="padding-top:10px">
+        <div class="bg-photo"></div><div class="bg-warm"></div>
+        <svg class="sprig" style="top:-10px;right:-8px;width:90px;height:100px" viewBox="0 0 90 100" fill="none"><path d="M75 90 Q55 68 35 48 Q22 36 12 18" stroke="#186338" stroke-width="1.4" stroke-linecap="round" fill="none"/><ellipse cx="44" cy="62" rx="11" ry="6.5" transform="rotate(-38 44 62)" fill="#186338"/><ellipse cx="30" cy="46" rx="9" ry="5.5" transform="rotate(-48 30 46)" fill="#186338"/><ellipse cx="20" cy="32" rx="8" ry="5" transform="rotate(-52 20 32)" fill="#186338"/><ellipse cx="58" cy="74" rx="9" ry="5.5" transform="rotate(-28 58 74)" fill="#186338"/><ellipse cx="14" cy="20" rx="6.5" ry="4" transform="rotate(-58 14 20)" fill="#186338"/></svg>
+        <div class="hl" style="margin-top:2px;margin-bottom:14px">
+          <h2>Welcome to Sprout</h2>
+          <p>Tell us a bit about yourself.</p>
+        </div>
+        <div class="inp-row">
+          <div class="inp"><div class="inp-lbl">First Name</div><div class="inp-val">Ahmad</div></div>
+          <div class="inp"><div class="inp-lbl">Last Name</div><div class="inp-val">Fauzan</div></div>
+        </div>
+        <div class="p-lbl">I'm a…</div>
+        <div class="p-sel">
+          <div class="p-btn"><div class="p-chk"></div><span class="p-txt">Mother</span></div>
+          <div class="p-btn sel"><div class="p-chk"></div><span class="p-txt">Father</span></div>
+        </div>
+        <div class="inp" style="position:relative;z-index:1"><div class="inp-lbl">Zip Code</div><div class="inp-val">2060</div></div>
+        <div class="sp"></div>
+      </div>
+      <div class="cta-area"><button class="btn">Continue →</button></div>
+      <div class="hi-bar"><div class="hi-pill"></div></div>
+    </div>
+    <div class="slbl">4.2 · All filled · Continue enabled</div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════
+     B · ADD KIDS  4.3, 4.4, 4.6, 4.12
+════════════════════════════════════ -->
+<div class="sec-lbl">B · Add Kids — 4.3, 4.4, 4.6 & 4.12</div>
+<div class="phones-row">
+
+  <!-- 4.3 Empty state -->
+  <div class="pw">
+    <div class="phone hi">
+      <div class="di"></div>
+      <div class="sb"><span class="sb-t">9:41</span><div class="sb-i"><svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="4.5" width="3" height="6.5" rx="0.5" fill="#4d525b"/><rect x="4.5" y="3" width="3" height="8" rx="0.5" fill="#4d525b"/><rect x="9" y="1.5" width="3" height="9.5" rx="0.5" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="#4d525b"/></svg><svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#4d525b"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#4d525b"/><path d="M24 5V8C25.1 7.5 25.1 5.5 24 5Z" fill="#4d525b"/></svg></div></div>
+      <div class="nav">
+        <div class="back"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M7.5 1.5L1.5 7.5L7.5 13.5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="prog"><div class="ps on"></div><div class="ps on"></div><div class="ps"></div><div class="ps"></div></div>
+        <div class="nav-r"></div>
+      </div>
+      <div class="ct" style="padding-top:12px">
+        <!-- corner sprig -->
+        <svg class="sprig" style="bottom:68px;right:-8px;width:88px;height:100px" viewBox="0 0 88 100" fill="none"><path d="M72 94 Q52 72 32 52 Q20 40 10 22" stroke="#186338" stroke-width="1.4" stroke-linecap="round" fill="none"/><ellipse cx="42" cy="64" rx="11" ry="6.5" transform="rotate(-36 42 64)" fill="#186338"/><ellipse cx="28" cy="48" rx="9" ry="5.5" transform="rotate(-46 28 48)" fill="#186338"/><ellipse cx="18" cy="34" rx="8" ry="5" transform="rotate(-52 18 34)" fill="#186338"/><ellipse cx="56" cy="76" rx="9" ry="5.5" transform="rotate(-26 56 76)" fill="#186338"/></svg>
+        <div class="hl">
+          <h2>Add your little ones 🌱</h2>
+        </div>
+        <div class="es">
+          <div class="es-av">👦</div>
+          <div class="es-t">No kids added yet</div>
+          <div class="es-d">Add your children so Sprout can find age-perfect activities and playdates nearby.</div>
+        </div>
+        <div class="ac">
+          <div class="ac-l">
+            <div class="ac-ico">👶</div>
+            <div><div class="ac-t">Add your child</div><div class="ac-s">Takes less than a minute</div></div>
+          </div>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 1.5L7 5L3 8.5" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="ib">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="7" cy="7" r="6" stroke="#186338" stroke-width="1.2"/><line x1="7" y1="6" x2="7" y2="10" stroke="#186338" stroke-width="1.2" stroke-linecap="round"/><circle cx="7" cy="4" r="0.6" fill="#186338"/></svg>
+          <span>Kids' info is private — only used to personalise your Sprout feed.</span>
+        </div>
+        <div class="sp"></div>
+      </div>
+      <div class="cta-area"><button class="btn dis">Continue</button></div>
+      <div class="hi-bar"><div class="hi-pill"></div></div>
+    </div>
+    <div class="slbl">4.3 · Empty state · no kids added</div>
+  </div>
+
+  <!-- 4.4 Modal open (empty form) -->
+  <div class="pw">
+    <div class="phone hi">
+      <div class="di"></div>
+      <div class="sb"><span class="sb-t">9:41</span><div class="sb-i"><svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="4.5" width="3" height="6.5" rx="0.5" fill="#4d525b"/><rect x="4.5" y="3" width="3" height="8" rx="0.5" fill="#4d525b"/><rect x="9" y="1.5" width="3" height="9.5" rx="0.5" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="#4d525b"/></svg><svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#4d525b"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#4d525b"/><path d="M24 5V8C25.1 7.5 25.1 5.5 24 5Z" fill="#4d525b"/></svg></div></div>
+      <div class="nav">
+        <div class="back"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M7.5 1.5L1.5 7.5L7.5 13.5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="prog"><div class="ps on"></div><div class="ps on"></div><div class="ps"></div><div class="ps"></div></div>
+        <div class="nav-r"></div>
+      </div>
+      <!-- Background screen (blurred by overlay) -->
+      <div class="ct" style="padding-top:12px">
+        <div class="hl"><h2>Add your little ones 🌱</h2></div>
+        <div class="es">
+          <div class="es-av">👦</div>
+          <div class="es-t">No kids added yet</div>
+        </div>
+      </div>
+      <!-- Overlay + sheet -->
+      <div class="overlay"></div>
+      <div class="sheet">
+        <div class="sh-handle"></div>
+        <div class="sh-title">Add a Child</div>
+        <div class="sh-step">STEP 1 OF 2</div>
+        <div class="av-pick">
+          <div class="av-circle">👦<div class="av-cam"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 2.5C2.9 2.5 2 3.4 2 4.5C2 5.6 2.9 6.5 4 6.5C5.1 6.5 6 5.6 6 4.5C6 3.4 5.1 2.5 4 2.5Z" fill="white"/><path d="M1 2.5H1.5L2 1.5H6L6.5 2.5H7C7.3 2.5 7.5 2.7 7.5 3V6.5C7.5 6.8 7.3 7 7 7H1C0.7 7 0.5 6.8 0.5 6.5V3C0.5 2.7 0.7 2.5 1 2.5Z" stroke="white" stroke-width="0.6" fill="none"/></svg></div></div>
+          <div class="av-nm">Child's Name</div>
+          <div class="av-gdr">Gender</div>
+        </div>
+        <div class="inp" style="margin-bottom:12px">
+          <div class="inp-lbl">Child's Name</div>
+          <div class="inp-ph">e.g. James, Lucas, Emma</div>
+        </div>
+        <div class="g-lbl">Gender</div>
+        <div class="g-row">
+          <div class="g-opt on"><div class="g-em">👦</div><div class="g-tx">Boy</div></div>
+          <div class="g-opt"><div class="g-em">👧</div><div class="g-tx">Girl</div></div>
+          <div class="g-opt"><div class="g-em">👀</div><div class="g-tx">Other</div></div>
+        </div>
+        <div class="inp" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0">
+          <div><div class="inp-lbl">Birth Date</div><div class="inp-ph">dd / mm / yyyy</div></div>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11" rx="2" stroke="#818898" stroke-width="1.2"/><line x1="5" y1="1" x2="5" y2="5" stroke="#818898" stroke-width="1.2" stroke-linecap="round"/><line x1="11" y1="1" x2="11" y2="5" stroke="#818898" stroke-width="1.2" stroke-linecap="round"/><line x1="1.5" y1="7" x2="14.5" y2="7" stroke="#818898" stroke-width="1.2"/></svg>
+        </div>
+        <div class="sh-btns">
+          <button class="sh-cancel">Cancel</button>
+          <button class="sh-add dis">Add Child</button>
+        </div>
+        <div class="hi-bar" style="background:var(--s5)"><div class="hi-pill"></div></div>
+      </div>
+    </div>
+    <div class="slbl">4.4 · Modal open · form empty</div>
+  </div>
+
+  <!-- 4.6 Modal (filled, ready to submit) -->
+  <div class="pw">
+    <div class="phone hi">
+      <div class="di"></div>
+      <div class="sb"><span class="sb-t">9:41</span><div class="sb-i"><svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="4.5" width="3" height="6.5" rx="0.5" fill="#4d525b"/><rect x="4.5" y="3" width="3" height="8" rx="0.5" fill="#4d525b"/><rect x="9" y="1.5" width="3" height="9.5" rx="0.5" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="#4d525b"/></svg><svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#4d525b"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#4d525b"/><path d="M24 5V8C25.1 7.5 25.1 5.5 24 5Z" fill="#4d525b"/></svg></div></div>
+      <div class="nav">
+        <div class="back"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M7.5 1.5L1.5 7.5L7.5 13.5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="prog"><div class="ps on"></div><div class="ps on"></div><div class="ps"></div><div class="ps"></div></div>
+        <div class="nav-r"></div>
+      </div>
+      <div class="ct" style="padding-top:12px">
+        <div class="hl"><h2>Add your little ones 🌱</h2></div>
+      </div>
+      <div class="overlay"></div>
+      <div class="sheet">
+        <div class="sh-handle"></div>
+        <div class="sh-title">Add a Child</div>
+        <div class="sh-step">STEP 1 OF 2</div>
+        <div class="av-pick">
+          <div class="av-circle" style="background:linear-gradient(150deg,#77b691 0%,#e2e9e3 100%)">👦<div class="av-cam"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 2.5C2.9 2.5 2 3.4 2 4.5C2 5.6 2.9 6.5 4 6.5C5.1 6.5 6 5.6 6 4.5C6 3.4 5.1 2.5 4 2.5Z" fill="white"/><path d="M1 2.5H1.5L2 1.5H6L6.5 2.5H7C7.3 2.5 7.5 2.7 7.5 3V6.5C7.5 6.8 7.3 7 7 7H1C0.7 7 0.5 6.8 0.5 6.5V3C0.5 2.7 0.7 2.5 1 2.5Z" stroke="white" stroke-width="0.6" fill="none"/></svg></div></div>
+          <div class="av-nm" style="color:var(--br7);font-weight:500">James</div>
+          <div class="av-gdr">Boy · 12 Jun 2020</div>
+        </div>
+        <div class="inp f" style="margin-bottom:12px">
+          <div class="inp-lbl">Child's Name</div>
+          <div class="inp-val">James</div>
+        </div>
+        <div class="g-lbl">Gender</div>
+        <div class="g-row">
+          <div class="g-opt on"><div class="g-em">👦</div><div class="g-tx">Boy</div></div>
+          <div class="g-opt"><div class="g-em">👧</div><div class="g-tx">Girl</div></div>
+          <div class="g-opt"><div class="g-em">👀</div><div class="g-tx">Other</div></div>
+        </div>
+        <div class="inp" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0">
+          <div><div class="inp-lbl">Birth Date</div><div class="inp-val">12 / 06 / 2020</div></div>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11" rx="2" stroke="#186338" stroke-width="1.2"/><line x1="5" y1="1" x2="5" y2="5" stroke="#186338" stroke-width="1.2" stroke-linecap="round"/><line x1="11" y1="1" x2="11" y2="5" stroke="#186338" stroke-width="1.2" stroke-linecap="round"/><line x1="1.5" y1="7" x2="14.5" y2="7" stroke="#186338" stroke-width="1.2"/></svg>
+        </div>
+        <div class="sh-btns">
+          <button class="sh-cancel">Cancel</button>
+          <button class="sh-add">Add Child</button>
+        </div>
+        <div class="hi-bar" style="background:var(--s5)"><div class="hi-pill"></div></div>
+      </div>
+    </div>
+    <div class="slbl">4.6 · Modal filled · Add Child enabled</div>
+  </div>
+
+  <!-- 4.12 Image Gallery -->
+  <div class="pw">
+    <div class="phone hi">
+      <div class="di"></div>
+      <div class="sb"><span class="sb-t">9:41</span><div class="sb-i"><svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="4.5" width="3" height="6.5" rx="0.5" fill="#4d525b"/><rect x="4.5" y="3" width="3" height="8" rx="0.5" fill="#4d525b"/><rect x="9" y="1.5" width="3" height="9.5" rx="0.5" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="#4d525b"/></svg><svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#4d525b"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#4d525b"/><path d="M24 5V8C25.1 7.5 25.1 5.5 24 5Z" fill="#4d525b"/></svg></div></div>
+      <div class="nav">
+        <div class="back"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M7.5 1.5L1.5 7.5L7.5 13.5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="prog"><div class="ps on"></div><div class="ps on"></div><div class="ps"></div><div class="ps"></div></div>
+        <div class="nav-r"></div>
+      </div>
+      <div class="ct" style="padding-top:12px">
+        <div class="hl"><h2>Add your little ones 🌱</h2></div>
+      </div>
+      <div class="overlay"></div>
+      <!-- Gallery sheet -->
+      <div class="gal-sheet">
+        <div class="gal-hdr" style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-family:'Playfair Display',serif;font-size:15px;color:var(--br7);font-weight:500">Choose Photo</span>
+          <span style="font-size:12px;color:var(--br)">Cancel</span>
+        </div>
+        <div class="gal-grid">
+          <div class="gi on"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#c8a67e"/><text x="50" y="60" text-anchor="middle" font-size="36">👦</text></svg></div>
+          <div class="gi"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#7eb5c8"/><text x="50" y="60" text-anchor="middle" font-size="36">🌊</text></svg></div>
+          <div class="gi"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#c8c07e"/><text x="50" y="60" text-anchor="middle" font-size="36">🌻</text></svg></div>
+          <div class="gi"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#a8c8a0"/><text x="50" y="60" text-anchor="middle" font-size="36">⚽</text></svg></div>
+          <div class="gi"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#c8a0b8"/><text x="50" y="60" text-anchor="middle" font-size="36">🎨</text></svg></div>
+          <div class="gi"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#a0a8c8"/><text x="50" y="60" text-anchor="middle" font-size="36">🏄</text></svg></div>
+        </div>
+        <div class="gal-foot">
+          <button class="btn" style="height:42px;font-size:13px">Use Selected Photo</button>
+          <div class="hi-bar" style="background:var(--s5)"><div class="hi-pill"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="slbl">4.12 · Photo gallery · 1 selected</div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════
+     C · ADD KIDS FILLED  4.14 & 4.15
+════════════════════════════════════ -->
+<div class="sec-lbl">C · Add Kids — Filled States · 4.14 & 4.15</div>
+<div class="phones-row">
+
+  <!-- 4.14 One kid added -->
+  <div class="pw">
+    <div class="phone hi">
+      <div class="di"></div>
+      <div class="sb"><span class="sb-t">9:41</span><div class="sb-i"><svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="4.5" width="3" height="6.5" rx="0.5" fill="#4d525b"/><rect x="4.5" y="3" width="3" height="8" rx="0.5" fill="#4d525b"/><rect x="9" y="1.5" width="3" height="9.5" rx="0.5" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="#4d525b"/></svg><svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#4d525b"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#4d525b"/><path d="M24 5V8C25.1 7.5 25.1 5.5 24 5Z" fill="#4d525b"/></svg></div></div>
+      <div class="nav">
+        <div class="back"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M7.5 1.5L1.5 7.5L7.5 13.5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="prog"><div class="ps on"></div><div class="ps on"></div><div class="ps"></div><div class="ps"></div></div>
+        <div class="nav-r"></div>
+      </div>
+      <div class="ct" style="padding-top:12px">
+        <svg class="sprig" style="bottom:70px;right:-8px;width:88px;height:100px" viewBox="0 0 88 100" fill="none"><path d="M72 94 Q52 72 32 52 Q20 40 10 22" stroke="#186338" stroke-width="1.4" stroke-linecap="round" fill="none"/><ellipse cx="42" cy="64" rx="11" ry="6.5" transform="rotate(-36 42 64)" fill="#186338"/><ellipse cx="28" cy="48" rx="9" ry="5.5" transform="rotate(-46 28 48)" fill="#186338"/><ellipse cx="56" cy="76" rx="9" ry="5.5" transform="rotate(-26 56 76)" fill="#186338"/></svg>
+        <div class="hl"><h2>Add your little ones 🌱</h2></div>
+        <div class="kc">
+          <div class="kc-av">👧</div>
+          <div class="kc-info">
+            <div class="kc-nr"><span class="kc-n">Jesica</span><span class="kc-age">2 yrs</span></div>
+            <div class="kc-d">Mar 04, 2024</div>
+          </div>
+          <div class="kc-del"><svg width="12" height="14" viewBox="0 0 12 14" fill="none"><path d="M1 3.5H11M4.5 1.5H7.5M2 3.5L2.5 11.5C2.5 12 2.9 12.5 3.5 12.5H8.5C9.1 12.5 9.5 12 9.5 11.5L10 3.5" stroke="#c0392b" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="6" x2="5" y2="10" stroke="#c0392b" stroke-width="1.2" stroke-linecap="round"/><line x1="7" y1="6" x2="7" y2="10" stroke="#c0392b" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="ac lt">
+          <div class="ac-l">
+            <div class="ac-ico">➕</div>
+            <div><div class="ac-t">Add another child</div><div class="ac-s">Up to 5 children</div></div>
+          </div>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 1.5L7 5L3 8.5" stroke="#1e3e2b" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="ib">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="7" cy="7" r="6" stroke="#186338" stroke-width="1.2"/><line x1="7" y1="6" x2="7" y2="10" stroke="#186338" stroke-width="1.2" stroke-linecap="round"/><circle cx="7" cy="4" r="0.6" fill="#186338"/></svg>
+          <span>Sprout will suggest activities tailored to your children's ages.</span>
+        </div>
+        <div class="sp"></div>
+      </div>
+      <div class="cta-area"><button class="btn">Continue →</button></div>
+      <div class="hi-bar"><div class="hi-pill"></div></div>
+    </div>
+    <div class="slbl">4.14 · One child added · Continue enabled</div>
+  </div>
+
+  <!-- 4.15 Full (3 kids) -->
+  <div class="pw">
+    <div class="phone hi">
+      <div class="di"></div>
+      <div class="sb"><span class="sb-t">9:41</span><div class="sb-i"><svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="4.5" width="3" height="6.5" rx="0.5" fill="#4d525b"/><rect x="4.5" y="3" width="3" height="8" rx="0.5" fill="#4d525b"/><rect x="9" y="1.5" width="3" height="9.5" rx="0.5" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="#4d525b"/></svg><svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#4d525b"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#4d525b"/><path d="M24 5V8C25.1 7.5 25.1 5.5 24 5Z" fill="#4d525b"/></svg></div></div>
+      <div class="nav">
+        <div class="back"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M7.5 1.5L1.5 7.5L7.5 13.5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="prog"><div class="ps on"></div><div class="ps on"></div><div class="ps"></div><div class="ps"></div></div>
+        <div class="nav-r"></div>
+      </div>
+      <div class="ct" style="padding-top:12px">
+        <div class="hl"><h2>Add your little ones 🌱</h2></div>
+        <div class="kc">
+          <div class="kc-av">👧</div>
+          <div class="kc-info"><div class="kc-nr"><span class="kc-n">Jesica</span><span class="kc-age">2 yrs</span></div><div class="kc-d">Mar 04, 2024</div></div>
+          <div class="kc-del"><svg width="12" height="14" viewBox="0 0 12 14" fill="none"><path d="M1 3.5H11M4.5 1.5H7.5M2 3.5L2.5 11.5C2.5 12 2.9 12.5 3.5 12.5H8.5C9.1 12.5 9.5 12 9.5 11.5L10 3.5" stroke="#c0392b" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="kc">
+          <div class="kc-av">👦</div>
+          <div class="kc-info"><div class="kc-nr"><span class="kc-n">Liam</span><span class="kc-age">5 yrs</span></div><div class="kc-d">Sep 12, 2020</div></div>
+          <div class="kc-del"><svg width="12" height="14" viewBox="0 0 12 14" fill="none"><path d="M1 3.5H11M4.5 1.5H7.5M2 3.5L2.5 11.5C2.5 12 2.9 12.5 3.5 12.5H8.5C9.1 12.5 9.5 12 9.5 11.5L10 3.5" stroke="#c0392b" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="kc">
+          <div class="kc-av">👧</div>
+          <div class="kc-info"><div class="kc-nr"><span class="kc-n">Mia</span><span class="kc-age">7 yrs</span></div><div class="kc-d">Feb 28, 2018</div></div>
+          <div class="kc-del"><svg width="12" height="14" viewBox="0 0 12 14" fill="none"><path d="M1 3.5H11M4.5 1.5H7.5M2 3.5L2.5 11.5C2.5 12 2.9 12.5 3.5 12.5H8.5C9.1 12.5 9.5 12 9.5 11.5L10 3.5" stroke="#c0392b" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="ac dis-lt">
+          <div class="ac-l">
+            <div class="ac-ico">➕</div>
+            <div><div class="ac-t">Add another child</div><div class="ac-s">Up to 5 children</div></div>
+          </div>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 1.5L7 5L3 8.5" stroke="#9aa0ad" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="sp"></div>
+      </div>
+      <div class="cta-area"><button class="btn">Continue →</button></div>
+      <div class="hi-bar"><div class="hi-pill"></div></div>
+    </div>
+    <div class="slbl">4.15 · 3 kids added · full-looking state</div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════
+     D · SCHOOL GROUPS  4.16, 4.17, 4.18
+════════════════════════════════════ -->
+<div class="sec-lbl">D · School Groups — 4.16, 4.17 & 4.18</div>
+<div class="phones-row">
+
+  <!-- 4.16 Default -->
+  <div class="pw">
+    <div class="phone hi">
+      <div class="di"></div>
+      <div class="sb"><span class="sb-t">9:41</span><div class="sb-i"><svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="4.5" width="3" height="6.5" rx="0.5" fill="#4d525b"/><rect x="4.5" y="3" width="3" height="8" rx="0.5" fill="#4d525b"/><rect x="9" y="1.5" width="3" height="9.5" rx="0.5" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="#4d525b"/></svg><svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#4d525b"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#4d525b"/><path d="M24 5V8C25.1 7.5 25.1 5.5 24 5Z" fill="#4d525b"/></svg></div></div>
+      <div class="nav">
+        <div class="back"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M7.5 1.5L1.5 7.5L7.5 13.5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="prog"><div class="ps on"></div><div class="ps on"></div><div class="ps on"></div><div class="ps"></div></div>
+        <div class="nav-r"></div>
+      </div>
+      <div class="ct" style="padding-top:10px">
+        <svg class="sprig" style="bottom:80px;right:-8px;width:80px;height:90px" viewBox="0 0 80 90" fill="none"><path d="M66 84 Q48 64 28 44 Q16 32 8 16" stroke="#186338" stroke-width="1.4" stroke-linecap="round" fill="none"/><ellipse cx="38" cy="56" rx="10" ry="6" transform="rotate(-36 38 56)" fill="#186338"/><ellipse cx="24" cy="40" rx="8" ry="5" transform="rotate(-46 24 40)" fill="#186338"/><ellipse cx="50" cy="68" rx="8" ry="5" transform="rotate(-26 50 68)" fill="#186338"/></svg>
+        <div class="zip-b">
+          <svg width="11" height="12" viewBox="0 0 11 12" fill="none"><path d="M5.5 1C3.3 1 1.5 2.8 1.5 5C1.5 7.8 5.5 11 5.5 11C5.5 11 9.5 7.8 9.5 5C9.5 2.8 7.7 1 5.5 1Z" stroke="#134f2d" stroke-width="1.1" fill="none"/><circle cx="5.5" cy="5" r="1.5" fill="#134f2d"/></svg>
+          73301
+        </div>
+        <div class="hl" style="margin-bottom:14px">
+          <h2>Schools near you</h2>
+          <p>Join your child's school group to find local families.</p>
+        </div>
+        <div class="sc-row">
+          <div class="sc-av">🍀</div><div class="sc-info"><div class="sc-n">Lincoln Elementary School</div><div class="sc-d">0.8 miles away</div></div>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2L6 5.5L2 9" stroke="#9aa0ad" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="sc-row">
+          <div class="sc-av">🍀</div><div class="sc-info"><div class="sc-n">Washington Middle School</div><div class="sc-d">1.2 miles away</div></div>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2L6 5.5L2 9" stroke="#9aa0ad" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="sc-row">
+          <div class="sc-av">🍀</div><div class="sc-info"><div class="sc-n">Jefferson High School</div><div class="sc-d">1.5 miles away</div></div>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2L6 5.5L2 9" stroke="#9aa0ad" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="sc-row">
+          <div class="sc-av">🍀</div><div class="sc-info"><div class="sc-n">Roosevelt Elementary</div><div class="sc-d">2.1 miles away</div></div>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2L6 5.5L2 9" stroke="#9aa0ad" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="tip" style="position:relative;z-index:1">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="6.5" cy="6.5" r="5.5" stroke="#134f2d" stroke-width="1.1"/><line x1="6.5" y1="5.5" x2="6.5" y2="9" stroke="#134f2d" stroke-width="1.1" stroke-linecap="round"/><circle cx="6.5" cy="3.8" r="0.6" fill="#134f2d"/></svg>
+          <span>School groups connect you with parents nearby — you'll see their events automatically.</span>
+        </div>
+        <div class="sp"></div>
+      </div>
+      <div class="cta-area"><button class="btn dis">Select your child's school</button></div>
+      <div class="hi-bar"><div class="hi-pill"></div></div>
+    </div>
+    <div class="slbl">4.16 · School list · none selected</div>
+  </div>
+
+  <!-- 4.17 Dropdown open -->
+  <div class="pw">
+    <div class="phone hi">
+      <div class="di"></div>
+      <div class="sb"><span class="sb-t">9:41</span><div class="sb-i"><svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="4.5" width="3" height="6.5" rx="0.5" fill="#4d525b"/><rect x="4.5" y="3" width="3" height="8" rx="0.5" fill="#4d525b"/><rect x="9" y="1.5" width="3" height="9.5" rx="0.5" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="#4d525b"/></svg><svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#4d525b"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#4d525b"/><path d="M24 5V8C25.1 7.5 25.1 5.5 24 5Z" fill="#4d525b"/></svg></div></div>
+      <div class="nav">
+        <div class="back"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M7.5 1.5L1.5 7.5L7.5 13.5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="prog"><div class="ps on"></div><div class="ps on"></div><div class="ps on"></div><div class="ps"></div></div>
+        <div class="nav-r"></div>
+      </div>
+      <div class="ct" style="padding-top:10px">
+        <div class="zip-b"><svg width="11" height="12" viewBox="0 0 11 12" fill="none"><path d="M5.5 1C3.3 1 1.5 2.8 1.5 5C1.5 7.8 5.5 11 5.5 11C5.5 11 9.5 7.8 9.5 5C9.5 2.8 7.7 1 5.5 1Z" stroke="#134f2d" stroke-width="1.1" fill="none"/><circle cx="5.5" cy="5" r="1.5" fill="#134f2d"/></svg>73301</div>
+        <div class="hl" style="margin-bottom:14px"><h2>Schools near you</h2></div>
+        <!-- Expanded school -->
+        <div class="sc-row exp">
+          <div class="sc-av">🍀</div><div class="sc-info"><div class="sc-n">Lincoln Elementary School</div><div class="sc-d">0.8 miles away</div></div>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3L6 7L10 3" stroke="#186338" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <!-- Grade panel -->
+        <div class="gr-panel">
+          <div class="gr-row"><div class="gr-chk"></div><span class="gr-lbl">Kindergarten</span></div>
+          <div class="gr-row"><div class="gr-chk"></div><span class="gr-lbl">1st Grade</span></div>
+          <div class="gr-row"><div class="gr-chk"></div><span class="gr-lbl">2nd Grade</span></div>
+          <div class="gr-row"><div class="gr-chk"></div><span class="gr-lbl">3rd Grade</span></div>
+          <div class="gr-row"><div class="gr-chk"></div><span class="gr-lbl">4th Grade</span></div>
+          <div class="gr-row"><div class="gr-chk"></div><span class="gr-lbl">5th Grade</span></div>
+        </div>
+        <div class="sc-row">
+          <div class="sc-av">🍀</div><div class="sc-info"><div class="sc-n">Washington Middle School</div><div class="sc-d">1.2 miles away</div></div>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2L6 5.5L2 9" stroke="#9aa0ad" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="sc-row">
+          <div class="sc-av">🍀</div><div class="sc-info"><div class="sc-n">Jefferson High School</div><div class="sc-d">1.5 miles away</div></div>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2L6 5.5L2 9" stroke="#9aa0ad" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="sp"></div>
+      </div>
+      <div class="cta-area"><button class="btn dis">Select your child's school</button></div>
+      <div class="hi-bar"><div class="hi-pill"></div></div>
+    </div>
+    <div class="slbl">4.17 · School expanded · grade picker</div>
+  </div>
+
+  <!-- 4.18 Selected -->
+  <div class="pw">
+    <div class="phone hi">
+      <div class="di"></div>
+      <div class="sb"><span class="sb-t">9:41</span><div class="sb-i"><svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="4.5" width="3" height="6.5" rx="0.5" fill="#4d525b"/><rect x="4.5" y="3" width="3" height="8" rx="0.5" fill="#4d525b"/><rect x="9" y="1.5" width="3" height="9.5" rx="0.5" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="#4d525b"/></svg><svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#4d525b"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#4d525b"/><path d="M24 5V8C25.1 7.5 25.1 5.5 24 5Z" fill="#4d525b"/></svg></div></div>
+      <div class="nav">
+        <div class="back"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M7.5 1.5L1.5 7.5L7.5 13.5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="prog"><div class="ps on"></div><div class="ps on"></div><div class="ps on"></div><div class="ps"></div></div>
+        <div class="nav-r"></div>
+      </div>
+      <div class="ct" style="padding-top:10px">
+        <div class="zip-b"><svg width="11" height="12" viewBox="0 0 11 12" fill="none"><path d="M5.5 1C3.3 1 1.5 2.8 1.5 5C1.5 7.8 5.5 11 5.5 11C5.5 11 9.5 7.8 9.5 5C9.5 2.8 7.7 1 5.5 1Z" stroke="#134f2d" stroke-width="1.1" fill="none"/><circle cx="5.5" cy="5" r="1.5" fill="#134f2d"/></svg>73301</div>
+        <div class="hl" style="margin-bottom:14px"><h2>Schools near you</h2></div>
+        <!-- Selected school expanded -->
+        <div class="sc-row exp">
+          <div class="sc-av">🍀</div><div class="sc-info"><div class="sc-n">Lincoln Elementary School</div><div class="sc-d">0.8 miles away</div></div>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3L6 7L10 3" stroke="#186338" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="gr-panel">
+          <div class="gr-row"><div class="gr-chk"></div><span class="gr-lbl">Kindergarten</span></div>
+          <div class="gr-row"><div class="gr-chk"></div><span class="gr-lbl">1st Grade</span></div>
+          <div class="gr-row"><div class="gr-chk"></div><span class="gr-lbl">2nd Grade</span></div>
+          <div class="gr-row"><div class="gr-chk on"><svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="gr-lbl" style="color:var(--br);font-weight:600">3rd Grade</span></div>
+          <div class="gr-row"><div class="gr-chk"></div><span class="gr-lbl">4th Grade</span></div>
+          <div class="gr-row"><div class="gr-chk"></div><span class="gr-lbl">5th Grade</span></div>
+        </div>
+        <div class="sc-row">
+          <div class="sc-av">🍀</div><div class="sc-info"><div class="sc-n">Washington Middle School</div><div class="sc-d">1.2 miles away</div></div>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2L6 5.5L2 9" stroke="#9aa0ad" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="sp"></div>
+      </div>
+      <div class="cta-area"><button class="btn">Continue →</button></div>
+      <div class="hi-bar"><div class="hi-pill"></div></div>
+    </div>
+    <div class="slbl">4.18 · 3rd Grade selected · Continue enabled</div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════
+     E · AI ONBOARDING  4.19 & 4.20
+════════════════════════════════════ -->
+<div class="sec-lbl">E · AI Onboarding — 4.19 & 4.20</div>
+<div class="phones-row">
+
+  <!-- 4.19 Tap to Talk -->
+  <div class="pw">
+    <div class="phone hi">
+      <div class="di"></div>
+      <div class="sb"><span class="sb-t">9:41</span><div class="sb-i"><svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="4.5" width="3" height="6.5" rx="0.5" fill="#4d525b"/><rect x="4.5" y="3" width="3" height="8" rx="0.5" fill="#4d525b"/><rect x="9" y="1.5" width="3" height="9.5" rx="0.5" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="#4d525b"/></svg><svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#4d525b"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#4d525b"/><path d="M24 5V8C25.1 7.5 25.1 5.5 24 5Z" fill="#4d525b"/></svg></div></div>
+      <div class="nav">
+        <div class="back"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M7.5 1.5L1.5 7.5L7.5 13.5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="prog"><div class="ps on"></div><div class="ps on"></div><div class="ps on"></div><div class="ps on"></div></div>
+        <div class="nav-r"></div>
+      </div>
+      <div class="ct" style="align-items:center;text-align:center;padding-top:28px">
+        <div class="hl" style="text-align:center;margin-bottom:10px">
+          <h2 style="font-size:22px">One quick <em>question</em></h2>
+          <p>Tell us what you're into.</p>
+        </div>
+        <div class="mic-wrap">
+          <div class="mic-btn">
+            <div class="mic-r mic-r1"></div>
+            <div class="mic-r mic-r2"></div>
+            <div class="mic-c">
+              <!-- Mic icon -->
+              <svg width="36" height="42" viewBox="0 0 36 42" fill="none">
+                <rect x="11" y="2" width="14" height="22" rx="7" stroke="#186338" stroke-width="2"/>
+                <path d="M5 18C5 25.2 11 31 18 31C25 31 31 25.2 31 18" stroke="#186338" stroke-width="2" stroke-linecap="round" fill="none"/>
+                <line x1="18" y1="31" x2="18" y2="38" stroke="#186338" stroke-width="2" stroke-linecap="round"/>
+                <line x1="11" y1="38" x2="25" y2="38" stroke="#186338" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div style="position:relative;z-index:1;margin-top:4px">
+          <p style="font-family:'Playfair Display',serif;font-size:22px;font-weight:500;color:var(--br7);font-style:italic">Tap to Talk with AI</p>
+        </div>
+        <div class="sp"></div>
+      </div>
+      <div class="hi-bar"><div class="hi-pill"></div></div>
+    </div>
+    <div class="slbl">4.19 · All steps done · tap to start AI chat</div>
+  </div>
+
+  <!-- 4.20 AI Question Active -->
+  <div class="pw">
+    <div class="phone hi">
+      <div class="di"></div>
+      <div class="sb"><span class="sb-t">9:41</span><div class="sb-i"><svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="4.5" width="3" height="6.5" rx="0.5" fill="#4d525b"/><rect x="4.5" y="3" width="3" height="8" rx="0.5" fill="#4d525b"/><rect x="9" y="1.5" width="3" height="9.5" rx="0.5" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="#4d525b"/></svg><svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#4d525b"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#4d525b"/><path d="M24 5V8C25.1 7.5 25.1 5.5 24 5Z" fill="#4d525b"/></svg></div></div>
+      <div class="nav">
+        <div class="back"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M7.5 1.5L1.5 7.5L7.5 13.5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="prog"><div class="ps on"></div><div class="ps on"></div><div class="ps on"></div><div class="ps on"></div></div>
+        <div class="nav-r"></div>
+      </div>
+      <div class="ct" style="padding-top:16px">
+        <!-- Animated dotted sphere (AI voice) -->
+        <div style="display:flex;justify-content:center;margin-bottom:14px;position:relative;z-index:1">
+          <svg width="160" height="160" viewBox="0 0 160 160" fill="none">
+            <!-- Stippled sphere approximation using dots in concentric rings -->
+            <g opacity="0.55">
+              <!-- Outermost ring dots -->
+              <circle cx="80" cy="14" r="1.5" fill="#186338" opacity="0.3"/>
+              <circle cx="107" cy="21" r="1.5" fill="#186338" opacity="0.35"/>
+              <circle cx="128" cy="40" r="1.5" fill="#186338" opacity="0.3"/>
+              <circle cx="140" cy="65" r="1.5" fill="#186338" opacity="0.35"/>
+              <circle cx="140" cy="95" r="1.5" fill="#186338" opacity="0.3"/>
+              <circle cx="128" cy="120" r="1.5" fill="#186338" opacity="0.35"/>
+              <circle cx="107" cy="139" r="1.5" fill="#186338" opacity="0.3"/>
+              <circle cx="80" cy="146" r="1.5" fill="#186338" opacity="0.35"/>
+              <circle cx="53" cy="139" r="1.5" fill="#186338" opacity="0.3"/>
+              <circle cx="32" cy="120" r="1.5" fill="#186338" opacity="0.35"/>
+              <circle cx="20" cy="95" r="1.5" fill="#186338" opacity="0.3"/>
+              <circle cx="20" cy="65" r="1.5" fill="#186338" opacity="0.35"/>
+              <circle cx="32" cy="40" r="1.5" fill="#186338" opacity="0.3"/>
+              <circle cx="53" cy="21" r="1.5" fill="#186338" opacity="0.35"/>
+              <!-- Middle ring dots -->
+              <circle cx="80" cy="30" r="1.8" fill="#186338" opacity="0.45"/>
+              <circle cx="104" cy="36" r="1.8" fill="#186338" opacity="0.5"/>
+              <circle cx="121" cy="54" r="1.8" fill="#186338" opacity="0.45"/>
+              <circle cx="128" cy="76" r="1.8" fill="#186338" opacity="0.5"/>
+              <circle cx="124" cy="100" r="1.8" fill="#186338" opacity="0.45"/>
+              <circle cx="110" cy="120" r="1.8" fill="#186338" opacity="0.5"/>
+              <circle cx="90" cy="132" r="1.8" fill="#186338" opacity="0.45"/>
+              <circle cx="68" cy="132" r="1.8" fill="#186338" opacity="0.5"/>
+              <circle cx="50" cy="120" r="1.8" fill="#186338" opacity="0.45"/>
+              <circle cx="36" cy="100" r="1.8" fill="#186338" opacity="0.5"/>
+              <circle cx="32" cy="76" r="1.8" fill="#186338" opacity="0.45"/>
+              <circle cx="39" cy="54" r="1.8" fill="#186338" opacity="0.5"/>
+              <circle cx="56" cy="36" r="1.8" fill="#186338" opacity="0.45"/>
+              <!-- Inner ring dots -->
+              <circle cx="80" cy="46" r="2" fill="#186338" opacity="0.6"/>
+              <circle cx="100" cy="50" r="2" fill="#186338" opacity="0.65"/>
+              <circle cx="113" cy="65" r="2" fill="#186338" opacity="0.6"/>
+              <circle cx="116" cy="83" r="2" fill="#186338" opacity="0.65"/>
+              <circle cx="110" cy="101" r="2" fill="#186338" opacity="0.6"/>
+              <circle cx="96" cy="113" r="2" fill="#186338" opacity="0.65"/>
+              <circle cx="80" cy="117" r="2" fill="#186338" opacity="0.6"/>
+              <circle cx="64" cy="113" r="2" fill="#186338" opacity="0.65"/>
+              <circle cx="50" cy="101" r="2" fill="#186338" opacity="0.6"/>
+              <circle cx="44" cy="83" r="2" fill="#186338" opacity="0.65"/>
+              <circle cx="47" cy="65" r="2" fill="#186338" opacity="0.6"/>
+              <circle cx="60" cy="50" r="2" fill="#186338" opacity="0.65"/>
+              <!-- Core dots -->
+              <circle cx="80" cy="58" r="2.2" fill="#186338" opacity="0.7"/>
+              <circle cx="96" cy="62" r="2.2" fill="#186338" opacity="0.75"/>
+              <circle cx="104" cy="74" r="2.2" fill="#186338" opacity="0.8"/>
+              <circle cx="104" cy="88" r="2.2" fill="#186338" opacity="0.75"/>
+              <circle cx="96" cy="100" r="2.2" fill="#186338" opacity="0.7"/>
+              <circle cx="80" cy="105" r="2.2" fill="#186338" opacity="0.75"/>
+              <circle cx="64" cy="100" r="2.2" fill="#186338" opacity="0.7"/>
+              <circle cx="56" cy="88" r="2.2" fill="#186338" opacity="0.75"/>
+              <circle cx="56" cy="74" r="2.2" fill="#186338" opacity="0.8"/>
+              <circle cx="64" cy="62" r="2.2" fill="#186338" opacity="0.75"/>
+              <!-- Center -->
+              <circle cx="80" cy="80" r="3" fill="#186338" opacity="0.85"/>
+              <circle cx="80" cy="70" r="2.5" fill="#186338" opacity="0.8"/>
+              <circle cx="80" cy="90" r="2.5" fill="#186338" opacity="0.8"/>
+              <circle cx="70" cy="80" r="2.5" fill="#186338" opacity="0.8"/>
+              <circle cx="90" cy="80" r="2.5" fill="#186338" opacity="0.8"/>
+            </g>
+          </svg>
+        </div>
+        <!-- AI question -->
+        <div style="position:relative;z-index:1;margin-bottom:10px">
+          <p style="font-family:'Playfair Display',serif;font-size:22px;font-weight:500;color:var(--br7);line-height:1.3;margin-bottom:8px">Activities that you enjoy?</p>
+          <p style="font-size:12px;color:var(--g5);line-height:1.55">Tell us about sports, hobbies, or food preferences worth sharing with other parents.</p>
+        </div>
+        <div class="sp"></div>
+        <!-- AI controls -->
+        <div class="ai-ctrl">
+          <!-- Speaker -->
+          <div class="ai-b dark">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 8H8L13 4V18L8 14H4V8Z" stroke="white" stroke-width="1.5" fill="none"/><path d="M16 7C17.7 8.3 18.5 9.5 18.5 11C18.5 12.5 17.7 13.7 16 15" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M17.5 4.5C20.2 6.4 21.5 8.6 21.5 11C21.5 13.4 20.2 15.6 17.5 17.5" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/></svg>
+          </div>
+          <!-- Retry (red) -->
+          <div class="ai-b red">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 4.5V9.5H9" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 9.5C5.8 6.3 9 4 12.5 4C17.2 4 21 7.8 21 12.5C21 17.2 17.2 21 12.5 21C8.8 21 5.7 18.8 4.4 15.7" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <!-- Mute mic -->
+          <div class="ai-b dark">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="8" y="2" width="6" height="11" rx="3" stroke="white" stroke-width="1.5"/><path d="M5 10C5 13.9 7.7 17 11 17C14.3 17 17 13.9 17 10" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/><line x1="11" y1="17" x2="11" y2="20" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="8" y1="20" x2="14" y2="20" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="3" y1="3" x2="19" y2="19" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="hi-bar"><div class="hi-pill"></div></div>
+    </div>
+    <div class="slbl">4.20 · AI speaking · 3 voice controls</div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════
+     DESIGN DECISIONS
+════════════════════════════════════ -->
+<div class="sec-lbl" style="margin-top:60px">Design Decisions</div>
+<div class="ann-row">
+  <div class="ann-col">
+    <div class="ann-item"><div class="ann-dot"></div><div class="ann-t"><strong>Subtitle trimmed on every screen</strong> — Long opening paragraphs removed. Each screen now has 1 headline + 1 supporting line max. "We'll personalise events, clubs, and activities to match each of your child's information" → gone. Form fields are self-explanatory.</div></div>
+    <div class="ann-item"><div class="ann-dot"></div><div class="ann-t"><strong>4.1/4.2 warm background retained</strong> — The photo overlay is the best brand moment in onboarding. v2 keeps it but shifts the subtitle from a marketing tagline ("Weekend play dates begin here") to a functional cue ("Tell us a bit about yourself.").</div></div>
+    <div class="ann-item"><div class="ann-dot"></div><div class="ann-t"><strong>Add Child modal: "Tell us about your kid" removed</strong> — The modal title "Add a Child" already explains what this is. The subtitle under it was repeating the same message. Replaced with a compact "STEP 1 OF 2" pill so users know progress exists without over-explaining.</div></div>
+    <div class="ann-item"><div class="ann-dot"></div><div class="ann-t"><strong>4.3/4.14 void addressed</strong> — The original 42–64px gap created a hollow lower half. The empty state and kid cards now sit in a tight content stack. The remaining whitespace is natural breathing room, not structural emptiness.</div></div>
+    <div class="ann-item"><div class="ann-dot"></div><div class="ann-t"><strong>4.16 school list void filled with a tip card</strong> — Below 5 school rows there were ~180px of nothing. Added a contextual note: "School groups connect you with parents nearby." This fills the void while delivering genuine value (answering the implicit "why should I do this?" question).</div></div>
+  </div>
+  <div class="ann-col">
+    <div class="ann-item"><div class="ann-dot"></div><div class="ann-t"><strong>"Join your kids school groups" → "Schools near you"</strong> — The original headline was imperative and long. v2 uses a factual label — the zip badge provides location context so the headline doesn't need to repeat it. Shorter + less demanding tone.</div></div>
+    <div class="ann-item"><div class="ann-dot"></div><div class="ann-t"><strong>4.17 grade picker inline</strong> — Instead of a separate modal for grade selection, the school row expands in-place. Reduces navigation depth and keeps the user in context of the full school list.</div></div>
+    <div class="ann-item"><div class="ann-dot"></div><div class="ann-t"><strong>4.19 AI screen: mic button italic</strong> — "Tap to Talk with AI" → italicised Playfair. Shifts the register from instruction to invitation. The pulsing ring animation (CSS @keyframes) reinforces that the button is alive and responsive.</div></div>
+    <div class="ann-item"><div class="ann-dot"></div><div class="ann-t"><strong>4.20 AI question subtitle halved</strong> — Original: "What activities do you personally enjoy doing in your free time? Any sports, hobbies, of food preferences worth sharing with other parents" (28 words) → v2: "Tell us about sports, hobbies, or food preferences worth sharing." (10 words). Same information, half the scan time.</div></div>
+    <div class="ann-item"><div class="ann-dot"></div><div class="ann-t"><strong>Botanical accent consistent throughout</strong> — Corner sprig at 12% opacity on every screen that has dead space. Used as texture only — it never competes with the primary content. AI screens omit it entirely since the dotted sphere and mic button are already visually rich.</div></div>
+  </div>
+  <div class="summ">
+    <h3>v2 changes at a glance</h3>
+    <div class="sg">
+      <div class="si"><strong>Was</strong>"Weekend play dates begin here" subtitle</div>
+      <div class="si"><strong>Now</strong>"Tell us a bit about yourself." — functional</div>
+      <div class="si"><strong>Was</strong>2-sentence subtitle on Add Kids screen</div>
+      <div class="si"><strong>Now</strong>Removed — empty state description is enough</div>
+      <div class="si"><strong>Was</strong>"Tell us a little about your kid…" in modal</div>
+      <div class="si"><strong>Now</strong>Removed + replaced with "STEP 1 OF 2" pill</div>
+      <div class="si"><strong>Was</strong>42–64px void below content areas</div>
+      <div class="si"><strong>Now</strong>Natural spacing — no structural holes</div>
+      <div class="si"><strong>Was</strong>"Join your kids school groups" long headline</div>
+      <div class="si"><strong>Now</strong>"Schools near you" + zip badge for context</div>
+      <div class="si"><strong>Was</strong>~180px void below school list</div>
+      <div class="si"><strong>Now</strong>Tip card fills space + answers "why?" inline</div>
+      <div class="si"><strong>Was</strong>Grade selection unclear (just a chevron)</div>
+      <div class="si"><strong>Now</strong>Inline expand shows grade checkboxes directly</div>
+      <div class="si"><strong>Was</strong>"Tap to Talk with AI" — plain instruction text</div>
+      <div class="si"><strong>Now</strong>Italic Playfair — invitation, not instruction</div>
+      <div class="si"><strong>Was</strong>28-word AI question subtitle</div>
+      <div class="si"><strong>Now</strong>10-word rewrite — same meaning, 64% shorter</div>
+      <div class="si"><strong>Was</strong>No botanical accent in onboarding screens</div>
+      <div class="si"><strong>Now</strong>12% opacity corner sprigs — textural warmth</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprout — App Design Sheet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --forest:       #1E4A35;
+      --green-600:    #2D6E4E;
+      --green-500:    #3A8A62;
+      --green-400:    #4FA878;
+      --green-300:    #7DC49A;
+      --green-200:    #B0DFC3;
+      --green-100:    #D8F0E5;
+      --green-50:     #EEF8F3;
+      --sage:         #D6E8DC;
+      --sage-text:    #2D6E4E;
+      --cream:        #F0EDE6;
+      --cream-light:  #FAF9F6;
+      --cream-card:   #EDEAE2;
+      --cream-input:  #E8E4DC;
+      --ink:          #1C1C1A;
+      --stone:        #6B6860;
+      --pebble:       #9E9B94;
+      --border:       rgba(0,0,0,0.08);
+      --border-md:    rgba(0,0,0,0.13);
+    }
+
+    body {
+      background: var(--cream);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 64px 48px 88px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ── Background glows ── */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -120px; right: -120px;
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, rgba(58,138,98,0.09) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -140px; left: -100px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(214,232,220,0.45) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Decorative leaf SVGs ── */
+    .leaf-deco {
+      position: fixed;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.10;
+    }
+
+    /* ── Page wrapper ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    /* ══════════════════════════════
+       HEADER
+    ══════════════════════════════ */
+    .sheet-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 72px;
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-icon {
+      width: 54px; height: 54px;
+      border-radius: 16px;
+      background: var(--forest);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 27px;
+      box-shadow: 0 8px 24px rgba(30,74,53,0.32);
+      flex-shrink: 0;
+    }
+
+    .brand-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.6px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .brand-tagline {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+      font-size: 14px;
+      color: var(--forest);
+      font-weight: 400;
+    }
+
+    .sheet-meta {
+      text-align: right;
+      padding-top: 6px;
+    }
+
+    .sheet-meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--pebble);
+      margin-bottom: 4px;
+    }
+
+    .sheet-meta-version {
+      font-size: 13px;
+      color: var(--stone);
+    }
+
+    /* ══════════════════════════════
+       PHONES ROW
+    ══════════════════════════════ */
+    .phones-row {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .phone-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      flex: 1;
+    }
+
+    /* ── iPhone Frame ── */
+    .phone {
+      width: 236px;
+      height: 510px;
+      background: #161616;
+      border-radius: 52px;
+      position: relative;
+      flex-shrink: 0;
+      box-shadow:
+        inset 0 0 0 1px #2e2e2e,
+        inset 0 0 0 3px #111,
+        0 2px 4px rgba(0,0,0,0.1),
+        0 10px 24px rgba(0,0,0,0.18),
+        0 32px 64px rgba(0,0,0,0.24),
+        0 48px 80px rgba(0,0,0,0.12);
+    }
+
+    /* Power button right */
+    .phone::before {
+      content: '';
+      position: absolute;
+      right: -3px; top: 116px;
+      width: 3px; height: 64px;
+      background: #1e1e1e;
+      border-radius: 0 2px 2px 0;
+    }
+
+    /* Volume buttons left */
+    .phone::after {
+      content: '';
+      position: absolute;
+      left: -3px; top: 86px;
+      width: 3px; height: 32px;
+      background: #1e1e1e;
+      border-radius: 2px 0 0 2px;
+      box-shadow: 0 48px 0 #1e1e1e, 0 88px 0 #1e1e1e;
+    }
+
+    /* Screen glass */
+    .phone-screen {
+      position: absolute;
+      top: 6px; left: 6px; right: 6px; bottom: 6px;
+      border-radius: 46px;
+      background: var(--cream);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Subtle glass shine */
+    .phone-screen::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.06) 0%, transparent 100%);
+      border-radius: 46px 46px 0 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* Dynamic island */
+    .dynamic-island {
+      position: absolute;
+      top: 14px;
+      left: 50%; transform: translateX(-50%);
+      width: 82px; height: 11px;
+      background: #161616;
+      border-radius: 6px;
+      z-index: 50;
+    }
+
+    /* ── Status bar ── */
+    .status-bar {
+      height: 46px;
+      padding: 0 18px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding-bottom: 6px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .sb-time {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -0.2px;
+    }
+
+    .sb-icons {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .sb-icon {
+      font-size: 8px;
+      color: var(--ink);
+      opacity: 0.7;
+    }
+
+    /* ── Screen content wrapper ── */
+    .screen-content {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Bottom nav (shared) ── */
+    .bottom-nav {
+      position: absolute;
+      bottom: 10px; left: 10px; right: 10px;
+      background: var(--cream-light);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+      z-index: 30;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      color: var(--pebble);
+      min-width: 32px;
+    }
+
+    .nav-item.active { color: var(--forest); }
+
+    .nav-icon { font-size: 15px; line-height: 1; }
+    .nav-label {
+      font-size: 6.5px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    .nav-item.active .nav-label { font-weight: 700; }
+
+    .nav-badge-wrap { position: relative; }
+
+    .nav-badge {
+      position: absolute;
+      top: -3px; right: -5px;
+      background: var(--forest);
+      color: white;
+      font-size: 5.5px;
+      font-weight: 700;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ══════════════════════════════
+       SCREEN 1 — HOME FEED
+    ══════════════════════════════ */
+    .s1-top {
+      padding: 4px 14px 10px;
+      flex-shrink: 0;
+    }
+
+    .s1-greeting {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px; font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.3px;
+      margin-bottom: 2px;
+    }
+
+    .s1-sub { font-size: 9px; color: var(--stone); }
+
+    .chips {
+      padding: 0 14px;
+      display: flex; gap: 5px;
+      margin-bottom: 9px;
+      flex-shrink: 0;
+    }
+
+    .chip-on {
+      background: var(--forest); color: white;
+      font-size: 8px; font-weight: 500;
+      padding: 4px 10px; border-radius: 999px;
+    }
+
+    .chip-off {
+      background: var(--sage); color: var(--sage-text);
+      font-size: 8px; font-weight: 400;
+      padding: 4px 10px; border-radius: 999px;
+    }
+
+    .ecard {
+      margin: 0 12px 7px;
+      background: var(--cream-light);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .ecard-img {
+      width: 100%; height: 64px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+    }
+
+    .ecard-img-a { background: linear-gradient(135deg, #b0dfc3, #7dc49a, #4fa878); }
+    .ecard-img-b { background: linear-gradient(135deg, #d8f0e5, #b0dfc3, #8fc4a8); }
+
+    .ecard-body { padding: 8px 10px 8px; }
+
+    .ecard-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 11px; font-weight: 600;
+      color: var(--ink); margin-bottom: 2px;
+    }
+
+    .ecard-meta { font-size: 7.5px; color: var(--pebble); margin-bottom: 6px; }
+
+    .ecard-footer { display: flex; justify-content: space-between; align-items: center; }
+
+    .ecard-host { font-size: 7.5px; color: var(--stone); }
+    .ecard-host strong { color: var(--green-500); font-weight: 600; }
+
+    .ecard-actions { display: flex; gap: 5px; }
+
+    .act-no {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--cream-card); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8px; color: var(--stone);
+    }
+
+    .act-yes {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--forest);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8px; color: white;
+    }
+
+    /* ══════════════════════════════
+       SCREEN 2 — EVENT DISCOVERY
+    ══════════════════════════════ */
+    .s2-top {
+      padding: 4px 14px 10px;
+      flex-shrink: 0;
+    }
+
+    .s2-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; font-weight: 700;
+      color: var(--ink); letter-spacing: -0.3px;
+    }
+
+    .s2-sub { font-size: 8px; color: var(--stone); margin-top: 1px; }
+
+    .feat-card {
+      margin: 0 10px;
+      background: var(--cream-light);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .feat-img {
+      width: 100%; height: 150px;
+      background: linear-gradient(155deg, #1E4A35 0%, #3A8A62 40%, #7DC49A 80%, #D8F0E5 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px;
+      position: relative;
+    }
+
+    .feat-img-grad {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
+      background: linear-gradient(to top, rgba(30,74,53,0.5), transparent);
+    }
+
+    .feat-body { padding: 10px 12px 11px; }
+
+    .feat-host-row {
+      display: flex; align-items: center; gap: 6px; margin-bottom: 5px;
+    }
+
+    .feat-avatar {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--green-200);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; flex-shrink: 0;
+    }
+
+    .feat-host { font-size: 8px; color: var(--stone); }
+    .feat-host strong { color: var(--green-500); font-weight: 600; }
+
+    .feat-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 14.5px; font-weight: 700;
+      color: var(--ink); letter-spacing: -0.2px; margin-bottom: 4px;
+    }
+
+    .feat-details { font-size: 7.5px; color: var(--stone); line-height: 1.7; margin-bottom: 7px; }
+
+    .feat-spots {
+      display: inline-flex; align-items: center; gap: 3px;
+      background: var(--sage); color: var(--sage-text);
+      font-size: 7.5px; font-weight: 600;
+      padding: 3px 9px; border-radius: 999px;
+    }
+
+    .swipe-row {
+      display: flex; justify-content: center; gap: 18px;
+      padding: 13px 0 6px;
+      flex-shrink: 0;
+    }
+
+    .swipe-no {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--cream-light);
+      border: 1.5px solid var(--border-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    }
+
+    .swipe-yes {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--forest);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; color: white;
+      box-shadow: 0 6px 18px rgba(30,74,53,0.38);
+    }
+
+    /* ══════════════════════════════
+       SCREEN 3 — COMMUNITIES
+    ══════════════════════════════ */
+    .s3-top { padding: 4px 14px 8px; flex-shrink: 0; }
+
+    .s3-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px; font-weight: 700;
+      color: var(--ink); letter-spacing: -0.3px;
+    }
+
+    .mp-banner {
+      margin: 0 10px 8px;
+      background: var(--sage);
+      border-radius: 13px;
+      padding: 9px 11px;
+      display: flex; align-items: center; gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .mp-icon { font-size: 17px; flex-shrink: 0; }
+
+    .mp-lbl {
+      font-size: 7px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--sage-text); margin-bottom: 1px;
+    }
+
+    .mp-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 11px; font-weight: 600; color: var(--forest);
+    }
+
+    .sect-lbl {
+      padding: 0 14px; margin-bottom: 6px;
+      font-size: 8px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--pebble); flex-shrink: 0;
+    }
+
+    .mem-row {
+      margin: 0 10px 5px;
+      padding: 8px 10px;
+      background: var(--cream-light);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex; align-items: center; gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .mem-av {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--green-100);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0;
+    }
+
+    .mem-info { flex: 1; min-width: 0; }
+
+    .mem-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 10px; font-weight: 600;
+      color: var(--ink);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .mem-role {
+      font-size: 7.5px; color: var(--pebble);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .tag-new {
+      background: var(--cream-card);
+      border: 1px solid var(--border-md);
+      color: var(--stone);
+      font-size: 7px; font-weight: 600;
+      padding: 2px 7px; border-radius: 999px;
+      flex-shrink: 0;
+    }
+
+    .tag-met {
+      background: var(--sage); color: var(--sage-text);
+      font-size: 7px; font-weight: 600;
+      padding: 2px 7px; border-radius: 999px;
+      flex-shrink: 0;
+    }
+
+    .mem-meets {
+      font-size: 7px; color: var(--pebble); flex-shrink: 0; margin-top: 2px;
+    }
+
+    /* ══════════════════════════════
+       SCREEN 4 — MEMORIES
+    ══════════════════════════════ */
+    .s4-top { padding: 4px 14px 8px; flex-shrink: 0; }
+
+    .s4-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px; font-weight: 700;
+      color: var(--ink); letter-spacing: -0.3px;
+    }
+
+    .celeb-banner {
+      margin: 0 10px 8px;
+      background: var(--forest);
+      border-radius: 15px;
+      padding: 11px 13px;
+      flex-shrink: 0;
+    }
+
+    .celeb-icon { font-size: 17px; margin-bottom: 4px; }
+
+    .celeb-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 12px; font-weight: 600;
+      color: white; margin-bottom: 2px;
+    }
+
+    .celeb-sub { font-size: 7.5px; color: rgba(255,255,255,0.6); font-style: italic; }
+
+    .photo-grid {
+      margin: 0 10px 8px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 3px;
+      border-radius: 13px; overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .pcell {
+      aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+    }
+
+    .pc1 { background: linear-gradient(135deg, #c5e3d0, #8fc4a8); }
+    .pc2 { background: linear-gradient(135deg, #d8f0e5, #b0dfc3); }
+    .pc3 { background: linear-gradient(135deg, #1E4A35, #3A8A62); }
+    .pc4 { background: linear-gradient(135deg, #b0dfc3, #7dc49a); }
+    .pc5 { background: linear-gradient(135deg, #eef8f3, #d8f0e5); }
+    .pc6 { background: linear-gradient(135deg, #4fa878, #2d6e4e); }
+
+    .mem-quote {
+      margin: 0 10px;
+      background: var(--cream-light);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--green-500);
+      border-radius: 0 11px 11px 0;
+      padding: 8px 10px;
+      flex-shrink: 0;
+    }
+
+    .mq-text {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 9px; color: var(--ink);
+      line-height: 1.55; margin-bottom: 3px;
+    }
+
+    .mq-ctx { font-size: 7.5px; color: var(--pebble); }
+
+    /* ══════════════════════════════
+       PHONE LABEL
+    ══════════════════════════════ */
+    .phone-label { text-align: center; }
+
+    .pl-num {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--pebble); margin-bottom: 4px;
+    }
+
+    .pl-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px; font-weight: 600;
+      color: var(--ink); margin-bottom: 4px;
+    }
+
+    .pl-desc { font-size: 12px; color: var(--stone); line-height: 1.45; }
+
+    /* ══════════════════════════════
+       COLOR LEGEND
+    ══════════════════════════════ */
+    .color-legend {
+      margin-top: 68px;
+      display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+    }
+
+    .cswatch {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--cream-light);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 14px 7px 8px;
+    }
+
+    .cswatch-dot {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .cswatch-name {
+      font-size: 11px; font-weight: 600; color: var(--ink);
+      margin-bottom: 1px;
+    }
+
+    .cswatch-hex { font-size: 10px; color: var(--pebble); font-family: monospace; }
+
+    /* ══════════════════════════════
+       FOOTER
+    ══════════════════════════════ */
+    .sheet-footer {
+      margin-top: 52px;
+      display: flex; align-items: center; justify-content: center; gap: 16px;
+    }
+
+    .footer-rule { height: 1px; flex: 1; background: var(--border); }
+
+    .footer-text {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--pebble); white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Decorative leaf — top left -->
+  <svg class="leaf-deco" style="top:0;left:0;width:200px;height:200px;" viewBox="0 0 200 200">
+    <path d="M100 16 Q148 54 136 100 Q124 148 76 158 Q28 168 16 118 Q4 68 54 46 Q76 36 100 16Z" fill="#1E4A35"/>
+    <path d="M100 16 Q100 88 76 158" stroke="#3A8A62" stroke-width="1.5" fill="none"/>
+    <path d="M100 16 Q56 80 16 118" stroke="#4FA878" stroke-width="0.8" fill="none"/>
+  </svg>
+
+  <!-- Decorative leaf — bottom right -->
+  <svg class="leaf-deco" style="bottom:0;right:0;width:260px;height:260px;" viewBox="0 0 260 260">
+    <path d="M130 20 Q192 68 176 130 Q160 192 96 204 Q32 216 20 152 Q8 88 72 58 Q100 44 130 20Z" fill="#1E4A35"/>
+    <path d="M130 20 Q130 112 96 204" stroke="#3A8A62" stroke-width="2" fill="none"/>
+    <path d="M130 20 Q72 104 20 152" stroke="#4FA878" stroke-width="1" fill="none"/>
+  </svg>
+
+  <!-- Decorative stem — right edge -->
+  <svg class="leaf-deco" style="top:38%;right:8px;transform:translateY(-50%);width:60px;height:220px;" viewBox="0 0 60 220">
+    <path d="M30 8 Q50 28 44 50 Q38 72 18 76 Q-2 80 2 58 Q6 36 22 26 Q30 20 30 8Z" fill="#3A8A62"/>
+    <path d="M30 8 Q30 46 18 76" stroke="#4FA878" stroke-width="1" fill="none"/>
+    <path d="M30 100 Q50 120 44 142 Q38 164 18 168 Q-2 172 2 150 Q6 128 22 118 Q30 112 30 100Z" fill="#1E4A35"/>
+    <path d="M30 100 Q30 138 18 168" stroke="#3A8A62" stroke-width="1" fill="none"/>
+  </svg>
+
+  <div class="page">
+
+    <!-- ══ HEADER ══ -->
+    <header class="sheet-header">
+      <div class="brand-lockup">
+        <div class="brand-icon">🍀</div>
+        <div>
+          <div class="brand-name">Sprout</div>
+          <div class="brand-tagline">"Where parents bond and childhoods flourish."</div>
+        </div>
+      </div>
+      <div class="sheet-meta">
+        <div class="sheet-meta-label">App Design Sheet</div>
+        <div class="sheet-meta-version">Version 1.0 &nbsp;·&nbsp; April 2026</div>
+      </div>
+    </header>
+
+    <!-- ══ PHONES ══ -->
+    <div class="phones-row">
+
+      <!-- ─── SCREEN 1: HOME FEED ─── -->
+      <div class="phone-col">
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="dynamic-island"></div>
+
+            <div class="status-bar">
+              <span class="sb-time">9:41</span>
+              <div class="sb-icons">
+                <span class="sb-icon">●●●</span>
+                <span class="sb-icon" style="opacity:.5">▶</span>
+                <span class="sb-icon">▌▌▌▌</span>
+              </div>
+            </div>
+
+            <div class="screen-content">
+              <div class="s1-top">
+                <div class="s1-greeting">Good morning, Sarah 🌱</div>
+                <div class="s1-sub">Your people are out there.</div>
+              </div>
+
+              <div class="chips">
+                <span class="chip-on">All</span>
+                <span class="chip-off">Today</span>
+                <span class="chip-off">Kids</span>
+                <span class="chip-off">Outdoors</span>
+              </div>
+
+              <div class="ecard">
+                <div class="ecard-img ecard-img-a">🏄</div>
+                <div class="ecard-body">
+                  <div class="ecard-title">Surfing at Second Point</div>
+                  <div class="ecard-meta">Sat, Nov 9 · 6:30pm CST · 8/15 · 2.1 mi</div>
+                  <div class="ecard-footer">
+                    <div class="ecard-host"><strong>James</strong> is hosting</div>
+                    <div class="ecard-actions">
+                      <div class="act-no">✕</div>
+                      <div class="act-yes">✓</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="ecard">
+                <div class="ecard-img ecard-img-b">🎨</div>
+                <div class="ecard-body">
+                  <div class="ecard-title">Kids Art & Craft Day</div>
+                  <div class="ecard-meta">Mon, Feb 25 · 10:00am · Griffith Park</div>
+                  <div class="ecard-footer">
+                    <div class="ecard-host"><strong>Maria</strong> &amp; 4 others going</div>
+                    <div class="ecard-actions">
+                      <div class="act-yes">🍀</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bottom-nav">
+                <div class="nav-item active">
+                  <div class="nav-icon">📍</div>
+                  <div class="nav-label">Events</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-icon">🖼️</div>
+                  <div class="nav-label">Memories</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-icon">✨</div>
+                  <div class="nav-label">AI Assist</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-badge-wrap">
+                    <div class="nav-icon">💬</div>
+                    <div class="nav-badge">2</div>
+                  </div>
+                  <div class="nav-label">Chat</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-icon">👥</div>
+                  <div class="nav-label">Clubs</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-label">
+          <div class="pl-num">01</div>
+          <div class="pl-name">Home Feed</div>
+          <div class="pl-desc">Events near you,<br>filtered by interest</div>
+        </div>
+      </div>
+
+      <!-- ─── SCREEN 2: EVENT DISCOVERY ─── -->
+      <div class="phone-col">
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="dynamic-island"></div>
+
+            <div class="status-bar">
+              <span class="sb-time">9:41</span>
+              <div class="sb-icons">
+                <span class="sb-icon">●●●</span>
+                <span class="sb-icon">▌▌▌▌</span>
+              </div>
+            </div>
+
+            <div class="screen-content">
+              <div class="s2-top">
+                <div class="s2-title">Discover</div>
+                <div class="s2-sub">Parks and playgrounds near you</div>
+              </div>
+
+              <div class="feat-card">
+                <div class="feat-img">
+                  🏄
+                  <div class="feat-img-grad"></div>
+                </div>
+                <div class="feat-body">
+                  <div class="feat-host-row">
+                    <div class="feat-avatar">👨</div>
+                    <div class="feat-host"><strong>James Chen</strong> is hosting</div>
+                  </div>
+                  <div class="feat-title">Surfing at Second Point</div>
+                  <div class="feat-details">
+                    Sat, Nov 9 · 6:30pm CST<br>
+                    📍 Second Point Beach · 2.1 mi
+                  </div>
+                  <span class="feat-spots">🌱 8 of 15 spots left</span>
+                </div>
+              </div>
+
+              <div class="swipe-row">
+                <div class="swipe-no">✕</div>
+                <div class="swipe-yes">✓</div>
+              </div>
+
+              <div class="bottom-nav">
+                <div class="nav-item active">
+                  <div class="nav-icon">📍</div>
+                  <div class="nav-label">Events</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-icon">🖼️</div>
+                  <div class="nav-label">Memories</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-icon">✨</div>
+                  <div class="nav-label">AI Assist</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-badge-wrap">
+                    <div class="nav-icon">💬</div>
+                    <div class="nav-badge">2</div>
+                  </div>
+                  <div class="nav-label">Chat</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-icon">👥</div>
+                  <div class="nav-label">Clubs</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-label">
+          <div class="pl-num">02</div>
+          <div class="pl-name">Event Discovery</div>
+          <div class="pl-desc">Swipe to join events<br>hosted by real people</div>
+        </div>
+      </div>
+
+      <!-- ─── SCREEN 3: COMMUNITIES ─── -->
+      <div class="phone-col">
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="dynamic-island"></div>
+
+            <div class="status-bar">
+              <span class="sb-time">9:41</span>
+              <div class="sb-icons">
+                <span class="sb-icon">●●●</span>
+                <span class="sb-icon">▌▌▌▌</span>
+              </div>
+            </div>
+
+            <div class="screen-content">
+              <div class="s3-top">
+                <div class="s3-title">Communities</div>
+              </div>
+
+              <div class="mp-banner">
+                <div class="mp-icon">🤝</div>
+                <div>
+                  <div class="mp-lbl">Meeting Points</div>
+                  <div class="mp-val">2 parents want to meet you</div>
+                </div>
+              </div>
+
+              <div class="sect-lbl">Lincoln School Parents · 24 members</div>
+
+              <div class="mem-row">
+                <div class="mem-av">👩</div>
+                <div class="mem-info">
+                  <div class="mem-name">Darlene Robertson</div>
+                  <div class="mem-role">Angel Investor · Salt Ventures</div>
+                </div>
+                <span class="tag-new">New</span>
+              </div>
+
+              <div class="mem-row">
+                <div class="mem-av">👨</div>
+                <div class="mem-info">
+                  <div class="mem-name">Albert Flores</div>
+                  <div class="mem-role">Angel Investor</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;">
+                  <span class="tag-met">Met</span>
+                  <span class="mem-meets">👥 12 meets</span>
+                </div>
+              </div>
+
+              <div class="mem-row">
+                <div class="mem-av">👩</div>
+                <div class="mem-info">
+                  <div class="mem-name">Maria Santos</div>
+                  <div class="mem-role">Teacher · San Francisco</div>
+                </div>
+                <span class="tag-new">New</span>
+              </div>
+
+              <div class="bottom-nav">
+                <div class="nav-item">
+                  <div class="nav-icon">📍</div>
+                  <div class="nav-label">Events</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-icon">🖼️</div>
+                  <div class="nav-label">Memories</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-icon">✨</div>
+                  <div class="nav-label">AI Assist</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-badge-wrap">
+                    <div class="nav-icon">💬</div>
+                    <div class="nav-badge">2</div>
+                  </div>
+                  <div class="nav-label">Chat</div>
+                </div>
+                <div class="nav-item active">
+                  <div class="nav-icon">👥</div>
+                  <div class="nav-label">Clubs</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-label">
+          <div class="pl-num">03</div>
+          <div class="pl-name">Communities</div>
+          <div class="pl-desc">Your people, organized<br>by school &amp; neighborhood</div>
+        </div>
+      </div>
+
+      <!-- ─── SCREEN 4: MEMORIES ─── -->
+      <div class="phone-col">
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="dynamic-island"></div>
+
+            <div class="status-bar">
+              <span class="sb-time">9:41</span>
+              <div class="sb-icons">
+                <span class="sb-icon">●●●</span>
+                <span class="sb-icon">▌▌▌▌</span>
+              </div>
+            </div>
+
+            <div class="screen-content">
+              <div class="s4-top">
+                <div class="s4-title">Memories</div>
+              </div>
+
+              <div class="celeb-banner">
+                <div class="celeb-icon">🌱</div>
+                <div class="celeb-title">You met 3 new people this week.</div>
+                <div class="celeb-sub">"You got lucky when you found these people."</div>
+              </div>
+
+              <div class="photo-grid">
+                <div class="pcell pc1">🏄</div>
+                <div class="pcell pc2">🎨</div>
+                <div class="pcell pc3">🌿</div>
+                <div class="pcell pc4">🏃</div>
+                <div class="pcell pc5">☕</div>
+                <div class="pcell pc6">🎭</div>
+              </div>
+
+              <div class="mem-quote">
+                <div class="mq-text">"You played together at the park. That's a beginning."</div>
+                <div class="mq-ctx">Last Saturday · Dolores Park, SF</div>
+              </div>
+
+              <div class="bottom-nav">
+                <div class="nav-item">
+                  <div class="nav-icon">📍</div>
+                  <div class="nav-label">Events</div>
+                </div>
+                <div class="nav-item active">
+                  <div class="nav-icon">🖼️</div>
+                  <div class="nav-label">Memories</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-icon">✨</div>
+                  <div class="nav-label">AI Assist</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-badge-wrap">
+                    <div class="nav-icon">💬</div>
+                    <div class="nav-badge">2</div>
+                  </div>
+                  <div class="nav-label">Chat</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-icon">👥</div>
+                  <div class="nav-label">Clubs</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-label">
+          <div class="pl-num">04</div>
+          <div class="pl-name">Memories</div>
+          <div class="pl-desc">Moments that mark<br>the start of something</div>
+        </div>
+      </div>
+
+    </div><!-- /phones-row -->
+
+    <!-- ══ COLOR LEGEND ══ -->
+    <div class="color-legend">
+      <div class="cswatch">
+        <div class="cswatch-dot" style="background:#1E4A35;"></div>
+        <div>
+          <div class="cswatch-name">Forest</div>
+          <div class="cswatch-hex">#1E4A35</div>
+        </div>
+      </div>
+      <div class="cswatch">
+        <div class="cswatch-dot" style="background:#3A8A62;"></div>
+        <div>
+          <div class="cswatch-name">Sprout Green</div>
+          <div class="cswatch-hex">#3A8A62</div>
+        </div>
+      </div>
+      <div class="cswatch">
+        <div class="cswatch-dot" style="background:#D6E8DC; border-color:rgba(0,0,0,0.12);"></div>
+        <div>
+          <div class="cswatch-name">Sage</div>
+          <div class="cswatch-hex">#D6E8DC</div>
+        </div>
+      </div>
+      <div class="cswatch">
+        <div class="cswatch-dot" style="background:#F0EDE6; border-color:rgba(0,0,0,0.12);"></div>
+        <div>
+          <div class="cswatch-name">Cream</div>
+          <div class="cswatch-hex">#F0EDE6</div>
+        </div>
+      </div>
+      <div class="cswatch">
+        <div class="cswatch-dot" style="background:#FAF9F6; border-color:rgba(0,0,0,0.12);"></div>
+        <div>
+          <div class="cswatch-name">Cream Light</div>
+          <div class="cswatch-hex">#FAF9F6</div>
+        </div>
+      </div>
+      <div class="cswatch">
+        <div class="cswatch-dot" style="background:#1C1C1A;"></div>
+        <div>
+          <div class="cswatch-name">Ink</div>
+          <div class="cswatch-hex">#1C1C1A</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ FOOTER ══ -->
+    <footer class="sheet-footer">
+      <div class="footer-rule"></div>
+      <span style="font-size:14px;">🍀</span>
+      <div class="footer-text">Sprout &nbsp;·&nbsp; Brand &amp; Design &nbsp;·&nbsp; Confidential &nbsp;·&nbsp; 2026</div>
+      <span style="font-size:14px;">🍀</span>
+      <div class="footer-rule"></div>
+    </footer>
+
+  </div>
+</body>
+</html>

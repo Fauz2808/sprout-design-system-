@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Join with Phone Number</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brand-500: #186338;
+    --brand-600: #134f2d;
+    --brand-700: #1e3e2b;
+    --brand-50:  #e2e9e3;
+    --brand-100: #d0dacf;
+    --brand-200: #77b691;
+    --secondary-500: #f4f1ea;
+    --secondary-600: #eae6db;
+    --secondary-700: #dbd5c8;
+    --secondary-800: #c2b9a6;
+    --secondary-900: #aa9e83;
+    --grey-100: #e6e7ea;
+    --grey-200: #cdcfd6;
+    --grey-300: #b3b8c1;
+    --grey-400: #9aa0ad;
+    --grey-500: #818898;
+    --grey-700: #4d525b;
+    --grey-900: #1a1b1e;
+    --error-500: #d64545;
+    --error-100: #f7dada;
+  }
+
+  body {
+    background: #cfc8b8;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 24px 64px;
+    font-family: 'Inter', sans-serif;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .variant-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .variant-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #5a5347;
+  }
+
+  /* ── Phone shell ─────────────────────────────────── */
+  .phone {
+    width: 393px;
+    height: 852px;
+    background: var(--secondary-500);
+    border-radius: 54px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.07),
+      0 2px 4px rgba(0,0,0,0.04),
+      0 24px 80px rgba(0,0,0,0.24);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Status bar ──────────────────────────────────── */
+  .status-bar {
+    height: 54px;
+    background: var(--secondary-500);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px 0;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 5;
+  }
+  .status-time { font-size: 15px; font-weight: 600; color: var(--grey-900); letter-spacing: -0.01em; }
+  .status-icons { display: flex; align-items: center; gap: 7px; }
+  .dynamic-island {
+    width: 120px; height: 36px;
+    background: #000; border-radius: 20px;
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    z-index: 10;
+  }
+
+  /* ── Nav row ─────────────────────────────────────── */
+  .nav-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 20px 0;
+    flex-shrink: 0;
+  }
+  .back-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--secondary-600);
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .back-btn svg { width: 18px; height: 18px; color: var(--grey-700); }
+
+  /* ── Screen body ─────────────────────────────────── */
+  .screen-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Brand illustration block ────────────────────── */
+  .brand-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 0 0;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .sprout-illustration {
+    width: 160px;
+    height: 160px;
+    position: relative;
+  }
+
+  /* ── Content block ───────────────────────────────── */
+  .content-block {
+    padding: 0 28px;
+    flex-shrink: 0;
+  }
+  .screen-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--grey-900);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .screen-heading em {
+    font-style: italic;
+    color: var(--brand-500);
+  }
+  .screen-subtitle {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--grey-500);
+    line-height: 1.55;
+    margin-bottom: 28px;
+  }
+
+  /* ── Phone input row ─────────────────────────────── */
+  .phone-input-row {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 16px;
+    border: 1.5px solid var(--grey-100);
+    height: 58px;
+    padding: 0 18px;
+    gap: 0;
+    transition: border-color 0.2s;
+    margin-bottom: 12px;
+  }
+  .phone-input-row.focused {
+    border-color: var(--brand-500);
+    box-shadow: 0 0 0 3px rgba(24,99,56,0.08);
+  }
+  .country-selector {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-right: 14px;
+    border-right: 1.5px solid var(--grey-100);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .country-flag { font-size: 18px; line-height: 1; }
+  .country-code { font-size: 15px; font-weight: 500; color: var(--grey-700); }
+  .country-chevron { width: 14px; height: 14px; color: var(--grey-400); }
+  .phone-number-input {
+    flex: 1;
+    padding-left: 14px;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--grey-900);
+    letter-spacing: 0.03em;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+  }
+  .phone-number-input::placeholder { color: var(--grey-300); font-weight: 400; }
+  .phone-number-input.has-value { color: var(--grey-900); }
+
+  .input-hint {
+    font-size: 12px;
+    color: var(--grey-400);
+    padding: 0 4px;
+    line-height: 1.5;
+  }
+
+  /* ── OTP input ───────────────────────────────────── */
+  .otp-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--grey-500);
+    margin-bottom: 12px;
+  }
+  .otp-boxes {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .otp-box {
+    flex: 1;
+    height: 60px;
+    background: #fff;
+    border-radius: 14px;
+    border: 1.5px solid var(--grey-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--grey-900);
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s, background 0.2s;
+    letter-spacing: 0;
+  }
+  .otp-box.active {
+    border-color: var(--brand-500);
+    box-shadow: 0 0 0 3px rgba(24,99,56,0.08);
+  }
+  .otp-box.filled { background: #fff; border-color: var(--grey-200); }
+  .otp-box.valid  { border-color: var(--brand-500); background: var(--brand-50); color: var(--brand-500); }
+  .otp-box.error  { border-color: var(--error-500); background: var(--error-100); color: var(--error-500); }
+  .otp-box.empty  { color: var(--grey-300); }
+
+  /* ── Resend row ──────────────────────────────────── */
+  .resend-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 0;
+  }
+  .resend-text { font-size: 13.5px; color: var(--grey-400); }
+  .resend-link {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--brand-500);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .resend-link.muted { color: var(--grey-400); font-weight: 400; }
+  .resend-timer { font-size: 13.5px; font-weight: 600; color: var(--grey-500); }
+
+  /* ── Spacer ──────────────────────────────────────── */
+  .flex-grow { flex: 1; }
+
+  /* ── CTA button ──────────────────────────────────── */
+  .cta-wrap {
+    padding: 0 28px 20px;
+    flex-shrink: 0;
+  }
+  .cta-btn {
+    width: 100%;
+    height: 56px;
+    border-radius: 99px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.01em;
+  }
+  .cta-btn.disabled {
+    background: var(--brand-200);
+    color: rgba(255,255,255,0.7);
+    cursor: default;
+  }
+  .cta-btn.active {
+    background: var(--brand-500);
+    color: #fff;
+    box-shadow: 0 4px 18px rgba(24,99,56,0.3);
+  }
+  .cta-btn.error-state {
+    background: var(--error-500);
+    color: #fff;
+    box-shadow: 0 4px 18px rgba(214,69,69,0.3);
+  }
+
+  /* ── Keyboard ────────────────────────────────────── */
+  .keyboard {
+    background: var(--secondary-700);
+    flex-shrink: 0;
+    padding: 10px 4px 6px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px 8px;
+  }
+  .key {
+    height: 46px;
+    background: #fff;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    gap: 0px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.25);
+    user-select: none;
+  }
+  .key-num {
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--grey-900);
+    line-height: 1;
+    font-family: 'Inter', sans-serif;
+  }
+  .key-letters {
+    font-size: 8px;
+    font-weight: 600;
+    color: var(--grey-500);
+    letter-spacing: 0.08em;
+    line-height: 1;
+    margin-top: 1px;
+  }
+  .key.empty { background: var(--secondary-700); box-shadow: none; cursor: default; }
+  .key.delete {
+    background: var(--secondary-700);
+    box-shadow: none;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .key.delete svg { width: 22px; height: 22px; color: var(--grey-700); }
+  .home-indicator {
+    height: 28px;
+    background: var(--secondary-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .home-bar {
+    width: 134px; height: 5px;
+    background: var(--grey-900); border-radius: 99px; opacity: 0.18;
+  }
+
+  /* ── Animations ──────────────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .phone .nav-row      { animation: fadeUp 0.35s ease both; animation-delay: 0.05s; }
+  .phone .brand-block  { animation: fadeUp 0.45s ease both; animation-delay: 0.10s; }
+  .phone .content-block{ animation: fadeUp 0.45s ease both; animation-delay: 0.15s; }
+  .phone .cta-wrap     { animation: fadeUp 0.35s ease both; animation-delay: 0.20s; }
+
+  /* ── OTP valid flash ─────────────────────────────── */
+  @keyframes validPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+  .otp-box.valid { animation: validPop 0.3s ease both; }
+
+  /* ── Illustration leaf/sprout styles ─────────────── */
+  .leaf-decoration {
+    position: absolute;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     2.1  Phone entry — Default (empty)
+     ══════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <span class="variant-label">2.1 — Enter Number</span>
+  <div class="phone">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg viewBox="0 0 17 12" fill="none" width="17" height="12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#1a1b1e"/><rect x="4.5" y="5.5" width="3" height="6.5" rx="1" fill="#1a1b1e"/><rect x="9" y="2.5" width="3" height="9.5" rx="1" fill="#1a1b1e"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#1a1b1e" opacity="0.25"/></svg>
+        <svg viewBox="0 0 16 12" fill="none" width="16" height="12"><path d="M8 9.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" fill="#1a1b1e"/><path d="M4.5 7C5.8 5.8 6.8 5.2 8 5.2s2.2.6 3.5 1.8" stroke="#1a1b1e" stroke-width="1.4" stroke-linecap="round"/><path d="M1.5 4.5C3.4 2.7 5.5 1.5 8 1.5s4.6 1.2 6.5 3" stroke="#1a1b1e" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 25 12" fill="none" width="25" height="12"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="15" height="8" rx="2" fill="#1a1b1e"/><path d="M23 4.5v3a1.5 1.5 0 0 0 0-3z" fill="#1a1b1e" opacity="0.4"/></svg>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="screen-body">
+      <!-- Brand illustration -->
+      <div class="brand-block" style="padding: 12px 0 4px;">
+        <div class="sprout-illustration">
+          <svg width="160" height="160" viewBox="0 0 160 160" fill="none">
+            <!-- Soft backing circle -->
+            <circle cx="80" cy="80" r="72" fill="var(--brand-50)" opacity="0.6"/>
+            <circle cx="80" cy="80" r="55" fill="var(--brand-50)" opacity="0.5"/>
+
+            <!-- Ground / soil arc -->
+            <ellipse cx="80" cy="118" rx="34" ry="9" fill="var(--secondary-800)" opacity="0.45"/>
+
+            <!-- Main stem -->
+            <path d="M80 116 C80 100 80 88 80 72" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round"/>
+
+            <!-- Left large leaf -->
+            <path d="M80 90 C68 84 54 80 50 68 C58 64 72 70 80 82" fill="var(--brand-200)" opacity="0.9"/>
+            <path d="M80 90 C68 84 54 80 50 68" stroke="var(--brand-500)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            <!-- Left leaf vein -->
+            <path d="M80 90 C72 80 62 74 50 68" stroke="var(--brand-500)" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.5"/>
+
+            <!-- Right large leaf -->
+            <path d="M80 82 C92 76 106 72 110 60 C102 56 88 62 80 74" fill="var(--brand-300, #579a74)" opacity="0.85"/>
+            <path d="M80 82 C92 76 106 72 110 60" stroke="var(--brand-500)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            <!-- Right leaf vein -->
+            <path d="M80 82 C88 72 98 66 110 60" stroke="var(--brand-500)" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.5"/>
+
+            <!-- Small top sprout left -->
+            <path d="M80 72 C74 66 66 62 64 54 C70 52 78 56 80 66" fill="var(--brand-200)" opacity="0.7"/>
+
+            <!-- Small top sprout right -->
+            <path d="M80 68 C86 62 94 58 96 50 C90 48 82 52 80 62" fill="var(--brand-200)" opacity="0.7"/>
+
+            <!-- Sparkle dots — playful touch -->
+            <circle cx="48" cy="50" r="3" fill="var(--brand-200)" opacity="0.7"/>
+            <circle cx="112" cy="45" r="2.5" fill="var(--brand-200)" opacity="0.6"/>
+            <circle cx="42" cy="90" r="2" fill="var(--secondary-800)" opacity="0.4"/>
+            <circle cx="118" cy="95" r="2" fill="var(--secondary-800)" opacity="0.4"/>
+            <circle cx="58" cy="40" r="1.5" fill="var(--brand-500)" opacity="0.3"/>
+            <circle cx="102" cy="36" r="1.5" fill="var(--brand-500)" opacity="0.3"/>
+          </svg>
+        </div>
+        <!-- Sprout wordmark -->
+        <div style="display:flex;align-items:center;gap:6px;margin-top:-4px;">
+          <span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--brand-700);letter-spacing:-0.02em;">Sprout</span>
+        </div>
+        <p style="font-size:12px;color:var(--secondary-900);margin-top:3px;font-style:italic;font-family:'Playfair Display',serif;">Where parents bond and childhoods flourish.</p>
+      </div>
+
+      <!-- Content -->
+      <div class="content-block" style="margin-top: 28px;">
+        <h1 class="screen-heading">Join with your<br><em>phone number</em></h1>
+        <p class="screen-subtitle">We'll send a quick verification code — no passwords needed.</p>
+
+        <!-- Phone input -->
+        <div class="phone-input-row">
+          <div class="country-selector">
+            <span class="country-flag">🇦🇺</span>
+            <span class="country-code">+61</span>
+            <svg class="country-chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <input class="phone-number-input" type="tel" placeholder="000 000 000" disabled style="cursor:default;"/>
+        </div>
+        <p class="input-hint">Your number is only used to sign you in securely.</p>
+      </div>
+
+      <div class="flex-grow"></div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-wrap">
+      <button class="cta-btn disabled">Send Code</button>
+    </div>
+
+    <!-- Keyboard -->
+    <div class="keyboard">
+      <div class="key"><span class="key-num">1</span></div>
+      <div class="key"><span class="key-num">2</span><span class="key-letters">ABC</span></div>
+      <div class="key"><span class="key-num">3</span><span class="key-letters">DEF</span></div>
+      <div class="key"><span class="key-num">4</span><span class="key-letters">GHI</span></div>
+      <div class="key"><span class="key-num">5</span><span class="key-letters">JKL</span></div>
+      <div class="key"><span class="key-num">6</span><span class="key-letters">MNO</span></div>
+      <div class="key"><span class="key-num">7</span><span class="key-letters">PQRS</span></div>
+      <div class="key"><span class="key-num">8</span><span class="key-letters">TUV</span></div>
+      <div class="key"><span class="key-num">9</span><span class="key-letters">WXYZ</span></div>
+      <div class="key empty"></div>
+      <div class="key"><span class="key-num">0</span></div>
+      <div class="key delete"><svg viewBox="0 0 24 24" fill="none"><path d="M21 12H9M9 12l4-4M9 12l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 7l3-3h15v14H6L3 17V7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="home-indicator"><div class="home-bar"></div></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     2.2  Phone entry — Filled (number typed)
+     ══════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <span class="variant-label">2.2 — Number Filled</span>
+  <div class="phone">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg viewBox="0 0 17 12" fill="none" width="17" height="12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#1a1b1e"/><rect x="4.5" y="5.5" width="3" height="6.5" rx="1" fill="#1a1b1e"/><rect x="9" y="2.5" width="3" height="9.5" rx="1" fill="#1a1b1e"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#1a1b1e" opacity="0.25"/></svg>
+        <svg viewBox="0 0 16 12" fill="none" width="16" height="12"><path d="M8 9.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" fill="#1a1b1e"/><path d="M4.5 7C5.8 5.8 6.8 5.2 8 5.2s2.2.6 3.5 1.8" stroke="#1a1b1e" stroke-width="1.4" stroke-linecap="round"/><path d="M1.5 4.5C3.4 2.7 5.5 1.5 8 1.5s4.6 1.2 6.5 3" stroke="#1a1b1e" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 25 12" fill="none" width="25" height="12"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="15" height="8" rx="2" fill="#1a1b1e"/><path d="M23 4.5v3a1.5 1.5 0 0 0 0-3z" fill="#1a1b1e" opacity="0.4"/></svg>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="screen-body">
+      <div class="brand-block" style="padding: 12px 0 4px;">
+        <div class="sprout-illustration">
+          <svg width="160" height="160" viewBox="0 0 160 160" fill="none">
+            <circle cx="80" cy="80" r="72" fill="var(--brand-50)" opacity="0.6"/>
+            <circle cx="80" cy="80" r="55" fill="var(--brand-50)" opacity="0.5"/>
+            <ellipse cx="80" cy="118" rx="34" ry="9" fill="var(--secondary-800)" opacity="0.45"/>
+            <path d="M80 116 C80 100 80 88 80 72" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round"/>
+            <path d="M80 90 C68 84 54 80 50 68 C58 64 72 70 80 82" fill="var(--brand-200)" opacity="0.9"/>
+            <path d="M80 90 C68 84 54 80 50 68" stroke="var(--brand-500)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            <path d="M80 90 C72 80 62 74 50 68" stroke="var(--brand-500)" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.5"/>
+            <path d="M80 82 C92 76 106 72 110 60 C102 56 88 62 80 74" fill="#579a74" opacity="0.85"/>
+            <path d="M80 82 C92 76 106 72 110 60" stroke="var(--brand-500)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            <path d="M80 82 C88 72 98 66 110 60" stroke="var(--brand-500)" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.5"/>
+            <path d="M80 72 C74 66 66 62 64 54 C70 52 78 56 80 66" fill="var(--brand-200)" opacity="0.7"/>
+            <path d="M80 68 C86 62 94 58 96 50 C90 48 82 52 80 62" fill="var(--brand-200)" opacity="0.7"/>
+            <circle cx="48" cy="50" r="3" fill="var(--brand-200)" opacity="0.7"/>
+            <circle cx="112" cy="45" r="2.5" fill="var(--brand-200)" opacity="0.6"/>
+            <circle cx="42" cy="90" r="2" fill="var(--secondary-800)" opacity="0.4"/>
+            <circle cx="118" cy="95" r="2" fill="var(--secondary-800)" opacity="0.4"/>
+            <circle cx="58" cy="40" r="1.5" fill="var(--brand-500)" opacity="0.3"/>
+            <circle cx="102" cy="36" r="1.5" fill="var(--brand-500)" opacity="0.3"/>
+          </svg>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:-4px;">
+          <span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--brand-700);letter-spacing:-0.02em;">Sprout</span>
+        </div>
+        <p style="font-size:12px;color:var(--secondary-900);margin-top:3px;font-style:italic;font-family:'Playfair Display',serif;">Where parents bond and childhoods flourish.</p>
+      </div>
+
+      <div class="content-block" style="margin-top: 28px;">
+        <h1 class="screen-heading">Join with your<br><em>phone number</em></h1>
+        <p class="screen-subtitle">We'll send a quick verification code — no passwords needed.</p>
+
+        <div class="phone-input-row focused">
+          <div class="country-selector">
+            <span class="country-flag">🇦🇺</span>
+            <span class="country-code">+61</span>
+            <svg class="country-chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <input class="phone-number-input has-value" type="tel" value="412 345 678" disabled style="cursor:default;"/>
+        </div>
+        <p class="input-hint">Your number is only used to sign you in securely.</p>
+      </div>
+      <div class="flex-grow"></div>
+    </div>
+
+    <div class="cta-wrap">
+      <button class="cta-btn active">
+        Send Code
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="keyboard">
+      <div class="key"><span class="key-num">1</span></div>
+      <div class="key"><span class="key-num">2</span><span class="key-letters">ABC</span></div>
+      <div class="key"><span class="key-num">3</span><span class="key-letters">DEF</span></div>
+      <div class="key"><span class="key-num">4</span><span class="key-letters">GHI</span></div>
+      <div class="key"><span class="key-num">5</span><span class="key-letters">JKL</span></div>
+      <div class="key"><span class="key-num">6</span><span class="key-letters">MNO</span></div>
+      <div class="key"><span class="key-num">7</span><span class="key-letters">PQRS</span></div>
+      <div class="key"><span class="key-num">8</span><span class="key-letters">TUV</span></div>
+      <div class="key"><span class="key-num">9</span><span class="key-letters">WXYZ</span></div>
+      <div class="key empty"></div>
+      <div class="key"><span class="key-num">0</span></div>
+      <div class="key delete"><svg viewBox="0 0 24 24" fill="none"><path d="M21 12H9M9 12l4-4M9 12l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 7l3-3h15v14H6L3 17V7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="home-indicator"><div class="home-bar"></div></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     2.3  Verify code — Default (empty)
+     ══════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <span class="variant-label">2.3 — Enter Code</span>
+  <div class="phone">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg viewBox="0 0 17 12" fill="none" width="17" height="12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#1a1b1e"/><rect x="4.5" y="5.5" width="3" height="6.5" rx="1" fill="#1a1b1e"/><rect x="9" y="2.5" width="3" height="9.5" rx="1" fill="#1a1b1e"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#1a1b1e" opacity="0.25"/></svg>
+        <svg viewBox="0 0 16 12" fill="none" width="16" height="12"><path d="M8 9.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" fill="#1a1b1e"/><path d="M4.5 7C5.8 5.8 6.8 5.2 8 5.2s2.2.6 3.5 1.8" stroke="#1a1b1e" stroke-width="1.4" stroke-linecap="round"/><path d="M1.5 4.5C3.4 2.7 5.5 1.5 8 1.5s4.6 1.2 6.5 3" stroke="#1a1b1e" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 25 12" fill="none" width="25" height="12"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="15" height="8" rx="2" fill="#1a1b1e"/><path d="M23 4.5v3a1.5 1.5 0 0 0 0-3z" fill="#1a1b1e" opacity="0.4"/></svg>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="screen-body">
+      <!-- Smaller brand moment for verify screen -->
+      <div class="brand-block" style="padding: 10px 0 0;">
+        <div style="width:110px;height:110px;">
+          <svg width="110" height="110" viewBox="0 0 110 110" fill="none">
+            <circle cx="55" cy="55" r="50" fill="var(--brand-50)" opacity="0.55"/>
+            <!-- SMS / message bubble with lock icon -->
+            <rect x="24" y="32" width="62" height="42" rx="10" fill="#fff" opacity="0.9"/>
+            <rect x="24" y="32" width="62" height="42" rx="10" stroke="var(--brand-200)" stroke-width="1.5"/>
+            <!-- message lines -->
+            <rect x="34" y="44" width="28" height="3" rx="1.5" fill="var(--brand-100)"/>
+            <rect x="34" y="51" width="20" height="3" rx="1.5" fill="var(--brand-100)"/>
+            <!-- asterisk / code dots -->
+            <circle cx="67" cy="45.5" r="2.5" fill="var(--brand-500)" opacity="0.7"/>
+            <circle cx="74" cy="45.5" r="2.5" fill="var(--brand-500)" opacity="0.5"/>
+            <circle cx="67" cy="52.5" r="2.5" fill="var(--brand-500)" opacity="0.4"/>
+            <circle cx="74" cy="52.5" r="2.5" fill="var(--brand-500)" opacity="0.3"/>
+            <!-- tail -->
+            <path d="M44 74 L38 84 L54 78" fill="#fff" stroke="var(--brand-200)" stroke-width="1.5" stroke-linejoin="round"/>
+            <!-- sparkles -->
+            <circle cx="20" cy="30" r="2.5" fill="var(--brand-200)" opacity="0.6"/>
+            <circle cx="90" cy="28" r="2" fill="var(--brand-200)" opacity="0.5"/>
+            <circle cx="94" cy="68" r="1.5" fill="var(--secondary-800)" opacity="0.4"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="content-block" style="margin-top: 18px;">
+        <h1 class="screen-heading" style="font-size:28px;">Check your<br><em>messages</em></h1>
+        <p class="screen-subtitle" style="margin-bottom:24px;">
+          We sent a 6-digit code to<br>
+          <strong style="color:var(--grey-700);font-weight:600;">+61 412 345 678</strong>
+        </p>
+
+        <!-- OTP boxes — empty, first active -->
+        <div class="otp-boxes">
+          <div class="otp-box active empty">—</div>
+          <div class="otp-box empty">—</div>
+          <div class="otp-box empty">—</div>
+          <div class="otp-box empty">—</div>
+          <div class="otp-box empty">—</div>
+          <div class="otp-box empty">—</div>
+        </div>
+
+        <div class="resend-row">
+          <span class="resend-text">Didn't receive a code?</span>
+          <span class="resend-link muted" style="margin-left:4px;">Resend in</span>
+          <span class="resend-timer" style="margin-left:4px;">0:30</span>
+        </div>
+      </div>
+      <div class="flex-grow"></div>
+    </div>
+
+    <div class="cta-wrap">
+      <button class="cta-btn disabled">Verify</button>
+    </div>
+    <div class="keyboard">
+      <div class="key"><span class="key-num">1</span></div>
+      <div class="key"><span class="key-num">2</span><span class="key-letters">ABC</span></div>
+      <div class="key"><span class="key-num">3</span><span class="key-letters">DEF</span></div>
+      <div class="key"><span class="key-num">4</span><span class="key-letters">GHI</span></div>
+      <div class="key"><span class="key-num">5</span><span class="key-letters">JKL</span></div>
+      <div class="key"><span class="key-num">6</span><span class="key-letters">MNO</span></div>
+      <div class="key"><span class="key-num">7</span><span class="key-letters">PQRS</span></div>
+      <div class="key"><span class="key-num">8</span><span class="key-letters">TUV</span></div>
+      <div class="key"><span class="key-num">9</span><span class="key-letters">WXYZ</span></div>
+      <div class="key empty"></div>
+      <div class="key"><span class="key-num">0</span></div>
+      <div class="key delete"><svg viewBox="0 0 24 24" fill="none"><path d="M21 12H9M9 12l4-4M9 12l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 7l3-3h15v14H6L3 17V7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="home-indicator"><div class="home-bar"></div></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     2.4  Verify code — Filled / Valid ✓
+     ══════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <span class="variant-label">2.4 — Code Valid ✓</span>
+  <div class="phone">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg viewBox="0 0 17 12" fill="none" width="17" height="12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#1a1b1e"/><rect x="4.5" y="5.5" width="3" height="6.5" rx="1" fill="#1a1b1e"/><rect x="9" y="2.5" width="3" height="9.5" rx="1" fill="#1a1b1e"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#1a1b1e" opacity="0.25"/></svg>
+        <svg viewBox="0 0 16 12" fill="none" width="16" height="12"><path d="M8 9.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" fill="#1a1b1e"/><path d="M4.5 7C5.8 5.8 6.8 5.2 8 5.2s2.2.6 3.5 1.8" stroke="#1a1b1e" stroke-width="1.4" stroke-linecap="round"/><path d="M1.5 4.5C3.4 2.7 5.5 1.5 8 1.5s4.6 1.2 6.5 3" stroke="#1a1b1e" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 25 12" fill="none" width="25" height="12"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="15" height="8" rx="2" fill="#1a1b1e"/><path d="M23 4.5v3a1.5 1.5 0 0 0 0-3z" fill="#1a1b1e" opacity="0.4"/></svg>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="screen-body">
+      <div class="brand-block" style="padding: 10px 0 0;">
+        <div style="width:110px;height:110px;">
+          <svg width="110" height="110" viewBox="0 0 110 110" fill="none">
+            <circle cx="55" cy="55" r="50" fill="var(--brand-50)" opacity="0.55"/>
+            <rect x="24" y="32" width="62" height="42" rx="10" fill="#fff" opacity="0.9"/>
+            <rect x="24" y="32" width="62" height="42" rx="10" stroke="var(--brand-200)" stroke-width="1.5"/>
+            <rect x="34" y="44" width="28" height="3" rx="1.5" fill="var(--brand-100)"/>
+            <rect x="34" y="51" width="20" height="3" rx="1.5" fill="var(--brand-100)"/>
+            <circle cx="67" cy="45.5" r="2.5" fill="var(--brand-500)" opacity="0.7"/>
+            <circle cx="74" cy="45.5" r="2.5" fill="var(--brand-500)" opacity="0.5"/>
+            <circle cx="67" cy="52.5" r="2.5" fill="var(--brand-500)" opacity="0.4"/>
+            <circle cx="74" cy="52.5" r="2.5" fill="var(--brand-500)" opacity="0.3"/>
+            <path d="M44 74 L38 84 L54 78" fill="#fff" stroke="var(--brand-200)" stroke-width="1.5" stroke-linejoin="round"/>
+            <!-- Valid checkmark overlay -->
+            <circle cx="82" cy="28" r="14" fill="var(--brand-500)"/>
+            <path d="M76 28l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="20" cy="30" r="2.5" fill="var(--brand-200)" opacity="0.6"/>
+            <circle cx="94" cy="68" r="1.5" fill="var(--secondary-800)" opacity="0.4"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="content-block" style="margin-top: 18px;">
+        <h1 class="screen-heading" style="font-size:28px;">Check your<br><em>messages</em></h1>
+        <p class="screen-subtitle" style="margin-bottom:24px;">
+          We sent a 6-digit code to<br>
+          <strong style="color:var(--grey-700);font-weight:600;">+61 412 345 678</strong>
+        </p>
+
+        <!-- OTP boxes — all valid -->
+        <div class="otp-boxes">
+          <div class="otp-box valid">6</div>
+          <div class="otp-box valid">0</div>
+          <div class="otp-box valid">1</div>
+          <div class="otp-box valid">0</div>
+          <div class="otp-box valid">2</div>
+          <div class="otp-box valid">0</div>
+        </div>
+
+        <div class="resend-row">
+          <span class="resend-text">Didn't receive a code?</span>
+          <a class="resend-link" style="margin-left:4px;">Resend</a>
+        </div>
+      </div>
+      <div class="flex-grow"></div>
+    </div>
+
+    <div class="cta-wrap">
+      <button class="cta-btn active">
+        Verify
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="keyboard">
+      <div class="key"><span class="key-num">1</span></div>
+      <div class="key"><span class="key-num">2</span><span class="key-letters">ABC</span></div>
+      <div class="key"><span class="key-num">3</span><span class="key-letters">DEF</span></div>
+      <div class="key"><span class="key-num">4</span><span class="key-letters">GHI</span></div>
+      <div class="key"><span class="key-num">5</span><span class="key-letters">JKL</span></div>
+      <div class="key"><span class="key-num">6</span><span class="key-letters">MNO</span></div>
+      <div class="key"><span class="key-num">7</span><span class="key-letters">PQRS</span></div>
+      <div class="key"><span class="key-num">8</span><span class="key-letters">TUV</span></div>
+      <div class="key"><span class="key-num">9</span><span class="key-letters">WXYZ</span></div>
+      <div class="key empty"></div>
+      <div class="key"><span class="key-num">0</span></div>
+      <div class="key delete"><svg viewBox="0 0 24 24" fill="none"><path d="M21 12H9M9 12l4-4M9 12l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 7l3-3h15v14H6L3 17V7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="home-indicator"><div class="home-bar"></div></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     2.5  Verify code — Error state ✗
+     ══════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <span class="variant-label">2.5 — Code Error ✗</span>
+  <div class="phone">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg viewBox="0 0 17 12" fill="none" width="17" height="12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#1a1b1e"/><rect x="4.5" y="5.5" width="3" height="6.5" rx="1" fill="#1a1b1e"/><rect x="9" y="2.5" width="3" height="9.5" rx="1" fill="#1a1b1e"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#1a1b1e" opacity="0.25"/></svg>
+        <svg viewBox="0 0 16 12" fill="none" width="16" height="12"><path d="M8 9.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" fill="#1a1b1e"/><path d="M4.5 7C5.8 5.8 6.8 5.2 8 5.2s2.2.6 3.5 1.8" stroke="#1a1b1e" stroke-width="1.4" stroke-linecap="round"/><path d="M1.5 4.5C3.4 2.7 5.5 1.5 8 1.5s4.6 1.2 6.5 3" stroke="#1a1b1e" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 25 12" fill="none" width="25" height="12"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="15" height="8" rx="2" fill="#1a1b1e"/><path d="M23 4.5v3a1.5 1.5 0 0 0 0-3z" fill="#1a1b1e" opacity="0.4"/></svg>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="screen-body">
+      <div class="brand-block" style="padding: 10px 0 0;">
+        <div style="width:110px;height:110px;">
+          <svg width="110" height="110" viewBox="0 0 110 110" fill="none">
+            <circle cx="55" cy="55" r="50" fill="var(--error-100)" opacity="0.5"/>
+            <rect x="24" y="32" width="62" height="42" rx="10" fill="#fff" opacity="0.9"/>
+            <rect x="24" y="32" width="62" height="42" rx="10" stroke="var(--error-500)" stroke-width="1.5" opacity="0.4"/>
+            <rect x="34" y="44" width="28" height="3" rx="1.5" fill="var(--error-100)"/>
+            <rect x="34" y="51" width="20" height="3" rx="1.5" fill="var(--error-100)"/>
+            <circle cx="67" cy="45.5" r="2.5" fill="var(--error-500)" opacity="0.5"/>
+            <circle cx="74" cy="45.5" r="2.5" fill="var(--error-500)" opacity="0.4"/>
+            <circle cx="67" cy="52.5" r="2.5" fill="var(--error-500)" opacity="0.3"/>
+            <circle cx="74" cy="52.5" r="2.5" fill="var(--error-500)" opacity="0.25"/>
+            <path d="M44 74 L38 84 L54 78" fill="#fff" stroke="var(--error-500)" stroke-width="1.5" stroke-linejoin="round" opacity="0.4"/>
+            <!-- Error X overlay -->
+            <circle cx="82" cy="28" r="14" fill="var(--error-500)"/>
+            <path d="M77 23l10 10M87 23L77 33" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="content-block" style="margin-top: 18px;">
+        <h1 class="screen-heading" style="font-size:28px;">Check your<br><em style="color:var(--error-500);">messages</em></h1>
+        <p class="screen-subtitle" style="margin-bottom:6px;">
+          We sent a 6-digit code to<br>
+          <strong style="color:var(--grey-700);font-weight:600;">+61 412 345 678</strong>
+        </p>
+        <!-- Inline error message -->
+        <div style="display:flex;align-items:center;gap:6px;background:var(--error-100);border-radius:10px;padding:8px 12px;margin-bottom:18px;">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="var(--error-500)" stroke-width="1.4"/><path d="M8 5v4" stroke="var(--error-500)" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="11.5" r="0.75" fill="var(--error-500)"/></svg>
+          <span style="font-size:12.5px;color:var(--error-500);font-weight:500;">That code isn't right. Please try again.</span>
+        </div>
+
+        <!-- OTP boxes — all error -->
+        <div class="otp-boxes">
+          <div class="otp-box error">6</div>
+          <div class="otp-box error">0</div>
+          <div class="otp-box error">1</div>
+          <div class="otp-box error">9</div>
+          <div class="otp-box error">9</div>
+          <div class="otp-box error">9</div>
+        </div>
+
+        <div class="resend-row">
+          <span class="resend-text">Didn't receive a code?</span>
+          <a class="resend-link" style="margin-left:4px;">Resend</a>
+        </div>
+      </div>
+      <div class="flex-grow"></div>
+    </div>
+
+    <div class="cta-wrap">
+      <button class="cta-btn error-state">
+        Try Again
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M1 4v6h6M23 20v-6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="keyboard">
+      <div class="key"><span class="key-num">1</span></div>
+      <div class="key"><span class="key-num">2</span><span class="key-letters">ABC</span></div>
+      <div class="key"><span class="key-num">3</span><span class="key-letters">DEF</span></div>
+      <div class="key"><span class="key-num">4</span><span class="key-letters">GHI</span></div>
+      <div class="key"><span class="key-num">5</span><span class="key-letters">JKL</span></div>
+      <div class="key"><span class="key-num">6</span><span class="key-letters">MNO</span></div>
+      <div class="key"><span class="key-num">7</span><span class="key-letters">PQRS</span></div>
+      <div class="key"><span class="key-num">8</span><span class="key-letters">TUV</span></div>
+      <div class="key"><span class="key-num">9</span><span class="key-letters">WXYZ</span></div>
+      <div class="key empty"></div>
+      <div class="key"><span class="key-num">0</span></div>
+      <div class="key delete"><svg viewBox="0 0 24 24" fill="none"><path d="M21 12H9M9 12l4-4M9 12l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 7l3-3h15v14H6L3 17V7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="home-indicator"><div class="home-bar"></div></div>
+  </div>
+</div>
+
+</body>
+</html>
