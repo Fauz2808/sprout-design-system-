@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Admin Dashboard · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #f0ede6;
+    --surface:     #ffffff;
+    --surface-2:   #f7f5f0;
+    --fg:          #161612;
+    --muted:       #7a7568;
+    --border:      #ddd9cf;
+    --border-2:    #e8e4db;
+    --green:       #2d5c2e;
+    --green-mid:   #3d7a40;
+    --green-light: #e6f0e6;
+    --green-pale:  #f0f6f0;
+    --amber:       #c17f2a;
+    --amber-pale:  #fdf3e3;
+    --red:         #b84040;
+    --red-pale:    #fdf0f0;
+    --blue:        #2a5fc1;
+    --blue-pale:   #eef3fd;
+    --font-display:'Playfair Display', Georgia, serif;
+    --font-body:   'Jost', system-ui, sans-serif;
+    --radius:      12px;
+    --radius-lg:   18px;
+    --sidebar-w:   244px;
+    --shadow:      0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { font-family: var(--font-body); font-size: 14px; line-height: 1.5; color: var(--fg); background: var(--bg); -webkit-font-smoothing: antialiased; }
+
+  /* ─── LAYOUT ─── */
+  .app { display: flex; min-height: 100vh; }
+  .sidebar { width: var(--sidebar-w); min-height: 100vh; background: var(--green); display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 0; height: 100vh; }
+  .sidebar-logo { padding: 26px 22px 18px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .logo-mark { display: flex; align-items: center; gap: 10px; }
+  .logo-icon { width: 34px; height: 34px; background: rgba(255,255,255,0.15); border-radius: 10px; display: grid; place-items: center; font-size: 18px; flex-shrink: 0; }
+  .logo-text { font-family: var(--font-display); font-size: 19px; font-weight: 600; color: #fff; line-height: 1.1; }
+  .logo-sub { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .sidebar-nav { flex: 1; padding: 14px 12px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+  .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.35); padding: 12px 12px 6px; }
+  .nav-label:first-child { padding-top: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; color: rgba(255,255,255,0.65); font-size: 13.5px; font-weight: 500; cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background .15s, color .15s; font-family: var(--font-body); }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9); }
+  .nav-item.active { background: rgba(255,255,255,0.15); color: #fff; }
+  .nav-item svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+  .nav-badge { margin-left: auto; min-width: 18px; height: 18px; background: rgba(255,255,255,0.2); color: #fff; border-radius: 999px; font-size: 10px; font-weight: 700; display: grid; place-items: center; padding: 0 5px; }
+  .nav-badge.warn { background: #e0a94a; color: #3a2a05; }
+  .sidebar-footer { padding: 14px 12px 22px; border-top: 1px solid rgba(255,255,255,0.1); }
+  .user-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; }
+  .user-av { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.2); display: grid; place-items: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .user-name { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); }
+  .user-role { font-size: 11px; color: rgba(255,255,255,0.45); }
+
+  .main { flex: 1; display: flex; flex-direction: column; min-height: 100vh; overflow: hidden; }
+  .topbar { height: 60px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 32px; gap: 16px; position: sticky; top: 0; z-index: 10; flex-shrink: 0; }
+  .topbar-title { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; flex: 1; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
+  .content { flex: 1; padding: 32px; overflow-y: auto; }
+  .view { display: none; animation: fadeIn .2s ease; }
+  .view.on { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ─── BUTTONS ─── */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 9px; font-family: var(--font-body); font-size: 13.5px; font-weight: 500; cursor: pointer; border: none; transition: all .15s; white-space: nowrap; }
+  .btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
+  .btn-primary { background: var(--green); color: #fff; }
+  .btn-primary:hover { background: var(--green-mid); }
+  .btn-secondary { background: var(--surface-2); color: var(--fg); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--border-2); }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--surface-2); }
+  .btn-danger { background: var(--red-pale); color: var(--red); border: 1px solid #f0c0c0; }
+  .btn-danger:hover { background: #fbe0e0; }
+  .btn-full { width: 100%; justify-content: center; padding: 13px 20px; font-size: 14.5px; font-weight: 600; }
+
+  /* ─── SEARCH FIELD ─── */
+  .searchbox { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 9px 13px; width: 240px; }
+  .searchbox svg { width: 15px; height: 15px; color: var(--muted); flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 2; }
+  .searchbox input { border: none; outline: none; background: none; font-size: 13.5px; flex: 1; font-family: var(--font-body); color: var(--fg); }
+
+  /* ─── PAGE HEADER ─── */
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 26px; gap: 16px; }
+  .page-header h1 { font-family: var(--font-display); font-size: 25px; font-weight: 600; color: var(--fg); letter-spacing: -0.02em; margin-bottom: 5px; }
+  .page-header p { font-size: 13px; color: var(--muted); max-width: 620px; line-height: 1.5; }
+  .headright { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+  /* ─── CARDS ─── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
+  .card-body { padding: 22px 24px; }
+  .card-header { padding: 18px 22px; border-bottom: 1px solid var(--border-2); display: flex; align-items: center; justify-content: space-between; }
+  .card-title { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--fg); }
+  .card-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+  /* ─── BADGES ─── */
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: 0.7; flex-shrink: 0; }
+  .badge-active    { background: var(--green-light); color: var(--green); }
+  .badge-draft     { background: #f0f0e8; color: #7a7040; }
+  .badge-ended     { background: var(--surface-2); color: var(--muted); }
+  .badge-pending   { background: var(--amber-pale); color: var(--amber); }
+  .badge-flagged   { background: var(--amber-pale); color: var(--amber); }
+  .badge-removed   { background: var(--red-pale); color: var(--red); }
+  .badge-camp      { background: var(--blue-pale); color: var(--blue); }
+  .badge-recurring { background: #f0eaf8; color: #6a3aaa; }
+
+  /* ─── STATS ─── */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 26px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 22px; box-shadow: var(--shadow); position: relative; overflow: hidden; cursor: default; }
+  .stat-card.clickable { cursor: pointer; transition: transform .12s; }
+  .stat-card.clickable:hover { transform: translateY(-2px); }
+  .stat-card::after { content: ''; position: absolute; top: 0; right: 0; width: 60px; height: 60px; background: var(--green-pale); border-radius: 0 0 0 60px; }
+  .stat-card.flag::after { background: var(--amber-pale); }
+  .stat-card.danger::after { background: var(--red-pale); }
+  .stat-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; position: relative; z-index: 2; }
+  .stat-value { font-family: var(--font-display); font-size: 27px; font-weight: 600; color: var(--fg); letter-spacing: -0.02em; line-height: 1; margin-bottom: 6px; position: relative; z-index: 2; }
+  .stat-card.flag .stat-value { color: var(--amber); }
+  .stat-card.danger .stat-value { color: var(--red); }
+  .stat-delta { font-size: 12px; color: var(--green-mid); font-weight: 500; position: relative; z-index: 2; }
+  .stat-icon { position: absolute; top: 16px; right: 16px; font-size: 19px; z-index: 1; }
+  .stat-card.auto { background: var(--surface-2); border-style: dashed; }
+  .stat-card.auto::after { display: none; }
+  .stat-card.auto .stat-value { font-family: var(--font-body); font-size: 14px; font-weight: 600; color: var(--fg); }
+  .stat-card.auto .stat-delta { color: var(--muted); }
+
+  /* ─── TABS ─── */
+  .tabs { display: flex; gap: 4px; border-bottom: 1.5px solid var(--border); margin-bottom: 16px; }
+  .tab { padding: 10px 4px; margin-right: 24px; font-size: 13.5px; font-weight: 500; color: var(--muted); cursor: pointer; position: relative; display: flex; align-items: center; gap: 7px; font-family: var(--font-body); }
+  .tab.active { color: var(--green); font-weight: 600; }
+  .tab.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1.5px; height: 2px; background: var(--green); border-radius: 2px 2px 0 0; }
+  .tab .n { font-size: 11px; font-weight: 700; background: var(--border-2); color: var(--muted); padding: 1px 7px; border-radius: 99px; }
+  .tab.active .n { background: var(--green-light); color: var(--green); }
+  .tab[data-tab="flagged"] .n { background: var(--amber-pale); color: var(--amber); }
+
+  /* ─── TABLE ─── */
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 12px 22px; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); border-bottom: 1px solid var(--border-2); }
+  tbody tr { border-bottom: 1px solid var(--border-2); cursor: pointer; transition: background .1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+  tbody tr.dimmed { opacity: .5; }
+  tbody td { padding: 13px 22px; font-size: 13.5px; color: var(--fg); vertical-align: middle; }
+  .td-muted { color: var(--muted); font-size: 13px; }
+  .ev-cell { display: flex; align-items: center; gap: 12px; }
+  .ev-thumb { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; }
+  .event-name-cell { font-weight: 600; }
+  .event-name-cell .sub { font-size: 12px; font-weight: 400; color: var(--muted); margin-top: 1px; }
+  .flagreason { font-size: 11px; color: var(--amber); margin-top: 3px; font-weight: 500; }
+  .creator-cell { display: flex; align-items: center; gap: 9px; }
+  .av { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .action-btn { font-size: 12.5px; font-weight: 500; color: var(--green-mid); cursor: pointer; border: none; background: none; font-family: var(--font-body); padding: 0; }
+  .action-btn:hover { text-decoration: underline; }
+  .action-btn.danger { color: var(--red); }
+  .sep { color: var(--border); margin: 0 6px; }
+
+  /* ─── DASHBOARD extras ─── */
+  .dash-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; align-items: start; }
+  .timeline { display: flex; flex-direction: column; }
+  .tl-row { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border-2); }
+  .tl-row:last-child { border-bottom: none; }
+  .tl-ic { width: 30px; height: 30px; border-radius: 50%; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+  .tl-tx { flex: 1; font-size: 13px; color: var(--fg); line-height: 1.5; }
+  .tl-tx b { font-weight: 600; }
+  .tl-tm { font-size: 11.5px; color: var(--muted); flex-shrink: 0; white-space: nowrap; padding-top: 2px; }
+  .attn-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border-2); cursor: pointer; }
+  .attn-row:last-child { border-bottom: none; }
+  .attn-ic { width: 32px; height: 32px; border-radius: 9px; background: var(--amber-pale); color: var(--amber); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .attn-ic svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; }
+  .attn-tx { flex: 1; font-size: 13px; font-weight: 600; color: var(--fg); }
+  .attn-tx span { display: block; font-size: 11.5px; font-weight: 400; color: var(--muted); margin-top: 1px; }
+  .attn-row .chev { color: var(--muted); flex-shrink: 0; }
+
+  /* ─── Detail drawer ─── */
+  .scrim { position: fixed; inset: 0; background: rgba(22,22,18,0.4); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 40; }
+  .scrim.on { opacity: 1; pointer-events: auto; }
+  .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 440px; background: var(--surface); box-shadow: -12px 0 40px rgba(0,0,0,0.15); transform: translateX(100%); transition: transform .28s cubic-bezier(.32,.72,0,1); z-index: 41; display: flex; flex-direction: column; }
+  .drawer.on { transform: translateX(0); }
+  .drawer-hero { height: 148px; position: relative; flex-shrink: 0; display: flex; align-items: flex-end; padding: 16px; }
+  .drawer-hero .x { position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .drawer-hero .x svg { width: 14px; height: 14px; stroke: var(--fg); fill: none; stroke-width: 1.8; }
+  .drawer-body { flex: 1; overflow-y: auto; padding: 20px 22px; }
+  .drawer-status { margin-bottom: 10px; }
+  .drawer-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--fg); margin-bottom: 4px; }
+  .drawer-club { font-size: 12.5px; color: var(--muted); margin-bottom: 18px; }
+  .flagcallout { display: flex; gap: 10px; background: var(--amber-pale); border: 1px solid #f0dba8; border-radius: var(--radius); padding: 12px 13px; margin-bottom: 18px; }
+  .flagcallout svg { width: 16px; height: 16px; color: var(--amber); flex-shrink: 0; margin-top: 1px; }
+  .flagcallout .tx { font-size: 12.5px; color: #6b5210; line-height: 1.5; }
+  .flagcallout .tx b { color: #4a3800; }
+  .drawer-sec { margin-bottom: 20px; }
+  .drawer-sec-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 8px; }
+  .drawer-desc { font-size: 13.5px; color: var(--fg); line-height: 1.6; }
+  .infogrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .infochip { background: var(--surface-2); border-radius: 10px; padding: 9px 11px; }
+  .infochip .l { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+  .infochip .v { font-size: 13px; font-weight: 600; color: var(--fg); }
+  .creator-card { display: flex; align-items: center; gap: 11px; background: var(--surface-2); border-radius: var(--radius); padding: 12px 13px; }
+  .creator-card .av { width: 36px; height: 36px; font-size: 13px; }
+  .creator-card .nm { font-size: 13.5px; font-weight: 700; color: var(--fg); }
+  .creator-card .met { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+  .listline { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--surface-2); font-size: 13px; }
+  .listline:last-child { border-bottom: none; }
+  .listline .l { color: var(--muted); }
+  .listline .v { font-weight: 600; color: var(--fg); }
+
+  .drawer-foot { flex-shrink: 0; padding: 16px 22px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+
+  /* ─── Confirm modal ─── */
+  .modal-scrim { position: fixed; inset: 0; background: rgba(22,22,18,0.5); opacity: 0; pointer-events: none; transition: opacity .18s; z-index: 50; display: flex; align-items: center; justify-content: center; }
+  .modal-scrim.on { opacity: 1; pointer-events: auto; }
+  .modal { width: 420px; background: var(--surface); border-radius: var(--radius-lg); padding: 24px; transform: scale(.96); transition: transform .18s; }
+  .modal-scrim.on .modal { transform: scale(1); }
+  .modal h3 { font-family: var(--font-display); font-size: 19px; font-weight: 700; color: var(--fg); margin-bottom: 6px; }
+  .modal p.sub { font-size: 12.5px; color: var(--muted); margin-bottom: 16px; }
+  .reason { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius); margin-bottom: 7px; cursor: pointer; }
+  .reason.on { border-color: var(--red); background: var(--red-pale); }
+  .reason .radio { width: 17px; height: 17px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; }
+  .reason.on .radio { border-color: var(--red); background: var(--red); box-shadow: inset 0 0 0 3px #fff; }
+  .reason span { font-size: 13px; font-weight: 500; color: var(--fg); }
+  .notecol textarea { width: 100%; margin-top: 8px; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 10px 12px; font-family: var(--font-body); font-size: 13px; resize: vertical; min-height: 56px; }
+  .notifyrow { display: flex; align-items: center; gap: 9px; margin: 14px 0 18px; padding: 11px 12px; background: var(--surface-2); border-radius: var(--radius); }
+  .notifyrow .chk { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--green); background: var(--green); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .notifyrow .chk svg { width: 12px; height: 12px; stroke: #fff; fill: none; stroke-width: 3; }
+  .notifyrow span { font-size: 12.5px; color: var(--fg); }
+  .notifyrow b { color: var(--fg); }
+  .modal-btns { display: flex; gap: 8px; }
+  .modal-btns .btn { flex: 1; justify-content: center; }
+
+  /* toast */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--fg); color: #fff; font-size: 13px; font-weight: 500; padding: 12px 20px; border-radius: var(--radius); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 60; display: flex; align-items: center; gap: 8px; font-family: var(--font-body); }
+  .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast svg { width: 15px; height: 15px; color: var(--green-mid); stroke: currentColor; fill: none; stroke-width: 2; }
+
+  /* ─── Settings ─── */
+  .settings-grid { display: flex; flex-direction: column; gap: 16px; max-width: 640px; }
+  .togglerow { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--surface-2); gap: 16px; }
+  .togglerow:last-child { border-bottom: none; }
+  .togglerow .tt { font-size: 13.5px; font-weight: 600; color: var(--fg); }
+  .togglerow .ts { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .switch { width: 42px; height: 24px; border-radius: 99px; background: var(--border); position: relative; cursor: pointer; flex-shrink: 0; transition: background .15s; }
+  .switch.on { background: var(--green); }
+  .switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+  .switch.on::after { transform: translateX(18px); }
+  .switch.disabled { opacity: .45; cursor: not-allowed; }
+  .comingsoon { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; background: var(--border-2); color: var(--muted); padding: 2px 7px; border-radius: 99px; margin-left: 8px; }
+  .adminrow { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--surface-2); }
+  .adminrow:last-child { border-bottom: none; }
+  .adminrow .av { width: 34px; height: 34px; font-size: 12px; }
+  .adminrow .nm { font-size: 13.5px; font-weight: 700; color: var(--fg); }
+  .adminrow .rl { font-size: 11.5px; color: var(--muted); }
+  .fieldrow { margin-bottom: 12px; }
+  .fieldrow label { display: block; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .fieldrow input { width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px; font-family: var(--font-body); font-size: 14px; background: var(--surface); color: var(--fg); }
+  .fieldrow input:disabled { background: var(--surface-2); color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">🌱</div>
+        <div><div class="logo-text">Sprout</div><div class="logo-sub">Admin Portal</div></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav" id="sbNav">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" data-view="dashboard"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+
+      <div class="nav-label">Platform</div>
+      <div class="nav-item" data-view="schools"><svg viewBox="0 0 24 24"><path d="M4 19V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v13M4 19h16M9 22V16h6v6"/></svg>Schools</div>
+      <div class="nav-item" data-view="users"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Users<span class="nav-badge warn" id="sbUserFlagCount">1</span></div>
+      <div class="nav-item" data-view="subgroups"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Subgroups</div>
+
+      <div class="nav-label">Content</div>
+      <div class="nav-item" data-view="events"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Events<span class="nav-badge warn" id="sbFlagCount">2</span></div>
+
+      <div class="nav-label">Account</div>
+      <div class="nav-item" data-view="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-row"><div class="user-av">T</div><div><div class="user-name">Tony</div><div class="user-role">Founder / Admin</div></div></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>Notifications</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ═══════════ DASHBOARD ═══════════ -->
+      <div class="view on" id="view-dashboard">
+        <div class="page-header"><div><h1>Welcome back, Tony 👋</h1><p>Here's what's happening across Sprout today.</p></div></div>
+        <div class="stats-grid">
+          <div class="stat-card clickable" onclick="switchView('schools')"><div class="stat-icon">🏫</div><div class="stat-label">Schools</div><div class="stat-value">5</div><div class="stat-delta">1 pending verification</div></div>
+          <div class="stat-card clickable" onclick="switchView('users')"><div class="stat-icon">👪</div><div class="stat-label">Parents</div><div class="stat-value">1,076</div><div class="stat-delta">↑ 47 this week</div></div>
+          <div class="stat-card clickable" onclick="switchView('subgroups')"><div class="stat-icon">🍀</div><div class="stat-label">Subgroups</div><div class="stat-value">6</div><div class="stat-delta">Classes &amp; social clubs</div></div>
+          <div class="stat-card clickable" onclick="switchView('events')"><div class="stat-icon">📅</div><div class="stat-label">Active Events</div><div class="stat-value">146</div><div class="stat-delta">2 flagged for review</div></div>
+        </div>
+        <div class="dash-grid">
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Recent Activity</div></div></div>
+            <div class="card-body">
+              <div class="timeline">
+                <div class="tl-row"><div class="tl-ic">🏫</div><div class="tl-tx"><b>Riverside Montessori</b> was added and is awaiting verification</div><div class="tl-tm">2h ago</div></div>
+                <div class="tl-row"><div class="tl-ic">🚩</div><div class="tl-tx">Event flagged: <b>"Backyard Fireworks Sale — DM me!!"</b></div><div class="tl-tm">4h ago</div></div>
+                <div class="tl-row"><div class="tl-ic">👥</div><div class="tl-tx">New subgroup created: <b>Weekend Hikers</b></div><div class="tl-tm">1d ago</div></div>
+                <div class="tl-row"><div class="tl-ic">⚠️</div><div class="tl-tx">User reported: <b>Guy Hawkins</b> — possible restricted-item listing</div><div class="tl-tm">1d ago</div></div>
+                <div class="tl-row"><div class="tl-ic">🌱</div><div class="tl-tx"><b>47 new parents</b> joined this week</div><div class="tl-tm">2d ago</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Needs Your Attention</div></div></div>
+            <div class="card-body" style="padding-top:8px;">
+              <div id="attnList">
+                <div class="attn-row" onclick="switchView('events');selectEventTab('flagged')">
+                  <div class="attn-ic"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div>
+                  <div class="attn-tx">2 events flagged for review<span>Keyword match &amp; member reports</span></div>
+                  <svg class="chev" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4"/></svg>
+                </div>
+                <div class="attn-row" onclick="switchView('schools')">
+                  <div class="attn-ic"><svg viewBox="0 0 24 24"><path d="M4 19V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v13M4 19h16"/></svg></div>
+                  <div class="attn-tx">1 school pending verification<span>Riverside Montessori</span></div>
+                  <svg class="chev" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4"/></svg>
+                </div>
+                <div class="attn-row" onclick="switchView('users')">
+                  <div class="attn-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></div>
+                  <div class="attn-tx">1 user reported<span>Guy Hawkins — restricted-item listing</span></div>
+                  <svg class="chev" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ SCHOOLS ═══════════ -->
+      <div class="view" id="view-schools">
+        <div class="page-header">
+          <div><h1>Schools</h1><p>Every school on Sprout. Verify new schools and keep class rosters in sync.</p></div>
+          <div class="headright"><div class="searchbox"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg><input placeholder="Search schools…"></div><button class="btn btn-primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add School</button></div>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>School</th><th>District</th><th>Classes</th><th>Parents</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbodySchools"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════ USERS ═══════════ -->
+      <div class="view" id="view-users">
+        <div class="page-header">
+          <div><h1>Users</h1><p>All parents on Sprout. Review reports and take action on accounts that break community guidelines.</p></div>
+          <div class="headright"><div class="searchbox"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg><input placeholder="Search parents…"></div></div>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Parent</th><th>Kids</th><th>Subgroups</th><th>Joined</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbodyUsers"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════ SUBGROUPS ═══════════ -->
+      <div class="view" id="view-subgroups">
+        <div class="page-header">
+          <div><h1>Subgroups</h1><p>Every class and social club created on Sprout. Remove inactive or guideline-breaking groups.</p></div>
+          <div class="headright"><div class="searchbox"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg><input placeholder="Search subgroups…"></div></div>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Subgroup</th><th>Admin</th><th>Members</th><th>Created</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbodySubgroups"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════ EVENTS ═══════════ -->
+      <div class="view" id="view-events">
+        <div class="page-header">
+          <div><h1>Events</h1><p>Every event created on Sprout, across all clubs and subgroups. Review flags, edit details, or remove content that doesn't follow community guidelines.</p></div>
+          <div class="headright"><div class="searchbox"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg><input placeholder="Search events, hosts, clubs…"></div></div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-label">Active Events</div><div class="stat-value">146</div></div>
+          <div class="stat-card flag"><div class="stat-icon">⚠️</div><div class="stat-label">Flagged for Review</div><div class="stat-value">2</div></div>
+          <div class="stat-card danger"><div class="stat-icon">🗑️</div><div class="stat-label">Removed This Month</div><div class="stat-value">3</div></div>
+          <div class="stat-card auto"><div class="stat-icon">🤖</div><div class="stat-label">Auto-moderation</div><div class="stat-value">Manual review only</div><div class="stat-delta">Keyword &amp; image auto-flagging — planned next</div></div>
+        </div>
+        <div class="tabs" id="tabs">
+          <div class="tab active" data-tab="all">All Events <span class="n">151</span></div>
+          <div class="tab" data-tab="flagged">Flagged for Review <span class="n">2</span></div>
+          <div class="tab" data-tab="removed">Removed <span class="n">3</span></div>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Event</th><th>Creator</th><th>Date</th><th>RSVPs</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════ SETTINGS ═══════════ -->
+      <div class="view" id="view-settings">
+        <div class="page-header"><div><h1>Settings</h1><p>Admin team, moderation preferences, and general Sprout configuration.</p></div></div>
+        <div class="settings-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Admin Team</div></div>
+            <div class="card-body">
+              <div class="adminrow"><div class="av" style="background:#2d5c2e;">T</div><div><div class="nm">Tony</div><div class="rl">Founder / Admin</div></div></div>
+              <div class="adminrow"><div class="av" style="background:#6a3aaa;">AF</div><div><div class="nm">Ahmad Fauzan</div><div class="rl">Design Admin</div></div></div>
+              <div class="adminrow"><div class="av" style="background:#2a5fc1;">MR</div><div><div class="nm">Mohit Rai</div><div class="rl">Engineering Admin</div></div></div>
+              <button class="btn btn-primary" style="margin-top:14px;"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Invite Admin</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Moderation</div></div>
+            <div class="card-body">
+              <div class="togglerow"><div><div class="tt">Auto-flag by keyword<span class="comingsoon">Coming soon</span></div><div class="ts">Scan new events for restricted or unsafe keywords automatically</div></div><div class="switch disabled"></div></div>
+              <div class="togglerow"><div><div class="tt">Auto-flag by image content<span class="comingsoon">Coming soon</span></div><div class="ts">Scan uploaded event photos for inappropriate content</div></div><div class="switch disabled"></div></div>
+              <div class="togglerow"><div><div class="tt">Email me when an event is flagged</div><div class="ts">Sent to tony@joinsprout.co</div></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="togglerow"><div><div class="tt">Weekly moderation summary</div><div class="ts">A digest of everything reviewed this week</div></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">General</div></div>
+            <div class="card-body">
+              <div class="fieldrow"><label>App name</label><input value="Sprout" disabled></div>
+              <div class="fieldrow"><label>Support email</label><input value="support@joinsprout.co"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-hero" id="drawerHero"></div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot" id="drawerFoot"></div>
+</div>
+
+<div class="modal-scrim" id="modalScrim">
+  <div class="modal">
+    <h3 id="modalTitle">Remove this event?</h3>
+    <p class="sub" id="modalSub">Choose a reason. This helps us track patterns and gives the host a clear explanation.</p>
+    <div id="reasonList"></div>
+    <div class="notecol"><textarea id="removeNote" placeholder="Add a note (optional) — only visible to your admin team"></textarea></div>
+    <div class="notifyrow"><div class="chk"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><span id="notifyLabel">Notify <b id="notifyName">the host</b> that their event was removed, with the reason above</span></div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" id="cancelRemove">Cancel</button>
+      <button class="btn btn-danger" id="confirmRemove">Remove</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span id="toastText"></span></div>
+
+<script>
+  /* ═══════════════════ NAV ═══════════════════ */
+  var VIEW_TITLES = { dashboard:'Dashboard', schools:'Schools', users:'Users', subgroups:'Subgroups', events:'Events', settings:'Settings' };
+  function switchView(name){
+    document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('on'); });
+    document.getElementById('view-' + name).classList.add('on');
+    document.querySelectorAll('.sb-nav .nav-item, #sbNav .nav-item').forEach(function(x){ x.classList.remove('active'); });
+    document.querySelector('.nav-item[data-view="' + name + '"]').classList.add('active');
+    document.getElementById('topbarTitle').textContent = VIEW_TITLES[name];
+  }
+  document.getElementById('sbNav').addEventListener('click', function(e){
+    var item = e.target.closest('.nav-item'); if(!item) return;
+    switchView(item.dataset.view);
+  });
+
+  /* ═══════════════════ EVENTS ═══════════════════ */
+  var EVENTS = [
+    { id:1, title:"Come Join me for Golf", club:"Y Combinator Social Club", creator:"Angelina Cruz", creatorInit:"AC", color:"#2d5c2e", emoji:"⛳", date:"Nov 18, 2025", rsvp:12, status:"active" },
+    { id:2, title:"1st Grade Talent Show", club:"Lincoln Elementary · 1st Grade", creator:"Ms. Rivera", creatorInit:"MR", color:"#6a3aaa", emoji:"🎤", date:"Nov 22, 2025", rsvp:34, status:"active" },
+    { id:3, title:"Backyard Fireworks Sale — DM me!!", club:"Eastern Mums", creator:"Guy Hawkins", creatorInit:"GH", color:"#c17f2a", emoji:"🎆", date:"Nov 20, 2025", rsvp:8, status:"flagged", reason:"Keyword match: sale of restricted fireworks" },
+    { id:4, title:"Picnic Playdate at Centennial Park", club:"Eastern Mums", creator:"Jessica Nolan", creatorInit:"JN", color:"#2d5c2e", emoji:"🧺", date:"Nov 23, 2025", rsvp:12, status:"active" },
+    { id:5, title:"\"Free puppies — first come first serve\"", club:"Y Combinator Social Club", creator:"Noah LaRonde", creatorInit:"NL", color:"#2a5fc1", emoji:"🐶", date:"Nov 19, 2025", rsvp:3, status:"flagged", reason:"Reported by 2 members — possible scam listing" },
+    { id:6, title:"Y Combinator Happy Hour", club:"Y Combinator Social Club", creator:"Angelina Cruz", creatorInit:"AC", color:"#c17f2a", emoji:"🥂", date:"Oct 30, 2025", rsvp:22, status:"removed", reason:"Duplicate of event #112", removedOn:"Nov 2, 2025" },
+    { id:7, title:"Miss Taylor's Class — Pizza Day Fundraiser", club:"Lincoln Elementary · Kindergarten", creator:"Ahmad Fauzan", creatorInit:"AF", color:"#2d5c2e", emoji:"🍕", date:"Nov 25, 2025", rsvp:19, status:"active" },
+    { id:8, title:"Adult content link — click here", club:"Eastern Mums", creator:"unknown_user22", creatorInit:"U", color:"#b84040", emoji:"🚫", date:"Oct 12, 2025", rsvp:0, status:"removed", reason:"Inappropriate or unsafe content", removedOn:"Oct 12, 2025" },
+    { id:9, title:"Surfing at Second Point", club:"Eastern Mums", creator:"Jessica Nolan", creatorInit:"JN", color:"#2a5fc1", emoji:"🏄", date:"Nov 30, 2025", rsvp:6, status:"active" },
+    { id:10, title:"Old Bake Sale — reposted 3x this week", club:"Lincoln Elementary · 1st Grade", creator:"Karen Diaz", creatorInit:"KD", color:"#6a3aaa", emoji:"🧁", date:"Nov 15, 2025", rsvp:1, status:"removed", reason:"Spam or duplicate listing", removedOn:"Nov 16, 2025" }
+  ];
+  var currentTab = 'all';
+
+  function pillFor(status){
+    var map = { active:['active','Active'], flagged:['flagged','Flagged'], removed:['removed','Removed'], pending:['pending','Pending'], banned:['removed','Banned'], warned:['flagged','Warned'], inactive:['ended','Inactive'] };
+    var m = map[status] || ['active','Active'];
+    return '<span class="badge badge-'+m[0]+'">'+m[1]+'</span>';
+  }
+
+  function renderEvents(){
+    var rows = EVENTS.filter(function(e){ return currentTab === 'all' || e.status === currentTab; });
+    document.getElementById('tbody').innerHTML = rows.map(function(e){
+      return '<tr class="'+(e.status==='removed'?'dimmed':'')+'" onclick="openEventDrawer('+e.id+')">' +
+        '<td><div class="ev-cell"><div class="ev-thumb" style="background:'+e.color+'">'+e.emoji+'</div><div class="event-name-cell">'+e.title+'<div class="sub">'+e.club+'</div>'+(e.status==='flagged'?'<div class="flagreason">⚠ '+e.reason+'</div>':'')+'</div></div></td>' +
+        '<td><div class="creator-cell"><div class="av" style="background:'+e.color+'">'+e.creatorInit+'</div>'+e.creator+'</div></td>' +
+        '<td class="td-muted">'+e.date+'</td>' +
+        '<td class="td-muted">'+e.rsvp+' going</td>' +
+        '<td>'+pillFor(e.status)+'</td>' +
+        '<td><button class="action-btn" onclick="event.stopPropagation();openEventDrawer('+e.id+')">View</button>' +
+          (e.status!=='removed' ? '<span class="sep">·</span><button class="action-btn danger" onclick="event.stopPropagation();askRemove(\'event\','+e.id+')">Remove</button>' : '') +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  }
+  document.getElementById('tabs').addEventListener('click', function(e){
+    var t = e.target.closest('.tab'); if(!t) return;
+    currentTab = t.dataset.tab;
+    document.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('active'); });
+    t.classList.add('active');
+    renderEvents();
+  });
+  function selectEventTab(tab){
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(function(x){ x.classList.toggle('active', x.dataset.tab === tab); });
+    renderEvents();
+  }
+
+  function openEventDrawer(id){
+    var e = EVENTS.find(function(x){ return x.id === id; });
+    document.getElementById('drawerHero').style.background = 'linear-gradient(135deg,'+e.color+',#00000022)';
+    document.getElementById('drawerHero').innerHTML = '<div class="x" onclick="closeDrawer()"><svg viewBox="0 0 16 16" fill="none" stroke="#1a1a17" stroke-width="1.8"><path d="M4 4l8 8M12 4l-8 8"/></svg></div><div style="font-size:44px;">'+e.emoji+'</div>';
+    var flagHtml = e.status === 'flagged' ? '<div class="flagcallout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg><div class="tx"><b>Flagged for review:</b> '+e.reason+'</div></div>' : '';
+    var removedHtml = e.status === 'removed' ? '<div class="flagcallout" style="background:var(--red-pale);border-color:#f0c0c0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg><div class="tx" style="color:#802929;"><b>Removed '+e.removedOn+':</b> '+e.reason+'</div></div>' : '';
+    document.getElementById('drawerBody').innerHTML =
+      '<div class="drawer-status">'+pillFor(e.status)+'</div>' +
+      '<div class="drawer-title">'+e.title+'</div>' +
+      '<div class="drawer-club">'+e.club+'</div>' +
+      flagHtml + removedHtml +
+      '<div class="drawer-sec"><div class="drawer-sec-lbl">Hosted by</div><div class="creator-card"><div class="av" style="background:'+e.color+'">'+e.creatorInit+'</div><div><div class="nm">'+e.creator+'</div><div class="met">Member since 2024 · 6 events created</div></div></div></div>' +
+      '<div class="drawer-sec"><div class="drawer-sec-lbl">Details</div><div class="infogrid"><div class="infochip"><div class="l">Date</div><div class="v">'+e.date+'</div></div><div class="infochip"><div class="l">RSVPs</div><div class="v">'+e.rsvp+' going</div></div></div></div>' +
+      '<div class="drawer-sec"><div class="drawer-sec-lbl">Description</div><div class="drawer-desc">Auto-pulled from the event listing. Full description, photos, and comments are visible in the mobile app view of this event.</div></div>';
+    var footHtml = '';
+    if(e.status === 'flagged') footHtml += '<button class="btn btn-primary btn-full" onclick="approveEvent('+e.id+')">✓ Approve &amp; Clear Flag</button>';
+    footHtml += '<button class="btn btn-secondary btn-full">Edit Event Details</button>';
+    if(e.status !== 'removed') footHtml += '<button class="btn btn-danger btn-full" onclick="askRemove(\'event\','+e.id+')">Remove Event</button>';
+    document.getElementById('drawerFoot').innerHTML = footHtml;
+    openDrawerUI();
+  }
+  function approveEvent(id){
+    var e = EVENTS.find(function(x){ return x.id === id; });
+    e.status = 'active'; e.reason = null;
+    closeDrawer(); renderEvents(); updateBadges();
+    showToast('Flag cleared. "'+e.title+'" is active again.');
+  }
+
+  /* ═══════════════════ SCHOOLS ═══════════════════ */
+  var SCHOOLS = [
+    { id:1, name:"Lincoln Elementary", district:"Sydney East", classes:12, parents:340, status:"active", emoji:"🏫", color:"#2d5c2e" },
+    { id:2, name:"Eastern Suburbs Grammar", district:"Sydney East", classes:8, parents:210, status:"active", emoji:"🎓", color:"#2a5fc1" },
+    { id:3, name:"Centennial Park Preschool", district:"Sydney East", classes:4, parents:96, status:"active", emoji:"🧸", color:"#c17f2a" },
+    { id:4, name:"Riverside Montessori", district:"Sydney West", classes:6, parents:150, status:"pending", emoji:"🌿", color:"#6a3aaa" },
+    { id:5, name:"Northside Primary", district:"Sydney North", classes:10, parents:280, status:"active", emoji:"🏫", color:"#2d5c2e" }
+  ];
+  function renderSchools(){
+    document.getElementById('tbodySchools').innerHTML = SCHOOLS.map(function(s){
+      return '<tr onclick="openSchoolDrawer('+s.id+')">' +
+        '<td><div class="ev-cell"><div class="ev-thumb" style="background:'+s.color+'">'+s.emoji+'</div><div class="event-name-cell">'+s.name+'</div></div></td>' +
+        '<td class="td-muted">'+s.district+'</td>' +
+        '<td class="td-muted">'+s.classes+' classes</td>' +
+        '<td class="td-muted">'+s.parents+'</td>' +
+        '<td>'+pillFor(s.status)+'</td>' +
+        '<td><button class="action-btn" onclick="event.stopPropagation();openSchoolDrawer('+s.id+')">View</button></td>' +
+      '</tr>';
+    }).join('');
+  }
+  function openSchoolDrawer(id){
+    var s = SCHOOLS.find(function(x){ return x.id === id; });
+    document.getElementById('drawerHero').style.background = 'linear-gradient(135deg,'+s.color+',#00000022)';
+    document.getElementById('drawerHero').innerHTML = '<div class="x" onclick="closeDrawer()"><svg viewBox="0 0 16 16" fill="none" stroke="#1a1a17" stroke-width="1.8"><path d="M4 4l8 8M12 4l-8 8"/></svg></div><div style="font-size:44px;">'+s.emoji+'</div>';
+    var pendingCallout = s.status === 'pending' ? '<div class="flagcallout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><div class="tx"><b>Pending verification:</b> confirm this school is real before parents can join classes under it.</div></div>' : '';
+    document.getElementById('drawerBody').innerHTML =
+      '<div class="drawer-status">'+pillFor(s.status)+'</div>' +
+      '<div class="drawer-title">'+s.name+'</div>' +
+      '<div class="drawer-club">'+s.district+'</div>' +
+      pendingCallout +
+      '<div class="drawer-sec"><div class="drawer-sec-lbl">Overview</div><div class="infogrid"><div class="infochip"><div class="l">Classes</div><div class="v">'+s.classes+'</div></div><div class="infochip"><div class="l">Parents</div><div class="v">'+s.parents+'</div></div></div></div>' +
+      '<div class="drawer-sec"><div class="drawer-sec-lbl">Classes at this school</div>' +
+        '<div class="listline"><span class="l">Kindergarten — Miss Taylor</span><span class="v">22 parents</span></div>' +
+        '<div class="listline"><span class="l">1st Grade</span><span class="v">26 parents</span></div>' +
+      '</div>';
+    var foot = '<button class="btn btn-secondary btn-full">Edit School Details</button>';
+    if(s.status === 'pending') foot = '<button class="btn btn-primary btn-full" onclick="verifySchool('+s.id+')">✓ Verify School</button>' + foot;
+    document.getElementById('drawerFoot').innerHTML = foot;
+    openDrawerUI();
+  }
+  function verifySchool(id){
+    var s = SCHOOLS.find(function(x){ return x.id === id; });
+    s.status = 'active';
+    closeDrawer(); renderSchools(); showToast(s.name + ' is now verified and active.');
+  }
+
+  /* ═══════════════════ USERS ═══════════════════ */
+  var USERS = [
+    { id:1, name:"Angelina Cruz", init:"AC", color:"#2d5c2e", email:"angelina@email.com", kids:2, subgroups:3, joined:"Jan 2024", status:"active" },
+    { id:2, name:"Guy Hawkins", init:"GH", color:"#c17f2a", email:"guy.h@email.com", kids:1, subgroups:2, joined:"Mar 2024", status:"active", flag:"Reported by 2 members for a restricted-item listing" },
+    { id:3, name:"Noah LaRonde", init:"NL", color:"#2a5fc1", email:"noah.l@email.com", kids:3, subgroups:4, joined:"Aug 2023", status:"active" },
+    { id:4, name:"Jessica Nolan", init:"JN", color:"#6a3aaa", email:"jess.nolan@email.com", kids:1, subgroups:2, joined:"Feb 2024", status:"active" },
+    { id:5, name:"Karen Diaz", init:"KD", color:"#6a3aaa", email:"karen.d@email.com", kids:2, subgroups:1, joined:"May 2024", status:"warned", flag:"Warned for repeated spam bake-sale reposts" },
+    { id:6, name:"unknown_user22", init:"U", color:"#b84040", email:"temp_9231@mailinator.com", kids:0, subgroups:1, joined:"Oct 2025", status:"banned", flag:"Banned for posting inappropriate content" }
+  ];
+  function renderUsers(){
+    document.getElementById('tbodyUsers').innerHTML = USERS.map(function(u){
+      return '<tr class="'+(u.status==='banned'?'dimmed':'')+'" onclick="openUserDrawer('+u.id+')">' +
+        '<td><div class="creator-cell"><div class="av" style="width:30px;height:30px;font-size:11px;background:'+u.color+'">'+u.init+'</div><div class="event-name-cell">'+u.name+'<div class="sub">'+u.email+'</div></div></div></td>' +
+        '<td class="td-muted">'+u.kids+'</td>' +
+        '<td class="td-muted">'+u.subgroups+'</td>' +
+        '<td class="td-muted">'+u.joined+'</td>' +
+        '<td>'+pillFor(u.status)+'</td>' +
+        '<td><button class="action-btn" onclick="event.stopPropagation();openUserDrawer('+u.id+')">View</button>' +
+          (u.status!=='banned' ? '<span class="sep">·</span><button class="action-btn danger" onclick="event.stopPropagation();askRemove(\'user\','+u.id+')">Ban</button>' : '') +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  }
+  function openUserDrawer(id){
+    var u = USERS.find(function(x){ return x.id === id; });
+    document.getElementById('drawerHero').style.background = 'linear-gradient(135deg,'+u.color+',#00000022)';
+    document.getElementById('drawerHero').innerHTML = '<div class="x" onclick="closeDrawer()"><svg viewBox="0 0 16 16" fill="none" stroke="#1a1a17" stroke-width="1.8"><path d="M4 4l8 8M12 4l-8 8"/></svg></div><div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;color:#fff;">'+u.init+'</div>';
+    var flagHtml = u.flag ? '<div class="flagcallout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg><div class="tx"><b>'+(u.status==='banned'?'Banned':'Flag')+':</b> '+u.flag+'</div></div>' : '';
+    document.getElementById('drawerBody').innerHTML =
+      '<div class="drawer-status">'+pillFor(u.status)+'</div>' +
+      '<div class="drawer-title">'+u.name+'</div>' +
+      '<div class="drawer-club">'+u.email+'</div>' +
+      flagHtml +
+      '<div class="drawer-sec"><div class="drawer-sec-lbl">Account</div><div class="infogrid"><div class="infochip"><div class="l">Kids</div><div class="v">'+u.kids+'</div></div><div class="infochip"><div class="l">Subgroups</div><div class="v">'+u.subgroups+'</div></div><div class="infochip"><div class="l">Joined</div><div class="v">'+u.joined+'</div></div><div class="infochip"><div class="l">Events created</div><div class="v">'+(u.kids+2)+'</div></div></div></div>';
+    var foot = '';
+    if(u.status !== 'banned') foot += '<button class="btn btn-danger btn-full" onclick="askRemove(\'user\','+u.id+')">Ban User</button>';
+    else foot += '<button class="btn btn-secondary btn-full" onclick="unbanUser('+u.id+')">Reinstate User</button>';
+    document.getElementById('drawerFoot').innerHTML = foot;
+    openDrawerUI();
+  }
+  function unbanUser(id){
+    var u = USERS.find(function(x){ return x.id === id; });
+    u.status = 'active'; u.flag = null;
+    closeDrawer(); renderUsers(); updateBadges();
+    showToast(u.name + ' has been reinstated.');
+  }
+
+  /* ═══════════════════ SUBGROUPS ═══════════════════ */
+  var SUBGROUPS = [
+    { id:1, name:"Y Combinator Social Club", type:"Social Club", admin:"Angelina Cruz", init:"AC", color:"#2d5c2e", members:48, created:"Jan 2024", status:"active", emoji:"🍀" },
+    { id:2, name:"Miss Taylor's Class", type:"Class · Lincoln Elementary", admin:"Ahmad Fauzan", init:"AF", color:"#c17f2a", members:22, created:"Aug 2024", status:"active", emoji:"🎨" },
+    { id:3, name:"Eastern Mums", type:"Social Club", admin:"Jessica Nolan", init:"JN", color:"#6a3aaa", members:112, created:"Nov 2023", status:"active", emoji:"👋" },
+    { id:4, name:"1st Grade", type:"Class · Lincoln Elementary", admin:"Ms. Rivera", init:"MR", color:"#2a5fc1", members:26, created:"Aug 2024", status:"active", emoji:"📚" },
+    { id:5, name:"Weekend Hikers", type:"Social Club", admin:"Noah LaRonde", init:"NL", color:"#2d5c2e", members:34, created:"Nov 2025", status:"active", emoji:"🥾" },
+    { id:6, name:"Old Book Swap Club", type:"Social Club", admin:"Karen Diaz", init:"KD", color:"#6a3aaa", members:4, created:"Feb 2023", status:"inactive", flag:"No activity in 60+ days", emoji:"📖" }
+  ];
+  function renderSubgroups(){
+    document.getElementById('tbodySubgroups').innerHTML = SUBGROUPS.map(function(g){
+      return '<tr class="'+(g.status==='inactive'?'dimmed':'')+'" onclick="openSubgroupDrawer('+g.id+')">' +
+        '<td><div class="ev-cell"><div class="ev-thumb" style="background:'+g.color+'">'+g.emoji+'</div><div class="event-name-cell">'+g.name+'<div class="sub">'+g.type+'</div></div></div></td>' +
+        '<td><div class="creator-cell"><div class="av" style="background:'+g.color+'">'+g.init+'</div>'+g.admin+'</div></td>' +
+        '<td class="td-muted">'+g.members+' members</td>' +
+        '<td class="td-muted">'+g.created+'</td>' +
+        '<td>'+pillFor(g.status)+'</td>' +
+        '<td><button class="action-btn" onclick="event.stopPropagation();openSubgroupDrawer('+g.id+')">View</button><span class="sep">·</span><button class="action-btn danger" onclick="event.stopPropagation();askRemove(\'subgroup\','+g.id+')">Delete</button></td>' +
+      '</tr>';
+    }).join('');
+  }
+  function openSubgroupDrawer(id){
+    var g = SUBGROUPS.find(function(x){ return x.id === id; });
+    document.getElementById('drawerHero').style.background = 'linear-gradient(135deg,'+g.color+',#00000022)';
+    document.getElementById('drawerHero').innerHTML = '<div class="x" onclick="closeDrawer()"><svg viewBox="0 0 16 16" fill="none" stroke="#1a1a17" stroke-width="1.8"><path d="M4 4l8 8M12 4l-8 8"/></svg></div><div style="font-size:44px;">'+g.emoji+'</div>';
+    var flagHtml = g.flag ? '<div class="flagcallout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg><div class="tx"><b>Flag:</b> '+g.flag+'</div></div>' : '';
+    document.getElementById('drawerBody').innerHTML =
+      '<div class="drawer-status">'+pillFor(g.status)+'</div>' +
+      '<div class="drawer-title">'+g.name+'</div>' +
+      '<div class="drawer-club">'+g.type+'</div>' +
+      flagHtml +
+      '<div class="drawer-sec"><div class="drawer-sec-lbl">Admin</div><div class="creator-card"><div class="av" style="background:'+g.color+'">'+g.init+'</div><div><div class="nm">'+g.admin+'</div><div class="met">Group admin</div></div></div></div>' +
+      '<div class="drawer-sec"><div class="drawer-sec-lbl">Overview</div><div class="infogrid"><div class="infochip"><div class="l">Members</div><div class="v">'+g.members+'</div></div><div class="infochip"><div class="l">Created</div><div class="v">'+g.created+'</div></div></div></div>';
+    document.getElementById('drawerFoot').innerHTML = '<button class="btn btn-secondary btn-full">Edit Subgroup</button><button class="btn btn-danger btn-full" onclick="askRemove(\'subgroup\','+g.id+')">Delete Subgroup</button>';
+    openDrawerUI();
+  }
+
+  /* ═══════════════════ SHARED DRAWER ═══════════════════ */
+  function openDrawerUI(){ document.getElementById('scrim').classList.add('on'); document.getElementById('drawer').classList.add('on'); }
+  function closeDrawer(){ document.getElementById('scrim').classList.remove('on'); document.getElementById('drawer').classList.remove('on'); }
+  document.getElementById('scrim').addEventListener('click', closeDrawer);
+
+  /* ═══════════════════ SHARED REMOVE / BAN MODAL ═══════════════════ */
+  var pending = null;
+  var REASONS = {
+    event: ["Violates community guidelines","Inappropriate or unsafe content","Spam or duplicate listing","Other"],
+    user: ["Harassment or bullying","Spam or scam behavior","Fake account","Other"],
+    subgroup: ["Violates community guidelines","Inactive or abandoned","Duplicate of another subgroup","Other"]
+  };
+  var MODAL_COPY = {
+    event: { title:"Remove this event?", sub:"Choose a reason. This helps us track patterns and gives the host a clear explanation.", btn:"Remove Event", notify:"that their event was removed, with the reason above" },
+    user: { title:"Ban this user?", sub:"They'll lose access to Sprout immediately. Choose a reason for the record.", btn:"Ban User", notify:"that their account was banned, with the reason above" },
+    subgroup: { title:"Delete this subgroup?", sub:"Members lose access immediately — this can't be undone. Choose a reason for the record.", btn:"Delete Subgroup", notify:"that their subgroup was removed, with the reason above" }
+  };
+  function askRemove(kind, id){
+    pending = { kind: kind, id: id };
+    var copy = MODAL_COPY[kind];
+    document.getElementById('modalTitle').textContent = copy.title;
+    document.getElementById('modalSub').textContent = copy.sub;
+    document.getElementById('confirmRemove').textContent = copy.btn;
+    document.getElementById('reasonList').innerHTML = REASONS[kind].map(function(r,i){
+      return '<div class="reason'+(i===0?' on':'')+'" data-r="'+r+'"><div class="radio"></div><span>'+r+'</span></div>';
+    }).join('');
+    var name = kind === 'event' ? EVENTS.find(function(x){return x.id===id;}).creator
+             : kind === 'user' ? USERS.find(function(x){return x.id===id;}).name
+             : SUBGROUPS.find(function(x){return x.id===id;}).admin;
+    document.getElementById('notifyName').textContent = name;
+    document.getElementById('notifyLabel').innerHTML = 'Notify <b id="notifyName">'+name+'</b> '+copy.notify;
+    document.getElementById('modalScrim').classList.add('on');
+  }
+  document.getElementById('cancelRemove').addEventListener('click', function(){ document.getElementById('modalScrim').classList.remove('on'); });
+  document.getElementById('reasonList').addEventListener('click', function(e){
+    var r = e.target.closest('.reason'); if(!r) return;
+    document.querySelectorAll('.reason').forEach(function(x){ x.classList.remove('on'); });
+    r.classList.add('on');
+  });
+  document.getElementById('confirmRemove').addEventListener('click', function(){
+    var reasonEl = document.querySelector('.reason.on');
+    var reason = reasonEl ? reasonEl.dataset.r : 'Other';
+    if(pending.kind === 'event'){
+      var e = EVENTS.find(function(x){ return x.id === pending.id; });
+      e.status = 'removed'; e.reason = reason; e.removedOn = 'Just now';
+      renderEvents();
+      showToast('Event removed. ' + e.creator + ' has been notified.');
+    } else if(pending.kind === 'user'){
+      var u = USERS.find(function(x){ return x.id === pending.id; });
+      u.status = 'banned'; u.flag = 'Banned: ' + reason;
+      renderUsers();
+      showToast(u.name + ' has been banned and notified.');
+    } else if(pending.kind === 'subgroup'){
+      var g = SUBGROUPS.find(function(x){ return x.id === pending.id; });
+      SUBGROUPS = SUBGROUPS.filter(function(x){ return x.id !== pending.id; });
+      renderSubgroups();
+      showToast(g.name + ' was deleted. ' + g.admin + ' has been notified.');
+    }
+    document.getElementById('modalScrim').classList.remove('on');
+    closeDrawer();
+    updateBadges();
+  });
+
+  function updateBadges(){
+    var flagged = EVENTS.filter(function(e){ return e.status === 'flagged'; }).length;
+    var removed = EVENTS.filter(function(e){ return e.status === 'removed'; }).length;
+    var active = EVENTS.filter(function(e){ return e.status === 'active'; }).length;
+    var evStats = document.querySelectorAll('#view-events .stat-card');
+    evStats[0].querySelector('.stat-value').textContent = active + 136;
+    evStats[1].querySelector('.stat-value').textContent = flagged;
+    evStats[2].querySelector('.stat-value').textContent = removed;
+    var sbBadge = document.getElementById('sbFlagCount');
+    sbBadge.textContent = flagged;
+    sbBadge.style.display = flagged === 0 ? 'none' : 'inline-block';
+    document.querySelector('[data-tab="flagged"] .n').textContent = flagged;
+    document.querySelector('[data-tab="removed"] .n').textContent = removed;
+    document.querySelector('[data-tab="all"] .n').textContent = EVENTS.length;
+
+    var reported = USERS.filter(function(u){ return u.status === 'warned' || (u.flag && u.status === 'active'); }).length;
+    var sbUserBadge = document.getElementById('sbUserFlagCount');
+    sbUserBadge.textContent = reported;
+    sbUserBadge.style.display = reported === 0 ? 'none' : 'inline-block';
+  }
+
+  var toastTimer;
+  function showToast(text){
+    document.getElementById('toastText').textContent = text;
+    var t = document.getElementById('toast');
+    t.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('on'); }, 3200);
+  }
+
+  renderEvents(); renderSchools(); renderUsers(); renderSubgroups(); updateBadges();
+</script>
+</body>
+</html>
