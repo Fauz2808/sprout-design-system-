@@ -1,0 +1,2038 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Sprout · Merchant Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:          #f0ede6;
+      --surface:     #ffffff;
+      --surface-2:   #f7f5f0;
+      --fg:          #161612;
+      --muted:       #7a7568;
+      --border:      #ddd9cf;
+      --border-2:    #e8e4db;
+      --green:       #2d5c2e;
+      --green-mid:   #3d7a40;
+      --green-light: #e6f0e6;
+      --green-pale:  #f0f6f0;
+      --amber:       #c17f2a;
+      --amber-pale:  #fdf3e3;
+      --red:         #b84040;
+      --red-pale:    #fdf0f0;
+      --blue:        #2a5fc1;
+      --blue-pale:   #eef3fd;
+      --font-display:'Playfair Display', Georgia, serif;
+      --font-body:   'Jost', system-ui, sans-serif;
+      --radius:      12px;
+      --radius-lg:   18px;
+      --sidebar-w:   240px;
+      --shadow:      0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { font-family: var(--font-body); font-size: 14px; line-height: 1.5; color: var(--fg); background: var(--bg); -webkit-font-smoothing: antialiased; }
+
+    /* ─── LAYOUT ─── */
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: var(--sidebar-w); min-height: 100vh;
+      background: var(--green); display: flex; flex-direction: column;
+      flex-shrink: 0; position: sticky; top: 0; height: 100vh;
+    }
+    .sidebar-logo { padding: 28px 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .logo-mark { display: flex; align-items: center; gap: 10px; }
+    .logo-icon { width: 34px; height: 34px; background: rgba(255,255,255,0.15); border-radius: 10px; display: grid; place-items: center; font-size: 18px; }
+    .logo-text { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: #fff; }
+    .logo-sub { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-top: 2px; }
+    .sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; }
+    .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.35); padding: 10px 12px 6px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 10px;
+      color: rgba(255,255,255,0.65); font-size: 13.5px; font-weight: 500;
+      cursor: pointer; border: none; background: none; width: 100%; text-align: left;
+      transition: background .15s, color .15s;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9); }
+    .nav-item.active { background: rgba(255,255,255,0.15); color: #fff; }
+    .nav-item svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+    .nav-badge { margin-left: auto; min-width: 18px; height: 18px; background: rgba(255,255,255,0.2); color: #fff; border-radius: 999px; font-size: 10px; font-weight: 700; display: grid; place-items: center; padding: 0 5px; }
+    .sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .user-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+    .user-row:hover { background: rgba(255,255,255,0.08); }
+    .user-av { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.2); display: grid; place-items: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .user-name { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); }
+    .user-role { font-size: 11px; color: rgba(255,255,255,0.45); }
+
+    .main { flex: 1; display: flex; flex-direction: column; min-height: 100vh; overflow: hidden; }
+    .topbar { height: 60px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+    .topbar-title { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; flex: 1; }
+    .topbar-actions { display: flex; align-items: center; gap: 10px; }
+    .content { flex: 1; padding: 32px; overflow-y: auto; }
+
+    /* ─── VIEWS ─── */
+    .view { display: none; animation: fadeIn .2s ease; }
+    .view.active { display: block; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ─── AUTH PAGES (full screen, no sidebar) ─── */
+    .auth-layout { display: none; min-height: 100vh; background: var(--bg); }
+    .auth-layout.active { display: flex; }
+    .auth-left {
+      width: 420px; flex-shrink: 0;
+      background: var(--green);
+      display: flex; flex-direction: column;
+      padding: 48px 40px;
+    }
+    .auth-left-logo { display: flex; align-items: center; gap: 10px; margin-bottom: auto; }
+    .auth-left-logo .icon { width: 40px; height: 40px; background: rgba(255,255,255,0.15); border-radius: 12px; display: grid; place-items: center; font-size: 20px; }
+    .auth-left-logo .name { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: #fff; }
+    .auth-left-body { margin-bottom: auto; }
+    .auth-left-body h2 { font-family: var(--font-display); font-size: 32px; font-weight: 600; color: #fff; line-height: 1.2; margin-bottom: 14px; letter-spacing: -0.02em; }
+    .auth-left-body p { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.6; }
+    .auth-left-features { display: flex; flex-direction: column; gap: 12px; margin-top: 32px; }
+    .auth-feature { display: flex; align-items: center; gap: 10px; }
+    .auth-feature .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.4); border-radius: 50%; flex-shrink: 0; }
+    .auth-feature span { font-size: 13px; color: rgba(255,255,255,0.75); }
+    .auth-right { flex: 1; display: flex; align-items: center; justify-content: center; padding: 48px 40px; }
+    .auth-box { width: 100%; max-width: 420px; }
+    .auth-box h1 { font-family: var(--font-display); font-size: 28px; font-weight: 600; color: var(--fg); margin-bottom: 6px; letter-spacing: -0.02em; }
+    .auth-box .sub { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+    .auth-box .sub a, .switch-link { color: var(--green-mid); font-weight: 500; cursor: pointer; text-decoration: none; border: none; background: none; font-family: var(--font-body); font-size: inherit; padding: 0; }
+    .auth-box .sub a:hover, .switch-link:hover { text-decoration: underline; }
+
+    /* ─── STEPPER ─── */
+    .stepper { display: flex; align-items: center; gap: 0; margin-bottom: 32px; }
+    .step { display: flex; align-items: center; gap: 8px; flex: 1; }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; flex-shrink: 0; border: 2px solid var(--border); color: var(--muted); background: var(--surface); }
+    .step.done .step-num { background: var(--green); border-color: var(--green); color: #fff; }
+    .step.active .step-num { background: var(--fg); border-color: var(--fg); color: #fff; }
+    .step-label { font-size: 12px; font-weight: 500; color: var(--muted); }
+    .step.active .step-label { color: var(--fg); font-weight: 600; }
+    .step.done .step-label { color: var(--green); }
+    .step-line { flex: 1; height: 2px; background: var(--border); margin: 0 8px; }
+    .step-line.done { background: var(--green); }
+
+    /* ─── FORMS ─── */
+    .form-stack { display: flex; flex-direction: column; gap: 18px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.span2 { grid-column: span 2; }
+    label { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+    input, select, textarea {
+      font-family: var(--font-body); font-size: 14px; color: var(--fg);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 11px 14px; width: 100%;
+      transition: border-color .15s, box-shadow .15s; outline: none; appearance: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--green-mid); box-shadow: 0 0 0 3px rgba(61,122,64,0.1); }
+    textarea { resize: vertical; min-height: 90px; }
+    /* date/time need native rendering so they show a proper "10:00" (appearance:none mangled them) */
+    input[type="time"], input[type="date"] { -webkit-appearance: auto; appearance: auto; min-height: 44px; }
+    /* selects: restore an obvious dropdown chevron (appearance:none removed it) */
+    select {
+      cursor: pointer; padding-right: 38px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237a7568' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 13px center;
+    }
+    .input-prefix { position: relative; }
+    .input-prefix span { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; pointer-events: none; }
+    .input-prefix input { padding-left: 26px; }
+    .input-hint { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    /* ─── BUTTONS ─── */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 9px; font-family: var(--font-body); font-size: 13.5px; font-weight: 500; cursor: pointer; border: none; transition: all .15s; }
+    .btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
+    .btn-primary { background: var(--green); color: #fff; }
+    .btn-primary:hover { background: var(--green-mid); }
+    .btn-primary-full { width: 100%; justify-content: center; padding: 13px 20px; font-size: 15px; font-weight: 600; }
+    .btn-secondary { background: var(--surface-2); color: var(--fg); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border-2); }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--surface-2); }
+    .btn-danger { background: var(--red-pale); color: var(--red); border: 1px solid #f0c0c0; }
+
+    /* ─── CARDS ─── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
+    .card-body { padding: 24px 28px; }
+    .card-header { padding: 18px 22px; border-bottom: 1px solid var(--border-2); display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 14px; font-weight: 600; color: var(--fg); }
+    .card-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+    /* ─── PAGE HEADER ─── */
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 { font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--fg); letter-spacing: -0.02em; margin-bottom: 4px; }
+    .page-header p { font-size: 13.5px; color: var(--muted); }
+
+    /* ─── BADGES ─── */
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: 0.7; }
+    .badge-active   { background: var(--green-light); color: var(--green); }
+    .badge-draft    { background: #f0f0e8; color: #7a7040; }
+    .badge-ended    { background: var(--surface-2); color: var(--muted); }
+    .badge-confirmed{ background: var(--green-light); color: var(--green); }
+    .badge-pending  { background: var(--amber-pale); color: var(--amber); }
+    .badge-camp     { background: var(--blue-pale); color: var(--blue); }
+    .badge-recurring{ background: #f0eaf8; color: #6a3aaa; }
+
+    /* ─── STATS ─── */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 22px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+    .stat-card::after { content: ''; position: absolute; top: 0; right: 0; width: 60px; height: 60px; background: var(--green-pale); border-radius: 0 0 0 60px; }
+    .stat-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .stat-value { font-family: var(--font-display); font-size: 28px; font-weight: 600; color: var(--fg); letter-spacing: -0.02em; line-height: 1; margin-bottom: 6px; }
+    .stat-delta { font-size: 12px; color: var(--green-mid); font-weight: 500; }
+    .stat-icon { position: absolute; top: 16px; right: 16px; font-size: 20px; z-index: 1; }
+
+    /* ─── TABLE ─── */
+    table { width: 100%; border-collapse: collapse; }
+    thead th { padding: 12px 22px; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); border-bottom: 1px solid var(--border-2); }
+    tbody tr { border-bottom: 1px solid var(--border-2); transition: background .1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-2); }
+    tbody td { padding: 14px 22px; font-size: 13.5px; color: var(--fg); vertical-align: middle; }
+    .td-muted { color: var(--muted); font-size: 13px; }
+    .event-name-cell { font-weight: 600; }
+    .event-name-cell .sub { font-size: 12px; font-weight: 400; color: var(--muted); margin-top: 1px; }
+    .action-btn { font-size: 12.5px; font-weight: 500; color: var(--green-mid); cursor: pointer; border: none; background: none; font-family: var(--font-body); padding: 0; }
+    .action-btn:hover { text-decoration: underline; }
+    .sep { color: var(--border); margin: 0 6px; }
+    .progress-bar { height: 4px; background: var(--border-2); border-radius: 999px; overflow: hidden; margin-top: 5px; width: 80px; }
+    .progress-fill { height: 100%; background: var(--green); border-radius: 999px; }
+    .avatar-cell { display: flex; align-items: center; gap: 10px; }
+    .av { width: 32px; height: 32px; border-radius: 50%; background: var(--green-light); display: grid; place-items: center; font-size: 12px; font-weight: 700; color: var(--green); flex-shrink: 0; }
+
+    /* ─── UPLOAD ─── */
+    .upload-area { border: 2px dashed var(--border); border-radius: var(--radius-lg); padding: 28px; text-align: center; background: var(--surface-2); cursor: pointer; transition: border-color .15s, background .15s; }
+    .upload-area:hover { border-color: var(--green-mid); background: var(--green-pale); }
+    .upload-area .icon { font-size: 28px; margin-bottom: 8px; }
+    .upload-area p { font-size: 13px; color: var(--muted); }
+    .upload-area strong { color: var(--green-mid); }
+
+    /* ─── MULTI-IMAGE UPLOADER ─── */
+    .img-uploader { display: flex; flex-direction: column; gap: 12px; }
+    .img-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .img-thumb {
+      aspect-ratio: 393/381; border-radius: 10px; position: relative; overflow: hidden;
+      background: var(--surface-2); border: 1px solid var(--border);
+      display: grid; place-items: center; cursor: pointer;
+    }
+    .img-thumb.filled { background: linear-gradient(135deg, #b8d4c0, #7aaa84); }
+    .img-thumb.cover-img::after { content: 'Cover'; position: absolute; top: 6px; left: 6px; background: var(--green); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px; letter-spacing: .03em; }
+    .img-thumb .remove-img { position: absolute; top: 5px; right: 5px; width: 22px; height: 22px; background: rgba(0,0,0,0.55); border-radius: 50%; border: none; color: #fff; font-size: 13px; display: grid; place-items: center; cursor: pointer; opacity: 0; transition: opacity .15s; }
+    .img-thumb:hover .remove-img { opacity: 1; }
+    .img-thumb-label { font-size: 11px; color: var(--muted); text-align: center; padding: 4px; }
+    .img-add {
+      aspect-ratio: 393/381; border-radius: 10px; border: 2px dashed var(--border);
+      background: var(--surface-2); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 4px;
+      cursor: pointer; transition: border-color .15s, background .15s; color: var(--muted);
+      font-size: 12px; font-weight: 500;
+    }
+    .img-add:hover { border-color: var(--green-mid); background: var(--green-pale); color: var(--green-mid); }
+    .img-add svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+    .img-upload-hint { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+    .img-upload-hint svg { width: 14px; height: 14px; stroke: var(--muted); fill: none; stroke-width: 2; flex-shrink: 0; }
+
+    /* ─── AI IMAGE GENERATION ─── */
+    .img-mode-tabs { display: inline-flex; gap: 4px; background: var(--surface-2); padding: 4px; border-radius: 10px; }
+    .img-mode-tab { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 7px; border: none; background: transparent; font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all .15s; }
+    .img-mode-tab svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+    .img-mode-tab.active { background: var(--surface); color: var(--green); box-shadow: 0 1px 3px rgba(0,0,0,.08); font-weight: 600; }
+    .img-mode-panel { display: flex; flex-direction: column; gap: 12px; }
+
+    .ai-gen-panel { display: none; flex-direction: column; gap: 14px; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; background: linear-gradient(180deg, var(--green-pale), var(--surface)); }
+    .ai-gen-panel.active { display: flex; }
+    .ai-gen-head { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--green); }
+    .ai-gen-head svg { width: 18px; height: 18px; fill: var(--green); }
+    .ai-prompt-row { display: flex; gap: 10px; align-items: flex-end; }
+    .ai-prompt-row .form-group { flex: 1; margin: 0; }
+    .ai-gen-btn { background: var(--green); color: #fff; border: none; border-radius: var(--radius); padding: 11px 18px; font-family: var(--font-body); font-size: 13.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; transition: background .15s; }
+    .ai-gen-btn:hover { background: var(--green-mid); }
+    .ai-gen-btn svg { width: 16px; height: 16px; fill: #fff; }
+    .ai-gen-btn:disabled { opacity: .6; cursor: default; }
+    .ai-suggest-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ai-chip { font-size: 11.5px; padding: 5px 11px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); cursor: pointer; transition: all .15s; }
+    .ai-chip:hover { border-color: var(--green-mid); color: var(--green); }
+    .ai-chip.primary { background: var(--green-light); border-color: var(--green-light); color: var(--green); font-weight: 600; }
+    .ai-loading { display: none; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; padding: 6px 0; }
+    .ai-loading.active { display: flex; }
+    .ai-spinner { width: 18px; height: 18px; border: 2px solid var(--green-light); border-top-color: var(--green); border-radius: 50%; animation: ai-spin .7s linear infinite; flex-shrink: 0; }
+    @keyframes ai-spin { to { transform: rotate(360deg); } }
+    .ai-results { display: none; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .ai-results.active { display: grid; }
+    .ai-result { aspect-ratio: 393/381; border-radius: 10px; position: relative; overflow: hidden; cursor: pointer; border: 2.5px solid transparent; transition: border-color .15s; }
+    .ai-result:hover { border-color: var(--green-mid); }
+    .ai-result.picked { border-color: var(--green); }
+    .ai-result.picked::after { content: '✓ Added'; position: absolute; bottom: 6px; left: 6px; background: var(--green); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+
+    /* ─── ACCOUNT SETTINGS TABS ─── */
+    .settings-layout { display: grid; grid-template-columns: 200px 1fr; gap: 24px; }
+    .settings-nav { display: flex; flex-direction: column; gap: 2px; }
+    .settings-nav-item { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: var(--muted); cursor: pointer; border: none; background: none; font-family: var(--font-body); text-align: left; width: 100%; transition: all .15s; }
+    .settings-nav-item:hover { background: var(--surface-2); color: var(--fg); }
+    .settings-nav-item.active { background: var(--green-light); color: var(--green); font-weight: 600; }
+    .settings-nav-item svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+    .settings-panel { display: none; }
+    .settings-panel.active { display: block; animation: fadeIn .2s ease; }
+    .danger-zone { background: var(--red-pale); border: 1px solid #f0c0c0; border-radius: var(--radius-lg); padding: 20px 24px; }
+    .danger-zone h3 { font-size: 14px; font-weight: 700; color: var(--red); margin-bottom: 4px; }
+    .danger-zone p { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+
+    /* ─── INFO BOX ─── */
+    .info-box { display: flex; align-items: flex-start; gap: 10px; border-radius: var(--radius); padding: 12px 14px; }
+    .info-box .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .info-box p { font-size: 13px; font-weight: 500; }
+    .info-green { background: var(--green-pale); border: 1px solid #c4ddc6; }
+    .info-green p { color: var(--green); }
+    .info-amber { background: var(--amber-pale); border: 1px solid #f5d98a; }
+    .info-amber p { color: var(--amber); }
+    .info-blue  { background: var(--blue-pale);  border: 1px solid #bdd0f5; }
+    .info-blue  p { color: var(--blue); }
+
+    /* ─── EVENT TYPE PICKER ─── */
+    .type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+    .type-card {
+      background: var(--surface); border: 2px solid var(--border);
+      border-radius: var(--radius-lg); padding: 24px 20px;
+      cursor: pointer; text-align: center; transition: all .15s;
+    }
+    .type-card:hover { border-color: var(--green-mid); background: var(--green-pale); }
+    .type-card.selected { border-color: var(--green); background: var(--green-pale); }
+    .type-card .emoji { font-size: 36px; margin-bottom: 12px; }
+    .type-card h3 { font-size: 15px; font-weight: 700; color: var(--fg); margin-bottom: 6px; }
+    .type-card p { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+    /* ── import from a link ── */
+    .import-banner{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,var(--blue-pale),#e6eefb);border:1px solid #cfdcf5;border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:20px;cursor:pointer;transition:transform .12s;}
+    .import-banner:hover{transform:translateY(-1px);}
+    .import-banner .ib-ic{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--blue),#5a8fc0);display:grid;place-items:center;font-size:20px;flex-shrink:0;}
+    .import-banner .ib-tx{flex:1;} .import-banner .ib-tx b{font-size:14.5px;color:var(--fg);} .import-banner .ib-tx span{display:block;font-size:12.5px;color:var(--muted);margin-top:2px;}
+    .import-banner .ib-go{font-size:13px;font-weight:600;color:var(--blue);white-space:nowrap;}
+    .imp-ic{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--blue),#5a8fc0);display:grid;place-items:center;font-size:24px;margin-bottom:14px;}
+    .imp-h{font-family:var(--font-display);font-size:20px;font-weight:600;margin:0 0 6px;}
+    .imp-p{font-size:13.5px;color:var(--muted);margin:0 0 18px;line-height:1.5;}
+    .imp-urlrow{display:flex;gap:10px;}
+    .imp-field{flex:1;display:flex;align-items:center;gap:9px;border:1.5px solid var(--border);border-radius:11px;padding:0 13px;background:var(--surface-2);}
+    .imp-field:focus-within{border-color:var(--green-mid);background:#fff;}
+    .imp-field svg{width:17px;height:17px;stroke:var(--muted);fill:none;stroke-width:2;flex-shrink:0;}
+    .imp-field input{flex:1;border:none;background:transparent;font-family:var(--font-body);font-size:14.5px;color:var(--fg);padding:12px 0;}
+    .imp-field input:focus{outline:none;}
+    .imp-src{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;font-size:12.5px;color:var(--muted);}
+    .imp-chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:5px 11px;font-size:12px;}
+    .imp-or{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:12px;}
+    .imp-or::before,.imp-or::after{content:'';flex:1;height:1px;background:var(--border);}
+    .imp-steps{max-width:330px;margin:16px auto 0;text-align:left;}
+    .imp-step{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--muted);padding:5px 0;}
+    .imp-step .isd{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:grid;place-items:center;font-size:10px;color:transparent;}
+    .imp-step.done{color:var(--fg);} .imp-step.done .isd{background:var(--green);border-color:var(--green);color:#fff;}
+    .imp-result-banner{display:flex;align-items:center;gap:12px;background:var(--green-light);border:1px solid #cfe0d0;border-radius:13px;padding:13px 16px;margin-bottom:20px;}
+    .imp-result-banner .bi{font-size:20px;} .imp-result-banner .bt{flex:1;} .imp-result-banner .bt b{font-size:13.5px;color:var(--green);} .imp-result-banner .bt span{display:block;font-size:12px;color:var(--green-mid);margin-top:1px;word-break:break-all;}
+    .imp-result-banner .redo{font-size:12.5px;font-weight:600;color:var(--green);background:#fff;border:1px solid #cfe0d0;border-radius:9px;padding:7px 12px;cursor:pointer;white-space:nowrap;}
+    /* mirrors the app's event cover aspect (mobile 393 × 381) — scales proportionally */
+    .imp-cover{aspect-ratio:393/381;max-width:340px;border-radius:14px;background:linear-gradient(135deg,#b8d4c0,#5a8f5d);display:grid;place-items:center;position:relative;margin-bottom:8px;}
+    .imp-cover .ce{font-size:50px;} .imp-cover .ctag{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.92);color:var(--green);font-size:10.5px;font-weight:700;padding:4px 9px;border-radius:999px;}
+    .imp-cover-note{font-size:11.5px;color:var(--muted);margin-bottom:16px;}
+    .ai-tag{font-size:9.5px;font-weight:700;color:var(--blue);background:var(--blue-pale);padding:1px 6px;border-radius:999px;margin-left:6px;vertical-align:1px;}
+
+    /* ── per-event ticket buyers + check-in ── */
+    .back-link{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--green);font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;margin-bottom:10px;}
+    .back-link svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;}
+    tr.row-link{cursor:pointer;} tr.row-link:hover{background:var(--green-pale);}
+    .row-go{color:var(--muted);font-size:16px;}
+    .checkin-btn{display:inline-flex;align-items:center;gap:5px;border:1.5px solid var(--green);background:var(--surface);color:var(--green);border-radius:999px;padding:5px 12px;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
+    .checkin-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.6;}
+    .checkin-btn.in{background:var(--green);color:#fff;border-color:var(--green);}
+    .checkin-pill{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);}
+
+    /* ─── SECTION DIVIDER ─── */
+    .section-divider { margin: 28px 0 20px; display: flex; align-items: center; gap: 14px; }
+    .section-divider h3 { font-family: var(--font-display); font-size: 17px; font-weight: 600; color: var(--fg); white-space: nowrap; }
+    .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ─── RECURRING SCHEDULE ─── */
+    .day-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+    .day-btn { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--surface); font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all .15s; display: grid; place-items: center; }
+    .day-btn.active { background: var(--green); border-color: var(--green); color: #fff; }
+
+    /* ─── CAMP SESSIONS ─── */
+    .session-row { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+    .add-session-btn { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border: 2px dashed var(--border); border-radius: var(--radius); background: transparent; color: var(--muted); font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; width: 100%; justify-content: center; transition: all .15s; margin-top: 10px; }
+    .add-session-btn:hover { border-color: var(--green-mid); color: var(--green-mid); background: var(--green-pale); }
+    .remove-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #f0c0c0; background: var(--red-pale); color: var(--red); display: grid; place-items: center; cursor: pointer; flex-shrink: 0; }
+    .remove-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    /* ─── CHART (CSS only) ─── */
+    .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; padding: 0 4px; }
+    .bar { flex: 1; border-radius: 4px 4px 0 0; background: var(--green-light); min-height: 6px; transition: background .2s; position: relative; }
+    .bar:hover { background: var(--green); }
+    .bar.highlight { background: var(--green); }
+    .chart-labels { display: flex; gap: 6px; margin-top: 6px; }
+    .chart-labels span { flex: 1; text-align: center; font-size: 10px; color: var(--muted); font-family: ui-monospace, monospace; }
+
+    /* ─── SALES SUMMARY ─── */
+    .summary-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .sales-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-2); }
+    .sales-row:last-child { border-bottom: none; }
+
+    /* ─── TABS ─── */
+    .tabs { display: flex; gap: 4px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 4px; margin-bottom: 20px; width: fit-content; }
+    .tab-btn { padding: 7px 16px; border-radius: 7px; font-size: 13px; font-weight: 500; color: var(--muted); border: none; background: none; cursor: pointer; font-family: var(--font-body); transition: all .15s; }
+    .tab-btn.active { background: var(--surface); color: var(--fg); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+    /* ─── TOGGLE SWITCH ─── */
+    .toggle { width: 42px; height: 24px; border-radius: 999px; background: var(--border); position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0; }
+    .toggle.on { background: var(--green); }
+    .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+    .toggle.on::after { left: 21px; }
+
+    /* ─── DIVIDER ─── */
+    hr { border: none; border-top: 1px solid var(--border-2); margin: 24px 0; }
+
+    /* ─── UTIL ─── */
+    .row { display: flex; align-items: center; gap: 12px; }
+    .row-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .gap-8 { gap: 8px; }
+    .mt-4  { margin-top: 4px; }
+    .mt-8  { margin-top: 8px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .mb-16 { margin-bottom: 16px; }
+    .text-muted { color: var(--muted); font-size: 13px; }
+    .text-green { color: var(--green-mid); font-weight: 600; }
+    .fw-600 { font-weight: 600; }
+    .fs-13  { font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     AUTH: LOGIN
+══════════════════════════════════════════ -->
+<div class="auth-layout active" id="auth-login">
+  <div class="auth-left">
+    <div class="auth-left-logo">
+      <div class="icon">🌱</div>
+      <div class="name" style="color:#fff; font-family: var(--font-display);">Sprout</div>
+    </div>
+    <div class="auth-left-body">
+      <h2>Reach thousands of Austin families</h2>
+      <p>Create and sell tickets to kids events directly on the Sprout platform — no website needed.</p>
+      <div class="auth-left-features">
+        <div class="auth-feature"><div class="dot"></div><span>One-time, recurring & summer camp events</span></div>
+        <div class="auth-feature"><div class="dot"></div><span>Real-time ticket sales monitoring</span></div>
+        <div class="auth-feature"><div class="dot"></div><span>Payouts within 3 business days</span></div>
+        <div class="auth-feature"><div class="dot"></div><span>Automatic visibility to nearby parents</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <h1>Welcome back</h1>
+      <p class="sub">Don't have an account? <button class="switch-link" onclick="showAuth('auth-signup-1')">Create one free</button></p>
+      <div class="form-stack">
+        <div class="form-group">
+          <label>Email address</label>
+          <input type="email" placeholder="you@example.com" value="sarah@sarahevents.com"/>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" value="••••••••••"/>
+        </div>
+        <div class="row-between">
+          <label style="display:flex; align-items:center; gap:8px; text-transform:none; font-size:13px; color:var(--muted); cursor:pointer;">
+            <input type="checkbox" checked style="width:auto; padding:0;"/> Remember me
+          </label>
+          <button class="switch-link" style="font-size:13px;">Forgot password?</button>
+        </div>
+        <button class="btn btn-primary btn-primary-full" onclick="showApp('dashboard')">Sign in</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     AUTH: SIGN UP STEP 1 — Personal Details
+══════════════════════════════════════════ -->
+<div class="auth-layout" id="auth-signup-1">
+  <div class="auth-left">
+    <div class="auth-left-logo">
+      <div class="icon">🌱</div>
+      <div class="name" style="color:#fff; font-family: var(--font-display);">Sprout</div>
+    </div>
+    <div class="auth-left-body">
+      <h2>Set up your merchant account</h2>
+      <p>Takes about 3 minutes. You'll be able to publish your first event right after.</p>
+      <div class="auth-left-features">
+        <div class="auth-feature"><div class="dot"></div><span>Step 1 — Create your account</span></div>
+        <div class="auth-feature"><div class="dot" style="background:rgba(255,255,255,0.2);"></div><span style="color:rgba(255,255,255,0.4);">Step 2 — Business details</span></div>
+        <div class="auth-feature"><div class="dot" style="background:rgba(255,255,255,0.2);"></div><span style="color:rgba(255,255,255,0.4);">Step 3 — Banking & payouts</span></div>
+        <div class="auth-feature"><div class="dot" style="background:rgba(255,255,255,0.2);"></div><span style="color:rgba(255,255,255,0.4);">Step 4 — Create your first event</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <div class="stepper">
+        <div class="step active"><div class="step-num">1</div><div class="step-label">Account</div></div>
+        <div class="step-line"></div>
+        <div class="step"><div class="step-num">2</div><div class="step-label">Details</div></div>
+        <div class="step-line"></div>
+        <div class="step"><div class="step-num">3</div><div class="step-label">Banking</div></div>
+        <div class="step-line"></div>
+        <div class="step"><div class="step-num">4</div><div class="step-label">Done</div></div>
+      </div>
+      <h1>Create your account</h1>
+      <p class="sub">Already have an account? <button class="switch-link" onclick="showAuth('auth-login')">Sign in</button></p>
+      <div class="form-stack">
+        <div class="form-group">
+          <label>Email address</label>
+          <input type="email" placeholder="you@example.com" value="sarah@sarahevents.com"/>
+          <div class="input-hint">You'll use this to sign in and receive sales notifications</div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" placeholder="Min. 8 characters" value="••••••••••"/>
+        </div>
+        <div class="form-group">
+          <label>Confirm password</label>
+          <input type="password" placeholder="Re-enter your password" value="••••••••••"/>
+        </div>
+        <button class="btn btn-primary btn-primary-full" onclick="showAuth('auth-signup-2')">
+          Continue to your details
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <p style="font-size:12px; color:var(--muted); text-align:center;">By continuing you agree to Sprout's <a href="#" style="color:var(--green-mid);">Terms of Service</a> and <a href="#" style="color:var(--green-mid);">Privacy Policy</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     AUTH: SIGN UP STEP 2 — Business Details
+══════════════════════════════════════════ -->
+<div class="auth-layout" id="auth-signup-2">
+  <div class="auth-left">
+    <div class="auth-left-logo">
+      <div class="icon">🌱</div>
+      <div class="name" style="color:#fff; font-family: var(--font-display);">Sprout</div>
+    </div>
+    <div class="auth-left-body">
+      <h2>Tell us about you &amp; your business</h2>
+      <p>This is what parents see when they discover your events. You can edit any of it later in Account Settings.</p>
+      <div class="auth-left-features">
+        <div class="auth-feature"><div class="dot" style="background:rgba(255,255,255,0.5);"></div><span style="color:rgba(255,255,255,0.5);">Step 1 — Create your account</span></div>
+        <div class="auth-feature"><div class="dot"></div><span>Step 2 — Business details</span></div>
+        <div class="auth-feature"><div class="dot" style="background:rgba(255,255,255,0.2);"></div><span style="color:rgba(255,255,255,0.4);">Step 3 — Banking & payouts</span></div>
+        <div class="auth-feature"><div class="dot" style="background:rgba(255,255,255,0.2);"></div><span style="color:rgba(255,255,255,0.4);">Step 4 — Create your first event</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <div class="stepper">
+        <div class="step done"><div class="step-num">✓</div><div class="step-label">Account</div></div>
+        <div class="step-line done"></div>
+        <div class="step active"><div class="step-num">2</div><div class="step-label">Details</div></div>
+        <div class="step-line"></div>
+        <div class="step"><div class="step-num">3</div><div class="step-label">Banking</div></div>
+        <div class="step-line"></div>
+        <div class="step"><div class="step-num">4</div><div class="step-label">Done</div></div>
+      </div>
+      <h1>Your details</h1>
+      <p class="sub">Help parents recognise and trust your organisation.</p>
+      <div class="form-stack">
+        <div class="section-divider" style="margin-top:0;"><h3>👤 Contact person</h3></div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>First name</label>
+            <input type="text" placeholder="Sarah" value="Sarah"/>
+          </div>
+          <div class="form-group">
+            <label>Last name</label>
+            <input type="text" placeholder="Thompson" value="Thompson"/>
+          </div>
+          <div class="form-group span2">
+            <label>Phone number</label>
+            <input type="tel" placeholder="+1 (512) 000-0000" value="+1 (512) 555-0182"/>
+            <div class="input-hint">Used for account verification and urgent event updates</div>
+          </div>
+        </div>
+
+        <div class="section-divider"><h3>🏢 Business</h3></div>
+        <div class="form-grid">
+          <div class="form-group span2">
+            <label>Business / Organiser name</label>
+            <input type="text" placeholder="e.g. Sarah's Events" value="Sarah's Events"/>
+            <div class="input-hint">This is the public name shown to parents on Sprout</div>
+          </div>
+          <div class="form-group">
+            <label>Business type</label>
+            <select>
+              <option selected>Individual / Sole proprietor</option>
+              <option>LLC</option>
+              <option>Corporation</option>
+              <option>Non-profit / 501(c)(3)</option>
+              <option>School / Educational institution</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Website or social <span style="text-transform:none; font-weight:400; color:var(--muted);">(optional)</span></label>
+            <input type="text" placeholder="instagram.com/yourbiz" value="@sarahsevents"/>
+          </div>
+          <div class="form-group span2">
+            <label>Short bio <span style="text-transform:none; font-weight:400; color:var(--muted);">(optional)</span></label>
+            <textarea placeholder="A sentence or two about what you offer — shown on your organiser profile.">Family-run events studio hosting creative workshops and camps for kids across Austin since 2019.</textarea>
+          </div>
+        </div>
+
+        <div class="section-divider"><h3>📍 Business address</h3></div>
+        <div class="form-grid">
+          <div class="form-group span2">
+            <label>Street address</label>
+            <input type="text" placeholder="123 Main St" value="1200 Barton Springs Rd"/>
+          </div>
+          <div class="form-group span2">
+            <label>Apartment, suite, unit <span style="text-transform:none; font-weight:400; color:var(--muted);">(optional)</span></label>
+            <input type="text" placeholder="Suite 200" value="Suite 4B"/>
+          </div>
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" placeholder="Austin" value="Austin"/>
+          </div>
+          <div class="form-group">
+            <label>State / Province</label>
+            <input type="text" placeholder="TX" value="TX"/>
+          </div>
+          <div class="form-group">
+            <label>ZIP / Postal code</label>
+            <input type="text" placeholder="78704" value="78704"/>
+          </div>
+          <div class="form-group">
+            <label>Country</label>
+            <select><option selected>United States</option><option>Australia</option><option>Canada</option><option>United Kingdom</option></select>
+          </div>
+        </div>
+
+        <div class="row" style="gap:10px;">
+          <button class="btn btn-ghost" style="flex:0 0 auto;" onclick="showAuth('auth-signup-1')">
+            <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Back
+          </button>
+          <button class="btn btn-primary btn-primary-full" onclick="showAuth('auth-signup-3')">
+            Continue to Banking
+            <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     AUTH: SIGN UP STEP 3 — Banking Info
+══════════════════════════════════════════ -->
+<div class="auth-layout" id="auth-signup-3">
+  <div class="auth-left">
+    <div class="auth-left-logo">
+      <div class="icon">🌱</div>
+      <div class="name" style="color:#fff; font-family: var(--font-display);">Sprout</div>
+    </div>
+    <div class="auth-left-body">
+      <h2>Where do we send your money?</h2>
+      <p>Your payout details are encrypted and stored securely. You can update them anytime.</p>
+      <div class="auth-left-features">
+        <div class="auth-feature"><div class="dot" style="background:rgba(255,255,255,0.5);"></div><span style="color:rgba(255,255,255,0.5);">Step 1 — Create your account</span></div>
+        <div class="auth-feature"><div class="dot" style="background:rgba(255,255,255,0.5);"></div><span style="color:rgba(255,255,255,0.5);">Step 2 — Business details</span></div>
+        <div class="auth-feature"><div class="dot"></div><span>Step 3 — Banking & payouts</span></div>
+        <div class="auth-feature"><div class="dot" style="background:rgba(255,255,255,0.2);"></div><span style="color:rgba(255,255,255,0.4);">Step 4 — Create your first event</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <div class="stepper">
+        <div class="step done"><div class="step-num">✓</div><div class="step-label">Account</div></div>
+        <div class="step-line done"></div>
+        <div class="step done"><div class="step-num">✓</div><div class="step-label">Details</div></div>
+        <div class="step-line done"></div>
+        <div class="step active"><div class="step-num">3</div><div class="step-label">Banking</div></div>
+        <div class="step-line"></div>
+        <div class="step"><div class="step-num">4</div><div class="step-label">Done</div></div>
+      </div>
+      <h1>Banking details</h1>
+      <p class="sub">Payouts are sent within 3 business days after an event ends.</p>
+      <div class="form-stack">
+        <div class="info-box info-green">
+          <span class="icon">🔒</span>
+          <p>Your banking details are encrypted with 256-bit SSL and are never shared with third parties.</p>
+        </div>
+        <div class="form-group">
+          <label>Account holder full name</label>
+          <input type="text" value="Sarah Marie Thompson"/>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Routing number (ABA)</label>
+            <input type="text" placeholder="e.g. 021000021" value="021000021"/>
+          </div>
+          <div class="form-group">
+            <label>Account number</label>
+            <input type="text" placeholder="e.g. 000123456789" value="000123456789"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Bank name</label>
+          <input type="text" placeholder="e.g. Chase, Wells Fargo…" value="Chase Bank"/>
+        </div>
+        <div class="form-group">
+          <label>Payout currency</label>
+          <select><option selected>USD — US Dollar</option><option>AUD — Australian Dollar</option></select>
+        </div>
+        <div class="row" style="gap:10px;">
+          <button class="btn btn-ghost" style="flex:0 0 auto;" onclick="showAuth('auth-signup-2')">
+            <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Back
+          </button>
+          <button class="btn btn-primary btn-primary-full" onclick="showApp('dashboard')">
+            Finish setup & go to Dashboard
+            <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MAIN APP (sidebar + content)
+══════════════════════════════════════════ -->
+<div class="app" id="main-app" style="display:none;">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">🌱</div>
+        <div>
+          <div class="logo-text">Sprout</div>
+          <div class="logo-sub">Merchant Portal</div>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Overview</div>
+      <button class="nav-item active" id="nav-dashboard" onclick="showView('dashboard',this)">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" id="nav-sales" onclick="showView('sales',this)">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Sales & Analytics
+      </button>
+
+      <div class="nav-label" style="margin-top:8px;">Events</div>
+      <button class="nav-item" id="nav-new-event" onclick="showView('new-event',this)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+        Create Event
+      </button>
+      <button class="nav-item" id="nav-my-events" onclick="showView('my-events',this)">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        My Events
+        <span class="nav-badge">4</span>
+      </button>
+      <button class="nav-item" id="nav-buyers" onclick="showBuyersList(this)">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Ticket Buyers
+        <span class="nav-badge">32</span>
+      </button>
+
+      <div class="nav-label" style="margin-top:8px;">Finance</div>
+      <button class="nav-item" id="nav-payouts" onclick="showView('payouts',this)">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Payouts
+      </button>
+
+      <div class="nav-label" style="margin-top:8px;">Account</div>
+      <button class="nav-item" id="nav-account" onclick="showView('account',this)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+        Account Settings
+      </button>
+      <button class="nav-item" onclick="showAuth('auth-login')">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="user-av">S</div>
+        <div>
+          <div class="user-name">Sarah's Events</div>
+          <div class="user-role">Event Organizer</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          Notifications
+        </button>
+        <button class="btn btn-primary" onclick="showView('new-event', document.getElementById('nav-new-event'))">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          New Event
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ══ VIEW: DASHBOARD ══ -->
+      <div class="view active" id="view-dashboard">
+        <div class="page-header">
+          <h1>Welcome back, Sarah's Events 👋</h1>
+          <p>Here's what's happening with your events today.</p>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-label">Total Revenue</div><div class="stat-value">$1,960</div><div class="stat-delta">↑ 18% this month</div></div>
+          <div class="stat-card"><div class="stat-icon">🎟️</div><div class="stat-label">Tickets Sold</div><div class="stat-value">76</div><div class="stat-delta">↑ 12 this week</div></div>
+          <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-label">Active Events</div><div class="stat-value">4</div><div class="stat-delta">2 selling fast</div></div>
+          <div class="stat-card"><div class="stat-icon">💸</div><div class="stat-label">Pending Payout</div><div class="stat-value">$640</div><div class="stat-delta">Arrives Jun 17</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Your Events</div><div class="card-sub">4 active · 1 draft</div></div>
+            <button class="btn btn-ghost" style="font-size:12px;">Filter</button>
+          </div>
+          <table>
+            <thead><tr><th>Event</th><th>Type</th><th>Date</th><th>Tickets</th><th>Revenue</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><div class="event-name-cell">Kids Coding Camp<div class="sub">Education · Riverside Hall</div></div></td>
+                <td><span class="badge badge-active">One-time</span></td>
+                <td class="td-muted">Jun 14</td>
+                <td>32/50<div class="progress-bar"><div class="progress-fill" style="width:64%"></div></div></td>
+                <td class="fw-600">$640</td>
+                <td><span class="badge badge-active">Active</span></td>
+                <td><button class="action-btn" onclick="gotoBuyers('coding')">Buyers</button><span class="sep">·</span><button class="action-btn">Edit</button></td>
+              </tr>
+              <tr>
+                <td><div class="event-name-cell">Saturday Art Workshop<div class="sub">Arts & Crafts · The Creative Space</div></div></td>
+                <td><span class="badge badge-recurring">Recurring</span></td>
+                <td class="td-muted">Every Sat</td>
+                <td>16/30<div class="progress-bar"><div class="progress-fill" style="width:53%"></div></div></td>
+                <td class="fw-600">$320</td>
+                <td><span class="badge badge-active">Active</span></td>
+                <td><button class="action-btn" onclick="gotoBuyers('art')">Buyers</button><span class="sep">·</span><button class="action-btn">Edit</button></td>
+              </tr>
+              <tr>
+                <td><div class="event-name-cell">Austin Kids Summer Camp<div class="sub">Multi-week Camp · Discovery Center</div></div></td>
+                <td><span class="badge badge-camp">Summer Camp</span></td>
+                <td class="td-muted">Jul 7 – Aug 15</td>
+                <td>28/60<div class="progress-bar"><div class="progress-fill" style="width:47%"></div></div></td>
+                <td class="fw-600">$1,000</td>
+                <td><span class="badge badge-active">Active</span></td>
+                <td><button class="action-btn" onclick="gotoBuyers('camp')">Buyers</button><span class="sep">·</span><button class="action-btn">Edit</button></td>
+              </tr>
+              <tr>
+                <td><div class="event-name-cell">Summer Science Fair<div class="sub">Education · Austin Discovery Center</div></div></td>
+                <td><span class="badge badge-active">One-time</span></td>
+                <td class="td-muted">Jul 5</td>
+                <td>0/40<div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div></td>
+                <td class="fw-600 td-muted">$0</td>
+                <td><span class="badge badge-draft">Draft</span></td>
+                <td><button class="action-btn">Publish</button><span class="sep">·</span><button class="action-btn">Edit</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: SALES & ANALYTICS ══ -->
+      <div class="view" id="view-sales">
+        <div class="page-header">
+          <h1>Sales & Analytics</h1>
+          <p>Track revenue, ticket sales and buyer trends across all your events.</p>
+        </div>
+        <div class="tabs">
+          <button class="tab-btn active">Last 30 days</button>
+          <button class="tab-btn">This month</button>
+          <button class="tab-btn">All time</button>
+        </div>
+        <div class="summary-grid">
+          <div class="card card-body">
+            <div class="row-between mb-16">
+              <div class="card-title">Revenue over time</div>
+              <span class="text-green">↑ $320 vs last month</span>
+            </div>
+            <div class="chart-bars">
+              <div class="bar" style="height:30%"></div>
+              <div class="bar" style="height:45%"></div>
+              <div class="bar" style="height:35%"></div>
+              <div class="bar" style="height:60%"></div>
+              <div class="bar" style="height:50%"></div>
+              <div class="bar" style="height:70%"></div>
+              <div class="bar" style="height:55%"></div>
+              <div class="bar" style="height:80%"></div>
+              <div class="bar" style="height:65%"></div>
+              <div class="bar" style="height:90%"></div>
+              <div class="bar" style="height:75%"></div>
+              <div class="bar highlight" style="height:100%"></div>
+            </div>
+            <div class="chart-labels">
+              <span>May 6</span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span>Jun 5</span>
+            </div>
+          </div>
+          <div class="card card-body">
+            <div class="card-title mb-16">Revenue by event type</div>
+            <div class="sales-row"><span>One-time events</span><span class="fw-600">$960</span></div>
+            <div class="sales-row"><span>Recurring events</span><span class="fw-600">$320</span></div>
+            <div class="sales-row"><span>Summer camps</span><span class="fw-600">$1,000</span></div>
+            <hr style="margin:16px 0 12px;"/>
+            <div class="row-between"><span class="fw-600">Total</span><span class="fw-600 text-green">$2,280</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Top events by revenue</div><div class="card-sub">Conversion = % of people who viewed the event in Sprout and bought a ticket</div></div>
+          </div>
+          <table>
+            <thead><tr><th>Event</th><th>Type</th><th>Tickets Sold</th><th>Revenue</th><th>Avg. ticket</th><th>View → Buy</th></tr></thead>
+            <tbody>
+              <tr><td class="fw-600">Austin Kids Summer Camp</td><td><span class="badge badge-camp">Summer Camp</span></td><td>28</td><td class="fw-600">$1,000</td><td class="td-muted">$35.71</td><td><span style="color:var(--green-mid); font-weight:600;">47%</span></td></tr>
+              <tr><td class="fw-600">Kids Coding Camp</td><td><span class="badge badge-active">One-time</span></td><td>32</td><td class="fw-600">$640</td><td class="td-muted">$20.00</td><td><span style="color:var(--green-mid); font-weight:600;">64%</span></td></tr>
+              <tr><td class="fw-600">Saturday Art Workshop</td><td><span class="badge badge-recurring">Recurring</span></td><td>16</td><td class="fw-600">$320</td><td class="td-muted">$20.00</td><td><span style="color:var(--amber); font-weight:600;">53%</span></td></tr>
+              <tr><td class="fw-600">Spring Music Recital</td><td><span class="badge badge-active">One-time</span></td><td>28</td><td class="fw-600">$280</td><td class="td-muted">$10.00</td><td><span style="color:var(--green-mid); font-weight:600;">100%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: CREATE EVENT — TYPE PICKER ══ -->
+      <div class="view" id="view-new-event">
+        <div class="page-header">
+          <h1>Create a new event</h1>
+          <p>Choose the type that fits your event best.</p>
+        </div>
+
+        <div class="import-banner" onclick="showView('import', document.getElementById('nav-new-event'))">
+          <div class="ib-ic">🔗</div>
+          <div class="ib-tx"><b>Already have this event online?</b><span>Paste a link from Eventbrite, your website or Facebook — AI fills it in for you.</span></div>
+          <span class="ib-go">Import with AI →</span>
+        </div>
+
+        <div class="type-grid">
+          <div class="type-card" onclick="showView('event-single', document.getElementById('nav-new-event'))">
+            <div class="emoji">🎯</div>
+            <h3>One-time Event</h3>
+            <p>A single event on a specific date. Great for workshops, fairs, shows, or special events.</p>
+          </div>
+          <div class="type-card" onclick="showView('event-recurring', document.getElementById('nav-new-event'))">
+            <div class="emoji">🔄</div>
+            <h3>Recurring Event</h3>
+            <p>Repeats on a set schedule — weekly, bi-weekly, or monthly. Perfect for ongoing classes.</p>
+          </div>
+          <div class="type-card" onclick="showView('event-camp', document.getElementById('nav-new-event'))">
+            <div class="emoji">🏕️</div>
+            <h3>Summer Camp</h3>
+            <p>Multi-week programs with sessions, age groups, and tiered pricing. Full camp management.</p>
+          </div>
+        </div>
+        <div class="info-box info-blue" style="max-width:600px;">
+          <span class="icon">💡</span>
+          <p>Not sure? One-time events are the easiest to start with. You can always create recurring or camp events later.</p>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: IMPORT FROM A LINK ══ -->
+      <div class="view" id="view-import">
+        <div class="page-header">
+          <h1>Import from a link</h1>
+          <p>Paste an event you've already listed online — AI reads the page and fills everything in.</p>
+        </div>
+        <div class="card card-body" style="max-width:720px;">
+
+          <!-- A: paste -->
+          <div id="imp-paste">
+            <div class="imp-ic">🔗</div>
+            <h2 class="imp-h">Import from a link</h2>
+            <p class="imp-p">We'll pull in the name, date, time, venue, price, description and cover image — you review before publishing.</p>
+            <div class="imp-urlrow">
+              <div class="imp-field">
+                <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+                <input id="imp-url" type="text" value="eventbrite.com/e/kids-coding-camp-summer-2025" placeholder="Paste your event URL…"/>
+              </div>
+              <button class="btn btn-primary" onclick="scanImport()">
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" style="width:16px;height:16px;"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg>
+                Scan with AI
+              </button>
+            </div>
+            <div class="imp-src">Works with
+              <span class="imp-chip">🎟️ Eventbrite</span>
+              <span class="imp-chip">🌐 Your website</span>
+              <span class="imp-chip">📘 Facebook events</span>
+              <span class="imp-chip">📷 Instagram</span>
+            </div>
+            <div class="imp-or">or</div>
+            <button class="btn btn-ghost" style="width:100%;" onclick="showView('event-single', document.getElementById('nav-new-event'))">Fill in manually instead</button>
+          </div>
+
+          <!-- B: loading -->
+          <div id="imp-loading" style="display:none; text-align:center; padding:14px 0;">
+            <div class="ai-spinner" style="width:42px;height:42px;border-width:4px;margin:0 auto 16px;"></div>
+            <h2 class="imp-h" style="text-align:center;">Reading the page…</h2>
+            <p class="imp-p" id="imp-loadurl" style="text-align:center;margin-bottom:6px;">eventbrite.com/e/kids-coding-camp-summer-2025</p>
+            <div class="imp-steps">
+              <div class="imp-step" id="ist1"><span class="isd">✓</span>Fetching the page</div>
+              <div class="imp-step" id="ist2"><span class="isd">✓</span>Extracting name, date &amp; venue</div>
+              <div class="imp-step" id="ist3"><span class="isd">✓</span>Pulling price &amp; description</div>
+              <div class="imp-step" id="ist4"><span class="isd">✓</span>Grabbing the cover image</div>
+            </div>
+          </div>
+
+          <!-- C: imported, review & edit -->
+          <div id="imp-result" style="display:none;">
+            <div class="imp-result-banner">
+              <span class="bi">✨</span>
+              <div class="bt"><b>Imported with AI — review &amp; edit</b><span id="imp-srclink">eventbrite.com/e/kids-coding-camp-summer-2025</span></div>
+              <button class="redo" onclick="resetImport()">Change link</button>
+            </div>
+
+            <div class="imp-cover"><span class="ctag">✨ AI-pulled cover</span><span class="ce">💻</span></div>
+            <div class="imp-cover-note">Cropped to Sprout's event cover aspect (mobile 393 × 381) so it scales to fit the app exactly.</div>
+
+            <div class="form-grid">
+              <div class="form-group span2"><label>Event name <span class="ai-tag">AI</span></label><input type="text" value="Kids Coding Camp — Summer Edition"/></div>
+              <div class="form-group"><label>Date <span class="ai-tag">AI</span></label><input type="date" value="2025-07-14"/></div>
+              <div class="form-group"><label>Category <span class="ai-tag">AI</span></label><select><option>Arts &amp; Crafts</option><option selected>Education</option><option>Sports</option><option>Outdoor</option></select></div>
+              <div class="form-group"><label>Start time <span class="ai-tag">AI</span></label><input type="time" value="10:00"/></div>
+              <div class="form-group"><label>End time <span class="ai-tag">AI</span></label><input type="time" value="14:00"/></div>
+              <div class="form-group span2"><label>Venue / Location <span class="ai-tag">AI</span></label><input type="text" value="Riverside Community Hall, Austin TX"/></div>
+              <div class="form-group span2"><label>Description <span class="ai-tag">AI</span></label><textarea>A hands-on coding camp for kids aged 7–12. Learn programming basics through fun games and creative projects — no experience needed. Bring a packed lunch!</textarea></div>
+              <div class="form-group"><label>Ticket price <span class="ai-tag">AI</span></label><div class="input-prefix"><span>$</span><input type="number" value="20"/></div></div>
+              <div class="form-group"><label>Age range <span class="ai-tag">AI</span></label><select><option>0–2 years</option><option>3–5 years</option><option>6–8 years</option><option selected>9–12 years</option><option>13+ years</option><option>All ages</option></select></div>
+            </div>
+
+            <div class="info-box info-amber" style="margin-top:16px;">
+              <span class="icon">⚠️</span>
+              <p><strong>2 fields need your input</strong> — we couldn't find <strong>max capacity</strong> or an <strong>early-bird price</strong> on the page. Add them below before publishing.</p>
+            </div>
+            <div class="form-grid" style="margin-top:14px;">
+              <div class="form-group"><label>Max capacity</label><input type="number" placeholder="e.g. 50"/></div>
+              <div class="form-group"><label>Early-bird price (optional)</label><div class="input-prefix"><span>$</span><input type="number" placeholder="15"/></div><div class="input-hint">Ends <input type="date" style="display:inline; width:auto; padding:4px 8px; font-size:12px;" value="2025-06-20"/></div></div>
+            </div>
+
+            <div class="row mt-24" style="gap:10px;">
+              <button class="btn btn-primary" style="padding:12px 24px; font-size:14px;"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> Publish Event</button>
+              <button class="btn btn-ghost" style="padding:12px 20px;">Save as Draft</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ VIEW: IMPORT A SUMMER CAMP FROM A LINK ══ -->
+      <div class="view" id="view-import-camp">
+        <div class="page-header">
+          <h1>Import a summer camp from a link</h1>
+          <p>Paste a camp you've already listed online — AI breaks it into weekly sessions for you.</p>
+        </div>
+        <div class="card card-body" style="max-width:780px;">
+
+          <!-- A: paste -->
+          <div id="impc-paste">
+            <div class="imp-ic">🏕️</div>
+            <h2 class="imp-h">Import a summer camp</h2>
+            <p class="imp-p">We'll read the page and split it into Sprout's weekly-session format — name, dates and price per week — plus location, description and cover photo. You review everything before publishing.</p>
+            <div class="imp-urlrow">
+              <div class="imp-field">
+                <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+                <input id="impc-url" type="text" value="austindiscoverycenter.org/programs/summer-camp-2025" placeholder="Paste your camp's URL…"/>
+              </div>
+              <button class="btn btn-primary" onclick="scanImportCamp()">
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" style="width:16px;height:16px;"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg>
+                Scan with AI
+              </button>
+            </div>
+            <div class="imp-src">Works with
+              <span class="imp-chip">🌐 Your website</span>
+              <span class="imp-chip">🎟️ Eventbrite</span>
+              <span class="imp-chip">📘 Facebook events</span>
+              <span class="imp-chip">📄 A PDF flyer link</span>
+            </div>
+            <div class="imp-or">or</div>
+            <button class="btn btn-ghost" style="width:100%;" onclick="showView('event-camp', document.getElementById('nav-new-event'))">Fill in manually instead</button>
+          </div>
+
+          <!-- B: loading -->
+          <div id="impc-loading" style="display:none; text-align:center; padding:14px 0;">
+            <div class="ai-spinner" style="width:42px;height:42px;border-width:4px;margin:0 auto 16px;"></div>
+            <h2 class="imp-h" style="text-align:center;">Reading the page…</h2>
+            <p class="imp-p" id="impc-loadurl" style="text-align:center;margin-bottom:6px;">austindiscoverycenter.org/programs/summer-camp-2025</p>
+            <div class="imp-steps">
+              <div class="imp-step" id="cst1"><span class="isd">✓</span>Fetching the page</div>
+              <div class="imp-step" id="cst2"><span class="isd">✓</span>Identifying camp name &amp; location</div>
+              <div class="imp-step" id="cst3"><span class="isd">✓</span>Finding weekly sessions &amp; dates</div>
+              <div class="imp-step" id="cst4"><span class="isd">✓</span>Extracting price per week</div>
+              <div class="imp-step" id="cst5"><span class="isd">✓</span>Grabbing photos &amp; description</div>
+            </div>
+          </div>
+
+          <!-- C: imported, review & edit -->
+          <div id="impc-result" style="display:none;">
+            <div class="imp-result-banner">
+              <span class="bi">✨</span>
+              <div class="bt"><b>Imported with AI — review &amp; edit</b><span id="impc-srclink">austindiscoverycenter.org/programs/summer-camp-2025</span></div>
+              <button class="redo" onclick="resetImportCamp()">Change link</button>
+            </div>
+
+            <div class="imp-cover"><span class="ctag">✨ AI-pulled cover</span><span class="ce">🏕️</span></div>
+            <div class="imp-cover-note">Cropped to Sprout's camp cover aspect so it scales to fit the app exactly.</div>
+
+            <div class="form-grid">
+              <div class="form-group span2"><label>Camp name <span class="ai-tag">AI</span></label><input type="text" value="Austin Kids Summer Camp 2025"/></div>
+              <div class="form-group span2"><label>Venue / Location <span class="ai-tag">AI</span></label><input type="text" value="Austin Discovery Center, 1830 Simond Ave, Austin TX"/></div>
+              <div class="form-group span2"><label>Camp description <span class="ai-tag">AI</span></label><textarea>A full-day summer camp program for kids aged 6–14. Campers explore STEM, arts, outdoor activities, and team sports across multiple themed weeks. All meals and equipment provided.</textarea></div>
+              <div class="form-group"><label>Daily hours <span class="ai-tag">AI</span></label><input type="text" value="8:00 AM – 5:00 PM"/></div>
+              <div class="form-group"><label>Category <span class="ai-tag">AI</span></label><select><option selected>Education</option><option>Sports</option><option>Arts &amp; Crafts</option><option>Outdoor</option></select></div>
+            </div>
+
+            <div class="section-divider"><h3>📅 Weekly Sessions Found <span class="ai-tag" style="margin-left:6px;">AI · 3 detected</span></h3></div>
+            <p class="text-muted mb-16">The page listed three separate weeks — we've split each into its own bookable session, matching Sprout's format.</p>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div class="session-row">
+                <div class="form-group"><label>Session name</label><input type="text" value="Week 1 — STEM Explorer"/></div>
+                <div class="form-group"><label>Dates</label><input type="text" value="Jul 7 – Jul 11"/></div>
+                <div class="form-group"><label>Price / week</label><div class="input-prefix"><span>$</span><input type="number" value="250"/></div></div>
+                <button class="remove-btn" onclick="removeSession(this)"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+              </div>
+              <div class="session-row">
+                <div class="form-group"><label>Session name</label><input type="text" value="Week 2 — Art & Music"/></div>
+                <div class="form-group"><label>Dates</label><input type="text" value="Jul 14 – Jul 18"/></div>
+                <div class="form-group"><label>Price / week</label><div class="input-prefix"><span>$</span><input type="number" value="250"/></div></div>
+                <button class="remove-btn" onclick="removeSession(this)"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+              </div>
+              <div class="session-row">
+                <div class="form-group"><label>Session name</label><input type="text" value="Week 3 — Outdoor Adventures"/></div>
+                <div class="form-group"><label>Dates</label><input type="text" value="Jul 21 – Jul 25"/></div>
+                <div class="form-group"><label>Price / week <span class="ai-tag" style="background:var(--amber-pale, #fdf3e3);color:var(--amber, #c17f2a);">low confidence</span></label><div class="input-prefix"><span>$</span><input type="number" value="275"/></div></div>
+                <button class="remove-btn" onclick="removeSession(this)"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+              </div>
+            </div>
+            <button class="add-session-btn" onclick="addSession()">
+              <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M12 5v14M5 12h14"/></svg>
+              Add another session / week
+            </button>
+
+            <div class="info-box info-amber" style="margin-top:18px;">
+              <span class="icon">⚠️</span>
+              <p><strong>Week 3's price looks unusual</strong> and we couldn't find <strong>age groups</strong> or <strong>capacity</strong> anywhere on the page — these don't fit our template well from scraped listings. Please confirm below before publishing.</p>
+            </div>
+
+            <div class="section-divider"><h3>👦 Age Groups &amp; Capacity</h3></div>
+            <div class="form-grid">
+              <div class="form-group"><label>Group 1 — Age range</label><input type="text" placeholder="e.g. 6–8 years"/></div>
+              <div class="form-group"><label>Capacity per session</label><input type="number" placeholder="20"/></div>
+              <div class="form-group"><label>Group 2 — Age range</label><input type="text" placeholder="e.g. 9–11 years"/></div>
+              <div class="form-group"><label>Capacity per session</label><input type="number" placeholder="20"/></div>
+            </div>
+
+            <div class="row mt-24" style="gap:10px;">
+              <button class="btn btn-primary" style="padding:12px 24px; font-size:14px;" onclick="showView('event-camp', document.getElementById('nav-new-event'))">
+                <svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+                Looks Good — Continue Setup
+              </button>
+              <button class="btn btn-ghost" style="padding:12px 20px;" onclick="resetImportCamp()">Change link</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ VIEW: ONE-TIME EVENT FORM ══ -->
+      <div class="view" id="view-event-single">
+        <div class="page-header">
+          <h1>One-time Event</h1>
+          <p>Fill in the details and publish to Sprout parents in Austin.</p>
+        </div>
+        <div class="card card-body" style="max-width:720px;">
+          <div class="form-grid">
+            <div class="form-group span2"><label>Event name</label><input type="text" placeholder="e.g. Kids Coding Camp — Summer Edition" value="Kids Coding Camp"/></div>
+            <div class="form-group"><label>Date</label><input type="date" value="2025-06-14"/></div>
+            <div class="form-group"><label>Start time</label><input type="time" value="10:00"/></div>
+            <div class="form-group"><label>End time</label><input type="time" value="14:00"/></div>
+            <div class="form-group"><label>Category</label><select><option>Arts & Crafts</option><option selected>Education</option><option>Sports</option><option>Music</option><option>Outdoor</option></select></div>
+            <div class="form-group span2"><label>Venue / Location</label><input type="text" value="Riverside Community Hall, Austin TX"/></div>
+            <div class="form-group span2"><label>Description</label><textarea>A hands-on coding camp for kids aged 7–12. Kids will learn the basics of programming through fun games and creative projects. No prior experience needed — just bring curiosity and a packed lunch!</textarea></div>
+            <div class="form-group"><label>Age range</label><select><option>0–2 years</option><option>3–5 years</option><option>6–8 years</option><option selected>9–12 years</option><option>13+ years</option><option>All ages</option></select></div>
+            <div class="form-group"><label>Max capacity</label><input type="number" value="50"/></div>
+            <div class="form-group"><label>Ticket price (USD)</label><div class="input-prefix"><span>$</span><input type="number" value="20"/></div></div>
+            <div class="form-group"><label>Early bird price (optional)</label><div class="input-prefix"><span>$</span><input type="number" placeholder="15"/></div><div class="input-hint">Applied before <input type="date" style="display:inline; width:auto; padding:4px 8px; font-size:12px;" value="2025-06-01"/></div></div>
+            <div class="form-group span2">
+              <label>Event images</label>
+              <div class="img-uploader">
+                <div class="img-mode-tabs">
+                  <button type="button" class="img-mode-tab active" onclick="setImgMode('single','upload',this)">
+                    <svg viewBox="0 0 24 24"><path d="M4 16l4-4 4 4 4-5 4 5M4 20h16M4 4h16"/></svg>
+                    Upload photos
+                  </button>
+                  <button type="button" class="img-mode-tab" onclick="setImgMode('single','ai',this)">
+                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/><path d="M19 14l.9 2.6L22.5 18l-2.6.9L19 21.5l-.9-2.6L15.5 18l2.6-.9z"/></svg>
+                    Generate with AI
+                  </button>
+                </div>
+
+                <!-- Upload mode -->
+                <div class="img-mode-panel" id="upload-single">
+                  <div class="img-grid">
+                    <div class="img-thumb filled cover-img"><button class="remove-img">✕</button></div>
+                    <div class="img-thumb filled"><button class="remove-img">✕</button></div>
+                    <div class="img-thumb filled"><button class="remove-img">✕</button></div>
+                    <div class="img-add">
+                      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                      Add photo
+                    </div>
+                  </div>
+                  <div class="img-upload-hint">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                    First image is the cover shown on Sprout. Add up to 8 photos. PNG or JPG, max 5MB each.
+                  </div>
+                </div>
+
+                <!-- AI generate mode -->
+                <div class="ai-gen-panel" id="ai-single">
+                  <div class="ai-gen-head">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg>
+                    No photo? Describe your event and we'll generate cover options.
+                  </div>
+                  <div class="ai-prompt-row">
+                    <div class="form-group">
+                      <label>Image prompt</label>
+                      <input type="text" id="ai-prompt-single" value="Kids coding camp in a bright classroom, children ages 7–12 with laptops, cheerful and colorful"/>
+                    </div>
+                    <button type="button" class="ai-gen-btn" id="ai-btn-single" onclick="aiGenerate('single')">
+                      <svg viewBox="0 0 24 24"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg>
+                      Generate
+                    </button>
+                  </div>
+                  <div class="ai-suggest-chips">
+                    <span class="ai-chip primary" onclick="aiAutofill('single','Kids coding camp in a bright classroom, children ages 7–12 with laptops, cheerful and colorful')">✨ Auto-fill from title &amp; description</span>
+                    <span class="ai-chip" onclick="aiAutofill('single','Bright cheerful kids event, warm natural light, candid joyful moment')">Bright &amp; cheerful</span>
+                    <span class="ai-chip" onclick="aiAutofill('single','Outdoor kids activity, green park, sunny day, families having fun')">Outdoor</span>
+                    <span class="ai-chip" onclick="aiAutofill('single','Cozy indoor workshop, soft lighting, hands-on creative activity')">Cozy indoor</span>
+                  </div>
+                  <div class="ai-loading" id="ai-loading-single"><span class="ai-spinner"></span> Generating 4 cover options…</div>
+                  <div class="ai-results" id="ai-results-single">
+                    <div class="ai-result" style="background:linear-gradient(135deg,#7aaa84,#b8d4c0)" onclick="pickAiImage(this)"></div>
+                    <div class="ai-result" style="background:linear-gradient(135deg,#e6b85c,#f0d79a)" onclick="pickAiImage(this)"></div>
+                    <div class="ai-result" style="background:linear-gradient(135deg,#6b9bc9,#a9c8e3)" onclick="pickAiImage(this)"></div>
+                    <div class="ai-result" style="background:linear-gradient(135deg,#c97a8a,#e3aab5)" onclick="pickAiImage(this)"></div>
+                  </div>
+                  <div class="img-upload-hint">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                    Tap an option to add it. The first added image becomes your cover. You can mix AI images with uploads.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-24" style="gap:10px;">
+            <button class="btn btn-primary" style="padding:12px 24px; font-size:14px;">
+              <svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+              Publish Event
+            </button>
+            <button class="btn btn-ghost" style="padding:12px 20px;">Save as Draft</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: RECURRING EVENT FORM ══ -->
+      <div class="view" id="view-event-recurring">
+        <div class="page-header">
+          <h1>Recurring Event</h1>
+          <p>Set a repeating schedule — each occurrence gets its own ticket pool.</p>
+        </div>
+        <div class="card card-body" style="max-width:720px;">
+          <div class="form-grid">
+            <div class="form-group span2"><label>Event name</label><input type="text" value="Saturday Art Workshop"/></div>
+            <div class="form-group span2"><label>Venue / Location</label><input type="text" value="The Creative Space, Austin TX"/></div>
+            <div class="form-group"><label>Start time</label><input type="time" value="10:00"/></div>
+            <div class="form-group"><label>End time</label><input type="time" value="12:00"/></div>
+            <div class="form-group"><label>Category</label><select><option selected>Arts & Crafts</option><option>Education</option><option>Sports</option></select></div>
+            <div class="form-group"><label>Age range</label><select><option>0–2 years</option><option>3–5 years</option><option selected>6–8 years</option><option>9–12 years</option><option>13+ years</option><option>All ages</option></select></div>
+            <div class="form-group span2"><label>Description</label><textarea>Weekly art workshop for young creators. We explore a new medium each week — painting, collage, clay, and more.</textarea></div>
+          </div>
+
+          <div class="section-divider"><h3>🔄 Repeat Schedule</h3></div>
+          <div class="form-grid">
+            <div class="form-group"><label>Repeat frequency</label>
+              <select>
+                <option selected>Weekly</option>
+                <option>Bi-weekly (every 2 weeks)</option>
+                <option>Monthly</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Repeat until</label><input type="date" value="2025-08-30"/></div>
+            <div class="form-group span2">
+              <label>Repeat on days</label>
+              <div class="day-picker mt-8">
+                <button class="day-btn">Mo</button>
+                <button class="day-btn">Tu</button>
+                <button class="day-btn">We</button>
+                <button class="day-btn">Th</button>
+                <button class="day-btn">Fr</button>
+                <button class="day-btn active">Sa</button>
+                <button class="day-btn">Su</button>
+              </div>
+            </div>
+            <div class="form-group"><label>Capacity per session</label><input type="number" value="30"/></div>
+            <div class="form-group"><label>Ticket price per session</label><div class="input-prefix"><span>$</span><input type="number" value="20"/></div></div>
+          </div>
+
+          <div class="info-box info-amber mt-16">
+            <span class="icon">📅</span>
+            <p>This will create 12 sessions from Jun 7 to Aug 30. Parents book individual sessions or all at once.</p>
+          </div>
+
+          <div class="form-group mt-24">
+            <label>Event images</label>
+            <div class="img-uploader">
+              <div class="img-mode-tabs">
+                <button type="button" class="img-mode-tab active" onclick="setImgMode('recurring','upload',this)">
+                  <svg viewBox="0 0 24 24"><path d="M4 16l4-4 4 4 4-5 4 5M4 20h16M4 4h16"/></svg>
+                  Upload photos
+                </button>
+                <button type="button" class="img-mode-tab" onclick="setImgMode('recurring','ai',this)">
+                  <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/><path d="M19 14l.9 2.6L22.5 18l-2.6.9L19 21.5l-.9-2.6L15.5 18l2.6-.9z"/></svg>
+                  Generate with AI
+                </button>
+              </div>
+
+              <div class="img-mode-panel" id="upload-recurring">
+                <div class="img-grid">
+                  <div class="img-thumb filled cover-img"><button class="remove-img">✕</button></div>
+                  <div class="img-thumb filled"><button class="remove-img">✕</button></div>
+                  <div class="img-add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add photo</div>
+                  <div class="img-add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add photo</div>
+                </div>
+                <div class="img-upload-hint">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                  First image is the cover. Add up to 8 photos, max 5MB each.
+                </div>
+              </div>
+
+              <div class="ai-gen-panel" id="ai-recurring">
+                <div class="ai-gen-head">
+                  <svg viewBox="0 0 24 24"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg>
+                  No photo? Describe your workshop and we'll generate cover options.
+                </div>
+                <div class="ai-prompt-row">
+                  <div class="form-group">
+                    <label>Image prompt</label>
+                    <input type="text" id="ai-prompt-recurring" value="Weekly kids art workshop, children painting and crafting, colorful studio, joyful"/>
+                  </div>
+                  <button type="button" class="ai-gen-btn" id="ai-btn-recurring" onclick="aiGenerate('recurring')">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg>
+                    Generate
+                  </button>
+                </div>
+                <div class="ai-suggest-chips">
+                  <span class="ai-chip primary" onclick="aiAutofill('recurring','Weekly kids art workshop, children painting and crafting, colorful studio, joyful')">✨ Auto-fill from title &amp; description</span>
+                  <span class="ai-chip" onclick="aiAutofill('recurring','Bright cheerful kids event, warm natural light, candid joyful moment')">Bright &amp; cheerful</span>
+                  <span class="ai-chip" onclick="aiAutofill('recurring','Cozy indoor workshop, soft lighting, hands-on creative activity')">Cozy indoor</span>
+                </div>
+                <div class="ai-loading" id="ai-loading-recurring"><span class="ai-spinner"></span> Generating 4 cover options…</div>
+                <div class="ai-results" id="ai-results-recurring">
+                  <div class="ai-result" style="background:linear-gradient(135deg,#c97a8a,#e3aab5)" onclick="pickAiImage(this)"></div>
+                  <div class="ai-result" style="background:linear-gradient(135deg,#7aaa84,#b8d4c0)" onclick="pickAiImage(this)"></div>
+                  <div class="ai-result" style="background:linear-gradient(135deg,#9b7ac9,#c5aae3)" onclick="pickAiImage(this)"></div>
+                  <div class="ai-result" style="background:linear-gradient(135deg,#e6b85c,#f0d79a)" onclick="pickAiImage(this)"></div>
+                </div>
+                <div class="img-upload-hint">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                  Tap an option to add it. The first added image becomes your cover.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-24" style="gap:10px;">
+            <button class="btn btn-primary" style="padding:12px 24px; font-size:14px;">
+              <svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+              Publish Recurring Event
+            </button>
+            <button class="btn btn-ghost" style="padding:12px 20px;">Save as Draft</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: SUMMER CAMP FORM ══ -->
+      <div class="view" id="view-event-camp">
+        <div class="page-header">
+          <h1>Summer Camp Setup</h1>
+          <p>Configure sessions, age groups, and pricing for your multi-week program.</p>
+        </div>
+
+        <div class="import-banner" style="max-width:780px;" onclick="showView('import-camp', document.getElementById('nav-new-event'))">
+          <div class="ib-ic">🔗</div>
+          <div class="ib-tx"><b>Already have this camp listed online?</b><span>Paste a link — AI finds the weekly sessions, pricing and details for you.</span></div>
+          <span class="ib-go">Import with AI →</span>
+        </div>
+
+        <div class="card card-body" style="max-width:780px;">
+          <div class="form-grid">
+            <div class="form-group span2"><label>Camp name</label><input type="text" value="Austin Kids Summer Camp 2025"/></div>
+            <div class="form-group span2"><label>Venue / Location</label><input type="text" value="Austin Discovery Center, 1830 Simond Ave, Austin TX"/></div>
+            <div class="form-group span2"><label>Camp description</label><textarea>A full-day summer camp program for kids aged 6–14. Campers explore STEM, arts, outdoor activities, and team sports across multiple themed weeks. All meals and equipment provided.</textarea></div>
+            <div class="form-group"><label>Daily hours</label><input type="text" value="8:00 AM – 5:00 PM"/></div>
+            <div class="form-group"><label>Category</label><select><option selected>Education</option><option>Sports</option><option>Arts & Crafts</option><option>Outdoor</option></select></div>
+          </div>
+
+          <div class="section-divider"><h3>📅 Camp Sessions / Weeks</h3></div>
+          <p class="text-muted mb-16">Each session is a separate bookable week. Parents can sign up for one or multiple weeks.</p>
+
+          <div id="sessions-list" style="display:flex; flex-direction:column; gap:10px;">
+            <div class="session-row">
+              <div class="form-group"><label>Session name</label><input type="text" value="Week 1 — STEM Explorer"/></div>
+              <div class="form-group"><label>Dates</label><input type="text" value="Jul 7 – Jul 11"/></div>
+              <div class="form-group"><label>Price / week</label><div class="input-prefix"><span>$</span><input type="number" value="250"/></div></div>
+              <button class="remove-btn" onclick="removeSession(this)"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+            </div>
+            <div class="session-row">
+              <div class="form-group"><label>Session name</label><input type="text" value="Week 2 — Art & Music"/></div>
+              <div class="form-group"><label>Dates</label><input type="text" value="Jul 14 – Jul 18"/></div>
+              <div class="form-group"><label>Price / week</label><div class="input-prefix"><span>$</span><input type="number" value="250"/></div></div>
+              <button class="remove-btn" onclick="removeSession(this)"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+            </div>
+            <div class="session-row">
+              <div class="form-group"><label>Session name</label><input type="text" value="Week 3 — Outdoor Adventures"/></div>
+              <div class="form-group"><label>Dates</label><input type="text" value="Jul 21 – Jul 25"/></div>
+              <div class="form-group"><label>Price / week</label><div class="input-prefix"><span>$</span><input type="number" value="275"/></div></div>
+              <button class="remove-btn" onclick="removeSession(this)"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+            </div>
+          </div>
+          <button class="add-session-btn" onclick="addSession()">
+            <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M12 5v14M5 12h14"/></svg>
+            Add another session / week
+          </button>
+
+          <div class="section-divider"><h3>👦 Age Groups & Capacity</h3></div>
+          <div class="form-grid">
+            <div class="form-group"><label>Group 1 — Age range</label><input type="text" value="6–8 years"/></div>
+            <div class="form-group"><label>Capacity per session</label><input type="number" value="20"/></div>
+            <div class="form-group"><label>Group 2 — Age range</label><input type="text" value="9–11 years"/></div>
+            <div class="form-group"><label>Capacity per session</label><input type="number" value="20"/></div>
+            <div class="form-group"><label>Group 3 — Age range</label><input type="text" value="12–14 years"/></div>
+            <div class="form-group"><label>Capacity per session</label><input type="number" value="20"/></div>
+          </div>
+
+          <div class="section-divider"><h3>💰 Pricing Options</h3></div>
+          <div class="form-grid">
+            <div class="form-group"><label>Early bird discount</label><div class="input-prefix"><span>%</span><input type="number" value="10" placeholder="10"/></div><div class="input-hint">Applied before <input type="date" style="display:inline;width:auto;padding:4px 8px;font-size:12px;" value="2025-06-15"/></div></div>
+            <div class="form-group"><label>Multi-week bundle discount</label><div class="input-prefix"><span>%</span><input type="number" value="15" placeholder="15"/></div><div class="input-hint">When booking 3 or more weeks</div></div>
+            <div class="form-group span2"><label>Sibling discount</label><div class="input-prefix"><span>%</span><input type="number" value="10"/></div><div class="input-hint">Second child onwards</div></div>
+          </div>
+
+          <div class="section-divider"><h3>📋 Additional Info</h3></div>
+          <div class="form-grid">
+            <div class="form-group span2"><label>What to bring</label><input type="text" value="Packed lunch, sunscreen, water bottle, comfortable clothes"/></div>
+            <div class="form-group span2">
+              <label>Camp images</label>
+              <div class="img-uploader">
+                <div class="img-mode-tabs">
+                  <button type="button" class="img-mode-tab active" onclick="setImgMode('camp','upload',this)">
+                    <svg viewBox="0 0 24 24"><path d="M4 16l4-4 4 4 4-5 4 5M4 20h16M4 4h16"/></svg>
+                    Upload photos
+                  </button>
+                  <button type="button" class="img-mode-tab" onclick="setImgMode('camp','ai',this)">
+                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/><path d="M19 14l.9 2.6L22.5 18l-2.6.9L19 21.5l-.9-2.6L15.5 18l2.6-.9z"/></svg>
+                    Generate with AI
+                  </button>
+                </div>
+
+                <div class="img-mode-panel" id="upload-camp">
+                  <div class="img-grid">
+                    <div class="img-thumb filled cover-img"><button class="remove-img">✕</button></div>
+                    <div class="img-thumb filled"><button class="remove-img">✕</button></div>
+                    <div class="img-thumb filled"><button class="remove-img">✕</button></div>
+                    <div class="img-thumb filled"><button class="remove-img">✕</button></div>
+                    <div class="img-add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add photo</div>
+                    <div class="img-add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add photo</div>
+                    <div class="img-add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add photo</div>
+                    <div class="img-add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add photo</div>
+                  </div>
+                  <div class="img-upload-hint">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                    First image is the camp cover. Add up to 8 photos to showcase activities, facilities, and past sessions. PNG or JPG, max 5MB each.
+                  </div>
+                </div>
+
+                <div class="ai-gen-panel" id="ai-camp">
+                  <div class="ai-gen-head">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg>
+                    Showcase your camp — describe the vibe and we'll generate options.
+                  </div>
+                  <div class="ai-prompt-row">
+                    <div class="form-group">
+                      <label>Image prompt</label>
+                      <input type="text" id="ai-prompt-camp" value="Summer day camp for kids, outdoor activities, nature, sunny, kids playing and smiling"/>
+                    </div>
+                    <button type="button" class="ai-gen-btn" id="ai-btn-camp" onclick="aiGenerate('camp')">
+                      <svg viewBox="0 0 24 24"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg>
+                      Generate
+                    </button>
+                  </div>
+                  <div class="ai-suggest-chips">
+                    <span class="ai-chip primary" onclick="aiAutofill('camp','Summer day camp for kids, outdoor activities, nature, sunny, kids playing and smiling')">✨ Auto-fill from title &amp; description</span>
+                    <span class="ai-chip" onclick="aiAutofill('camp','Outdoor summer camp, green park, sunny day, kids playing sports')">Outdoor &amp; active</span>
+                    <span class="ai-chip" onclick="aiAutofill('camp','Creative arts camp, kids crafting, colorful studio, joyful')">Arts &amp; crafts</span>
+                    <span class="ai-chip" onclick="aiAutofill('camp','STEM summer camp, kids with science kits and robots, bright lab')">STEM / science</span>
+                  </div>
+                  <div class="ai-loading" id="ai-loading-camp"><span class="ai-spinner"></span> Generating 4 cover options…</div>
+                  <div class="ai-results" id="ai-results-camp">
+                    <div class="ai-result" style="background:linear-gradient(135deg,#e6b85c,#f0d79a)" onclick="pickAiImage(this)"></div>
+                    <div class="ai-result" style="background:linear-gradient(135deg,#7aaa84,#b8d4c0)" onclick="pickAiImage(this)"></div>
+                    <div class="ai-result" style="background:linear-gradient(135deg,#6b9bc9,#a9c8e3)" onclick="pickAiImage(this)"></div>
+                    <div class="ai-result" style="background:linear-gradient(135deg,#d98a5c,#f0b890)" onclick="pickAiImage(this)"></div>
+                  </div>
+                  <div class="img-upload-hint">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                    Tap options to add them. The first added image becomes your camp cover.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-24" style="gap:10px;">
+            <button class="btn btn-primary" style="padding:12px 24px; font-size:14px;">
+              <svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+              Publish Summer Camp
+            </button>
+            <button class="btn btn-ghost" style="padding:12px 20px;">Save as Draft</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: MY EVENTS ══ -->
+      <div class="view" id="view-my-events">
+        <div class="page-header"><h1>My Events</h1><p>All your events in one place.</p></div>
+        <div class="tabs">
+          <button class="tab-btn active">All</button>
+          <button class="tab-btn">Active</button>
+          <button class="tab-btn">Drafts</button>
+          <button class="tab-btn">Ended</button>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Event</th><th>Type</th><th>Date</th><th>Tickets</th><th>Revenue</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td><div class="event-name-cell">Kids Coding Camp<div class="sub">Education · Riverside Hall</div></div></td><td><span class="badge badge-active">One-time</span></td><td class="td-muted">Jun 14</td><td>32/50<div class="progress-bar"><div class="progress-fill" style="width:64%"></div></div></td><td class="fw-600">$640</td><td><span class="badge badge-active">Active</span></td><td><button class="action-btn" onclick="gotoBuyers('coding')">Buyers</button><span class="sep">·</span><button class="action-btn">Edit</button></td></tr>
+              <tr><td><div class="event-name-cell">Saturday Art Workshop<div class="sub">Arts & Crafts · The Creative Space</div></div></td><td><span class="badge badge-recurring">Recurring</span></td><td class="td-muted">Every Sat</td><td>16/30<div class="progress-bar"><div class="progress-fill" style="width:53%"></div></div></td><td class="fw-600">$320</td><td><span class="badge badge-active">Active</span></td><td><button class="action-btn" onclick="gotoBuyers('art')">Buyers</button><span class="sep">·</span><button class="action-btn">Edit</button></td></tr>
+              <tr><td><div class="event-name-cell">Austin Kids Summer Camp<div class="sub">Multi-week · Discovery Center</div></div></td><td><span class="badge badge-camp">Summer Camp</span></td><td class="td-muted">Jul 7 – Aug 15</td><td>28/60<div class="progress-bar"><div class="progress-fill" style="width:47%"></div></div></td><td class="fw-600">$1,000</td><td><span class="badge badge-active">Active</span></td><td><button class="action-btn" onclick="gotoBuyers('camp')">Buyers</button><span class="sep">·</span><button class="action-btn">Edit</button></td></tr>
+              <tr><td><div class="event-name-cell">Summer Science Fair<div class="sub">Education · Austin Discovery Center</div></div></td><td><span class="badge badge-active">One-time</span></td><td class="td-muted">Jul 5</td><td>0/40<div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div></td><td class="fw-600 td-muted">$0</td><td><span class="badge badge-draft">Draft</span></td><td><button class="action-btn">Publish</button><span class="sep">·</span><button class="action-btn">Edit</button></td></tr>
+              <tr><td><div class="event-name-cell">Spring Music Recital<div class="sub">Music · Lincoln Elementary</div></div></td><td><span class="badge badge-active">One-time</span></td><td class="td-muted">May 18</td><td>28/28<div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--muted)"></div></div></td><td class="fw-600">$280</td><td><span class="badge badge-ended">Ended</span></td><td><button class="action-btn">Report</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: TICKET BUYERS ══ -->
+      <div class="view" id="view-buyers">
+        <!-- STATE A: pick an event -->
+        <div id="buyers-list">
+          <div class="page-header"><h1>Ticket Buyers</h1><p>Pick an event to see who bought tickets and check people in at the door.</p></div>
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Your events</div><div class="card-sub">Tap an event to view its buyers</div></div></div>
+            <table>
+              <thead><tr><th>Event</th><th>Type</th><th>Date</th><th>Sold</th><th>Revenue</th><th>Checked in</th><th></th></tr></thead>
+              <tbody>
+                <tr class="row-link" onclick="openBuyers('coding')"><td><div class="event-name-cell">Kids Coding Camp<div class="sub">Education · Riverside Hall</div></div></td><td><span class="badge badge-active">One-time</span></td><td class="td-muted">Jun 14</td><td>32/50</td><td class="fw-600">$640</td><td class="td-muted" id="ci-coding">0 / 32</td><td class="row-go">›</td></tr>
+                <tr class="row-link" onclick="openBuyers('art')"><td><div class="event-name-cell">Saturday Art Workshop<div class="sub">Arts &amp; Crafts · The Creative Space</div></div></td><td><span class="badge badge-recurring">Recurring</span></td><td class="td-muted">Every Sat</td><td>16/30</td><td class="fw-600">$320</td><td class="td-muted" id="ci-art">0 / 16</td><td class="row-go">›</td></tr>
+                <tr class="row-link" onclick="openBuyers('camp')"><td><div class="event-name-cell">Austin Kids Summer Camp<div class="sub">Multi-week Camp · Discovery Center</div></div></td><td><span class="badge badge-camp">Summer Camp</span></td><td class="td-muted">Jul 7 – Aug 15</td><td>28/60</td><td class="fw-600">$1,000</td><td class="td-muted" id="ci-camp">0 / 28</td><td class="row-go">›</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- STATE B: one event's buyers + door check-in -->
+        <div id="buyers-detail" style="display:none;">
+          <button class="back-link" onclick="backToBuyersList()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>All events</button>
+          <div class="page-header"><h1 id="bd-title">Kids Coding Camp</h1><p id="bd-sub">One-time · Jun 14, 2025</p></div>
+          <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px 26px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; box-shadow:var(--shadow);">
+            <div style="display:flex;gap:32px;">
+              <div><div style="font-family:var(--font-display);font-size:24px;font-weight:600;letter-spacing:-.02em;" id="bd-sold">32</div><div class="checkin-pill" style="margin-top:2px;">Tickets Sold</div></div>
+              <div><div style="font-family:var(--font-display);font-size:24px;font-weight:600;letter-spacing:-.02em;" id="bd-rev">$640</div><div class="checkin-pill" style="margin-top:2px;">Revenue</div></div>
+              <div><div style="font-family:var(--font-display);font-size:24px;font-weight:600;letter-spacing:-.02em;" id="bd-rem">18</div><div class="checkin-pill" style="margin-top:2px;">Remaining</div></div>
+              <div><div style="font-family:var(--font-display);font-size:24px;font-weight:600;letter-spacing:-.02em;color:var(--green);" id="bd-checkin">0 / 32</div><div class="checkin-pill" style="margin-top:2px;">Checked in</div></div>
+            </div>
+            <div style="display:flex;gap:10px;align-self:flex-start;">
+              <button class="btn btn-ghost"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export CSV</button>
+              <button class="btn btn-secondary">Message all buyers</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Buyers</div><div class="card-sub" id="bd-status">7 buyers</div></div>
+              <input type="text" placeholder="Search buyers…" style="width:200px;padding:7px 12px;font-size:13px;"/>
+            </div>
+            <table>
+              <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Tickets</th><th>Amount Paid</th><th>Date</th><th>Status</th><th>Door check-in</th></tr></thead>
+              <tbody id="bd-rows"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: PAYOUTS ══ -->
+      <div class="view" id="view-payouts">
+        <div class="page-header"><h1>Payouts</h1><p>Your earnings and payout history.</p></div>
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="stat-card"><div class="stat-icon">💸</div><div class="stat-label">Pending Payout</div><div class="stat-value">$640</div><div class="stat-delta">Arrives Jun 17</div></div>
+          <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-label">Paid Out (All time)</div><div class="stat-value">$1,320</div><div class="stat-delta">3 payouts</div></div>
+          <div class="stat-card"><div class="stat-icon">🏦</div><div class="stat-label">Bank Account</div><div class="stat-value" style="font-size:18px;">Chase ••78</div><div class="stat-delta">USD · Routing 021000021</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Payout History</div></div>
+          <table>
+            <thead><tr><th>Payout date</th><th>Event</th><th>Tickets</th><th>Gross</th><th>Sprout fee (5%)</th><th>Net payout</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td class="fw-600">Jun 17, 2025</td><td>Kids Coding Camp</td><td>32</td><td>$640</td><td class="td-muted">$32</td><td class="fw-600 text-green">$608</td><td><span class="badge badge-pending">Scheduled</span></td></tr>
+              <tr><td class="fw-600">May 21, 2025</td><td>Spring Music Recital</td><td>28</td><td>$280</td><td class="td-muted">$14</td><td class="fw-600 text-green">$266</td><td><span class="badge badge-confirmed">Paid</span></td></tr>
+              <tr><td class="fw-600">Apr 15, 2025</td><td>Easter Art Workshop</td><td>22</td><td>$440</td><td class="td-muted">$22</td><td class="fw-600 text-green">$418</td><td><span class="badge badge-confirmed">Paid</span></td></tr>
+              <tr><td class="fw-600">Mar 8, 2025</td><td>Kids Science Day</td><td>18</td><td>$360</td><td class="td-muted">$18</td><td class="fw-600 text-green">$342</td><td><span class="badge badge-confirmed">Paid</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: ACCOUNT SETTINGS ══ -->
+      <div class="view" id="view-account">
+        <div class="page-header">
+          <h1>Account Settings</h1>
+          <p>Manage your profile, business details, banking, and preferences.</p>
+        </div>
+        <div class="settings-layout">
+
+          <!-- Settings sidebar nav -->
+          <div class="settings-nav">
+            <button class="settings-nav-item active" onclick="showSettingsPanel('profile', this)">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+              Profile
+            </button>
+            <button class="settings-nav-item" onclick="showSettingsPanel('business', this)">
+              <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              Business
+            </button>
+            <button class="settings-nav-item" onclick="showSettingsPanel('banking', this)">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Banking
+            </button>
+            <button class="settings-nav-item" onclick="showSettingsPanel('notifications', this)">
+              <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+              Notifications
+            </button>
+            <button class="settings-nav-item" onclick="showSettingsPanel('security', this)">
+              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Password & Security
+            </button>
+            <button class="settings-nav-item" onclick="showSettingsPanel('danger', this)">
+              <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Danger Zone
+            </button>
+          </div>
+
+          <!-- Settings panels -->
+          <div>
+
+            <!-- Profile -->
+            <div class="settings-panel active" id="panel-profile">
+              <div class="card card-body">
+                <h2 style="font-family:var(--font-display);font-size:18px;font-weight:600;margin-bottom:20px;letter-spacing:-.01em;">Personal Profile</h2>
+                <div style="display:flex;align-items:center;gap:20px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--border-2);">
+                  <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#8fba92,#5a8f5d);display:grid;place-items:center;font-size:28px;font-weight:700;color:#fff;flex-shrink:0;">S</div>
+                  <div>
+                    <button class="btn btn-secondary" style="font-size:13px;padding:8px 14px;">Change photo</button>
+                    <p style="font-size:12px;color:var(--muted);margin-top:6px;">JPG or PNG. Max 2MB.</p>
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group"><label>First name</label><input type="text" value="Sarah"/></div>
+                  <div class="form-group"><label>Last name</label><input type="text" value="Thompson"/></div>
+                  <div class="form-group span2"><label>Email address</label><input type="email" value="sarah@sarahevents.com"/></div>
+                  <div class="form-group"><label>Phone number</label><input type="tel" value="+1 (512) 555-0182"/></div>
+                  <div class="form-group"><label>City</label><input type="text" value="Austin, TX"/></div>
+                  <div class="form-group span2"><label>Bio (shown on your event pages)</label><textarea style="min-height:80px;">Kids event organizer based in Austin, TX. Passionate about creating fun, educational experiences for children of all ages.</textarea></div>
+                </div>
+                <div class="row mt-24"><button class="btn btn-primary" style="padding:10px 22px;">Save changes</button></div>
+              </div>
+            </div>
+
+            <!-- Business -->
+            <div class="settings-panel" id="panel-business">
+              <div class="card card-body">
+                <h2 style="font-family:var(--font-display);font-size:18px;font-weight:600;margin-bottom:20px;letter-spacing:-.01em;">Business Details</h2>
+                <div class="form-grid">
+                  <div class="form-group span2"><label>Business / Organiser name</label><input type="text" value="Sarah's Events"/><div class="input-hint">Shown to parents on Sprout event listings</div></div>
+                  <div class="form-group span2"><label>Business website (optional)</label><input type="url" placeholder="https://yourwebsite.com"/></div>
+                  <div class="form-group span2"><label>Instagram handle (optional)</label><input type="text" placeholder="@yourbusiness"/></div>
+                  <div class="form-group span2"><label>Business description</label><textarea style="min-height:90px;">Fun, creative events for Austin kids ages 4–14. We specialise in STEM, arts, and outdoor adventures.</textarea></div>
+                  <div class="form-group"><label>Primary event category</label>
+                    <select><option>Arts & Crafts</option><option selected>Education</option><option>Sports</option><option>Music</option><option>Outdoor</option></select>
+                  </div>
+                  <div class="form-group"><label>Operating city</label><input type="text" value="Austin, TX"/></div>
+                </div>
+                <div class="section-divider"><h3>🖼️ Brand images</h3></div>
+                <div class="form-grid">
+                  <div class="form-group"><label>Business logo</label><div class="upload-area" style="padding:20px;"><div class="icon">🏷️</div><p><strong>Upload logo</strong></p><p style="font-size:11px;margin-top:2px;">PNG with transparent background preferred</p></div></div>
+                  <div class="form-group"><label>Banner image</label><div class="upload-area" style="padding:20px;"><div class="icon">🖼️</div><p><strong>Upload banner</strong></p><p style="font-size:11px;margin-top:2px;">Shown at top of your organiser page — 1200×300px</p></div></div>
+                </div>
+                <div class="row mt-24"><button class="btn btn-primary" style="padding:10px 22px;">Save changes</button></div>
+              </div>
+            </div>
+
+            <!-- Banking -->
+            <div class="settings-panel" id="panel-banking">
+              <div class="card card-body">
+                <h2 style="font-family:var(--font-display);font-size:18px;font-weight:600;margin-bottom:8px;letter-spacing:-.01em;">Banking & Payouts</h2>
+                <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Payouts are sent within 3 business days after each event ends. Sprout charges a 5% platform fee.</p>
+                <div class="info-box info-green" style="margin-bottom:20px;">
+                  <span class="icon">🔒</span>
+                  <p>Your banking details are encrypted with 256-bit SSL and never shared with third parties.</p>
+                </div>
+                <div class="form-stack">
+                  <div class="form-group"><label>Account holder full name</label><input type="text" value="Sarah Marie Thompson"/></div>
+                  <div class="form-grid">
+                    <div class="form-group"><label>Routing number (ABA)</label><input type="text" value="021000021"/></div>
+                    <div class="form-group"><label>Account number</label><input type="text" value="••••••6789"/></div>
+                  </div>
+                  <div class="form-grid">
+                    <div class="form-group"><label>Bank name</label><input type="text" value="Chase Bank"/></div>
+                    <div class="form-group"><label>Payout currency</label><select><option selected>USD — US Dollar</option></select></div>
+                  </div>
+                  <div class="form-group"><label>Payout schedule</label>
+                    <select><option selected>After each event ends (3 business days)</option><option>Weekly (every Friday)</option><option>Monthly (1st of month)</option></select>
+                  </div>
+                </div>
+                <div class="row mt-24"><button class="btn btn-primary" style="padding:10px 22px;">Update banking details</button></div>
+              </div>
+            </div>
+
+            <!-- Notifications -->
+            <div class="settings-panel" id="panel-notifications">
+              <div class="card card-body">
+                <h2 style="font-family:var(--font-display);font-size:18px;font-weight:600;margin-bottom:20px;letter-spacing:-.01em;">Notification Preferences</h2>
+                <div style="display:flex;flex-direction:column;gap:0;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-2);">
+                    <div><div style="font-size:14px;font-weight:500;">New ticket sale</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Get notified every time a ticket is purchased</div></div>
+                    <div class="toggle on"></div>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-2);">
+                    <div><div style="font-size:14px;font-weight:500;">Daily sales summary</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">A daily digest of ticket sales across all your events</div></div>
+                    <div class="toggle on"></div>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-2);">
+                    <div><div style="font-size:14px;font-weight:500;">Event selling fast</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Alert when an event reaches 80% capacity</div></div>
+                    <div class="toggle on"></div>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-2);">
+                    <div><div style="font-size:14px;font-weight:500;">Event sold out</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Notification when tickets are fully sold</div></div>
+                    <div class="toggle on"></div>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-2);">
+                    <div><div style="font-size:14px;font-weight:500;">Payout sent</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Confirmation when a payout is transferred to your bank</div></div>
+                    <div class="toggle on"></div>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-2);">
+                    <div><div style="font-size:14px;font-weight:500;">New review or message</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">When a parent leaves a message or review</div></div>
+                    <div class="toggle"></div>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;">
+                    <div><div style="font-size:14px;font-weight:500;">Sprout news & updates</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Product updates and new features from Sprout</div></div>
+                    <div class="toggle"></div>
+                  </div>
+                </div>
+                <div class="row mt-24"><button class="btn btn-primary" style="padding:10px 22px;">Save preferences</button></div>
+              </div>
+            </div>
+
+            <!-- Security -->
+            <div class="settings-panel" id="panel-security">
+              <div class="card card-body">
+                <h2 style="font-family:var(--font-display);font-size:18px;font-weight:600;margin-bottom:20px;letter-spacing:-.01em;">Password & Security</h2>
+                <div class="form-stack">
+                  <div class="form-group"><label>Current password</label><input type="password" placeholder="Enter current password"/></div>
+                  <div class="form-group"><label>New password</label><input type="password" placeholder="Min. 8 characters"/></div>
+                  <div class="form-group"><label>Confirm new password</label><input type="password" placeholder="Repeat new password"/></div>
+                </div>
+                <div class="row mt-24"><button class="btn btn-primary" style="padding:10px 22px;">Update password</button></div>
+                <hr/>
+                <h3 style="font-size:15px;font-weight:600;margin-bottom:12px;">Two-factor authentication</h3>
+                <div class="info-box info-amber" style="margin-bottom:16px;">
+                  <span class="icon">⚠️</span>
+                  <p>2FA is not enabled. We recommend enabling it to protect your account and payouts.</p>
+                </div>
+                <button class="btn btn-secondary" style="padding:10px 20px;">Enable 2FA via SMS</button>
+              </div>
+            </div>
+
+            <!-- Danger zone -->
+            <div class="settings-panel" id="panel-danger">
+              <div class="danger-zone">
+                <h3>⚠️ Danger Zone</h3>
+                <p>These actions are permanent and cannot be undone. Please be certain before proceeding.</p>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <div style="background:#fff;border:1px solid #f0c0c0;border-radius:10px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
+                    <div><div style="font-size:14px;font-weight:600;color:var(--fg);">Pause my account</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Hide all your events from Sprout temporarily. You can reactivate anytime.</div></div>
+                    <button class="btn btn-ghost" style="white-space:nowrap;flex-shrink:0;font-size:13px;">Pause account</button>
+                  </div>
+                  <div style="background:#fff;border:1px solid #f0c0c0;border-radius:10px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
+                    <div><div style="font-size:14px;font-weight:600;color:var(--red);">Delete my account</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Permanently delete your account, all events, and data. Pending payouts will still be processed.</div></div>
+                    <button class="btn btn-danger" style="white-space:nowrap;flex-shrink:0;font-size:13px;">Delete account</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /settings panels -->
+        </div><!-- /settings-layout -->
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+  const viewTitles = {
+    dashboard: 'Dashboard',
+    sales: 'Sales & Analytics',
+    'new-event': 'Create Event',
+    'import': 'Import from a Link',
+    'import-camp': 'Import a Summer Camp',
+    'event-single': 'New One-time Event',
+    'event-recurring': 'New Recurring Event',
+    'event-camp': 'New Summer Camp',
+    'my-events': 'My Events',
+    buyers: 'Ticket Buyers',
+    payouts: 'Payouts',
+    account: 'Account Settings'
+  };
+
+  function showSettingsPanel(id, btn) {
+    document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.settings-nav-item').forEach(b => b.classList.remove('active'));
+    const panel = document.getElementById('panel-' + id);
+    if (panel) panel.classList.add('active');
+    if (btn) btn.classList.add('active');
+  }
+
+  function showView(id, navBtn) {
+    document.querySelectorAll('#main-app .view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const el = document.getElementById('view-' + id);
+    if (el) el.classList.add('active');
+    if (navBtn) navBtn.classList.add('active');
+    document.getElementById('topbar-title').textContent = viewTitles[id] || id;
+  }
+
+  function showAuth(id) {
+    document.querySelectorAll('.auth-layout').forEach(a => a.classList.remove('active'));
+    document.getElementById('main-app').style.display = 'none';
+    const el = document.getElementById(id);
+    if (el) el.classList.add('active');
+  }
+
+  function showApp(viewId) {
+    document.querySelectorAll('.auth-layout').forEach(a => a.classList.remove('active'));
+    document.getElementById('main-app').style.display = 'flex';
+    showView(viewId, document.getElementById('nav-' + viewId));
+  }
+
+  // ─── Import from a link (prototype: simulated AI scrape) ───
+  function scanImport() {
+    const url = document.getElementById('imp-url').value || 'your event link';
+    document.getElementById('imp-loadurl').textContent = url;
+    document.getElementById('imp-srclink').textContent = url;
+    document.getElementById('imp-paste').style.display = 'none';
+    document.getElementById('imp-result').style.display = 'none';
+    document.getElementById('imp-loading').style.display = 'block';
+    ['ist1','ist2','ist3','ist4'].forEach(id => document.getElementById(id).classList.remove('done'));
+    const t = [400, 900, 1500, 2050];
+    ['ist1','ist2','ist3','ist4'].forEach((id, i) => setTimeout(() => document.getElementById(id).classList.add('done'), t[i]));
+    setTimeout(() => {
+      document.getElementById('imp-loading').style.display = 'none';
+      document.getElementById('imp-result').style.display = 'block';
+    }, 2550);
+  }
+  function resetImport() {
+    document.getElementById('imp-result').style.display = 'none';
+    document.getElementById('imp-paste').style.display = 'block';
+  }
+
+  function scanImportCamp() {
+    const url = document.getElementById('impc-url').value || 'your camp link';
+    document.getElementById('impc-loadurl').textContent = url;
+    document.getElementById('impc-srclink').textContent = url;
+    document.getElementById('impc-paste').style.display = 'none';
+    document.getElementById('impc-result').style.display = 'none';
+    document.getElementById('impc-loading').style.display = 'block';
+    ['cst1','cst2','cst3','cst4','cst5'].forEach(id => document.getElementById(id).classList.remove('done'));
+    const t = [350, 800, 1400, 1950, 2500];
+    ['cst1','cst2','cst3','cst4','cst5'].forEach((id, i) => setTimeout(() => document.getElementById(id).classList.add('done'), t[i]));
+    setTimeout(() => {
+      document.getElementById('impc-loading').style.display = 'none';
+      document.getElementById('impc-result').style.display = 'block';
+    }, 3000);
+  }
+  function resetImportCamp() {
+    document.getElementById('impc-result').style.display = 'none';
+    document.getElementById('impc-paste').style.display = 'block';
+  }
+
+  // ─── Ticket buyers (per-event) + door check-in ───
+  const EVENTS = {
+    coding: { title:'Kids Coding Camp', sub:'One-time · Jun 14, 2025', sold:32, rev:'$640', rem:18, buyers:[
+      ['Jessica Martinez','jessica.m@gmail.com','(512) 555-0121',2,'$40.00','May 28','Confirmed'],
+      ['Rachel Kim','rkim@icloud.com','(512) 555-0188',1,'$20.00','May 30','Confirmed'],
+      ['Tom Patterson','tpatterson@outlook.com','(512) 555-0143',3,'$60.00','Jun 1','Confirmed'],
+      ['Amanda Lee','amanda.lee@gmail.com','(512) 555-0167',2,'$40.00','Jun 2','Confirmed'],
+      ['Mike Chen','mchen@gmail.com','(512) 555-0109',1,'$20.00','Jun 3','Pending'],
+      ['Stephanie Walsh','s.walsh@yahoo.com','(512) 555-0134',2,'$40.00','Jun 4','Confirmed'],
+      ['David Nguyen','d.nguyen@gmail.com','(512) 555-0156',1,'$20.00','Jun 5','Pending'] ] },
+    art: { title:'Saturday Art Workshop', sub:'Recurring · Every Sat', sold:16, rev:'$320', rem:14, buyers:[
+      ['Olivia Brooks','olivia.b@gmail.com','(512) 555-0211',1,'$20.00','Jun 1','Confirmed'],
+      ['Priya Patel','priya.p@gmail.com','(512) 555-0233',2,'$40.00','Jun 3','Confirmed'],
+      ['Marcus Chen','marcus.c@gmail.com','(512) 555-0241',1,'$20.00','Jun 6','Confirmed'],
+      ['Grace Kim','grace.k@icloud.com','(512) 555-0259',2,'$40.00','Jun 7','Pending'] ] },
+    camp: { title:'Austin Kids Summer Camp', sub:'Summer Camp · Jul 7 – Aug 15', sold:28, rev:'$1,000', rem:32, buyers:[
+      ['Sarah Park','sarah.park@gmail.com','(512) 555-0301',1,'$250.00','May 20','Confirmed'],
+      ['Daniel Reed','d.reed@gmail.com','(512) 555-0318',2,'$500.00','May 22','Confirmed'],
+      ['Nadia Hassan','n.hassan@yahoo.com','(512) 555-0326',1,'$275.00','May 25','Confirmed'],
+      ['Ben Carter','ben.c@outlook.com','(512) 555-0334',1,'$250.00','Jun 1','Pending'] ] }
+  };
+  let currentEvent = null;
+
+  function initials(n){ return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+
+  function openBuyers(key){
+    const ev = EVENTS[key]; if(!ev) return;
+    currentEvent = key;
+    document.getElementById('bd-title').textContent = ev.title;
+    document.getElementById('bd-sub').textContent = ev.sub;
+    document.getElementById('bd-sold').textContent = ev.sold;
+    document.getElementById('bd-rev').textContent = ev.rev;
+    document.getElementById('bd-rem').textContent = ev.rem;
+    document.getElementById('bd-status').textContent = ev.buyers.length + ' buyers';
+    document.getElementById('bd-rows').innerHTML = ev.buyers.map((b,i)=>{
+      const badge = b[6]==='Confirmed' ? 'badge-confirmed' : 'badge-pending';
+      return `<tr data-i="${i}">
+        <td><div class="avatar-cell"><div class="av">${initials(b[0])}</div>${b[0]}</div></td>
+        <td class="td-muted">${b[1]}</td><td class="td-muted">${b[2]}</td>
+        <td>${b[3]}</td><td class="fw-600">${b[4]}</td><td class="td-muted">${b[5]}</td>
+        <td><span class="badge ${badge}">${b[6]}</span></td>
+        <td><button class="checkin-btn" onclick="toggleCheckin(this)"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Check in</span></button></td>
+      </tr>`;
+    }).join('');
+    updateCheckinCount();
+    document.getElementById('buyers-list').style.display = 'none';
+    document.getElementById('buyers-detail').style.display = 'block';
+  }
+  function backToBuyersList(){
+    document.getElementById('buyers-detail').style.display = 'none';
+    document.getElementById('buyers-list').style.display = 'block';
+  }
+  function toggleCheckin(btn){
+    btn.classList.toggle('in');
+    btn.querySelector('span').textContent = btn.classList.contains('in') ? 'Checked in' : 'Check in';
+    updateCheckinCount();
+  }
+  function updateCheckinCount(){
+    const ev = EVENTS[currentEvent]; if(!ev) return;
+    const inCount = document.querySelectorAll('#bd-rows .checkin-btn.in').length;
+    document.getElementById('bd-checkin').textContent = inCount + ' / ' + ev.sold;
+    const lc = document.getElementById('ci-' + currentEvent);
+    if(lc) lc.textContent = inCount + ' / ' + ev.sold;
+  }
+  // entry points
+  function showBuyersList(nav){ showView('buyers', nav); backToBuyersList(); }
+  function gotoBuyers(key){ showView('buyers', document.getElementById('nav-buyers')); openBuyers(key); }
+
+  // ─── AI image generation (prototype: simulated) ───
+  function setImgMode(key, mode, btn) {
+    btn.closest('.img-mode-tabs').querySelectorAll('.img-mode-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('upload-' + key).style.display = (mode === 'upload') ? 'flex' : 'none';
+    document.getElementById('ai-' + key).classList.toggle('active', mode === 'ai');
+  }
+
+  function aiAutofill(key, prompt) {
+    const input = document.getElementById('ai-prompt-' + key);
+    if (input) input.value = prompt;
+  }
+
+  function aiGenerate(key) {
+    const loading = document.getElementById('ai-loading-' + key);
+    const results = document.getElementById('ai-results-' + key);
+    const btn = document.getElementById('ai-btn-' + key);
+    results.classList.remove('active');
+    loading.classList.add('active');
+    if (btn) btn.disabled = true;
+    setTimeout(() => {
+      loading.classList.remove('active');
+      results.classList.add('active');
+      if (btn) btn.disabled = false;
+    }, 1400);
+  }
+
+  function pickAiImage(el) {
+    el.classList.toggle('picked');
+  }
+
+  let sessionCount = 3;
+  function addSession() {
+    sessionCount++;
+    const list = document.getElementById('sessions-list');
+    const row = document.createElement('div');
+    row.className = 'session-row';
+    row.innerHTML = `
+      <div class="form-group"><label>Session name</label><input type="text" placeholder="e.g. Week ${sessionCount} — Theme"/></div>
+      <div class="form-group"><label>Dates</label><input type="text" placeholder="e.g. Jul 28 – Aug 1"/></div>
+      <div class="form-group"><label>Price / week</label><div class="input-prefix"><span>$</span><input type="number" value="250"/></div></div>
+      <button class="remove-btn" onclick="removeSession(this)"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>`;
+    list.appendChild(row);
+  }
+
+  function removeSession(btn) {
+    btn.closest('.session-row').remove();
+  }
+
+  // Day picker toggle
+  document.querySelectorAll('.day-btn').forEach(btn => {
+    btn.addEventListener('click', () => btn.classList.toggle('active'));
+  });
+
+  // Notification toggles
+  document.querySelectorAll('.toggle').forEach(t => {
+    t.addEventListener('click', () => t.classList.toggle('on'));
+  });
+
+  // Tab buttons (visual only)
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      this.closest('.tabs').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

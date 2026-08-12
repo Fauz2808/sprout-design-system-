@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Summer Camps Feature</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ─── Design Tokens ──────────────────────────────────── */
+  :root {
+    --brand-500: #186338;
+    --brand-600: #134f2d;
+    --brand-700: #1e3e2b;
+    --brand-50:  #e2e9e3;
+    --brand-100: #d0dacf;
+    --brand-200: #77b691;
+
+    --secondary-500: #f4f1ea;
+    --secondary-600: #eae6db;
+    --secondary-700: #dbd5c8;
+    --secondary-800: #c2b9a6;
+    --secondary-900: #aa9e83;
+
+    --grey-100: #e6e7ea;
+    --grey-200: #cdcfd6;
+    --grey-300: #b3b8c1;
+    --grey-400: #9aa0ad;
+    --grey-500: #818898;
+    --grey-700: #4d525b;
+    --grey-900: #1a1b1e;
+
+    --bg-primary: #f4f1ea;
+    --content-primary: #4d525b;
+    --content-secondary: #818898;
+    --content-brand: #186338;
+    --surface-l0: #f4f1ea;
+    --surface-l1: #eae6db;
+    --surface-l2: #dbd5c8;
+
+    --camp-orange: #e07b39;
+    --camp-orange-light: #fef3eb;
+    --camp-orange-50: #fde8d4;
+  }
+
+  /* ─── Page layout ────────────────────────────────────── */
+  body {
+    background: #cfc8b8;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 32px 80px;
+    font-family: 'Inter', sans-serif;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+
+  .flow-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .flow-label-main {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: #3a332a;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .flow-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 48px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .variant-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .variant-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #5a5347;
+  }
+
+  /* ─── Phone shell ────────────────────────────────────── */
+  .phone {
+    width: 393px;
+    height: 852px;
+    background: var(--bg-primary);
+    border-radius: 54px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.07),
+      0 2px 4px rgba(0,0,0,0.04),
+      0 24px 80px rgba(0,0,0,0.22);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── Status bar ─────────────────────────────────────── */
+  .status-bar {
+    height: 54px;
+    background: var(--bg-primary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px 0;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 5;
+  }
+  .status-time { font-size: 15px; font-weight: 600; color: var(--grey-900); letter-spacing: -0.01em; }
+  .status-icons { display: flex; align-items: center; gap: 7px; }
+  .dynamic-island {
+    width: 120px; height: 36px;
+    background: #000;
+    border-radius: 20px;
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    z-index: 10;
+  }
+
+  /* ─── App Header ─────────────────────────────────────── */
+  .app-header {
+    background: var(--bg-primary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px 12px;
+    flex-shrink: 0;
+    position: relative; z-index: 4;
+  }
+  .header-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--surface-l2);
+    border: 2.5px solid var(--brand-100);
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .header-location-label { font-size: 11px; font-weight: 500; color: var(--content-secondary); letter-spacing: 0.03em; text-align: center; display: block; margin-bottom: 1px; }
+  .header-location-city {
+    display: flex; align-items: center; gap: 3px;
+    font-family: 'Playfair Display', serif;
+    font-size: 17px; font-weight: 600; color: var(--grey-900); line-height: 1;
+    cursor: pointer;
+  }
+  .header-location-city svg { width: 14px; height: 14px; color: var(--content-brand); margin-top: 1px; }
+  .header-actions { display: flex; align-items: center; gap: 8px; }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--surface-l1);
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; position: relative;
+  }
+  .icon-btn svg { width: 18px; height: 18px; color: var(--content-primary); }
+  .notif-badge {
+    position: absolute; top: 7px; right: 7px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #d64545; border: 1.5px solid var(--bg-primary);
+  }
+
+  /* ─── Back nav header ────────────────────────────────── */
+  .nav-header {
+    background: var(--bg-primary);
+    display: flex; align-items: center;
+    padding: 8px 16px 12px;
+    flex-shrink: 0; gap: 10px;
+  }
+  .back-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--surface-l1);
+    border: none; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .back-btn svg { width: 16px; height: 16px; color: var(--content-primary); }
+  .nav-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 600; color: var(--grey-900);
+  }
+
+  /* ─── Segment tabs ───────────────────────────────────── */
+  .segment-wrap {
+    background: var(--bg-primary);
+    padding: 0 20px 0;
+    flex-shrink: 0; position: relative; z-index: 3;
+  }
+  .segment-tabs { display: flex; border-bottom: 1.5px solid var(--grey-100); }
+  .seg-tab {
+    flex: 1; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 500; color: var(--content-secondary);
+    cursor: pointer; position: relative; border: none; background: none;
+  }
+  .seg-tab.active { color: var(--content-brand); font-weight: 600; }
+  .seg-tab.active::after {
+    content: ''; position: absolute; bottom: -1.5px; left: 0; right: 0;
+    height: 2px; background: var(--content-brand); border-radius: 2px 2px 0 0;
+  }
+
+  /* ─── Screen body ────────────────────────────────────── */
+  .screen-body {
+    flex: 1; overflow-y: auto; overflow-x: hidden;
+    display: flex; flex-direction: column; padding-bottom: 8px;
+  }
+  .screen-body::-webkit-scrollbar { display: none; }
+
+  /* ─── Section ────────────────────────────────────────── */
+  .section { padding: 20px 0 4px; }
+  .section-header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    padding: 0 20px; margin-bottom: 14px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px; font-weight: 600; color: var(--grey-900); line-height: 1.2;
+  }
+  .section-see-all {
+    font-size: 13px; font-weight: 500; color: var(--content-brand);
+    cursor: pointer; border: none; background: none; white-space: nowrap;
+  }
+
+  /* ─── Category pill row ──────────────────────────────── */
+  .pill-row {
+    display: flex; gap: 8px; overflow-x: auto;
+    padding: 0 20px 2px; -webkit-overflow-scrolling: touch; margin-bottom: 4px;
+  }
+  .pill-row::-webkit-scrollbar { display: none; }
+  .pill {
+    display: flex; align-items: center; gap: 5px;
+    height: 32px; padding: 0 12px; border-radius: 99px;
+    border: 1.5px solid var(--grey-100); background: #fff;
+    font-size: 12.5px; font-weight: 500; color: var(--content-primary);
+    white-space: nowrap; cursor: pointer; flex-shrink: 0;
+  }
+  .pill.active { background: var(--brand-500); border-color: var(--brand-500); color: #fff; }
+  .pill.active-camp { background: var(--camp-orange); border-color: var(--camp-orange); color: #fff; }
+  .pill-emoji { font-size: 13px; }
+
+  /* ─── Event card list ────────────────────────────────── */
+  .event-list { display: flex; flex-direction: column; gap: 12px; padding: 0 20px; }
+  .event-card {
+    background: #ffffff; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07);
+    cursor: pointer;
+  }
+  .event-img-wrap { width: 100%; height: 152px; position: relative; overflow: hidden; }
+  .event-img-bg { width: 100%; height: 100%; }
+  .art-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.16) 100%);
+    pointer-events: none;
+  }
+  .event-body { padding: 14px; }
+  .event-category { font-size: 11px; font-weight: 600; color: var(--content-brand); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 5px; }
+  .event-category.camp { color: var(--camp-orange); }
+  .event-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--grey-900); line-height: 1.3; margin-bottom: 10px; }
+  .event-details { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+  .event-detail-row {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12.5px; color: var(--content-secondary);
+  }
+  .event-detail-row svg { width: 13px; height: 13px; color: var(--grey-400); flex-shrink: 0; }
+  .event-footer { display: flex; align-items: center; justify-content: space-between; }
+  .event-attendees { display: flex; align-items: center; gap: 7px; }
+  .attendee-count { font-size: 12px; font-weight: 500; color: var(--content-secondary); }
+
+  /* ─── Camp age badge ─────────────────────────────────── */
+  .age-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--camp-orange-light);
+    border: 1px solid var(--camp-orange-50);
+    border-radius: 99px; padding: 4px 10px;
+  }
+  .age-badge-text { font-size: 11.5px; font-weight: 600; color: var(--camp-orange); }
+
+  /* ─── Price badge ────────────────────────────────────── */
+  .price-badge {
+    display: inline-flex; align-items: center;
+    background: var(--surface-l1); border-radius: 99px; padding: 4px 10px;
+  }
+  .price-text { font-size: 13px; font-weight: 700; color: var(--grey-900); }
+  .price-per { font-size: 10.5px; font-weight: 400; color: var(--content-secondary); margin-left: 2px; }
+
+  /* ─── Bottom tab bar ─────────────────────────────────── */
+  .tab-bar {
+    height: 80px; background: #fff; border-top: 1px solid var(--grey-100);
+    display: flex; align-items: flex-start; padding: 10px 8px 0; flex-shrink: 0;
+  }
+  .tab-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; padding: 4px 0 0; border: none; background: none;
+  }
+  .tab-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: var(--grey-300); }
+  .tab-icon.active { color: var(--content-brand); }
+  .tab-label { font-size: 10px; font-weight: 500; color: var(--grey-400); }
+  .tab-label.active { color: var(--content-brand); font-weight: 600; }
+  .tab-create {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--brand-500); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(24,99,56,0.38); flex-shrink: 0;
+    margin-top: -12px;
+  }
+  .tab-create svg { width: 22px; height: 22px; color: #fff; }
+
+  /* ─── SCREEN 2: FILTER WIDGET ────────────────────────── */
+  .filter-widget {
+    background: #fff;
+    border-radius: 20px;
+    margin: 12px 20px 0;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.08);
+  }
+  .filter-widget-title {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--content-secondary); margin-bottom: 12px;
+  }
+
+  /* Kid selector row */
+  .kid-selector { display: flex; gap: 10px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 2px; }
+  .kid-selector::-webkit-scrollbar { display: none; }
+  .kid-chip {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .kid-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; font-weight: 700; color: #fff;
+    border: 2.5px solid transparent; position: relative;
+    transition: border-color 0.2s;
+  }
+  .kid-avatar.selected { border-color: var(--camp-orange); box-shadow: 0 0 0 3px rgba(224,123,57,0.18); }
+  .kid-avatar.selected::after {
+    content: '✓'; position: absolute; bottom: -2px; right: -2px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--camp-orange); color: #fff;
+    font-size: 8px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid #fff;
+  }
+  .kid-name { font-size: 10.5px; font-weight: 500; color: var(--content-primary); white-space: nowrap; }
+  .kid-name.selected { color: var(--camp-orange); font-weight: 600; }
+
+  /* Date range row */
+  .filter-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .filter-field {
+    flex: 1; background: var(--surface-l0); border-radius: 12px;
+    padding: 10px 12px; cursor: pointer; position: relative;
+  }
+  .filter-field-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--content-secondary); margin-bottom: 3px; }
+  .filter-field-value { font-size: 14px; font-weight: 600; color: var(--grey-900); }
+  .filter-field-value.placeholder { color: var(--grey-300); font-weight: 400; }
+
+  .filter-location {
+    background: var(--surface-l0); border-radius: 12px;
+    padding: 10px 12px; cursor: pointer;
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  }
+  .filter-location svg { width: 16px; height: 16px; color: var(--camp-orange); flex-shrink: 0; }
+  .filter-location-text { flex: 1; }
+  .filter-location-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--content-secondary); margin-bottom: 2px; }
+  .filter-location-value { font-size: 13.5px; font-weight: 600; color: var(--grey-900); }
+
+  .filter-search-btn {
+    width: 100%; height: 44px; border-radius: 12px;
+    background: var(--camp-orange); border: none;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 14px; font-weight: 600; color: #fff; cursor: pointer;
+  }
+  .filter-search-btn svg { width: 15px; height: 15px; }
+
+  /* Weeks field (replaces hotel-style date range) */
+  .filter-weeks {
+    background: var(--surface-l0); border-radius: 12px;
+    padding: 10px 12px; cursor: pointer;
+    display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  }
+  .filter-weeks svg { width: 16px; height: 16px; color: var(--camp-orange); flex-shrink: 0; }
+  .filter-weeks-text { flex: 1; }
+  .filter-weeks-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--content-secondary); margin-bottom: 2px; }
+  .filter-weeks-value { font-size: 13.5px; font-weight: 600; color: var(--grey-900); }
+  .filter-weeks-value.placeholder { color: var(--grey-300); font-weight: 400; }
+
+  /* Selected-weeks chip tray (only shown once weeks are picked) */
+  .week-tray { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; padding: 0 0 4px; margin-bottom: 2px; }
+  .week-tray::-webkit-scrollbar { display: none; }
+  .week-ptag {
+    flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px;
+    background: var(--camp-orange); color: #fff; font-size: 12.5px; font-weight: 600;
+    padding: 6px 8px 6px 12px; border-radius: 999px; white-space: nowrap;
+  }
+  .week-ptag .x { width: 15px; height: 15px; display: grid; place-items: center; border-radius: 50%; background: rgba(255,255,255,.22); font-size: 11px; }
+
+  /* Week row (inside the Select Weeks sheet) */
+  .weekrow {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface-l0); border-radius: 14px;
+    padding: 12px 14px; margin-bottom: 8px; cursor: pointer;
+  }
+  .weekrow.sel { background: var(--camp-orange-light); }
+  .week-check { width: 22px; height: 22px; border-radius: 7px; border: 2px solid #cfc7b5; flex-shrink: 0; display: grid; place-items: center; }
+  .weekrow.sel .week-check { background: var(--camp-orange); border-color: var(--camp-orange); }
+  .week-check svg { width: 13px; height: 13px; color: #fff; }
+  .week-info { flex: 1; min-width: 0; }
+  .week-name { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 14px; color: var(--grey-900); }
+  .week-dates { font-size: 12px; color: var(--content-secondary); margin-top: 1px; }
+  .week-note { font-size: 11px; color: var(--camp-orange); margin-top: 3px; font-weight: 500; }
+  .week-count { font-size: 11px; font-weight: 700; color: var(--camp-orange); background: var(--camp-orange-light); padding: 4px 10px; border-radius: 99px; flex-shrink: 0; white-space: nowrap; }
+  .weekrow.sel .week-count { background: #fff; }
+
+  /* ─── Camp list items ────────────────────────────────── */
+  .camp-list { display: flex; flex-direction: column; gap: 10px; padding: 16px 20px 0; }
+  .camp-card {
+    background: #fff; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06);
+    cursor: pointer; display: flex;
+  }
+  .camp-thumb {
+    width: 88px; flex-shrink: 0;
+    position: relative; overflow: hidden;
+  }
+  .camp-thumb-img { width: 100%; height: 100%; object-fit: cover; }
+  .camp-body { flex: 1; padding: 12px 14px; }
+  .camp-tags { display: flex; gap: 5px; margin-bottom: 6px; flex-wrap: wrap; }
+  .camp-tag {
+    font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px;
+    background: var(--camp-orange-light); color: var(--camp-orange);
+  }
+  .camp-tag.age { background: var(--brand-50); color: var(--brand-600); }
+  .camp-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px; font-weight: 600; color: var(--grey-900);
+    line-height: 1.3; margin-bottom: 5px;
+  }
+  .camp-meta { display: flex; flex-direction: column; gap: 3px; margin-bottom: 8px; }
+  .camp-meta-row {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11.5px; color: var(--content-secondary);
+  }
+  .camp-meta-row svg { width: 12px; height: 12px; color: var(--grey-400); flex-shrink: 0; }
+  .camp-footer { display: flex; align-items: center; justify-content: space-between; }
+  .camp-price { font-size: 14px; font-weight: 700; color: var(--grey-900); }
+  .camp-price span { font-size: 10.5px; font-weight: 400; color: var(--content-secondary); }
+  .camp-spots { font-size: 11px; font-weight: 500; color: #5c8a5c; }
+
+  /* ─── SCREEN 3: CAMP DETAIL ──────────────────────────── */
+  .detail-header-img {
+    width: 100%; height: 220px;
+    position: relative; overflow: hidden; flex-shrink: 0;
+  }
+  .detail-photo-bg {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .detail-header-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.45) 100%);
+  }
+  .detail-back-btn {
+    position: absolute; top: 16px; left: 16px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.88); backdrop-filter: blur(8px);
+    border: none; display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .detail-back-btn svg { width: 16px; height: 16px; color: var(--grey-900); }
+  .detail-share-btn {
+    position: absolute; top: 16px; right: 16px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.88); backdrop-filter: blur(8px);
+    border: none; display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .detail-share-btn svg { width: 16px; height: 16px; color: var(--grey-900); }
+
+  /* Photo dots */
+  .photo-dots {
+    position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 4px;
+  }
+  .photo-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.5); }
+  .photo-dot.active { width: 16px; border-radius: 3px; background: #fff; }
+
+  /* Detail content scroll */
+  .detail-scroll { flex: 1; overflow-y: auto; }
+  .detail-scroll::-webkit-scrollbar { display: none; }
+
+  .detail-content { padding: 20px; }
+  .detail-eyebrow {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+  }
+  .detail-eyebrow-tag {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--camp-orange); padding: 3px 8px; border-radius: 99px;
+    background: var(--camp-orange-light);
+  }
+  .detail-eyebrow-age {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--brand-600); padding: 3px 8px; border-radius: 99px;
+    background: var(--brand-50);
+  }
+
+  .detail-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: var(--grey-900);
+    line-height: 1.25; margin-bottom: 6px;
+  }
+  .detail-org { font-size: 13px; font-weight: 500; color: var(--content-secondary); margin-bottom: 14px; }
+  .detail-org span { color: var(--content-brand); font-weight: 600; }
+
+  .detail-info-row {
+    display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .detail-info-chip {
+    display: flex; align-items: center; gap: 5px; flex: 1; min-width: 0;
+    background: #fff; border-radius: 10px; padding: 8px 12px;
+    border: 1px solid var(--grey-100);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .detail-info-chip svg { width: 14px; height: 14px; color: var(--camp-orange); flex-shrink: 0; }
+  .detail-info-chip-text {}
+  .detail-info-chip-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--content-secondary); }
+  .detail-info-chip-value { font-size: 13px; font-weight: 600; color: var(--grey-900); }
+
+  .detail-divider { height: 1px; background: var(--grey-100); margin: 16px 0; }
+
+  .detail-section-label {
+    font-size: 13px; font-weight: 700; color: var(--grey-900); margin-bottom: 8px;
+  }
+  .detail-desc {
+    font-size: 13.5px; color: var(--content-primary); line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .highlights-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+  .highlight-row {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 13px; color: var(--content-primary);
+  }
+  .highlight-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--camp-orange); flex-shrink: 0; margin-top: 5px;
+  }
+
+  .detail-price-row {
+    background: #fff; border-radius: 16px;
+    padding: 14px 16px;
+    border: 1px solid var(--grey-100);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .detail-price-left {}
+  .detail-price-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--content-secondary); margin-bottom: 3px; }
+  .detail-price-amount { font-size: 24px; font-weight: 700; color: var(--grey-900); line-height: 1; }
+  .detail-price-amount span { font-size: 13px; font-weight: 400; color: var(--content-secondary); }
+  .detail-price-note { font-size: 11px; color: var(--content-secondary); margin-top: 2px; }
+  .spots-badge {
+    background: var(--brand-50); border-radius: 10px; padding: 8px 12px; text-align: center; flex-shrink: 0;
+  }
+  .spots-count { font-size: 18px; font-weight: 700; color: var(--brand-500); line-height: 1; }
+  .spots-label { font-size: 10px; font-weight: 500; color: var(--brand-600); }
+
+  /* Price surfaced right under the title — no scrolling required to see it */
+  .price-hero-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--camp-orange-light); border: 1px solid var(--camp-orange-50);
+    border-radius: 16px; padding: 14px 16px; margin: 14px 0 14px;
+  }
+  .price-hero-left {}
+  .price-hero-amount { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--grey-900); line-height: 1; }
+  .price-hero-amount span { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 400; color: var(--content-secondary); }
+  .price-hero-note { font-size: 11.5px; color: var(--content-secondary); margin-top: 4px; }
+
+  /* Real address, not just a suburb name */
+  .location-card {
+    display: flex; align-items: center; gap: 12px;
+    background: #fff; border: 1px solid var(--grey-100); border-radius: 14px;
+    padding: 12px 14px; margin: 4px 0 16px;
+  }
+  .location-card-icon {
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    background: var(--camp-orange-light); display: flex; align-items: center; justify-content: center;
+  }
+  .location-card-icon svg { width: 17px; height: 17px; color: var(--camp-orange); }
+  .location-card-text { flex: 1; min-width: 0; }
+  .location-card-address { font-size: 13px; font-weight: 600; color: var(--grey-900); line-height: 1.35; }
+  .location-card-sub { font-size: 11px; color: var(--content-secondary); margin-top: 2px; }
+  .location-card-cta {
+    flex-shrink: 0; display: flex; align-items: center; gap: 3px;
+    background: none; border: none; cursor: pointer;
+    font-size: 12px; font-weight: 600; color: var(--camp-orange);
+  }
+  .location-card-cta svg { width: 13px; height: 13px; }
+
+  /* Register CTA */
+  .detail-cta {
+    position: sticky; bottom: 0; padding: 12px 20px 16px;
+    background: linear-gradient(to top, var(--bg-primary) 80%, transparent);
+    flex-shrink: 0;
+  }
+  .register-btn {
+    width: 100%; height: 52px; border-radius: 14px;
+    background: var(--camp-orange); border: none;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 15px; font-weight: 700; color: #fff; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(224,123,57,0.4);
+  }
+  .register-btn svg { width: 17px; height: 17px; }
+
+  /* ─── SCREEN 4: CONFIRM SHEET ────────────────────────── */
+  .sheet-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    z-index: 20;
+  }
+  .sheet {
+    background: #fff;
+    border-radius: 24px 24px 0 0;
+    max-height: 88%;
+    display: flex; flex-direction: column;
+  }
+  .sheet-handle {
+    width: 36px; height: 4px; border-radius: 2px;
+    background: var(--grey-200);
+    margin: 10px auto 0; flex-shrink: 0;
+  }
+  .sheet-header {
+    padding: 14px 20px 0;
+    display: flex; align-items: flex-start; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .sheet-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 700; color: var(--grey-900);
+  }
+  .sheet-subtitle { font-size: 13px; color: var(--content-secondary); margin-top: 3px; }
+  .sheet-close {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--surface-l1); border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; margin-top: 2px;
+  }
+  .sheet-close svg { width: 14px; height: 14px; color: var(--content-primary); }
+  .sheet-scroll { flex: 1; overflow-y: auto; padding: 16px 20px 0; }
+  .sheet-scroll::-webkit-scrollbar { display: none; }
+
+  /* Camp summary in sheet */
+  .sheet-camp-summary {
+    background: var(--surface-l0); border-radius: 14px;
+    padding: 12px 14px; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sheet-camp-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--camp-orange-light); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .sheet-camp-name { font-size: 14px; font-weight: 600; color: var(--grey-900); margin-bottom: 2px; }
+  .sheet-camp-dates { font-size: 12px; color: var(--content-secondary); }
+
+  /* Section groups in form */
+  .sheet-section { margin-bottom: 20px; }
+  .sheet-section-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--content-secondary); margin-bottom: 8px;
+  }
+  .field-group { display: flex; flex-direction: column; gap: 8px; }
+
+  .form-field {
+    background: var(--surface-l0); border-radius: 12px;
+    padding: 11px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .form-field-left {}
+  .form-field-label { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--content-secondary); margin-bottom: 2px; }
+  .form-field-value { font-size: 14px; font-weight: 500; color: var(--grey-900); }
+  .form-field-edit { width: 28px; height: 28px; border-radius: 8px; background: #fff; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+  .form-field-edit svg { width: 13px; height: 13px; color: var(--content-brand); }
+
+  /* Sheet CTA */
+  .sheet-footer {
+    padding: 14px 20px 20px; flex-shrink: 0;
+    border-top: 1px solid var(--grey-100);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .confirm-btn {
+    width: 100%; height: 50px; border-radius: 14px;
+    background: var(--camp-orange); border: none;
+    font-size: 15px; font-weight: 700; color: #fff; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(224,123,57,0.35);
+  }
+  .edit-btn {
+    width: 100%; height: 44px; border-radius: 14px;
+    background: var(--surface-l1); border: none;
+    font-size: 14px; font-weight: 600; color: var(--content-primary); cursor: pointer;
+  }
+
+  /* ─── SCREEN 5: SAVE PROMPT ──────────────────────────── */
+  .save-prompt-sheet {
+    background: #fff; border-radius: 24px 24px 0 0;
+    padding: 0 0 20px;
+    max-height: 55%;
+    display: flex; flex-direction: column;
+  }
+  .save-prompt-icon {
+    width: 60px; height: 60px; border-radius: 18px;
+    background: linear-gradient(135deg, #fde8d4, var(--camp-orange-light));
+    margin: 24px auto 16px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 28px;
+  }
+  .save-prompt-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 700; color: var(--grey-900);
+    text-align: center; padding: 0 24px; line-height: 1.3; margin-bottom: 8px;
+  }
+  .save-prompt-subtitle {
+    font-size: 13.5px; color: var(--content-secondary); text-align: center;
+    padding: 0 28px; line-height: 1.55; margin-bottom: 20px;
+  }
+  .save-prompt-btns { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+  .save-yes-btn {
+    width: 100%; height: 50px; border-radius: 14px;
+    background: var(--brand-500); border: none;
+    font-size: 15px; font-weight: 700; color: #fff; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(24,99,56,0.3);
+  }
+  .save-no-btn {
+    width: 100%; height: 44px; border-radius: 14px;
+    background: var(--surface-l1); border: none;
+    font-size: 14px; font-weight: 600; color: var(--content-primary); cursor: pointer;
+  }
+
+  /* ─── Seasonal banner in Discover ───────────────────── */
+  .seasonal-banner {
+    margin: 14px 20px 4px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #c85e20 0%, #e07b39 50%, #f0a060 100%);
+    padding: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    overflow: hidden; position: relative; cursor: pointer;
+  }
+  .seasonal-banner::before {
+    content: ''; position: absolute;
+    top: -20px; right: -20px;
+    width: 120px; height: 120px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+  }
+  .seasonal-banner::after {
+    content: ''; position: absolute;
+    bottom: -30px; right: 60px;
+    width: 80px; height: 80px; border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .seasonal-text { position: relative; z-index: 1; }
+  .seasonal-eyebrow { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.8); margin-bottom: 4px; }
+  .seasonal-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; line-height: 1.25; }
+  .seasonal-sub { font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 12px; }
+  .seasonal-cta {
+    display: inline-flex; align-items: center; gap: 5px;
+    height: 30px; padding: 0 12px; border-radius: 99px;
+    background: #fff; font-size: 12px; font-weight: 700;
+    color: var(--camp-orange); border: none; cursor: pointer;
+  }
+  .seasonal-img {
+    width: 80px; height: 80px; border-radius: 14px;
+    background: rgba(255,255,255,0.15); flex-shrink: 0;
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+  }
+
+  /* ─── Art backgrounds ────────────────────────────────── */
+  .art-camp-1 { background: linear-gradient(135deg, #2a6648 0%, #3a9060 50%, #60b880 100%); }
+  .art-camp-2 { background: linear-gradient(135deg, #1a4a8a 0%, #2a6ab0 50%, #4a8aca 100%); }
+  .art-camp-3 { background: linear-gradient(135deg, #7a3a8a 0%, #9a5aaa 50%, #ba7aca 100%); }
+  .art-camp-4 { background: linear-gradient(135deg, #c85e20 0%, #e07b39 60%, #f0a060 100%); }
+  .art-camp-detail { background: linear-gradient(135deg, #1e5c38 0%, #186338 40%, #2a8050 100%); }
+
+  /* Thumb color fills */
+  .thumb-1 { background: linear-gradient(160deg, #2a6648, #60b880); }
+  .thumb-2 { background: linear-gradient(160deg, #c85e20, #f0a060); }
+  .thumb-3 { background: linear-gradient(160deg, #1a4a8a, #4a8aca); }
+  .thumb-4 { background: linear-gradient(160deg, #7a3a8a, #ba7aca); }
+
+  /* Icon helpers in photos */
+  .camp-photo-icon {
+    font-size: 52px; opacity: 0.25; position: absolute;
+    bottom: 10px; right: 16px;
+  }
+
+  /* Avatar helpers */
+  .av-k1 { background: #e07b39; }
+  .av-k2 { background: #3a7ca5; }
+  .av-k3 { background: #9a5aaa; }
+  .av-k4 { background: #5c8a5c; }
+  .av-ring { border: 2.5px solid var(--camp-orange); }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     FLOW HEADER
+════════════════════════════════════════════════════════ -->
+<div style="width:100%;text-align:center;padding-bottom:16px;flex-basis:100%;">
+  <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#3a332a;margin-bottom:6px;">
+    🏕️ Summer Camps — Feature Flow
+  </div>
+  <div style="font-size:13px;color:#7a7060;max-width:640px;margin:0 auto;line-height:1.6;">
+    Seasonal discovery for summer camps — from Discover entry point → filtered list → camp detail → registration confirmation → save details prompt.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SCREEN 1 — DISCOVER: SEASONAL ENTRY POINT
+════════════════════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <div class="phone">
+    <!-- Status -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#1a1b1e"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#1a1b1e"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#1a1b1e"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="#1a1b1e" opacity="0.3"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2C10.8 2 13.3 3.2 15 5.2L13.5 6.7C12.2 5.1 10.2 4 8 4 5.8 4 3.8 5.1 2.5 6.7L1 5.2C2.7 3.2 5.2 2 8 2z" fill="#1a1b1e"/><path d="M8 6c1.7 0 3.2.7 4.3 1.9L10.8 9.4C10.1 8.5 9.1 8 8 8s-2.1.5-2.8 1.4L3.7 7.9C4.8 6.7 6.3 6 8 6z" fill="#1a1b1e"/><circle cx="8" cy="11" r="1.5" fill="#1a1b1e"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1b1e"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#1a1b1e" opacity="0.4"/></svg>
+      </div>
+    </div>
+    <!-- Header -->
+    <div class="app-header">
+      <div class="header-avatar">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" fill="#aa9e83"/><path d="M3 19c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#aa9e83" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div style="text-align:center;">
+        <span class="header-location-label">Exploring in</span>
+        <div class="header-location-city">
+          Sydney, NSW
+          <svg viewBox="0 0 16 16" fill="none"><path d="M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="notif-badge"></div>
+        </button>
+      </div>
+    </div>
+    <!-- Segment tabs -->
+    <div class="segment-wrap">
+      <div class="segment-tabs">
+        <button class="seg-tab">My Events</button>
+        <button class="seg-tab active">Discover</button>
+        <button class="seg-tab">Memories</button>
+      </div>
+    </div>
+
+    <!-- Screen body -->
+    <div class="screen-body">
+
+      <!-- Seasonal Summer Camps Banner -->
+      <div class="seasonal-banner" style="margin-top:16px;">
+        <div class="seasonal-text">
+          <div class="seasonal-eyebrow">🌞 Seasonal</div>
+          <div class="seasonal-title">Summer Camps<br>2025 are here!</div>
+          <div class="seasonal-sub">Find the perfect camp for your kids</div>
+          <button class="seasonal-cta">Explore camps →</button>
+        </div>
+        <div class="seasonal-img">⛺</div>
+      </div>
+
+      <!-- Category pills — Summer Camps pill added -->
+      <div style="padding: 14px 0 4px;">
+        <div class="pill-row">
+          <div class="pill active-camp"><span class="pill-emoji">⛺</span> Summer Camps</div>
+          <div class="pill"><span class="pill-emoji">🌳</span> Parks</div>
+          <div class="pill"><span class="pill-emoji">🎨</span> Arts</div>
+          <div class="pill"><span class="pill-emoji">🏊</span> Swimming</div>
+          <div class="pill"><span class="pill-emoji">🎭</span> Classes</div>
+          <div class="pill"><span class="pill-emoji">🍕</span> Dining</div>
+        </div>
+      </div>
+
+      <!-- Parks & Playgrounds section (existing) -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">Parks &amp; Playgrounds</h2>
+          <button class="section-see-all">See all</button>
+        </div>
+        <div class="event-list">
+          <div class="event-card">
+            <div class="event-img-wrap">
+              <div class="event-img-bg" style="background:linear-gradient(135deg,#2a6648,#60b880);"></div>
+              <div class="art-overlay"></div>
+              <div style="position:absolute;top:10px;left:10px;background:rgba(255,255,255,0.92);backdrop-filter:blur(8px);border-radius:10px;padding:6px 10px;">
+                <div style="font-size:18px;font-weight:700;color:#1a1b1e;line-height:1;">23</div>
+                <div style="font-size:11px;font-weight:600;color:#818898;text-transform:uppercase;letter-spacing:.06em;line-height:1.2;">Nov</div>
+              </div>
+            </div>
+            <div class="event-body">
+              <div class="event-category">Parks &amp; Playgrounds</div>
+              <div class="event-title">Picnic Playdate at Centennial Park</div>
+              <div class="event-details">
+                <div class="event-detail-row">
+                  <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 4.5v3l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Saturday, 23 Nov · 10:00 am
+                </div>
+                <div class="event-detail-row">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+                  Centennial Park, Eastern Suburbs
+                </div>
+              </div>
+              <div class="event-footer">
+                <div class="event-attendees">
+                  <span class="attendee-count">12 going</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:4px;background:var(--surface-l1);border-radius:99px;padding:4px 10px 4px 6px;">
+                  <div style="width:18px;height:18px;border-radius:50%;background:var(--brand-200);display:flex;align-items:center;justify-content:center;">
+                    <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3" fill="currentColor" opacity="0.7"/><path d="M3 13c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                  </div>
+                  <span style="font-size:11.5px;font-weight:500;color:var(--content-primary);">Eastern Mums</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:16px;"></div>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <button class="tab-item">
+        <div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21H15v-5h-6v5H3V10.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+        <span class="tab-label">Home</span>
+      </button>
+      <button class="tab-item">
+        <div class="tab-icon active"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <span class="tab-label active">Discover</span>
+      </button>
+      <button class="tab-create">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="tab-item">
+        <div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M8 2v3M16 2v3M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <span class="tab-label">Events</span>
+      </button>
+      <button class="tab-item">
+        <div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <span class="tab-label">Profile</span>
+      </button>
+    </div>
+  </div>
+  <span class="variant-label">1 — Discover · Seasonal Entry</span>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SCREEN 2 — SUMMER CAMPS LIST + FILTER
+════════════════════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <div class="phone">
+    <!-- Status -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#1a1b1e"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#1a1b1e"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#1a1b1e"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="#1a1b1e" opacity="0.3"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1b1e"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#1a1b1e" opacity="0.4"/></svg>
+      </div>
+    </div>
+    <!-- Nav header -->
+    <div class="nav-header" style="padding-top:12px;">
+      <button class="back-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div>
+        <div class="nav-title">Summer Camps</div>
+        <div style="font-size:12px;color:var(--content-secondary);margin-top:1px;">🌞 Available now · Sydney</div>
+      </div>
+    </div>
+
+    <!-- Filter widget -->
+    <div class="filter-widget">
+      <div class="filter-widget-title">⛺ Find a Camp For</div>
+
+      <!-- Kid selector -->
+      <div class="kid-selector">
+        <div class="kid-chip">
+          <div class="kid-avatar av-k1 selected" style="font-size:16px;font-weight:700;">L</div>
+          <span class="kid-name selected">Liam</span>
+        </div>
+        <div class="kid-chip">
+          <div class="kid-avatar av-k2" style="font-size:16px;font-weight:700;">S</div>
+          <span class="kid-name">Sofia</span>
+        </div>
+        <div class="kid-chip">
+          <div class="kid-avatar av-k3" style="font-size:16px;font-weight:700;">O</div>
+          <span class="kid-name">Oscar</span>
+        </div>
+        <div class="kid-chip">
+          <div class="kid-avatar av-k4" style="font-size:16px;font-weight:700;">A</div>
+          <span class="kid-name">Aria</span>
+        </div>
+      </div>
+
+      <!-- Which weeks? — replaces the hotel-style date range picker -->
+      <div class="filter-weeks">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <div class="filter-weeks-text">
+          <div class="filter-weeks-label">Which weeks?</div>
+          <div class="filter-weeks-value placeholder">Select weeks</div>
+        </div>
+        <svg viewBox="0 0 16 16" fill="none" style="width:14px;height:14px;color:var(--grey-300);"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <!-- Location -->
+      <div class="filter-location">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+        <div class="filter-location-text">
+          <div class="filter-location-label">Near</div>
+          <div class="filter-location-value">Sydney, NSW · 15 km radius</div>
+        </div>
+        <svg viewBox="0 0 16 16" fill="none" style="width:14px;height:14px;color:var(--grey-300);"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <!-- Search button -->
+      <button class="filter-search-btn">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        Show 8 Camps
+      </button>
+    </div>
+
+    <!-- Camp list -->
+    <div class="screen-body">
+      <div class="camp-list">
+
+        <!-- Camp 1 -->
+        <div class="camp-card">
+          <div class="camp-thumb thumb-1" style="position:relative;min-height:100%;">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px;opacity:0.5;">🌿</div>
+          </div>
+          <div class="camp-body">
+            <div class="camp-tags">
+              <span class="camp-tag">Outdoor</span>
+              <span class="camp-tag age">Ages 6–12</span>
+            </div>
+            <div class="camp-name">Nature Explorers Camp</div>
+            <div class="camp-meta">
+              <div class="camp-meta-row">
+                <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                Jul 7 – Jul 18 · Full day
+              </div>
+              <div class="camp-meta-row">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+                Centennial Park, Randwick
+              </div>
+            </div>
+            <div class="camp-footer">
+              <div class="camp-price">$420 <span>/ 2 wks</span></div>
+              <div class="camp-spots">4 spots left</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Camp 2 -->
+        <div class="camp-card">
+          <div class="camp-thumb thumb-2" style="position:relative;min-height:100%;">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px;opacity:0.5;">🎨</div>
+          </div>
+          <div class="camp-body">
+            <div class="camp-tags">
+              <span class="camp-tag" style="background:#fde8d4;color:#c85e20;">Arts</span>
+              <span class="camp-tag age">Ages 5–10</span>
+            </div>
+            <div class="camp-name">Creative Arts Summer Camp</div>
+            <div class="camp-meta">
+              <div class="camp-meta-row">
+                <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                Jul 14 – Jul 25 · Half day
+              </div>
+              <div class="camp-meta-row">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+                Surry Hills Community Centre
+              </div>
+            </div>
+            <div class="camp-footer">
+              <div class="camp-price">$280 <span>/ 2 wks</span></div>
+              <div class="camp-spots">12 spots left</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Camp 3 -->
+        <div class="camp-card">
+          <div class="camp-thumb thumb-3" style="position:relative;min-height:100%;">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px;opacity:0.5;">🏊</div>
+          </div>
+          <div class="camp-body">
+            <div class="camp-tags">
+              <span class="camp-tag" style="background:#ddeeff;color:#1a4a8a;">Sport</span>
+              <span class="camp-tag age">Ages 7–14</span>
+            </div>
+            <div class="camp-name">AquaSport Summer Academy</div>
+            <div class="camp-meta">
+              <div class="camp-meta-row">
+                <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                Jul 7 – Jul 11 · Full day
+              </div>
+              <div class="camp-meta-row">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+                Sydney Olympic Park Aquatic
+              </div>
+            </div>
+            <div class="camp-footer">
+              <div class="camp-price">$195 <span>/ week</span></div>
+              <div class="camp-spots">8 spots left</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Camp 4 -->
+        <div class="camp-card">
+          <div class="camp-thumb thumb-4" style="position:relative;min-height:100%;">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px;opacity:0.5;">🎭</div>
+          </div>
+          <div class="camp-body">
+            <div class="camp-tags">
+              <span class="camp-tag" style="background:#eeddf5;color:#7a3a8a;">Drama</span>
+              <span class="camp-tag age">Ages 8–13</span>
+            </div>
+            <div class="camp-name">Stage Stars Theatre Camp</div>
+            <div class="camp-meta">
+              <div class="camp-meta-row">
+                <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                Jul 21 – Aug 1 · Full day
+              </div>
+              <div class="camp-meta-row">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+                Newtown Arts Centre
+              </div>
+            </div>
+            <div class="camp-footer">
+              <div class="camp-price">$360 <span>/ 2 wks</span></div>
+              <div class="camp-spots">2 spots left</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div style="height:20px;"></div>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21H15v-5h-6v5H3V10.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><span class="tab-label">Home</span></button>
+      <button class="tab-item"><div class="tab-icon active"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label active">Discover</span></button>
+      <button class="tab-create"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+      <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M8 2v3M16 2v3M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Events</span></button>
+      <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Profile</span></button>
+    </div>
+  </div>
+  <span class="variant-label">2 — Summer Camps List + Filter</span>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SCREEN 2B — SELECT CAMP WEEKS (replaces date-range picker)
+     Per Tony's comment: dropdown/list of discrete camp weeks,
+     multi-select with checkboxes — not a hotel-style calendar.
+════════════════════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <div class="phone" style="position:relative;">
+    <!-- Dimmed background: same filter screen, faded -->
+    <div style="position:absolute;inset:0;filter:blur(2px);opacity:.5;overflow:hidden;border-radius:54px;background:var(--bg-primary);">
+      <div style="padding:70px 20px 0;">
+        <div style="height:16px;background:var(--grey-100);border-radius:8px;width:50%;margin-bottom:18px;"></div>
+        <div style="height:180px;background:#fff;border-radius:20px;"></div>
+      </div>
+    </div>
+
+    <!-- Sheet overlay -->
+    <div class="sheet-backdrop">
+      <div class="sheet" style="max-height:82%;">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+          <div>
+            <div class="sheet-title">Select Camp Weeks</div>
+            <div class="sheet-subtitle">Choose one or more weeks — we'll show camps running in any of them</div>
+          </div>
+          <button class="sheet-close">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="sheet-scroll">
+          <div class="weekrow sel">
+            <div class="week-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+            <div class="week-info"><div class="week-name">Week 1</div><div class="week-dates">Jun 15 – Jun 19</div></div>
+            <div class="week-count">14 camps</div>
+          </div>
+          <div class="weekrow">
+            <div class="week-check"></div>
+            <div class="week-info"><div class="week-name">Week 2</div><div class="week-dates">Jun 22 – Jun 26</div></div>
+            <div class="week-count">11 camps</div>
+          </div>
+          <div class="weekrow">
+            <div class="week-check"></div>
+            <div class="week-info"><div class="week-name">Week 3</div><div class="week-dates">Jun 29 – Jul 3</div><div class="week-note">Short week — no camp Fri, Jul 4</div></div>
+            <div class="week-count">6 camps</div>
+          </div>
+          <div class="weekrow sel">
+            <div class="week-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+            <div class="week-info"><div class="week-name">Week 4</div><div class="week-dates">Jul 6 – Jul 10</div></div>
+            <div class="week-count">9 camps</div>
+          </div>
+          <div class="weekrow sel">
+            <div class="week-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+            <div class="week-info"><div class="week-name">Week 5</div><div class="week-dates">Jul 13 – Jul 17</div></div>
+            <div class="week-count">12 camps</div>
+          </div>
+          <div class="weekrow">
+            <div class="week-check"></div>
+            <div class="week-info"><div class="week-name">Week 6</div><div class="week-dates">Jul 20 – Jul 24</div></div>
+            <div class="week-count">8 camps</div>
+          </div>
+          <div class="weekrow">
+            <div class="week-check"></div>
+            <div class="week-info"><div class="week-name">Week 7</div><div class="week-dates">Jul 27 – Jul 31</div></div>
+            <div class="week-count">10 camps</div>
+          </div>
+          <div class="weekrow">
+            <div class="week-check"></div>
+            <div class="week-info"><div class="week-name">Week 8</div><div class="week-dates">Aug 3 – Aug 7</div></div>
+            <div class="week-count">7 camps</div>
+          </div>
+        </div>
+
+        <div class="sheet-footer">
+          <button class="confirm-btn">View Camps for 3 Weeks</button>
+          <button class="edit-btn">Clear all</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="variant-label">2b — Select Camp Weeks (multi-select sheet)</span>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SCREEN 2C — FILTER, WEEKS SELECTED
+════════════════════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <div class="phone">
+    <!-- Status -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#1a1b1e"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#1a1b1e"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#1a1b1e"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="#1a1b1e" opacity="0.3"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1b1e"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#1a1b1e" opacity="0.4"/></svg>
+      </div>
+    </div>
+    <!-- Nav header -->
+    <div class="nav-header" style="padding-top:12px;">
+      <button class="back-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div>
+        <div class="nav-title">Summer Camps</div>
+        <div style="font-size:12px;color:var(--content-secondary);margin-top:1px;">🌞 Available now · Sydney</div>
+      </div>
+    </div>
+
+    <!-- Filter widget -->
+    <div class="filter-widget">
+      <div class="filter-widget-title">⛺ Find a Camp For</div>
+
+      <!-- Kid selector -->
+      <div class="kid-selector">
+        <div class="kid-chip">
+          <div class="kid-avatar av-k1 selected" style="font-size:16px;font-weight:700;">L</div>
+          <span class="kid-name selected">Liam</span>
+        </div>
+        <div class="kid-chip">
+          <div class="kid-avatar av-k2" style="font-size:16px;font-weight:700;">S</div>
+          <span class="kid-name">Sofia</span>
+        </div>
+        <div class="kid-chip">
+          <div class="kid-avatar av-k3" style="font-size:16px;font-weight:700;">O</div>
+          <span class="kid-name">Oscar</span>
+        </div>
+        <div class="kid-chip">
+          <div class="kid-avatar av-k4" style="font-size:16px;font-weight:700;">A</div>
+          <span class="kid-name">Aria</span>
+        </div>
+      </div>
+
+      <!-- Which weeks? — now filled -->
+      <div class="filter-weeks">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <div class="filter-weeks-text">
+          <div class="filter-weeks-label">Which weeks?</div>
+          <div class="filter-weeks-value">3 weeks selected</div>
+        </div>
+        <svg viewBox="0 0 16 16" fill="none" style="width:14px;height:14px;color:var(--grey-300);"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <!-- Removable chips — quick edit without reopening the sheet -->
+      <div class="week-tray">
+        <span class="week-ptag">Week 1 · Jun 15–19 <span class="x">✕</span></span>
+        <span class="week-ptag">Week 4 · Jul 6–10 <span class="x">✕</span></span>
+        <span class="week-ptag">Week 5 · Jul 13–17 <span class="x">✕</span></span>
+      </div>
+
+      <!-- Location -->
+      <div class="filter-location" style="margin-top:2px;">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+        <div class="filter-location-text">
+          <div class="filter-location-label">Near</div>
+          <div class="filter-location-value">Sydney, NSW · 15 km radius</div>
+        </div>
+        <svg viewBox="0 0 16 16" fill="none" style="width:14px;height:14px;color:var(--grey-300);"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <!-- Search button -->
+      <button class="filter-search-btn">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        Show 5 Camps
+      </button>
+    </div>
+
+    <!-- Camp list — filtered to camps running during the selected weeks -->
+    <div class="screen-body">
+      <div class="camp-list">
+
+        <div class="camp-card">
+          <div class="camp-thumb thumb-1" style="position:relative;min-height:100%;">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px;opacity:0.5;">🌿</div>
+          </div>
+          <div class="camp-body">
+            <div class="camp-tags">
+              <span class="camp-tag">Outdoor</span>
+              <span class="camp-tag age">Ages 6–12</span>
+            </div>
+            <div class="camp-name">Nature Explorers Camp</div>
+            <div class="camp-meta">
+              <div class="camp-meta-row">
+                <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                Week 4–5 · Jul 6 – Jul 17
+              </div>
+              <div class="camp-meta-row">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+                Centennial Park, Randwick
+              </div>
+            </div>
+            <div class="camp-footer">
+              <div class="camp-price">$420 <span>/ 2 wks</span></div>
+              <div class="camp-spots">4 spots left</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="camp-card">
+          <div class="camp-thumb thumb-2" style="position:relative;min-height:100%;">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px;opacity:0.5;">🎨</div>
+          </div>
+          <div class="camp-body">
+            <div class="camp-tags">
+              <span class="camp-tag">Arts</span>
+              <span class="camp-tag age">Ages 5–10</span>
+            </div>
+            <div class="camp-name">Creative Kids Camp</div>
+            <div class="camp-meta">
+              <div class="camp-meta-row">
+                <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                Week 1 · Jun 15 – Jun 19
+              </div>
+              <div class="camp-meta-row">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+                The Creative Space, Bondi
+              </div>
+            </div>
+            <div class="camp-footer">
+              <div class="camp-price">$260 <span>/ wk</span></div>
+              <div class="camp-spots">9 spots left</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21H15v-5h-6v5H3V10.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><span class="tab-label">Home</span></button>
+      <button class="tab-item"><div class="tab-icon active"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label active">Discover</span></button>
+      <button class="tab-create"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+      <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M8 2v3M16 2v3M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Events</span></button>
+      <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Profile</span></button>
+    </div>
+  </div>
+  <span class="variant-label">2c — Filter widget, weeks selected</span>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SCREEN 3 — CAMP DETAIL PAGE
+════════════════════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <div class="phone">
+    <!-- Status bar over image -->
+    <div class="status-bar" style="background:transparent;position:absolute;top:0;left:0;right:0;z-index:10;">
+      <span class="status-time" style="color:#fff;">9:41</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#fff"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#fff"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#fff"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="#fff" opacity="0.4"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity="0.6"/><rect x="2" y="2" width="14" height="8" rx="2" fill="#fff"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#fff" opacity="0.5"/></svg>
+      </div>
+    </div>
+
+    <!-- Hero image -->
+    <div class="detail-header-img" style="margin-top:0;">
+      <div class="art-camp-detail" style="width:100%;height:100%;position:relative;">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:0.22;">🌿</div>
+      </div>
+      <div class="detail-header-overlay"></div>
+      <button class="detail-back-btn">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="detail-share-btn">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M12 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM4 6a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM12 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4z" stroke="currentColor" stroke-width="1.4"/><path d="M6 7.5l4-2M6 8.5l4 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </button>
+      <!-- Camp name overlay at bottom of image -->
+      <div style="position:absolute;bottom:16px;left:16px;right:16px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.8);margin-bottom:4px;">⛺ Summer Camp</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;line-height:1.2;">Nature Explorers Camp</div>
+      </div>
+      <!-- Photo dots -->
+      <div class="photo-dots" style="bottom:10px;right:16px;left:auto;transform:none;">
+        <div class="photo-dot active"></div>
+        <div class="photo-dot"></div>
+        <div class="photo-dot"></div>
+        <div class="photo-dot"></div>
+      </div>
+    </div>
+
+    <!-- Detail scroll -->
+    <div class="detail-scroll">
+      <div class="detail-content">
+
+        <!-- Tags row -->
+        <div class="detail-eyebrow" style="margin-bottom:10px;">
+          <span class="detail-eyebrow-tag">Outdoor</span>
+          <span class="detail-eyebrow-age">Ages 6–12</span>
+          <span class="detail-eyebrow-age" style="background:#fff3cd;color:#7a6010;border:1px solid #f0e08a;">⭐ 4.9</span>
+        </div>
+
+        <div class="detail-org">By <span>Green Pines Education</span> · Sydney</div>
+
+        <!-- Price — surfaced immediately, not buried after scrolling -->
+        <div class="price-hero-row">
+          <div class="price-hero-left">
+            <div class="price-hero-amount">$420 <span>/ 2 weeks</span></div>
+            <div class="price-hero-note">$210 per week · Includes lunch</div>
+          </div>
+          <div class="spots-badge">
+            <div class="spots-count">4</div>
+            <div class="spots-label">spots left</div>
+          </div>
+        </div>
+
+        <!-- Info chips -->
+        <div class="detail-info-row">
+          <div class="detail-info-chip">
+            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <div class="detail-info-chip-text">
+              <div class="detail-info-chip-label">Dates</div>
+              <div class="detail-info-chip-value">Jul 7 – 18</div>
+            </div>
+          </div>
+          <div class="detail-info-chip">
+            <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 4.5v3l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="detail-info-chip-text">
+              <div class="detail-info-chip-label">Hours</div>
+              <div class="detail-info-chip-value">8am – 4pm</div>
+            </div>
+          </div>
+          <div class="detail-info-chip">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5 13.5 14 8 11 2.5 14 8 1.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            <div class="detail-info-chip-text">
+              <div class="detail-info-chip-label">Distance</div>
+              <div class="detail-info-chip-value">2.3 km away</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location card — real address, not just a suburb name -->
+        <div class="location-card">
+          <div class="location-card-icon">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+          </div>
+          <div class="location-card-text">
+            <div class="location-card-address">Centennial Park, Grand Dr, Randwick NSW 2031</div>
+            <div class="location-card-sub">Street parking available</div>
+          </div>
+          <button class="location-card-cta">
+            Directions
+            <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+
+        <div class="detail-divider"></div>
+
+        <!-- Description -->
+        <div class="detail-section-label">About this Camp</div>
+        <div class="detail-desc">
+          A hands-on outdoor adventure camp where kids explore the natural world through science, bush craft, and environmental discovery. Set in the beautiful Centennial Park, your child will form lifelong friendships while building confidence in the great outdoors.
+        </div>
+
+        <!-- Highlights -->
+        <div class="detail-section-label">What's included</div>
+        <div class="highlights-list">
+          <div class="highlight-row"><div class="highlight-dot"></div>Daily nature hikes &amp; scavenger hunts</div>
+          <div class="highlight-row"><div class="highlight-dot"></div>Wildlife education &amp; birdwatching sessions</div>
+          <div class="highlight-row"><div class="highlight-dot"></div>Bush craft skills: fire safety, navigation</div>
+          <div class="highlight-row"><div class="highlight-dot"></div>Healthy catered lunches included</div>
+          <div class="highlight-row"><div class="highlight-dot"></div>Daily end-of-day parent summary</div>
+        </div>
+
+        <div style="height:60px;"></div>
+      </div>
+    </div>
+
+    <!-- Register CTA — price baked into the action itself, no need to repeat it lower down -->
+    <div class="detail-cta">
+      <button class="register-btn">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Register Liam — $420
+      </button>
+    </div>
+  </div>
+  <span class="variant-label">3 — Camp Detail Page</span>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SCREEN 4 — CONFIRM DETAILS SHEET
+════════════════════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <div class="phone" style="position:relative;">
+    <!-- Blurred background: Camp detail -->
+    <div style="position:absolute;inset:0;filter:blur(2px);overflow:hidden;border-radius:54px;">
+      <div style="height:220px;background:linear-gradient(135deg,#1e5c38,#186338,#2a8050);position:relative;">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:0.15;">🌿</div>
+        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.2),transparent 40%,transparent 60%,rgba(0,0,0,0.45));"></div>
+        <div style="position:absolute;bottom:16px;left:16px;">
+          <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;line-height:1.2;">Nature Explorers Camp</div>
+        </div>
+      </div>
+      <div style="background:var(--bg-primary);flex:1;height:100%;padding:20px;"></div>
+    </div>
+
+    <!-- Sheet overlay -->
+    <div class="sheet-backdrop">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+          <div>
+            <div class="sheet-title">Confirm Details</div>
+            <div class="sheet-subtitle">We'll send these details to the camp</div>
+          </div>
+          <button class="sheet-close">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="sheet-scroll">
+          <!-- Camp summary -->
+          <div class="sheet-camp-summary">
+            <div class="sheet-camp-icon">⛺</div>
+            <div>
+              <div class="sheet-camp-name">Nature Explorers Camp</div>
+              <div class="sheet-camp-dates">Jul 7 – Jul 18, 2025 · Full day</div>
+            </div>
+          </div>
+
+          <!-- Child info -->
+          <div class="sheet-section">
+            <div class="sheet-section-label">👦 Child Details</div>
+            <div class="field-group">
+              <div class="form-field">
+                <div class="form-field-left">
+                  <div class="form-field-label">Full Name</div>
+                  <div class="form-field-value">Liam Ahmad</div>
+                </div>
+                <button class="form-field-edit"><svg viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3L5 14H2v-3L11 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></button>
+              </div>
+              <div class="form-field">
+                <div class="form-field-left">
+                  <div class="form-field-label">Date of Birth</div>
+                  <div class="form-field-value">12 Mar 2016 · Age 9</div>
+                </div>
+                <button class="form-field-edit"><svg viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3L5 14H2v-3L11 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></button>
+              </div>
+              <div class="form-field">
+                <div class="form-field-left">
+                  <div class="form-field-label">Medical Notes</div>
+                  <div class="form-field-value" style="color:var(--content-secondary);font-size:13px;font-style:italic;">None specified</div>
+                </div>
+                <button class="form-field-edit"><svg viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3L5 14H2v-3L11 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Parent info -->
+          <div class="sheet-section">
+            <div class="sheet-section-label">👩 Parent / Guardian</div>
+            <div class="field-group">
+              <div class="form-field">
+                <div class="form-field-left">
+                  <div class="form-field-label">Parent Name</div>
+                  <div class="form-field-value">Ahmad Fauzan</div>
+                </div>
+                <button class="form-field-edit"><svg viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3L5 14H2v-3L11 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></button>
+              </div>
+              <div class="form-field">
+                <div class="form-field-left">
+                  <div class="form-field-label">Email</div>
+                  <div class="form-field-value">ahmad@joinsprout.co</div>
+                </div>
+                <button class="form-field-edit"><svg viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3L5 14H2v-3L11 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></button>
+              </div>
+              <div class="form-field">
+                <div class="form-field-left">
+                  <div class="form-field-label">Phone</div>
+                  <div class="form-field-value">+61 412 345 678</div>
+                </div>
+                <button class="form-field-edit"><svg viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3L5 14H2v-3L11 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></button>
+              </div>
+              <div class="form-field">
+                <div class="form-field-left">
+                  <div class="form-field-label">Home Address</div>
+                  <div class="form-field-value" style="font-size:13px;">12 Park St, Surry Hills NSW 2010</div>
+                </div>
+                <button class="form-field-edit"><svg viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3L5 14H2v-3L11 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <div style="height:8px;"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="sheet-footer">
+          <button class="confirm-btn">✓ Confirm &amp; Send Registration</button>
+          <button class="edit-btn">Edit Details</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="variant-label">4 — Registration · Confirm Details</span>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SCREEN 5 — SAVE UPDATED DETAILS PROMPT
+════════════════════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <div class="phone" style="position:relative;">
+    <!-- Blurred background: confirmation sheet dim -->
+    <div style="position:absolute;inset:0;background:var(--bg-primary);overflow:hidden;border-radius:54px;">
+      <div style="height:220px;background:linear-gradient(135deg,#1e5c38,#186338);"></div>
+      <div style="padding:20px;display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+        <div style="height:14px;background:var(--grey-100);border-radius:8px;width:60%;"></div>
+        <div style="height:10px;background:var(--grey-100);border-radius:8px;width:80%;"></div>
+        <div style="height:44px;background:#fff;border-radius:12px;margin-top:8px;"></div>
+        <div style="height:44px;background:#fff;border-radius:12px;"></div>
+        <div style="height:44px;background:#fff;border-radius:12px;"></div>
+        <div style="height:14px;background:var(--grey-100);border-radius:8px;width:50%;margin-top:12px;"></div>
+        <div style="height:44px;background:#fff;border-radius:12px;"></div>
+        <div style="height:44px;background:#fff;border-radius:12px;"></div>
+      </div>
+    </div>
+
+    <!-- Save prompt overlay -->
+    <div class="sheet-backdrop" style="align-items:flex-end;">
+      <div class="save-prompt-sheet">
+        <div class="sheet-handle" style="margin-top:10px;"></div>
+        <div class="save-prompt-icon">💾</div>
+        <div class="save-prompt-title">Save updated details to Liam's profile?</div>
+        <div class="save-prompt-subtitle">
+          You changed Liam's home address. Save it to his profile so you don't have to re-enter it next time.
+        </div>
+        <div class="save-prompt-btns">
+          <button class="save-yes-btn">
+            ✓ Yes, save to Liam's profile
+          </button>
+          <button class="save-no-btn">
+            No thanks, just this once
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="variant-label">5 — Save Updated Details Prompt</span>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SCREEN 6 — SUCCESS / REGISTRATION SENT
+════════════════════════════════════════════════════════ -->
+<div class="variant-wrap">
+  <div class="phone">
+    <div class="status-bar">
+      <span class="status-time">9:44</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1b1e"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#1a1b1e" opacity="0.4"/></svg>
+      </div>
+    </div>
+
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;text-align:center;">
+
+      <!-- Success icon -->
+      <div style="width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,#e07b39,#f0a060);display:flex;align-items:center;justify-content:center;font-size:38px;margin-bottom:22px;box-shadow:0 8px 28px rgba(224,123,57,0.35);">
+        ⛺
+      </div>
+
+      <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--camp-orange);margin-bottom:8px;">Registration Sent!</div>
+      <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--grey-900);line-height:1.25;margin-bottom:10px;">
+        Liam's all set for Nature Explorers Camp 🌿
+      </div>
+      <div style="font-size:14px;color:var(--content-secondary);line-height:1.6;margin-bottom:28px;">
+        Your registration details have been sent to Green Pines Education. They'll be in touch to confirm your spot.
+      </div>
+
+      <!-- Summary card -->
+      <div style="width:100%;background:#fff;border-radius:18px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.07);margin-bottom:28px;text-align:left;">
+        <div style="display:flex;gap:10px;align-items:flex-start;padding-bottom:12px;border-bottom:1px solid var(--grey-100);margin-bottom:12px;">
+          <div style="width:42px;height:42px;border-radius:12px;background:var(--camp-orange-light);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">⛺</div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--grey-900);margin-bottom:2px;">Nature Explorers Camp</div>
+            <div style="font-size:12px;color:var(--content-secondary);">Green Pines Education</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;">
+            <span style="color:var(--content-secondary);">Child</span>
+            <span style="font-weight:600;color:var(--grey-900);">Liam Ahmad, age 9</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;">
+            <span style="color:var(--content-secondary);">Dates</span>
+            <span style="font-weight:600;color:var(--grey-900);">Jul 7 – Jul 18, 2025</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;">
+            <span style="color:var(--content-secondary);">Location</span>
+            <span style="font-weight:600;color:var(--grey-900);">Centennial Park</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;">
+            <span style="color:var(--content-secondary);">Total</span>
+            <span style="font-weight:700;color:var(--grey-900);">$420</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTAs -->
+      <button style="width:100%;height:50px;border-radius:14px;background:var(--brand-500);border:none;font-size:15px;font-weight:700;color:#fff;cursor:pointer;margin-bottom:10px;box-shadow:0 4px 14px rgba(24,99,56,0.3);">
+        View in My Registrations
+      </button>
+      <button style="width:100%;height:44px;border-radius:14px;background:var(--surface-l1);border:none;font-size:14px;font-weight:600;color:var(--content-primary);cursor:pointer;">
+        Find More Camps
+      </button>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21H15v-5h-6v5H3V10.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><span class="tab-label">Home</span></button>
+      <button class="tab-item"><div class="tab-icon active"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label active">Discover</span></button>
+      <button class="tab-create"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+      <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M8 2v3M16 2v3M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Events</span></button>
+      <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Profile</span></button>
+    </div>
+  </div>
+  <span class="variant-label">6 — Registration Success</span>
+</div>
+
+</body>
+</html>

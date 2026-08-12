@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register for Nature Explorers Camp · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #f4f1ea; --cream-mid: #eae6db; --cream-deep: #dbd5c8;
+  --green: #186338; --green-bold: #1e3e2b; --green-xbold: #0f2218; --green-light: #e2e9e3; --green-mid: #77b691;
+  --sage: #d0dacf; --text: #2a2e25; --text-mid: #4d525b; --text-muted: #818898; --white: #ffffff;
+  --camp: #e07b39; --camp-bold: #b3591f; --camp-light: #fef3eb; --camp-50: #fde8d4;
+  --danger: #c0533d; --danger-bg: #fae3dd;
+  --r-sm: 6px; --r-md: 12px; --r-lg: 20px; --r-xl: 32px; --r-full: 9999px;
+  --font-display: 'Playfair Display', Georgia, serif; --font-body: 'Inter', -apple-system, sans-serif;
+}
+* , *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--cream); color: var(--text); line-height: 1.6; }
+img { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+input, textarea, select { font-family: inherit; }
+
+/* ── Nav ── */
+nav { position: sticky; top: 0; z-index: 50; background: rgba(244,241,234,0.92); backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--cream-deep); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { display: flex; align-items: center; gap: 9px; }
+.nav-logo img { width: 30px; height: 30px; border-radius: 8px; object-fit: cover; }
+.nav-logo-name { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--green-bold); }
+.nav-open { display: flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--green-bold); }
+.nav-open svg { width: 14px; height: 14px; }
+
+.wrap { max-width: 640px; margin: 0 auto; padding: 0 24px; }
+
+/* ── Hero ── */
+.hero { position: relative; overflow: hidden; padding: 0 0 0; }
+.hero-art { height: 260px; background: linear-gradient(135deg, #1e5c38 0%, #186338 45%, #2a8050 100%); position: relative; display: flex; align-items: center; justify-content: center; }
+.hero-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.35)); }
+.hero-emoji { font-size: 74px; opacity: .28; position: relative; z-index: 1; }
+.hero-badge { position: absolute; top: 18px; left: 24px; z-index: 2; background: rgba(255,255,255,0.92); backdrop-filter: blur(6px); border-radius: var(--r-full); padding: 6px 14px; font-size: 11.5px; font-weight: 700; color: var(--camp-bold); text-transform: uppercase; letter-spacing: .05em; }
+.hero-body { background: #fff; margin: -28px 20px 0; border-radius: var(--r-xl); padding: 24px 24px 22px; position: relative; z-index: 3; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+.hero-eyebrow { font-size: 12px; font-weight: 700; color: var(--camp-bold); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+.hero-title { font-family: var(--font-display); font-size: 30px; font-weight: 700; color: var(--text); line-height: 1.2; margin-bottom: 6px; }
+.hero-org { font-size: 13.5px; color: var(--text-muted); margin-bottom: 16px; }
+.hero-org b { color: var(--green); }
+.hero-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.hero-fact { background: var(--cream); border-radius: var(--r-md); padding: 10px 13px; }
+.hero-fact .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin-bottom: 2px; }
+.hero-fact .val { font-size: 14px; font-weight: 700; color: var(--text); }
+.hero-cta { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 52px; border-radius: var(--r-md); background: var(--camp); color: #fff; font-size: 15.5px; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 8px 22px rgba(224,123,57,0.35); }
+.spots-note { text-align: center; font-size: 12px; color: var(--green); font-weight: 600; margin-top: 10px; }
+
+/* ── About section ── */
+.section { padding: 44px 0; }
+.section-title { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+.desc { font-size: 14.5px; color: var(--text-mid); line-height: 1.75; margin-bottom: 18px; }
+.highlights { display: flex; flex-direction: column; gap: 9px; margin-bottom: 4px; }
+.highlight { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--text-mid); }
+.highlight .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--camp); flex-shrink: 0; margin-top: 7px; }
+
+.logi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 22px; }
+.logi-chip { background: #fff; border: 1px solid var(--cream-deep); border-radius: var(--r-md); padding: 12px 14px; }
+.logi-chip .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin-bottom: 3px; }
+.logi-chip .val { font-size: 13.5px; font-weight: 600; color: var(--text); }
+
+/* ── Form ── */
+.formsec { background: #fff; border-radius: var(--r-xl); padding: 30px 26px; box-shadow: 0 4px 24px rgba(0,0,0,0.05); }
+.formsec-head { text-align: center; margin-bottom: 26px; }
+.formsec-head h2 { font-family: var(--font-display); font-size: 24px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.formsec-head p { font-size: 13.5px; color: var(--text-muted); }
+
+.fgroup-lbl { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text-mid); margin: 26px 0 12px; }
+.fgroup-lbl:first-of-type { margin-top: 0; }
+.fgroup-lbl .req { font-size: 10px; font-weight: 700; text-transform: none; letter-spacing: 0; color: var(--camp-bold); background: var(--camp-light); padding: 2px 8px; border-radius: var(--r-full); }
+
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-size: 11.5px; font-weight: 600; color: var(--text-mid); }
+.field input, .field textarea, .field select { font-size: 14.5px; color: var(--text); background: var(--cream); border: 1.5px solid transparent; border-radius: var(--r-md); padding: 12px 14px; outline: none; transition: border-color .15s, background .15s; width: 100%; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--camp); background: #fff; }
+.field input::placeholder, .field textarea::placeholder { color: #b3aa96; }
+.field textarea { resize: vertical; min-height: 68px; font-family: inherit; }
+
+.relation-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.relation-pill { font-size: 13px; font-weight: 500; padding: 8px 14px; border-radius: var(--r-full); border: 1.5px solid var(--cream-deep); background: var(--cream); color: var(--text-mid); cursor: pointer; transition: all .12s; }
+.relation-pill.on { background: var(--camp); border-color: var(--camp); color: #fff; }
+
+.waiver-box { display: flex; gap: 12px; background: var(--cream); border: 1.5px solid var(--cream-deep); border-radius: var(--r-md); padding: 15px; cursor: pointer; margin-bottom: 6px; }
+.waiver-box .chk { width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--text-muted); flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: background .12s, border-color .12s; }
+.waiver-box .chk svg { width: 13px; height: 13px; stroke: #fff; fill: none; stroke-width: 3; opacity: 0; }
+.waiver-box.on { background: var(--green-light); border-color: var(--green-mid); }
+.waiver-box.on .chk { background: var(--green); border-color: var(--green); }
+.waiver-box.on .chk svg { opacity: 1; }
+.waiver-box .tx { font-size: 13px; color: var(--text-mid); line-height: 1.55; }
+.waiver-box .tx a { color: var(--green); font-weight: 600; text-decoration: underline; }
+
+.paycard { background: var(--cream); border-radius: var(--r-md); padding: 14px 16px; margin-bottom: 16px; }
+.order-row { display: flex; justify-content: space-between; font-size: 13.5px; padding: 5px 0; color: var(--text-mid); }
+.order-row.total { border-top: 1px dashed var(--cream-deep); margin-top: 4px; padding-top: 10px; font-weight: 700; color: var(--text); font-size: 16px; }
+
+.submit-btn { width: 100%; height: 54px; border-radius: var(--r-md); background: var(--camp); border: none; font-size: 16px; font-weight: 700; color: #fff; cursor: pointer; margin-top: 20px; box-shadow: 0 8px 22px rgba(224,123,57,0.32); transition: opacity .15s; }
+.submit-btn:disabled { opacity: .4; cursor: not-allowed; box-shadow: none; }
+.secure-note { text-align: center; font-size: 11.5px; color: var(--text-muted); margin-top: 12px; }
+
+/* ── Confirmation state ── */
+.confirm { display: none; text-align: center; padding: 20px 4px; }
+.confirm.show { display: block; }
+.formsec.done .form-body { display: none; }
+.confirm-icon { width: 74px; height: 74px; border-radius: 22px; background: linear-gradient(135deg, var(--camp), #f0a060); display: flex; align-items: center; justify-content: center; font-size: 34px; margin: 0 auto 20px; box-shadow: 0 10px 28px rgba(224,123,57,0.35); }
+.confirm-eyebrow { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--camp-bold); margin-bottom: 8px; }
+.confirm h2 { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.confirm p { font-size: 14px; color: var(--text-mid); line-height: 1.6; margin-bottom: 22px; }
+.confirm-summary { background: var(--cream); border-radius: var(--r-md); padding: 16px; text-align: left; margin-bottom: 24px; }
+.appcta { background: var(--green-bold); border-radius: var(--r-lg); padding: 22px; color: #fff; text-align: center; }
+.appcta h3 { font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+.appcta p { color: rgba(255,255,255,0.75); font-size: 13px; margin-bottom: 16px; }
+.appbadge { display: inline-flex; align-items: center; gap: 8px; background: #fff; color: var(--green-bold); padding: 10px 18px; border-radius: var(--r-md); font-size: 14px; font-weight: 700; }
+
+footer { text-align: center; padding: 32px 24px 40px; font-size: 12px; color: var(--text-muted); }
+
+@media (max-width: 560px) {
+  .hero-facts { grid-template-columns: 1fr 1fr; }
+  .frow { grid-template-columns: 1fr; }
+  .logi-grid { grid-template-columns: 1fr; }
+  .formsec { padding: 24px 18px; }
+  .hero-body { margin: -28px 14px 0; padding: 20px 18px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <img src="../09 - Logo/Sprout Logo White Background.jpeg" alt="Sprout">
+    <span class="nav-logo-name">Sprout</span>
+  </div>
+  <a class="nav-open" href="#">Have the app? Open Sprout
+    <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</nav>
+
+<div class="hero">
+  <div class="hero-art"><div class="hero-badge">🌞 Summer 2025</div><div class="hero-emoji">🌿</div></div>
+  <div class="wrap">
+    <div class="hero-body">
+      <div class="hero-eyebrow">⛺ Summer Camp</div>
+      <div class="hero-title">Nature Explorers Camp</div>
+      <div class="hero-org">Hosted by <b>Green Pines Education</b> · Centennial Park, Sydney</div>
+      <div class="hero-facts">
+        <div class="hero-fact"><div class="lbl">Dates</div><div class="val">Jul 7 – Jul 18, 2025</div></div>
+        <div class="hero-fact"><div class="lbl">Ages</div><div class="val">6 – 12 years</div></div>
+        <div class="hero-fact"><div class="lbl">Schedule</div><div class="val">Full day, Mon–Fri</div></div>
+        <div class="hero-fact"><div class="lbl">Price</div><div class="val">$420 per camper</div></div>
+      </div>
+      <button class="hero-cta" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">
+        Register Now
+        <svg viewBox="0 0 16 16" fill="none" width="15" height="15"><path d="M8 3v10M3 8l5 5 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="spots-note">🟢 6 spots left</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="section">
+    <div class="section-title">About this camp</div>
+    <p class="desc">Two weeks of hiking, wildlife tracking, campfire cooking, and outdoor survival basics — built for kids who'd rather be outside than anywhere else. Small groups, experienced counselors, all gear provided.</p>
+    <div class="highlights">
+      <div class="highlight"><span class="dot"></span>Certified counselors, 1 adult per 8 campers</div>
+      <div class="highlight"><span class="dot"></span>All hiking &amp; craft gear provided — just bring a water bottle</div>
+      <div class="highlight"><span class="dot"></span>Daily photo updates shared with parents</div>
+      <div class="highlight"><span class="dot"></span>Nut-free site, full allergy accommodation on request</div>
+    </div>
+    <div class="logi-grid">
+      <div class="logi-chip"><div class="lbl">Drop-off</div><div class="val">8:30 – 9:00 AM</div></div>
+      <div class="logi-chip"><div class="lbl">Pick-up</div><div class="val">3:30 – 4:00 PM</div></div>
+      <div class="logi-chip"><div class="lbl">Location</div><div class="val">Centennial Park, Sydney</div></div>
+      <div class="logi-chip"><div class="lbl">Group size</div><div class="val">Max 32 campers</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" id="register" style="padding-bottom:56px;">
+  <div class="formsec" id="formsec">
+    <div class="form-body">
+      <div class="formsec-head">
+        <h2>Register for this camp</h2>
+        <p>No Sprout account needed — this takes about 3 minutes.</p>
+      </div>
+
+      <div class="fgroup-lbl">Child's Information <span class="req">Required</span></div>
+      <div class="frow">
+        <div class="field full"><label>Child's full name</label><input type="text" placeholder="e.g. Maya Ahmad" id="childName"></div>
+        <div class="field"><label>Date of birth</label><input type="date"></div>
+        <div class="field"><label>T-shirt size</label>
+          <select><option>Youth S</option><option>Youth M</option><option>Youth L</option><option>Adult S</option></select>
+        </div>
+        <div class="field full"><label>Allergies &amp; medical notes (optional)</label><textarea placeholder="e.g. Peanut allergy — carries an EpiPen. Leave blank if none."></textarea></div>
+      </div>
+
+      <div class="fgroup-lbl">Parent / Guardian <span class="req">Required</span></div>
+      <div class="frow">
+        <div class="field full"><label>Full name</label><input type="text" placeholder="Your full name" id="parentName"></div>
+        <div class="field"><label>Email</label><input type="email" placeholder="you@email.com" id="parentEmail"></div>
+        <div class="field"><label>Phone</label><input type="tel" placeholder="+61 4XX XXX XXX"></div>
+      </div>
+
+      <div class="fgroup-lbl">Emergency Contact <span class="req">Required</span></div>
+      <div class="frow">
+        <div class="field"><label>Full name</label><input type="text" placeholder="Contact's name"></div>
+        <div class="field"><label>Phone</label><input type="tel" placeholder="+61 4XX XXX XXX"></div>
+        <div class="field full"><label>Relationship to child</label>
+          <div class="relation-row">
+            <span class="relation-pill on">Grandparent</span><span class="relation-pill">Family friend</span><span class="relation-pill">Sibling</span><span class="relation-pill">Other</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="fgroup-lbl">Payment <span class="req">Required</span></div>
+      <div class="paycard">
+        <div class="order-row"><span>Nature Explorers Camp × 1 camper</span><span>$420.00</span></div>
+        <div class="order-row total"><span>Total due today</span><span>$420.00</span></div>
+      </div>
+      <div class="frow">
+        <div class="field full"><label>Name on card</label><input type="text" placeholder="Full name"></div>
+        <div class="field full"><label>Card number</label><input type="text" placeholder="1234 1234 1234 1234"></div>
+        <div class="field"><label>Expiry</label><input type="text" placeholder="MM/YY"></div>
+        <div class="field"><label>CVC</label><input type="text" placeholder="123"></div>
+      </div>
+
+      <div class="fgroup-lbl">Agreements <span class="req">Required</span></div>
+      <div class="waiver-box" id="waiverBox">
+        <div class="chk"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+        <div class="tx">I agree to the <a href="#">liability waiver</a> and consent to photo/video use of my child for camp promotional material.</div>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" disabled>Complete Registration — $420.00</button>
+      <div class="secure-note">🔒 Payments are processed securely. You'll receive an email confirmation immediately.</div>
+    </div>
+
+    <div class="confirm" id="confirmState">
+      <div class="confirm-icon">⛺</div>
+      <div class="confirm-eyebrow">You're Registered!</div>
+      <h2 id="confirmTitle">Maya's all set for Nature Explorers Camp 🌿</h2>
+      <p id="confirmSub">A confirmation has been sent to your.email@example.com. Green Pines Education will follow up with drop-off details closer to Jul 7.</p>
+      <div class="confirm-summary">
+        <div class="order-row"><span>Child</span><span style="font-weight:600;color:var(--text);" id="sumChild">Maya Ahmad</span></div>
+        <div class="order-row"><span>Camp</span><span style="font-weight:600;color:var(--text);">Nature Explorers Camp</span></div>
+        <div class="order-row"><span>Dates</span><span style="font-weight:600;color:var(--text);">Jul 7 – Jul 18, 2025</span></div>
+        <div class="order-row total"><span>Paid</span><span>$420.00</span></div>
+      </div>
+      <div class="appcta">
+        <h3>Keep track of it all in one place</h3>
+        <p>Download Sprout to see this registration, get camp updates, and discover more local events for your family.</p>
+        <div class="appbadge">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.5c-.02-2.4 1.96-3.55 2.05-3.6-1.12-1.63-2.86-1.86-3.48-1.88-1.48-.15-2.9.87-3.65.87-.76 0-1.9-.85-3.13-.83-1.6.02-3.09.94-3.92 2.38-1.68 2.9-.43 7.2 1.2 9.55.8 1.15 1.76 2.44 3.01 2.4 1.21-.05 1.67-.78 3.13-.78 1.46 0 1.87.78 3.15.76 1.3-.02 2.13-1.17 2.92-2.33.92-1.34 1.3-2.63 1.32-2.7-.03-.01-2.53-.97-2.55-3.84z"/><path d="M14.68 5.4c.66-.8 1.11-1.9 1-3.02-.96.04-2.13.64-2.82 1.44-.62.7-1.16 1.83-1.02 2.9 1.05.08 2.13-.53 2.84-1.32z"/></svg>
+          Download on the App Store
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>© 2025 Sprout · joinsprout.co</footer>
+
+<script>
+  var waiver = document.getElementById('waiverBox');
+  var submitBtn = document.getElementById('submitBtn');
+  waiver.addEventListener('click', function(){
+    waiver.classList.toggle('on');
+    submitBtn.disabled = !waiver.classList.contains('on');
+  });
+  document.querySelectorAll('.relation-pill').forEach(function(p){
+    p.addEventListener('click', function(){
+      p.parentElement.querySelectorAll('.relation-pill').forEach(function(x){ x.classList.remove('on'); });
+      p.classList.add('on');
+    });
+  });
+  submitBtn.addEventListener('click', function(){
+    if(submitBtn.disabled) return;
+    var childName = document.getElementById('childName').value || 'Your child';
+    var parentEmail = document.getElementById('parentEmail').value || 'your.email@example.com';
+    document.getElementById('confirmTitle').textContent = childName.split(' ')[0] + "'s all set for Nature Explorers Camp 🌿";
+    document.getElementById('sumChild').textContent = childName;
+    document.getElementById('confirmSub').textContent = 'A confirmation has been sent to ' + parentEmail + '. Green Pines Education will follow up with drop-off details closer to Jul 7.';
+    document.getElementById('formsec').classList.add('done');
+    document.getElementById('confirmState').classList.add('show');
+    window.scrollTo({top: document.getElementById('register').offsetTop - 20, behavior: 'smooth'});
+  });
+</script>
+</body>
+</html>

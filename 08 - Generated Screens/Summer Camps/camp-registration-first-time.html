@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camp Registration — First-Time Parent · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --brand-500: #186338; --brand-600: #134f2d; --brand-700: #1e3e2b; --brand-50: #e2e9e3; --brand-100: #d0dacf; --brand-200: #77b691;
+    --secondary-500: #f4f1ea; --secondary-600: #eae6db; --secondary-700: #dbd5c8; --secondary-800: #c2b9a6; --secondary-900: #aa9e83;
+    --grey-100: #e6e7ea; --grey-200: #cdcfd6; --grey-300: #b3b8c1; --grey-400: #9aa0ad; --grey-500: #818898; --grey-700: #4d525b; --grey-900: #1a1b1e;
+    --bg-primary: #f4f1ea; --content-primary: #4d525b; --content-secondary: #818898; --content-brand: #186338;
+    --surface-l0: #f4f1ea; --surface-l1: #eae6db; --surface-l2: #dbd5c8;
+    --camp-orange: #e07b39; --camp-orange-light: #fef3eb; --camp-orange-50: #fde8d4;
+    --danger: #c0533d; --danger-bg: #fae3dd;
+  }
+  body { background: #cfc8b8; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 48px 32px 80px; font-family: 'Inter', sans-serif; gap: 48px; flex-wrap: wrap; }
+  .variant-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 393px; }
+  .variant-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #5a5347; text-align:center; }
+  .goalcard { width: 100%; background: #fffdf8; border: 1px solid #e4ddcb; border-radius: 14px; padding: 13px 16px; }
+  .goalcard p { font-size: 12px; color: #4d4738; line-height: 1.55; }
+  .goalcard b { color: #23271f; }
+
+  .phone { width: 393px; height: 852px; background: var(--bg-primary); border-radius: 54px; overflow: hidden; position: relative;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04), 0 24px 80px rgba(0,0,0,0.22);
+    display: flex; flex-direction: column; }
+  .status-bar { height: 54px; background: var(--bg-primary); display: flex; align-items: center; justify-content: space-between; padding: 14px 28px 0; flex-shrink: 0; position: relative; z-index: 5; }
+  .status-time { font-size: 15px; font-weight: 600; color: var(--grey-900); }
+  .status-icons { display: flex; align-items: center; gap: 7px; }
+  .dynamic-island { width: 120px; height: 36px; background: #000; border-radius: 20px; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 10; }
+
+  .nav-header { background: var(--bg-primary); display: flex; align-items: center; padding: 8px 16px 12px; flex-shrink: 0; gap: 10px; }
+  .back-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-l1); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+  .back-btn svg { width: 16px; height: 16px; color: var(--content-primary); }
+  .nav-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--grey-900); }
+  .nav-sub { font-size: 12px; color: var(--content-secondary); margin-top: 1px; }
+
+  .screen-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 4px 20px 16px; }
+  .screen-body::-webkit-scrollbar { display: none; }
+
+  .camp-strip { display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 14px; padding: 10px 12px; margin-bottom: 18px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05); }
+  .camp-strip .ic { width: 40px; height: 40px; border-radius: 11px; background: var(--camp-orange-light); display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; }
+  .camp-strip .nm { font-size: 14px; font-weight: 700; color: var(--grey-900); }
+  .camp-strip .dt { font-size: 11.5px; color: var(--content-secondary); margin-top: 1px; }
+
+  .sec-lbl { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--content-secondary); margin: 20px 0 10px; }
+  .sec-lbl:first-of-type { margin-top: 0; }
+  .sec-lbl .req { color: var(--camp-orange); font-size: 10px; font-weight: 700; text-transform: none; letter-spacing: 0; background: var(--camp-orange-light); padding: 1px 7px; border-radius: 99px; }
+
+  /* Kid picker */
+  .kidpick { display: flex; flex-direction: column; gap: 8px; }
+  .kidcard { display: flex; align-items: center; gap: 11px; background: #fff; border: 1.5px solid var(--grey-100); border-radius: 14px; padding: 11px 13px; cursor: pointer; }
+  .kidcard.sel { border-color: var(--camp-orange); background: var(--camp-orange-light); }
+  .kidcard .av { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #fff; background: var(--brand-200); flex-shrink: 0; }
+  .kidcard .nm { font-size: 13.5px; font-weight: 600; color: var(--grey-900); }
+  .kidcard .age { font-size: 11.5px; color: var(--content-secondary); }
+  .kidcard .radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--grey-200); flex-shrink: 0; margin-left: auto; }
+  .kidcard.sel .radio { border-color: var(--camp-orange); background: var(--camp-orange); position: relative; }
+  .kidcard.sel .radio::after { content: ''; position: absolute; inset: 5px; border-radius: 50%; background: #fff; }
+
+  .addkid-btn { display: flex; align-items: center; justify-content: center; gap: 7px; border: 1.5px dashed var(--camp-orange); background: var(--camp-orange-light); color: var(--camp-orange); border-radius: 14px; padding: 12px; font-size: 13.5px; font-weight: 700; cursor: pointer; }
+  .addkid-btn svg { width: 16px; height: 16px; }
+
+  .newkid-form { display: none; flex-direction: column; gap: 8px; background: #fff; border: 1.5px solid var(--camp-orange-50); border-radius: 14px; padding: 12px; margin-top: 8px; }
+  .newkid-form.show { display: flex; }
+
+  /* Real inputs — first-time / empty state */
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--content-secondary); }
+  .field input, .field textarea, .field select { font-family: 'Inter', sans-serif; font-size: 14px; color: var(--grey-900); background: var(--surface-l0); border: 1.5px solid transparent; border-radius: 11px; padding: 11px 13px; outline: none; transition: border-color .15s, background .15s; }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--camp-orange); background: #fff; }
+  .field input::placeholder, .field textarea::placeholder { color: var(--grey-300); }
+  .field textarea { resize: none; min-height: 56px; font-family: inherit; }
+  .field-group { display: flex; flex-direction: column; gap: 10px; }
+  .field-row { display: flex; gap: 8px; }
+  .field-row .field { flex: 1; }
+
+  .relation-row { display: flex; gap: 7px; flex-wrap: wrap; }
+  .relation-pill { font-size: 12.5px; font-weight: 500; padding: 7px 13px; border-radius: 99px; border: 1.5px solid var(--grey-100); background: #fff; color: var(--content-primary); cursor: pointer; }
+  .relation-pill.on { background: var(--camp-orange); border-color: var(--camp-orange); color: #fff; }
+
+  /* Waiver */
+  .waiver-box { display: flex; gap: 11px; background: #fff; border: 1.5px solid var(--grey-100); border-radius: 14px; padding: 13px; cursor: pointer; }
+  .waiver-box .chk { width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--grey-300); flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: background .12s, border-color .12s; }
+  .waiver-box .chk svg { width: 13px; height: 13px; stroke: #fff; fill: none; stroke-width: 3; opacity: 0; }
+  .waiver-box.on .chk { background: var(--brand-500); border-color: var(--brand-500); }
+  .waiver-box.on .chk svg { opacity: 1; }
+  .waiver-box .tx { font-size: 12.5px; color: var(--content-primary); line-height: 1.5; }
+  .waiver-box .tx a { color: var(--content-brand); font-weight: 600; text-decoration: underline; }
+
+  .cta-dock { flex-shrink: 0; padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--grey-100); background: rgba(244,241,234,0.94); backdrop-filter: blur(12px); }
+  .cta-total { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .cta-total .lbl { font-size: 12px; color: var(--content-secondary); }
+  .cta-total .amt { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--grey-900); }
+  .primary-btn { width: 100%; height: 50px; border-radius: 14px; background: var(--camp-orange); border: none; font-size: 15px; font-weight: 700; color: #fff; cursor: pointer; box-shadow: 0 4px 14px rgba(224,123,57,0.35); transition: opacity .15s, box-shadow .15s; }
+  .primary-btn:disabled { opacity: .4; box-shadow: none; cursor: not-allowed; }
+
+  /* Payment screen */
+  .paycard { background: #fff; border-radius: 16px; padding: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06); margin-bottom: 14px; }
+  .order-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; color: var(--content-primary); }
+  .order-row.total { border-top: 1px dashed var(--grey-200); margin-top: 4px; padding-top: 10px; font-weight: 700; color: var(--grey-900); font-size: 15px; }
+  .paymethod { display: flex; align-items: center; gap: 10px; background: #fff; border: 1.5px solid var(--camp-orange); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; }
+  .paymethod .pic { width: 34px; height: 22px; border-radius: 4px; background: linear-gradient(135deg,#1a1b1e,#4d525b); flex-shrink: 0; }
+  .paymethod .tx { flex: 1; font-size: 13px; font-weight: 600; color: var(--grey-900); }
+  .paymethod .chev { color: var(--camp-orange); }
+
+  /* Success (adapted) */
+  .success-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 28px; text-align: center; }
+</style>
+</head>
+<body>
+
+<div style="width:100%;text-align:center;padding-bottom:8px;flex-basis:100%;">
+  <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#3a332a;margin-bottom:6px;">⛺ First-Time Registration — In-App</div>
+  <div style="font-size:13px;color:#7a7060;max-width:680px;margin:0 auto;line-height:1.6;">
+    Closes the gap in <code>summer-camps-flow.html</code>: that flow only ever showed a pre-filled Confirm sheet for an existing kid. This version supports a parent who's never registered before — zero kids on file, empty inputs instead of read-only values, plus the fields that were only marketing copy until now: emergency contact and a real waiver checkbox. Same camp-orange system, same tokens.
+  </div>
+</div>
+
+<!-- ═══ SCREEN A — Registration form (new parent, new kid) ═══ -->
+<div class="variant-wrap">
+  <div class="goalcard"><p><b>What's new:</b> "Who's coming?" now defaults to empty (no kids on file) and opens straight into <b>+ Add a new kid</b> — real inputs, not edit-pencils on fake data. Waiver checkbox is functional: <b>Continue</b> stays disabled until it's checked.</p></div>
+  <div class="phone">
+    <div class="status-bar"><span class="status-time">9:41</span><div class="dynamic-island"></div>
+      <div class="status-icons"><svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1b1e"/></svg></div>
+    </div>
+    <div class="nav-header">
+      <button class="back-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div><div class="nav-title">Register for Camp</div><div class="nav-sub">Step 1 of 2 · Details</div></div>
+    </div>
+
+    <div class="screen-body">
+      <div class="camp-strip"><div class="ic">⛺</div><div><div class="nm">Nature Explorers Camp</div><div class="dt">Jul 7 – Jul 18, 2025 · $420</div></div></div>
+
+      <div class="sec-lbl">Who's coming? <span class="req">Required</span></div>
+      <div class="kidpick" id="kidpick"></div>
+      <button class="addkid-btn" id="addKidBtn">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        Add a new kid
+      </button>
+      <div class="newkid-form" id="newKidForm">
+        <div class="field"><label>Child's full name</label><input type="text" id="nkName" placeholder="e.g. Maya Ahmad"></div>
+        <div class="field"><label>Date of birth</label><input type="date" id="nkDob"></div>
+        <div class="field"><label>Allergies &amp; medical notes (optional)</label><textarea placeholder="e.g. Peanut allergy — carries an EpiPen"></textarea></div>
+        <button class="addkid-btn" style="border-style:solid;background:var(--brand-500);border-color:var(--brand-500);color:#fff;" id="saveKidBtn">Save child</button>
+      </div>
+
+      <div class="sec-lbl">Parent / Guardian <span class="req">Required</span></div>
+      <div class="field-group">
+        <div class="field"><label>Full name</label><input type="text" placeholder="Your full name"></div>
+        <div class="field-row">
+          <div class="field"><label>Email</label><input type="email" placeholder="you@email.com"></div>
+          <div class="field"><label>Phone</label><input type="tel" placeholder="+61 4XX XXX XXX"></div>
+        </div>
+      </div>
+
+      <div class="sec-lbl">Emergency Contact <span class="req">Required</span></div>
+      <div class="field-group">
+        <div class="field-row">
+          <div class="field"><label>Full name</label><input type="text" placeholder="Contact's name"></div>
+          <div class="field"><label>Phone</label><input type="tel" placeholder="+61 4XX XXX XXX"></div>
+        </div>
+        <div class="field"><label>Relationship to child</label>
+          <div class="relation-row">
+            <span class="relation-pill on">Grandparent</span><span class="relation-pill">Family friend</span><span class="relation-pill">Sibling</span><span class="relation-pill">Other</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-lbl">Agreements <span class="req">Required</span></div>
+      <div class="waiver-box" id="waiverBox">
+        <div class="chk"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+        <div class="tx">I agree to the <a href="#">liability waiver</a> and consent to photo/video use for camp promotional material.</div>
+      </div>
+      <div style="height:8px;"></div>
+    </div>
+
+    <div class="cta-dock">
+      <div class="cta-total"><span class="lbl">Total for 1 camper</span><span class="amt">$420</span></div>
+      <button class="primary-btn" id="continueBtn" disabled onclick="location.href='#pay'">Continue to Payment</button>
+    </div>
+  </div>
+  <span class="variant-label">A — Registration form · new parent, new kid</span>
+</div>
+
+<!-- ═══ SCREEN B — Payment ═══ -->
+<div class="variant-wrap">
+  <div class="goalcard"><p><b>What's new:</b> no payment UI existed anywhere in the prior flow — only a static price total. This is the missing checkout step.</p></div>
+  <div class="phone">
+    <div class="status-bar"><span class="status-time">9:41</span><div class="dynamic-island"></div>
+      <div class="status-icons"><svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1b1e"/></svg></div>
+    </div>
+    <div class="nav-header">
+      <button class="back-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div><div class="nav-title">Payment</div><div class="nav-sub">Step 2 of 2 · Checkout</div></div>
+    </div>
+    <div class="screen-body">
+      <div class="sec-lbl" style="margin-top:6px;">Order Summary</div>
+      <div class="paycard">
+        <div class="order-row"><span>Nature Explorers Camp</span><span>$420</span></div>
+        <div class="order-row"><span style="color:var(--content-secondary);">Maya Ahmad · Jul 7–18</span><span></span></div>
+        <div class="order-row total"><span>Total due today</span><span>$420.00</span></div>
+      </div>
+
+      <div class="sec-lbl">Payment Method</div>
+      <div class="paymethod"><div class="pic"></div><div class="tx">•••• •••• •••• 4242</div><svg class="chev" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="field-group">
+        <div class="field"><label>Name on card</label><input type="text" placeholder="Full name"></div>
+        <div class="field"><label>Card number</label><input type="text" placeholder="1234 1234 1234 1234"></div>
+        <div class="field-row">
+          <div class="field"><label>Expiry</label><input type="text" placeholder="MM/YY"></div>
+          <div class="field"><label>CVC</label><input type="text" placeholder="123"></div>
+        </div>
+      </div>
+    </div>
+    <div class="cta-dock">
+      <div class="cta-total"><span class="lbl">Charging today</span><span class="amt">$420.00</span></div>
+      <button class="primary-btn" onclick="location.href='#success'">Pay &amp; Confirm Registration</button>
+    </div>
+  </div>
+  <span class="variant-label">B — Payment · checkout</span>
+</div>
+
+<!-- ═══ SCREEN C — Success ═══ -->
+<div class="variant-wrap">
+  <div class="goalcard"><p><b>What's new:</b> same success pattern as the existing flow, plus a nudge that this is now a saved profile — proof the "first time" cost pays off on the next registration.</p></div>
+  <div class="phone">
+    <div class="status-bar"><span class="status-time">9:44</span><div class="dynamic-island"></div>
+      <div class="status-icons"><svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1b1e"/></svg></div>
+    </div>
+    <div class="success-wrap">
+      <div style="width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,#e07b39,#f0a060);display:flex;align-items:center;justify-content:center;font-size:38px;margin-bottom:22px;box-shadow:0 8px 28px rgba(224,123,57,0.35);">⛺</div>
+      <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--camp-orange);margin-bottom:8px;">You're Registered!</div>
+      <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--grey-900);line-height:1.25;margin-bottom:10px;">Maya's all set for Nature Explorers Camp 🌿</div>
+      <div style="font-size:14px;color:var(--content-secondary);line-height:1.6;margin-bottom:20px;">A receipt was sent to your email. Maya's profile has been saved — next time, registering takes one tap.</div>
+      <div style="width:100%;background:#fff;border-radius:18px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.07);margin-bottom:24px;text-align:left;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;"><span style="color:var(--content-secondary);">Child</span><span style="font-weight:600;">Maya Ahmad</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;"><span style="color:var(--content-secondary);">Dates</span><span style="font-weight:600;">Jul 7 – Jul 18, 2025</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;"><span style="color:var(--content-secondary);">Paid</span><span style="font-weight:700;">$420.00</span></div>
+      </div>
+      <button style="width:100%;height:50px;border-radius:14px;background:var(--brand-500);border:none;font-size:15px;font-weight:700;color:#fff;cursor:pointer;margin-bottom:10px;">View in My Registrations</button>
+      <button style="width:100%;height:44px;border-radius:14px;background:var(--surface-l1);border:none;font-size:14px;font-weight:600;color:var(--content-primary);cursor:pointer;">Find More Camps</button>
+    </div>
+  </div>
+  <span class="variant-label">C — Success</span>
+</div>
+
+<script>
+  var kids = []; // starts empty — this is a first-time parent, the whole point of this screen
+  var pick = document.getElementById('kidpick');
+  var addBtn = document.getElementById('addKidBtn');
+  var form = document.getElementById('newKidForm');
+  var saveBtn = document.getElementById('saveKidBtn');
+  var waiver = document.getElementById('waiverBox');
+  var continueBtn = document.getElementById('continueBtn');
+
+  function renderKids(){
+    pick.innerHTML = kids.map(function(k, i){
+      return '<div class="kidcard sel" data-i="'+i+'"><div class="av">'+k.name[0]+'</div><div><div class="nm">'+k.name+'</div><div class="age">'+k.age+'</div></div><div class="radio"></div></div>';
+    }).join('');
+  }
+  function updateContinue(){
+    continueBtn.disabled = !waiver.classList.contains('on') || kids.length === 0;
+  }
+  addBtn.addEventListener('click', function(){ form.classList.toggle('show'); });
+  saveBtn.addEventListener('click', function(){
+    var name = document.getElementById('nkName').value || 'New child';
+    var dob = document.getElementById('nkDob').value;
+    kids.push({name: name, age: dob ? 'Age from ' + dob : 'Age not set'});
+    renderKids();
+    updateContinue();
+    form.classList.remove('show');
+    document.getElementById('nkName').value = '';
+    document.getElementById('nkDob').value = '';
+  });
+  waiver.addEventListener('click', function(){
+    waiver.classList.toggle('on');
+    updateContinue();
+  });
+
+  document.querySelectorAll('.relation-pill').forEach(function(p){
+    p.addEventListener('click', function(){
+      p.parentElement.querySelectorAll('.relation-pill').forEach(function(x){ x.classList.remove('on'); });
+      p.classList.add('on');
+    });
+  });
+</script>
+</body>
+</html>

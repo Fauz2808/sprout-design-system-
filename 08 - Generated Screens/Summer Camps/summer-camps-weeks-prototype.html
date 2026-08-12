@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Summer Camps — Select Weeks (Playable Prototype) · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --brand-500: #186338; --brand-600: #134f2d; --brand-700: #1e3e2b; --brand-50: #e2e9e3; --brand-100: #d0dacf; --brand-200: #77b691;
+    --secondary-500: #f4f1ea; --secondary-600: #eae6db; --secondary-700: #dbd5c8; --secondary-800: #c2b9a6; --secondary-900: #aa9e83;
+    --grey-100: #e6e7ea; --grey-200: #cdcfd6; --grey-300: #b3b8c1; --grey-400: #9aa0ad; --grey-500: #818898; --grey-700: #4d525b; --grey-900: #1a1b1e;
+    --bg-primary: #f4f1ea; --content-primary: #4d525b; --content-secondary: #818898; --content-brand: #186338;
+    --surface-l0: #f4f1ea; --surface-l1: #eae6db; --surface-l2: #dbd5c8;
+    --camp-orange: #e07b39; --camp-orange-light: #fef3eb; --camp-orange-50: #fde8d4;
+  }
+  body { background: #cfc8b8; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 44px 24px 80px; font-family: 'Inter', sans-serif; gap: 20px; }
+  .lede { max-width: 640px; text-align: center; margin-bottom: 4px; }
+  .lede h1 { font-family: 'Playfair Display', serif; font-size: 23px; font-weight: 600; color: #3a332a; margin-bottom: 8px; }
+  .lede p { font-size: 13px; color: #7a7060; line-height: 1.6; }
+  .lede b { color: #3a332a; }
+
+  .phone { width: 393px; height: 852px; background: var(--bg-primary); border-radius: 54px; overflow: hidden; position: relative;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04), 0 24px 80px rgba(0,0,0,0.22);
+    display: flex; flex-direction: column; }
+  .status-bar { height: 54px; background: var(--bg-primary); display: flex; align-items: center; justify-content: space-between; padding: 14px 28px 0; flex-shrink: 0; position: relative; z-index: 5; }
+  .status-time { font-size: 15px; font-weight: 600; color: var(--grey-900); }
+  .status-icons { display: flex; align-items: center; gap: 7px; }
+  .dynamic-island { width: 120px; height: 36px; background: #000; border-radius: 20px; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 40; }
+
+  .nav-header { background: var(--bg-primary); display: flex; align-items: center; padding: 8px 16px 12px; flex-shrink: 0; gap: 10px; }
+  .back-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-l1); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+  .back-btn svg { width: 16px; height: 16px; color: var(--content-primary); }
+  .nav-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--grey-900); }
+
+  .screen-body { flex: 1; overflow-y: auto; overflow-x: hidden; }
+  .screen-body::-webkit-scrollbar { display: none; }
+
+  /* Filter widget */
+  .filter-widget { background: #fff; border-radius: 20px; margin: 0 20px 14px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.08); }
+  .filter-widget-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--content-secondary); margin-bottom: 12px; }
+  .kid-selector { display: flex; gap: 10px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 2px; }
+  .kid-selector::-webkit-scrollbar { display: none; }
+  .kid-chip { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; flex-shrink: 0; }
+  .kid-avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; color: #fff; border: 2.5px solid transparent; position: relative; }
+  .kid-avatar.selected { border-color: var(--camp-orange); box-shadow: 0 0 0 3px rgba(224,123,57,0.18); }
+  .kid-avatar.selected::after { content: '✓'; position: absolute; bottom: -2px; right: -2px; width: 16px; height: 16px; border-radius: 50%; background: var(--camp-orange); color: #fff; font-size: 8px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 1.5px solid #fff; }
+  .kid-name { font-size: 10.5px; font-weight: 500; color: var(--content-primary); white-space: nowrap; }
+  .kid-name.selected { color: var(--camp-orange); font-weight: 600; }
+  .av-k1 { background: #e07b39; } .av-k2 { background: #3a7ca5; } .av-k3 { background: #9a5aaa; } .av-k4 { background: #5c8a5c; }
+
+  .filter-weeks { background: var(--surface-l0); border-radius: 12px; padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; transition: background .12s; }
+  .filter-weeks:active { background: var(--camp-orange-50); }
+  .filter-weeks svg { width: 16px; height: 16px; color: var(--camp-orange); flex-shrink: 0; }
+  .filter-weeks-text { flex: 1; }
+  .filter-weeks-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--content-secondary); margin-bottom: 2px; }
+  .filter-weeks-value { font-size: 13.5px; font-weight: 600; color: var(--grey-900); }
+  .filter-weeks-value.placeholder { color: var(--grey-300); font-weight: 400; }
+  .filter-weeks .chev { width: 14px; height: 14px; color: var(--grey-300); flex-shrink: 0; }
+
+  .week-tray { display: none; gap: 8px; flex-wrap: nowrap; overflow-x: auto; padding: 0 0 4px; margin-bottom: 2px; }
+  .week-tray.show { display: flex; }
+  .week-tray::-webkit-scrollbar { display: none; }
+  .week-ptag { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; background: var(--camp-orange); color: #fff; font-size: 12px; font-weight: 600; padding: 6px 8px 6px 12px; border-radius: 999px; white-space: nowrap; cursor: pointer; }
+  .week-ptag .x { width: 15px; height: 15px; display: grid; place-items: center; border-radius: 50%; background: rgba(255,255,255,.22); font-size: 10px; }
+
+  .filter-location { background: var(--surface-l0); border-radius: 12px; padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; margin-top: 2px; }
+  .filter-location svg { width: 16px; height: 16px; color: var(--camp-orange); flex-shrink: 0; }
+  .filter-location-text { flex: 1; }
+  .filter-location-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--content-secondary); margin-bottom: 2px; }
+  .filter-location-value { font-size: 13.5px; font-weight: 600; color: var(--grey-900); }
+
+  .filter-search-btn { width: 100%; height: 44px; border-radius: 12px; background: var(--camp-orange); border: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; color: #fff; cursor: pointer; font-family: inherit; }
+  .filter-search-btn svg { width: 15px; height: 15px; }
+
+  /* Camp list */
+  .camp-list { display: flex; flex-direction: column; gap: 10px; padding: 0 20px; }
+  .camp-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06); display: flex; transition: opacity .15s, transform .15s; }
+  .camp-card.hide { display: none; }
+  .camp-thumb { width: 88px; flex-shrink: 0; position: relative; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+  .camp-body { flex: 1; padding: 12px 14px; min-width: 0; }
+  .camp-tags { display: flex; gap: 5px; margin-bottom: 6px; flex-wrap: wrap; }
+  .camp-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; background: var(--camp-orange-light); color: var(--camp-orange); }
+  .camp-tag.age { background: var(--brand-50); color: var(--brand-600); }
+  .camp-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--grey-900); line-height: 1.3; margin-bottom: 5px; }
+  .camp-meta-row { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--content-secondary); margin-bottom: 2px; }
+  .camp-meta-row svg { width: 12px; height: 12px; color: var(--grey-400); flex-shrink: 0; }
+  .camp-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+  .camp-price { font-size: 14px; font-weight: 700; color: var(--grey-900); }
+  .camp-price span { font-size: 10.5px; font-weight: 400; color: var(--content-secondary); }
+  .camp-spots { font-size: 11px; font-weight: 500; color: #5c8a5c; }
+
+  .empty-state { display: none; flex-direction: column; align-items: center; text-align: center; padding: 48px 30px; }
+  .empty-state.show { display: flex; }
+  .empty-state .ic { font-size: 36px; margin-bottom: 12px; opacity: .6; }
+  .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--grey-900); margin-bottom: 6px; }
+  .empty-state p { font-size: 12.5px; color: var(--content-secondary); line-height: 1.5; }
+
+  /* Bottom sheet */
+  .scrim { position: absolute; inset: 0; background: rgba(20,20,15,0.45); opacity: 0; pointer-events: none; transition: opacity .22s; z-index: 20; }
+  .scrim.on { opacity: 1; pointer-events: auto; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 24px 24px 0 0; padding: 10px 20px 0; z-index: 21;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.2); max-height: 85%; display: flex; flex-direction: column;
+    transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
+  .sheet.on { transform: translateY(0); }
+  .sheet-handle { width: 36px; height: 4px; border-radius: 999px; background: var(--surface-l2); margin: 4px auto 14px; flex-shrink: 0; }
+  .sheet-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; flex-shrink: 0; }
+  .sheet-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 700; color: var(--grey-900); }
+  .sheet-subtitle { font-size: 12.5px; color: var(--content-secondary); margin-top: 3px; line-height: 1.5; max-width: 280px; }
+  .sheet-close { width: 30px; height: 30px; border-radius: 50%; background: var(--surface-l1); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; margin-top: 2px; }
+  .sheet-scroll { flex: 1; overflow-y: auto; padding-bottom: 8px; }
+  .sheet-scroll::-webkit-scrollbar { display: none; }
+
+  .weekrow { display: flex; align-items: center; gap: 12px; background: var(--surface-l0); border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; transition: background .12s; }
+  .weekrow.sel { background: var(--camp-orange-light); }
+  .week-check { width: 22px; height: 22px; border-radius: 7px; border: 2px solid #cfc7b5; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: background .12s, border-color .12s; }
+  .weekrow.sel .week-check { background: var(--camp-orange); border-color: var(--camp-orange); }
+  .week-check svg { width: 13px; height: 13px; color: #fff; opacity: 0; }
+  .weekrow.sel .week-check svg { opacity: 1; }
+  .week-info { flex: 1; min-width: 0; }
+  .week-name { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 14px; color: var(--grey-900); }
+  .week-dates { font-size: 12px; color: var(--content-secondary); margin-top: 1px; }
+  .week-note { font-size: 11px; color: var(--camp-orange); margin-top: 3px; font-weight: 500; }
+  .week-count { font-size: 11px; font-weight: 700; color: var(--camp-orange); background: var(--camp-orange-light); padding: 4px 10px; border-radius: 99px; flex-shrink: 0; white-space: nowrap; }
+  .weekrow.sel .week-count { background: #fff; }
+
+  .sheet-footer { flex-shrink: 0; padding: 12px 0 24px; display: flex; flex-direction: column; gap: 9px; background: #fff; }
+  .confirm-btn { width: 100%; height: 50px; border-radius: 14px; background: var(--camp-orange); border: none; font-size: 15px; font-weight: 700; color: #fff; cursor: pointer; box-shadow: 0 4px 14px rgba(224,123,57,.35); font-family: inherit; }
+  .edit-btn { width: 100%; height: 40px; border-radius: 14px; background: var(--surface-l1); border: none; font-size: 13.5px; font-weight: 600; color: var(--content-primary); cursor: pointer; font-family: inherit; }
+
+  .tab-bar { height: 78px; background: #fff; border-top: 1px solid var(--grey-100); display: flex; align-items: flex-start; padding: 10px 8px 0; flex-shrink: 0; }
+  .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .tab-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: var(--grey-300); }
+  .tab-icon.active { color: var(--content-brand); }
+  .tab-label { font-size: 10px; font-weight: 500; color: var(--grey-400); }
+  .tab-label.active { color: var(--content-brand); font-weight: 600; }
+  .tab-create { width: 52px; height: 52px; border-radius: 50%; background: var(--brand-500); border: none; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(24,99,56,0.38); flex-shrink: 0; margin-top: -12px; }
+  .tab-create svg { width: 22px; height: 22px; color: #fff; }
+</style>
+</head>
+<body>
+
+  <div class="lede">
+    <h1>🏕️ Select Camp Weeks — playable prototype</h1>
+    <p>Tap <b>"Which weeks?"</b> to open the sheet, check any combination of weeks, then <b>View Camps</b> — the list below filters live to only the camps running in your selected weeks. Tap a chip's ✕ to drop a week without reopening the sheet.</p>
+  </div>
+
+  <div class="phone">
+    <div class="status-bar"><span class="status-time">9:41</span><div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#1a1b1e"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#1a1b1e"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#1a1b1e"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="#1a1b1e" opacity="0.3"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1b1e"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#1a1b1e" opacity="0.4"/></svg>
+      </div>
+    </div>
+
+    <div class="nav-header" style="padding-top:12px;">
+      <button class="back-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div><div class="nav-title">Summer Camps</div><div style="font-size:12px;color:var(--content-secondary);margin-top:1px;">🌞 Available now · Sydney</div></div>
+    </div>
+
+    <div class="screen-body">
+      <div class="filter-widget">
+        <div class="filter-widget-title">⛺ Find a Camp For</div>
+
+        <div class="kid-selector">
+          <div class="kid-chip"><div class="kid-avatar av-k1 selected">L</div><span class="kid-name selected">Liam</span></div>
+          <div class="kid-chip"><div class="kid-avatar av-k2">S</div><span class="kid-name">Sofia</span></div>
+          <div class="kid-chip"><div class="kid-avatar av-k3">O</div><span class="kid-name">Oscar</span></div>
+          <div class="kid-chip"><div class="kid-avatar av-k4">A</div><span class="kid-name">Aria</span></div>
+        </div>
+
+        <div class="filter-weeks" id="weeksField">
+          <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <div class="filter-weeks-text">
+            <div class="filter-weeks-label">Which weeks?</div>
+            <div class="filter-weeks-value placeholder" id="weeksValue">Select weeks</div>
+          </div>
+          <svg class="chev" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+
+        <div class="week-tray" id="weekTray"></div>
+
+        <div class="filter-location">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+          <div class="filter-location-text"><div class="filter-location-label">Near</div><div class="filter-location-value">Sydney, NSW · 15 km radius</div></div>
+        </div>
+
+        <button class="filter-search-btn" id="searchBtn">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          <span id="searchBtnText">Show 8 Camps</span>
+        </button>
+      </div>
+
+      <div class="camp-list" id="campList">
+        <div class="camp-card" data-weeks="4,5">
+          <div class="camp-thumb" style="background:linear-gradient(160deg,#2a6648,#60b880);">🌿</div>
+          <div class="camp-body">
+            <div class="camp-tags"><span class="camp-tag">Outdoor</span><span class="camp-tag age">Ages 6–12</span></div>
+            <div class="camp-name">Nature Explorers Camp</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Week 4–5 · Jul 6 – Jul 17</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>Centennial Park, Randwick</div>
+            <div class="camp-footer"><div class="camp-price">$420 <span>/ 2 wks</span></div><div class="camp-spots">4 spots left</div></div>
+          </div>
+        </div>
+
+        <div class="camp-card" data-weeks="1">
+          <div class="camp-thumb" style="background:linear-gradient(160deg,#c85e20,#f0a060);">🎨</div>
+          <div class="camp-body">
+            <div class="camp-tags"><span class="camp-tag">Arts</span><span class="camp-tag age">Ages 5–10</span></div>
+            <div class="camp-name">Creative Kids Camp</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Week 1 · Jun 15 – Jun 19</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>The Creative Space, Bondi</div>
+            <div class="camp-footer"><div class="camp-price">$260 <span>/ wk</span></div><div class="camp-spots">9 spots left</div></div>
+          </div>
+        </div>
+
+        <div class="camp-card" data-weeks="2,3">
+          <div class="camp-thumb" style="background:linear-gradient(160deg,#1a4a8a,#4a8aca);">⚽</div>
+          <div class="camp-body">
+            <div class="camp-tags"><span class="camp-tag">Sport</span><span class="camp-tag age">Ages 7–14</span></div>
+            <div class="camp-name">Junior Soccer Camp</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Week 2–3 · Jun 22 – Jul 3</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>Moore Park Fields</div>
+            <div class="camp-footer"><div class="camp-price">$380 <span>/ 2 wks</span></div><div class="camp-spots">6 spots left</div></div>
+          </div>
+        </div>
+
+        <div class="camp-card" data-weeks="6,7">
+          <div class="camp-thumb" style="background:linear-gradient(160deg,#7a3a8a,#ba7aca);">💻</div>
+          <div class="camp-body">
+            <div class="camp-tags"><span class="camp-tag">STEM</span><span class="camp-tag age">Ages 8–14</span></div>
+            <div class="camp-name">Kids Coding Camp</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Week 6–7 · Jul 20 – Jul 31</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>Riverside Hall</div>
+            <div class="camp-footer"><div class="camp-price">$640 <span>/ 2 wks</span></div><div class="camp-spots">2 spots left</div></div>
+          </div>
+        </div>
+
+        <div class="camp-card" data-weeks="1,2">
+          <div class="camp-thumb" style="background:linear-gradient(160deg,#c0392b,#e77f6e);">🎭</div>
+          <div class="camp-body">
+            <div class="camp-tags"><span class="camp-tag">Performing Arts</span><span class="camp-tag age">Ages 6–11</span></div>
+            <div class="camp-name">Music &amp; Drama Camp</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Week 1–2 · Jun 15 – Jun 26</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>The Concourse, Chatswood</div>
+            <div class="camp-footer"><div class="camp-price">$400 <span>/ 2 wks</span></div><div class="camp-spots">7 spots left</div></div>
+          </div>
+        </div>
+
+        <div class="camp-card" data-weeks="8">
+          <div class="camp-thumb" style="background:linear-gradient(160deg,#186338,#4fa472);">🧗</div>
+          <div class="camp-body">
+            <div class="camp-tags"><span class="camp-tag">Adventure</span><span class="camp-tag age">Ages 9–14</span></div>
+            <div class="camp-name">Wild Adventure Camp</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Week 8 · Aug 3 – Aug 7</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>Lane Cove National Park</div>
+            <div class="camp-footer"><div class="camp-price">$310 <span>/ wk</span></div><div class="camp-spots">11 spots left</div></div>
+          </div>
+        </div>
+
+        <div class="camp-card" data-weeks="3,4">
+          <div class="camp-thumb" style="background:linear-gradient(160deg,#c08a2d,#f1c04a);">🔬</div>
+          <div class="camp-body">
+            <div class="camp-tags"><span class="camp-tag">STEM</span><span class="camp-tag age">Ages 7–12</span></div>
+            <div class="camp-name">Junior Science Camp</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Week 3–4 · Jun 29 – Jul 10</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>Austin Discovery Center</div>
+            <div class="camp-footer"><div class="camp-price">$350 <span>/ 2 wks</span></div><div class="camp-spots">15 spots left</div></div>
+          </div>
+        </div>
+
+        <div class="camp-card" data-weeks="5,6,7">
+          <div class="camp-thumb" style="background:linear-gradient(160deg,#8a3a6a,#ca7aac);">💃</div>
+          <div class="camp-body">
+            <div class="camp-tags"><span class="camp-tag">Dance</span><span class="camp-tag age">Ages 5–12</span></div>
+            <div class="camp-name">Rhythm &amp; Dance Camp</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Week 5–7 · Jul 13 – Jul 31</div>
+            <div class="camp-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>Surry Hills Community Centre</div>
+            <div class="camp-footer"><div class="camp-price">$540 <span>/ 3 wks</span></div><div class="camp-spots">3 spots left</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" id="emptyState">
+        <div class="ic">🏕️</div>
+        <h3>No camps match these weeks</h3>
+        <p>Try selecting different weeks, or clear your filter to see everything.</p>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5V21H15v-5h-6v5H3V10.5z"/></svg></div><span class="tab-label">Home</span></div>
+      <div class="tab-item"><div class="tab-icon active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></div><span class="tab-label active">Discover</span></div>
+      <div class="tab-create"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg></div>
+      <div class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M8 2v3M16 2v3M3 10h18"/></svg></div><span class="tab-label">Events</span></div>
+      <div class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></div><span class="tab-label">Profile</span></div>
+    </div>
+
+    <!-- Select Weeks sheet -->
+    <div class="scrim" id="scrim"></div>
+    <div class="sheet" id="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <div><div class="sheet-title">Select Camp Weeks</div><div class="sheet-subtitle">Choose one or more weeks — we'll show camps running in any of them</div></div>
+        <button class="sheet-close" id="sheetClose"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      </div>
+      <div class="sheet-scroll" id="weekList"></div>
+      <div class="sheet-footer">
+        <button class="confirm-btn" id="applyBtn">View Camps</button>
+        <button class="edit-btn" id="clearBtn">Clear all</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  var WEEKS = [
+    { n:1, label:'Jun 15 – Jun 19', count:14 },
+    { n:2, label:'Jun 22 – Jun 26', count:11 },
+    { n:3, label:'Jun 29 – Jul 3', count:6, note:'Short week — no camp Fri, Jul 4' },
+    { n:4, label:'Jul 6 – Jul 10', count:9 },
+    { n:5, label:'Jul 13 – Jul 17', count:12 },
+    { n:6, label:'Jul 20 – Jul 24', count:8 },
+    { n:7, label:'Jul 27 – Jul 31', count:10 },
+    { n:8, label:'Aug 3 – Aug 7', count:7 }
+  ];
+  var selected = new Set();
+  var draft = new Set(); // working selection while sheet is open
+
+  var weekList = document.getElementById('weekList');
+  var weeksField = document.getElementById('weeksField');
+  var weeksValue = document.getElementById('weeksValue');
+  var weekTray = document.getElementById('weekTray');
+  var scrim = document.getElementById('scrim');
+  var sheet = document.getElementById('sheet');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.camp-card'));
+  var emptyState = document.getElementById('emptyState');
+  var searchBtnText = document.getElementById('searchBtnText');
+  var TOTAL_CAMPS = cards.length;
+
+  function renderWeekList(){
+    weekList.innerHTML = WEEKS.map(function(w){
+      var sel = draft.has(w.n);
+      return '<div class="weekrow'+(sel?' sel':'')+'" data-n="'+w.n+'">' +
+        '<div class="week-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>' +
+        '<div class="week-info"><div class="week-name">Week '+w.n+'</div><div class="week-dates">'+w.label+'</div>'+(w.note?'<div class="week-note">'+w.note+'</div>':'')+'</div>' +
+        '<div class="week-count">'+w.count+' camps</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function openSheet(){
+    draft = new Set(selected);
+    renderWeekList();
+    updateApplyBtn();
+    scrim.classList.add('on');
+    sheet.classList.add('on');
+  }
+  function closeSheet(){
+    scrim.classList.remove('on');
+    sheet.classList.remove('on');
+  }
+  function updateApplyBtn(){
+    document.getElementById('applyBtn').textContent = draft.size === 0 ? 'View All Camps' : 'View Camps for ' + draft.size + ' Week' + (draft.size > 1 ? 's' : '');
+  }
+
+  weeksField.addEventListener('click', openSheet);
+  document.getElementById('sheetClose').addEventListener('click', closeSheet);
+  scrim.addEventListener('click', closeSheet);
+
+  weekList.addEventListener('click', function(e){
+    var row = e.target.closest('.weekrow'); if(!row) return;
+    var n = parseInt(row.dataset.n, 10);
+    if(draft.has(n)) draft.delete(n); else draft.add(n);
+    renderWeekList();
+    updateApplyBtn();
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', function(){
+    draft = new Set();
+    renderWeekList();
+    updateApplyBtn();
+  });
+
+  document.getElementById('applyBtn').addEventListener('click', function(){
+    selected = new Set(draft);
+    applySelection();
+    closeSheet();
+  });
+
+  function applySelection(){
+    if(selected.size === 0){
+      weeksValue.textContent = 'Select weeks';
+      weeksValue.classList.add('placeholder');
+      weekTray.classList.remove('show');
+      weekTray.innerHTML = '';
+      cards.forEach(function(c){ c.classList.remove('hide'); });
+      emptyState.classList.remove('show');
+      searchBtnText.textContent = 'Show ' + TOTAL_CAMPS + ' Camps';
+      return;
+    }
+    weeksValue.textContent = selected.size + ' week' + (selected.size > 1 ? 's' : '') + ' selected';
+    weeksValue.classList.remove('placeholder');
+
+    weekTray.classList.add('show');
+    weekTray.innerHTML = Array.from(selected).sort(function(a,b){return a-b;}).map(function(n){
+      var w = WEEKS.find(function(x){ return x.n === n; });
+      return '<span class="week-ptag" data-n="'+n+'">Week '+n+' · '+w.label+' <span class="x">✕</span></span>';
+    }).join('');
+
+    var visible = 0;
+    cards.forEach(function(c){
+      var weeks = c.dataset.weeks.split(',').map(Number);
+      var match = weeks.some(function(w){ return selected.has(w); });
+      c.classList.toggle('hide', !match);
+      if(match) visible++;
+    });
+    emptyState.classList.toggle('show', visible === 0);
+    searchBtnText.textContent = visible === 0 ? 'No Camps Match' : 'Show ' + visible + ' Camp' + (visible > 1 ? 's' : '');
+  }
+
+  document.getElementById('searchBtn').addEventListener('click', function(){
+    var body = document.querySelector('.screen-body');
+    var list = document.getElementById('campList');
+    body.scrollTo({ top: list.offsetTop - 12, behavior: 'smooth' });
+  });
+
+  weekTray.addEventListener('click', function(e){
+    var chip = e.target.closest('.week-ptag'); if(!chip) return;
+    var n = parseInt(chip.dataset.n, 10);
+    selected.delete(n);
+    applySelection();
+  });
+</script>
+</body>
+</html>
