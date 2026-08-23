@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Add To-Do — UI States (for Syed) · Sprout</title>
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --field:#e8e4d9; --fg:#1a1a17; --muted:#8a8578;
+    --border:#d8d3c7; --green:#2d5c2e; --green-mid:#3d7a40; --green-sage:#8aab86;
+    --green-soft:#e8f0e8; --tag-bg:#ece9e2;
+    --t-event:#2d5c2e; --t-noschool:#c0533d; --t-special:#c08a2d;
+    --t-todo:#3b6ea5; --t-todo-bg:#e1ecf7;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:#cfcabd;font-family:var(--font);font-size:15px;color:var(--fg);-webkit-font-smoothing:antialiased;padding:40px 28px 60px;}
+  .board-head{text-align:center;margin-bottom:36px;}
+  .board-head .k{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#6a665a;margin:0 0 8px;}
+  .board-head h1{font-family:Georgia,serif;font-weight:normal;font-size:27px;margin:0 0 6px;color:#2a2820;}
+  .board-head p{font-size:13.5px;color:#5a5648;margin:0;}
+  .grid{display:flex;flex-wrap:wrap;gap:34px 30px;justify-content:center;align-items:flex-start;max-width:1500px;margin:0 auto;}
+  .cell{display:flex;flex-direction:column;align-items:center;gap:12px;width:300px;}
+  .cap{text-align:center;}
+  .cap .n{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;font-size:12px;font-weight:700;line-height:22px;font-family:var(--mono);margin-bottom:6px;}
+  .cap .t{font-size:14px;font-weight:700;color:#2a2820;}
+  .cap .d{font-size:12px;color:#5a5648;margin-top:3px;line-height:1.4;max-width:260px;}
+
+  /* device */
+  .device{position:relative;width:300px;height:600px;border-radius:44px;padding:9px;background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 16px 40px -10px rgba(0,0,0,.4);}
+  .island{position:absolute;top:16px;left:50%;transform:translateX(-50%);width:92px;height:27px;background:#000;border-radius:999px;z-index:5;}
+  .screen{position:relative;width:100%;height:100%;background:var(--bg);border-radius:36px;overflow:hidden;display:flex;flex-direction:column;}
+  .sb{flex:0 0 34px;padding:13px 20px 0;display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--fg);}
+  .sb .dot3{letter-spacing:1px;}
+  .scr{flex:1 1 auto;overflow:hidden;}
+
+  .hd{padding:6px 13px 8px;display:flex;align-items:center;gap:8px;}
+  .hd .bk svg{width:18px;height:18px;stroke:var(--fg);fill:none;stroke-width:2;}
+  .hd .ti{flex:1;text-align:center;font-size:14px;font-weight:600;}
+  .hd .sp{width:18px;}
+
+  .body{padding:2px 14px;}
+  .datec{background:var(--field);border-radius:11px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:13px;}
+  .datec svg{width:17px;height:17px;stroke:var(--muted);fill:none;stroke-width:1.8;}
+  .datec .l{font-size:10px;color:var(--muted);} .datec .v{font-size:13px;font-weight:700;margin-top:1px;}
+
+  .fl{font-size:11px;font-weight:600;margin:0 1px 6px;}
+  .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--field);border-radius:11px;padding:4px;margin-bottom:14px;}
+  .chip{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:8px;font-size:9.5px;font-weight:600;color:var(--muted);}
+  .chip .e{font-size:13px;}
+  .chip.on{background:var(--surface);color:var(--t-todo);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+
+  .bf{background:var(--field);border:1.5px solid transparent;border-radius:13px;padding:10px 12px;margin-bottom:12px;}
+  .bf.focus{border-color:var(--green-sage);background:#fff;}
+  .bf .l{font-size:11px;color:var(--muted);margin-bottom:3px;}
+  .bf .l span{font-weight:400;}
+  .bf .val{font-size:14px;color:var(--fg);} .bf .ph{font-size:14px;color:#b3ae9f;}
+  .caret{display:inline-block;width:1.5px;height:16px;background:var(--green-mid);vertical-align:-3px;animation:bl 1s steps(1) infinite;}
+  @keyframes bl{50%{opacity:0;}}
+
+  .optrow{display:flex;align-items:center;gap:9px;background:var(--field);border-radius:13px;padding:10px 12px;margin-bottom:12px;}
+  .optrow > svg{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:1.8;flex-shrink:0;}
+  .optrow .ot{flex:1;font-size:12.5px;font-weight:600;} .optrow .ot span{font-weight:400;color:var(--muted);font-size:11px;}
+  .optrow .od{font-size:12.5px;font-weight:700;color:var(--t-todo);} .optrow .od.empty{color:#b3ae9f;font-weight:500;}
+
+  .linkrow{display:flex;align-items:center;gap:8px;}
+  .linkrow svg{width:15px;height:15px;stroke:var(--muted);fill:none;stroke-width:2;flex-shrink:0;}
+  .linkrow .val{font-size:13px;color:var(--t-todo);} .linkrow .ph{font-size:13px;color:#b3ae9f;}
+
+  .seg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;background:var(--field);padding:4px;border-radius:11px;margin-bottom:11px;}
+  .seg .s{padding:8px 2px;border-radius:8px;font-size:10.5px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .seg .s .i{font-size:13px;}
+  .seg .s.on{background:var(--surface);color:var(--t-todo);box-shadow:0 1px 3px rgba(0,0,0,.1);}
+
+  .choose{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1.5px solid var(--t-todo);border-radius:11px;background:var(--t-todo-bg);margin-bottom:10px;}
+  .choose .ic{width:30px;height:30px;border-radius:8px;background:#fff;display:grid;place-items:center;font-size:14px;flex-shrink:0;}
+  .choose .ct .a{font-size:12.5px;font-weight:700;color:var(--t-todo);} .choose .ct .b{font-size:11px;color:#5d7e9e;margin-top:1px;}
+  .choose .cx{margin-left:auto;color:var(--t-todo);} .choose .cx svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;}
+
+  .hint{display:flex;gap:7px;align-items:flex-start;font-size:11px;color:var(--muted);line-height:1.4;padding:0 2px;}
+  .hint svg{width:13px;height:13px;stroke:var(--t-todo);fill:none;stroke-width:2;flex-shrink:0;margin-top:1px;}
+
+  /* picker sheet (state 5) */
+  .ovl{position:absolute;inset:0;background:rgba(20,20,15,.45);border-radius:36px;z-index:10;}
+  .sheet{position:absolute;left:0;right:0;bottom:0;top:64px;background:#fff;border-radius:20px 20px 0 0;z-index:11;display:flex;flex-direction:column;overflow:hidden;}
+  .grab{width:32px;height:4px;border-radius:99px;background:var(--border);margin:9px auto 4px;}
+  .sh-h{padding:2px 15px 10px;border-bottom:1px solid var(--border);}
+  .sh-h .t{font-size:15px;font-weight:700;} .sh-h .s{font-size:11px;color:var(--muted);margin-top:1px;}
+  .srch{display:flex;align-items:center;gap:7px;background:var(--field);border-radius:9px;padding:8px 10px;margin-top:9px;}
+  .srch svg{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2;} .srch .ph{font-size:12.5px;color:#b3ae9f;}
+  .quick{display:flex;gap:7px;padding:9px 15px 3px;} .quick b{font-size:11px;font-weight:600;color:var(--t-todo);background:var(--t-todo-bg);border-radius:99px;padding:5px 11px;}
+  .pl{flex:1;overflow:hidden;padding:2px 15px;}
+  .pr{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--border);}
+  .pr:first-child{border-top:none;}
+  .pav{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#8fba92,#5a8f5d);display:grid;place-items:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0;}
+  .pr .pn{flex:1;font-size:13px;font-weight:600;} .pr .pq{font-size:10.5px;color:var(--muted);}
+  .pc{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);flex-shrink:0;display:grid;place-items:center;}
+  .pc svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:3;opacity:0;}
+  .pr.on .pc{background:var(--t-todo);border-color:var(--t-todo);} .pr.on .pc svg{opacity:1;}
+  .sh-f{padding:10px 15px 16px;border-top:1px solid var(--border);}
+  .done{background:var(--t-todo);color:#fff;border-radius:11px;text-align:center;padding:12px;font-size:14px;font-weight:700;}
+
+  .note{max-width:1100px;margin:40px auto 0;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 22px;}
+  .note h2{font-family:Georgia,serif;font-weight:normal;font-size:17px;margin:0 0 10px;}
+  .note ul{margin:0;padding-left:20px;} .note li{font-size:13px;line-height:1.6;color:#3a3830;margin-bottom:3px;}
+  .note b{color:var(--green);}
+</style>
+</head>
+<body>
+  <div class="board-head">
+    <p class="k">Sprout · Hand-off spec for Syed</p>
+    <h1>Add To-Do — UI states</h1>
+    <p>Approved single-to-do flow (4th note type). Each state below is what to build. Live prototype: add-note-todo-single.html</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- helper macro is inlined per phone -->
+
+    <!-- 1 · EMPTY -->
+    <div class="cell">
+      <div class="cap"><span class="n">1</span><div class="t">Empty state</div><div class="d">Opens focused, keyboard up. No pre-filled text — placeholder only.</div></div>
+      <div class="device"><span class="island"></span><div class="screen">
+        <div class="sb"><span>9:41</span><span class="dot3">•••  ᯤ  ▰</span></div>
+        <div class="scr">
+          <div class="hd"><span class="bk"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></span><span class="ti">Add To-Do</span><span class="sp"></span></div>
+          <div class="body">
+            <div class="datec"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div><div class="l">Selected Date</div><div class="v">Thursday, June 12</div></div></div>
+            <div class="fl">Note type</div>
+            <div class="chips"><div class="chip"><span class="e">📝</span>Event</div><div class="chip"><span class="e">🚫</span>No School</div><div class="chip"><span class="e">⭐</span>Special</div><div class="chip on"><span class="e">✅</span>To-Do</div></div>
+            <div class="bf focus"><div class="l">Describe to-do</div><div class="ph">e.g. Bring a white dress to school<span class="caret"></span></div></div>
+            <div class="optrow"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div class="ot">Deadline <span>(optional)</span></div><div class="od empty">Set date</div></div>
+            <div class="bf"><div class="l">Attach a link <span>(optional)</span></div><div class="linkrow"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg><span class="ph">Paste a URL</span></div></div>
+            <div class="fl">Assign to</div>
+            <div class="seg"><div class="s on"><span class="i">👥</span>Everyone</div><div class="s"><span class="i">🙋</span>Specific</div><div class="s"><span class="i">🔒</span>Just me</div></div>
+            <div class="hint"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span>Everyone in this class group will get this to-do.</span></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- 2 · TYPED -->
+    <div class="cell">
+      <div class="cap"><span class="n">2</span><div class="t">Filled · Everyone</div><div class="d">User typed a to-do. Default assignment is Everyone.</div></div>
+      <div class="device"><span class="island"></span><div class="screen">
+        <div class="sb"><span>9:41</span><span class="dot3">•••  ᯤ  ▰</span></div>
+        <div class="scr">
+          <div class="hd"><span class="bk"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></span><span class="ti">Add To-Do</span><span class="sp"></span></div>
+          <div class="body">
+            <div class="datec"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div><div class="l">Selected Date</div><div class="v">Thursday, June 12</div></div></div>
+            <div class="fl">Note type</div>
+            <div class="chips"><div class="chip"><span class="e">📝</span>Event</div><div class="chip"><span class="e">🚫</span>No School</div><div class="chip"><span class="e">⭐</span>Special</div><div class="chip on"><span class="e">✅</span>To-Do</div></div>
+            <div class="bf focus"><div class="l">Describe to-do</div><div class="val">Bring a white dress to school</div></div>
+            <div class="optrow"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div class="ot">Deadline <span>(optional)</span></div><div class="od empty">Set date</div></div>
+            <div class="bf"><div class="l">Attach a link <span>(optional)</span></div><div class="linkrow"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg><span class="ph">Paste a URL</span></div></div>
+            <div class="fl">Assign to</div>
+            <div class="seg"><div class="s on"><span class="i">👥</span>Everyone</div><div class="s"><span class="i">🙋</span>Specific</div><div class="s"><span class="i">🔒</span>Just me</div></div>
+            <div class="hint"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span>Everyone in this class group will get this to-do.</span></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- 3 · DEADLINE + LINK -->
+    <div class="cell">
+      <div class="cap"><span class="n">3</span><div class="t">Deadline + link set</div><div class="d">Both optionals filled. Deadline uses the native date picker.</div></div>
+      <div class="device"><span class="island"></span><div class="screen">
+        <div class="sb"><span>9:41</span><span class="dot3">•••  ᯤ  ▰</span></div>
+        <div class="scr">
+          <div class="hd"><span class="bk"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></span><span class="ti">Add To-Do</span><span class="sp"></span></div>
+          <div class="body">
+            <div class="datec"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div><div class="l">Selected Date</div><div class="v">Thursday, June 12</div></div></div>
+            <div class="fl">Note type</div>
+            <div class="chips"><div class="chip"><span class="e">📝</span>Event</div><div class="chip"><span class="e">🚫</span>No School</div><div class="chip"><span class="e">⭐</span>Special</div><div class="chip on"><span class="e">✅</span>To-Do</div></div>
+            <div class="bf focus"><div class="l">Describe to-do</div><div class="val">Bring towels for water day</div></div>
+            <div class="optrow"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div class="ot">Deadline <span>(optional)</span></div><div class="od">Fri, Jun 13</div></div>
+            <div class="bf"><div class="l">Attach a link <span>(optional)</span></div><div class="linkrow"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg><span class="val">forms.gle/water-day-signup</span></div></div>
+            <div class="fl">Assign to</div>
+            <div class="seg"><div class="s on"><span class="i">👥</span>Everyone</div><div class="s"><span class="i">🙋</span>Specific</div><div class="s"><span class="i">🔒</span>Just me</div></div>
+            <div class="hint"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span>Everyone in this class group will get this to-do.</span></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- 4 · SPECIFIC SELECTED -->
+    <div class="cell">
+      <div class="cap"><span class="n">4</span><div class="t">Assign → Specific</div><div class="d">People chosen. "Choose people" row summarises the selection.</div></div>
+      <div class="device"><span class="island"></span><div class="screen">
+        <div class="sb"><span>9:41</span><span class="dot3">•••  ᯤ  ▰</span></div>
+        <div class="scr">
+          <div class="hd"><span class="bk"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></span><span class="ti">Add To-Do</span><span class="sp"></span></div>
+          <div class="body">
+            <div class="datec"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div><div class="l">Selected Date</div><div class="v">Thursday, June 12</div></div></div>
+            <div class="fl">Note type</div>
+            <div class="chips"><div class="chip"><span class="e">📝</span>Event</div><div class="chip"><span class="e">🚫</span>No School</div><div class="chip"><span class="e">⭐</span>Special</div><div class="chip on"><span class="e">✅</span>To-Do</div></div>
+            <div class="bf focus"><div class="l">Describe to-do</div><div class="val">Bring a pop-up shade tent</div></div>
+            <div class="optrow"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div class="ot">Deadline <span>(optional)</span></div><div class="od empty">Set date</div></div>
+            <div class="fl">Assign to</div>
+            <div class="seg"><div class="s"><span class="i">👥</span>Everyone</div><div class="s on"><span class="i">🙋</span>Specific</div><div class="s"><span class="i">🔒</span>Just me</div></div>
+            <div class="choose"><div class="ic">🙋</div><div class="ct"><div class="a">Sarah Park +4 more</div><div class="b">5 parents selected · tap to edit</div></div><div class="cx"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div></div>
+            <div class="hint"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span>Only the parents you choose will get this to-do.</span></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- 5 · PICKER OPEN -->
+    <div class="cell">
+      <div class="cap"><span class="n">5</span><div class="t">People picker (sheet)</div><div class="d">Scrollable, searchable list of the whole group. Select all / clear.</div></div>
+      <div class="device"><span class="island"></span><div class="screen">
+        <div class="sb"><span>9:41</span><span class="dot3">•••  ᯤ  ▰</span></div>
+        <div class="scr">
+          <div class="hd"><span class="bk"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></span><span class="ti">Add To-Do</span><span class="sp"></span></div>
+          <div class="body"><div class="datec" style="opacity:.5"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div><div class="l">Selected Date</div><div class="v">Thursday, June 12</div></div></div></div>
+          <div class="ovl"></div>
+          <div class="sheet">
+            <div class="grab"></div>
+            <div class="sh-h"><div class="t">Who's this for?</div><div class="s">Kinder · Miss Taylor's Class · 25 parents</div>
+              <div class="srch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span class="ph">Search parents…</span></div></div>
+            <div class="quick"><b>Select all</b><b>Clear</b></div>
+            <div class="pl">
+              <div class="pr on"><div class="pav">SP</div><div><div class="pn">Sarah Park</div><div class="pq">Kennedy's mom</div></div><div class="pc"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div></div>
+              <div class="pr on"><div class="pav">EM</div><div><div class="pn">Emily Miller</div><div class="pq">Jake's mom</div></div><div class="pc"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div></div>
+              <div class="pr"><div class="pav">MC</div><div><div class="pn">Marcus Chen</div><div class="pq">Oliver's dad</div></div><div class="pc"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div></div>
+              <div class="pr"><div class="pav">PP</div><div><div class="pn">Priya Patel</div><div class="pq">Aanya's mom</div></div><div class="pc"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div></div>
+              <div class="pr"><div class="pav">JM</div><div><div class="pn">James Martin</div><div class="pq">Cooper's dad</div></div><div class="pc"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div></div>
+            </div>
+            <div class="sh-f"><div class="done">Done · 2 selected</div></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- 6 · JUST ME -->
+    <div class="cell">
+      <div class="cap"><span class="n">6</span><div class="t">Assign → Just me</div><div class="d">Private to-do. No picker. Only the creator sees it.</div></div>
+      <div class="device"><span class="island"></span><div class="screen">
+        <div class="sb"><span>9:41</span><span class="dot3">•••  ᯤ  ▰</span></div>
+        <div class="scr">
+          <div class="hd"><span class="bk"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></span><span class="ti">Add To-Do</span><span class="sp"></span></div>
+          <div class="body">
+            <div class="datec"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div><div class="l">Selected Date</div><div class="v">Thursday, June 12</div></div></div>
+            <div class="fl">Note type</div>
+            <div class="chips"><div class="chip"><span class="e">📝</span>Event</div><div class="chip"><span class="e">🚫</span>No School</div><div class="chip"><span class="e">⭐</span>Special</div><div class="chip on"><span class="e">✅</span>To-Do</div></div>
+            <div class="bf focus"><div class="l">Describe to-do</div><div class="val">Pack Cooper's swim bag</div></div>
+            <div class="optrow"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div class="ot">Deadline <span>(optional)</span></div><div class="od">Today</div></div>
+            <div class="bf"><div class="l">Attach a link <span>(optional)</span></div><div class="linkrow"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg><span class="ph">Paste a URL</span></div></div>
+            <div class="fl">Assign to</div>
+            <div class="seg"><div class="s"><span class="i">👥</span>Everyone</div><div class="s"><span class="i">🙋</span>Specific</div><div class="s on"><span class="i">🔒</span>Just me</div></div>
+            <div class="hint"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span>Private — only you will see this to-do.</span></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <h2>Build notes for Syed</h2>
+    <ul>
+      <li><b>To-Do is the 4th note type.</b> Selecting it swaps the form to: one-line describe + optional deadline + optional link + Assign-to. Event / No School / Special keep their Title + Details form (no assign-to).</li>
+      <li><b>"Describe to-do"</b> is the field label (not "Title"). One line, no details field.</li>
+      <li><b>Empty state (1):</b> field is blank + auto-focused (keyboard opens). Placeholder only — never pre-fill text.</li>
+      <li><b>Deadline + link are optional</b> — both can be left unset. Deadline uses the platform native date picker; link is a plain URL field.</li>
+      <li><b>Assign-to:</b> Everyone (default) · Specific · Just me. The hint line under the segment changes per mode (states 2/4/6).</li>
+      <li><b>Specific (4 & 5):</b> opens the people sheet — full group, searchable, with Select all / Clear and a "Done · N selected" button. Selecting writes back to the "Choose people" summary row. This replaces the old cramped 2-name list.</li>
+      <li>Use the live prototype <b>add-note-todo-single.html</b> as the source of truth for spacing, colors, and interactions.</li>
+    </ul>
+  </div>
+</body>
+</html>

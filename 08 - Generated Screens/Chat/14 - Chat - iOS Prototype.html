@@ -1,0 +1,2013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Sprout Chat – WhatsApp iOS Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────── RESET ─────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* ─────────────────────────────── TOKENS ─────────────────────────────── */
+:root {
+  --brand:   #186338;
+  --brand-d: #145530;
+  --brand-dd:#1e3e2b;
+  --brand-l: #e2e9e3;
+  --bg:      #f4f1ea;
+  --s1:      #eae6db;
+  --s2:      #dbd5c8;
+  --s3:      #ccc5b5;
+  --tp:      #4d525b;
+  --ts:      #818898;
+  --tt:      #b3b8c1;
+  --border:  rgba(0,0,0,.08);
+  --chat-bg: #f0ece1;
+}
+
+/* ─────────────────────────────── OUTER ─────────────────────────────── */
+body {
+  min-height: 100vh;
+  background: linear-gradient(140deg,#aca49a 0%,#c9c2b4 50%,#a9a296 100%);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 52px 0 80px;
+  font-family: 'Inter', -apple-system, sans-serif;
+  user-select: none;
+}
+
+/* ─────────────────────────────── PHONE ─────────────────────────────── */
+.phone {
+  width: 393px; height: 852px;
+  background: var(--bg);
+  border-radius: 54px; overflow: hidden; position: relative;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.12),
+    0 0 0 10px #1c1c1e, 0 0 0 12px #2c2c2e,
+    0 60px 130px rgba(0,0,0,.55);
+}
+.phone::before {
+  content:''; position:absolute; left:-13px; top:120px;
+  width:4px; height:32px; background:#2a2a2a;
+  border-radius:2px 0 0 2px;
+  box-shadow:0 44px 0 #2a2a2a,0 88px 0 #2a2a2a; z-index:200;
+}
+.phone::after {
+  content:''; position:absolute; right:-13px; top:148px;
+  width:4px; height:66px; background:#2a2a2a;
+  border-radius:0 2px 2px 0; z-index:200;
+}
+.island {
+  position:absolute; top:14px; left:50%; transform:translateX(-50%);
+  width:120px; height:34px; background:#0a0a0a;
+  border-radius:18px; z-index:150; pointer-events:none;
+}
+
+/* ─────────────────────────────── SCREENS ─────────────────────────────── */
+.sc-wrap { position:absolute; inset:0; overflow:hidden; border-radius:54px; }
+
+.screen {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  background:var(--bg);
+  will-change:transform; backface-visibility:hidden;
+}
+.screen.right  { transform:translateX(100%); pointer-events:none; }
+.screen.left   { transform:translateX(-28%); filter:brightness(.88); pointer-events:none; }
+
+/* Navigation keyframes */
+@keyframes pushIn  { from{transform:translateX(100%)}    to{transform:translateX(0)} }
+@keyframes pushOut { from{transform:translateX(0);filter:brightness(1)}
+                     to  {transform:translateX(-28%);filter:brightness(.88)} }
+@keyframes popIn   { from{transform:translateX(-28%);filter:brightness(.88)}
+                     to  {transform:translateX(0);filter:brightness(1)} }
+@keyframes popOut  { from{transform:translateX(0)}    to{transform:translateX(100%)} }
+
+.anim-push-in  { animation:pushIn  .36s cubic-bezier(.25,.46,.45,.94) forwards }
+.anim-push-out { animation:pushOut .36s cubic-bezier(.25,.46,.45,.94) forwards }
+.anim-pop-in   { animation:popIn   .34s cubic-bezier(.25,.46,.45,.94) forwards }
+.anim-pop-out  { animation:popOut  .34s cubic-bezier(.25,.46,.45,.94) forwards }
+
+/* ─────────────────────────────── STATUS BAR ─────────────────────────────── */
+.sb {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 26px 0; height:52px; flex-shrink:0;
+}
+.sb-time { font-size:15px; font-weight:600; color:var(--tp); }
+.sb-icons { display:flex; align-items:center; gap:6px; }
+
+/* ─────────────────────────────── LIST SCREEN ─────────────────────────────── */
+.list-hdr {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:6px 20px 0;
+}
+.list-title {
+  font-family:'Playfair Display',serif;
+  font-size:28px; font-weight:700; color:var(--brand-dd);
+}
+.icon-btn {
+  width:36px; height:36px; border-radius:50%;
+  background:var(--s1); border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .15s; flex-shrink:0;
+}
+.icon-btn:active { transform:scale(.88); background:var(--s2); }
+
+.search-row { padding:10px 20px 4px; }
+.search-bar {
+  height:38px; border-radius:99px; background:var(--s1);
+  display:flex; align-items:center; gap:8px; padding:0 14px; cursor:text;
+}
+.search-bar span { font-size:14px; color:var(--tt); }
+
+/* list body */
+.list-body {
+  flex:1; overflow-y:auto; scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+.list-body::-webkit-scrollbar { display:none; }
+
+/* section */
+.sec-hdr {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 20px 8px; cursor:pointer; transition:opacity .15s;
+}
+.sec-hdr:active { opacity:.55; }
+.sec-left { display:flex; align-items:center; gap:8px; }
+.sec-name {
+  font-size:11px; font-weight:700; letter-spacing:.6px;
+  text-transform:uppercase; color:var(--ts);
+}
+.sec-count { font-size:11px; color:var(--tt); }
+.chevron { transition:transform .3s cubic-bezier(.25,.46,.45,.94); flex-shrink:0; }
+.chevron.closed { transform:rotate(-90deg); }
+
+.sec-body {
+  overflow:hidden;
+  transition:max-height .38s cubic-bezier(.25,.46,.45,.94), opacity .25s;
+  opacity:1;
+}
+.sec-body.collapsed { max-height:0 !important; opacity:0; }
+.sec-sep { height:.5px; background:var(--border); margin:2px 0 0; }
+
+/* chat row */
+.chat-row {
+  display:flex; align-items:center; gap:12px; padding:9px 20px;
+  cursor:pointer; transition:background .1s; position:relative;
+}
+.chat-row:active { background:rgba(0,0,0,.04); }
+.chat-row + .chat-row::before {
+  content:''; position:absolute; top:0; left:84px; right:0;
+  height:.5px; background:var(--border);
+}
+
+/* avatars */
+.avi {
+  width:50px; height:50px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:23px; position:relative; border-radius:16px; overflow:hidden;
+}
+.avi.circle { border-radius:50%; }
+.avi.text-avi {
+  font-size:16px; font-weight:700; color:#fff; letter-spacing:.3px;
+}
+.online-dot {
+  position:absolute; bottom:2px; right:2px;
+  width:12px; height:12px; background:#30d158;
+  border-radius:50%; border:2.5px solid var(--bg);
+}
+
+.chat-info { flex:1; min-width:0; }
+.row-top {
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:6px; margin-bottom:3px;
+}
+.row-name {
+  font-size:15px; font-weight:600; color:var(--tp);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.row-time { font-size:11.5px; color:var(--tt); flex-shrink:0; }
+.row-time.new { color:var(--brand); font-weight:600; }
+.row-bot { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+.row-preview {
+  font-size:13px; color:var(--ts);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;
+}
+.row-preview.b { color:var(--tp); font-weight:500; }
+.row-sub { font-size:11px; color:var(--tt); margin-top:1px; }
+.badge {
+  min-width:20px; height:20px; background:var(--brand);
+  border-radius:10px; display:flex; align-items:center;
+  justify-content:center; padding:0 6px; flex-shrink:0;
+}
+.badge span { font-size:11px; font-weight:700; color:#fff; }
+
+/* muted badge */
+.badge.muted { background:var(--s3); }
+
+/* bottom nav */
+.bottom-nav {
+  height:82px; background:var(--bg); border-top:.5px solid var(--border);
+  display:flex; align-items:flex-start; padding-top:10px; flex-shrink:0;
+}
+.nav-item {
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  gap:3px; cursor:pointer; padding-top:2px; transition:transform .15s; position:relative;
+}
+.nav-item:active { transform:scale(.88); }
+.nav-label { font-size:9.5px; font-weight:500; color:var(--tt); }
+.nav-item.active .nav-label { color:var(--brand); font-weight:600; }
+.nav-notif {
+  position:absolute; top:-1px; right:18%;
+  width:16px; height:16px; background:#ff3b30;
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+  border:2px solid var(--bg);
+}
+.nav-notif span { font-size:8.5px; font-weight:700; color:#fff; }
+
+/* ─────────────────────────────── CHAT NAV ─────────────────────────────── */
+.chat-nav {
+  background:rgba(244,241,234,.96);
+  backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  border-bottom:.5px solid var(--border); flex-shrink:0; z-index:10;
+}
+.chat-nav-row {
+  display:flex; align-items:center;
+  padding:6px 10px; gap:6px; min-height:52px;
+}
+.back-btn {
+  display:flex; align-items:center; gap:2px;
+  color:var(--brand); font-size:15px; font-weight:500;
+  cursor:pointer; border:none; background:none;
+  padding:6px 4px; transition:opacity .15s; flex-shrink:0;
+}
+.back-btn:active { opacity:.4; }
+.chat-nav-center {
+  flex:1; display:flex; align-items:center; gap:9px;
+  cursor:pointer; min-width:0;
+}
+.nav-avi {
+  width:34px; height:34px; border-radius:11px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:17px; flex-shrink:0; overflow:hidden;
+}
+.nav-avi.circle { border-radius:50%; }
+.nav-avi.text-avi { font-size:13px; font-weight:700; color:#fff; }
+.nav-text { flex:1; min-width:0; }
+.nav-name {
+  font-size:14.5px; font-weight:600; color:var(--tp);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.nav-sub { font-size:11px; color:var(--ts); }
+.nav-sub.online { color:#30d158; font-weight:500; }
+.chat-nav-acts { display:flex; gap:2px; flex-shrink:0; }
+.act-btn {
+  width:34px; height:34px; border-radius:50%;
+  border:none; background:none;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all .15s;
+}
+.act-btn:active { transform:scale(.85); background:var(--s1); }
+
+/* ─────────────────────────────── MESSAGES AREA ─────────────────────────────── */
+.msg-area {
+  flex:1; overflow-y:auto; overflow-x:hidden;
+  scrollbar-width:none; -webkit-overflow-scrolling:touch;
+  background:var(--chat-bg); position:relative;
+}
+.msg-area::-webkit-scrollbar { display:none; }
+.msg-inner { padding:10px 0 14px; display:flex; flex-direction:column; gap:1px; }
+
+/* date divider */
+.date-div {
+  display:flex; align-items:center; justify-content:center;
+  padding:10px 0 4px;
+}
+.date-div span {
+  font-size:11.5px; font-weight:500; color:var(--ts);
+  background:rgba(228,222,206,.9); backdrop-filter:blur(8px);
+  padding:4px 13px; border-radius:99px;
+}
+
+/* message wrapper */
+.mw {
+  display:flex; align-items:flex-end; gap:5px;
+  padding:1px 10px; position:relative; flex-shrink:0;
+  transition:transform .18s;
+}
+.mw.sent { flex-direction:row-reverse; }
+
+/* group avatar */
+.msg-avi {
+  width:28px; height:28px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; color:#fff; margin-bottom:1px;
+}
+.msg-avi.ghost { visibility:hidden; }
+
+/* bubble column */
+.bc { display:flex; flex-direction:column; max-width:72%; }
+.mw.sent .bc { align-items:flex-end; }
+.mw.recv .bc { align-items:flex-start; }
+
+.sender-name {
+  font-size:11px; font-weight:600; color:#1a7040;
+  margin-bottom:2px; padding-left:3px;
+}
+
+/* bubble */
+.bbl {
+  position:relative; border-radius:18px; padding:8px 11px 6px;
+  max-width:100%; cursor:pointer;
+  transition:transform .15s;
+}
+.bbl:active { transform:scale(.97); }
+
+.bbl.sent {
+  background:var(--brand); color:#fff; border-bottom-right-radius:5px;
+}
+.bbl.recv {
+  background:var(--s1); color:var(--tp); border-bottom-left-radius:5px;
+}
+.bbl.nt.sent { border-bottom-right-radius:18px; }
+.bbl.nt.recv { border-bottom-left-radius:18px; }
+
+/* tails */
+.bbl.sent:not(.nt)::after {
+  content:''; position:absolute; bottom:0; right:-7px;
+  border:8px solid transparent;
+  border-bottom-color:var(--brand); border-right:0;
+  margin-bottom:0;
+  width:0; height:0;
+}
+.bbl.recv:not(.nt)::after {
+  content:''; position:absolute; bottom:0; left:-7px;
+  border:8px solid transparent;
+  border-bottom-color:var(--s1); border-left:0;
+  width:0; height:0;
+}
+
+.bbl-txt { font-size:15px; line-height:1.42; word-wrap:break-word; }
+
+/* meta */
+.bbl-meta {
+  display:flex; align-items:center; justify-content:flex-end;
+  gap:3px; margin-top:3px;
+}
+.bbl-time { font-size:10px; line-height:1; }
+.bbl.sent .bbl-time { color:rgba(255,255,255,.65); }
+.bbl.recv .bbl-time { color:var(--tt); }
+
+/* checkmarks */
+.checks svg { display:block; }
+
+/* reaction badge */
+.rxn-badge {
+  position:absolute; bottom:-13px;
+  background:var(--bg); border-radius:99px;
+  padding:2px 7px; font-size:13px;
+  box-shadow:0 1px 4px rgba(0,0,0,.15);
+  display:flex; align-items:center; gap:3px;
+  z-index:2; cursor:pointer; white-space:nowrap;
+  transition:transform .15s;
+}
+.rxn-badge:active { transform:scale(.9); }
+.rxn-badge.r { right:5px; }
+.rxn-badge.l { left:5px; }
+.rxn-cnt { font-size:10.5px; font-weight:600; color:var(--ts); }
+
+/* reply quote inside bubble */
+.rq {
+  border-radius:10px; padding:5px 9px; margin-bottom:6px;
+  font-size:12.5px; line-height:1.38; border-left:3px solid; cursor:pointer;
+}
+.bbl.sent .rq {
+  background:rgba(255,255,255,.15); border-left-color:rgba(255,255,255,.5);
+  color:rgba(255,255,255,.82);
+}
+.bbl.recv .rq {
+  background:rgba(0,0,0,.06); border-left-color:var(--brand);
+  color:var(--ts);
+}
+.rq-who { font-weight:700; margin-bottom:1px; font-size:11.5px; }
+
+/* ─────────────────────────────── TYPING ─────────────────────────────── */
+.typing-wrap {
+  display:flex; align-items:flex-end; gap:5px; padding:2px 10px;
+}
+.typing-bbl {
+  background:var(--s1); border-radius:18px; border-bottom-left-radius:5px;
+  padding:11px 14px; display:flex; align-items:center; gap:5px; position:relative;
+}
+.typing-bbl::after {
+  content:''; position:absolute; bottom:0; left:-7px;
+  border:8px solid transparent; border-bottom-color:var(--s1); border-left:0;
+  width:0; height:0;
+}
+.td {
+  width:7px; height:7px; background:var(--tt); border-radius:50%;
+  animation:tdot 1.4s ease-in-out infinite;
+}
+.td:nth-child(2) { animation-delay:.2s; }
+.td:nth-child(3) { animation-delay:.4s; }
+@keyframes tdot {
+  0%,55%,100% { transform:translateY(0); opacity:.5; }
+  28% { transform:translateY(-7px); opacity:1; }
+}
+
+/* ─────────────────────────────── VOICE MSG ─────────────────────────────── */
+.voice-inner { display:flex; align-items:center; gap:9px; min-width:172px; padding:2px 0; }
+.vplay {
+  width:32px; height:32px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; border:none; transition:transform .15s; flex-shrink:0;
+}
+.vplay:active { transform:scale(.88); }
+.bbl.sent .vplay { background:rgba(255,255,255,.2); }
+.bbl.recv .vplay { background:rgba(0,0,0,.08); }
+.waveform { flex:1; height:30px; display:flex; align-items:center; gap:2px; }
+.wb { width:3px; border-radius:2px; flex-shrink:0; }
+.bbl.sent .wb { background:rgba(255,255,255,.55); }
+.bbl.recv .wb { background:var(--tt); }
+.vdur { font-size:11px; flex-shrink:0; }
+.bbl.sent .vdur { color:rgba(255,255,255,.65); }
+.bbl.recv .vdur { color:var(--tt); }
+
+/* ─────────────────────────────── SCROLL FAB ─────────────────────────────── */
+.scroll-fab {
+  position:absolute; bottom:10px; right:12px;
+  width:34px; height:34px; border-radius:50%;
+  background:var(--bg); box-shadow:0 2px 12px rgba(0,0,0,.22);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; z-index:5; border:none;
+  transition:transform .28s cubic-bezier(.34,1.56,.64,1), opacity .25s;
+}
+.scroll-fab.gone { transform:scale(0) translateY(20px); opacity:0; pointer-events:none; }
+.fab-badge {
+  position:absolute; top:-3px; right:-3px; min-width:16px; height:16px;
+  background:var(--brand); border-radius:8px;
+  display:flex; align-items:center; justify-content:center; padding:0 3px;
+}
+.fab-badge span { font-size:9px; font-weight:700; color:#fff; }
+
+/* ─────────────────────────────── REPLY BAR ─────────────────────────────── */
+.reply-bar {
+  background:rgba(244,241,234,.97); backdrop-filter:blur(16px);
+  border-top:.5px solid var(--border);
+  display:flex; align-items:center; gap:10px;
+  flex-shrink:0; overflow:hidden;
+  transition:max-height .3s cubic-bezier(.34,1.56,.64,1),
+              padding .3s, opacity .2s;
+  max-height:68px; padding:9px 14px; opacity:1;
+}
+.reply-bar.hidden { max-height:0; padding:0; opacity:0; }
+.reply-line { width:3px; height:34px; background:var(--brand); border-radius:2px; flex-shrink:0; }
+.reply-body { flex:1; min-width:0; }
+.reply-who { font-size:12px; font-weight:700; color:var(--brand); margin-bottom:2px; }
+.reply-txt {
+  font-size:12.5px; color:var(--ts);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.reply-x {
+  width:22px; height:22px; border-radius:50%;
+  background:var(--s2); border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  transition:background .15s;
+}
+.reply-x:active { background:var(--s3); }
+
+/* ─────────────────────────────── INPUT BAR ─────────────────────────────── */
+.input-bar {
+  background:rgba(244,241,234,.97); backdrop-filter:blur(20px);
+  border-top:.5px solid var(--border);
+  padding:8px 10px; display:flex; align-items:flex-end;
+  gap:7px; flex-shrink:0;
+}
+.input-wrap {
+  flex:1; background:var(--s1); border-radius:22px;
+  display:flex; align-items:flex-end;
+  padding:8px 8px 8px 14px; gap:5px; min-height:38px; cursor:text;
+}
+.input-fake {
+  flex:1; font-size:15px; font-family:inherit;
+  color:var(--tp); line-height:1.4; outline:none;
+  min-height:22px; max-height:96px;
+  overflow-y:auto; word-break:break-word;
+  -webkit-overflow-scrolling:touch;
+}
+.input-fake:empty::before {
+  content:attr(data-ph); color:var(--tt); pointer-events:none;
+}
+.input-fake::-webkit-scrollbar { display:none; }
+.emoji-btn {
+  width:26px; height:26px; border:none; background:none;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:19px; transition:transform .15s; flex-shrink:0;
+}
+.emoji-btn:active { transform:scale(.82); }
+.attach-btn {
+  width:36px; height:36px; border:none; background:none;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:transform .15s; flex-shrink:0;
+}
+.attach-btn:active { transform:scale(.82); }
+.send-btn {
+  width:36px; height:36px; border-radius:50%; background:var(--brand);
+  border:none; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0; transition:transform .15s, background .15s;
+}
+.send-btn:active { transform:scale(.88); background:var(--brand-d); }
+.mic-btn {
+  width:36px; height:36px; border-radius:50%; background:var(--s1);
+  border:none; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0; transition:transform .15s, background .15s;
+}
+.mic-btn:active { transform:scale(.88); background:var(--s2); }
+.mic-btn.recording { background:#ff3b30; animation:micPulse 1s ease-in-out infinite; }
+@keyframes micPulse {
+  0%,100% { transform:scale(1); }
+  50% { transform:scale(1.08); }
+}
+
+/* send/mic toggle */
+.send-btn { display:none; }
+.send-btn.show { display:flex; }
+.mic-btn.hide { display:none; }
+
+/* ─────────────────────────────── KEYBOARD ─────────────────────────────── */
+.kb {
+  background:#d1d3d9; flex-shrink:0; overflow:hidden;
+  transition:height .34s cubic-bezier(.25,.46,.45,.94); height:0;
+}
+.kb.open { height:258px; }
+.kb-inner { padding:8px 3px 4px; display:flex; flex-direction:column; gap:6px; }
+.kb-row { display:flex; gap:5px; justify-content:center; padding:0 1px; }
+.k {
+  height:42px; background:#fff; border-radius:6px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:17px; font-weight:400; color:#000; cursor:pointer;
+  box-shadow:0 1px 0 rgba(0,0,0,.4); user-select:none;
+  flex:1; transition:background .08s;
+}
+.k:active { background:#aab0ba; }
+.k.fn { background:#adb6c0; font-size:13px; font-weight:500; flex:1.55; }
+.k.space { flex:4.5; font-size:14px; }
+.k.ret  { background:#adb6c0; font-size:13px; font-weight:500; flex:2.2; }
+
+/* ─────────────────────────────── REACTION OVERLAY ─────────────────────────────── */
+.rxn-overlay {
+  position:absolute; inset:0; z-index:80;
+  pointer-events:none; opacity:0; transition:opacity .2s;
+}
+.rxn-overlay.on { pointer-events:all; opacity:1; }
+.rxn-bg {
+  position:absolute; inset:0;
+  background:rgba(0,0,0,.4); backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.rxn-picker {
+  position:absolute;
+  background:rgba(255,255,255,.92); backdrop-filter:blur(20px);
+  border-radius:28px; padding:8px 10px;
+  display:flex; gap:2px;
+  box-shadow:0 10px 40px rgba(0,0,0,.22);
+  transform-origin:bottom center;
+}
+.rxn-picker.appear { animation:rxnIn .32s cubic-bezier(.34,1.56,.64,1) forwards; }
+.rxn-picker.dismiss { animation:rxnOut .18s ease-in forwards; }
+@keyframes rxnIn  { from{transform:scale(.35) translateY(14px);opacity:0} to{transform:scale(1);opacity:1} }
+@keyframes rxnOut { from{transform:scale(1);opacity:1} to{transform:scale(.35) translateY(14px);opacity:0} }
+.rxn-em {
+  width:44px; height:44px; font-size:27px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:50%; cursor:pointer;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+}
+.rxn-em:hover,.rxn-em:active { transform:scale(1.35) translateY(-6px); background:rgba(0,0,0,.05); }
+
+/* preview bubble in overlay */
+.rxn-bbl-preview {
+  position:absolute; border-radius:18px; padding:8px 11px 6px;
+  font-size:15px; line-height:1.42; color:#fff;
+  background:var(--brand); pointer-events:none;
+  box-shadow:0 6px 24px rgba(0,0,0,.18);
+}
+
+/* msg action menu */
+.msg-menu {
+  position:absolute; background:rgba(255,255,255,.94);
+  backdrop-filter:blur(20px); border-radius:14px; overflow:hidden;
+  box-shadow:0 6px 28px rgba(0,0,0,.18); min-width:185px; z-index:85;
+}
+.msg-menu.appear { animation:menuIn .2s cubic-bezier(.34,1.56,.64,1); }
+@keyframes menuIn { from{transform:scale(.82);opacity:0} to{transform:scale(1);opacity:1} }
+.mmi {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:13px 16px; font-size:15px; color:var(--tp);
+  cursor:pointer; border-bottom:.5px solid rgba(0,0,0,.07);
+  transition:background .1s;
+}
+.mmi:last-child { border-bottom:none; }
+.mmi:active { background:rgba(0,0,0,.06); }
+.mmi.red { color:#ff3b30; }
+
+/* ─────────────────────────────── MESSAGE ANIMATIONS ─────────────────────────────── */
+@keyframes msgSpring {
+  0%   { transform:scale(.82) translateY(12px); opacity:0; }
+  55%  { transform:scale(1.04) translateY(-2px); opacity:1; }
+  100% { transform:scale(1) translateY(0); opacity:1; }
+}
+@keyframes msgSlide {
+  0%   { transform:translateX(-22px); opacity:0; }
+  100% { transform:translateX(0); opacity:1; }
+}
+@keyframes fadeInUp {
+  from { transform:translateY(10px); opacity:0; }
+  to   { transform:translateY(0); opacity:1; }
+}
+
+.mw.new-sent { animation:msgSpring .38s cubic-bezier(.34,1.56,.64,1) forwards; transform-origin:bottom right; }
+.mw.new-recv { animation:msgSlide .28s cubic-bezier(.25,.46,.45,.94) forwards; }
+.typing-wrap.appear { animation:fadeInUp .22s ease forwards; }
+
+/* swipe reply icon */
+.swipe-icon {
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:30px; height:30px; background:var(--s2); border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .15s;
+}
+.mw.sent .swipe-icon { left:6px; }
+.mw.recv .swipe-icon { right:6px; }
+
+/* ─────────────────────────────── MISC ─────────────────────────────── */
+.event-thumb {
+  width:100%; height:100%; object-fit:cover;
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px;
+}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="island"></div>
+  <div class="sc-wrap" id="scWrap">
+
+    <!-- ══════════════ SCREEN 1 · CHAT LIST ══════════════ -->
+    <div class="screen" id="sList">
+      <!-- status bar -->
+      <div class="sb">
+        <span class="sb-time">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".3"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+        </div>
+      </div>
+      <!-- header -->
+      <div class="list-hdr">
+        <div class="list-title">Chat</div>
+        <button class="icon-btn">
+          <svg width="17" height="17" viewBox="0 0 17 17" fill="none"><path d="M2 15l1.6-4.8L11.5 2.5l3 3L6 14l-4 1Z" stroke="#818898" stroke-width="1.4" stroke-linejoin="round"/><path d="M9.8 4.2l3 3" stroke="#818898" stroke-width="1.4"/></svg>
+        </button>
+      </div>
+      <!-- search -->
+      <div class="search-row">
+        <div class="search-bar">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.5" cy="6.5" r="4.5" stroke="#b3b8c1" stroke-width="1.4"/><path d="M10 10l3 3" stroke="#b3b8c1" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span>Search</span>
+        </div>
+      </div>
+      <!-- list body -->
+      <div class="list-body">
+
+        <!-- ── Social Clubs ── -->
+        <div class="sec-hdr" onclick="toggleSec('clubs')">
+          <div class="sec-left">
+            <span class="sec-name">Social Clubs</span>
+            <span class="sec-count">4</span>
+          </div>
+          <svg class="chevron open" id="chv-clubs" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="#b3b8c1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="sec-body" id="sec-clubs" style="max-height:240px">
+          <div class="chat-row" onclick="openChat('group')">
+            <div class="avi" style="background:#e2e9e3">🌿</div>
+            <div class="chat-info">
+              <div class="row-top">
+                <span class="row-name">Lincoln School</span>
+                <span class="row-time new">9:38 AM</span>
+              </div>
+              <div class="row-bot">
+                <span class="row-preview b">Sarah: I can bring them! 😊</span>
+                <div class="badge"><span>3</span></div>
+              </div>
+              <div class="row-sub">12 online</div>
+            </div>
+          </div>
+          <div class="chat-row">
+            <div class="avi" style="background:#d0dacf">🌳</div>
+            <div class="chat-info">
+              <div class="row-top">
+                <span class="row-name">Washington Middle School</span>
+                <span class="row-time">8:15 AM</span>
+              </div>
+              <div class="row-bot">
+                <span class="row-preview">Field trip reminder for Thursday</span>
+              </div>
+              <div class="row-sub">50 online</div>
+            </div>
+          </div>
+          <div class="chat-row">
+            <div class="avi" style="background:#e2e9e3">🍀</div>
+            <div class="chat-info">
+              <div class="row-top">
+                <span class="row-name">Jefferson High School</span>
+                <span class="row-time">Yesterday</span>
+              </div>
+              <div class="row-bot">
+                <span class="row-preview">Graduation planning is underway!</span>
+              </div>
+              <div class="row-sub">10 online</div>
+            </div>
+          </div>
+          <div class="chat-row">
+            <div class="avi" style="background:#cce0d4">🌱</div>
+            <div class="chat-info">
+              <div class="row-top">
+                <span class="row-name">Roosevelt Elementary</span>
+                <span class="row-time">Mon</span>
+              </div>
+              <div class="row-bot">
+                <span class="row-preview">PTA meeting notes shared</span>
+                <div class="badge muted"><span>1</span></div>
+              </div>
+              <div class="row-sub">10 online</div>
+            </div>
+          </div>
+        </div>
+        <div class="sec-sep"></div>
+
+        <!-- ── Meeting Points ── -->
+        <div class="sec-hdr" onclick="toggleSec('events')">
+          <div class="sec-left">
+            <span class="sec-name">Meeting Points</span>
+            <span class="sec-count">2</span>
+          </div>
+          <svg class="chevron open" id="chv-events" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="#b3b8c1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="sec-body" id="sec-events" style="max-height:160px">
+          <div class="chat-row">
+            <div class="avi rounded" style="background:linear-gradient(135deg,#2d6a4f,#52b788);font-size:22px">⛳</div>
+            <div class="chat-info">
+              <div class="row-top">
+                <span class="row-name">Come Join Me for Golf</span>
+                <span class="row-time">8:22 AM</span>
+              </div>
+              <div class="row-bot">
+                <span class="row-preview">Raj: See you at the tee! 🏌️</span>
+                <div class="badge"><span>2</span></div>
+              </div>
+              <div class="row-sub">Saturday, Feb 7 · 10:00 AM (UTC)</div>
+            </div>
+          </div>
+          <div class="chat-row">
+            <div class="avi rounded" style="background:linear-gradient(135deg,#1d4e89,#4a90d9);font-size:22px">☕</div>
+            <div class="chat-info">
+              <div class="row-top">
+                <span class="row-name">Staffing at Second Point</span>
+                <span class="row-time">7:55 AM</span>
+              </div>
+              <div class="row-bot">
+                <span class="row-preview">Don't forget to bring your badge!</span>
+              </div>
+              <div class="row-sub">Saturday, Feb 7 · 8:00 AM (UTC)</div>
+            </div>
+          </div>
+        </div>
+        <div class="sec-sep"></div>
+
+        <!-- ── Direct Messages ── -->
+        <div class="sec-hdr" onclick="toggleSec('dms')">
+          <div class="sec-left">
+            <span class="sec-name">Direct Messages</span>
+            <span class="sec-count">2</span>
+          </div>
+          <svg class="chevron open" id="chv-dms" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="#b3b8c1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="sec-body" id="sec-dms" style="max-height:140px">
+          <div class="chat-row" onclick="openChat('dm')">
+            <div class="avi circle text-avi" style="background:#2a7551">RS</div>
+            <div class="chat-info">
+              <div class="row-top">
+                <span class="row-name">Raj Singh</span>
+                <span class="row-time">8:54 AM</span>
+              </div>
+              <div class="row-bot">
+                <span class="row-preview">You'll love it. Beautiful course 🌿</span>
+              </div>
+            </div>
+          </div>
+          <div class="chat-row">
+            <div class="avi circle text-avi" style="background:#5a4a8a">JM</div>
+            <div class="chat-info">
+              <div class="row-top">
+                <span class="row-name">Joe Mravca</span>
+                <span class="row-time">Yesterday</span>
+              </div>
+              <div class="row-bot">
+                <span class="row-preview">Yeah, I'll call you again in a minute</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="height:10px"></div>
+      </div><!-- /list-body -->
+
+      <!-- bottom nav -->
+      <div class="bottom-nav">
+        <div class="nav-item">
+          <svg width="23" height="23" viewBox="0 0 23 23" fill="none"><rect x="2.5" y="4.5" width="18" height="16" rx="3" stroke="#b3b8c1" stroke-width="1.5"/><path d="M7.5 2.5v3M15.5 2.5v3M2.5 9.5h18" stroke="#b3b8c1" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span class="nav-label">Events</span>
+        </div>
+        <div class="nav-item">
+          <svg width="23" height="23" viewBox="0 0 23 23" fill="none"><rect x="2.5" y="4.5" width="18" height="14" rx="3" stroke="#b3b8c1" stroke-width="1.5"/><circle cx="8.5" cy="10" r="2" stroke="#b3b8c1" stroke-width="1.5"/><path d="M2.5 15.5l5-4.5 4 3 3-2.5 6.5 5" stroke="#b3b8c1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="nav-label">Memories</span>
+        </div>
+        <div class="nav-item">
+          <svg width="23" height="23" viewBox="0 0 23 23" fill="none"><path d="M11.5 2L13.4 8.6H20.3L14.9 12.6L16.8 19.2L11.5 15.2L6.2 19.2L8.1 12.6L2.7 8.6H9.6Z" stroke="#b3b8c1" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <span class="nav-label">AI Assist</span>
+        </div>
+        <div class="nav-item active">
+          <svg width="23" height="23" viewBox="0 0 23 23" fill="none"><path d="M4 3.5h15a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H7.5l-5.5 4V5.5a2 2 0 0 1 2-2Z" fill="#186338" fill-opacity=".15" stroke="#186338" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <span class="nav-label">Chat</span>
+        </div>
+        <div class="nav-item">
+          <svg width="23" height="23" viewBox="0 0 23 23" fill="none"><circle cx="8.5" cy="8" r="4" stroke="#b3b8c1" stroke-width="1.5"/><circle cx="14.5" cy="8" r="4" stroke="#b3b8c1" stroke-width="1.5"/><path d="M2 20c0-3.59 2.91-6.5 6.5-6.5S15 16.41 15 20" stroke="#b3b8c1" stroke-width="1.5" stroke-linecap="round"/><path d="M9 20c0-3.59 2.91-6.5 6.5-6.5s6.5 2.91 6.5 6.5" stroke="#b3b8c1" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span class="nav-label">Clubs</span>
+        </div>
+      </div>
+    </div><!-- /sList -->
+
+
+    <!-- ══════════════ SCREEN 2 · GROUP CHAT ══════════════ -->
+    <div class="screen right" id="sGroup">
+      <!-- status bar -->
+      <div class="sb">
+        <span class="sb-time">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".3"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+        </div>
+      </div>
+      <!-- nav -->
+      <div class="chat-nav">
+        <div class="chat-nav-row">
+          <button class="back-btn" onclick="goBack()">
+            <svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1.5 8.5 9 16" stroke="#186338" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Chat</span>
+          </button>
+          <div class="chat-nav-center" onclick="/* info */">
+            <div class="nav-avi" style="background:#e2e9e3;font-size:17px">🌿</div>
+            <div class="nav-text">
+              <div class="nav-name">Lincoln School</div>
+              <div class="nav-sub">12 members · 5 online</div>
+            </div>
+          </div>
+          <div class="chat-nav-acts">
+            <button class="act-btn">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM2 17c0-3.87 3.13-7 7-7a6.97 6.97 0 0 1 5 2.1" stroke="#818898" stroke-width="1.5" stroke-linecap="round"/><circle cx="15.5" cy="14.5" r="3.5" fill="#30d158"/><path d="M13.8 14.5l1.2 1.2 2-2" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="act-btn">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="1.5" fill="#818898"/><circle cx="10" cy="4" r="1.5" fill="#818898"/><circle cx="10" cy="16" r="1.5" fill="#818898"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- messages -->
+      <div class="msg-area" id="msgAreaGroup">
+        <div class="msg-inner" id="msgInnerGroup">
+
+          <div class="date-div"><span>Yesterday</span></div>
+
+          <!-- Emily - first msg -->
+          <div class="mw recv" id="m0">
+            <div class="msg-avi" style="background:#c0717a">EC</div>
+            <div class="bc">
+              <div class="sender-name">Emily Chen</div>
+              <div class="bbl recv" data-msgid="m0" onmousedown="startLongPress(event,'m0')" ontouchstart="startLongPress(event,'m0')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="bbl-txt">Reminder: Spring Fair planning tomorrow at 3pm! 🌸</div>
+                <div class="bbl-meta"><span class="bbl-time">5:22 PM</span></div>
+              </div>
+            </div>
+            <div class="swipe-icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M6 2L1 7l5 5M1 7h12" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+          <!-- Sarah -->
+          <div class="mw recv" id="m1">
+            <div class="msg-avi" style="background:#4a90c4">SM</div>
+            <div class="bc">
+              <div class="sender-name">Sarah M.</div>
+              <div class="bbl recv" data-msgid="m1" onmousedown="startLongPress(event,'m1')" ontouchstart="startLongPress(event,'m1')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="bbl-txt">Thanks for the reminder! Can't wait 🎉</div>
+                <div class="bbl-meta"><span class="bbl-time">5:45 PM</span></div>
+              </div>
+            </div>
+            <div class="swipe-icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M6 2L1 7l5 5M1 7h12" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+          <div class="date-div"><span>Today</span></div>
+
+          <!-- Emily -->
+          <div class="mw recv" id="m2">
+            <div class="msg-avi" style="background:#c0717a">EC</div>
+            <div class="bc">
+              <div class="sender-name">Emily Chen</div>
+              <div class="bbl recv" data-msgid="m2" onmousedown="startLongPress(event,'m2')" ontouchstart="startLongPress(event,'m2')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="bbl-txt">Hey everyone! Ready for the spring fair planning? 🌺</div>
+                <div class="bbl-meta"><span class="bbl-time">9:15 AM</span></div>
+              </div>
+            </div>
+            <div class="swipe-icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M6 2L1 7l5 5M1 7h12" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+          <!-- Me -->
+          <div class="mw sent" id="m3">
+            <div class="bc">
+              <div class="bbl sent" data-msgid="m3" onmousedown="startLongPress(event,'m3')" ontouchstart="startLongPress(event,'m3')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="bbl-txt">Me too! Should we bring sign-up sheets?</div>
+                <div class="bbl-meta">
+                  <span class="bbl-time">9:18 AM</span>
+                  <span class="checks">
+                    <svg width="16" height="9" viewBox="0 0 16 9" fill="none"><path d="M1 4.5l3 3 5-6" stroke="rgba(255,255,255,.65)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 4.5l3 3 5-6" stroke="rgba(255,255,255,.65)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="swipe-icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8 2l5 5-5 5M13 7H1" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+          <!-- Emily - multi consecutive -->
+          <div class="mw recv" id="m4">
+            <div class="msg-avi" style="background:#c0717a">EC</div>
+            <div class="bc">
+              <div class="bbl recv" data-msgid="m4" onmousedown="startLongPress(event,'m4')" ontouchstart="startLongPress(event,'m4')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="bbl-txt">Great idea! Also can someone bring poster boards?</div>
+                <div class="bbl-meta"><span class="bbl-time">9:20 AM</span></div>
+              </div>
+            </div>
+            <div class="swipe-icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M6 2L1 7l5 5M1 7h12" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+          <div class="mw recv" id="m5" style="padding-top:0">
+            <div class="msg-avi ghost" style="background:#c0717a">EC</div>
+            <div class="bc">
+              <div class="bbl recv nt" data-msgid="m5" onmousedown="startLongPress(event,'m5')" ontouchstart="startLongPress(event,'m5')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="bbl-txt">I'll bring the markers 🖊️</div>
+                <div class="bbl-meta"><span class="bbl-time">9:21 AM</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sarah with reaction -->
+          <div class="mw recv" id="m6" style="margin-bottom:16px">
+            <div class="msg-avi" style="background:#4a90c4">SM</div>
+            <div class="bc">
+              <div class="sender-name">Sarah M.</div>
+              <div class="bbl recv" data-msgid="m6" data-txt="I can bring them! Have extras from last year 😊" onmousedown="startLongPress(event,'m6')" ontouchstart="startLongPress(event,'m6')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="bbl-txt">I can bring them! Have extras from last year 😊</div>
+                <div class="bbl-meta"><span class="bbl-time">9:35 AM</span></div>
+                <div class="rxn-badge l" onclick="showRxnInfo()">❤️<span class="rxn-cnt">3</span></div>
+              </div>
+            </div>
+            <div class="swipe-icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M6 2L1 7l5 5M1 7h12" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+          <!-- Me - sent with reply quote -->
+          <div class="mw sent" id="m7" style="margin-bottom:4px">
+            <div class="bc">
+              <div class="bbl sent" data-msgid="m7" onmousedown="startLongPress(event,'m7')" ontouchstart="startLongPress(event,'m7')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="rq">
+                  <div class="rq-who">Sarah M.</div>
+                  I can bring them! Have extras…
+                </div>
+                <div class="bbl-txt">Perfect. See everyone at 3pm! 🎉</div>
+                <div class="bbl-meta">
+                  <span class="bbl-time">9:38 AM</span>
+                  <span class="checks" id="checks-m7">
+                    <svg width="16" height="9" viewBox="0 0 16 9" fill="none"><path d="M1 4.5l3 3 5-6" stroke="#7dd4a8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 4.5l3 3 5-6" stroke="#7dd4a8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="swipe-icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8 2l5 5-5 5M13 7H1" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+          <!-- typing indicator (hidden initially) -->
+          <div class="typing-wrap" id="typingGroup" style="display:none">
+            <div class="msg-avi" style="background:#c0717a">EC</div>
+            <div class="typing-bbl">
+              <div class="td"></div><div class="td"></div><div class="td"></div>
+            </div>
+          </div>
+
+        </div><!-- /msg-inner -->
+      </div><!-- /msg-area -->
+
+      <!-- scroll fab -->
+      <button class="scroll-fab gone" id="fabGroup" onclick="scrollToBottom('group')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 4l5 5 5-5" stroke="#818898" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <!-- reply bar -->
+      <div class="reply-bar hidden" id="replyBarGroup">
+        <div class="reply-line"></div>
+        <div class="reply-body">
+          <div class="reply-who" id="replyWhoGroup">Sarah M.</div>
+          <div class="reply-txt" id="replyTxtGroup">I can bring them!</div>
+        </div>
+        <button class="reply-x" onclick="closeReply('group')">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="#818898" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <!-- input bar -->
+      <div class="input-bar" id="inputBarGroup">
+        <button class="attach-btn">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9.5" stroke="#818898" stroke-width="1.4"/><path d="M11 7v8M7 11h8" stroke="#818898" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="input-wrap" onclick="focusInput('group')">
+          <div class="input-fake" id="inputGroup" contenteditable="true" data-ph="Message" oninput="onInput('group')" onkeydown="onKey(event,'group')"></div>
+          <button class="emoji-btn">😊</button>
+        </div>
+        <button class="mic-btn" id="micGroup" onmousedown="startMic('group')" ontouchstart="startMic('group')" onmouseup="stopMic('group')" ontouchend="stopMic('group')">
+          <svg width="16" height="20" viewBox="0 0 16 20" fill="none"><rect x="4.5" y="1" width="7" height="11" rx="3.5" stroke="#818898" stroke-width="1.5"/><path d="M1 9.5C1 13.09 4.13 16 8 16s7-2.91 7-6.5" stroke="#818898" stroke-width="1.5" stroke-linecap="round"/><path d="M8 16v3" stroke="#818898" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="send-btn" id="sendGroup" onclick="sendMessage('group')">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 14L8 2l6 12-6-4-6 4Z" fill="white"/></svg>
+        </button>
+      </div>
+      <!-- keyboard sim -->
+      <div class="kb" id="kbGroup">
+        <div class="kb-inner">
+          <div class="kb-row" id="kbR1g"></div>
+          <div class="kb-row" id="kbR2g"></div>
+          <div class="kb-row">
+            <div class="k fn">⇧</div>
+            <div class="k fn">Z</div><div class="k fn">X</div><div class="k fn">C</div>
+            <div class="k fn">V</div><div class="k fn">B</div><div class="k fn">N</div>
+            <div class="k fn">M</div>
+            <div class="k fn" onclick="delChar('group')">⌫</div>
+          </div>
+          <div class="kb-row">
+            <div class="k fn">123</div>
+            <div class="k space" onclick="addChar(' ','group')">space</div>
+            <div class="k ret" onclick="sendMessage('group')">return</div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /sGroup -->
+
+
+    <!-- ══════════════ SCREEN 3 · DM CHAT ══════════════ -->
+    <div class="screen right" id="sDM">
+      <!-- status bar -->
+      <div class="sb">
+        <span class="sb-time">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".3"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+        </div>
+      </div>
+      <div class="chat-nav">
+        <div class="chat-nav-row">
+          <button class="back-btn" onclick="goBack()">
+            <svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1.5 8.5 9 16" stroke="#186338" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Chat</span>
+          </button>
+          <div class="chat-nav-center">
+            <div class="nav-avi circle text-avi" style="background:#2a7551">RS</div>
+            <div class="nav-text">
+              <div class="nav-name">Raj Singh</div>
+              <div class="nav-sub online">Online</div>
+            </div>
+          </div>
+          <div class="chat-nav-acts">
+            <button class="act-btn">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6.5 3.5c-.5 1.5-.5 3 .5 4.5L3.5 11.5c-.5.5-.5 1.5 0 2l1 1c.5.5 1.5.5 2 0l1-1c1 1 2 1.5 3 1.5M16.5 13.5c-1.5-.5-3-.5-4.5.5" stroke="#818898" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="act-btn">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M2 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6Z" stroke="#818898" stroke-width="1.4"/><path d="M2 8l8 5 8-5" stroke="#818898" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </button>
+            <button class="act-btn">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="1.5" fill="#818898"/><circle cx="10" cy="4" r="1.5" fill="#818898"/><circle cx="10" cy="16" r="1.5" fill="#818898"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="msg-area" id="msgAreaDM">
+        <div class="msg-inner" id="msgInnerDM">
+
+          <div class="date-div"><span>Today</span></div>
+
+          <div class="mw recv" id="d0">
+            <div class="bc">
+              <div class="bbl recv" data-msgid="d0" onmousedown="startLongPress(event,'d0')" ontouchstart="startLongPress(event,'d0')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="bbl-txt">Hey! See you at the golf event 👋</div>
+                <div class="bbl-meta"><span class="bbl-time">8:45 AM</span></div>
+              </div>
+            </div>
+            <div class="swipe-icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M6 2L1 7l5 5M1 7h12" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+          <div class="mw sent" id="d1">
+            <div class="bc">
+              <div class="bbl sent" data-msgid="d1" onmousedown="startLongPress(event,'d1')" ontouchstart="startLongPress(event,'d1')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="bbl-txt">Looking forward to it! 🏌️</div>
+                <div class="bbl-meta">
+                  <span class="bbl-time">8:47 AM</span>
+                  <span class="checks"><svg width="16" height="9" viewBox="0 0 16 9" fill="none"><path d="M1 4.5l3 3 5-6" stroke="rgba(255,255,255,.65)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 4.5l3 3 5-6" stroke="rgba(255,255,255,.65)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mw recv" id="d2">
+            <div class="bc">
+              <div class="bbl recv nt" data-msgid="d2" onmousedown="startLongPress(event,'d2')" ontouchstart="startLongPress(event,'d2')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="bbl-txt">Should be a great day. Weather looks perfect!</div>
+                <div class="bbl-meta"><span class="bbl-time">8:48 AM</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mw sent" id="d3" style="padding-top:0">
+            <div class="bc">
+              <div class="bbl sent nt" data-msgid="d3" onmousedown="startLongPress(event,'d3')" ontouchstart="startLongPress(event,'d3')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="bbl-txt">Will you be bringing your own clubs?</div>
+                <div class="bbl-meta">
+                  <span class="bbl-time">8:50 AM</span>
+                  <span class="checks"><svg width="16" height="9" viewBox="0 0 16 9" fill="none"><path d="M1 4.5l3 3 5-6" stroke="rgba(255,255,255,.65)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 4.5l3 3 5-6" stroke="rgba(255,255,255,.65)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mw recv" id="d4">
+            <div class="bc">
+              <div class="bbl recv" data-msgid="d4" onmousedown="startLongPress(event,'d4')" ontouchstart="startLongPress(event,'d4')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="bbl-txt">Of course! Always prepared 😄 You?</div>
+                <div class="bbl-meta"><span class="bbl-time">8:51 AM</span></div>
+              </div>
+            </div>
+            <div class="swipe-icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M6 2L1 7l5 5M1 7h12" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+          <div class="mw sent" id="d5">
+            <div class="bc">
+              <div class="bbl sent" data-msgid="d5" onmousedown="startLongPress(event,'d5')" ontouchstart="startLongPress(event,'d5')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="bbl-txt">Renting there — first time on this course! 🌿</div>
+                <div class="bbl-meta">
+                  <span class="bbl-time">8:52 AM</span>
+                  <span class="checks" id="checks-d5">
+                    <svg width="16" height="9" viewBox="0 0 16 9" fill="none"><path d="M1 4.5l3 3 5-6" stroke="#7dd4a8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 4.5l3 3 5-6" stroke="#7dd4a8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mw recv" id="d6">
+            <div class="bc">
+              <div class="bbl recv" data-msgid="d6" onmousedown="startLongPress(event,'d6')" ontouchstart="startLongPress(event,'d6')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="bbl-txt">You'll love it. It's a beautiful course 🌿</div>
+                <div class="bbl-meta"><span class="bbl-time">8:54 AM</span></div>
+              </div>
+            </div>
+            <div class="swipe-icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M6 2L1 7l5 5M1 7h12" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+          <!-- Voice message -->
+          <div class="mw recv" id="d7" style="margin-top:2px">
+            <div class="bc">
+              <div class="bbl recv" data-msgid="d7" onmousedown="startLongPress(event,'d7')" ontouchstart="startLongPress(event,'d7')" onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+                <div class="voice-inner">
+                  <button class="vplay" onclick="playVoice(this)">
+                    <svg width="12" height="14" viewBox="0 0 12 14" fill="none"><path d="M1 1l10 6-10 6V1Z" fill="#818898"/></svg>
+                  </button>
+                  <div class="waveform" id="wf-d7"></div>
+                  <span class="vdur">1:23</span>
+                </div>
+                <div class="bbl-meta"><span class="bbl-time">9:03 AM</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- typing (hidden) -->
+          <div class="typing-wrap" id="typingDM" style="display:none">
+            <div class="typing-bbl">
+              <div class="td"></div><div class="td"></div><div class="td"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <button class="scroll-fab gone" id="fabDM" onclick="scrollToBottom('dm')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 4l5 5 5-5" stroke="#818898" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <div class="reply-bar hidden" id="replyBarDM">
+        <div class="reply-line"></div>
+        <div class="reply-body">
+          <div class="reply-who" id="replyWhoDM">Raj Singh</div>
+          <div class="reply-txt" id="replyTxtDM">Voice message</div>
+        </div>
+        <button class="reply-x" onclick="closeReply('dm')">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="#818898" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <div class="input-bar" id="inputBarDM">
+        <button class="attach-btn">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9.5" stroke="#818898" stroke-width="1.4"/><path d="M11 7v8M7 11h8" stroke="#818898" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="input-wrap" onclick="focusInput('dm')">
+          <div class="input-fake" id="inputDM" contenteditable="true" data-ph="Message" oninput="onInput('dm')" onkeydown="onKey(event,'dm')"></div>
+          <button class="emoji-btn">😊</button>
+        </div>
+        <button class="mic-btn" id="micDM" onmousedown="startMic('dm')" ontouchstart="startMic('dm')" onmouseup="stopMic('dm')" ontouchend="stopMic('dm')">
+          <svg width="16" height="20" viewBox="0 0 16 20" fill="none"><rect x="4.5" y="1" width="7" height="11" rx="3.5" stroke="#818898" stroke-width="1.5"/><path d="M1 9.5C1 13.09 4.13 16 8 16s7-2.91 7-6.5" stroke="#818898" stroke-width="1.5" stroke-linecap="round"/><path d="M8 16v3" stroke="#818898" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="send-btn" id="sendDM" onclick="sendMessage('dm')">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 14L8 2l6 12-6-4-6 4Z" fill="white"/></svg>
+        </button>
+      </div>
+      <div class="kb" id="kbDM">
+        <div class="kb-inner">
+          <div class="kb-row" id="kbR1d"></div>
+          <div class="kb-row" id="kbR2d"></div>
+          <div class="kb-row">
+            <div class="k fn">⇧</div>
+            <div class="k fn">Z</div><div class="k fn">X</div><div class="k fn">C</div>
+            <div class="k fn">V</div><div class="k fn">B</div><div class="k fn">N</div>
+            <div class="k fn">M</div>
+            <div class="k fn" onclick="delChar('dm')">⌫</div>
+          </div>
+          <div class="kb-row">
+            <div class="k fn">123</div>
+            <div class="k space" onclick="addChar(' ','dm')">space</div>
+            <div class="k ret" onclick="sendMessage('dm')">return</div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /sDM -->
+
+
+    <!-- ══════════════ REACTION OVERLAY ══════════════ -->
+    <div class="rxn-overlay" id="rxnOverlay">
+      <div class="rxn-bg" onclick="closeRxn()"></div>
+      <div class="rxn-picker appear" id="rxnPicker">
+        <div class="rxn-em" onclick="addReaction('❤️')">❤️</div>
+        <div class="rxn-em" onclick="addReaction('👍')">👍</div>
+        <div class="rxn-em" onclick="addReaction('😂')">😂</div>
+        <div class="rxn-em" onclick="addReaction('😮')">😮</div>
+        <div class="rxn-em" onclick="addReaction('😢')">😢</div>
+        <div class="rxn-em" onclick="addReaction('🙏')">🙏</div>
+      </div>
+    </div>
+
+    <!-- ══════════════ MESSAGE CONTEXT MENU ══════════════ -->
+    <div class="rxn-overlay" id="menuOverlay">
+      <div class="rxn-bg" onclick="closeMenu()"></div>
+      <div class="msg-menu appear" id="msgMenu">
+        <div class="mmi" onclick="replyToMsg()">Reply <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 4L1 8l4 4M1 8h9a4 4 0 0 1 0 8H8" stroke="#4d525b" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="mmi" onclick="openRxnPicker()">React <span style="font-size:15px">😊</span></div>
+        <div class="mmi" onclick="copyMsg()">Copy <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="#4d525b" stroke-width="1.4"/><path d="M4 11H3a1.5 1.5 0 0 1-1.5-1.5v-6A1.5 1.5 0 0 1 3 2h6A1.5 1.5 0 0 1 10.5 3.5V5" stroke="#4d525b" stroke-width="1.4"/></svg></div>
+        <div class="mmi" onclick="forwardMsg()">Forward <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4l5 4-5 4M1 12v-2a4 4 0 0 1 4-4h10" stroke="#4d525b" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="mmi red" onclick="deleteMsg()">Delete <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M6 4V2h4v2M5.5 4v8a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1V4" stroke="#ff3b30" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
+
+  </div><!-- /sc-wrap -->
+</div><!-- /phone -->
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   KEYBOARD BUILDER
+═══════════════════════════════════════════════════════ */
+const ROWS = [
+  ['Q','W','E','R','T','Y','U','I','O','P'],
+  ['A','S','D','F','G','H','J','K','L']
+];
+
+function buildKb(r1id, r2id, ctx) {
+  const r1 = document.getElementById(r1id);
+  const r2 = document.getElementById(r2id);
+  ROWS[0].forEach(k => {
+    const d = document.createElement('div');
+    d.className='k'; d.textContent=k;
+    d.addEventListener('mousedown', e => { e.preventDefault(); addChar(k.toLowerCase(), ctx); });
+    d.addEventListener('touchstart', e => { e.preventDefault(); addChar(k.toLowerCase(), ctx); });
+    r1.appendChild(d);
+  });
+  ROWS[1].forEach(k => {
+    const d = document.createElement('div');
+    d.className='k'; d.textContent=k;
+    d.addEventListener('mousedown', e => { e.preventDefault(); addChar(k.toLowerCase(), ctx); });
+    d.addEventListener('touchstart', e => { e.preventDefault(); addChar(k.toLowerCase(), ctx); });
+    r2.appendChild(d);
+  });
+}
+
+buildKb('kbR1g','kbR2g','group');
+buildKb('kbR1d','kbR2d','dm');
+
+/* ═══════════════════════════════════════════════════════
+   WAVEFORM BUILDER
+═══════════════════════════════════════════════════════ */
+function buildWaveform(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const heights = [8,14,20,28,22,16,24,30,18,12,26,20,14,24,18,28,20,14,22,16,10,18,24,16,20,28,18,12,20,16];
+  heights.forEach((h, i) => {
+    const b = document.createElement('div');
+    b.className = 'wb';
+    const filled = i < 12; // first portion "played"
+    b.style.height = h + 'px';
+    b.style.opacity = filled ? '0.9' : '0.5';
+    el.appendChild(b);
+  });
+}
+buildWaveform('wf-d7');
+
+/* ═══════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════ */
+let activeScreen = 'list'; // 'list' | 'group' | 'dm'
+
+function openChat(type) {
+  const listEl  = document.getElementById('sList');
+  const chatEl  = document.getElementById(type === 'group' ? 'sGroup' : 'sDM');
+
+  listEl.classList.remove('right','left');
+  chatEl.classList.remove('right','left');
+
+  listEl.classList.add('anim-push-out');
+  chatEl.classList.add('anim-push-in');
+
+  listEl.addEventListener('animationend', () => {
+    listEl.classList.remove('anim-push-out');
+    listEl.classList.add('left');
+  }, { once: true });
+
+  chatEl.addEventListener('animationend', () => {
+    chatEl.classList.remove('anim-push-in');
+    activeScreen = type;
+    scrollToBottom(type, false);
+  }, { once: true });
+}
+
+function goBack() {
+  const listEl = document.getElementById('sList');
+  const chatEl = document.getElementById(activeScreen === 'group' ? 'sGroup' : 'sDM');
+
+  // close keyboard if open
+  closeKb(activeScreen);
+
+  listEl.classList.remove('right','left');
+  chatEl.classList.remove('right','left');
+
+  listEl.classList.add('anim-pop-in');
+  chatEl.classList.add('anim-pop-out');
+
+  listEl.addEventListener('animationend', () => {
+    listEl.classList.remove('anim-pop-in');
+  }, { once: true });
+
+  chatEl.addEventListener('animationend', () => {
+    chatEl.classList.remove('anim-pop-out');
+    chatEl.classList.add('right');
+    activeScreen = 'list';
+  }, { once: true });
+}
+
+/* ═══════════════════════════════════════════════════════
+   EDGE SWIPE-BACK (touch)
+═══════════════════════════════════════════════════════ */
+let edgeTouchX = null;
+document.addEventListener('touchstart', e => {
+  if (e.touches[0].clientX < 20 && activeScreen !== 'list') {
+    edgeTouchX = e.touches[0].clientX;
+  }
+}, { passive: true });
+document.addEventListener('touchend', e => {
+  if (edgeTouchX !== null) {
+    const dx = e.changedTouches[0].clientX - edgeTouchX;
+    if (dx > 50) goBack();
+    edgeTouchX = null;
+  }
+}, { passive: true });
+
+/* ═══════════════════════════════════════════════════════
+   SECTION COLLAPSE
+═══════════════════════════════════════════════════════ */
+const secState = { clubs: true, events: true, dms: true };
+
+function toggleSec(id) {
+  const body = document.getElementById('sec-' + id);
+  const chv  = document.getElementById('chv-' + id);
+  secState[id] = !secState[id];
+  if (secState[id]) {
+    body.classList.remove('collapsed');
+    body.style.maxHeight = body.scrollHeight + 'px';
+    chv.classList.remove('closed');
+    chv.classList.add('open');
+  } else {
+    body.style.maxHeight = body.scrollHeight + 'px';
+    requestAnimationFrame(() => {
+      body.classList.add('collapsed');
+      chv.classList.remove('open');
+      chv.classList.add('closed');
+    });
+  }
+}
+
+/* Init max-heights */
+['clubs','events','dms'].forEach(id => {
+  const el = document.getElementById('sec-' + id);
+  el.style.maxHeight = el.scrollHeight + 'px';
+});
+
+/* ═══════════════════════════════════════════════════════
+   KEYBOARD / INPUT
+═══════════════════════════════════════════════════════ */
+let kbOpen = { group: false, dm: false };
+
+function focusInput(ctx) {
+  if (kbOpen[ctx]) return;
+  kbOpen[ctx] = true;
+  document.getElementById('kb' + (ctx === 'group' ? 'Group' : 'DM')).classList.add('open');
+  scrollToBottom(ctx, true);
+  setTimeout(() => document.getElementById('input' + (ctx === 'group' ? 'Group' : 'DM')).focus(), 50);
+}
+
+function closeKb(ctx) {
+  kbOpen[ctx] = false;
+  document.getElementById('kb' + (ctx === 'group' ? 'Group' : 'DM')).classList.remove('open');
+}
+
+// Tap outside input → close keyboard
+document.addEventListener('mousedown', e => {
+  ['group','dm'].forEach(ctx => {
+    if (!kbOpen[ctx]) return;
+    const bar = document.getElementById('inputBar' + (ctx === 'group' ? 'Group' : 'DM'));
+    const kb  = document.getElementById('kb' + (ctx === 'group' ? 'Group' : 'DM'));
+    if (!bar.contains(e.target) && !kb.contains(e.target)) {
+      closeKb(ctx);
+    }
+  });
+});
+
+function addChar(ch, ctx) {
+  const el = document.getElementById('input' + (ctx === 'group' ? 'Group' : 'DM'));
+  el.textContent += ch;
+  onInput(ctx);
+  // move cursor to end
+  const range = document.createRange();
+  const sel = window.getSelection();
+  range.selectNodeContents(el);
+  range.collapse(false);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+function delChar(ctx) {
+  const el = document.getElementById('input' + (ctx === 'group' ? 'Group' : 'DM'));
+  const txt = el.textContent;
+  if (txt.length > 0) {
+    el.textContent = txt.slice(0, -1);
+    onInput(ctx);
+  }
+}
+
+function onInput(ctx) {
+  const el   = document.getElementById('input' + (ctx === 'group' ? 'Group' : 'DM'));
+  const send = document.getElementById('send' + (ctx === 'group' ? 'Group' : 'DM'));
+  const mic  = document.getElementById('mic' + (ctx === 'group' ? 'Group' : 'DM'));
+  const has  = el.textContent.trim().length > 0;
+  send.classList.toggle('show', has);
+  mic.classList.toggle('hide', has);
+}
+
+function onKey(e, ctx) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage(ctx);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   SEND MESSAGE
+═══════════════════════════════════════════════════════ */
+let msgCounter = { group: 100, dm: 200 };
+const replies = {
+  group: [
+    'Can't wait! This is going to be amazing 🌸',
+    'I'll bring some extra chairs too!',
+    'Thanks for organizing everything! 🙌',
+    'See you all there! 🎉',
+    'Does anyone need a ride?'
+  ],
+  dm: [
+    'That's awesome! You'll get the hang of it quickly 😄',
+    'The pro shop there is great too!',
+    'We should do this more often! ⛳',
+    'Let me know if you need any tips!',
+    'Looking forward to seeing you there 🌿'
+  ]
+};
+let replyIndex = { group: 0, dm: 0 };
+
+function sendMessage(ctx) {
+  const inputId = 'input' + (ctx === 'group' ? 'Group' : 'DM');
+  const innerId = 'msgInner' + (ctx === 'group' ? 'Group' : 'DM');
+  const typingId = 'typing' + (ctx === 'group' ? 'Group' : 'DM');
+  const el = document.getElementById(inputId);
+  const txt = el.textContent.trim();
+  if (!txt) return;
+
+  el.textContent = '';
+  onInput(ctx);
+
+  const id = ctx + '-' + msgCounter[ctx]++;
+  const time = new Date().toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+
+  // build message
+  const mw = document.createElement('div');
+  mw.className = 'mw sent new-sent';
+  mw.id = id;
+
+  // check if replying
+  const replyBar = document.getElementById('replyBar' + (ctx === 'group' ? 'Group' : 'DM'));
+  const isReplying = !replyBar.classList.contains('hidden');
+  const replyWho = document.getElementById('replyWho' + (ctx === 'group' ? 'Group' : 'DM'))?.textContent;
+  const replyTxt = document.getElementById('replyTxt' + (ctx === 'group' ? 'Group' : 'DM'))?.textContent;
+
+  mw.innerHTML = `
+    <div class="bc">
+      <div class="bbl sent"
+        data-msgid="${id}"
+        onmousedown="startLongPress(event,'${id}')"
+        ontouchstart="startLongPress(event,'${id}')"
+        onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+        ${isReplying ? `<div class="rq"><div class="rq-who">${replyWho}</div>${replyTxt}</div>` : ''}
+        <div class="bbl-txt">${escHtml(txt)}</div>
+        <div class="bbl-meta">
+          <span class="bbl-time">${time}</span>
+          <span class="checks">
+            <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="rgba(255,255,255,.65)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="swipe-icon">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8 2l5 5-5 5M13 7H1" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  `;
+
+  document.getElementById(innerId).appendChild(mw);
+  if (isReplying) closeReply(ctx);
+  scrollToBottom(ctx, true);
+
+  // delivered check after 600ms
+  setTimeout(() => {
+    const checksEl = mw.querySelector('.checks');
+    if (checksEl) checksEl.innerHTML = `<svg width="16" height="9" viewBox="0 0 16 9" fill="none"><path d="M1 4.5l3 3 5-6" stroke="rgba(255,255,255,.65)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 4.5l3 3 5-6" stroke="rgba(255,255,255,.65)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  }, 600);
+
+  // read check (blue) after 1.2s
+  setTimeout(() => {
+    const checksEl = mw.querySelector('.checks');
+    if (checksEl) checksEl.innerHTML = `<svg width="16" height="9" viewBox="0 0 16 9" fill="none"><path d="M1 4.5l3 3 5-6" stroke="#7dd4a8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 4.5l3 3 5-6" stroke="#7dd4a8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  }, 1200);
+
+  // show typing after 1.4s
+  setTimeout(() => {
+    const typing = document.getElementById(typingId);
+    typing.style.display = 'flex';
+    typing.classList.add('appear');
+    scrollToBottom(ctx, true);
+  }, 1400);
+
+  // show reply after 3.2s
+  setTimeout(() => {
+    const typing = document.getElementById(typingId);
+    typing.style.display = 'none';
+    typing.classList.remove('appear');
+
+    const replyTxtContent = replies[ctx][replyIndex[ctx] % replies[ctx].length];
+    replyIndex[ctx]++;
+
+    const rmw = document.createElement('div');
+    rmw.className = 'mw recv new-recv';
+    const rtime = new Date().toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+
+    if (ctx === 'group') {
+      const senders = [{ name:'Emily Chen', bg:'#c0717a', init:'EC' }, { name:'Sarah M.', bg:'#4a90c4', init:'SM' }];
+      const s = senders[replyIndex.group % 2];
+      rmw.innerHTML = `
+        <div class="msg-avi" style="background:${s.bg}">${s.init}</div>
+        <div class="bc">
+          <div class="sender-name">${s.name}</div>
+          <div class="bbl recv" data-msgid="auto-${Date.now()}"
+            onmousedown="startLongPress(event,'auto-${Date.now()}')"
+            ontouchstart="startLongPress(event,'auto-${Date.now()}')"
+            onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+            <div class="bbl-txt">${escHtml(replyTxtContent)}</div>
+            <div class="bbl-meta"><span class="bbl-time">${rtime}</span></div>
+          </div>
+        </div>
+        <div class="swipe-icon">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M6 2L1 7l5 5M1 7h12" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      `;
+    } else {
+      rmw.innerHTML = `
+        <div class="bc">
+          <div class="bbl recv" data-msgid="auto-${Date.now()}"
+            onmousedown="startLongPress(event,'auto-${Date.now()}')"
+            ontouchstart="startLongPress(event,'auto-${Date.now()}')"
+            onmouseup="cancelLong()" ontouchend="cancelLong()" onmouseleave="cancelLong()">
+            <div class="bbl-txt">${escHtml(replyTxtContent)}</div>
+            <div class="bbl-meta"><span class="bbl-time">${rtime}</span></div>
+          </div>
+        </div>
+        <div class="swipe-icon">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M6 2L1 7l5 5M1 7h12" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      `;
+    }
+    document.getElementById(innerId).appendChild(rmw);
+    scrollToBottom(ctx, true);
+    attachSwipe(rmw, ctx);
+  }, 3200);
+
+  attachSwipe(mw, ctx);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLL
+═══════════════════════════════════════════════════════ */
+function scrollToBottom(ctx, smooth) {
+  const area = document.getElementById('msgArea' + (ctx === 'group' ? 'Group' : 'DM'));
+  if (!area) return;
+  area.scrollTo({ top: area.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
+}
+
+function setupScrollFab(areaId, fabId) {
+  const area = document.getElementById(areaId);
+  const fab  = document.getElementById(fabId);
+  if (!area || !fab) return;
+  area.addEventListener('scroll', () => {
+    const atBottom = area.scrollHeight - area.scrollTop - area.clientHeight < 60;
+    fab.classList.toggle('gone', atBottom);
+  });
+}
+setupScrollFab('msgAreaGroup','fabGroup');
+setupScrollFab('msgAreaDM','fabDM');
+
+/* ═══════════════════════════════════════════════════════
+   LONG PRESS → CONTEXT MENU
+═══════════════════════════════════════════════════════ */
+let longTimer = null;
+let activeMsg = null;
+let activeBbl = null;
+let activeCtx = null;
+
+function startLongPress(e, msgId) {
+  cancelLong();
+  const bbl = e.currentTarget;
+  longTimer = setTimeout(() => {
+    activeBbl = bbl;
+    activeMsg = msgId;
+    activeCtx = activeScreen;
+    showMenu(bbl, e);
+  }, 480);
+}
+
+function cancelLong() {
+  clearTimeout(longTimer);
+  longTimer = null;
+}
+
+function showMenu(bbl, e) {
+  const overlay = document.getElementById('menuOverlay');
+  const menu    = document.getElementById('msgMenu');
+  const bblRect = bbl.getBoundingClientRect();
+  const phoneRect = document.querySelector('.phone').getBoundingClientRect();
+
+  overlay.classList.add('on');
+  menu.classList.add('appear');
+
+  // position the menu relative to the phone
+  const relTop  = bblRect.top  - phoneRect.top;
+  const relLeft = bblRect.left - phoneRect.left;
+  const isSent  = bbl.classList.contains('sent');
+
+  let top = relTop - 180;
+  if (top < 60) top = relTop + bblRect.height + 10;
+  const left = isSent ? Math.min(relLeft, 393 - 200) : relLeft;
+
+  menu.style.top  = Math.max(60, top) + 'px';
+  menu.style.left = Math.max(10, Math.min(left, 180)) + 'px';
+  menu.style.transformOrigin = isSent ? 'top right' : 'top left';
+
+  // show reaction picker above message too
+  positionRxnPicker(bblRect, phoneRect, isSent);
+}
+
+function positionRxnPicker(bblRect, phoneRect, isSent) {
+  const picker = document.getElementById('rxnPicker');
+  const relTop  = bblRect.top  - phoneRect.top;
+  const relLeft = bblRect.left - phoneRect.left;
+
+  let top = relTop - 64;
+  if (top < 58) top = relTop + bblRect.height + 8;
+  let left = isSent ? relLeft + bblRect.width - 285 : relLeft;
+  left = Math.max(10, Math.min(left, 393 - 290));
+
+  picker.style.top  = top + 'px';
+  picker.style.left = left + 'px';
+  picker.className  = 'rxn-picker appear';
+}
+
+function closeMenu() {
+  document.getElementById('menuOverlay').classList.remove('on');
+}
+
+/* ═══════════════════════════════════════════════════════
+   REACTION PICKER
+═══════════════════════════════════════════════════════ */
+function openRxnPicker() {
+  closeMenu();
+  const overlay = document.getElementById('rxnOverlay');
+  const picker  = document.getElementById('rxnPicker');
+  overlay.classList.add('on');
+  picker.className = 'rxn-picker appear';
+
+  if (activeBbl) {
+    const bblRect   = activeBbl.getBoundingClientRect();
+    const phoneRect = document.querySelector('.phone').getBoundingClientRect();
+    positionRxnPicker(bblRect, phoneRect, activeBbl.classList.contains('sent'));
+  }
+}
+
+function closeRxn() {
+  const picker = document.getElementById('rxnPicker');
+  picker.className = 'rxn-picker dismiss';
+  setTimeout(() => {
+    document.getElementById('rxnOverlay').classList.remove('on');
+    picker.className = 'rxn-picker';
+  }, 200);
+}
+
+function addReaction(emoji) {
+  if (activeBbl) {
+    // remove old badge if exists
+    let old = activeBbl.querySelector('.rxn-badge');
+    if (old) old.remove();
+    const badge = document.createElement('div');
+    const isSent = activeBbl.classList.contains('sent');
+    badge.className = 'rxn-badge ' + (isSent ? 'r' : 'l');
+    badge.textContent = emoji;
+    badge.style.animation = 'rxnIn .3s cubic-bezier(.34,1.56,.64,1)';
+    activeBbl.appendChild(badge);
+    // add margin to wrapper
+    const mw = activeBbl.closest('.mw');
+    if (mw) mw.style.marginBottom = '16px';
+  }
+  closeRxn();
+}
+
+function showRxnInfo() {
+  // Could show who reacted - just a tap feedback for now
+}
+
+/* ═══════════════════════════════════════════════════════
+   CONTEXT MENU ACTIONS
+═══════════════════════════════════════════════════════ */
+function replyToMsg() {
+  closeMenu();
+  const ctx = activeCtx;
+  if (!ctx || ctx === 'list') return;
+  const who   = activeBbl?.classList.contains('sent') ? 'You' :
+    (ctx === 'group' ? (activeBbl?.closest('.mw')?.querySelector('.sender-name')?.textContent || 'Someone') : 'Raj Singh');
+  const txt   = activeBbl?.querySelector('.bbl-txt')?.textContent?.slice(0,48) || 'Message';
+  const barId = 'replyBar' + (ctx === 'group' ? 'Group' : 'DM');
+  document.getElementById('replyWho' + (ctx === 'group' ? 'Group' : 'DM')).textContent = who;
+  document.getElementById('replyTxt' + (ctx === 'group' ? 'Group' : 'DM')).textContent = txt;
+  document.getElementById(barId).classList.remove('hidden');
+  focusInput(ctx);
+}
+
+function copyMsg() {
+  const txt = activeBbl?.querySelector('.bbl-txt')?.textContent || '';
+  navigator.clipboard?.writeText(txt).catch(()=>{});
+  closeMenu();
+}
+
+function forwardMsg() { closeMenu(); }
+function deleteMsg()  { closeMenu(); }
+
+/* ═══════════════════════════════════════════════════════
+   REPLY BAR
+═══════════════════════════════════════════════════════ */
+function closeReply(ctx) {
+  document.getElementById('replyBar' + (ctx === 'group' ? 'Group' : 'DM')).classList.add('hidden');
+}
+
+/* ═══════════════════════════════════════════════════════
+   SWIPE TO REPLY
+═══════════════════════════════════════════════════════ */
+function attachSwipe(mw, ctx) {
+  let startX = null, isDragging = false, dx = 0;
+  const bbl      = mw.querySelector('.bbl');
+  const icon     = mw.querySelector('.swipe-icon');
+  const isSent   = mw.classList.contains('sent');
+  const threshold = 72;
+
+  function onStart(e) {
+    startX = (e.touches ? e.touches[0] : e).clientX;
+    isDragging = false; dx = 0;
+  }
+  function onMove(e) {
+    if (startX === null) return;
+    const cx = (e.touches ? e.touches[0] : e).clientX;
+    const rawDx = cx - startX;
+    // For sent msgs, swipe left; for recv, swipe right
+    dx = isSent ? Math.max(-threshold - 10, Math.min(0, rawDx))
+                : Math.max(0, Math.min(threshold + 10, rawDx));
+    if (Math.abs(dx) > 6) {
+      isDragging = true;
+      if (e.cancelable) e.preventDefault();
+    }
+    if (!isDragging) return;
+    bbl.style.transition = 'none';
+    bbl.style.transform = `translateX(${dx}px)`;
+    if (icon) {
+      const pct = Math.min(Math.abs(dx) / threshold, 1);
+      icon.style.opacity = pct > 0.4 ? ((pct - 0.4) / 0.6).toFixed(2) : '0';
+      icon.style.transform = `translateY(-50%) scale(${0.7 + pct * 0.3})`;
+    }
+  }
+  function onEnd() {
+    if (!isDragging) { startX = null; return; }
+    const didReply = Math.abs(dx) >= threshold;
+    bbl.style.transition = 'transform .4s cubic-bezier(.34,1.56,.64,1)';
+    bbl.style.transform = 'translateX(0)';
+    if (icon) { icon.style.opacity = '0'; icon.style.transform = 'translateY(-50%) scale(0.7)'; }
+    if (didReply) {
+      activeBbl = bbl;
+      activeCtx = ctx;
+      replyToMsg();
+    }
+    startX = null; isDragging = false; dx = 0;
+  }
+
+  mw.addEventListener('touchstart', onStart, { passive: true });
+  mw.addEventListener('touchmove',  onMove,  { passive: false });
+  mw.addEventListener('touchend',   onEnd);
+  mw.addEventListener('mousedown',  onStart);
+  document.addEventListener('mousemove', e => { if (startX !== null && mw === e.target?.closest('.mw')) onMove(e); });
+  document.addEventListener('mouseup', onEnd);
+}
+
+// Attach swipe to pre-existing messages
+document.querySelectorAll('.mw').forEach(mw => {
+  const ctx = mw.closest('#sGroup') ? 'group' : 'dm';
+  attachSwipe(mw, ctx);
+});
+
+/* ═══════════════════════════════════════════════════════
+   VOICE MESSAGE
+═══════════════════════════════════════════════════════ */
+let micTimer = null;
+let recording = false;
+
+function startMic(ctx) {
+  micTimer = setTimeout(() => {
+    recording = true;
+    const btn = document.getElementById('mic' + (ctx === 'group' ? 'Group' : 'DM'));
+    btn.classList.add('recording');
+  }, 300);
+}
+
+function stopMic(ctx) {
+  clearTimeout(micTimer);
+  const btn = document.getElementById('mic' + (ctx === 'group' ? 'Group' : 'DM'));
+  if (recording) {
+    btn.classList.remove('recording');
+    recording = false;
+    sendVoiceMessage(ctx);
+  }
+}
+
+function sendVoiceMessage(ctx) {
+  const innerId = 'msgInner' + (ctx === 'group' ? 'Group' : 'DM');
+  const time = new Date().toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+  const wfId = 'wf-' + Date.now();
+  const mw = document.createElement('div');
+  mw.className = 'mw sent new-sent';
+  mw.innerHTML = `
+    <div class="bc">
+      <div class="bbl sent" onmousedown="cancelLong()" onmouseup="cancelLong()">
+        <div class="voice-inner">
+          <button class="vplay" onclick="playVoice(this)">
+            <svg width="12" height="14" viewBox="0 0 12 14" fill="none"><path d="M1 1l10 6-10 6V1Z" fill="rgba(255,255,255,.9)"/></svg>
+          </button>
+          <div class="waveform" id="${wfId}"></div>
+          <span class="vdur">0:${Math.floor(Math.random()*40+10)}</span>
+        </div>
+        <div class="bbl-meta">
+          <span class="bbl-time">${time}</span>
+          <span class="checks"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="rgba(255,255,255,.65)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById(innerId).appendChild(mw);
+  buildWaveform(wfId);
+  scrollToBottom(ctx, true);
+}
+
+function playVoice(btn) {
+  const icon = btn.querySelector('svg path');
+  const wf   = btn.closest('.voice-inner')?.querySelector('.waveform');
+  const isPlaying = btn.dataset.playing === '1';
+  if (isPlaying) {
+    btn.dataset.playing = '0';
+    icon.setAttribute('d','M1 1l10 6-10 6V1Z');
+    return;
+  }
+  btn.dataset.playing = '1';
+  icon.setAttribute('d','M2 2h3v12H2V2ZM9 2h3v12H9V2Z'); // pause icon
+  if (wf) {
+    const bars = wf.querySelectorAll('.wb');
+    let i = 0;
+    const step = () => {
+      if (i < bars.length) {
+        bars[i].style.opacity = '0.9';
+        i++;
+        if (btn.dataset.playing === '1') setTimeout(step, 80);
+        else { btn.dataset.playing = '0'; icon.setAttribute('d','M1 1l10 6-10 6V1Z'); }
+      } else {
+        btn.dataset.playing = '0';
+        icon.setAttribute('d','M1 1l10 6-10 6V1Z');
+      }
+    };
+    setTimeout(step, 80);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════ */
+// Initial scroll
+scrollToBottom('group', false);
+scrollToBottom('dm', false);
+</script>
+</body>
+</html>

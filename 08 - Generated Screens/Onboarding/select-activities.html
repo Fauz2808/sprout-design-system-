@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Onboarding: Select Activities (revised)</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brand-500: #186338;
+    --brand-600: #134f2d;
+    --brand-700: #1e3e2b;
+    --brand-200: #77b691;
+    --brand-50:  #e2e9e3;
+    --secondary-500: #f4f1ea;
+    --secondary-600: #eae6db;
+    --secondary-700: #dbd5c8;
+    --grey-300: #b3b8c1;
+    --grey-500: #818898;
+    --grey-700: #4d525b;
+    --grey-900: #1a1b1e;
+  }
+
+  body {
+    background: #cfc8b8;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 24px 64px;
+    font-family: 'Inter', sans-serif;
+    gap: 32px;
+  }
+
+  .variant-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .variant-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #5a5347; text-align: center; max-width: 393px; }
+
+  .phone {
+    width: 393px; height: 852px;
+    background: var(--secondary-500);
+    border-radius: 54px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04), 0 24px 80px rgba(0,0,0,0.24);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dynamic-island { width: 120px; height: 36px; background: #000; border-radius: 20px; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 10; }
+
+  .status-bar { height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 14px 28px 0; flex-shrink: 0; }
+  .status-time { font-size: 15px; font-weight: 600; color: var(--grey-900); }
+  .status-icons { display: flex; align-items: center; gap: 7px; }
+
+  .nav-row { display: flex; align-items: center; gap: 14px; padding: 8px 24px 0; flex-shrink: 0; }
+  .back-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--secondary-600); border: none; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .back-btn svg { width: 18px; height: 18px; stroke: var(--brand-700); }
+  .progress { flex: 1; display: flex; gap: 8px; }
+  .progress span { flex: 1; height: 4px; border-radius: 2px; background: var(--brand-50); }
+  .progress span.done { background: var(--brand-700); }
+
+  .scroll-area { flex: 1; overflow-y: auto; padding: 20px 24px 12px; }
+  .scroll-area::-webkit-scrollbar { display: none; }
+
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--brand-600); }
+  h1 { margin-top: 8px; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 34px; color: var(--brand-700); line-height: 1.1; }
+
+  .rationale { margin-top: 10px; font-size: 14.5px; line-height: 1.5; color: var(--grey-700); }
+  .rationale b { color: var(--brand-700); font-weight: 600; }
+
+  .search {
+    margin-top: 18px;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--secondary-700); border-radius: 16px;
+    padding: 14px 16px;
+  }
+  .search svg { width: 18px; height: 18px; stroke: var(--grey-500); flex-shrink: 0; }
+  .search span { font-size: 15px; color: var(--grey-500); }
+
+  .create-btn {
+    margin-top: 12px;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--secondary-700); border-radius: 14px; border: none;
+    padding: 12px 18px; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700;
+    color: var(--brand-700); cursor: pointer;
+  }
+  .create-btn svg { width: 15px; height: 15px; stroke: var(--brand-700); stroke-width: 2.6; }
+
+  .category { margin-top: 26px; }
+  .cat-header { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .cat-header .emoji { font-size: 17px; }
+  .cat-header .name { flex: 1; font-size: 16px; font-weight: 700; color: var(--brand-700); }
+  .cat-header svg { width: 16px; height: 16px; stroke: var(--brand-700); stroke-width: 2.2; }
+  .cat-header.is-new .name::after {
+    content: 'NEW'; margin-left: 8px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em;
+    background: var(--brand-50); color: var(--brand-700); padding: 3px 7px; border-radius: 99px; vertical-align: 2px;
+  }
+
+  .chips { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--secondary-700); border-radius: 99px;
+    padding: 11px 16px; font-size: 14.5px; font-weight: 600; color: var(--brand-700);
+    white-space: nowrap;
+  }
+  .chip.highlight { background: var(--brand-50); box-shadow: inset 0 0 0 1.5px var(--brand-200); }
+
+  .footer { flex-shrink: 0; padding: 16px 24px 28px; box-shadow: 0 -8px 20px rgba(0,0,0,0.05); }
+  .continue-btn {
+    width: 100%; padding: 17px; border: none; border-radius: 99px;
+    background: var(--brand-200); color: #fff;
+    font-family: 'Playfair Display', serif; font-weight: 600; font-size: 18px; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+  <div class="variant-wrap">
+    <div class="variant-label">Select Activities — revised: adds rationale copy, renames Food → Food &amp; Beverage (+wine/happy hour), adds a Games category</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="11" viewBox="0 0 17 11" fill="var(--grey-900)"><rect x="0" y="7" width="3" height="4" rx="0.6"/><rect x="4" y="5" width="3" height="6" rx="0.6"/><rect x="8" y="3" width="3" height="8" rx="0.6"/><rect x="12" y="0" width="3" height="11" rx="0.6"/></svg>
+          <svg width="15" height="11" viewBox="0 0 17 11" fill="var(--grey-900)"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1zM3.5 7.6L5 9.1c1-0.9 2.2-1.4 3.5-1.4 1.3 0 2.5 0.5 3.5 1.4l1.5-1.5c-1.4-1.3-3.1-2-5-2-1.9 0-3.6 0.7-5 2zM6.5 10.6l2 2 2-2c-0.5-0.5-1.2-0.8-2-0.8s-1.5 0.3-2 0.8z"/></svg>
+          <svg width="25" height="11" viewBox="0 0 25 11"><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" fill="none" stroke="var(--grey-900)" stroke-opacity="0.45"/><rect x="22" y="3.5" width="1.5" height="4" rx="0.4" fill="var(--grey-900)" fill-opacity="0.45"/><rect x="2" y="2" width="9" height="7" rx="1.4" fill="var(--grey-900)"/></svg>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="back-btn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div class="progress"><span class="done"></span><span class="done"></span><span></span></div>
+      </div>
+
+      <div class="scroll-area">
+        <div class="eyebrow">Your Interests</div>
+        <h1>Select Activities</h1>
+        <div class="rationale">This helps you find <b>parents with similar interests</b>, swap recommendations, and get to know each other beyond drop-off.</div>
+
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <span>Search</span>
+        </div>
+
+        <button class="create-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Create Activity
+        </button>
+
+        <div class="category">
+          <div class="cat-header"><span class="emoji">⚽</span><span class="name">Sports</span><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6"/></svg></div>
+          <div class="chips">
+            <div class="chip">🏈 Football</div>
+            <div class="chip">🏀 Basketball</div>
+            <div class="chip">⚾ Baseball</div>
+            <div class="chip">⚽ Soccer</div>
+            <div class="chip">🎾 Tennis</div>
+            <div class="chip">🏐 Volleyball</div>
+            <div class="chip">🏓 Pickleball</div>
+            <div class="chip">⛳ Golf</div>
+            <div class="chip">🥊 Boxing</div>
+            <div class="chip">🥎 Softball</div>
+            <div class="chip">🏉 Rugby</div>
+            <div class="chip">🤾 Dodgeball</div>
+            <div class="chip">🏐 Sand Volleyball</div>
+            <div class="chip">🎾 Padel</div>
+            <div class="chip">🏓 Ping Pong</div>
+            <div class="chip">🥋 Martial Arts</div>
+          </div>
+        </div>
+
+        <div class="category">
+          <div class="cat-header"><span class="emoji">🍕</span><span class="name">Food &amp; Beverage</span><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6"/></svg></div>
+          <div class="chips">
+            <div class="chip highlight">🍷 Wine Night</div>
+            <div class="chip highlight">🍹 Happy Hour</div>
+            <div class="chip">🍤 Seafood</div>
+            <div class="chip">🍖 BBQ</div>
+            <div class="chip">🍗 Southern Comfort</div>
+            <div class="chip">🌶️ Latin</div>
+            <div class="chip">🍜 Korean</div>
+            <div class="chip">🍲 Vietnamese</div>
+            <div class="chip">🥙 Middle Eastern</div>
+            <div class="chip">🫒 Mediterranean</div>
+            <div class="chip">🍛 Indian</div>
+          </div>
+        </div>
+
+        <div class="category">
+          <div class="cat-header is-new"><span class="emoji">🎲</span><span class="name">Games</span><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6"/></svg></div>
+          <div class="chips">
+            <div class="chip highlight">🃏 Poker</div>
+            <div class="chip highlight">🎴 Cards</div>
+            <div class="chip highlight">🀄 Mahjong</div>
+            <div class="chip highlight">🎲 Board Games</div>
+            <div class="chip highlight">🧠 Trivia</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <button class="continue-btn">Continue</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

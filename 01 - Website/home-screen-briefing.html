@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Home · Sprout</title>
+  <style>
+    :root {
+      --forest:      #1E4A35;
+      --green-500:   #3A8A62;
+      --green-100:   #D8F0E5;
+      --sage:        #D6E8DC;
+      --cream:       #F0EDE6;
+      --cream-light: #FAF9F6;
+      --ink:         #1C1C1A;
+      --stone:       #6B6860;
+      --pebble:      #9E9B94;
+      --border:      rgba(0,0,0,0.08);
+      --surface:     #ffffff;
+
+      --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
+      --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {
+      background: #E8E4DC;
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+    }
+
+    .stage { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+    .caption {
+      font-family: var(--font-mono);
+      font-size: 11px; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--stone);
+    }
+    .caption strong { color: var(--ink); font-weight: 500; }
+
+    /* ── Device ── */
+    .device {
+      position: relative;
+      width: 390px; height: 844px;
+      border-radius: 56px; padding: 12px;
+      background: linear-gradient(160deg, #2a2a2c 0%, #1a1a1c 50%, #0e0e10 100%);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.04) inset,
+        0 0 0 2px #000 inset,
+        0 28px 60px -12px rgba(0,0,0,0.45),
+        0 8px 20px -8px rgba(0,0,0,0.35);
+      isolation: isolate;
+    }
+    .device::before, .device::after {
+      content: '';
+      position: absolute; width: 3px;
+      background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.06) 8%, transparent 16%, transparent 84%, rgba(255,255,255,0.04) 92%, transparent 100%);
+      top: 100px; bottom: 100px; pointer-events: none;
+    }
+    .device::before { left: -1px; }
+    .device::after  { right: -1px; }
+
+    .island {
+      position: absolute; top: 22px; left: 50%;
+      transform: translateX(-50%);
+      width: 124px; height: 36px;
+      background: #000; border-radius: 999px; z-index: 5;
+    }
+    .btn-rail { position: absolute; width: 4px; background: #0a0a0c; border-radius: 2px; }
+    .btn-rail.left-1  { left: -3px; top: 174px; height: 32px; }
+    .btn-rail.left-2  { left: -3px; top: 220px; height: 60px; }
+    .btn-rail.left-3  { left: -3px; top: 290px; height: 60px; }
+    .btn-rail.right-1 { right: -3px; top: 250px; height: 100px; }
+
+    /* ── Screen ── */
+    .screen {
+      position: relative; width: 100%; height: 100%;
+      background: var(--cream);
+      border-radius: 44px; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+
+    /* Status bar */
+    .statusbar {
+      flex: 0 0 47px;
+      padding: 18px 26px 0;
+      display: flex; align-items: flex-start; justify-content: space-between;
+      font-family: var(--font-body);
+      font-size: 15px; font-weight: 600; color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .statusbar .right { display: inline-flex; align-items: center; gap: 6px; }
+    .statusbar svg { width: 17px; height: 11px; fill: var(--ink); }
+    .statusbar .battery { width: 25px; }
+
+    /* Scroll area */
+    .content {
+      flex: 1 1 auto;
+      overflow-y: auto; overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 12px;
+    }
+    .content::-webkit-scrollbar { display: none; }
+
+    /* Home indicator */
+    .home-indicator { flex: 0 0 28px; position: relative; }
+    .home-indicator::after {
+      content: ''; position: absolute; left: 50%; bottom: 8px;
+      transform: translateX(-50%);
+      width: 134px; height: 5px;
+      background: var(--ink); border-radius: 999px; opacity: 0.2;
+    }
+
+    /* ── Header ── */
+    .top-header {
+      padding: 10px 20px 0;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #c8b89a;
+      overflow: hidden; flex-shrink: 0;
+      display: grid; place-items: center;
+      font-size: 15px;
+    }
+    .header-title {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 17px; font-weight: 600; color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .header-title svg { width: 14px; height: 14px; fill: var(--ink); opacity: 0.5; }
+    .notif-btn {
+      position: relative; width: 36px; height: 36px;
+      border-radius: 50%; background: var(--surface);
+      border: 1px solid var(--border);
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .notif-btn svg { width: 18px; height: 18px; stroke: var(--ink); fill: none; stroke-width: 1.7; }
+    .notif-badge {
+      position: absolute; top: 4px; right: 4px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--forest); color: #fff;
+      font-size: 9px; font-weight: 700;
+      display: grid; place-items: center;
+      border: 1.5px solid var(--cream);
+    }
+
+    /* ── Discover / My Events tabs ── */
+    .page-tabs {
+      display: flex; gap: 0;
+      padding: 12px 20px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .page-tab {
+      flex: 1; text-align: center;
+      padding-bottom: 10px;
+      font-size: 14px; font-weight: 500; color: var(--stone);
+    }
+    .page-tab.active {
+      color: var(--forest); font-weight: 600;
+      border-bottom: 2px solid var(--forest);
+      margin-bottom: -1px;
+    }
+
+    /* ── Search ── */
+    .search-bar {
+      margin: 0 20px 14px;
+      background: rgba(0,0,0,0.06);
+      border-radius: 12px;
+      padding: 9px 14px;
+      display: flex; align-items: center; gap: 8px;
+      color: var(--stone); font-size: 14px;
+    }
+    .search-bar svg { width: 16px; height: 16px; stroke: var(--stone); fill: none; stroke-width: 1.8; flex-shrink: 0; }
+
+    /* ── Filter pills ── */
+    .filter-row {
+      display: flex; gap: 8px;
+      padding: 0 20px 14px;
+      overflow-x: auto;
+    }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .filter-pill {
+      display: inline-flex; align-items: center;
+      padding: 7px 16px; border-radius: 999px;
+      font-size: 13px; font-weight: 500; white-space: nowrap;
+      background: transparent;
+      border: 1.5px solid rgba(0,0,0,0.12);
+      color: var(--ink);
+      flex-shrink: 0;
+    }
+    .filter-pill.active {
+      background: var(--forest); color: #fff; border-color: transparent;
+    }
+
+    /* ── Section header ── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; margin-bottom: 10px;
+    }
+    .section-title { font-size: 15px; font-weight: 600; color: var(--ink); }
+    .section-link  { font-size: 13px; color: var(--green-500); font-weight: 500; }
+
+    /* ── Briefing Card (hero) ── */
+    .briefing-card {
+      margin: 0 20px 18px;
+      background: linear-gradient(135deg, var(--forest) 0%, #2a5e3f 100%);
+      border-radius: 18px; padding: 18px;
+      position: relative; overflow: hidden; cursor: pointer;
+    }
+    .briefing-card::before {
+      content: ''; position: absolute;
+      top: -40px; right: -40px;
+      width: 130px; height: 130px; border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .briefing-label {
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.65); margin: 0 0 6px;
+      font-family: var(--font-mono);
+    }
+    .briefing-greeting {
+      font-size: 17px; font-weight: 600; color: #fff;
+      margin: 0 0 12px; line-height: 1.25;
+    }
+    .briefing-row {
+      display: flex; gap: 10px; margin-bottom: 14px;
+    }
+    .briefing-chip {
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,0.14);
+      border-radius: 999px; padding: 5px 10px;
+      font-size: 12px; color: rgba(255,255,255,0.9);
+    }
+    .briefing-chip span { font-weight: 700; }
+    .briefing-cta {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.13);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px; padding: 10px 14px;
+    }
+    .briefing-cta-label { font-size: 13px; font-weight: 600; color: #fff; }
+    .briefing-cta-sub   { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 1px; }
+    .briefing-arrow {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .briefing-arrow svg { width: 13px; height: 13px; stroke: #fff; fill: none; stroke-width: 2.5; }
+
+    /* ── Invitation cards ── */
+    .invite-card {
+      margin: 0 20px 10px;
+      background: var(--surface);
+      border-radius: 16px;
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .invite-thumb {
+      width: 52px; height: 52px; border-radius: 12px;
+      background: var(--sage); flex-shrink: 0;
+      overflow: hidden; display: grid; place-items: center;
+      font-size: 22px;
+    }
+    .invite-body { flex: 1; min-width: 0; }
+    .invite-name { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.3; }
+    .invite-meta { font-size: 11px; color: var(--stone); margin-top: 2px; }
+    .invite-by   { font-size: 11px; color: var(--stone); margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+    .invite-by .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--sage); flex-shrink: 0; overflow:hidden; display:grid; place-items:center; font-size: 8px; }
+    .invite-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .invite-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: grid; place-items: center; border: none; cursor: pointer;
+    }
+    .invite-btn.decline { background: rgba(0,0,0,0.07); }
+    .invite-btn.accept  { background: var(--forest); }
+    .invite-btn svg { width: 14px; height: 14px; stroke-width: 2.5; }
+    .invite-btn.decline svg { stroke: var(--stone); fill: none; }
+    .invite-btn.accept  svg { stroke: #fff; fill: none; }
+
+    /* ── Activity card ── */
+    .activity-scroll {
+      display: flex; gap: 10px;
+      padding: 0 20px; overflow-x: auto;
+      margin-bottom: 18px;
+    }
+    .activity-scroll::-webkit-scrollbar { display: none; }
+    .activity-card {
+      width: 160px; flex-shrink: 0;
+      background: var(--surface);
+      border-radius: 16px; overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .activity-img {
+      width: 100%; height: 90px;
+      background: var(--sage);
+      display: grid; place-items: center;
+      font-size: 28px;
+    }
+    .activity-body { padding: 10px; }
+    .activity-name { font-size: 12px; font-weight: 600; color: var(--ink); line-height: 1.3; margin: 0 0 4px; }
+    .activity-meta { font-size: 10px; color: var(--stone); display: flex; align-items: center; gap: 3px; }
+    .activity-meta svg { width: 10px; height: 10px; stroke: var(--stone); fill: none; stroke-width: 2; }
+    .activity-share {
+      margin-top: 8px;
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--green-100); border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 10px; font-weight: 600; color: var(--forest);
+    }
+    .activity-share svg { width: 10px; height: 10px; fill: var(--forest); }
+
+    /* ── Floating tab bar ── */
+    .tabbar-wrap {
+      padding: 6px 16px 0;
+      flex: 0 0 auto;
+    }
+    .tabbar {
+      background: var(--surface);
+      border-radius: 999px;
+      display: grid; grid-template-columns: repeat(5, 1fr);
+      padding: 6px 4px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      margin-bottom: 4px;
+    }
+    .tab {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: 6px 2px;
+      color: var(--pebble); font-size: 9px; letter-spacing: 0.01em;
+      position: relative;
+    }
+    .tab.active {
+      color: var(--forest);
+    }
+    .tab.active::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--green-100);
+      border-radius: 999px;
+      z-index: -1;
+    }
+    .tab svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+    .tab.active svg { stroke-width: 2; }
+    .tab-badge {
+      position: absolute; top: 4px; right: 14px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--forest); color: #fff;
+      font-size: 8px; font-weight: 700;
+      display: grid; place-items: center;
+      border: 1.5px solid var(--surface);
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="caption"><strong>Sprout</strong> · Home Screen</div>
+
+    <div class="device">
+      <span class="btn-rail left-1"  aria-hidden></span>
+      <span class="btn-rail left-2"  aria-hidden></span>
+      <span class="btn-rail left-3"  aria-hidden></span>
+      <span class="btn-rail right-1" aria-hidden></span>
+      <span class="island"           aria-hidden></span>
+
+      <div class="screen">
+        <!-- Status bar -->
+        <div class="statusbar">
+          <span style="font-variant-numeric:tabular-nums;">9:41</span>
+          <span class="right">
+            <svg viewBox="0 0 17 11" aria-hidden>
+              <rect x="0" y="7" width="3" height="4" rx="0.6"/>
+              <rect x="4" y="5" width="3" height="6" rx="0.6"/>
+              <rect x="8" y="3" width="3" height="8" rx="0.6"/>
+              <rect x="12" y="0" width="3" height="11" rx="0.6"/>
+            </svg>
+            <svg viewBox="0 0 17 11" aria-hidden>
+              <path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1zM3.5 7.6L5 9.1c1-0.9 2.2-1.4 3.5-1.4 1.3 0 2.5 0.5 3.5 1.4l1.5-1.5c-1.4-1.3-3.1-2-5-2-1.9 0-3.6 0.7-5 2zM6.5 10.6l2 2 2-2c-0.5-0.5-1.2-0.8-2-0.8s-1.5 0.3-2 0.8z"/>
+            </svg>
+            <svg class="battery" viewBox="0 0 25 11" aria-hidden>
+              <rect x="0.5" y="0.5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity="0.45"/>
+              <rect x="22" y="3.5" width="1.5" height="4" rx="0.4" fill="currentColor" fill-opacity="0.45"/>
+              <rect x="2" y="2" width="18" height="7" rx="1.4"/>
+            </svg>
+          </span>
+        </div>
+
+        <main class="content">
+
+          <!-- Top header -->
+          <div class="top-header">
+            <div class="avatar">👤</div>
+            <div class="header-title">
+              Home
+              <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            </div>
+            <div class="notif-btn">
+              <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+              <span class="notif-badge">4</span>
+            </div>
+          </div>
+
+          <!-- Discover / My Events tabs -->
+          <div class="page-tabs">
+            <div class="page-tab active">Discover</div>
+            <div class="page-tab">My Events</div>
+          </div>
+
+          <!-- Search -->
+          <div class="search-bar">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            Search
+          </div>
+
+          <!-- Filter pills -->
+          <div class="filter-row">
+            <div class="filter-pill active">Kids</div>
+            <div class="filter-pill">Teens</div>
+            <div class="filter-pill">Parents</div>
+          </div>
+
+          <!-- Daily Briefing Card -->
+          <div class="briefing-card">
+            <p class="briefing-label">Today's Briefing · Wed, Jun 4</p>
+            <p class="briefing-greeting">Good morning, Tony. ☀️<br>Here's your day at a glance.</p>
+            <div class="briefing-row">
+              <div class="briefing-chip"><span>3</span> Events</div>
+              <div class="briefing-chip"><span>2</span> Updates</div>
+              <div class="briefing-chip"><span>2</span> Pending</div>
+            </div>
+            <div class="briefing-cta">
+              <div>
+                <div class="briefing-cta-label">Summarize My Day</div>
+                <div class="briefing-cta-sub">Tap to see everything for today</div>
+              </div>
+              <div class="briefing-arrow">
+                <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Your Invitations -->
+          <div class="section-header">
+            <span class="section-title">Your Invitations</span>
+            <span class="section-link">2 Meeting Points</span>
+          </div>
+
+          <div class="invite-card">
+            <div class="invite-thumb">🏄</div>
+            <div class="invite-body">
+              <div class="invite-name">Surfing at Second Point</div>
+              <div class="invite-meta">Sat, Nov 9 · 6:30pm CST · 🍀 8/15 · 2.1 mi</div>
+              <div class="invite-by">
+                <div class="dot">👤</div>
+                Patrick Collison
+              </div>
+            </div>
+            <div class="invite-actions">
+              <button class="invite-btn decline">
+                <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              </button>
+              <button class="invite-btn accept">
+                <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="invite-card">
+            <div class="invite-thumb">🏌️</div>
+            <div class="invite-body">
+              <div class="invite-name">Founder Invitational</div>
+              <div class="invite-meta">Fri, Nov 15 · 1:30pm CST · 🍀 5/20 · 1.1 mi</div>
+              <div class="invite-by">
+                <div class="dot">👤</div>
+                Steve Huffman and 4 going
+              </div>
+            </div>
+            <div class="invite-actions">
+              <button class="invite-btn decline">
+                <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              </button>
+              <button class="invite-btn accept">
+                <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Activities this week -->
+          <div class="section-header" style="margin-top: 6px;">
+            <span class="section-title">Activities this week</span>
+            <span class="section-link">See All</span>
+          </div>
+
+          <div class="activity-scroll">
+            <div class="activity-card">
+              <div class="activity-img">🎨</div>
+              <div class="activity-body">
+                <div class="activity-name">Kids Art & Craft Day</div>
+                <div class="activity-meta">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  Mon, Feb 25 · 10:00am
+                </div>
+                <div class="activity-meta" style="margin-top:2px;">
+                  <svg viewBox="0 0 24 24"><path d="M12 2C8 2 5 5 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-4-3-7-7-7z"/></svg>
+                  Griffith Park, LA
+                </div>
+                <div class="activity-share">
+                  <svg viewBox="0 0 10 10"><path d="M5 1v6M2 4l3-3 3 3M1 8h8" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+                  Share
+                </div>
+              </div>
+            </div>
+            <div class="activity-card">
+              <div class="activity-img">⚽</div>
+              <div class="activity-body">
+                <div class="activity-name">Soccer Practice Open Day</div>
+                <div class="activity-meta">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  Wed, Feb 26 · 3:30pm
+                </div>
+                <div class="activity-meta" style="margin-top:2px;">
+                  <svg viewBox="0 0 24 24"><path d="M12 2C8 2 5 5 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-4-3-7-7-7z"/></svg>
+                  Riverside Park
+                </div>
+                <div class="activity-share">
+                  <svg viewBox="0 0 10 10"><path d="M5 1v6M2 4l3-3 3 3M1 8h8" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+                  Share
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </main>
+
+        <!-- Floating tab bar -->
+        <div class="tabbar-wrap">
+          <nav class="tabbar">
+            <a class="tab active">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg>
+              Events
+            </a>
+            <a class="tab">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+              Memories
+            </a>
+            <a class="tab">
+              <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 8v4l3 2"/></svg>
+              AI Assist
+            </a>
+            <a class="tab" style="position:relative;">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Chat
+              <span class="tab-badge">2</span>
+            </a>
+            <a class="tab">
+              <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              Clubs
+            </a>
+          </nav>
+        </div>
+
+        <div class="home-indicator" aria-hidden></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

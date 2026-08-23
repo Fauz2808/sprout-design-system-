@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Birthday Cover Frames · Sprout</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Pacifico&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#ddd8ce;min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:22px;padding:40px 24px;font-family:'Fredoka',system-ui,sans-serif;}
+  .cap{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#7a7568;}
+  .row{display:flex;gap:34px;flex-wrap:wrap;justify-content:center;}
+  .cover{width:340px;border-radius:22px;overflow:hidden;box-shadow:0 24px 50px -20px rgba(0,0,0,.32);background:#fff;}
+  .cover svg{display:block;width:100%;height:auto;}
+  .label{text-align:center;font-size:12px;color:#8a8478;margin-top:9px;letter-spacing:.04em;}
+</style>
+</head>
+<body>
+  <div class="cap">Birthday cover frames · quick-photo stock covers</div>
+  <div class="row">
+    <div><div class="cover" id="c1"></div><div class="label">Cover 1 — Playful rainbow</div></div>
+    <div><div class="cover" id="c2"></div><div class="label">Cover 2 — Elegant blue</div></div>
+  </div>
+
+<script>
+const W=380,H=470;
+
+/* ── shared shape helpers (return SVG strings) ── */
+function balloon(x,y,grad,s=1,rot=0,stringTo=34){
+  return `<g transform="translate(${x},${y}) rotate(${rot})">
+    <path d="M0 ${23*s} q ${-7*s} ${12*s} ${-2*s} ${stringTo}" fill="none" stroke="#d8d3c6" stroke-width="1.3"/>
+    <ellipse cx="0" cy="0" rx="${18*s}" ry="${23*s}" fill="url(#${grad})"/>
+    <path d="M${-4*s} ${21*s} L${4*s} ${21*s} L0 ${27*s} Z" fill="url(#${grad})"/>
+    <ellipse cx="${-6*s}" cy="${-8*s}" rx="${4.2*s}" ry="${6.6*s}" fill="#fff" opacity="0.42"/>
+  </g>`;
+}
+function confettiBalloon(x,y,s=1,rot=0){ // translucent, dotted
+  const dots=['#ff8fc8','#ffd24a','#7bb6e8','#9be0c9','#b69be0'];
+  let d=''; for(let i=0;i<7;i++){ d+=`<circle cx="${(-9+Math.random()*18)*s}" cy="${(-12+Math.random()*22)*s}" r="${1.7*s}" fill="${dots[i%dots.length]}" opacity=".85"/>`; }
+  return `<g transform="translate(${x},${y}) rotate(${rot})">
+    <path d="M0 ${23*s} q ${-7*s} ${12*s} ${-2*s} 34" fill="none" stroke="#cdd8e4" stroke-width="1.3"/>
+    <ellipse cx="0" cy="0" rx="${18*s}" ry="${23*s}" fill="#ffffff" stroke="#dbe6f0" stroke-width="1"/>
+    <clipPath id="cb${x}${y}"><ellipse cx="0" cy="0" rx="${18*s}" ry="${23*s}"/></clipPath>
+    <g clip-path="url(#cb${x}${y})">${d}</g>
+    <path d="M${-4*s} ${21*s} L${4*s} ${21*s} L0 ${27*s} Z" fill="#eef4fa"/>
+    <ellipse cx="${-6*s}" cy="${-8*s}" rx="${4.2*s}" ry="${6.6*s}" fill="#fff" opacity="0.6"/>
+  </g>`;
+}
+function starBalloon(x,y,fill,s=1,rot=-8){ // foil star balloon
+  const r=20*s, pts=[];
+  for(let i=0;i<10;i++){ const a=(Math.PI/5)*i - Math.PI/2; const rr=i%2?r*0.46:r; pts.push([Math.cos(a)*rr, Math.sin(a)*rr]); }
+  const p='M'+pts.map(q=>q.map(n=>n.toFixed(1)).join(',')).join(' L')+' Z';
+  return `<g transform="translate(${x},${y}) rotate(${rot})">
+    <path d="M0 ${r*0.95} q ${-6*s} 12 ${-2*s} 32" fill="none" stroke="#cdd8e4" stroke-width="1.3"/>
+    <path d="${p}" fill="${fill}"/>
+    <path d="${p}" fill="#fff" opacity="0.16" transform="translate(${-2.5*s},${-2.5*s}) scale(.6)"/>
+  </g>`;
+}
+function star(x,y,c,s=1,rot=0){
+  return `<path d="M0 -9 L2.6 -2.8 L9.3 -2.8 L3.8 1.4 L5.9 7.9 L0 3.9 L-5.9 7.9 L-3.8 1.4 L-9.3 -2.8 L-2.6 -2.8 Z" fill="${c}" transform="translate(${x},${y}) rotate(${rot}) scale(${s})"/>`;
+}
+function conf(x,y,c,rot){ return `<rect x="${x-3.5}" y="${y-1.6}" width="7" height="3.2" rx="1.6" fill="${c}" transform="rotate(${rot} ${x} ${y})"/>`; }
+function dot(x,y,c,r=2.4){ return `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/>`; }
+
+/* ── photo window ── */
+function photoWindow(){
+  return `<rect x="40" y="98" width="300" height="286" rx="16" fill="#f3f1ea"/>
+    <rect x="40" y="98" width="300" height="286" rx="16" fill="none" stroke="#e7e3d8" stroke-width="1"/>
+    <g transform="translate(190,232)" opacity="0.34">
+      <circle cx="0" cy="-14" r="17" fill="#cfcabc"/>
+      <path d="M-30 34 Q0 -2 30 34 Z" fill="#cfcabc"/>
+    </g>
+    <text x="190" y="300" text-anchor="middle" font-family="Fredoka" font-size="12" fill="#b9b4a6" letter-spacing="1">YOUR PHOTO</text>`;
+}
+
+/* ═══════════════ COVER 1 — PLAYFUL RAINBOW ═══════════════ */
+function cover1(){
+  // bunting across the top, gentle sag
+  const bc=['#ff8fc8','#ffd24a','#5ed0c5','#b07bd4','#ff8fc8','#ffd24a','#5ed0c5','#b07bd4','#ff8fc8'];
+  let bunt='<path d="M8 18 Q190 40 372 18" fill="none" stroke="#d9d4c8" stroke-width="1.3"/>';
+  for(let i=0;i<9;i++){ const t=i/8, x=8+t*364, y=18+Math.sin(t*Math.PI)*16; bunt+=`<path d="M${x-9} ${y-1} L${x+9} ${y-1} L${x} ${y+16} Z" fill="${bc[i]}"/>`; }
+
+  // balloons flanking the title (top corners)
+  const bal = balloon(40,128,'g1pink',0.92,-12)+balloon(66,150,'g1teal',0.8,8)+balloon(22,162,'g1yellow',0.72,-4)
+            + balloon(340,128,'g1purple',0.92,12)+balloon(316,152,'g1pink',0.78,-8)+balloon(358,166,'g1teal',0.7,6);
+
+  // confetti + stars scattered in the border band
+  const scat = star(150,70,'#ffd24a',0.7,10)+star(232,72,'#5ed0c5',0.62,-12)+star(196,44,'#ff8fc8',0.55,0)
+    + conf(120,96,'#b07bd4',20)+conf(262,92,'#ffd24a',-30)+conf(96,200,'#5ed0c5',45)+conf(300,210,'#ff8fc8',-20)
+    + conf(28,250,'#ffd24a',15)+conf(352,260,'#b07bd4',-40)+dot(168,300,'#ff8fc8',2.2)+dot(214,108,'#5ed0c5',2)
+    + star(34,330,'#ffd24a',0.5)+star(348,330,'#ff8fc8',0.5)+conf(70,372,'#b07bd4',30)+conf(312,372,'#5ed0c5',-25);
+
+  // cake bottom-left
+  const cake = `<g transform="translate(92,452)">
+    <ellipse cx="0" cy="2" rx="58" ry="9" fill="#eadfce"/>
+    <rect x="-50" y="-26" width="100" height="28" rx="7" fill="#ffd1e6"/>
+    <rect x="-50" y="-24" width="100" height="6" fill="#ff9ec8" opacity=".5"/>
+    <rect x="-40" y="-50" width="80" height="26" rx="7" fill="#fff3d6"/>
+    <rect x="-30" y="-72" width="60" height="24" rx="7" fill="#cdeee6"/>
+    <path d="M-50 -26 q12 8 25 0 q12 8 25 0 q12 8 25 0 q12 8 25 0" fill="none" stroke="#fff" stroke-width="3" opacity=".7"/>
+    ${[-18,0,18].map(cx=>`<rect x="${cx-2}" y="-86" width="4" height="16" rx="2" fill="#ff8fc8"/><path d="M${cx} -92 q-4 4 0 8 q4 -4 0 -8Z" fill="#ffb13d"/><circle cx="${cx}" cy="-90" r="1.6" fill="#fff4c2"/>`).join('')}
+  </g>`;
+
+  // gift bottom-right
+  const gift = `<g transform="translate(296,452)">
+    <rect x="-34" y="-44" width="68" height="46" rx="6" fill="#7fd4c6"/>
+    <rect x="-34" y="-30" width="68" height="32" rx="0" fill="#69c6b7"/>
+    ${[-22,-6,10,26].map((dx,i)=>[-36,-20,-6].map(dy=>dot(dx,dy-2,'#ffffff',1.7)).join('')).join('')}
+    <rect x="-7" y="-44" width="14" height="46" fill="#ff8fc8"/>
+    <path d="M0 -44 C-22 -64 -34 -44 0 -44 C34 -44 22 -64 0 -44Z" fill="#ff9ec8"/>
+    <circle cx="0" cy="-44" r="5" fill="#ff7eb6"/>
+  </g>`;
+
+  // bottom ribbon banner
+  const banner = `<g transform="translate(190,432)">
+    <path d="M-96 0 L-110 -9 L-110 11 Z" fill="#e85f9c"/>
+    <path d="M96 0 L110 -9 L110 11 Z" fill="#e85f9c"/>
+    <rect x="-96" y="-15" width="192" height="30" rx="15" fill="#ff8fc8"/>
+    <text x="0" y="5" text-anchor="middle" font-family="Fredoka" font-weight="600" font-size="13" fill="#fff" letter-spacing=".3">Wishing you a day full of smiles</text>
+  </g>`;
+
+  // rainbow title
+  const t1=['H','a','p','p','y'], t2=['B','i','r','t','h','d','a','y','!'];
+  const colA=['#ff5fa2','#ff9b3d','#ffc83d','#5ec8b8','#5aa9e0'];
+  const colB=['#ff5fa2','#ff7e3d','#ffc83d','#7bc96a','#5ec8b8','#5aa9e0','#8a7bd8','#c86fc0','#ff5fa2'];
+  function titleLine(arr,cols,y,size){
+    const total=arr.length*size*0.62; let x=190-total/2+size*0.31; let out='';
+    arr.forEach((ch,i)=>{ out+=`<text x="${x}" y="${y}" text-anchor="middle" font-family="'Baloo 2'" font-weight="800" font-size="${size}" fill="${cols[i]}" transform="rotate(${(i-arr.length/2)*2.2} ${x} ${y})">${ch}</text>`; x+=size*0.62; });
+    return out;
+  }
+  const title = titleLine(t1,colA,62,30)+titleLine(t2,colB,90,30);
+
+  document.getElementById('c1').innerHTML = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="g1pink" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#ffc0de"/><stop offset="1" stop-color="#ff7eb6"/></radialGradient>
+      <radialGradient id="g1purple" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#d8bdf0"/><stop offset="1" stop-color="#b07bd4"/></radialGradient>
+      <radialGradient id="g1teal" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#bff0e7"/><stop offset="1" stop-color="#5ed0c5"/></radialGradient>
+      <radialGradient id="g1yellow" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#ffe9a8"/><stop offset="1" stop-color="#ffd24a"/></radialGradient>
+    </defs>
+    <rect width="${W}" height="${H}" fill="#ffffff"/>
+    ${photoWindow()}
+    ${bunt}
+    ${title}
+    ${bal}
+    ${scat}
+    ${cake}
+    ${gift}
+    ${banner}
+  </svg>`;
+}
+
+/* ═══════════════ COVER 2 — ELEGANT BLUE ═══════════════ */
+function cover2(){
+  // script title (Pacifico)
+  const title = `<text x="190" y="56" text-anchor="middle" font-family="Pacifico" font-size="33" fill="#2f6fb0">Happy</text>
+    <text x="200" y="92" text-anchor="middle" font-family="Pacifico" font-size="33" fill="#3f86c8">Birthday!</text>`;
+
+  // balloon clusters in corners
+  const bal = starBalloon(46,150,'#3f86c8',1,-12)
+            + balloon(74,158,'g2blue',0.86,8)
+            + confettiBalloon(30,176,0.72,-6)
+            + balloon(336,150,'g2blue',0.92,12)
+            + confettiBalloon(360,166,0.74,8)
+            + balloon(312,170,'g2white',0.74,-8)
+            + starBalloon(348,196,'#7fb2e0',0.66,10);
+
+  // sparse silver/blue confetti
+  const scat = dot(150,64,'#bcd7ef',2)+dot(232,66,'#9cc4e8',2)+star(196,40,'#cfe2f4',0.5)
+    + conf(110,108,'#7fb2e0',20)+conf(270,104,'#bcd7ef',-26)+dot(96,250,'#cfe2f4',2)+dot(300,250,'#9cc4e8',2)
+    + conf(34,300,'#bcd7ef',12)+conf(348,300,'#7fb2e0',-30);
+
+  // blue candles + bow at the bottom
+  const candles = `<g transform="translate(108,452)">
+    ${[-26,-9,8,25].map((cx,i)=>`<rect x="${cx-2.6}" y="-30" width="5.2" height="30" rx="2.6" fill="${i%2?'#5aa0d8':'#86bce6'}"/>
+      <rect x="${cx-2.6}" y="-30" width="5.2" height="30" rx="2.6" fill="url(#g2stripe)" opacity=".35"/>
+      <path d="M${cx} -38 q-4 5 0 8 q4 -3 0 -8Z" fill="#ffd27a"/><circle cx="${cx}" cy="-35" r="1.6" fill="#fff6d8"/>`).join('')}
+  </g>`;
+  const bow = `<g transform="translate(290,440)">
+    <rect x="-5" y="0" width="10" height="22" rx="3" fill="#3f86c8"/>
+    <path d="M0 6 C-26 -12 -40 8 0 8 C40 8 26 -12 0 6Z" fill="#4a90cf"/>
+    <path d="M0 6 C-24 -10 -36 8 0 8Z" fill="#3f86c8" opacity=".5"/>
+    <path d="M0 6 C24 -10 36 8 0 8Z" fill="#3f86c8" opacity=".5"/>
+    <circle cx="0" cy="6" r="6" fill="#2f6fb0"/>
+    <path d="M-6 10 L-20 30 M6 10 L20 30" stroke="#4a90cf" stroke-width="9" stroke-linecap="round"/>
+  </g>`;
+
+  document.getElementById('c2').innerHTML = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="g2blue" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#aacdec"/><stop offset="1" stop-color="#4a86c8"/></radialGradient>
+      <radialGradient id="g2white" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dce8f3"/></radialGradient>
+      <linearGradient id="g2stripe" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    </defs>
+    <rect width="${W}" height="${H}" fill="#ffffff"/>
+    ${photoWindow()}
+    ${title}
+    ${bal}
+    ${scat}
+    ${candles}
+    ${bow}
+  </svg>`;
+}
+
+cover1(); cover2();
+</script>
+</body>
+</html>

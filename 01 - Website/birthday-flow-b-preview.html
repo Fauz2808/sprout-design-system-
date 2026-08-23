@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Birthday via Voice — AI Cover · Sprout</title>
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --field:#e8e4d9; --fg:#1a1a17; --muted:#7a7568; --border:#ddd9cf;
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-soft:#e8f0e8; --tag-bg:#ece9e2;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif;
+    --serif:'Georgia',serif; --mono:ui-monospace,'SF Mono',Menlo,monospace; --radius:16px;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;height:100%;}
+  body{background:#ddd8ce;font-family:var(--font);font-size:15px;line-height:1.4;-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;gap:40px;padding:32px 24px;min-height:100vh;flex-wrap:wrap;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .caption{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:340px;}
+  .caption strong{color:#3a3830;font-weight:600;}
+
+  .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .device::before,.device::after{content:'';position:absolute;width:3px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.06) 8%,transparent 16%,transparent 84%,rgba(255,255,255,.04) 92%,transparent);top:100px;bottom:100px;}
+  .device::before{left:-1px;}.device::after{right:-1px;}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:5;}
+  .br{position:absolute;width:4px;background:#0a0a0c;border-radius:2px;}
+  .br.l1{left:-3px;top:174px;height:32px;}.br.l2{left:-3px;top:220px;height:60px;}.br.l3{left:-3px;top:290px;height:60px;}.br.r1{right:-3px;top:250px;height:100px;}
+
+  .screen{position:relative;width:100%;height:100%;background:var(--bg);border-radius:44px;overflow:hidden;display:flex;flex-direction:column;}
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--fg);}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--fg);} .sb .bat{width:25px;}
+  .scroll{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;} .scroll::-webkit-scrollbar{display:none;}
+  .home{flex:0 0 26px;position:relative;} .home::after{content:'';position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:134px;height:5px;background:var(--fg);border-radius:999px;opacity:.2;}
+
+  .top{padding:8px 16px 6px;display:flex;align-items:center;gap:10px;}
+  .ibtn{width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;flex-shrink:0;}
+  .ibtn svg{width:18px;height:18px;stroke:var(--fg);fill:none;stroke-width:2;}
+  .top .tt{flex:1;text-align:center;font-size:15px;font-weight:600;}
+  .top .sp{width:34px;}
+
+  .body{padding:8px 16px 16px;}
+  .h{font-family:var(--serif);font-size:21px;font-weight:700;color:var(--fg);letter-spacing:-.01em;margin:6px 0 3px;}
+  .sub{font-size:13px;color:var(--muted);margin:0 0 16px;line-height:1.45;}
+
+  /* ── voice create (AI Assist style) ── */
+  .assistant{display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 6px 0;}
+  .orb{width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#5aa85f,#2d5c2e);display:grid;place-items:center;margin:8px 0 20px;box-shadow:0 12px 30px -8px rgba(45,92,46,.5);position:relative;}
+  .orb::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(45,92,46,.25);animation:pulse 2.2s ease-out infinite;}
+  @keyframes pulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.25);opacity:0}}
+  .orb svg{width:38px;height:38px;stroke:#fff;fill:none;stroke-width:2;}
+  .said{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;font-size:15px;color:var(--fg);line-height:1.5;width:100%;text-align:left;}
+  .said .q{font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--green-mid);margin-bottom:5px;display:flex;align-items:center;gap:5px;}
+  .said .q .dot{width:5px;height:5px;border-radius:50%;background:var(--green-mid);}
+  .hintchips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:14px;}
+  .hintchips .c{font-size:11.5px;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 11px;}
+
+  /* ── building / generating ── */
+  .gen{text-align:center;padding:46px 20px;}
+  .gen .ring{width:74px;height:74px;border:5px solid var(--green-soft);border-top-color:var(--green);border-radius:50%;margin:0 auto 20px;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .gen .t{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--fg);} .gen .s{font-size:13px;color:var(--muted);margin-top:6px;}
+
+  /* ── event preview ── */
+  .cover{aspect-ratio:393/381;border-radius:16px;overflow:hidden;position:relative;box-shadow:0 12px 30px -12px rgba(0,0,0,.25);margin-bottom:14px;}
+  .cover-empty{aspect-ratio:393/381;border-radius:16px;border:2px dashed var(--border);background:var(--field);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--muted);text-align:center;padding:20px;margin-bottom:14px;}
+  .cover-empty .e{font-size:32px;} .cover-empty .t{font-size:13.5px;font-weight:600;color:var(--fg);} .cover-empty .s{font-size:12px;}
+  .cover-load{aspect-ratio:393/381;border-radius:16px;background:var(--field);display:grid;place-items:center;margin-bottom:14px;}
+  .cover-load .ring{width:46px;height:46px;border:4px solid var(--green-soft);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;}
+
+  /* editorial cover render */
+  .cover-tag{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.92);color:var(--green);font-size:10px;font-weight:700;padding:4px 9px;border-radius:999px;z-index:5;}
+  .ed-left{position:absolute;left:18px;top:50%;transform:translateY(-50%);max-width:48%;z-index:3;}
+  .ed-name{font-family:var(--serif);font-weight:700;font-size:28px;line-height:1;}
+  .ed-rule{height:1px;background:currentColor;opacity:.35;margin:8px 0;width:64%;}
+  .ed-ch{font-size:10.5px;font-weight:700;letter-spacing:.22em;}
+  .ed-tag{font-size:8px;font-weight:600;letter-spacing:.18em;margin-top:8px;opacity:.78;line-height:1.7;}
+  .ed-num{position:absolute;right:-6px;top:50%;transform:translateY(-50%);font-family:var(--serif);font-weight:800;font-size:215px;line-height:.75;opacity:.9;z-index:1;}
+  .ed-windows{position:absolute;right:24px;top:14%;display:flex;flex-direction:column;gap:6px;z-index:2;}
+  .ed-win{width:42px;height:30px;border-radius:6px;background:rgba(20,16,10,.45);display:grid;place-items:center;font-size:16px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.3),0 2px 6px rgba(0,0,0,.25);}
+  .ed-photo{position:absolute;right:30%;bottom:12%;width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.45);display:grid;place-items:center;font-size:42px;border:4px solid rgba(255,255,255,.75);box-shadow:0 8px 20px rgba(0,0,0,.22);z-index:3;}
+
+  .ev-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:6px 14px;margin-bottom:16px;}
+  .ev-row{display:flex;align-items:center;gap:11px;padding:11px 0;border-top:1px solid var(--border);}
+  .ev-row:first-child{border-top:none;}
+  .ev-row svg{width:17px;height:17px;stroke:var(--green-mid);fill:none;stroke-width:1.8;flex-shrink:0;}
+  .ev-row .lbl{font-size:11px;color:var(--muted);} .ev-row .val{font-size:14.5px;font-weight:600;color:var(--fg);}
+  .ev-row .edit{margin-left:auto;font-size:12px;color:var(--green);font-weight:600;}
+
+  .sec-label{font-size:12px;font-weight:700;color:var(--fg);margin:18px 2px 9px;display:flex;align-items:center;gap:6px;}
+  .kids{display:flex;gap:9px;flex-wrap:wrap;}
+  .kid{display:flex;align-items:center;gap:8px;padding:8px 12px 8px 8px;border:1.5px solid var(--border);border-radius:999px;background:var(--surface);cursor:pointer;}
+  .kid.on{border-color:var(--green);background:var(--green-soft);}
+  .kid .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#8fba92,#5a8f5d);display:grid;place-items:center;font-size:14px;color:#fff;flex-shrink:0;}
+  .kid .kn{font-size:13.5px;font-weight:700;color:var(--fg);line-height:1;} .kid .ka{font-size:11px;color:var(--muted);margin-top:2px;}
+  .kid.add{color:var(--muted);font-size:13px;font-weight:600;padding:12px 14px;}
+
+  .style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+  .style-card{border-radius:12px;overflow:hidden;border:2px solid transparent;cursor:pointer;background:var(--surface);box-shadow:0 2px 6px rgba(0,0,0,.05);position:relative;}
+  .style-card.on{border-color:var(--green);}
+  .style-thumb{aspect-ratio:1/1;display:grid;place-items:center;position:relative;}
+  .style-thumb .num{font-family:var(--serif);font-weight:800;font-size:34px;}
+  .style-thumb .nmtag{position:absolute;left:5px;top:5px;font-family:var(--serif);font-weight:700;font-size:8px;}
+  .style-card .pt{position:absolute;bottom:5px;right:5px;font-size:8px;font-weight:700;padding:2px 5px;border-radius:999px;}
+  .pt.photo{background:#e1ecf7;color:#3b6ea5;} .pt.nophoto{background:rgba(255,255,255,.85);color:var(--muted);}
+  .style-card.on .check{position:absolute;top:5px;right:5px;width:18px;height:18px;border-radius:50%;background:var(--green);display:grid;place-items:center;}
+  .style-card .check{display:none;} .style-card.on .check{display:grid;} .style-card .check svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:3;}
+  .needphoto{display:none;gap:8px;align-items:flex-start;background:#fff7e8;border:1px solid #f0d99a;border-radius:11px;padding:10px 12px;margin-top:11px;font-size:12px;color:#9a6b1a;line-height:1.45;}
+  .needphoto.show{display:flex;}
+  .needphoto .up{margin-left:auto;font-weight:700;color:var(--green);white-space:nowrap;cursor:pointer;}
+
+  .bbar{flex:0 0 auto;border-top:1px solid var(--border);background:color-mix(in srgb,var(--surface) 96%,transparent);backdrop-filter:blur(14px);padding:12px 16px 14px;display:flex;gap:10px;}
+  .btn{flex:1;padding:14px;border:none;border-radius:13px;font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;}
+  .btn-primary{background:var(--green);color:#fff;} .btn-primary svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.4;}
+  .btn-ghost{flex:0 0 auto;background:transparent;color:var(--fg);border:1px solid var(--border);padding:14px 18px;}
+  .btn[disabled]{opacity:.45;}
+  .mic{flex:0 0 auto;width:52px;border-radius:13px;background:var(--green-soft);border:none;display:grid;place-items:center;cursor:pointer;}
+  .mic svg{width:20px;height:20px;stroke:var(--green);fill:none;stroke-width:2;}
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="caption"><strong>Flow B · Proactive + one screen</strong> · AI suggests the kid → one editable preview</div>
+  <div class="device">
+    <span class="br l1"></span><span class="br l2"></span><span class="br l3"></span><span class="br r1"></span><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg>
+        <svg viewBox="0 0 17 11"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1z"/></svg>
+        <svg class="bat" viewBox="0 0 25 11"><rect x=".5" y=".5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="22" y="3.5" width="1.5" height="4" rx=".4" fill="currentColor" fill-opacity=".45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+      </span></div>
+
+      <div class="top">
+        <div class="ibtn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+        <div class="tt" id="topTitle">Create with AI</div>
+        <div class="sp"></div>
+      </div>
+
+      <div class="scroll" id="scroll">
+
+        <!-- V1: voice create (same as meeting points) -->
+        <div id="v-voice" class="body">
+          <div class="assistant">
+            <div class="orb"><svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
+            <div class="said">
+              <div class="q"><span class="dot"></span>Sprout AI</div>
+              A birthday's coming up — <b>Kennedy turns 5 in 3 days</b>. Want to set up her party? I'll pre-fill what I know.
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;width:100%;margin-top:20px;">
+              <button class="btn btn-primary" style="width:100%;" onclick="createEvent()">Yes — set up Kennedy's party 🎉</button>
+              <button class="btn btn-ghost" style="width:100%;border:1px solid var(--border);" onclick="alert('No problem — I\'ll remind you closer to the day.')">Not right now</button>
+            </div>
+            <div class="hintchips"><span class="c">🎤 or tell me about any other event</span></div>
+          </div>
+        </div>
+
+        <!-- V2: building event -->
+        <div id="v-build" style="display:none;">
+          <div class="gen">
+            <div class="ring"></div>
+            <div class="t">Setting up the party…</div>
+            <div class="s">Pulling the date, time &amp; place from what you said ✨</div>
+          </div>
+        </div>
+
+        <!-- V3: event preview (cover styles inline — NOT a separate flow) -->
+        <div id="v-preview" class="body" style="display:none;">
+          <!-- cover area (placeholder → loading → generated) -->
+          <div class="cover-empty" id="coverEmpty"><div class="e">🎂</div><div class="t">Design a birthday cover</div><div class="s">Pick the birthday star &amp; a style below</div></div>
+          <div class="cover-load" id="coverLoad" style="display:none;"><div class="ring"></div></div>
+          <div class="cover" id="coverArt" style="display:none;"></div>
+
+          <!-- editable event details (parsed from voice) -->
+          <div class="ev-card">
+            <div class="ev-row"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 4.8 5.3.8-3.8 3.7.9 5.3L12 19l-4.8 2.5.9-5.3L4.3 8.4l5.3-.8z"/></svg><div><div class="lbl">Event</div><div class="val" id="evTitle">Kennedy's Birthday 🎂</div></div><span class="edit">Edit</span></div>
+            <div class="ev-row"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div><div class="lbl">When</div><div class="val">Fri, Jun 20 · 2:00 PM</div></div><span class="edit">Edit</span></div>
+            <div class="ev-row"><svg viewBox="0 0 24 24"><path d="M12 21s-6-5.3-6-10a6 6 0 1 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg><div><div class="lbl">Where</div><div class="val">Zilker Park, Austin TX</div></div><span class="edit">Edit</span></div>
+          </div>
+
+          <!-- birthday star: pick from your kids (pulls name/age/photo) -->
+          <div class="sec-label">🎉 Who's the birthday star?</div>
+          <div class="kids" id="kids"></div>
+
+          <!-- AI cover styles (the only thing different vs a normal event) -->
+          <div class="sec-label">✨ Pick a cover style</div>
+          <div class="style-grid" id="styleGrid"></div>
+
+          <div class="needphoto" id="needPhoto">
+            <span>🖼️</span>
+            <span>This style features the birthday child. Add a photo of <b id="npName">Kennedy</b> (or pick a No-photo style).</span>
+            <span class="up" onclick="addPhoto()">Add photo</span>
+          </div>
+        </div>
+
+        <!-- V4: event created -->
+        <div id="v-done" class="body" style="display:none;">
+          <div style="text-align:center;"><div style="font-size:48px;margin:6px 0;">🎉</div>
+            <div class="h" style="text-align:center;">Kennedy's party is live!</div>
+            <div class="sub" style="text-align:center;">Invites just went out to your saved families.</div>
+          </div>
+          <div class="cover" id="doneCover" style="max-width:210px;margin:0 auto 16px;"></div>
+          <div class="ev-card">
+            <div class="ev-row"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div><div class="lbl">When</div><div class="val">Fri, Jun 20 · 2:00 PM</div></div></div>
+            <div class="ev-row"><svg viewBox="0 0 24 24"><path d="M12 21s-6-5.3-6-10a6 6 0 1 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg><div><div class="lbl">Where</div><div class="val">Zilker Park, Austin TX</div></div></div>
+            <div class="ev-row"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div><div class="lbl">Invites</div><div class="val"><b>12 families</b> invited · 0 replied</div></div></div>
+          </div>
+          <div class="sec-label">Share &amp; manage</div>
+          <div style="display:flex;flex-direction:column;gap:9px;">
+            <button class="kid" style="justify-content:center;border-radius:13px;" onclick="alert('Invite link copied 🔗')"><span>🔗</span> Share invite link</button>
+            <button class="kid" style="justify-content:center;border-radius:13px;" onclick="alert('Added to your calendar 📅')"><span>📅</span> Add to my calendar</button>
+          </div>
+        </div>
+
+      </div><!-- /scroll -->
+      <div class="bbar" id="bbar"></div>
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const $=id=>document.getElementById(id);
+  // styles — "Chapter N" editorial poster family
+  const STYLES=[
+    {id:'wonder', nm:'Wonder',  photo:true,  bg:'#e7dcc6', ink:'#5b4326', tag:'A WHOLE WORLD OF WONDER'},
+    {id:'magical',nm:'Magical', photo:true,  bg:'#efe7d7', ink:'#6e5836', tag:'A MAGICAL WORLD'},
+    {id:'bloom',  nm:'Bloom',   photo:true,  bg:'#efe2dc', ink:'#7a4f4a', tag:'365 MORE DAYS OF SUNSHINE'},
+    {id:'coastal',nm:'Coastal', photo:true,  bg:'#e2e6e6', ink:'#3f5a66', tag:'365 MORE DAYS OF WONDER'},
+    {id:'minimal',nm:'Minimal', photo:false, bg:'#e9e1d1', ink:'#5f5240', tag:'365 MORE DAYS OF WONDER'},
+    {id:'classic',nm:'Classic', photo:false, bg:'#ece6d8', ink:'#6a5a44', tag:'A WHOLE WORLD OF WONDER'}
+  ];
+  // Sprout already knows the user's kids → pick to auto-fill name/age/photo
+  const KIDS=[
+    {name:'Kennedy', age:5, photo:true,  loves:['🦄','🪐']},
+    {name:'Cooper',  age:3, photo:true,  loves:['🦕','⚽']}
+  ];
+  let state={ kid:null, styleId:null };
+
+  function renderKids(){
+    $('kids').innerHTML = KIDS.map((k,i)=>`
+      <div class="kid ${state.kid===i?'on':''}" onclick="selectKid(${i})">
+        <div class="av">${k.photo?'🧒':k.name[0]}</div>
+        <div><div class="kn">${k.name}</div><div class="ka">turns ${k.age}${k.photo?' · 📷':''}</div></div>
+      </div>`).join('') + `<div class="kid add" onclick="alert('Add a child to your family profile')">＋ Add child</div>`;
+  }
+  function selectKid(i){ state.kid=i; renderKids(); if(state.styleId) generateCover(); else updateNeed(); }
+
+  function renderStyles(){
+    const age = state.kid!=null?KIDS[state.kid].age:5;
+    $('styleGrid').innerHTML = STYLES.map(s=>`
+      <div class="style-card ${state.styleId===s.id?'on':''}" onclick="pickStyle('${s.id}')">
+        <div class="style-thumb" style="background:${s.bg};color:${s.ink};">
+          <span class="nmtag">${state.kid!=null?KIDS[state.kid].name.split(' ')[0]:'Name'}</span>
+          <span class="num">${age}</span>
+        </div>
+        <span class="pt ${s.photo?'photo':'nophoto'}">${s.photo?'Photo':'No photo'}</span>
+        <div class="check"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+      </div>`).join('');
+  }
+  function pickStyle(id){
+    state.styleId=id; renderStyles();
+    const s=STYLES.find(x=>x.id===id);
+    // photo style needs a child with a photo
+    if(s.photo && (state.kid==null || !KIDS[state.kid].photo)){ updateNeed(); return; }
+    $('needPhoto').classList.remove('show');
+    generateCover();
+  }
+  function updateNeed(){
+    const s=STYLES.find(x=>x.id===state.styleId);
+    const need = s && s.photo && (state.kid==null || !KIDS[state.kid].photo);
+    $('needPhoto').classList.toggle('show', !!need);
+    if(state.kid!=null) $('npName').textContent=KIDS[state.kid].name;
+  }
+  function addPhoto(){ if(state.kid!=null) KIDS[state.kid].photo=true; renderKids(); $('needPhoto').classList.remove('show'); generateCover(); }
+
+  function renderCover(){
+    const s=STYLES.find(x=>x.id===state.styleId)||STYLES[0];
+    const k = state.kid!=null?KIDS[state.kid]:{name:'Kennedy',age:5,photo:true,loves:['🎈','🎂']};
+    let loves=(k.loves||[]).slice(0,3); if(loves.length===0) loves=['🎈','🎂','✨'];
+    const windows = loves.map(e=>`<div class="ed-win">${e}</div>`).join('');
+    const photo = s.photo ? `<div class="ed-photo">🧒</div>` : '';
+    const c=$('coverArt'); c.style.background=s.bg; c.style.color=s.ink;
+    c.innerHTML=`<div class="cover-tag">✨ AI-generated</div>
+      <div class="ed-num">${k.age}</div><div class="ed-windows">${windows}</div>${photo}
+      <div class="ed-left"><div class="ed-name">${k.name.split(' ')[0]}</div><div class="ed-rule"></div>
+        <div class="ed-ch">CHAPTER ${k.age}</div><div class="ed-tag">${s.tag}</div></div>`;
+  }
+  function generateCover(){
+    $('coverEmpty').style.display='none'; $('coverArt').style.display='none';
+    $('coverLoad').style.display='grid';
+    setTimeout(()=>{ $('coverLoad').style.display='none'; renderCover(); $('coverArt').style.display='block'; renderBar(); }, 1500);
+  }
+
+  // ── flow ──
+  const ALL=['v-voice','v-build','v-preview','v-done']; let cur='v-voice';
+  function show(v){
+    ALL.forEach(x=>$(x).style.display = x===v?'block':'none');
+    $('scroll').scrollTop=0; cur=v;
+    $('topTitle').textContent = v==='v-preview'?'Birthday preview':v==='v-done'?'Event created':'Create with AI';
+    renderBar();
+  }
+  function createEvent(){ state.kid=0; show('v-build'); setTimeout(()=>{ renderKids(); renderStyles(); show('v-preview'); },1900); }
+  function goBack(){ if(cur==='v-preview') show('v-voice'); else if(cur==='v-done') show('v-preview'); }
+
+  function showDone(){
+    // reuse the generated cover
+    const dc=$('doneCover'); dc.style.cssText=$('coverArt').style.cssText+';max-width:210px;margin:0 auto 16px;'; dc.innerHTML=$('coverArt').innerHTML;
+    show('v-done');
+  }
+
+  function renderBar(){
+    const bar=$('bbar');
+    if(cur==='v-voice'){
+      bar.innerHTML=`<button class="mic" onclick="createEvent()"><svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+        <button class="btn btn-primary" onclick="createEvent()">Set up Kennedy's party 🎉</button>`;
+    } else if(cur==='v-build'){ bar.innerHTML='';
+    } else if(cur==='v-done'){
+      bar.innerHTML=`<button class="btn btn-primary" onclick="alert('Opening the event page…')">View event</button>`;
+    } else {
+      const ready = $('coverArt').style.display==='block';
+      bar.innerHTML = ready
+        ? `<button class="btn btn-ghost" onclick="generateCover()">Regenerate</button><button class="btn btn-primary" onclick="showDone()">Save &amp; invite</button>`
+        : `<button class="btn btn-primary" disabled>Pick a cover style to continue</button>`;
+    }
+  }
+  show('v-voice');
+</script>
+</body>
+</html>

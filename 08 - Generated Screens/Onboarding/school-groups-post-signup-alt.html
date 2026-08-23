@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Onboarding — School Groups: in sign-up vs post-signup · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f1ea; --surface:#ffffff; --card:#ffffff; --field:#e8e2d6;
+  --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+  --brand:#186338; --brand-bold:#1e3e2b; --brand-mid:#4fa472;
+  --brand-light:#e2e9e3; --brand-border:#77b691; --border:#d0dacf;
+  --surface-l2:#dbd5c8; --border-brand-light:#d0dacf;
+  --bg-brand-disable:#a9c2af; --neg:#d64545; --neg-subtle:#f7dada;
+  --shadow-sm:1px 3px 9px rgba(13,13,18,.07); --shadow:1px 4px 16px rgba(13,13,18,.12);
+  --shadow-l:1px 4px 25px rgba(13,13,18,.2); --radius:16px;
+  --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --brand-500:#186338; --grey-100:#e6e7ea; --grey-300:#b3b8c1; --grey-400:#9aa0ad; --grey-900:#1a1b1e;
+  --content-secondary:#818898; --content-brand:#186338; --surface-l1:#eae6db;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;padding:48px 24px 80px;}
+.ph{display:inline-block;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+
+.lede{max-width:820px;margin:0 auto 20px;text-align:center;}
+.lede .k{font:600 11px/14px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--brand);margin-bottom:8px;}
+.lede h1{font-family:var(--serif);font-size:25px;font-weight:600;color:var(--brand-bold);margin:0 0 8px;}
+.lede p{font-size:13.5px;color:var(--muted);margin:0;line-height:1.65;}
+
+.rowlabel{max-width:900px;margin:34px auto 16px;padding:0 8px;}
+.rowlabel .badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:4px 11px;border-radius:99px;margin-bottom:8px;}
+.rowlabel.a .badge{background:var(--surface-l2);color:var(--brand-bold);}
+.rowlabel.b .badge{background:var(--brand-light);color:var(--brand);}
+.rowlabel h2{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);margin:0 0 6px;}
+.rowlabel p{font-size:13px;color:var(--muted);margin:0;line-height:1.6;max-width:680px;}
+.rowlabel .stepcount{display:inline-flex;gap:6px;align-items:center;font-size:12px;font-weight:700;color:var(--body);background:#fff;border:1px solid var(--border);padding:5px 12px;border-radius:99px;margin-top:8px;}
+
+.row{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-start;gap:36px;padding:0 8px;overflow-x:auto;}
+.col{flex:0 0 auto;}
+.tag{font:600 11px/14px var(--sans);color:var(--muted);text-align:center;margin-bottom:12px;letter-spacing:.04em;text-transform:uppercase;}
+.tag b{color:var(--brand-bold);}
+.arrow{align-self:center;color:var(--muted);flex-shrink:0;margin-top:120px;}
+.arrow.skip{color:var(--brand);}
+.arrowlbl{font-size:10px;font-weight:700;text-align:center;color:var(--muted);margin-top:6px;white-space:nowrap;}
+.arrowlbl.skip{color:var(--brand);}
+
+.device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;
+  background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+  box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+.island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:50;}
+.screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+
+.sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);z-index:20;}
+.sb .r{display:inline-flex;gap:6px;align-items:center;}
+.sb svg{width:17px;height:11px;fill:var(--ink);} .sb .bat{width:25px;}
+
+.hdrp{flex:0 0 auto;padding:6px 20px 6px;display:flex;align-items:center;gap:14px;}
+.backc{width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--border);
+  display:grid;place-items:center;flex-shrink:0;box-shadow:var(--shadow-sm);}
+.backc .ph{width:18px;height:18px;color:var(--ink);}
+.ptrack{flex:1;display:flex;gap:6px;position:relative;}
+.pseg{flex:1;height:5px;border-radius:999px;background:var(--surface-l2);overflow:visible;position:relative;}
+.pseg.done{background:var(--brand);}
+.pseg.done.tip::after{content:"🌱";position:absolute;right:-9px;top:-11px;font-size:13px;}
+
+.hdrx{flex:0 0 auto;display:flex;align-items:center;padding:14px 16px 4px;}
+.hdrx .ttl{flex:1;text-align:center;font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink);}
+.hdrx .sp{width:38px;flex-shrink:0;}
+.skipbtn{font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;}
+
+.body{flex:1 1 auto;overflow-y:auto;padding:10px 20px 130px;}
+.body::-webkit-scrollbar{display:none;}
+
+.eyebrow{font:700 11px/14px var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--brand);margin:8px 0 6px;}
+.title{font-family:var(--serif);font-weight:600;font-size:23px;line-height:29px;color:var(--ink);margin:0 0 8px;}
+.title em{font-style:italic;color:var(--brand);font-weight:500;}
+.subcopy{font-size:13px;line-height:19px;color:var(--muted);margin:0 0 20px;}
+
+.cta{position:absolute;left:0;right:0;bottom:0;padding:14px 20px 30px;
+  background:linear-gradient(to top,var(--bg) 68%,rgba(244,241,234,0));z-index:15;}
+.btn{width:100%;border:none;border-radius:var(--radius);padding:16px;font-family:var(--serif);font-size:15.5px;font-weight:600;
+  background:var(--brand);color:#fff;cursor:pointer;box-shadow:var(--shadow);letter-spacing:.01em;}
+.btn:disabled{background:var(--bg-brand-disable);color:rgba(255,255,255,.75);box-shadow:none;cursor:default;}
+.skiplink{display:block;text-align:center;font-size:13px;font-weight:600;color:var(--muted);margin-top:12px;text-decoration:underline;cursor:pointer;}
+
+.kidcard{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:18px;
+  padding:12px 14px;box-shadow:var(--shadow-sm);margin-bottom:10px;}
+.kidphoto{width:52px;height:52px;border-radius:14px;flex-shrink:0;display:grid;place-items:center;font-size:22px;
+  background:linear-gradient(135deg,#dcead0,#9dc08a);box-shadow:inset 0 0 0 1px rgba(0,0,0,.05);}
+.kidinfo{flex:1;min-width:0;}
+.kidinfo .n{font-family:var(--serif);font-size:14.5px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:7px;}
+.kidinfo .agebadge{background:var(--brand-light);color:var(--brand);font-size:10.5px;font-weight:700;
+  padding:2px 8px;border-radius:999px;}
+.kidinfo .d{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.trashbtn{width:34px;height:34px;border-radius:50%;background:var(--neg-subtle);display:grid;place-items:center;flex-shrink:0;}
+.trashbtn .ph{width:15px;height:15px;color:var(--neg);}
+
+.completestrip{display:flex;align-items:center;gap:11px;background:var(--brand-light);
+  border:1px solid var(--border-brand-light);border-radius:16px;padding:14px 15px;margin:4px 0 12px;}
+.completestrip .ic{width:36px;height:36px;border-radius:50%;background:var(--brand);display:grid;place-items:center;flex-shrink:0;}
+.completestrip .ic .ph{width:17px;height:17px;color:#fff;}
+.completestrip .n{font-family:var(--serif);font-size:13.5px;font-weight:600;color:var(--ink);}
+.completestrip .s{font-size:11.5px;color:var(--muted);margin-top:1px;}
+
+.zipline{font-size:12px;color:var(--muted);margin-bottom:14px;}
+.searchfield{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--border);
+  border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-sm);margin-bottom:16px;}
+.searchfield .ph{width:17px;height:17px;color:var(--muted);flex-shrink:0;}
+.searchfield span{font-size:13.5px;color:var(--muted);}
+
+.avatar{border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;
+  background:linear-gradient(144deg,var(--brand) 5%,var(--brand-mid) 100%);flex-shrink:0;}
+
+.xcard{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px 15px;
+  box-shadow:var(--shadow-sm);cursor:pointer;margin-bottom:11px;}
+.xhead{display:flex;align-items:center;gap:12px;}
+.xhead .avatar{width:42px;height:42px;font-size:15px;}
+.xhead .tx{flex:1;min-width:0;}
+.xhead .tx .n{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink);}
+.xhead .tx .s{font-size:11.5px;color:var(--muted);margin-top:1px;}
+.xhead .chev{width:16px;height:16px;color:var(--muted);flex-shrink:0;transition:transform .2s;}
+.xcard.open .chev{transform:rotate(180deg);}
+.xcard .detail{overflow:hidden;}
+.xcard .detail .inner{padding-top:12px;margin-top:12px;border-top:1px dashed var(--border);}
+
+.mrow{display:flex;align-items:center;gap:11px;padding:8px 2px;cursor:pointer;}
+.gradebadge{width:29px;height:29px;border-radius:50%;background:var(--brand-light);color:var(--brand);
+  font-family:var(--serif);font-weight:600;font-size:11.5px;display:grid;place-items:center;flex-shrink:0;}
+.mrow .gn{flex:1;font-size:13.5px;color:var(--body);font-weight:500;}
+.checkbox{width:23px;height:23px;border-radius:8px;border:2px solid #cfc7b5;display:grid;place-items:center;flex-shrink:0;}
+.mrow.sel .checkbox{background:var(--brand);border-color:var(--brand);}
+.mrow.sel .gn{color:var(--ink);font-weight:600;}
+.checkbox .ph{width:12px;height:12px;color:#fff;}
+
+/* ── Home screen (reused convention from home-screen.html) ── */
+.app-header{background:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:10px 20px 12px;flex-shrink:0;}
+.header-avatar{width:38px;height:38px;border-radius:50%;background:var(--surface-l2);border:2.5px solid var(--brand-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.header-location-label{font-size:11px;font-weight:500;color:var(--content-secondary);text-align:center;display:block;margin-bottom:1px;}
+.header-location-city{display:flex;align-items:center;gap:3px;font-family:var(--serif);font-size:17px;font-weight:600;color:var(--grey-900);line-height:1;}
+.icon-btn{width:38px;height:38px;border-radius:50%;background:var(--surface-l1);border:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;}
+.icon-btn svg{width:18px;height:18px;color:var(--body);}
+.notif-badge{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:#d64545;border:1.5px solid var(--bg);}
+.welcomecard{margin:6px 0 4px;}
+.welcomecard h2{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);}
+.welcomecard p{font-size:12.5px;color:var(--muted);margin-top:3px;}
+
+.promptcard{margin-top:16px;background:linear-gradient(180deg,#eef4ec,#e3efe1);border:1.5px solid var(--border-brand-light);border-radius:20px;padding:16px;}
+.promptcard .ph2{width:34px;height:34px;border-radius:10px;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-bottom:10px;}
+.promptcard h3{font-family:var(--serif);font-size:15.5px;font-weight:600;color:var(--ink);margin-bottom:4px;}
+.promptcard p{font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:12px;}
+.promptcard .btn{padding:12px;font-size:14px;}
+.promptcard .dismiss{text-align:center;font-size:11.5px;color:var(--muted);margin-top:8px;cursor:pointer;}
+
+.tab-bar{height:78px;background:#fff;border-top:1px solid var(--grey-100);display:flex;align-items:flex-start;padding:10px 8px 0;flex-shrink:0;}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 0 0;}
+.tab-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--grey-300);}
+.tab-icon.active{color:var(--brand-500);}
+.tab-label{font-size:10px;font-weight:500;color:var(--grey-400);}
+.tab-label.active{color:var(--brand-500);font-weight:600;}
+.tab-create{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:-8px;}
+.tab-create-btn{width:48px;height:48px;border-radius:16px;background:var(--brand-500);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(24,99,56,.35);}
+.tab-create-btn svg{width:22px;height:22px;color:#fff;}
+
+/* ── Verdict panel ── */
+.verdict{max-width:900px;margin:44px auto 0;background:#fffdf8;border:1px solid #e4ddcb;border-radius:16px;padding:22px 26px;}
+.verdict h3{font-family:var(--serif);font-size:17px;font-weight:600;color:#23271f;margin-bottom:10px;}
+.verdict p{font-size:13px;color:#4d4738;line-height:1.65;margin-bottom:10px;}
+.verdict p:last-child{margin-bottom:0;}
+.verdict b{color:#23271f;}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <div class="k">Onboarding · discussion draft for Tony</div>
+  <h1>School Groups: required mid-signup vs. optional after Home</h1>
+  <p>From the team sync: Mohit proposed pulling "Join your kids' school groups" out of the sign-up wizard and into a post-signup prompt on Home, to shorten sign-up. Both paths below use the exact same screens and fields — nothing about the School Groups step itself changes, only <em>when</em> it's asked.</p>
+</div>
+
+<div class="rowlabel a">
+  <span class="badge">Current</span>
+  <h2>School Groups is a required step inside sign-up</h2>
+  <p>After adding kids, the parent must search their school, expand it, and pick a grade before "Continue" unlocks. No school group, no finishing sign-up.</p>
+  <div class="stepcount">🧭 4 required steps to reach Home</div>
+</div>
+
+<div class="row">
+  <div class="col">
+    <div class="tag">4.15 · <b>Add Kids — Full</b></div>
+    <div class="device"><div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+        <div class="hdrp"><div class="backc"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+          <div class="ptrack"><div class="pseg done"></div><div class="pseg done tip"></div><div class="pseg"></div><div class="pseg"></div></div>
+        </div>
+        <div class="body" style="padding-bottom:150px;">
+          <div class="eyebrow">Your Family</div>
+          <div class="title">Add your little <em>ones</em> 🌱</div>
+          <p class="subcopy">We'll personalize events, clubs, and activities to match each of your child's information.</p>
+          <div class="kidcard"><div class="kidphoto">🌿</div><div class="kidinfo"><div class="n">Jesica <span class="agebadge">2 yrs</span></div><div class="d">Mar 03, 2024</div></div><div class="trashbtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Z"/></svg></span></div></div>
+          <div class="kidcard"><div class="kidphoto" style="background:linear-gradient(135deg,#f0dcb0,#c9975e);">🌻</div><div class="kidinfo"><div class="n">Marco <span class="agebadge">4 yrs</span></div><div class="d">Jan 18, 2022</div></div><div class="trashbtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Z"/></svg></span></div></div>
+          <div class="completestrip"><div class="ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88Z"/></svg></span></div><div><div class="n">Family all set</div><div class="s">2 of 5 children added.</div></div></div>
+        </div>
+        <div class="cta"><button class="btn">Continue</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+
+  <div class="col">
+    <div class="tag">4.16 · <b>School Groups</b> — blocking</div>
+    <div class="device"><div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+        <div class="hdrp"><div class="backc"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+          <div class="ptrack"><div class="pseg done"></div><div class="pseg done"></div><div class="pseg done tip"></div><div class="pseg"></div></div>
+        </div>
+        <div class="body">
+          <div class="eyebrow">Join Group</div>
+          <div class="title">Join your kids <em>school groups</em> 🏫</div>
+          <div class="zipline">Zip Code: 73301</div>
+          <div class="searchfield"><span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 218.34-50.07-50.06a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.32-11.32M40 112a72 72 0 1 1 72 72 72.08 72.08 0 0 1-72-72"/></svg></span><span>Search</span></div>
+          <div class="xcard open"><div class="xhead"><div class="avatar" style="width:42px;height:42px;font-size:15px;">L</div><div class="tx"><div class="n">Lincoln Elementary School</div><div class="s">0.8 miles away</div></div><span class="chev ph"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg></span></div>
+            <div class="detail"><div class="inner">
+              <div class="mrow"><div class="gradebadge">P</div><div class="gn">Pre-K</div><div class="checkbox"></div></div>
+              <div class="mrow"><div class="gradebadge">K</div><div class="gn">Kinder</div><div class="checkbox"></div></div>
+              <div class="mrow"><div class="gradebadge">1</div><div class="gn">1st grade</div><div class="checkbox"></div></div>
+            </div></div>
+          </div>
+          <div class="xcard"><div class="xhead"><div class="avatar" style="width:42px;height:42px;font-size:15px;">W</div><div class="tx"><div class="n">Washington Middle School</div><div class="s">1.2 miles away</div></div><span class="chev ph"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg></span></div></div>
+        </div>
+        <div class="cta"><button class="btn" disabled>Select your child's school + grade</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="rowlabel b">
+  <span class="badge">Alternative</span>
+  <h2>School Groups becomes an optional prompt on Home</h2>
+  <p>Sign-up ends right after "Add Kids." The same School Groups screen still exists — it's just reached from a prompt card on Home instead of blocking sign-up, and it can be skipped.</p>
+  <div class="stepcount">🧭 3 required steps to reach Home</div>
+</div>
+
+<div class="row">
+  <div class="col">
+    <div class="tag">4.15 · <b>Add Kids — Full</b></div>
+    <div class="device"><div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+        <div class="hdrp"><div class="backc"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+          <div class="ptrack"><div class="pseg done"></div><div class="pseg done tip"></div><div class="pseg"></div></div>
+        </div>
+        <div class="body" style="padding-bottom:150px;">
+          <div class="eyebrow">Your Family</div>
+          <div class="title">Add your little <em>ones</em> 🌱</div>
+          <p class="subcopy">We'll personalize events, clubs, and activities to match each of your child's information.</p>
+          <div class="kidcard"><div class="kidphoto">🌿</div><div class="kidinfo"><div class="n">Jesica <span class="agebadge">2 yrs</span></div><div class="d">Mar 03, 2024</div></div><div class="trashbtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Z"/></svg></span></div></div>
+          <div class="kidcard"><div class="kidphoto" style="background:linear-gradient(135deg,#f0dcb0,#c9975e);">🌻</div><div class="kidinfo"><div class="n">Marco <span class="agebadge">4 yrs</span></div><div class="d">Jan 18, 2022</div></div><div class="trashbtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Z"/></svg></span></div></div>
+          <div class="completestrip"><div class="ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88Z"/></svg></span></div><div><div class="n">Family all set</div><div class="s">2 of 5 children added.</div></div></div>
+        </div>
+        <div class="cta"><button class="btn">Finish Setup</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow skip"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg><div class="arrowlbl skip">school step<br>skipped</div></div>
+
+  <div class="col">
+    <div class="tag">New · <b>Home — with prompt card</b></div>
+    <div class="device"><div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+        <div class="app-header">
+          <div class="header-avatar"><svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="9" r="4" fill="#aa9e83"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="#aa9e83"/></svg></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:1px;"><span class="header-location-label">Welcome to</span><div class="header-location-city">Sprout 🌱</div></div>
+          <div class="icon-btn"><div class="notif-badge"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 10a6 6 0 1 1 12 0c0 3.5 1.5 5 2 6H4c.5-1 2-2.5 2-6z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></div>
+        </div>
+        <div class="body" style="padding-top:2px;">
+          <div class="welcomecard"><h2>Hey there! 👋</h2><p>Your family's all set up. Here's one more thing that'll help us match you better.</p></div>
+          <div class="promptcard">
+            <div class="ph2"><span class="ph" style="color:#fff;"><svg viewBox="0 0 256 256"><path d="M224 200h-8V88a16 16 0 0 0-16-16h-56V40a8 8 0 0 0-11.581-7.155L88 60.783A16 16 0 0 0 80 74.943V200H40a8 8 0 0 0 0 16h184a8 8 0 0 0 0-16m-72 0v-40h16v40Z"/></svg></span></div>
+            <h3>Add your kids' school groups</h3>
+            <p>Join Lincoln Elementary and Washington Middle's parent groups to get class updates and meet nearby families.</p>
+            <button class="btn">Set up now</button>
+            <div class="dismiss">Maybe later</div>
+          </div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab-item"><div class="tab-icon active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5V21H15v-5h-6v5H3V10.5z"/></svg></div><span class="tab-label active">Home</span></div>
+          <div class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></div><span class="tab-label">Discover</span></div>
+          <div class="tab-create"><div class="tab-create-btn"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg></div></div>
+          <div class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><span class="tab-label">Clubs</span></div>
+          <div class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span class="tab-label">Chat</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+
+  <div class="col">
+    <div class="tag">Same screen · now <b>skippable</b></div>
+    <div class="device"><div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+        <div class="hdrx"><div class="backc"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="ttl">School Groups</div><div class="skipbtn">Skip</div></div>
+        <div class="body">
+          <div class="eyebrow">Join Group</div>
+          <div class="title">Join your kids <em>school groups</em> 🏫</div>
+          <div class="zipline">Zip Code: 73301</div>
+          <div class="searchfield"><span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 218.34-50.07-50.06a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.32-11.32M40 112a72 72 0 1 1 72 72 72.08 72.08 0 0 1-72-72"/></svg></span><span>Search</span></div>
+          <div class="xcard open"><div class="xhead"><div class="avatar" style="width:42px;height:42px;font-size:15px;">L</div><div class="tx"><div class="n">Lincoln Elementary School</div><div class="s">0.8 miles away</div></div><span class="chev ph"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg></span></div>
+            <div class="detail"><div class="inner">
+              <div class="mrow sel"><div class="gradebadge">P</div><div class="gn">Pre-K</div><div class="checkbox"><span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 77.66-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69 218.34 66.34a8 8 0 0 1 11.32 11.32Z"/></svg></span></div></div>
+              <div class="mrow"><div class="gradebadge">K</div><div class="gn">Kinder</div><div class="checkbox"></div></div>
+            </div></div>
+          </div>
+        </div>
+        <div class="cta"><button class="btn">Join Group</button><div class="skiplink">Do this later</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="verdict">
+  <h3>Ahmad's honest read, for the discussion with Tony</h3>
+  <p><b>Functionally almost identical.</b> Same fields, same end state, same screens reused — the only real change is <em>when</em> it's asked. It's not a redesign, it's a resequencing.</p>
+  <p><b>What it buys:</b> sign-up drops from 4 required steps to 3, and the tap count to reach Home drops by roughly half (no search → expand → pick grade → continue chain up front).</p>
+  <p><b>What it risks:</b> the current version <em>guarantees</em> every kid gets mapped to a school group before they ever see the rest of the app — that mapping is what powers school-based matching (class updates, nearby-parent discovery) from day one. Move it to a dismissible "maybe later" card, and some parents will dismiss it and never come back, weakening that matching for exactly the users who skipped it.</p>
+  <p>Given onboarding is already long, this trims one blocking step — but it trades a guarantee for a hope. Worth Tony's call on whether that trade is right for where Sprout is right now.</p>
+</div>
+
+</body>
+</html>

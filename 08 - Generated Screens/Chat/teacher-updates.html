@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Class Updates · Ms. Taylor · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ece6da;
+    --surface:#f7f4ee;
+    --card:#ffffff;
+    --field:#e8e2d6;
+    --ink:#1e3e2b;
+    --ink-2:#2c2a24;
+    --muted:#7d715e;
+    --brand:#1e3e2b;
+    --brand-mid:#4fa472;
+    --brand-light:#e2e9e3;
+    --brand-border:#77b691;
+    --border:#e5dfd2;
+    --shadow:1px 4px 12.5px rgba(13,13,18,.12);
+    --shadow-sm:1px 3px 9px rgba(13,13,18,.06);
+    --serif:'Playfair Display',Georgia,serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace;
+    /* type accents (earthy) */
+    --news-fg:#1e3e2b; --news-bg:#e2e9e3;
+    --event-fg:#9c4f2e; --event-bg:#f1e1d6;
+    --rem-fg:#836516; --rem-bg:#efe7cd;
+    --note-fg:#6d4a63; --note-bg:#ece0e8;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:30px 40px;padding:40px 24px 60px;}
+
+  .lede{flex:1 0 100%;text-align:center;max-width:760px;margin:0 auto 6px;}
+  .lede h1{font-family:var(--serif);font-size:25px;font-weight:600;color:#23271f;margin:0 0 6px;}
+  .lede p{font-size:13px;color:#6a665b;margin:0;line-height:1.55;}
+
+  .panel{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .cap{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8a8478;text-align:center;}
+  .cap strong{color:#3a3830;font-weight:600;}
+
+  .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:50;}
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);z-index:20;}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;}
+  .sb svg{width:17px;height:11px;fill:var(--ink);} .sb .bat{width:25px;}
+
+  .view{flex:1 1 auto;display:none;flex-direction:column;min-height:0;}
+  .view.on{display:flex;}
+
+  .ibtn{width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--border);
+    display:grid;place-items:center;cursor:pointer;flex-shrink:0;box-shadow:var(--shadow-sm);}
+  .ibtn svg{width:21px;height:21px;stroke:var(--ink);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  .avatar{border-radius:50%;flex-shrink:0;display:grid;place-items:center;color:#fff;
+    background:linear-gradient(144deg,#1e3e2b 5%,#4fa472 100%);font-family:var(--serif);font-weight:600;}
+
+  /* ===== VIEW A: chat with pinned teacher header ===== */
+  .chattop{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:2px 14px 10px;}
+  .chattop .tt{flex:1;text-align:center;line-height:1.1;}
+  .chattop .tt .t{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);}
+  .chattop .tt .s{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .teacherbar{margin:2px 14px 6px;background:linear-gradient(135deg,#f7f4ee,#eef3ec);
+    border:1px solid var(--brand-border);border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;
+    cursor:pointer;box-shadow:var(--shadow);transition:transform .12s;}
+  .teacherbar:active{transform:scale(.985);}
+  .teacherbar .avatar{width:46px;height:46px;font-size:17px;}
+  .teacherbar .tinfo{flex:1;min-width:0;}
+  .teacherbar .tinfo .r1{display:flex;align-items:center;gap:7px;}
+  .teacherbar .tinfo .nm{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);}
+  .teacherbar .tinfo .pin{font-size:11px;}
+  .teacherbar .tinfo .sub{font-size:12px;color:var(--muted);margin-top:1px;}
+  .teacherbar .cta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
+  .teacherbar .badge{background:var(--brand);color:#fff;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;}
+  .teacherbar .go{font-size:11px;color:var(--brand-mid);font-weight:600;display:flex;align-items:center;gap:2px;}
+  .teacherbar .go svg{width:12px;height:12px;stroke:var(--brand-mid);fill:none;stroke-width:2.4;}
+
+  .chatscroll{flex:1;overflow-y:auto;padding:8px 16px 16px;display:flex;flex-direction:column;gap:10px;}
+  .chatscroll::-webkit-scrollbar{display:none;}
+  .daysep{align-self:center;font-size:11px;color:var(--muted);background:rgba(0,0,0,.04);padding:3px 12px;border-radius:999px;margin:4px 0;}
+  .bubble{max-width:76%;padding:9px 13px;border-radius:16px;font-size:14px;line-height:1.4;box-shadow:var(--shadow-sm);}
+  .bubble .who{font-size:11px;font-weight:600;color:var(--brand-mid);margin-bottom:2px;}
+  .bubble.them{align-self:flex-start;background:var(--card);color:var(--ink-2);border-bottom-left-radius:5px;}
+  .bubble.me{align-self:flex-end;background:var(--brand);color:#fff;border-bottom-right-radius:5px;}
+  .composer{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:10px 16px 28px;}
+  .composer .f{flex:1;background:var(--field);border-radius:999px;padding:12px 16px;color:#9c9788;font-size:14px;}
+  .composer .snd{width:42px;height:42px;border-radius:50%;background:var(--brand);display:grid;place-items:center;}
+  .composer .snd svg{width:19px;height:19px;stroke:#fff;fill:none;stroke-width:2;}
+
+  /* ===== VIEW B: updates hub ===== */
+  .hubtop{flex:0 0 auto;display:flex;align-items:center;gap:12px;padding:2px 14px 12px;}
+  .hubtop .tt{flex:1;line-height:1.1;}
+  .hubtop .tt .t{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);}
+  .hubtop .tt .s{font-size:12px;color:var(--muted);margin-top:2px;}
+  .hubtop .sp{width:38px;}
+
+  .hubhead{flex:0 0 auto;margin:0 16px 6px;background:var(--surface);border:1px solid var(--border);border-radius:18px;
+    padding:14px;display:flex;align-items:center;gap:13px;box-shadow:var(--shadow-sm);}
+  .hubhead .avatar{width:52px;height:52px;font-size:19px;}
+  .hubhead .hi{flex:1;}
+  .hubhead .hi .nm{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);}
+  .hubhead .hi .r{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4;}
+  .hubhead .wl{font-size:11px;color:var(--brand-mid);font-weight:600;margin-top:5px;display:inline-flex;align-items:center;gap:4px;}
+
+  .filters{flex:0 0 auto;display:flex;gap:8px;overflow-x:auto;padding:8px 16px 10px;}
+  .filters::-webkit-scrollbar{display:none;}
+  .fchip{flex:0 0 auto;font-size:13px;font-weight:500;color:var(--ink-2);background:var(--surface);border:1px solid var(--border);
+    border-radius:999px;padding:7px 14px;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow-sm);}
+  .fchip.on{background:var(--brand);border-color:var(--brand);color:#fff;}
+
+  .feed{flex:1 1 auto;overflow-y:auto;padding:2px 16px 30px;display:flex;flex-direction:column;gap:12px;}
+  .feed::-webkit-scrollbar{display:none;}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:15px;box-shadow:var(--shadow-sm);cursor:pointer;transition:box-shadow .15s;}
+  .card:hover{box-shadow:var(--shadow);}
+  .card .top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px;}
+  .type{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:4px 9px;border-radius:8px;}
+  .from{display:inline-flex;align-items:center;gap:7px;font-family:var(--sans);font-weight:600;font-size:12.5px;color:var(--ink);}
+  .fav{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:9px;background:linear-gradient(145deg,#1e3e2b,#4fa472);}
+  .date{font-size:12px;color:var(--muted);font-weight:500;white-space:nowrap;}
+  .card h3{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink-2);margin:0 0 6px;line-height:1.25;}
+  .card .sum{font-size:13.5px;color:#5f5849;line-height:1.5;margin:0;}
+
+  .hl{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px;}
+  .htag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--ink);
+    background:var(--brand-light);border-radius:999px;padding:5px 10px;}
+  .htag.link{background:#e6ecf3;color:#2f4d70;}
+  .htag .e{font-size:12px;}
+
+  .detail{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+  .detail.open{max-height:900px;}
+  .detail .inner{padding-top:13px;margin-top:13px;border-top:1px dashed var(--border);}
+  .sect{margin-bottom:12px;}
+  .sect:last-child{margin-bottom:0;}
+  .sect h4{font-size:12.5px;font-weight:700;color:var(--ink);margin:0 0 3px;}
+  .sect p{font-size:13px;color:#5f5849;line-height:1.5;margin:0;}
+  .linkrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px;}
+  .lbtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:#2f4d70;
+    background:#e6ecf3;border:1px solid #d3ddea;border-radius:10px;padding:8px 12px;cursor:pointer;}
+  .lbtn svg{width:14px;height:14px;stroke:#2f4d70;fill:none;stroke-width:2;}
+  .expand{display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:600;color:var(--brand-mid);margin-top:12px;}
+  .expand svg{width:15px;height:15px;stroke:var(--brand-mid);fill:none;stroke-width:2.2;transition:transform .25s;}
+  .card.open .expand svg{transform:rotate(180deg);}
+  .card.open .sum{display:none;}
+  .card.open .hl{display:none;}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Class Updates from Ms. Taylor</h1>
+  <p>A header on the class chat opens every update the teacher has sent — dated, categorized, and readable. Better than forwarding email: signatures and legal boilerplate stripped, the what / when / where / action surfaced. Tap the header (left) to open the hub (right); tap any card to expand.</p>
+</div>
+
+<!-- ===== PANEL 1: chat with teacher header ===== -->
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+
+      <div class="view on" id="v-chat">
+        <div class="chattop">
+          <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="tt"><div class="t">Miss Taylor's Class</div><div class="s">22 members · Lincoln School</div></div>
+          <div class="ibtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="6" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="18" r="1.6"/></svg></div>
+        </div>
+
+        <!-- pinned teacher header -->
+        <div class="teacherbar" onclick="openHub()">
+          <div class="avatar">VT</div>
+          <div class="tinfo">
+            <div class="r1"><span class="pin">📌</span><span class="nm">Ms. Taylor's Updates</span></div>
+            <div class="sub">Everything from your teacher, in one place</div>
+          </div>
+          <div class="cta">
+            <span class="badge">10 updates</span>
+            <span class="go">View all <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
+          </div>
+        </div>
+
+        <div class="chatscroll">
+          <div class="daysep">Today</div>
+          <div class="bubble them"><div class="who">Ana Michel</div>Did everyone get their art bags sent in? 🎨</div>
+          <div class="bubble them"><div class="who">Marcus Reed</div>Sent ours this morning!</div>
+          <div class="bubble me">Tapping the header above to catch up on Ms. Taylor's notes 👆</div>
+          <div class="bubble them"><div class="who">Hannah Larsen</div>Good call — the end of year party details are all in there</div>
+        </div>
+
+        <div class="composer">
+          <div class="f">Message Miss Taylor's Class…</div>
+          <div class="snd"><svg viewBox="0 0 24 24"><path d="M4 12l16-7-7 16-2-7z"/></svg></div>
+        </div>
+      </div>
+
+      <!-- ===== VIEW B: updates hub ===== -->
+      <div class="view" id="v-hub">
+        <div class="hubtop">
+          <div class="ibtn" onclick="closeHub()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="tt"><div class="t">Ms. Taylor's Updates</div><div class="s">10 updates · newest first</div></div>
+          <div class="sp"></div>
+        </div>
+
+        <div class="hubhead">
+          <div class="avatar">VT</div>
+          <div class="hi">
+            <div class="nm">Veronica Taylor</div>
+            <div class="r">Kindergarten Teacher · Kiker Elementary</div>
+            <span class="wl">🎁 Ms. Taylor's Amazon Wishlist</span>
+          </div>
+        </div>
+
+        <div class="filters" id="filters"></div>
+        <div class="feed" id="feed"></div>
+      </div>
+    </div>
+  </div>
+  <div class="cap"><strong>Chat header → tap → full archive.</strong> Dates on every update. Roster & legal footers omitted.</div>
+</div>
+
+<script>
+  var UPDATES=[
+    {type:'Note', date:'May 29', title:'Thank You!',
+      summary:"A heartfelt end-of-year thank-you to families for their support, gifts, and a wonderful year together.",
+      sections:[
+        {h:'From Ms. Taylor', b:"It's been a joy getting to know your children and watching them grow. Thank you for trusting me with them each day, and for the thoughtful class gift, individual gifts, and kind notes."},
+        {h:'Have a great summer', b:"Wishing every family a restful summer full of fun, adventure, and special memories."}
+      ], links:[]},
+
+    {type:'Newsletter', date:'May 26', title:'Newsletter · Week of May 18',
+      summary:"Last-week logistics, MAP results sent home, summer reading, and a look ahead to next year.",
+      highlights:[['📅','Aug 14 · Meet the Teacher'],['📅','Aug 18 · First day']],
+      sections:[
+        {h:'Leaving early?', b:"If your child won't be in through Thursday, let Ms. Taylor know so belongings can be packed in advance."},
+        {h:'School supply pre-order', b:"Order next year's supplies via School Toolbox (link below). More info in Comet Connections."},
+        {h:'MAP Growth results', b:"Reading and Math results were sent home Friday."},
+        {h:'ELA books & summer reading', b:"Consumable ELA books came home to keep skills up. Pizza Hut BOOK IT! rewards free personal pizzas for meeting reading goals over the summer."},
+        {h:'Planning ahead · 2026-27', b:"Aug 14 — Meet the Teacher @ 3:30 · Aug 18 — 1st Day of School · Sep 1 — Back to School Night (K/1/2) @ 5:30."}
+      ], links:[['School Toolbox pre-order'],['BOOK IT! program']]},
+
+    {type:'Reminder', date:'May 20', title:'Art Bags',
+      summary:"Send a labeled reusable bag so your child can bring their artwork home.",
+      highlights:[['📅','Due tomorrow'],['🎒','Reusable bag w/ handles']],
+      sections:[
+        {h:'What to send', b:"A trash bag with a handle, an HEB-size reusable bag, or any other reusable bag with handles — labeled with your child's name."}
+      ], links:[]},
+
+    {type:'Event', date:'May 11', title:'End of the Year Class Party',
+      summary:"An end-of-year class party outside of school hours. All families welcome.",
+      highlights:[['📅','Sat May 16 · 10:30–12:30'],['📍','Vintage Place Playground'],['🔗','RSVP']],
+      sections:[
+        {h:'When', b:"Saturday, May 16th from 10:30–12:30. Rain or shine."},
+        {h:'Where', b:"Vintage Place Playground in Circle C — across from 9513 Bungalow Lane, Austin, TX 78749."},
+        {h:'Who', b:"Siblings and family are welcome. Hosted by room parents Ana Michel & Hannah Larsen."}
+      ], links:[['RSVP on Evite']]},
+
+    {type:'Newsletter', date:'May 11', title:'Newsletter · Week of May 11',
+      summary:"Career Week, the End-of-Year Celebration, art bags, and the PTA glow party.",
+      highlights:[['📅','May 12 · Career Day on Wheels'],['📅','May 15 · EOY Celebration'],['📅','May 22 · Glow Party']],
+      sections:[
+        {h:'Career Day on Wheels', b:"Tuesday — several vehicles on campus presenting to students. Don't be alarmed driving by."},
+        {h:'Career Week dress-up', b:"See Kiker Connections for themes. Disregard the Friday Kiker t-shirt theme — wear the Red class t-shirt Friday."},
+        {h:'End of Year Celebration', b:"This Friday 8:15–9:30 at the front of the school. Class shirt, athletic shoes, water bottle (hat & sunscreen optional). Families invited."},
+        {h:'MAP Growth testing', b:"All Reading and Math assessments are complete. 🎉"},
+        {h:'Art bags', b:"Send a handled bag (labeled) by Wed May 21 so students can bring art home from Ms. Billman's class. Extras welcome. Sent May 18–21."},
+        {h:'Glow Party', b:"PTA-sponsored end-of-year glow party Friday, May 22. More info to come."}
+      ], links:[]},
+
+    {type:'Newsletter', date:'May 1', title:'Newsletter · Week of April 27',
+      summary:"Field Day thanks, end-of-year MAP testing, a substitute day, and key end-of-year dates.",
+      highlights:[['📅','May 15 · EOY Celebration'],['📅','May 28 · Last Day']],
+      sections:[
+        {h:'Indoor Field Day', b:"Thank you to everyone who came out — the PE team ran great stations on teamwork and sportsmanship."},
+        {h:'End-of-year MAP', b:"MAP testing next week. Let Ms. Taylor know about travel absences so kids can be tested while here."},
+        {h:'Substitute · Mon May 4', b:"Mrs. Henry (former Kiker 1st grade teacher) will sub. Call the front office for any dismissal changes."},
+        {h:'Important dates', b:"May 11–15 Career Week · May 15 EOY Celebration 8:15–9:30 (parents invited) · May 25 Memorial Day (no school) · May 27 Bowie HS Senior Walk 2PM · May 28 Last Day of School."}
+      ], links:[]},
+
+    {type:'Reminder', date:'May 1', title:'Track & Field Day Rotations',
+      summary:"The rainy-day rotation schedule for Track & Field Day.",
+      highlights:[['🔗','Rotation schedule']],
+      sections:[
+        {h:'Rainy-day schedule', b:"Ms. Taylor shared the rain plan rotation schedule as a Google Sheet (link below)."}
+      ], links:[['Rotation schedule (Google Sheets)']]},
+
+    {type:'Reminder', date:'Apr 24', title:'Lemonade Play',
+      summary:"An encore of the class chorus show this morning.",
+      highlights:[['📅','Today · 8:30 AM'],['👕','White shirt & blue pants']],
+      sections:[
+        {h:'Encore performance', b:"Last night's show was fantastic — one more performance this morning at 8:30. Chorus students should wear a white shirt and blue pants."}
+      ], links:[]},
+
+    {type:'Newsletter', date:'Apr 17', title:'Newsletter · Week of April 13',
+      summary:"Reward day, the Track & Field lunch order deadline, and the Spring Book Fair.",
+      highlights:[['📅','Apr 20 · Reward Day'],['📅','Apr 24–30 · Book Fair'],['🔗','Lunch form']],
+      sections:[
+        {h:'Reward Day · Mon Apr 20', b:"The class earned a reward for compliments at school — kids may bring one backpack-sized toy to share."},
+        {h:'Track & Field lunch order', b:"Due Monday, Apr 20. Complete the Google form to choose a cafeteria sack lunch (sunbutter & jelly, fruit, veg, milk) or a lunch from home."},
+        {h:'Spring Book Fair', b:"Kiker Library Book Fair Apr 24–30. Volunteer via SignUpGenius; add funds through a Scholastic e-wallet."}
+      ], links:[['Track & Field lunch form'],['Book Fair volunteer'],['Scholastic e-wallet']]},
+
+    {type:'Newsletter', date:'Apr 12', title:'Newsletter · Week of April 6',
+      summary:"Track & Field Day details, Dad's on Duty, and the HSR curriculum opt-in.",
+      highlights:[['📅','May 1 · Track & Field'],['📅','May 5 · Dad\'s on Duty'],['⏰','HSR opt-in Apr 21']],
+      sections:[
+        {h:'Gifts of Time', b:"If your child attends another teacher's Gift of Time, let Ms. Taylor know when and where they need to go."},
+        {h:'Track & Field Day · Fri May 1', b:"Kindergarten runs 8:30–10:10; parents welcome to cheer. Complete the form for a cafeteria sack lunch. Class eats 10:30–11:00 — pack a larger snack. Wear the Red class t-shirt, athletic shoes, optional sunscreen/hat."},
+        {h:"Dad's on Duty · Tue May 5", b:"Campus volunteer group's recess event at the end of lunchtime."},
+        {h:'HSR curriculum', b:"Human Sexuality & Responsibility lessons run Apr 27–May 15. Submit the grade-level opt-in form by 3:30pm Apr 21 — the deadline will not be extended. Without opt-in, students receive alternative SEL lessons."}
+      ], links:[['Track & Field lunch form'],['HSR opt-in form']]}
+  ];
+
+  // Label by SENDER, not type (Tony: show who it's from, not Newsletter/Reminder/etc)
+  function senderOf(u){ return u.from || (u.title==='End of the Year Class Party' ? 'Ana Michel' : 'Ms. Taylor'); }
+  function initials(n){var p=n.split(' ');return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();}
+  var SENDERS=['All','Ms. Taylor','Ana Michel'];
+  var active='All';
+
+  function renderFilters(){
+    document.getElementById('filters').innerHTML=SENDERS.map(function(f){
+      var n = f==='All'?UPDATES.length:UPDATES.filter(function(u){return senderOf(u)===f;}).length;
+      return '<div class="fchip'+(active===f?' on':'')+'" onclick="setFilter(\''+f+'\')">'+f+' · '+n+'</div>';
+    }).join('');
+  }
+  function setFilter(f){active=f;renderFilters();renderFeed();}
+
+  function renderFeed(){
+    var feed=document.getElementById('feed');
+    var list=UPDATES.filter(function(u){return active==='All'||senderOf(u)===active;});
+    feed.innerHTML=list.map(function(u,i){
+      var from=senderOf(u);
+      var hl=(u.highlights||[]).map(function(h){var cls=h[0]==='🔗'?' link':'';return '<span class="htag'+cls+'"><span class="e">'+h[0]+'</span>'+h[1]+'</span>';}).join('');
+      var sects=(u.sections||[]).map(function(s){return '<div class="sect"><h4>'+s.h+'</h4><p>'+s.b+'</p></div>';}).join('');
+      var links=(u.links&&u.links.length)?'<div class="linkrow">'+u.links.map(function(l){
+        return '<span class="lbtn"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg>'+l[0]+'</span>';
+      }).join('')+'</div>':'';
+      return '<div class="card" onclick="toggleCard(this)">'+
+        '<div class="top"><span class="from"><span class="fav">'+initials(from)+'</span>'+from+'</span><span class="date">'+u.date+'</span></div>'+
+        '<h3>'+u.title+'</h3>'+
+        '<p class="sum">'+u.summary+'</p>'+
+        (hl?'<div class="hl">'+hl+'</div>':'')+
+        '<div class="detail"><div class="inner">'+sects+links+'</div></div>'+
+        '<div class="expand"><span class="lbl">Read update</span><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div>'+
+      '</div>';
+    }).join('');
+  }
+  function toggleCard(el){
+    var open=el.classList.toggle('open');
+    el.querySelector('.detail').classList.toggle('open',open);
+    el.querySelector('.expand .lbl').textContent=open?'Show less':'Read update';
+  }
+
+  function openHub(){document.getElementById('v-chat').classList.remove('on');document.getElementById('v-hub').classList.add('on');}
+  function closeHub(){document.getElementById('v-hub').classList.remove('on');document.getElementById('v-chat').classList.add('on');}
+
+  renderFilters();renderFeed();
+</script>
+</body>
+</html>

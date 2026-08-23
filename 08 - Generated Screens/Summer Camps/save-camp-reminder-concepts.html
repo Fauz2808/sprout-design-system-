@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Save a Camp + Registration Reminder — 3 Concept Directions · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --surf-1:#eae6db; --surf-2:#dbd5c8;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#818898; --border:#e6e7ea;
+    --green:#186338; --green-l:#e2e9e3; --amber:#c88a2e; --amber-l:#f7ecd8; --red:#c0392b;
+    --camp-orange:#e07b39; --camp-orange-l:#fef3eb;
+    --serif:'Playfair Display',serif; --sans:'Inter',sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#cfc8b8;font-family:var(--sans);display:flex;flex-direction:column;align-items:center;gap:40px;padding:48px 32px 90px;}
+
+  .lede{max-width:760px;text-align:center;margin-bottom:8px;}
+  .lede .kicker{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);background:var(--amber-l);display:inline-flex;padding:5px 14px;border-radius:99px;margin-bottom:14px;}
+  .lede h1{font-family:var(--serif);font-size:28px;font-weight:700;color:#3a332a;margin-bottom:10px;line-height:1.25;}
+  .lede p{font-size:13.5px;color:#7a7060;line-height:1.65;}
+  .lede p b{color:#4a4436;}
+
+  .shared-row{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .row-title{font-family:var(--serif);font-size:20px;font-weight:600;color:#3a332a;text-align:center;}
+  .row-sub{font-size:12.5px;color:#7a7060;text-align:center;max-width:480px;line-height:1.6;margin-top:-6px;margin-bottom:4px;}
+
+  .directions{display:flex;gap:36px;flex-wrap:wrap;justify-content:center;align-items:flex-start;}
+  .direction{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:340px;}
+  .dir-badge{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--green);padding:5px 14px;border-radius:99px;}
+  .dir-name{font-family:var(--serif);font-size:19px;font-weight:600;color:#3a332a;text-align:center;}
+  .dir-desc{font-size:12.5px;color:#7a7060;line-height:1.6;text-align:center;}
+  .dir-tradeoffs{width:100%;background:#fff;border:1px solid #e2ddd0;border-radius:14px;padding:12px 14px;font-size:11.5px;line-height:1.6;color:#5a5347;}
+  .dir-tradeoffs b{color:#3a332a;}
+  .dir-tradeoffs .pro{color:#186338;}
+  .dir-tradeoffs .con{color:#a05a2c;}
+
+  .phone{width:320px;height:693px;background:var(--bg);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 0 0 1px rgba(0,0,0,.07),0 20px 60px rgba(0,0,0,.22);display:flex;flex-direction:column;flex-shrink:0;}
+  .island{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:96px;height:28px;background:#000;border-radius:16px;z-index:10;}
+  .sb{height:40px;padding:11px 22px 0;display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--ink);flex-shrink:0;}
+  .sb.on-photo{color:#fff;position:absolute;top:0;left:0;right:0;z-index:5;background:transparent;}
+
+  /* ── shared: camp detail with heart ── */
+  .det-hero{width:100%;height:150px;position:relative;background:linear-gradient(135deg,#1e5c38 0%,#186338 40%,#2a8050 100%);flex-shrink:0;}
+  .det-hero .ic{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px;opacity:.22;}
+  .det-back,.det-heart{position:absolute;top:44px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .det-back{left:14px;} .det-heart{right:14px;}
+  .det-heart svg{width:16px;height:16px;color:var(--red);transition:transform .25s cubic-bezier(.34,1.6,.64,1);}
+  .det-heart.saved svg{transform:scale(1.15);}
+  .det-body{flex:1;padding:16px 18px;overflow-y:auto;}
+  .det-body::-webkit-scrollbar{display:none;}
+  .det-tag{display:inline-flex;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--camp-orange);background:var(--camp-orange-l);padding:3px 8px;border-radius:99px;margin-bottom:8px;}
+  .det-title{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+  .det-org{font-size:12px;color:var(--muted);margin-bottom:14px;}
+  .det-reg-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .det-reg-card svg{width:18px;height:18px;color:var(--amber);flex-shrink:0;}
+  .det-reg-card .l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);}
+  .det-reg-card .v{font-size:13.5px;font-weight:700;color:var(--ink);margin-top:1px;}
+  .toast{position:absolute;left:16px;right:16px;bottom:20px;background:var(--ink);color:#fff;font-size:12px;font-weight:600;padding:11px 15px;border-radius:12px;text-align:center;line-height:1.4;opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s;z-index:20;}
+  .toast.on{opacity:1;transform:translateY(0);}
+
+  /* ── Direction A: Saved strip under Events ── */
+  .ev-head{padding:14px 18px 10px;flex-shrink:0;}
+  .ev-head h2{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);}
+  .ev-scroll{flex:1;overflow-y:auto;padding:0 18px 16px;}
+  .ev-scroll::-webkit-scrollbar{display:none;}
+  .saved-strip-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:6px 0 8px;}
+  .saved-strip{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;}
+  .saved-strip::-webkit-scrollbar{display:none;}
+  .saved-card{flex:0 0 170px;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .saved-card .th{height:64px;background:linear-gradient(135deg,#1e5c38,#2a8050);position:relative;}
+  .saved-card .th .ic{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:26px;opacity:.3;}
+  .saved-card .b{padding:9px 11px;}
+  .saved-card .nm{font-family:var(--serif);font-size:13px;font-weight:600;color:var(--ink);margin-bottom:5px;line-height:1.25;}
+  .saved-card .cd{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--amber);background:var(--amber-l);padding:3px 7px;border-radius:99px;}
+  .other-ev{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 13px;margin-bottom:9px;font-size:12.5px;color:var(--body);}
+
+  /* ── Direction B: Calendar note ── */
+  .cal-month{padding:14px 18px 10px;flex-shrink:0;}
+  .cal-month h2{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 14px;flex-shrink:0;}
+  .cal-dow{font-size:9px;font-weight:700;color:var(--muted);text-align:center;padding-bottom:4px;}
+  .cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--body);border-radius:9px;position:relative;}
+  .cal-day.today{background:var(--green-l);font-weight:700;color:var(--green);}
+  .cal-day.marked{background:var(--amber-l);font-weight:700;color:var(--amber);}
+  .cal-day.marked::after{content:'';position:absolute;bottom:4px;width:4px;height:4px;border-radius:50%;background:var(--amber);}
+  .cal-note-detail{margin:16px 18px;background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px 15px;}
+  .cal-note-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--amber);background:var(--amber-l);padding:4px 9px;border-radius:99px;margin-bottom:9px;}
+  .cal-note-title{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px;}
+  .cal-note-sub{font-size:11.5px;color:var(--muted);margin-bottom:12px;}
+  .cal-note-btn{width:100%;height:38px;border-radius:11px;background:var(--green);color:#fff;border:none;font-size:12.5px;font-weight:700;font-family:var(--sans);cursor:pointer;}
+
+  /* ── Direction C: hybrid ── */
+  .hy-section-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:14px 0 8px;padding:0 18px;}
+  .hy-req-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:9px 12px;margin:0 18px 7px;}
+  .hy-req-row .ic{width:30px;height:30px;border-radius:9px;background:var(--surf-1);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+  .hy-req-row .nm{font-size:12px;font-weight:600;color:var(--ink);}
+  .hy-req-row .tag{margin-left:auto;font-size:9.5px;font-weight:700;color:var(--muted);background:var(--surf-1);padding:3px 7px;border-radius:99px;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <div class="kicker">Concept options — not yet built</div>
+  <h1>Save a Camp + Get Reminded to Register</h1>
+  <p>Tony's ask directly to Ahmad: figure out how a parent stars/hearts/saves a camp, where that lives, and how they get notified when registration opens. This isn't urgent — the splash pages cover summer camps until January — so these are <b>three directions to react to</b>, not a committed build. Pick one (or mix) and we'll build it properly.</p>
+</div>
+
+<div class="shared-row">
+  <div class="row-title">The save action (same in all 3 directions)</div>
+  <div class="row-sub">A heart icon sits next to the back button on Camp Detail. Tapping it saves the camp and confirms when the reminder will fire — this part doesn't change between options.</div>
+  <div class="phone" id="sharedPhone">
+    <div class="sb on-photo"><span>9:41</span><span>🔋</span></div>
+    <div class="island"></div>
+    <div class="det-hero">
+      <div class="ic">🌿</div>
+      <div class="det-back"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="det-heart" id="sharedHeart" onclick="toggleHeart()">
+        <svg viewBox="0 0 24 24" id="sharedHeartIcon" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 8.6c0-3.2-2.6-5.6-5.7-5.6-1.9 0-3.6 1-4.6 2.4C9.4 4 7.7 3 5.8 3 2.7 3 .1 5.4.1 8.6c0 6.3 9.4 11.4 11.4 11.4s9.3-5.1 9.3-11.4Z"/></svg>
+      </div>
+    </div>
+    <div class="det-body">
+      <div class="det-tag">Outdoor</div>
+      <div class="det-title">Nature Explorers Camp</div>
+      <div class="det-org">Run by Wild Kids Co.</div>
+      <div class="det-reg-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+        <div><div class="l">Registration opens</div><div class="v">Feb 1, 2027</div></div>
+      </div>
+    </div>
+    <div class="toast" id="sharedToast">Saved 🤍 — we'll remind you Feb 1 when registration opens</div>
+  </div>
+</div>
+
+<div class="directions">
+
+  <!-- DIRECTION A -->
+  <div class="direction">
+    <span class="dir-badge">Direction A</span>
+    <div class="dir-name">"Saved Camps" strip under Events</div>
+    <div class="dir-desc">Saved camps get their own horizontally-scrolling strip pinned to the top of the Events tab, each card showing a countdown badge to registration day.</div>
+    <div class="phone">
+      <div class="sb"><span>9:41</span><span>🔋</span></div>
+      <div class="island"></div>
+      <div class="ev-head"><h2>Events</h2></div>
+      <div class="ev-scroll">
+        <div class="saved-strip-label">Saved camps · 2</div>
+        <div class="saved-strip">
+          <div class="saved-card"><div class="th"><div class="ic">🌿</div></div><div class="b"><div class="nm">Nature Explorers Camp</div><span class="cd">⏰ Opens in 12 days</span></div></div>
+          <div class="saved-card"><div class="th" style="background:linear-gradient(135deg,#c85e20,#f0a060);"><div class="ic">🎨</div></div><div class="b"><div class="nm">Creative Arts Camp</div><span class="cd">⏰ Opens in 28 days</span></div></div>
+        </div>
+        <div class="saved-strip-label">Upcoming</div>
+        <div class="other-ev">Free Story Time · Tue, Aug 18</div>
+        <div class="other-ev">Kids Art &amp; Craft Day · Mon, Feb 25</div>
+      </div>
+    </div>
+    <div class="dir-tradeoffs">
+      <b class="pro">+</b> Browsable — parent can see all saved camps at a glance, feels like a personal shortlist.<br>
+      <b class="con">−</b> One more section competing for space at the top of Events.
+    </div>
+  </div>
+
+  <!-- DIRECTION B -->
+  <div class="direction">
+    <span class="dir-badge">Direction B</span>
+    <div class="dir-name">Calendar reminder note (Ahmad's suggestion)</div>
+    <div class="dir-desc">Saving a camp auto-creates a note on the registration date — reusing the exact to-do/calendar-note system already shipped this session. No new UI surface.</div>
+    <div class="phone">
+      <div class="sb"><span>9:41</span><span>🔋</span></div>
+      <div class="island"></div>
+      <div class="cal-month"><h2>February</h2></div>
+      <div class="cal-grid">
+        <div class="cal-dow">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div><div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div><div class="cal-dow">S</div>
+        <div></div><div class="cal-day">1<br></div>
+        <div class="cal-day marked">1</div><div class="cal-day">2</div><div class="cal-day">3</div><div class="cal-day">4</div><div class="cal-day">5</div><div class="cal-day">6</div>
+        <div class="cal-day">7</div><div class="cal-day">8</div><div class="cal-day">9</div><div class="cal-day">10</div><div class="cal-day">11</div><div class="cal-day">12</div><div class="cal-day today">13</div>
+      </div>
+      <div class="cal-note-detail">
+        <div class="cal-note-tag">⏰ Registration reminder</div>
+        <div class="cal-note-title">Nature Explorers Camp</div>
+        <div class="cal-note-sub">Registration opens today — spots are usually limited.</div>
+        <button class="cal-note-btn">View Camp</button>
+      </div>
+    </div>
+    <div class="dir-tradeoffs">
+      <b class="pro">+</b> Zero new UI — reuses the to-do/note pattern parents already know, fires exactly on the date that matters.<br>
+      <b class="con">−</b> Not browsable as a "saved list" — buried in the calendar until the date arrives.
+    </div>
+  </div>
+
+  <!-- DIRECTION C -->
+  <div class="direction">
+    <span class="dir-badge">Direction C — Recommended</span>
+    <div class="dir-name">Hybrid: strip + note + passive history</div>
+    <div class="dir-desc">Combines A and B — hearted camps get both the browsable strip AND the calendar reminder. Every "Go to website" tap (hearted or not) also quietly logs under a low-key "Recently viewed" list, per Moe's tracking idea.</div>
+    <div class="phone">
+      <div class="sb"><span>9:41</span><span>🔋</span></div>
+      <div class="island"></div>
+      <div class="ev-head"><h2>Events</h2></div>
+      <div class="ev-scroll">
+        <div class="saved-strip-label">Saved camps · 1</div>
+        <div class="saved-strip">
+          <div class="saved-card"><div class="th"><div class="ic">🌿</div></div><div class="b"><div class="nm">Nature Explorers Camp</div><span class="cd">⏰ Opens in 12 days</span></div></div>
+        </div>
+      </div>
+      <div class="hy-section-lbl">Recently viewed</div>
+      <div class="hy-req-row"><div class="ic">🎨</div><div class="nm">Creative Arts Summer Camp</div><span class="tag">Requested</span></div>
+      <div class="hy-req-row"><div class="ic">🔬</div><div class="nm">Young Scientists Camp</div><span class="tag">Requested</span></div>
+    </div>
+    <div class="dir-tradeoffs">
+      <b class="pro">+</b> Covers both intent (hearted = strong interest, gets a reminder) and passive signal (clicked out = mild interest, useful for Tony/Moe's engagement data).<br>
+      <b class="con">−</b> Most surface area to design and build — save for once v1 traction data justifies it.
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let saved = false;
+  function toggleHeart(){
+    saved = !saved;
+    const heart = document.getElementById('sharedHeart');
+    const icon = document.getElementById('sharedHeartIcon');
+    const toast = document.getElementById('sharedToast');
+    heart.classList.toggle('saved', saved);
+    icon.setAttribute('fill', saved ? 'currentColor' : 'none');
+    toast.textContent = saved ? "Saved 🤍 — we'll remind you Feb 1 when registration opens" : 'Removed from saved camps';
+    toast.classList.add('on');
+    clearTimeout(window._t);
+    window._t = setTimeout(()=>toast.classList.remove('on'), 2200);
+  }
+</script>
+
+</body>
+</html>

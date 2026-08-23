@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Clubs: Member Directory (revised)</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brand-500: #186338;
+    --brand-600: #134f2d;
+    --brand-700: #1e3e2b;
+    --brand-50:  #e2e9e3;
+    --secondary-500: #f4f1ea;
+    --secondary-600: #eae6db;
+    --secondary-700: #dbd5c8;
+    --grey-300: #b3b8c1;
+    --grey-500: #818898;
+    --grey-700: #4d525b;
+    --grey-900: #1a1b1e;
+    --warning-100: #f6ecd1;
+    --warning-700: #7f600e;
+  }
+
+  body {
+    background: #cfc8b8;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 24px 64px;
+    font-family: 'Inter', sans-serif;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .variant-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .variant-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #5a5347; text-align: center; max-width: 393px; }
+
+  .phone {
+    width: 393px; height: 852px;
+    background: var(--secondary-500);
+    border-radius: 54px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04), 0 24px 80px rgba(0,0,0,0.24);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dynamic-island { width: 120px; height: 36px; background: #000; border-radius: 20px; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 10; }
+
+  .status-bar { height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 14px 28px 0; flex-shrink: 0; }
+  .status-time { font-size: 15px; font-weight: 600; color: var(--grey-900); }
+  .status-icons { display: flex; align-items: center; gap: 7px; }
+
+  .scroll-area { flex: 1; overflow-y: auto; padding: 18px 22px 100px; }
+  .scroll-area::-webkit-scrollbar { display: none; }
+
+  /* ── Subgroup badges ─────────────────────────────── */
+  .subgroups { display: flex; gap: 22px; }
+  .subgroup { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .badge { width: 68px; height: 68px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #fff; }
+  .badge.green { border: 3px solid #2f8a4e; }
+  .badge.skyblue { border: 3px solid #6aa9dd; }
+  .badge.navy { border: 3px solid #1e3a5f; }
+  .badge svg { width: 30px; height: 30px; }
+  .subgroup-name { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 14px; color: var(--brand-700); }
+
+  /* ── Member Directory progress — enlarged per Tony's "bigger UI" note ── */
+  .directory-row { margin-top: 30px; display: flex; align-items: center; gap: 18px; }
+  .ring-wrap { position: relative; width: 84px; height: 84px; flex-shrink: 0; }
+  .ring-wrap svg { width: 84px; height: 84px; transform: rotate(-90deg); }
+  .ring-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 22px; color: var(--brand-700); }
+  .directory-copy { flex: 1; }
+  .directory-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 20px; color: var(--brand-700); }
+  .directory-sub { margin-top: 4px; font-size: 14.5px; color: var(--grey-500); }
+  .search-btn { width: 48px; height: 48px; border-radius: 14px; background: var(--secondary-700); border: none; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; }
+  .search-btn svg { width: 20px; height: 20px; stroke: var(--brand-700); }
+
+  /* ── Filters — now subgroup-based, enlarged ─────────────── */
+  .filter-row { margin-top: 22px; display: flex; align-items: center; gap: 10px; }
+  .filter-scroll { flex: 1; min-width: 0; display: flex; gap: 10px; overflow-x: auto; padding-right: 6px; mask-image: linear-gradient(to right, black 88%, transparent 100%); -webkit-mask-image: linear-gradient(to right, black 88%, transparent 100%); }
+  .filter-scroll::-webkit-scrollbar { display: none; }
+  .chip { flex-shrink: 0; padding: 13px 20px; border-radius: 99px; font-size: 16px; font-weight: 700; white-space: nowrap; background: var(--secondary-700); color: var(--brand-700); }
+  .chip.active { background: var(--brand-700); color: #fff; }
+  .invite-btn { flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 13px 16px; border-radius: 99px; background: var(--secondary-700); border: none; font-size: 15px; font-weight: 700; color: var(--brand-700); cursor: pointer; }
+  .invite-btn svg { width: 17px; height: 17px; stroke: var(--brand-700); }
+
+  /* ── Member card ─────────────────────────────────── */
+  .member-card { margin-top: 22px; display: flex; align-items: center; gap: 16px; padding: 16px; border: 1px solid var(--secondary-700); border-radius: 18px; }
+  .avatar { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: var(--secondary-600); }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .member-info { flex: 1; }
+  .member-name { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 19px; color: var(--brand-700); }
+  .member-sub { margin-top: 2px; font-size: 14px; color: var(--grey-500); }
+  .new-pill { padding: 6px 12px; border-radius: 99px; background: var(--warning-100); color: var(--warning-700); font-size: 12.5px; font-weight: 700; flex-shrink: 0; }
+
+  /* ── Bottom nav ───────────────────────────────────── */
+  .tabbar { position: absolute; left: 18px; right: 18px; bottom: 18px; background: var(--secondary-500); border: 1px solid var(--secondary-700); border-radius: 30px; padding: 12px 8px; display: flex; justify-content: space-between; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; }
+  .tab svg { width: 22px; height: 22px; stroke: var(--grey-500); }
+  .tab span { font-size: 11px; font-weight: 600; color: var(--grey-500); }
+  .tab.active svg { stroke: var(--brand-700); }
+  .tab.active span { color: var(--brand-700); }
+  .tab-badge { position: absolute; top: -4px; right: 22px; width: 16px; height: 16px; border-radius: 50%; background: var(--brand-50); color: var(--brand-700); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+
+  <div class="variant-wrap">
+    <div class="variant-label">Clubs — Member Directory, revised: filters swapped to subgroups, filters + progress ring enlarged</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="11" viewBox="0 0 17 11" fill="var(--grey-900)"><rect x="0" y="7" width="3" height="4" rx="0.6"/><rect x="4" y="5" width="3" height="6" rx="0.6"/><rect x="8" y="3" width="3" height="8" rx="0.6"/><rect x="12" y="0" width="3" height="11" rx="0.6"/></svg>
+          <svg width="15" height="11" viewBox="0 0 17 11" fill="var(--grey-900)"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1zM3.5 7.6L5 9.1c1-0.9 2.2-1.4 3.5-1.4 1.3 0 2.5 0.5 3.5 1.4l1.5-1.5c-1.4-1.3-3.1-2-5-2-1.9 0-3.6 0.7-5 2zM6.5 10.6l2 2 2-2c-0.5-0.5-1.2-0.8-2-0.8s-1.5 0.3-2 0.8z"/></svg>
+          <svg width="25" height="11" viewBox="0 0 25 11"><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" fill="none" stroke="var(--grey-900)" stroke-opacity="0.45"/><rect x="22" y="3.5" width="1.5" height="4" rx="0.4" fill="var(--grey-900)" fill-opacity="0.45"/><rect x="2" y="2" width="9" height="7" rx="1.4" fill="var(--grey-900)"/></svg>
+        </div>
+      </div>
+
+      <div class="scroll-area">
+        <div class="subgroups">
+          <div class="subgroup">
+            <div class="badge green"><svg viewBox="0 0 24 24" fill="none" stroke="#2f8a4e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.5 5 5.5.6-4 4 1 5.4-5-2.8-5 2.8 1-5.4-4-4 5.5-.6z"/></svg></div>
+            <div class="subgroup-name">3+ Year Old's</div>
+          </div>
+          <div class="subgroup">
+            <div class="badge skyblue"><svg viewBox="0 0 24 24" fill="none" stroke="#3a7fc4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 3 3 6 3s6-2 6-3v-5"/></svg></div>
+            <div class="subgroup-name">Kindergarten</div>
+          </div>
+          <div class="subgroup">
+            <div class="badge navy"><svg viewBox="0 0 24 24" fill="none" stroke="#1e3a5f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 3 3 6 3s6-2 6-3v-5"/></svg></div>
+            <div class="subgroup-name">1st Grade</div>
+          </div>
+        </div>
+
+        <div class="directory-row">
+          <div class="ring-wrap">
+            <svg viewBox="0 0 84 84">
+              <circle cx="42" cy="42" r="36" fill="none" stroke="var(--secondary-700)" stroke-width="7"/>
+              <circle cx="42" cy="42" r="36" fill="none" stroke="var(--brand-500)" stroke-width="7" stroke-linecap="round" stroke-dasharray="226.2" stroke-dashoffset="226.2"/>
+            </svg>
+            <div class="ring-pct">0%</div>
+          </div>
+          <div class="directory-copy">
+            <div class="directory-title">Member Directory</div>
+            <div class="directory-sub">You've met 0 out of 1 members</div>
+          </div>
+          <button class="search-btn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
+        </div>
+
+        <div class="filter-row">
+          <div class="filter-scroll">
+            <div class="chip active">All</div>
+            <div class="chip">3+ Year Old's</div>
+            <div class="chip">Kindergarten</div>
+            <div class="chip">1st Grade</div>
+          </div>
+          <button class="invite-btn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>Invite</button>
+        </div>
+
+        <div class="member-card">
+          <div class="avatar"><img src="https://images.unsplash.com/photo-1600180758890-6b94519a8ba6?w=200&h=200&fit=crop" alt=""></div>
+          <div class="member-info">
+            <div class="member-name">Tony Martin</div>
+            <div class="member-sub">Father of 4 kids</div>
+          </div>
+          <div class="new-pill">New</div>
+        </div>
+      </div>
+
+      <div class="tabbar">
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Events</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Memories</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5z"/><path d="M19 15l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg><span>AI Assist</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chat</span><div class="tab-badge">3</div></div>
+        <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Clubs</span></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

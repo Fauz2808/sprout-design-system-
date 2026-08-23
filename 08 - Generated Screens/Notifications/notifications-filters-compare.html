@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Notifications — 3 directions compared · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --surface:#ffffff; --card:#ffffff; --field:#e8e2d6;
+    --ink:#1e3e2b; --ink-2:#23271f; --body:#4d525b; --muted:#7d715e;
+    --brand:#186338; --brand-bold:#1e3e2b; --brand-mid:#4fa472; --brand-light:#e2e9e3; --brand-border:#77b691;
+    --border:#e2dccf; --shadow-sm:1px 3px 9px rgba(13,13,18,.06); --radius:16px;
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  .ph{display:inline-block;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;padding:40px 24px 80px;}
+
+  .lede{text-align:center;max-width:760px;margin:0 auto 40px;}
+  .lede h1{font-family:var(--serif);font-size:24px;font-weight:600;color:#23271f;margin:0 0 8px;}
+  .lede p{font-size:13px;color:#6a665b;margin:0;line-height:1.6;}
+
+  .row{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-start;gap:44px;padding:0 40px 20px;overflow-x:auto;}
+  .col{display:flex;flex-direction:column;align-items:center;gap:14px;flex-shrink:0;}
+  .caption{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:340px;line-height:1.7;}
+  .caption strong{display:block;color:#3a3830;font-weight:700;font-size:11.5px;margin-bottom:3px;text-transform:none;letter-spacing:0;}
+
+  /* device (shared) */
+  .device{position:relative;width:376px;height:812px;border-radius:54px;padding:11px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:118px;height:34px;background:#000;border-radius:999px;z-index:50;}
+  .screen{position:relative;width:100%;height:100%;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .sb{flex:0 0 44px;padding:16px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:14px;font-weight:600;color:var(--ink);z-index:20;}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;}
+  .sb svg{width:16px;height:10px;fill:var(--ink);} .sb .bat{width:23px;}
+
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:4px 14px 8px;}
+  .ibtn{width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--border);
+    display:grid;place-items:center;cursor:pointer;flex-shrink:0;box-shadow:var(--shadow-sm);}
+  .ibtn svg{width:20px;height:20px;stroke:var(--ink);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .ibtn.solid svg{fill:var(--ink);stroke:none;}
+  .top .tt{flex:1;line-height:1.1;} .top .tt.center{text-align:center;}
+  .top .tt .t{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);}
+  .top .sp{width:38px;flex-shrink:0;}
+
+  .body{flex:1 1 auto;overflow-y:auto;padding:2px 12px 28px;position:relative;}
+  .body::-webkit-scrollbar{display:none;}
+
+  /* notification row (shared) */
+  .nrow{display:flex;gap:11px;padding:12px 11px;border-radius:14px;cursor:pointer;}
+  .nrow.unread{background:var(--brand-light);}
+  .ico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;font-size:18px;color:#fff;}
+  .ico.club{background:linear-gradient(144deg,#dd7a37,#f0aa63);font-family:var(--serif);font-weight:600;font-size:18px;}
+  .ico.photo{background:linear-gradient(144deg,#1e3e2b,#4fa472);}
+  .avatar{border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;
+    background:linear-gradient(144deg,#1e3e2b 5%,#4fa472 100%);width:42px;height:42px;font-size:15px;flex-shrink:0;}
+  .ntxt{flex:1;min-width:0;padding-top:1px;}
+  .ntxt .row1{display:flex;align-items:flex-start;gap:6px;}
+  .ntxt .ti{font-family:var(--sans);font-weight:700;font-size:13px;color:var(--ink-2);flex:1;min-width:0;}
+  .ntxt .tm{font-family:var(--sans);font-size:10.5px;color:var(--muted);flex-shrink:0;padding-top:1px;white-space:nowrap;}
+  .ntxt .de{font-family:var(--sans);font-size:12px;color:var(--body);line-height:1.4;margin-top:2px;}
+
+  .fnote{display:flex;gap:6px;align-items:flex-start;justify-content:center;text-align:center;padding:16px 18px 4px;color:var(--muted);}
+  .fnote .ph{width:12px;height:12px;flex-shrink:0;margin-top:2px;}
+  .fnote span{font-size:10.5px;line-height:1.5;}
+
+  .emptynote{display:none;text-align:center;padding:34px 30px;color:var(--muted);font-size:12px;line-height:1.55;}
+  .emptynote.on{display:block;}
+
+  /* ============ DIRECTION A — segmented tabs ============ */
+  .filters{flex:0 0 auto;display:flex;gap:7px;overflow-x:auto;padding:2px 14px 11px;}
+  .filters::-webkit-scrollbar{display:none;}
+  .fchip{flex:0 0 auto;font-family:var(--sans);font-size:12.5px;font-weight:500;background:var(--surface);border:1px solid var(--border);
+    color:var(--ink-2);border-radius:999px;padding:7px 13px;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow-sm);
+    transition:background .12s,color .12s,border-color .12s;}
+  .fchip .n{opacity:.62;margin-left:2px;}
+  .fchip.on{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .fchip.on .n{opacity:.8;}
+
+  /* ============ DIRECTION B — time groups + filter sheet ============ */
+  .tsection{margin-bottom:2px;}
+  .tsection.hide{display:none;}
+  .seclbl{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:12px 11px 6px;}
+  .scrim{position:absolute;inset:0;background:rgba(20,20,16,.4);opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;}
+  .scrim.on{opacity:1;pointer-events:auto;}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:22px 22px 0 0;
+    padding:8px 18px calc(18px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .25s ease;z-index:31;
+    box-shadow:0 -12px 30px rgba(0,0,0,.15);}
+  .sheet.on{transform:translateY(0);}
+  .sheet .grabber{width:36px;height:4px;background:var(--border);border-radius:99px;margin:2px auto 14px;}
+  .sheethead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .sheethead .h{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);}
+  .sheethead .x{width:30px;height:30px;border-radius:50%;background:var(--field);display:grid;place-items:center;cursor:pointer;color:var(--ink-2);}
+  .sheethead .x .ph{width:13px;height:13px;}
+  .mrow{display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:14px;padding:12px 13px;cursor:pointer;margin-bottom:8px;}
+  .mrow .rowtext{flex:1;} .mrow .n{font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--ink-2);}
+  .check{width:22px;height:22px;border-radius:7px;border:2px solid #cfc7b5;display:grid;place-items:center;flex-shrink:0;}
+  .mrow.sel .check{background:var(--brand);border-color:var(--brand);}
+  .check svg{width:13px;height:13px;}
+  .sheetbtn{width:100%;border:none;border-radius:14px;padding:14px;font-family:var(--sans);font-size:14.5px;font-weight:600;
+    background:var(--brand);color:#fff;cursor:pointer;margin-top:4px;}
+
+  /* ============ DIRECTION C — multi-select chips + inline tag ============ */
+  .catchips{flex:0 0 auto;display:flex;gap:7px;overflow-x:auto;padding:2px 14px 11px;}
+  .catchips::-webkit-scrollbar{display:none;}
+  .catchip{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:12.5px;font-weight:500;
+    background:var(--surface);border:1px solid var(--border);color:var(--ink-2);border-radius:999px;padding:7px 12px 7px 9px;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow-sm);}
+  .catchip .dot{width:7px;height:7px;border-radius:50%;background:var(--border);}
+  .catchip.on{border-color:var(--brand);color:var(--brand);background:var(--brand-light);}
+  .catchip.on .dot{background:var(--brand);}
+  .catchip[data-cat="all"]{background:var(--ink-2);border-color:var(--ink-2);color:#fff;}
+  .catchip[data-cat="all"] .dot{display:none;}
+  .tag{flex-shrink:0;font-size:9.5px;font-weight:600;color:var(--muted);background:var(--field);border-radius:6px;padding:2px 6px;white-space:nowrap;}
+</style>
+</head>
+<body>
+
+  <div class="lede">
+    <h1>Notifications — three directions, side by side</h1>
+    <p>Same 8 notifications, same tokens — three different structural answers to "filter + categorize." Direction A (segmented tabs) is the one already picked; B and C are the alternates for comparison before committing.</p>
+  </div>
+
+  <div class="row">
+
+    <!-- ============ A ============ -->
+    <div class="col">
+      <div class="caption"><strong>A — Segmented tabs</strong>Category is the primary lens. Tap a tab, list swaps. Costs a tap to catch up on everything mixed.</div>
+      <div class="device" id="dA">
+        <div class="island"></div>
+        <div class="screen">
+          <div class="sb"><span>9:41</span><span class="r">
+            <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+            <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+            <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+          </span></div>
+          <div class="top">
+            <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="tt center"><div class="t">Notifications</div></div>
+            <div class="sp"></div>
+          </div>
+
+          <div class="filters" id="filtersA">
+            <span class="fchip on" data-tab="all">All<span class="n">· 8</span></span>
+            <span class="fchip" data-tab="events">Events<span class="n">· 5</span></span>
+            <span class="fchip" data-tab="clubs">Clubs<span class="n">· 3</span></span>
+            <span class="fchip" data-tab="daily">Daily Brief<span class="n">· 0</span></span>
+          </div>
+
+          <div class="body">
+            <div id="listA">
+              <div class="nrow unread" data-cat="clubs"><div class="ico club">Y</div><div class="ntxt"><div class="row1"><div class="ti">Removed from Club</div><div class="tm">1h</div></div><div class="de">"Guy Hawkins admin from Y Combinator has removed you from the club"</div></div></div>
+              <div class="nrow" data-cat="events"><div class="ico photo">⛳</div><div class="ntxt"><div class="row1"><div class="ti">New Event</div><div class="tm">1h</div></div><div class="de">"Come Join me for Golf" Nov 18, 8:00–9:00 AM (CST)</div></div></div>
+              <div class="nrow" data-cat="clubs"><div class="avatar">NL</div><div class="ntxt"><div class="row1"><div class="ti">Join Request</div><div class="tm">1d</div></div><div class="de">Noah LaRonde requested to join "Y Combinator Social Club"</div></div></div>
+              <div class="nrow" data-cat="events"><div class="avatar">A</div><div class="ntxt"><div class="row1"><div class="ti">Join Request</div><div class="tm">1d</div></div><div class="de">Angelina requested to join your "Come Join me for Golf" event!</div></div></div>
+              <div class="nrow" data-cat="events"><div class="ico photo">🎉</div><div class="ntxt"><div class="row1"><div class="ti">Event Completed!</div><div class="tm">2w</div></div><div class="de">"Y Combinator Happy hour" wrapped up! Share your best moments.</div></div></div>
+              <div class="nrow" data-cat="clubs"><div class="ico club">Y</div><div class="ntxt"><div class="row1"><div class="ti">New Member</div><div class="tm">1mo</div></div><div class="de">Noah LaRonde joined "Y Combinator"</div></div></div>
+              <div class="nrow" data-cat="events"><div class="ico photo">🥂</div><div class="ntxt"><div class="row1"><div class="ti">Almost Time!</div><div class="tm">2w</div></div><div class="de">"Y Combinator Happy hour" starts at 5:30 PM CDT.</div></div></div>
+              <div class="nrow" data-cat="events"><div class="avatar">A</div><div class="ntxt"><div class="row1"><div class="ti">Event Accepted</div><div class="tm"></div></div><div class="de">You're in! 🎉 Angelina approved your registration to "Come Join me for Golf".</div></div></div>
+            </div>
+            <div class="emptynote" id="emptyA">No notifications in this category yet.</div>
+            <div class="fnote"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12"/></svg></span><span>Notifications over 30 days old are removed.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ B ============ -->
+    <div class="col">
+      <div class="caption"><strong>B — Time groups + filter sheet</strong>Keeps the familiar "what's new" chronology as the default. Category is opt-in via the funnel icon → bottom sheet, multi-select.</div>
+      <div class="device" id="dB">
+        <div class="island"></div>
+        <div class="screen">
+          <div class="sb"><span>9:41</span><span class="r">
+            <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+            <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+            <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+          </span></div>
+          <div class="top">
+            <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="tt center"><div class="t">Notifications</div></div>
+            <div class="ibtn" id="filterBtnB"><svg viewBox="0 0 256 256"><path d="M200 136a8 8 0 0 1-8 8H64a8 8 0 0 1 0-16h128a8 8 0 0 1 8 8m32-56H24a8 8 0 0 0 0 16h208a8 8 0 0 0 0-16m-80 96h-48a8 8 0 0 0 0 16h48a8 8 0 0 0 0-16" fill="var(--ink)" stroke="none"/></svg></div>
+          </div>
+
+          <div class="body">
+            <div id="listB">
+              <div class="tsection" data-sec="today">
+                <div class="seclbl">Today</div>
+                <div class="nrow unread" data-cat="clubs"><div class="ico club">Y</div><div class="ntxt"><div class="row1"><div class="ti">Removed from Club</div><div class="tm">1h</div></div><div class="de">"Guy Hawkins admin from Y Combinator has removed you from the club"</div></div></div>
+                <div class="nrow" data-cat="events"><div class="ico photo">⛳</div><div class="ntxt"><div class="row1"><div class="ti">New Event</div><div class="tm">1h</div></div><div class="de">"Come Join me for Golf" Nov 18, 8:00–9:00 AM (CST)</div></div></div>
+              </div>
+              <div class="tsection" data-sec="week">
+                <div class="seclbl">This Week</div>
+                <div class="nrow" data-cat="clubs"><div class="avatar">NL</div><div class="ntxt"><div class="row1"><div class="ti">Join Request</div><div class="tm">1d</div></div><div class="de">Noah LaRonde requested to join "Y Combinator Social Club"</div></div></div>
+                <div class="nrow" data-cat="events"><div class="avatar">A</div><div class="ntxt"><div class="row1"><div class="ti">Join Request</div><div class="tm">1d</div></div><div class="de">Angelina requested to join your "Come Join me for Golf" event!</div></div></div>
+              </div>
+              <div class="tsection" data-sec="earlier">
+                <div class="seclbl">Earlier</div>
+                <div class="nrow" data-cat="events"><div class="ico photo">🎉</div><div class="ntxt"><div class="row1"><div class="ti">Event Completed!</div><div class="tm">2w</div></div><div class="de">"Y Combinator Happy hour" wrapped up! Share your best moments.</div></div></div>
+                <div class="nrow" data-cat="clubs"><div class="ico club">Y</div><div class="ntxt"><div class="row1"><div class="ti">New Member</div><div class="tm">1mo</div></div><div class="de">Noah LaRonde joined "Y Combinator"</div></div></div>
+                <div class="nrow" data-cat="events"><div class="ico photo">🥂</div><div class="ntxt"><div class="row1"><div class="ti">Almost Time!</div><div class="tm">2w</div></div><div class="de">"Y Combinator Happy hour" starts at 5:30 PM CDT.</div></div></div>
+                <div class="nrow" data-cat="events"><div class="avatar">A</div><div class="ntxt"><div class="row1"><div class="ti">Event Accepted</div><div class="tm"></div></div><div class="de">You're in! 🎉 Angelina approved your registration to "Come Join me for Golf".</div></div></div>
+              </div>
+            </div>
+            <div class="emptynote" id="emptyB">No notifications match this filter.</div>
+            <div class="fnote"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12"/></svg></span><span>Notifications over 30 days old are removed.</span></div>
+          </div>
+
+          <div class="scrim" id="scrimB"></div>
+          <div class="sheet" id="sheetB">
+            <div class="grabber"></div>
+            <div class="sheethead"><div class="h">Filter by category</div><div class="x" id="closeSheetB"><span class="ph"><svg viewBox="0 0 256 256"><path d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128 50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg></span></div></div>
+            <div class="mrow" data-cat="events"><div class="rowtext"><div class="n">Events</div></div><div class="check"></div></div>
+            <div class="mrow" data-cat="clubs"><div class="rowtext"><div class="n">Clubs</div></div><div class="check"></div></div>
+            <div class="mrow" data-cat="daily"><div class="rowtext"><div class="n">Daily Brief</div></div><div class="check"></div></div>
+            <button class="sheetbtn" id="applyB">Apply</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ C ============ -->
+    <div class="col">
+      <div class="caption"><strong>C — Multi-select chips + inline tag</strong>Chips filter (can combine Events + Clubs); every row also carries its own tag so category reads even with "All" selected.</div>
+      <div class="device" id="dC">
+        <div class="island"></div>
+        <div class="screen">
+          <div class="sb"><span>9:41</span><span class="r">
+            <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+            <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+            <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+          </span></div>
+          <div class="top">
+            <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="tt center"><div class="t">Notifications</div></div>
+            <div class="sp"></div>
+          </div>
+
+          <div class="catchips" id="chipsC">
+            <span class="catchip on" data-cat="all">All</span>
+            <span class="catchip" data-cat="events"><span class="dot"></span>Events</span>
+            <span class="catchip" data-cat="clubs"><span class="dot"></span>Clubs</span>
+            <span class="catchip" data-cat="daily"><span class="dot"></span>Daily Brief</span>
+          </div>
+
+          <div class="body">
+            <div id="listC">
+              <div class="nrow unread" data-cat="clubs"><div class="ico club">Y</div><div class="ntxt"><div class="row1"><div class="ti">Removed from Club</div><span class="tag">Clubs</span><div class="tm">1h</div></div><div class="de">"Guy Hawkins admin from Y Combinator has removed you from the club"</div></div></div>
+              <div class="nrow" data-cat="events"><div class="ico photo">⛳</div><div class="ntxt"><div class="row1"><div class="ti">New Event</div><span class="tag">Events</span><div class="tm">1h</div></div><div class="de">"Come Join me for Golf" Nov 18, 8:00–9:00 AM (CST)</div></div></div>
+              <div class="nrow" data-cat="clubs"><div class="avatar">NL</div><div class="ntxt"><div class="row1"><div class="ti">Join Request</div><span class="tag">Clubs</span><div class="tm">1d</div></div><div class="de">Noah LaRonde requested to join "Y Combinator Social Club"</div></div></div>
+              <div class="nrow" data-cat="events"><div class="avatar">A</div><div class="ntxt"><div class="row1"><div class="ti">Join Request</div><span class="tag">Events</span><div class="tm">1d</div></div><div class="de">Angelina requested to join your "Come Join me for Golf" event!</div></div></div>
+              <div class="nrow" data-cat="events"><div class="ico photo">🎉</div><div class="ntxt"><div class="row1"><div class="ti">Event Completed!</div><span class="tag">Events</span><div class="tm">2w</div></div><div class="de">"Y Combinator Happy hour" wrapped up! Share your best moments.</div></div></div>
+              <div class="nrow" data-cat="clubs"><div class="ico club">Y</div><div class="ntxt"><div class="row1"><div class="ti">New Member</div><span class="tag">Clubs</span><div class="tm">1mo</div></div><div class="de">Noah LaRonde joined "Y Combinator"</div></div></div>
+              <div class="nrow" data-cat="events"><div class="ico photo">🥂</div><div class="ntxt"><div class="row1"><div class="ti">Almost Time!</div><span class="tag">Events</span><div class="tm">2w</div></div><div class="de">"Y Combinator Happy hour" starts at 5:30 PM CDT.</div></div></div>
+              <div class="nrow" data-cat="events"><div class="avatar">A</div><div class="ntxt"><div class="row1"><div class="ti">Event Accepted</div><span class="tag">Events</span><div class="tm"></div></div><div class="de">You're in! 🎉 Angelina approved your registration to "Come Join me for Golf".</div></div></div>
+            </div>
+            <div class="emptynote" id="emptyC">No notifications match these filters.</div>
+            <div class="fnote"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12"/></svg></span><span>Notifications over 30 days old are removed.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  // ---- A: exclusive tabs ----
+  (function(){
+    var filters = document.getElementById('filtersA');
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#listA .nrow'));
+    var empty = document.getElementById('emptyA');
+    filters.addEventListener('click', function(e){
+      var chip = e.target.closest('.fchip'); if(!chip) return;
+      var tab = chip.dataset.tab;
+      Array.prototype.forEach.call(filters.querySelectorAll('.fchip'), function(c){ c.classList.remove('on'); });
+      chip.classList.add('on');
+      var any = false;
+      rows.forEach(function(r){ var show = tab === 'all' || r.dataset.cat === tab; r.style.display = show ? 'flex' : 'none'; if(show) any = true; });
+      empty.classList.toggle('on', !any);
+    });
+  })();
+
+  // ---- B: time groups + filter sheet (multi-select) ----
+  (function(){
+    var scrim = document.getElementById('scrimB'), sheet = document.getElementById('sheetB');
+    var openBtn = document.getElementById('filterBtnB'), closeBtn = document.getElementById('closeSheetB'), applyBtn = document.getElementById('applyB');
+    var mrows = Array.prototype.slice.call(sheet.querySelectorAll('.mrow'));
+    var sections = Array.prototype.slice.call(document.querySelectorAll('#listB .tsection'));
+    var empty = document.getElementById('emptyB');
+
+    function openSheet(){ scrim.classList.add('on'); sheet.classList.add('on'); }
+    function closeSheet(){ scrim.classList.remove('on'); sheet.classList.remove('on'); }
+    openBtn.addEventListener('click', openSheet);
+    closeBtn.addEventListener('click', closeSheet);
+    scrim.addEventListener('click', closeSheet);
+    mrows.forEach(function(m){ m.addEventListener('click', function(){ m.classList.toggle('sel'); }); });
+
+    applyBtn.addEventListener('click', function(){
+      var selected = mrows.filter(function(m){ return m.classList.contains('sel'); }).map(function(m){ return m.dataset.cat; });
+      var any = false;
+      sections.forEach(function(sec){
+        var rows = Array.prototype.slice.call(sec.querySelectorAll('.nrow'));
+        var secAny = false;
+        rows.forEach(function(r){ var show = selected.length === 0 || selected.indexOf(r.dataset.cat) > -1; r.style.display = show ? 'flex' : 'none'; if(show) secAny = true; });
+        sec.classList.toggle('hide', !secAny);
+        if(secAny) any = true;
+      });
+      empty.classList.toggle('on', !any);
+      closeSheet();
+    });
+  })();
+
+  // ---- C: multi-select chips + inline tag ----
+  (function(){
+    var chips = document.getElementById('chipsC');
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#listC .nrow'));
+    var empty = document.getElementById('emptyC');
+    var selected = new Set();
+
+    function render(){
+      Array.prototype.forEach.call(chips.querySelectorAll('.catchip'), function(c){
+        c.classList.toggle('on', c.dataset.cat === 'all' ? selected.size === 0 : selected.has(c.dataset.cat));
+      });
+      var any = false;
+      rows.forEach(function(r){ var show = selected.size === 0 || selected.has(r.dataset.cat); r.style.display = show ? 'flex' : 'none'; if(show) any = true; });
+      empty.classList.toggle('on', !any);
+    }
+    chips.addEventListener('click', function(e){
+      var chip = e.target.closest('.catchip'); if(!chip) return;
+      var cat = chip.dataset.cat;
+      if(cat === 'all'){ selected.clear(); } else { selected.has(cat) ? selected.delete(cat) : selected.add(cat); }
+      render();
+    });
+  })();
+</script>
+</body>
+</html>

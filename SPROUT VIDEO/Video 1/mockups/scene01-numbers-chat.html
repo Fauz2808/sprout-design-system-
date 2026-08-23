@@ -1,0 +1,107 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#c9c4b6; display:flex; justify-content:center; align-items:center; padding:60px; font-family:'Inter',sans-serif; }
+  .frame { width:393px; height:852px; background:#ffffff; border-radius:52px; overflow:hidden; position:relative; box-shadow:0 40px 80px rgba(0,0,0,0.35); }
+  .statusbar { height:47px; display:flex; align-items:center; justify-content:space-between; padding:0 28px 0 32px; font-weight:600; font-size:15px; color:#000; }
+  .statusicons { display:flex; align-items:center; gap:5px; }
+  .signal { display:flex; gap:2px; align-items:flex-end; }
+  .signal span { width:3px; background:#000; border-radius:1px; }
+  .signal span:nth-child(1){height:4px;} .signal span:nth-child(2){height:6px;} .signal span:nth-child(3){height:8px;} .signal span:nth-child(4){height:10px;}
+  .wifi { width:15px; height:11px; border:2px solid #000; border-radius:50% 50% 0 0 / 100% 100% 0 0; border-bottom:none; position:relative; }
+  .battery { width:24px; height:12px; border:1.4px solid #000; border-radius:3px; position:relative; }
+  .battery::after { content:''; position:absolute; right:-3px; top:3px; width:2px; height:6px; background:#000; border-radius:0 1px 1px 0; }
+  .battery::before { content:''; position:absolute; top:1.5px; left:1.5px; bottom:1.5px; width:16px; background:#000; border-radius:1.5px; }
+
+  .navheader { padding:4px 20px 14px; }
+  .navheader h1 { font-family:'Playfair Display',serif; font-weight:700; font-size:34px; color:#0f2218; }
+  .editbtn { position:absolute; top:56px; right:20px; color:#186338; font-size:16px; font-weight:500; }
+
+  .search { margin:8px 20px 10px; background:#eae6db; border-radius:11px; padding:9px 12px; color:#818898; font-size:16px; }
+
+  .row { display:flex; align-items:center; padding:12px 20px; border-bottom:1px solid #f0ede4; position:relative; }
+  .avatar { width:52px; height:52px; border-radius:50%; background:#dfe2e6; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-right:12px; }
+  .avatar svg { width:28px; height:28px; fill:#a7adb6; }
+  .rowbody { flex:1; min-width:0; }
+  .rowtop { display:flex; justify-content:space-between; align-items:baseline; }
+  .rowname { font-weight:600; font-size:17px; color:#0f0f0f; letter-spacing:-0.2px; }
+  .rowtime { font-size:14px; color:#a7adb6; flex-shrink:0; margin-left:8px; }
+  .rowpreview { font-size:15px; color:#8a8f98; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dot { width:9px; height:9px; border-radius:50%; background:#186338; position:absolute; left:6px; top:50%; transform:translateY(-50%); }
+
+  .callout-ring { position:absolute; left:8px; top:10px; width:377px; height:78px; border:3px dashed #d94f4f; border-radius:20px; transform:rotate(-0.6deg); pointer-events:none; }
+  .callout-tag { position:absolute; left:230px; top:98px; background:#186338; color:#f4f1ea; font-family:'Caveat',cursive; font-weight:700; font-size:26px; padding:6px 16px 8px; border-radius:14px 14px 14px 2px; transform:rotate(-2deg); box-shadow:0 6px 14px rgba(0,0,0,0.2); }
+</style><link rel="stylesheet" href="scene-system.css"></head>
+<body class="motion-ready scene01">
+<div class="frame">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="statusicons">
+      <div class="signal"><span></span><span></span><span></span><span></span></div>
+      <div class="wifi"></div>
+      <div class="battery"></div>
+    </div>
+  </div>
+
+  <div class="navheader"><h1>Messages</h1></div>
+  <div class="editbtn">Edit</div>
+  <div class="search">🔍 Search</div>
+
+  <div class="callout-ring" hidden></div>
+
+  <div class="row">
+    <div class="dot"></div>
+    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg></div>
+    <div class="rowbody">
+      <div class="rowtop"><span class="rowname">512-304-7782</span><span class="rowtime">7:42 AM</span></div>
+      <div class="rowpreview">Anyone free for pickup today??</div>
+    </div>
+  </div>
+
+  <div class="callout-tag">Mason's mom?<br>Or Lily's??</div>
+
+  <div class="row">
+    <div class="dot"></div>
+    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg></div>
+    <div class="rowbody">
+      <div class="rowtop"><span class="rowname">(737) 555-0182</span><span class="rowtime">7:44 AM</span></div>
+      <div class="rowpreview">Field trip form due tmrw 😩</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg></div>
+    <div class="rowbody">
+      <div class="rowtop"><span class="rowname">Unknown Caller</span><span class="rowtime">7:45 AM</span></div>
+      <div class="rowpreview">•••</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg></div>
+    <div class="rowbody">
+      <div class="rowtop"><span class="rowname">(210) 998-4432</span><span class="rowtime">Yesterday</span></div>
+      <div class="rowpreview">🎨 Art class Saturday?</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg></div>
+    <div class="rowbody">
+      <div class="rowtop"><span class="rowname">512-304-9981</span><span class="rowtime">Yesterday</span></div>
+      <div class="rowpreview">wait what</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg></div>
+    <div class="rowbody">
+      <div class="rowtop"><span class="rowname">346-201-6650</span><span class="rowtime">Mon</span></div>
+      <div class="rowpreview">Snack schedule??</div>
+    </div>
+  </div>
+</div>
+</body></html>

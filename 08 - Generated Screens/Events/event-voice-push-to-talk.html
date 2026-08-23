@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Event Voice — Push to Talk · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff; --field:#e8e2d6;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e; --green:#186338; --brand-mid:#4fa472;
+    --brand-light:#e2e9e3; --brand-border:#77b691; --border-light:#d0dacf; --border:#e6e7ea;
+    --shadow-m:1px 4px 25px rgba(13,13,18,.05); --shadow-l:1px 4px 25px rgba(13,13,18,.12);
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:22px 44px;padding:40px 22px 60px;-webkit-user-select:none;user-select:none;}
+  .lede{flex:1 0 100%;text-align:center;max-width:760px;margin:0 auto 6px;}
+  .lede h1{font-family:var(--serif);font-weight:600;font-size:23px;color:#23271f;margin:0 0 5px;}
+  .lede p{font-size:12.5px;color:#6a665b;margin:0;line-height:1.5;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:11px;}
+  .cap{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:330px;line-height:1.5;}
+  .cap b{color:#3a3830;}
+  .ph{display:inline-block;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+
+  .device{position:relative;width:372px;height:770px;border-radius:52px;padding:10px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 2px #000 inset,0 22px 46px -14px rgba(0,0,0,.45);}
+  .island{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:112px;height:31px;background:#000;border-radius:999px;z-index:60;}
+  .screen{position:relative;width:100%;height:100%;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .sb{flex:0 0 42px;padding:15px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:14px;font-weight:600;color:var(--ink);}
+  .sb .r{display:inline-flex;gap:5px;align-items:center;} .sb svg{width:16px;height:10px;fill:var(--ink);} .sb .bat{width:23px;}
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:2px 14px 6px;}
+  .top .ib{width:34px;height:34px;display:grid;place-items:center;color:var(--ink);flex-shrink:0;}
+  .top .ib .ph{width:22px;height:22px;}
+  .top .h{flex:1;text-align:center;font-family:var(--serif);font-weight:500;font-size:15px;color:var(--ink);display:flex;align-items:center;justify-content:center;gap:6px;}
+  .top .h .sp-ic{width:16px;height:16px;color:var(--green);}
+  .top .sp{width:34px;}
+
+  .conv{flex:1;overflow-y:auto;padding:10px 18px;display:flex;flex-direction:column;gap:9px;}
+  .conv::-webkit-scrollbar{display:none;}
+  .b{max-width:82%;padding:9px 13px;border-radius:16px;font-size:13.5px;line-height:1.4;box-shadow:var(--shadow-m);}
+  .b.ai{align-self:flex-start;background:var(--card);color:var(--body);border-bottom-left-radius:5px;}
+  .b.me{align-self:flex-end;background:var(--ink);color:#fff;border-bottom-right-radius:5px;}
+  .evcard{align-self:stretch;background:var(--brand-light);border:1px solid var(--brand-border);border-radius:16px;padding:13px;margin-top:2px;}
+  .evcard .et{font-family:var(--serif);font-weight:600;font-size:15px;color:var(--ink);}
+  .evcard .em{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#2c3e30;margin-top:6px;}
+  .evcard .em .ph{width:14px;height:14px;color:var(--green);flex-shrink:0;}
+  .building{align-self:flex-start;font-size:11px;color:var(--muted);font-style:italic;padding-left:4px;}
+
+  /* voice control zone */
+  .voice{flex:0 0 auto;width:100%;padding:14px 18px 26px;position:relative;text-align:center;}
+  .wave{display:inline-flex;align-items:center;gap:3px;height:26px;margin-bottom:12px;}
+  .wave i{width:3px;height:6px;border-radius:2px;background:var(--brand-border);transition:height .12s,background .2s;}
+  .voice.talking .wave i{background:var(--green);animation:eq .7s ease-in-out infinite;}
+  .voice.talking .wave i:nth-child(2){animation-delay:.1s}.voice.talking .wave i:nth-child(3){animation-delay:.2s}.voice.talking .wave i:nth-child(4){animation-delay:.05s}.voice.talking .wave i:nth-child(5){animation-delay:.25s}.voice.talking .wave i:nth-child(6){animation-delay:.15s}.voice.talking .wave i:nth-child(7){animation-delay:.3s}
+  .voice.responding .wave i{background:var(--brand-mid);animation:eq .5s ease-in-out infinite;}
+  @keyframes eq{0%,100%{height:6px}50%{height:22px}}
+  .voice:not(.talking):not(.responding) .wave{opacity:.35}
+
+  .mic{width:88px;height:88px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;cursor:pointer;transition:transform .15s,background .2s,box-shadow .2s;touch-action:none;}
+  .mic .ph{width:38px;height:38px;}
+  .voice.idle .mic{background:var(--brand-light);border:2px solid var(--brand-border);color:var(--green);}
+  .voice.talking .mic{background:var(--green);color:#fff;transform:scale(1.06);box-shadow:0 0 0 10px rgba(24,99,56,.14),0 0 0 22px rgba(24,99,56,.06);}
+  .voice.responding .mic{background:#e6e2d6;color:#a79f8d;cursor:default;}
+
+  .hint{font-family:var(--sans);font-weight:600;font-size:14px;color:var(--ink);min-height:20px;margin-bottom:12px;}
+  .voice.talking .hint{color:var(--green);}
+  .voice.responding .hint{color:var(--muted);}
+  .lbl{display:none;} .voice.idle .lbl.idle{display:block;} .voice.talking .lbl.talking{display:block;} .voice.responding .lbl.responding{display:block;}
+  .typebtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;color:var(--muted);border:1px solid var(--border-light);background:var(--card);border-radius:999px;padding:7px 14px;cursor:pointer;}
+  .typebtn .ph{width:16px;height:16px;}
+</style>
+</head>
+<body>
+<div class="lede">
+  <h1>Event Voice — Push to Talk (walkie-talkie)</h1>
+  <p>Ganti UI restart/call/mute → satu tombol <b>tahan-untuk-ngomong</b>. Tahan = mic nyala & AI dengerin; lepas = auto-mute & AI jawab. Fix lag ElevenLabs. Phone kiri interaktif — tahan tombol mic-nya.</p>
+</div>
+
+<!-- ===== 1. IDLE (interactive) ===== -->
+<div class="panel">
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="top"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128 50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg></span></div><div class="h"><span class="sp-ic ph"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88ZM137 164.22a8 8 0 0 0-4.74 4.74L112 223.85 91.78 169a8 8 0 0 0-4.78-4.78L32.15 144 87 123.78a8 8 0 0 0 4.78-4.78L112 64.15 132.22 119a8 8 0 0 0 4.74 4.74L191.85 144Z"/></svg></span>Create with AI</div><div class="sp"></div></div>
+    <div class="conv">
+      <div class="b ai">Hi! Tell me about the event — who, what, when, and where.</div>
+      <div class="b me">Presley's birthday party this Saturday at 2pm at our house.</div>
+      <div class="b ai">Got it 🎉 Here's what I have so far — anything to add?</div>
+      <div class="evcard">
+        <div class="et">Presley's Birthday Party</div>
+        <div class="em"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span>Saturday · 2:00 PM</div>
+        <div class="em"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 64a40 40 0 1 0 40 40 40 40 0 0 0-40-40m0 64a24 24 0 1 1 24-24 24 24 0 0 1-24 24m0-112a88.1 88.1 0 0 0-88 88c0 31.4 14.51 64.68 42 96.25a254.2 254.2 0 0 0 41.45 38.3 8 8 0 0 0 9.18 0 254.2 254.2 0 0 0 41.37-38.3c27.45-31.57 42-64.85 42-96.25a88.1 88.1 0 0 0-88-88m0 206c-16.53-13-72-60.75-72-118a72 72 0 0 1 144 0c0 57.23-55.47 105-72 118"/></svg></span>Home</div>
+      </div>
+    </div>
+    <div class="voice idle" id="v1">
+      <div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="mic" id="mic1"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 176a48.05 48.05 0 0 0 48-48V64a48 48 0 0 0-96 0v64a48.05 48.05 0 0 0 48 48M96 64a32 32 0 0 1 64 0v64a32 32 0 0 1-64 0Zm40 143.6V240a8 8 0 0 1-16 0v-32.4A80.11 80.11 0 0 1 48 128a8 8 0 0 1 16 0 64 64 0 0 0 128 0 8 8 0 0 1 16 0 80.11 80.11 0 0 1-72 79.6"/></svg></span></div>
+      <div class="hint"><span class="lbl idle">Hold to talk</span><span class="lbl talking">Listening… release to send</span><span class="lbl responding">Sprout is responding…</span></div>
+      <div class="typebtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h192a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16m0 144H32V64h192zm-16-64a8 8 0 0 1-8 8H56a8 8 0 0 1 0-16h144a8 8 0 0 1 8 8m0-32a8 8 0 0 1-8 8H56a8 8 0 0 1 0-16h144a8 8 0 0 1 8 8M72 160a8 8 0 0 1-8 8h-8a8 8 0 0 1 0-16h8a8 8 0 0 1 8 8m96 0a8 8 0 0 1-8 8H96a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8m40 0a8 8 0 0 1-8 8h-8a8 8 0 0 1 0-16h8a8 8 0 0 1 8 8"/></svg></span>Type instead</div>
+    </div>
+  </div></div>
+  <div class="cap"><b>1 · Idle (interaktif).</b> Tahan tombol mic → ngomong; lepas → AI jawab.</div>
+</div>
+
+<!-- ===== 2. TALKING (held) ===== -->
+<div class="panel">
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="top"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128 50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg></span></div><div class="h">Create with AI</div><div class="sp"></div></div>
+    <div class="conv">
+      <div class="b ai">Got it 🎉 Anything to add — like a theme or guests?</div>
+      <div class="b me" style="opacity:.55">Yeah, add that it's a…</div>
+    </div>
+    <div class="voice talking">
+      <div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="mic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 176a48.05 48.05 0 0 0 48-48V64a48 48 0 0 0-96 0v64a48.05 48.05 0 0 0 48 48M96 64a32 32 0 0 1 64 0v64a32 32 0 0 1-64 0Zm40 143.6V240a8 8 0 0 1-16 0v-32.4A80.11 80.11 0 0 1 48 128a8 8 0 0 1 16 0 64 64 0 0 0 128 0 8 8 0 0 1 16 0 80.11 80.11 0 0 1-72 79.6"/></svg></span></div>
+      <div class="hint"><span class="lbl talking">Listening… release to send</span></div>
+      <div class="typebtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h192a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16m0 144H32V64h192zm-16-64a8 8 0 0 1-8 8H56a8 8 0 0 1 0-16h144a8 8 0 0 1 8 8m0-32a8 8 0 0 1-8 8H56a8 8 0 0 1 0-16h144a8 8 0 0 1 8 8M72 160a8 8 0 0 1-8 8h-8a8 8 0 0 1 0-16h8a8 8 0 0 1 8 8m96 0a8 8 0 0 1-8 8H96a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8m40 0a8 8 0 0 1-8 8h-8a8 8 0 0 1 0-16h8a8 8 0 0 1 8 8"/></svg></span>Type instead</div>
+    </div>
+  </div></div>
+  <div class="cap"><b>2 · Talking (ditahan).</b> Mic panas, waveform hijau, "release to send".</div>
+</div>
+
+<!-- ===== 3. RESPONDING ===== -->
+<div class="panel">
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="top"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128 50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg></span></div><div class="h">Create with AI</div><div class="sp"></div></div>
+    <div class="conv">
+      <div class="b me">Add a dinosaur theme and invite the class.</div>
+      <div class="b ai">Perfect — dinosaur theme 🦖 added, and I'll invite Miss Taylor's Class.</div>
+      <div class="building">Sprout is updating the event…</div>
+    </div>
+    <div class="voice responding">
+      <div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="mic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M56 96v64a8 8 0 0 1-16 0V96a8 8 0 0 1 16 0m32-72a8 8 0 0 0-8 8v192a8 8 0 0 0 16 0V32a8 8 0 0 0-8-8m40 32a8 8 0 0 0-8 8v128a8 8 0 0 0 16 0V64a8 8 0 0 0-8-8m40 32a8 8 0 0 0-8 8v64a8 8 0 0 0 16 0V96a8 8 0 0 0-8-8m40-16a8 8 0 0 0-8 8v96a8 8 0 0 0 16 0V80a8 8 0 0 0-8-8"/></svg></span></div>
+      <div class="hint"><span class="lbl responding">Sprout is responding…</span></div>
+      <div class="typebtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h192a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16m0 144H32V64h192zm-16-64a8 8 0 0 1-8 8H56a8 8 0 0 1 0-16h144a8 8 0 0 1 8 8m0-32a8 8 0 0 1-8 8H56a8 8 0 0 1 0-16h144a8 8 0 0 1 8 8M72 160a8 8 0 0 1-8 8h-8a8 8 0 0 1 0-16h8a8 8 0 0 1 8 8m96 0a8 8 0 0 1-8 8H96a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8m40 0a8 8 0 0 1-8 8h-8a8 8 0 0 1 0-16h8a8 8 0 0 1 8 8"/></svg></span>Type instead</div>
+    </div>
+  </div></div>
+  <div class="cap"><b>3 · Responding.</b> Lepas → mic mute, AI ngejawab. Nggak nunggu "sunyi".</div>
+</div>
+
+<script>
+  var v1=document.getElementById('v1'), mic1=document.getElementById('mic1');
+  function set(s){v1.classList.remove('idle','talking','responding');v1.classList.add(s);}
+  mic1.addEventListener('pointerdown',function(e){e.preventDefault();set('talking');});
+  window.addEventListener('pointerup',function(){ if(v1.classList.contains('talking')){ set('responding'); setTimeout(function(){set('idle');},1300);} });
+</script>
+</body>
+</html>

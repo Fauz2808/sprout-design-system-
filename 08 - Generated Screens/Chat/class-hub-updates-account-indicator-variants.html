@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Updates — Connected Account Indicator, 4 Variants · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff; --field:#e8e2d6;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e; --green:#186338; --brand-mid:#4fa472;
+    --brand-light:#e2e9e3; --brand-border:#77b691; --border-light:#d0dacf; --border:#e6e7ea;
+    --shadow-m:1px 4px 25px rgba(13,13,18,.05);
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:30px 36px;padding:40px 22px 80px;}
+  .lede{flex:1 0 100%;text-align:center;max-width:760px;margin:0 auto 6px;}
+  .lede h1{font-family:var(--serif);font-weight:700;font-size:23px;color:#23271f;margin:0 0 6px;}
+  .lede p{font-size:12.5px;color:#6a665b;margin:0;line-height:1.55;}
+  .ph{display:inline-block;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+
+  .panel{display:flex;flex-direction:column;align-items:center;gap:11px;}
+  .panel-label{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:340px;line-height:1.5;}
+  .panel-label b{color:#3a3830;}
+
+  .device{position:relative;width:340px;height:560px;border-radius:44px;padding:9px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 2px #000 inset,0 20px 42px -12px rgba(0,0,0,.42);}
+  .island{position:absolute;top:16px;left:50%;transform:translateX(-50%);width:100px;height:28px;background:#000;border-radius:999px;z-index:60;}
+  .screen{position:relative;width:100%;height:100%;border-radius:35px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .sb{flex:0 0 38px;padding:13px 22px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:13px;font-weight:600;color:var(--ink);}
+  .sb .r{display:inline-flex;gap:5px;align-items:center;} .sb svg{width:15px;height:10px;fill:var(--ink);} .sb .bat{width:22px;}
+
+  .hrow{display:flex;align-items:center;gap:9px;padding:2px 12px 6px;}
+  .hrow .ib{width:30px;height:30px;display:grid;place-items:center;color:var(--ink);flex-shrink:0;}
+  .hrow .ib .ph{width:20px;height:20px;}
+  .hrow .av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:11px;background:linear-gradient(145deg,#1e3e2b,#4fa472);flex-shrink:0;}
+  .hrow .nm{flex:1;font-family:var(--serif);font-weight:600;font-size:14px;color:var(--ink);}
+
+  .tabs{display:flex;border-bottom:1px solid var(--border-light);padding:0 6px;}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 8px;color:var(--muted);position:relative;}
+  .tab .ph{width:18px;height:18px;}
+  .tab .tl{font-size:9.5px;font-weight:500;}
+  .tab.on{color:var(--green);}
+  .tab.on .tl{font-weight:600;}
+  .tab.on::after{content:"";position:absolute;left:16%;right:16%;bottom:-1px;height:2.5px;background:var(--green);border-radius:2px;}
+
+  .scroll{flex:1;overflow-y:auto;padding:12px 14px;}
+
+  .slbl{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 10px;gap:8px;}
+  .slbl .t{font-family:var(--serif);font-weight:600;font-size:13px;color:var(--ink);flex-shrink:0;}
+  .slbl .s{font-size:10.5px;color:var(--muted);}
+
+  .ucard{background:var(--card);border-radius:13px;padding:11px;box-shadow:var(--shadow-m);margin-bottom:8px;}
+  .ucard .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+  .ucard .from{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:11.5px;color:var(--ink);}
+  .ucard .fav{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:8px;background:linear-gradient(145deg,#1e3e2b,#4fa472);}
+  .ucard .dt{font-size:10px;color:var(--muted);}
+  .ucard h3{font-family:var(--serif);font-weight:600;font-size:13.5px;color:var(--ink);margin:0 0 2px;}
+  .ucard p{font-size:11.5px;color:#5f5849;line-height:1.4;margin:0;}
+
+  /* ── VARIANT-SPECIFIC INDICATORS ── */
+  .dots-btn{background:none;border:none;padding:4px;display:flex;color:var(--muted);cursor:pointer;flex-shrink:0;}
+  .dots-btn .ph{width:15px;height:15px;}
+
+  .avatar-chip{width:22px;height:22px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);color:#fff;font-family:var(--serif);font-weight:600;font-size:9px;display:grid;place-items:center;cursor:pointer;flex-shrink:0;border:1.5px solid var(--card);box-shadow:0 0 0 1px var(--border-light);}
+
+  .email-pill{display:inline-flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--border-light);border-radius:999px;padding:4px 9px 4px 6px;cursor:pointer;box-shadow:var(--shadow-m);flex-shrink:0;max-width:172px;}
+  .email-pill .av{width:16px;height:16px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);color:#fff;font-family:var(--serif);font-weight:600;font-size:7.5px;display:grid;place-items:center;flex-shrink:0;}
+  .email-pill .e{font-size:10px;color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .email-pill .chev{width:9px;height:9px;color:var(--muted);flex-shrink:0;}
+
+  .status-row{display:flex;align-items:center;gap:9px;background:var(--brand-light);border:1px solid var(--brand-border);border-radius:12px;padding:9px 11px;margin:0 2px 12px;cursor:pointer;}
+  .status-row .dotgreen{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;}
+  .status-row .st{flex:1;font-size:11px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .status-row .st b{font-weight:700;}
+  .status-row .manage{font-size:10.5px;font-weight:700;color:var(--green);flex-shrink:0;}
+
+  /* ── shared bottom sheet ── */
+  .dim{position:absolute;inset:0;background:rgba(20,20,18,.45);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s;}
+  .dim.on{opacity:1;pointer-events:auto;}
+  .sheet{position:absolute;left:0;right:0;bottom:0;z-index:50;background:var(--card);border-radius:20px 20px 0 0;padding:9px 16px 20px;
+    box-shadow:0 -8px 30px rgba(0,0,0,.18);transform:translateY(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);}
+  .sheet.on{transform:translateY(0);}
+  .sheet .handle{width:32px;height:4px;border-radius:3px;background:var(--border-light);margin:0 auto 12px;}
+  .sheet h3{font-family:var(--serif);font-weight:600;font-size:15px;color:var(--ink);margin:0 0 3px;}
+  .sheet .sd{font-size:11px;color:var(--muted);margin:0 0 12px;line-height:1.4;}
+  .acct{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--border-light);border-radius:13px;padding:11px;margin-bottom:12px;}
+  .acct .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:13px;flex-shrink:0;}
+  .acct .ai{flex:1;min-width:0;} .acct .ai .n{font-weight:600;font-size:12.5px;color:var(--ink);} .acct .ai .e{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .acct .chk{width:18px;height:18px;color:var(--green);flex-shrink:0;}
+  .sheetbtns{display:flex;gap:8px;margin-top:2px;}
+  .sbtn{flex:1;border:none;border-radius:12px;padding:11px;font-weight:600;font-size:12.5px;cursor:pointer;}
+  .sbtn.ghost{background:var(--field);color:var(--body);}
+  .sbtn.danger{background:#f7dada;color:#b3372e;}
+  .sbtn.primary{background:var(--green);color:#fff;}
+  .sbtn:disabled{opacity:.4;cursor:not-allowed;}
+
+  /* switch-account sub-view inside the sheet */
+  .sheet-head{display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+  .sheet-back{width:26px;height:26px;border-radius:50%;background:var(--field);border:none;display:grid;place-items:center;color:var(--ink);flex-shrink:0;cursor:pointer;}
+  .sheet-back .ph{width:13px;height:13px;}
+  .acct-row{display:flex;align-items:center;gap:10px;background:var(--bg);border:1.5px solid var(--border-light);border-radius:12px;padding:10px 11px;margin-bottom:8px;cursor:pointer;}
+  .acct-row.picked{border-color:var(--green);background:var(--brand-light);}
+  .acct-row .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:11px;flex-shrink:0;}
+  .acct-row .ai{flex:1;min-width:0;} .acct-row .ai .n{font-weight:600;font-size:12px;color:var(--ink);} .acct-row .ai .e{font-size:10.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .acct-row .rd{width:18px;height:18px;border-radius:50%;border:2px solid var(--border-light);flex-shrink:0;position:relative;}
+  .acct-row.picked .rd{border-color:var(--green);}
+  .acct-row.picked .rd::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--green);}
+  .acct-row.addnew{border-style:dashed;color:var(--green);align-items:center;justify-content:center;font-weight:600;font-size:12.5px;gap:7px;}
+  .acct-row.addnew .ph{width:16px;height:16px;}
+
+  /* not-connected pill + empty state */
+  .connect-pill{display:inline-flex;align-items:center;gap:5px;background:none;border:1.5px dashed var(--brand-border);border-radius:999px;padding:5px 11px 5px 8px;cursor:pointer;color:var(--green);font-weight:600;font-size:11px;flex-shrink:0;}
+  .connect-pill .ph{width:13px;height:13px;}
+  .empty-upd{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px 26px 60px;}
+  .empty-upd .hero{width:56px;height:56px;border-radius:16px;background:var(--brand-light);display:grid;place-items:center;color:var(--green);margin-bottom:14px;}
+  .empty-upd .hero .ph{width:28px;height:28px;}
+  .empty-upd h4{font-family:var(--serif);font-weight:600;font-size:15px;color:var(--ink);margin:0 0 6px;}
+  .empty-upd p{font-size:11.5px;color:var(--muted);line-height:1.5;max-width:220px;margin:0 0 16px;}
+  .empty-upd .cbtn{border:none;border-radius:12px;padding:10px 18px;background:var(--green);color:#fff;font-weight:600;font-size:12.5px;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="lede">
+  <h1>Connected-Account Indicator — 3 Alternatives</h1>
+  <p>Same job as the shipped version (Updates tab → tap → see connected Gmail, switch or disconnect) but three different ways to surface it inline. All four tap into the same account sheet at the bottom — only the trigger changes. Tap any indicator to try it.</p>
+</div>
+
+<!-- A — shipped baseline, for comparison -->
+<div class="panel">
+  <div class="panel-label"><b>A · Shipped (for comparison)</b> — icon-only dots. Smallest footprint, but tells you nothing until you tap it.</div>
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="hrow"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="av">MT</div><div class="nm">Miss Taylor's Class</div></div>
+    <div class="tabs">
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24"/></svg></span><span class="tl">Chat</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16"/></svg></span><span class="tl">Calendar</span></div>
+      <div class="tab on"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span><span class="tl">Updates</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224"/></svg></span><span class="tl">Links</span></div>
+    </div>
+    <div class="scroll">
+      <div class="slbl"><span class="t">Updates</span><span class="s" style="display:flex;align-items:center;gap:6px;">from teacher &amp; room parents<button class="dots-btn" onclick="openSheet('A')"><span class="ph"><svg viewBox="0 0 256 256"><path d="M140 128a12 12 0 1 1-12-12 12 12 0 0 1 12 12m-12-56a12 12 0 1 0-12-12 12 12 0 0 0 12 12m0 112a12 12 0 1 0 12 12 12 12 0 0 0-12-12"/></svg></span></button></span></div>
+      <div class="ucard"><div class="top"><span class="from"><span class="fav">MT</span>Ms. Taylor</span><span class="dt">today</span></div><h3>Art Bags</h3><p>Send a labeled reusable bag tomorrow.</p></div>
+      <div class="ucard"><div class="top"><span class="from"><span class="fav">MT</span>Ms. Taylor</span><span class="dt">2d ago</span></div><h3>Newsletter · Week of May 18</h3><p>MAP results, summer reading, and next year.</p></div>
+    </div>
+    <div class="dim" id="dim-A"></div>
+    <div class="sheet" id="sheet-A">
+      <div class="handle"></div>
+      <h3>Connected Account</h3>
+      <p class="sd">This is the Gmail Sprout pulls teacher updates from for this class.</p>
+      <div class="acct"><div class="av">AM</div><div class="ai"><div class="n">Anthony Martin</div><div class="e">anthonyjohnmartin@gmail.com</div></div><span class="chk ph"><svg viewBox="0 0 256 256"><path d="M173.66 98.34a8 8 0 0 1 0 11.32l-56 56a8 8 0 0 1-11.32 0l-24-24a8 8 0 0 1 11.32-11.32L112 148.69l50.34-50.35a8 8 0 0 1 11.32 0"/></svg></span></div>
+      <div class="sheetbtns"><button class="sbtn ghost" onclick="closeSheet('A')">Switch email</button><button class="sbtn danger" onclick="closeSheet('A')">Disconnect</button></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- B — avatar chip -->
+<div class="panel">
+  <div class="panel-label"><b>B · Avatar chip</b> — shows whose account it is at a glance, no tap needed to identify. Best when a family has multiple adults who might connect different inboxes.</div>
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="hrow"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="av">MT</div><div class="nm">Miss Taylor's Class</div></div>
+    <div class="tabs">
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24"/></svg></span><span class="tl">Chat</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16"/></svg></span><span class="tl">Calendar</span></div>
+      <div class="tab on"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span><span class="tl">Updates</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224"/></svg></span><span class="tl">Links</span></div>
+    </div>
+    <div class="scroll">
+      <div class="slbl"><span class="t">Updates</span><span class="s" style="display:flex;align-items:center;gap:6px;">from teacher &amp; room parents<div class="avatar-chip" onclick="openSheet('B')">AM</div></span></div>
+      <div class="ucard"><div class="top"><span class="from"><span class="fav">MT</span>Ms. Taylor</span><span class="dt">today</span></div><h3>Art Bags</h3><p>Send a labeled reusable bag tomorrow.</p></div>
+      <div class="ucard"><div class="top"><span class="from"><span class="fav">MT</span>Ms. Taylor</span><span class="dt">2d ago</span></div><h3>Newsletter · Week of May 18</h3><p>MAP results, summer reading, and next year.</p></div>
+    </div>
+    <div class="dim" id="dim-B"></div>
+    <div class="sheet" id="sheet-B">
+      <div class="handle"></div>
+      <h3>Connected Account</h3>
+      <p class="sd">This is the Gmail Sprout pulls teacher updates from for this class.</p>
+      <div class="acct"><div class="av">AM</div><div class="ai"><div class="n">Anthony Martin</div><div class="e">anthonyjohnmartin@gmail.com</div></div><span class="chk ph"><svg viewBox="0 0 256 256"><path d="M173.66 98.34a8 8 0 0 1 0 11.32l-56 56a8 8 0 0 1-11.32 0l-24-24a8 8 0 0 1 11.32-11.32L112 148.69l50.34-50.35a8 8 0 0 1 11.32 0"/></svg></span></div>
+      <div class="sheetbtns"><button class="sbtn ghost" onclick="closeSheet('B')">Switch email</button><button class="sbtn danger" onclick="closeSheet('B')">Disconnect</button></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- C — truncated email pill -->
+<div class="panel">
+  <div class="panel-label"><b>C · Email pill</b> — most explicit, answers "which email is this?" without any tap at all. Takes the most horizontal room; truncates on long addresses.</div>
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="hrow"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="av">MT</div><div class="nm">Miss Taylor's Class</div></div>
+    <div class="tabs">
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24"/></svg></span><span class="tl">Chat</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16"/></svg></span><span class="tl">Calendar</span></div>
+      <div class="tab on"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span><span class="tl">Updates</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224"/></svg></span><span class="tl">Links</span></div>
+    </div>
+    <div class="scroll">
+      <div class="slbl"><span class="t">Updates</span>
+        <div class="email-pill" onclick="openSheet('C')"><div class="av" id="pillAv-C">AM</div><span class="e" id="pillEmail-C">anthonyjohn…@gmail.com</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
+      </div>
+      <div class="ucard"><div class="top"><span class="from"><span class="fav">MT</span>Ms. Taylor</span><span class="dt">today</span></div><h3>Art Bags</h3><p>Send a labeled reusable bag tomorrow.</p></div>
+      <div class="ucard"><div class="top"><span class="from"><span class="fav">MT</span>Ms. Taylor</span><span class="dt">2d ago</span></div><h3>Newsletter · Week of May 18</h3><p>MAP results, summer reading, and next year.</p></div>
+    </div>
+    <div class="dim" id="dim-C"></div>
+    <div class="sheet" id="sheet-C">
+      <div class="handle"></div>
+      <div id="sheet-C-default">
+        <h3>Connected Account</h3>
+        <p class="sd">This is the Gmail Sprout pulls teacher updates from for this class.</p>
+        <div class="acct"><div class="av" id="acctAv-C">AM</div><div class="ai"><div class="n" id="acctName-C">Anthony Martin</div><div class="e" id="acctEmail-C">anthonyjohnmartin@gmail.com</div></div><span class="chk ph"><svg viewBox="0 0 256 256"><path d="M173.66 98.34a8 8 0 0 1 0 11.32l-56 56a8 8 0 0 1-11.32 0l-24-24a8 8 0 0 1 11.32-11.32L112 148.69l50.34-50.35a8 8 0 0 1 11.32 0"/></svg></span></div>
+        <div class="sheetbtns"><button class="sbtn ghost" onclick="showSwitch('C')">Switch email</button><button class="sbtn danger" onclick="closeSheet('C')">Disconnect</button></div>
+      </div>
+      <div id="sheet-C-switch" style="display:none;">
+        <div class="sheet-head"><button class="sheet-back" onclick="backToDefault('C')"><span class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></span></button><h3>Switch Email</h3></div>
+        <p class="sd">Pick another Google account already signed in, or add a new one.</p>
+        <div class="acct-row picked" onclick="pickSwitch('C', this, 'Anthony Martin', 'anthonyjohnmartin@gmail.com', 'AM')"><div class="av">AM</div><div class="ai"><div class="n">Anthony Martin</div><div class="e">anthonyjohnmartin@gmail.com</div></div><div class="rd"></div></div>
+        <div class="acct-row" onclick="pickSwitch('C', this, 'Anthony Martin', 'ajmartin.work@gmail.com', 'AM')"><div class="av">AM</div><div class="ai"><div class="n">Anthony Martin</div><div class="e">ajmartin.work@gmail.com</div></div><div class="rd"></div></div>
+        <div class="acct-row addnew" onclick="pickSwitch('C', this, 'New Account', 'choose in Google sign-in…', '+')"><span class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Use a different Google email</div>
+        <div class="sheetbtns"><button class="sbtn primary" id="confirmSwitch-C" onclick="confirmSwitch('C')" disabled>Switch to this email</button></div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- C-empty — not connected yet -->
+<div class="panel">
+  <div class="panel-label"><b>C · Not connected</b> — pill becomes an invite instead of an identity. Tapping starts the same connect flow as <span style="text-decoration:underline">email-integration-flow.html</span>; not rebuilt here.</div>
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="hrow"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="av">MT</div><div class="nm">Miss Taylor's Class</div></div>
+    <div class="tabs">
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24"/></svg></span><span class="tl">Chat</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16"/></svg></span><span class="tl">Calendar</span></div>
+      <div class="tab on"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span><span class="tl">Updates</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224"/></svg></span><span class="tl">Links</span></div>
+    </div>
+    <div class="scroll" style="display:flex;flex-direction:column;">
+      <div class="slbl"><span class="t">Updates</span>
+        <button class="connect-pill" onclick="alert('Would open email-integration-flow.html — Intro → Connect Gmail → Add Senders.')"><span class="ph"><svg viewBox="0 0 256 256"><path d="M221.66 133.66l-72 72a8 8 0 0 1-11.32-11.32L196.69 136H40a8 8 0 0 1 0-16h156.69l-58.35-58.34a8 8 0 0 1 11.32-11.32l72 72a8 8 0 0 1 0 11.32"/></svg></span>Connect email</button>
+      </div>
+      <div class="empty-upd">
+        <div class="hero"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span></div>
+        <h4>Nothing connected yet</h4>
+        <p>Connect your inbox and Sprout pulls Ms. Taylor's emails in here automatically.</p>
+        <button class="cbtn" onclick="alert('Would open email-integration-flow.html — Intro → Connect Gmail → Add Senders.')">Connect email</button>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- D — persistent status banner -->
+<div class="panel">
+  <div class="panel-label"><b>D · Status banner</b> — most prominent, its own row above the cards. Best if this needs to feel like a "setting you should know about," worst for space — costs a full row every time you open Updates.</div>
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="hrow"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="av">MT</div><div class="nm">Miss Taylor's Class</div></div>
+    <div class="tabs">
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24"/></svg></span><span class="tl">Chat</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16"/></svg></span><span class="tl">Calendar</span></div>
+      <div class="tab on"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span><span class="tl">Updates</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224"/></svg></span><span class="tl">Links</span></div>
+    </div>
+    <div class="scroll">
+      <div class="slbl"><span class="t">Updates</span></div>
+      <div class="status-row" onclick="openSheet('D')"><span class="dotgreen"></span><span class="st">Connected as <b>anthonyjohnmartin@gmail.com</b></span><span class="manage">Manage</span></div>
+      <div class="ucard"><div class="top"><span class="from"><span class="fav">MT</span>Ms. Taylor</span><span class="dt">today</span></div><h3>Art Bags</h3><p>Send a labeled reusable bag tomorrow.</p></div>
+      <div class="ucard"><div class="top"><span class="from"><span class="fav">MT</span>Ms. Taylor</span><span class="dt">2d ago</span></div><h3>Newsletter · Week of May 18</h3><p>MAP results, summer reading, and next year.</p></div>
+    </div>
+    <div class="dim" id="dim-D"></div>
+    <div class="sheet" id="sheet-D">
+      <div class="handle"></div>
+      <h3>Connected Account</h3>
+      <p class="sd">This is the Gmail Sprout pulls teacher updates from for this class.</p>
+      <div class="acct"><div class="av">AM</div><div class="ai"><div class="n">Anthony Martin</div><div class="e">anthonyjohnmartin@gmail.com</div></div><span class="chk ph"><svg viewBox="0 0 256 256"><path d="M173.66 98.34a8 8 0 0 1 0 11.32l-56 56a8 8 0 0 1-11.32 0l-24-24a8 8 0 0 1 11.32-11.32L112 148.69l50.34-50.35a8 8 0 0 1 11.32 0"/></svg></span></div>
+      <div class="sheetbtns"><button class="sbtn ghost" onclick="closeSheet('D')">Switch email</button><button class="sbtn danger" onclick="closeSheet('D')">Disconnect</button></div>
+    </div>
+  </div></div>
+</div>
+
+<script>
+  function openSheet(v){ document.getElementById('dim-'+v).classList.add('on'); document.getElementById('sheet-'+v).classList.add('on'); }
+  function closeSheet(v){
+    document.getElementById('dim-'+v).classList.remove('on');
+    document.getElementById('sheet-'+v).classList.remove('on');
+    backToDefault(v);
+  }
+  function showSwitch(v){
+    document.getElementById('sheet-'+v+'-default').style.display = 'none';
+    document.getElementById('sheet-'+v+'-switch').style.display = 'block';
+  }
+  function backToDefault(v){
+    var sw = document.getElementById('sheet-'+v+'-switch');
+    var df = document.getElementById('sheet-'+v+'-default');
+    if (sw) sw.style.display = 'none';
+    if (df) df.style.display = 'block';
+  }
+  var pendingSwitch = {};
+  function pickSwitch(v, el, name, email, initials){
+    el.parentElement.querySelectorAll('.acct-row').forEach(function(r){ r.classList.remove('picked'); });
+    el.classList.add('picked');
+    pendingSwitch[v] = { name: name, email: email, initials: initials };
+    var isCurrent = email === 'anthonyjohnmartin@gmail.com';
+    var btn = document.getElementById('confirmSwitch-'+v);
+    btn.disabled = isCurrent;
+  }
+  function confirmSwitch(v){
+    var chosen = pendingSwitch[v];
+    if (!chosen) return;
+    document.getElementById('acctName-'+v).textContent = chosen.name;
+    document.getElementById('acctEmail-'+v).textContent = chosen.email;
+    document.getElementById('acctAv-'+v).textContent = chosen.initials;
+    var pillEmail = document.getElementById('pillEmail-'+v);
+    var pillAv = document.getElementById('pillAv-'+v);
+    if (pillEmail) pillEmail.textContent = chosen.email.length > 20 ? chosen.email.slice(0,17) + '…' : chosen.email;
+    if (pillAv) pillAv.textContent = chosen.initials;
+    backToDefault(v);
+  }
+  document.querySelectorAll('.dim').forEach(function(d){
+    d.addEventListener('click', function(){ d.classList.remove('on'); d.nextElementSibling.classList.remove('on'); });
+  });
+</script>
+</body>
+</html>

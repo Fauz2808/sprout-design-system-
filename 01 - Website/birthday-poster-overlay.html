@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Birthday Poster — Type Overlay · Sprout</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Pinyon+Script&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold:#8a7350; --gold-lt:#a99372; --ink:#3a3328; --soft:#bcae93; --cream:#efe9dd;
+    --serif:'Playfair Display',Georgia,serif; --cormorant:'Cormorant Garamond',Georgia,serif; --script:'Pinyon Script',cursive; --mono:ui-monospace,Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#d8d2c6;font-family:var(--cormorant);padding:36px 24px;min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:8px;}
+  .cap{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#7a7568;margin-bottom:18px;text-align:center;}
+  .cap b{color:#3a3830;}
+  .row{display:flex;gap:30px;flex-wrap:wrap;justify-content:center;}
+  figure{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  figcaption{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#8a8478;}
+
+  /* ── poster ── */
+  .poster{position:relative;width:300px;aspect-ratio:2/3;border-radius:14px;overflow:hidden;box-shadow:0 22px 46px -18px rgba(0,0,0,.4);}
+  /* AI-scene stand-in (REPLACE .scene with your AI image: <img> object-fit cover) */
+  .scene{position:absolute;inset:0;background:
+      radial-gradient(120% 80% at 70% 18%, rgba(255,255,255,.5), transparent 55%),
+      radial-gradient(90% 70% at 25% 90%, rgba(180,160,130,.35), transparent 60%),
+      linear-gradient(160deg,#efe7d8 0%,#e6dcc8 55%,#dccdb4 100%);}
+  .scene .ghost-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-48%);font-family:var(--serif);font-weight:700;font-size:330px;line-height:1;color:#fff;opacity:.5;text-shadow:0 8px 30px rgba(120,100,70,.25);}
+  .scene .kid{position:absolute;left:50%;bottom:23%;transform:translateX(-50%);font-size:62px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.18));}
+  .scene .hint{position:absolute;left:0;right:0;bottom:7px;text-align:center;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:rgba(120,100,70,.5);}
+  /* soft top/bottom scrims so text always reads */
+  .poster .scrim-t{position:absolute;top:0;left:0;right:0;height:34%;background:linear-gradient(to bottom,rgba(245,240,230,.65),transparent);}
+  .poster .scrim-b{position:absolute;bottom:0;left:0;right:0;height:30%;background:linear-gradient(to top,rgba(238,230,215,.78),transparent);}
+
+  .ov{position:absolute;inset:0;z-index:3;color:var(--gold);}
+  /* type atoms */
+  .hb{font-family:var(--cormorant);font-size:15px;font-weight:600;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);}
+  .hb-script{font-family:var(--script);font-size:46px;line-height:.8;color:var(--gold);}
+  .nm{font-family:var(--serif);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);}
+  .chap{font-family:var(--cormorant);font-size:11px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--gold-lt);display:flex;align-items:center;justify-content:center;gap:8px;}
+  .chap::before,.chap::after{content:'';width:18px;height:1px;background:var(--gold-lt);opacity:.7;}
+  .tag{font-family:var(--cormorant);font-size:10.5px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-lt);}
+
+  /* preset A — editorial top script + bottom block (the floral "6" look) */
+  .A .top{position:absolute;top:26px;left:0;right:0;text-align:center;}
+  .A .hb-script{margin:2px 0;}
+  .A .bottom{position:absolute;bottom:30px;left:0;right:0;text-align:center;}
+  .A .nm{font-size:25px;}
+  .A .chap{margin-top:9px;}
+
+  /* preset B — side block, left-aligned (the denim / pink look) */
+  .B .block{position:absolute;left:22px;top:50%;transform:translateY(-50%);text-align:left;}
+  .B .nm{font-size:27px;letter-spacing:.1em;display:block;}
+  .B .chap{justify-content:flex-start;margin-top:8px;}
+  .B .chap::after{display:none;}
+  .B .tag{display:block;margin-top:10px;max-width:120px;line-height:1.5;}
+
+  /* preset C — centered name over the number, tagline at base */
+  .C .center{position:absolute;top:62px;left:0;right:0;text-align:center;}
+  .C .nm{font-size:30px;display:block;}
+  .C .age{font-family:var(--serif);font-style:italic;font-weight:500;font-size:20px;color:var(--gold-lt);margin-top:4px;}
+  .C .bottom{position:absolute;bottom:34px;left:0;right:0;text-align:center;}
+  .C .tag{display:block;}
+  .C .chap{margin-bottom:8px;}
+</style>
+</head>
+<body>
+  <div class="cap"><b>Birthday poster — type overlay</b> · drop over any AI scene · 3 placement presets · editable text</div>
+  <div class="row">
+
+    <!-- PRESET A -->
+    <figure>
+      <div class="poster A">
+        <div class="scene"><span class="ghost-num">6</span><span class="kid">🧒</span><span class="hint">↳ your AI photo here</span></div>
+        <div class="scrim-t"></div><div class="scrim-b"></div>
+        <div class="ov">
+          <div class="top"><div class="hb">Happy</div><div class="hb-script">Birthday</div><div class="hb">to you</div></div>
+          <div class="bottom"><div class="nm">Persley</div><div class="chap">Chapter Six</div></div>
+        </div>
+      </div>
+      <figcaption>A · Editorial top + bottom</figcaption>
+    </figure>
+
+    <!-- PRESET B -->
+    <figure>
+      <div class="poster B">
+        <div class="scene"><span class="ghost-num">6</span><span class="kid">🧒</span><span class="hint">↳ your AI photo here</span></div>
+        <div class="scrim-t"></div><div class="scrim-b"></div>
+        <div class="ov">
+          <div class="block">
+            <span class="nm">Persley</span>
+            <div class="chap">Chapter 6</div>
+            <span class="tag">365 more days of wonder</span>
+          </div>
+        </div>
+      </div>
+      <figcaption>B · Side block</figcaption>
+    </figure>
+
+    <!-- PRESET C -->
+    <figure>
+      <div class="poster C">
+        <div class="scene"><span class="ghost-num">6</span><span class="kid">🧒</span><span class="hint">↳ your AI photo here</span></div>
+        <div class="scrim-t"></div><div class="scrim-b"></div>
+        <div class="ov">
+          <div class="center"><span class="nm">Persley</span><div class="age">is six</div></div>
+          <div class="bottom"><div class="chap">A whole world of wonder</div><span class="tag">let the adventure begin</span></div>
+        </div>
+      </div>
+      <figcaption>C · Centered name</figcaption>
+    </figure>
+
+  </div>
+</body>
+</html>

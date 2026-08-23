@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>To-do placement — Option A vs B · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand-500:#186338; --brand-600:#134f2d; --brand-700:#1e3e2b; --brand-50:#e2e9e3; --brand-100:#d0dacf; --brand-200:#77b691;
+    --secondary-500:#f4f1ea; --secondary-600:#eae6db; --secondary-700:#dbd5c8; --secondary-800:#c2b9a6; --secondary-900:#aa9e83;
+    --grey-100:#e6e7ea; --grey-200:#cdcfd6; --grey-300:#b3b8c1; --grey-400:#9aa0ad; --grey-500:#818898; --grey-700:#4d525b; --grey-900:#1a1b1e;
+    --bg-primary:#f4f1ea; --content-primary:#4d525b; --content-secondary:#818898; --content-brand:#186338;
+    --surface-l0:#f4f1ea; --surface-l1:#eae6db; --surface-l2:#dbd5c8;
+    --t-todo:#3b6ea5; --t-todo-bg:#e1ecf7; --danger:#d64545;
+    --serif:'Playfair Display',serif; --sans:'Inter',sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#cfc8b8;font-family:var(--sans);-webkit-font-smoothing:antialiased;padding:44px 24px 80px;}
+
+  .lede{max-width:820px;margin:0 auto 20px;text-align:center;}
+  .lede h1{font-family:var(--serif);font-size:24px;font-weight:600;color:#23271f;margin:0 0 8px;}
+  .lede p{font-size:13px;color:#5a5347;line-height:1.65;margin:0 0 10px;}
+  .lede .baseline{display:inline-block;font-size:11.5px;color:#6a6455;background:#e4ddcb;border-radius:999px;padding:6px 14px;}
+  .lede .baseline b{color:#3a3830;}
+
+  .row{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-start;justify-content:center;gap:56px;padding:20px 40px;overflow-x:auto;}
+  .col{display:flex;flex-direction:column;align-items:center;gap:16px;flex-shrink:0;width:393px;}
+
+  .goalcard{width:100%;background:#fffdf8;border:1px solid #e4ddcb;border-radius:16px;padding:16px 18px;}
+  .goalcard .tag{display:inline-block;font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:999px;margin-bottom:8px;}
+  .col.a .goalcard .tag{background:#e2e9e3;color:var(--brand-600);}
+  .col.b .goalcard .tag{background:var(--t-todo-bg);color:var(--t-todo);}
+  .goalcard h3{font-family:var(--serif);font-size:16px;font-weight:600;color:#23271f;margin:0 0 6px;}
+  .goalcard .goal{font-size:12px;color:#4d4738;line-height:1.55;margin-bottom:8px;}
+  .goalcard .goal b{color:#23271f;}
+  .goalcard .tradeoff{font-size:11.5px;color:#8a6a4a;line-height:1.55;background:#f8f0e2;border-radius:10px;padding:8px 10px;}
+  .goalcard .tradeoff b{color:#6b4a2a;}
+
+  /* ─── Phone shell (from home-screen.html, verbatim tokens) ─── */
+  .phone{width:393px;height:852px;background:var(--bg-primary);border-radius:54px;overflow:hidden;position:relative;
+    box-shadow:0 0 0 1px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.04),0 24px 80px rgba(0,0,0,.22);
+    display:flex;flex-direction:column;}
+  .status-bar{height:54px;background:var(--bg-primary);display:flex;align-items:center;justify-content:space-between;padding:14px 28px 0;flex-shrink:0;position:relative;z-index:5;}
+  .status-time{font-size:15px;font-weight:600;color:var(--grey-900);letter-spacing:-.01em;}
+  .status-icons{display:flex;align-items:center;gap:7px;}
+  .dynamic-island{width:120px;height:36px;background:#000;border-radius:20px;position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:10;}
+
+  .app-header{background:var(--bg-primary);display:flex;align-items:center;justify-content:space-between;padding:10px 20px 12px;flex-shrink:0;position:relative;z-index:4;}
+  .header-avatar{width:38px;height:38px;border-radius:50%;background:var(--surface-l2);border:2.5px solid var(--brand-100);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .header-location-label{font-size:11px;font-weight:500;color:var(--content-secondary);letter-spacing:.03em;text-align:center;display:block;margin-bottom:1px;}
+  .header-location-city{display:flex;align-items:center;gap:3px;font-family:var(--serif);font-size:17px;font-weight:600;color:var(--grey-900);line-height:1;}
+  .header-location-city svg{width:14px;height:14px;color:var(--content-brand);margin-top:1px;}
+  .header-actions{display:flex;align-items:center;gap:8px;}
+  .icon-btn{width:38px;height:38px;border-radius:50%;background:var(--surface-l1);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;position:relative;}
+  .icon-btn svg{width:18px;height:18px;color:var(--content-primary);}
+  .notif-badge{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--danger);border:1.5px solid var(--bg-primary);}
+
+  .segment-wrap{background:var(--bg-primary);padding:0 20px 0;flex-shrink:0;position:relative;z-index:3;}
+  .segment-tabs{display:flex;border-bottom:1.5px solid var(--grey-100);}
+  .seg-tab{flex:1;height:40px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--content-secondary);cursor:pointer;position:relative;border:none;background:none;}
+  .seg-tab.active{color:var(--content-brand);font-weight:600;}
+  .seg-tab.active::after{content:'';position:absolute;bottom:-1.5px;left:0;right:0;height:2px;background:var(--content-brand);border-radius:2px 2px 0 0;}
+
+  .screen-body{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;padding-bottom:8px;}
+  .screen-body::-webkit-scrollbar{display:none;}
+
+  .section{padding:16px 0 4px;}
+  .section-header{display:flex;align-items:baseline;justify-content:space-between;padding:0 20px;margin-bottom:12px;}
+  .section-title{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--grey-900);}
+  .section-see-all{font-size:12.5px;font-weight:500;color:var(--content-brand);border:none;background:none;cursor:pointer;}
+
+  /* generic tab bar (Option B — unmodified, 5 slots) */
+  .tab-bar{height:80px;background:#fff;border-top:1px solid var(--grey-100);display:flex;align-items:flex-start;padding:10px 8px 0;flex-shrink:0;}
+  .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 0 0;border:none;background:none;position:relative;}
+  .tab-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--grey-300);}
+  .tab-icon.active{color:var(--brand-500);}
+  .tab-icon svg{width:22px;height:22px;}
+  .tab-label{font-size:10px;font-weight:500;color:var(--grey-400);}
+  .tab-label.active{color:var(--brand-500);font-weight:600;}
+  .tab-create{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;border:none;background:none;margin-top:-8px;}
+  .tab-create-btn{width:48px;height:48px;border-radius:16px;background:var(--brand-500);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(24,99,56,.35);}
+  .tab-create-btn svg{width:22px;height:22px;color:#fff;}
+  .tab-create-label{font-size:10px;font-weight:500;color:var(--grey-400);}
+
+  /* compressed tab bar (Option A — 6 slots, the cost being demonstrated) */
+  .tab-bar.crowded{padding:9px 4px 0;}
+  .tab-bar.crowded .tab-item{gap:2px;}
+  .tab-bar.crowded .tab-icon{width:21px;height:21px;}
+  .tab-bar.crowded .tab-icon svg{width:19px;height:19px;}
+  .tab-bar.crowded .tab-label{font-size:8.6px;}
+  .tab-bar.crowded .tab-create{margin-top:-6px;}
+  .tab-bar.crowded .tab-create-btn{width:42px;height:42px;border-radius:14px;}
+  .tab-bar.crowded .tab-create-btn svg{width:19px;height:19px;}
+  .tabbadge{position:absolute;top:-3px;right:14px;min-width:15px;height:15px;padding:0 3px;border-radius:999px;background:var(--danger);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+
+  /* ═══ Option A: dedicated Tasks screen content ═══ */
+  .taskshead{padding:6px 20px 10px;}
+  .taskshead h2{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--grey-900);}
+  .taskshead .sub{font-size:12.5px;color:var(--content-secondary);margin-top:2px;}
+  .taskgroup-lbl{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--content-secondary);padding:14px 20px 8px;}
+  .taskrow{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--grey-100);border-radius:14px;padding:13px 14px;margin:0 20px 8px;cursor:pointer;}
+  .taskrow .tcb{width:24px;height:24px;border-radius:7px;border:2px solid var(--t-todo);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .12s;}
+  .taskrow .tcb svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:3;opacity:0;transition:opacity .12s;}
+  .taskrow.done .tcb{background:var(--t-todo);}
+  .taskrow.done .tcb svg{opacity:1;}
+  .taskrow.done .tn{color:var(--content-secondary);text-decoration:line-through;}
+  .taskrow .tb{flex:1;min-width:0;}
+  .taskrow .tn{font-size:14px;font-weight:600;color:var(--grey-900);}
+  .taskrow .td{font-size:11.5px;color:var(--content-secondary);margin-top:2px;}
+  .taskrow .tpill{flex-shrink:0;font-size:10px;font-weight:700;background:var(--t-todo-bg);color:var(--t-todo);padding:3px 9px;border-radius:999px;}
+
+  /* ═══ Option B: Home action card ═══ */
+  .attncard{margin:14px 20px 4px;border-radius:18px;background:linear-gradient(180deg,#eef4ff,#e4edfb);border:1px solid #cfe0f5;padding:14px 16px 8px;}
+  .attncard .ah{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .attncard .ah .lbl{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--t-todo);}
+  .attncard .ah .lbl svg{width:15px;height:15px;}
+  .attncard .ah .see{font-size:11.5px;font-weight:600;color:var(--t-todo);cursor:pointer;}
+  .attncard .arow{display:flex;align-items:center;gap:11px;background:#fff;border-radius:13px;padding:11px 12px;margin-bottom:8px;cursor:pointer;}
+  .attncard .arow .acb{width:22px;height:22px;border-radius:6px;border:2px solid var(--t-todo);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .attncard .arow .acb svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:3;opacity:0;}
+  .attncard .arow.done .acb{background:var(--t-todo);}
+  .attncard .arow.done .acb svg{opacity:1;}
+  .attncard .arow.done .an{color:var(--content-secondary);text-decoration:line-through;}
+  .attncard .arow .ab{flex:1;min-width:0;}
+  .attncard .arow .an{font-size:13px;font-weight:600;color:var(--grey-900);}
+  .attncard .arow .ad{font-size:10.5px;color:var(--content-secondary);margin-top:1px;}
+  .attncard-empty{display:none;text-align:center;font-size:12px;color:var(--t-todo);padding:6px 0 14px;}
+
+  .nearby-teaser{margin:18px 20px 4px;border-radius:18px;background:linear-gradient(120deg,var(--brand-600),var(--brand-500));padding:16px 18px;color:#fff;}
+  .nearby-teaser .ne{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.75;}
+  .nearby-teaser .nt{font-family:var(--serif);font-size:16px;font-weight:600;margin-top:5px;line-height:1.3;}
+</style>
+</head>
+<body>
+
+  <div class="lede">
+    <h1>Where should to-do live? Two more placements, compared</h1>
+    <p>Baseline so far: to-do split into its own Notifications tab with a pinned "Needs your attention" strip. That fixes the burying problem without touching anything outside Notifications — but it still asks parents to open Notifications to see it. These two options trade that low cost for stronger visibility, at different prices.</p>
+    <span class="baseline">Current baseline: <b>pinned strip inside Notifications</b> — see notifications-v2-full-taxonomy.html</span>
+  </div>
+
+  <div class="row">
+
+    <!-- ═══════════ OPTION A ═══════════ -->
+    <div class="col a">
+      <div class="goalcard">
+        <span class="tag">Option A</span>
+        <h3>Dedicated "Tasks" tab</h3>
+        <div class="goal"><b>Goal:</b> treat to-dos as a different app section entirely — not a feed, a checklist. Always one tap away regardless of notification volume, with its own badge on the nav bar itself (the same visibility tier as Chat's unread count).</div>
+        <div class="tradeoff"><b>Cost:</b> Sprout's tab bar is already full — Home / Discover / Create / Clubs / Chat is 5 slots. Adding Tasks means cramming a 6th icon (shown here, compressed) or replacing an existing tab. That's a bigger IA call than anything scoped to Notifications alone — highest visibility, highest cost to ship.</div>
+      </div>
+
+      <div class="phone">
+        <div class="status-bar"><span class="status-time">9:41</span><div class="dynamic-island"></div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#1a1b1e"/><rect x="4" y="5" width="3" height="6" rx=".6" fill="#1a1b1e"/><rect x="8" y="3" width="3" height="8" rx=".6" fill="#1a1b1e"/><rect x="12" y="0" width="3" height="11" rx=".6" fill="#1a1b1e"/></svg>
+            <svg width="16" height="12" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1a1b1e"/><rect x="2.5" y="3.5" width="15" height="5" rx="1" fill="#1a1b1e"/></svg>
+          </div>
+        </div>
+
+        <div class="app-header">
+          <div class="header-avatar"><svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="9" r="4" fill="#aa9e83"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="#aa9e83"/></svg></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
+            <span class="header-location-label">Your family</span>
+            <div class="header-location-city">Tasks<svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+          <div class="header-actions"><button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M6 10a6 6 0 1 1 12 0c0 3.5 1.5 5 2 6H4c.5-1 2-2.5 2-6z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/><path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></button></div>
+        </div>
+
+        <div class="screen-body">
+          <div class="taskshead">
+            <h2>Tasks</h2>
+            <div class="sub">2 open · everything your clubs and calendar have asked of you</div>
+          </div>
+          <div class="taskgroup-lbl">Open</div>
+          <div class="taskrow" data-task="1"><div class="tcb"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><div class="tb"><div class="tn">Bring towels for water day</div><div class="td">1st Grade Class</div></div><div class="tpill">Tomorrow</div></div>
+          <div class="taskrow" data-task="1"><div class="tcb"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><div class="tb"><div class="tn">Sign Jake's permission slip</div><div class="td">1st Grade Class</div></div><div class="tpill">Fri</div></div>
+          <div class="taskgroup-lbl">Completed</div>
+          <div class="taskrow done"><div class="tcb"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><div class="tb"><div class="tn">RSVP to the class picnic</div><div class="td">Done Monday</div></div></div>
+        </div>
+
+        <div class="tab-bar crowded">
+          <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21H15v-5h-6v5H3V10.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><span class="tab-label">Home</span></button>
+          <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Discover</span></button>
+          <button class="tab-create"><div class="tab-create-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div><span class="tab-create-label">Create</span></button>
+          <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Clubs</span></button>
+          <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><span class="tab-label">Chat</span></button>
+          <button class="tab-item"><div class="tabbadge" id="tabBadgeA">2</div><div class="tab-icon" style="color:var(--brand-500)"><svg viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><span class="tab-label" style="color:var(--brand-500);font-weight:600;">Tasks</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ OPTION B ═══════════ -->
+    <div class="col b">
+      <div class="goalcard">
+        <span class="tag">Option B</span>
+        <h3>"Needs your attention" card on Home</h3>
+        <div class="goal"><b>Goal:</b> zero new navigation. Meet parents where they already land every single open — Home — with the 1-2 things that need action, completable inline without opening Notifications at all. Notifications goes back to being a pure passive log.</div>
+        <div class="tradeoff"><b>Cost:</b> only visible if the user actually lands on Home first — someone tapping straight into a chat or a push notification can miss it entirely. And Home currently leads with "discover fun things nearby" (per PRODUCT.md); a chores card at the very top risks a tonal clash right at the app's front door.</div>
+      </div>
+
+      <div class="phone">
+        <div class="status-bar"><span class="status-time">9:41</span><div class="dynamic-island"></div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#1a1b1e"/><rect x="4" y="5" width="3" height="6" rx=".6" fill="#1a1b1e"/><rect x="8" y="3" width="3" height="8" rx=".6" fill="#1a1b1e"/><rect x="12" y="0" width="3" height="11" rx=".6" fill="#1a1b1e"/></svg>
+            <svg width="16" height="12" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1a1b1e"/><rect x="2.5" y="3.5" width="15" height="5" rx="1" fill="#1a1b1e"/></svg>
+          </div>
+        </div>
+
+        <div class="app-header">
+          <div class="header-avatar"><svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="9" r="4" fill="#aa9e83"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="#aa9e83"/></svg></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
+            <span class="header-location-label">Current location</span>
+            <div class="header-location-city">Sydney, NSW<svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+          <div class="header-actions"><button class="icon-btn"><div class="notif-badge"></div><svg viewBox="0 0 24 24"><path d="M6 10a6 6 0 1 1 12 0c0 3.5 1.5 5 2 6H4c.5-1 2-2.5 2-6z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/><path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></button></div>
+        </div>
+
+        <div class="segment-wrap">
+          <div class="segment-tabs">
+            <button class="seg-tab active">Discover</button>
+            <button class="seg-tab">My Events</button>
+          </div>
+        </div>
+
+        <div class="screen-body">
+          <div class="attncard" id="attnCard">
+            <div class="ah">
+              <div class="lbl"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12"/></svg>Needs your attention</div>
+              <span class="see">See all (2)</span>
+            </div>
+            <div id="attnList">
+              <div class="arow" data-a="1"><div class="acb"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><div class="ab"><div class="an">Bring towels for water day</div><div class="ad">Due tomorrow · 1st Grade Class</div></div></div>
+              <div class="arow" data-a="1"><div class="acb"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><div class="ab"><div class="an">Sign Jake's permission slip</div><div class="ad">Due Fri · 1st Grade Class</div></div></div>
+            </div>
+            <div class="attncard-empty" id="attnEmpty">All caught up — nice work. 🎉</div>
+          </div>
+
+          <div class="nearby-teaser"><div class="ne">Near you</div><div class="nt">3 events happening<br>this weekend nearby</div></div>
+
+          <div class="section">
+            <div class="section-header"><span class="section-title">Popular in your area</span><button class="section-see-all">See all</button></div>
+          </div>
+        </div>
+
+        <div class="tab-bar">
+          <button class="tab-item"><div class="tab-icon active"><svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21H15v-5h-6v5H3V10.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" fill="rgba(24,99,56,.1)"/></svg></div><span class="tab-label active">Home</span></button>
+          <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Discover</span></button>
+          <button class="tab-create"><div class="tab-create-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div><span class="tab-create-label">Create</span></button>
+          <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Clubs</span></button>
+          <button class="tab-item"><div class="tab-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><span class="tab-label">Chat</span></button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  // Option A — task rows toggle done, badge count follows open count
+  var tasksBody = document.querySelector('.col.a .screen-body');
+  var tabBadgeA = document.getElementById('tabBadgeA');
+  tasksBody.addEventListener('click', function(e){
+    var row = e.target.closest('.taskrow[data-task]');
+    if(!row) return;
+    row.classList.toggle('done');
+    var open = document.querySelectorAll('.col.a .taskrow[data-task]:not(.done)').length;
+    tabBadgeA.textContent = open;
+    tabBadgeA.style.display = open === 0 ? 'none' : 'flex';
+  });
+
+  // Option B — attention card rows toggle done, card empties when all clear
+  var attnList = document.getElementById('attnList');
+  var attnEmpty = document.getElementById('attnEmpty');
+  var attnCard = document.getElementById('attnCard');
+  attnList.addEventListener('click', function(e){
+    var row = e.target.closest('.arow[data-a]');
+    if(!row) return;
+    row.classList.toggle('done');
+    setTimeout(function(){
+      var open = attnList.querySelectorAll('.arow:not(.done)').length;
+      attnCard.querySelector('.see').textContent = 'See all (' + open + ')';
+      attnEmpty.style.display = open === 0 ? 'block' : 'none';
+    }, 350);
+  });
+</script>
+</body>
+</html>

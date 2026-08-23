@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sprout · iOS UI Kit</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<style>
+  html, body { margin: 0; padding: 0; background: #f4f1ea; font-family: 'Inter', sans-serif; }
+  @keyframes sproutPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .fadeUp { animation: fadeUp 0.45s ease both; }
+  .wrap { max-width: 1600px; margin: 0 auto; padding: 48px 40px 80px; }
+  .header { margin-bottom: 32px; }
+  .eyebrow { font-family: 'Inter'; font-weight: 600; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #186338; }
+  h1.top { font-family: 'Playfair Display', serif; font-weight: 500; font-size: 44px; line-height: 50px; margin: 4px 0 0; color: #4d525b; letter-spacing: -0.01em; }
+  .sub { font-family: 'Inter'; font-size: 15px; color: #818898; max-width: 640px; margin: 8px 0 0; }
+  .toolbar { display: flex; gap: 8px; margin: 24px 0 32px; flex-wrap: wrap; }
+  .tab { font-family: 'Inter'; font-weight: 500; font-size: 13px; padding: 9px 16px; border-radius: 9999px; border: 1px solid #e6e7ea; background: #fff; color: #4d525b; cursor: pointer; transition: all 120ms; }
+  .tab.active { background: #186338; color: #fff; border-color: #186338; }
+  .devices { display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-start; }
+  .device-col { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .device-label { font-family: 'Inter'; font-weight: 600; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #818898; }
+  #root { min-height: 100vh; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="screens-home.jsx"></script>
+<script type="text/babel" src="screens-other.jsx"></script>
+<script type="text/babel" src="screens-redesigns.jsx"></script>
+
+<script type="text/babel">
+function SproutPhone({ screen, initial, onOpen, active, onNavChange, label }) {
+  return (
+    <div className="device-col">
+      <div style={{ width: 393, height: 852, borderRadius: 54, overflow: 'hidden', position: 'relative', background: '#f4f1ea', boxShadow: '0 40px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.12)', fontFamily: "'Inter', -apple-system, system-ui, sans-serif" }} data-screen-label={label}>
+        {/* Status bar */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }}>
+          <IOSStatusBar dark={false}/>
+        </div>
+        {/* Dynamic island */}
+        <div style={{ position: 'absolute', top: 11, left: '50%', transform: 'translateX(-50%)', width: 126, height: 37, borderRadius: 24, background: '#000', zIndex: 50 }}/>
+        {/* Content */}
+        <div style={{ position: 'absolute', top: 56, left: 0, right: 0, bottom: 0, overflow: 'auto' }}>
+          <div className="fadeUp">{screen}</div>
+        </div>
+        {/* Nav */}
+        <SproutNav active={active} onChange={onNavChange}/>
+        {/* Home indicator */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 60, height: 34, display: 'flex', justifyContent: 'center', alignItems: 'flex-end', paddingBottom: 8, pointerEvents: 'none' }}>
+          <div style={{ width: 139, height: 5, borderRadius: 100, background: 'rgba(0,0,0,0.25)' }}/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const initial = (() => { try { return localStorage.getItem('sprout_tab') || 'events'; } catch (e) { return 'events'; } })();
+  const [tab, setTab] = React.useState(initial);
+  const [detailEvent, setDetailEvent] = React.useState(null);
+  React.useEffect(() => { try { localStorage.setItem('sprout_tab', tab); } catch (e) {} }, [tab]);
+
+  const tabs = [
+    { id: 'events', label: 'Events (Home)' },
+    { id: 'memories', label: 'Memories' },
+    { id: 'ai', label: 'AI Assist' },
+    { id: 'chat', label: 'Chat' },
+    { id: 'clubs', label: 'Clubs' },
+    { id: 'seeall', label: 'See All' },
+    { id: 'subcat', label: 'Sub-Category' },
+    { id: 'shimmer', label: 'Shimmer' },
+    { id: 'detail', label: 'Event Detail' },
+  ];
+
+  const renderScreen = (id) => {
+    switch(id) {
+      case 'events':   return <HomeScreen onOpenEvent={e => { setDetailEvent(e); setTab('detail'); }}/>;
+      case 'memories': return <MemoriesScreen/>;
+      case 'ai':       return <AIScreen/>;
+      case 'chat':     return <ChatScreen/>;
+      case 'clubs':    return <ClubsScreen/>;
+      case 'seeall':   return <SeeAllScreen onBack={() => setTab('events')}/>;
+      case 'subcat':   return <SubCategoryScreen onBack={() => setTab('events')}/>;
+      case 'shimmer':  return <ShimmerScreen/>;
+      case 'detail':   return <DetailScreen event={detailEvent} onBack={() => setTab('events')}/>;
+      default: return null;
+    }
+  };
+
+  // Map detail back to the events tab for the floating nav
+  const navActive = tab === 'detail' ? 'events' : tab;
+  const activeLabel = tabs.find(t => t.id === tab)?.label;
+
+  return (
+    <div className="wrap">
+      <div className="header">
+        <div className="eyebrow">UI Kit</div>
+        <h1 className="top">Sprout iOS — full app mock</h1>
+        <p className="sub">Pixel-true recreation of the Sprout iOS app at 393×852. Every chrome element, card, button, input, and pill is built from the same tokens in <code>colors_and_type.css</code> and the production component source in <code>source/components/</code>. Switch screens below, or tap the floating nav inside the phone.</p>
+      </div>
+
+      <div className="toolbar">
+        {tabs.map(t => (
+          <button key={t.id} className={`tab ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)}>{t.label}</button>
+        ))}
+      </div>
+
+      <div className="devices">
+        {(() => {
+          const variantConfig = {
+            events:   { labels: ['A · Editorial','B · Today','C · Storyboard'], render: v => <HomeScreen variant={v} onOpenEvent={e => { setDetailEvent(e); setTab('detail'); }}/> },
+            memories: { labels: ['A · Scrapbook','B · Timeline','C · Year-in-review'], render: v => <MemoriesScreenV variant={v}/> },
+            ai:       { labels: ['A · Editorial co-pilot','B · Active conversation','C · Daily brief'], render: v => <AIScreenV variant={v}/> },
+            chat:     { labels: ['A · Pinned + list','B · Stories + list','C · Filter tabs'], render: v => <ChatScreenV variant={v}/> },
+            clubs:    { labels: ['A · Activity feed','B · Hero cards','C · Member-forward'], render: v => <ClubsScreenV variant={v}/> },
+          };
+          const cfg = variantConfig[tab];
+          if (cfg) {
+            return ['A','B','C'].map((v, idx) => (
+              <div key={v} className="device-col">
+                <div className="device-label">{cfg.labels[idx]}</div>
+                <SproutPhone
+                  screen={cfg.render(v)}
+                  active={tab}
+                  onNavChange={setTab}
+                  label={`${activeLabel} · Variant ${v}`}
+                />
+              </div>
+            ));
+          }
+          return (
+            <SproutPhone
+              key={tab}
+              screen={renderScreen(tab)}
+              active={navActive}
+              onNavChange={setTab}
+              label={`Sprout · ${activeLabel}`}
+            />
+          );
+        })()}
+      </div>
+    </div>
+  );
+}
+
+// wait for components to be defined
+function boot() {
+  if (!window.HomeScreen || !window.SproutNav || !window.DetailScreen || !window.IOSStatusBar || !window.MemoriesScreenV || !window.AIScreenV || !window.ChatScreenV || !window.ClubsScreenV) {
+    return setTimeout(boot, 50);
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+}
+boot();
+</script>
+</body>
+</html>

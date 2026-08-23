@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — App Store Screenshots (Recommended Order)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green-900: #0f2318;
+  --green-800: #1a3526;
+  --green-700: #1e3e2b;
+  --green-600: #145530;
+  --green-500: #186338;
+  --green-400: #2d8655;
+  --green-300: #77b691;
+  --green-100: #d0dacf;
+  --green-50:  #e2e9e3;
+  --cream:     #f4f1ea;
+  --cream-2:   #eae6db;
+  --cream-3:   #dbd5c8;
+  --tp:        #4d525b;
+  --ts:        #818898;
+  --tt:        #b3b8c1;
+  --white:     #ffffff;
+}
+
+body {
+  background: #1a1a1a;
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(20,20,20,.96); backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  padding: 16px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.topbar-logo { display: flex; align-items: center; gap: 10px; }
+.topbar-logo-icon {
+  width: 32px; height: 32px; background: var(--green-500);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+}
+.topbar-name { font-size: 15px; font-weight: 700; color: #fff; }
+.topbar-sub { font-size: 12px; color: rgba(255,255,255,.4); }
+.topbar-badge {
+  background: var(--green-500); color: #fff;
+  font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 99px;
+  letter-spacing: .3px;
+}
+
+/* ── CHANGE LOG ── */
+.changelog {
+  padding: 20px 40px;
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+}
+.cl-item {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 8px; padding: 6px 12px;
+}
+.cl-from { font-size: 11px; color: rgba(255,255,255,.35); text-decoration: line-through; }
+.cl-arrow { font-size: 11px; color: rgba(255,255,255,.3); }
+.cl-to { font-size: 11px; font-weight: 600; color: var(--green-300); }
+.cl-removed {
+  background: rgba(185,28,28,.1); border-color: rgba(185,28,28,.2);
+}
+.cl-removed .cl-from { color: #f87171; text-decoration: none; }
+.cl-removed .cl-label { font-size: 11px; color: #f87171; font-weight: 600; }
+
+/* ── SCROLL STAGE ── */
+.stage {
+  padding: 20px 40px 60px;
+  display: flex; gap: 24px; align-items: flex-start;
+  overflow-x: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.15) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+.stage::-webkit-scrollbar { height: 4px; }
+.stage::-webkit-scrollbar-track { background: transparent; }
+.stage::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 99px; }
+
+/* ── SCREENSHOT CARD ── */
+.ss-card {
+  flex-shrink: 0; width: 300px;
+  border-radius: 28px; overflow: hidden;
+  display: flex; flex-direction: column;
+  position: relative;
+  box-shadow: 0 32px 80px rgba(0,0,0,.5);
+}
+
+/* Backgrounds */
+.ss-card.dark  { background: var(--green-800); }
+.ss-card.cream { background: var(--cream); }
+.ss-card.deep  { background: var(--green-900); }
+.ss-card.mid   { background: #f0ede6; }
+
+/* ── CARD HEADER ── */
+.card-head {
+  padding: 22px 22px 16px;
+  display: flex; flex-direction: column; gap: 0;
+  flex-shrink: 0;
+}
+.card-num {
+  font-size: 11px; font-weight: 700; letter-spacing: .8px;
+  margin-bottom: 10px;
+}
+.dark .card-num, .deep .card-num { color: rgba(255,255,255,.35); }
+.cream .card-num, .mid .card-num { color: rgba(24,99,56,.4); }
+
+.card-brand {
+  display: flex; align-items: center; gap: 7px; margin-bottom: 14px;
+}
+.card-brand-icon {
+  width: 22px; height: 22px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+}
+.dark .card-brand-icon, .deep .card-brand-icon { background: rgba(255,255,255,.12); }
+.cream .card-brand-icon, .mid .card-brand-icon  { background: var(--green-50); }
+.card-brand-name { font-size: 13px; font-weight: 700; letter-spacing: .3px; }
+.dark .card-brand-name, .deep .card-brand-name { color: rgba(255,255,255,.7); }
+.cream .card-brand-name, .mid .card-brand-name  { color: var(--green-700); }
+
+.card-tag {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.dark .card-tag, .deep .card-tag  { color: rgba(255,255,255,.45); }
+.cream .card-tag, .mid .card-tag  { color: var(--green-400); }
+
+.card-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 23px; line-height: 1.22; font-weight: 600;
+  margin-bottom: 9px;
+}
+.dark .card-headline, .deep .card-headline { color: #fff; }
+.cream .card-headline, .mid .card-headline  { color: var(--green-700); }
+
+.card-headline em { font-style: italic; }
+.dark .card-headline em, .deep .card-headline em { color: var(--green-300); }
+.cream .card-headline em, .mid .card-headline em  { color: var(--green-500); }
+
+.card-body {
+  font-size: 11.5px; line-height: 1.6; font-weight: 400;
+}
+.dark .card-body, .deep .card-body  { color: rgba(255,255,255,.5); }
+.cream .card-body, .mid .card-body  { color: var(--ts); }
+
+/* ── PHONE WRAP ── */
+.phone-wrap {
+  flex: 1; display: flex; align-items: flex-end; justify-content: center;
+  padding: 10px 20px 0; position: relative; min-height: 340px;
+}
+
+/* Phone shell */
+.phone {
+  width: 180px; height: 340px;
+  border-radius: 28px; overflow: hidden; position: relative;
+  flex-shrink: 0;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.1),
+    0 0 0 5px #1c1c1e,
+    0 0 0 6px #2a2a2a,
+    0 24px 60px rgba(0,0,0,.5);
+}
+.phone-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  font-family: 'Inter', sans-serif;
+}
+.phone-island {
+  position: absolute; top: 7px; left: 50%; transform: translateX(-50%);
+  width: 58px; height: 16px; background: #0a0a0a;
+  border-radius: 99px; z-index: 50;
+}
+.phone-sb {
+  height: 26px; display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 0 13px 3px; flex-shrink: 0; position: relative; z-index: 10;
+}
+.phone-time { font-size: 7px; font-weight: 700; }
+.phone-icons { display: flex; gap: 3px; align-items: center; }
+
+/* ═══════════════════════════════════════
+   SCREEN 1 — COMMUNITY
+═══════════════════════════════════════ */
+.s1-bg { background: var(--cream); flex: 1; display: flex; flex-direction: column; }
+.s1-header {
+  background: var(--green-800); padding: 8px 10px 10px;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.s1-header-title { font-size: 9px; font-weight: 700; color: #fff; }
+.s1-search {
+  margin: 6px 8px;
+  background: var(--cream-2); border-radius: 99px; padding: 4px 8px;
+  font-size: 7px; color: var(--tt); display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+}
+.s1-sec-label {
+  font-size: 6.5px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+  color: var(--ts); padding: 4px 8px 3px;
+}
+.club-row {
+  display: flex; align-items: center; gap: 7px;
+  padding: 5px 8px; border-bottom: .5px solid rgba(0,0,0,.06);
+}
+.club-avi {
+  width: 28px; height: 28px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 13px;
+}
+.club-info { flex: 1; min-width: 0; }
+.club-name { font-size: 7.5px; font-weight: 600; color: var(--tp); }
+.club-meta { font-size: 6.5px; color: var(--ts); margin-top: 1px; }
+.club-badge {
+  background: var(--green-500); border-radius: 99px; padding: 2px 5px;
+  font-size: 6px; font-weight: 700; color: #fff;
+}
+.s1-bottomnav {
+  height: 36px; background: var(--cream); border-top: .5px solid rgba(0,0,0,.08);
+  display: flex; align-items: center; justify-content: space-around; flex-shrink: 0; padding: 0 4px;
+}
+.nav-ico { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.nav-ico span { font-size: 5.5px; color: var(--tt); }
+.nav-ico.active span { color: var(--green-500); font-weight: 600; }
+
+/* ═══════════════════════════════════════
+   SCREEN 2 — JOIN
+═══════════════════════════════════════ */
+.s2-bg { background: var(--cream); flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.s2-header {
+  background: var(--cream); padding: 6px 10px;
+  display: flex; align-items: center; gap: 5px; flex-shrink: 0;
+  border-bottom: .5px solid rgba(0,0,0,.07);
+}
+.s2-header-title { font-size: 8.5px; font-weight: 700; color: var(--green-700); flex: 1; text-align: center; }
+.profile-card {
+  margin: 8px; background: #fff; border-radius: 16px;
+  overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,.08);
+  flex-shrink: 0;
+}
+.profile-card-top {
+  background: linear-gradient(135deg, var(--green-800), var(--green-600));
+  padding: 14px 12px 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.profile-avi {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--green-300); border: 2px solid rgba(255,255,255,.4);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.profile-name { font-size: 9px; font-weight: 700; color: #fff; }
+.profile-grade { font-size: 7px; color: rgba(255,255,255,.6); }
+.profile-kids {
+  display: flex; align-items: center; gap: 4px; margin-top: 2px;
+}
+.kid-chip {
+  background: rgba(255,255,255,.15); border-radius: 99px; padding: 2px 7px;
+  font-size: 6.5px; color: rgba(255,255,255,.8); font-weight: 500;
+}
+.profile-card-body { padding: 8px 10px; }
+.profile-bio { font-size: 6.5px; color: var(--ts); line-height: 1.5; margin-bottom: 6px; }
+.profile-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 7px; }
+.ptag {
+  background: var(--green-50); border-radius: 99px; padding: 2px 6px;
+  font-size: 6px; color: var(--green-600); font-weight: 600;
+}
+.profile-actions { display: flex; gap: 5px; }
+.p-btn {
+  flex: 1; height: 22px; border-radius: 99px;
+  font-size: 7px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+}
+.p-btn.primary { background: var(--green-500); color: #fff; }
+.p-btn.secondary { background: var(--cream-2); color: var(--green-600); }
+.discover-hint {
+  margin: 4px 8px 6px; padding: 5px 8px;
+  background: var(--green-50); border-radius: 10px;
+  font-size: 6.5px; color: var(--green-700); text-align: center; flex-shrink: 0;
+}
+.discover-hint strong { font-weight: 700; }
+
+/* ═══════════════════════════════════════
+   SCREEN 3 — CONNECT
+═══════════════════════════════════════ */
+.s3-bg { background: var(--cream); flex: 1; display: flex; flex-direction: column; }
+.s3-header {
+  background: rgba(244,241,234,.97); padding: 6px 10px;
+  border-bottom: .5px solid rgba(0,0,0,.07); flex-shrink: 0;
+}
+.s3-header-title { font-size: 9px; font-weight: 700; color: var(--green-700); }
+.chat-row-item {
+  display: flex; align-items: center; gap: 6px; padding: 5px 8px;
+  border-bottom: .5px solid rgba(0,0,0,.05);
+}
+.chat-avi {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff;
+}
+.chat-avi.sq { border-radius: 9px; }
+.chat-info { flex: 1; min-width: 0; }
+.chat-name { font-size: 7.5px; font-weight: 600; color: var(--tp); }
+.chat-preview { font-size: 6.5px; color: var(--ts); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.chat-time { font-size: 6px; color: var(--tt); }
+.chat-unread {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--green-500); display: flex; align-items: center; justify-content: center;
+  font-size: 6px; font-weight: 700; color: #fff;
+}
+.open-bubble {
+  margin: 5px 8px;
+  background: var(--green-500); border-radius: 14px 14px 14px 4px;
+  padding: 6px 9px; max-width: 80%;
+}
+.open-bubble p { font-size: 6.5px; color: #fff; line-height: 1.5; }
+.reply-bubble {
+  margin: 3px 8px; margin-left: auto;
+  background: #fff; border-radius: 14px 14px 4px 14px;
+  padding: 6px 9px; max-width: 75%;
+  border: .5px solid rgba(0,0,0,.08);
+}
+.reply-bubble p { font-size: 6.5px; color: var(--tp); line-height: 1.5; }
+
+/* ═══════════════════════════════════════
+   SCREEN 4 — DISCOVER
+═══════════════════════════════════════ */
+.s4-bg { background: var(--cream); flex: 1; display: flex; flex-direction: column; }
+.s4-header {
+  background: rgba(244,241,234,.97); padding: 6px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: .5px solid rgba(0,0,0,.07); flex-shrink: 0;
+}
+.s4-title { font-size: 9px; font-weight: 700; color: var(--green-700); }
+.s4-chips { display: flex; gap: 4px; padding: 6px 8px; flex-shrink: 0; }
+.chip {
+  padding: 3px 8px; border-radius: 99px; font-size: 6.5px; font-weight: 600;
+}
+.chip.active { background: var(--green-500); color: #fff; }
+.chip.inactive { background: var(--cream-2); color: var(--ts); }
+.event-card {
+  margin: 0 8px 6px;
+  background: #fff; border-radius: 12px; overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,.07); flex-shrink: 0;
+}
+.event-card-img {
+  height: 52px; position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.event-card-body { padding: 6px 8px 7px; }
+.event-cat {
+  display: inline-flex; align-items: center;
+  background: var(--green-50); border-radius: 99px; padding: 2px 6px;
+  font-size: 5.5px; font-weight: 700; color: var(--green-600); margin-bottom: 3px;
+}
+.event-title { font-size: 7.5px; font-weight: 700; color: var(--tp); margin-bottom: 2px; }
+.event-meta { font-size: 6px; color: var(--ts); }
+.event-row-going {
+  display: flex; align-items: center; justify-content: space-between; margin-top: 4px;
+}
+.avi-stack { display: flex; }
+.avi-sm {
+  width: 13px; height: 13px; border-radius: 50%;
+  border: 1.5px solid #fff; margin-left: -3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 5px; font-weight: 700; color: #fff;
+}
+.avi-sm:first-child { margin-left: 0; }
+.rsvp-btn {
+  background: var(--green-500); color: #fff; border-radius: 99px;
+  padding: 2px 7px; font-size: 6px; font-weight: 700;
+}
+
+/* ═══════════════════════════════════════
+   SCREEN 5 — EXPLORE
+═══════════════════════════════════════ */
+.s5-bg { background: var(--cream); flex: 1; display: flex; flex-direction: column; }
+.s5-cover {
+  height: 100px; flex-shrink: 0; position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #2d6b45 0%, #1a4030 50%, #0f2a1e 100%);
+}
+.s5-cover::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,.5) 100%);
+}
+.s5-cover-label {
+  position: absolute; bottom: 8px; left: 10px; z-index: 2;
+}
+.s5-park-name { font-size: 9px; font-weight: 700; color: #fff; }
+.s5-park-sub { font-size: 6.5px; color: rgba(255,255,255,.7); margin-top: 1px; }
+.s5-back-btn {
+  position: absolute; top: 8px; left: 8px; z-index: 2;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center;
+}
+.s5-body { flex: 1; overflow: hidden; padding: 6px 8px; display: flex; flex-direction: column; gap: 5px; }
+.s5-section-label { font-size: 6.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--ts); margin-bottom: 2px; }
+.s5-info-row {
+  display: flex; gap: 5px; align-items: flex-start;
+  background: #fff; border-radius: 10px; padding: 6px 8px;
+}
+.s5-info-icon { font-size: 12px; flex-shrink: 0; }
+.s5-info-text { font-size: 6.5px; color: var(--tp); line-height: 1.4; }
+.s5-events-row { display: flex; gap: 5px; }
+.s5-event-mini {
+  flex: 1; background: #fff; border-radius: 10px; overflow: hidden;
+}
+.s5-event-mini-img { height: 36px; }
+.s5-event-mini-body { padding: 4px 5px; }
+.s5-event-mini-title { font-size: 6.5px; font-weight: 600; color: var(--tp); }
+.s5-event-mini-date { font-size: 5.5px; color: var(--ts); margin-top: 1px; }
+
+/* ═══════════════════════════════════════
+   SCREEN 6 — EVENTS
+═══════════════════════════════════════ */
+.s6-bg { background: var(--cream); flex: 1; display: flex; flex-direction: column; }
+.s6-header {
+  background: rgba(244,241,234,.97); padding: 6px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: .5px solid rgba(0,0,0,.07); flex-shrink: 0;
+}
+.s6-title { font-size: 9px; font-weight: 700; color: var(--green-700); }
+.s6-tabs { display: flex; gap: 0; padding: 0 8px; flex-shrink: 0; border-bottom: .5px solid rgba(0,0,0,.07); }
+.s6-tab { padding: 5px 10px; font-size: 7px; font-weight: 600; color: var(--ts); border-bottom: 1.5px solid transparent; }
+.s6-tab.active { color: var(--green-500); border-bottom-color: var(--green-500); }
+.big-event-card {
+  margin: 8px;
+  background: #fff; border-radius: 14px; overflow: hidden;
+  box-shadow: 0 3px 12px rgba(0,0,0,.09); flex-shrink: 0;
+}
+.big-event-img {
+  height: 80px; position: relative;
+  background: linear-gradient(135deg, #3a7d30 0%, #2d6022 60%, #1e4a16 100%);
+  display: flex; align-items: flex-end; padding: 7px;
+}
+.big-event-img::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,.45) 100%);
+}
+.big-event-tag {
+  position: relative; z-index: 2;
+  background: rgba(255,255,255,.2); backdrop-filter: blur(6px);
+  border-radius: 99px; padding: 2px 7px;
+  font-size: 6px; font-weight: 700; color: #fff;
+}
+.big-event-body { padding: 7px 9px; }
+.big-event-title { font-size: 8.5px; font-weight: 700; color: var(--tp); margin-bottom: 4px; }
+.big-event-row { display: flex; align-items: center; gap: 4px; margin-bottom: 2px; }
+.big-event-row span { font-size: 6.5px; color: var(--ts); }
+.big-event-footer {
+  display: flex; align-items: center; justify-content: space-between; margin-top: 5px;
+}
+.attendees-row { display: flex; align-items: center; gap: 3px; }
+.attendees-text { font-size: 6px; color: var(--ts); }
+.rsvp-big-btn {
+  background: var(--green-500); color: #fff; border-radius: 99px;
+  padding: 3px 10px; font-size: 6.5px; font-weight: 700;
+}
+.mini-events { padding: 0 8px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.mini-event-row {
+  background: #fff; border-radius: 10px; padding: 5px 7px;
+  display: flex; align-items: center; gap: 6px;
+}
+.mini-event-thumb {
+  width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.mini-event-info { flex: 1; }
+.mini-event-title { font-size: 7px; font-weight: 600; color: var(--tp); }
+.mini-event-meta { font-size: 6px; color: var(--ts); margin-top: 1px; }
+
+/* ═══════════════════════════════════════
+   SCREEN 7 — MEMORIES
+═══════════════════════════════════════ */
+.s7-bg { background: var(--cream); flex: 1; display: flex; flex-direction: column; }
+.s7-header {
+  background: rgba(244,241,234,.97); padding: 6px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: .5px solid rgba(0,0,0,.07); flex-shrink: 0;
+}
+.s7-title { font-size: 9px; font-weight: 700; color: var(--green-700); }
+.memory-section { padding: 5px 8px 3px; flex-shrink: 0; }
+.memory-section-label { font-size: 7px; font-weight: 700; color: var(--tp); margin-bottom: 4px; }
+.memory-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+.memory-cell {
+  border-radius: 8px; overflow: hidden; position: relative;
+  aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+}
+.memory-cell.tall { grid-row: span 2; aspect-ratio: auto; min-height: 70px; }
+.memory-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 4px 5px;
+  background: linear-gradient(to top, rgba(0,0,0,.55) 0%, transparent 100%);
+}
+.memory-label span { font-size: 5.5px; font-weight: 600; color: #fff; }
+.memory-toast {
+  margin: 5px 8px;
+  background: var(--green-700); border-radius: 12px; padding: 6px 9px;
+  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+}
+.memory-toast-icon { font-size: 14px; }
+.memory-toast-text { font-size: 7px; font-weight: 600; color: #fff; }
+.memory-toast-sub { font-size: 6px; color: rgba(255,255,255,.6); margin-top: 1px; }
+
+/* ── CAPTION ── */
+.ss-caption {
+  padding: 12px 16px;
+  background: rgba(0,0,0,.25);
+  flex-shrink: 0;
+}
+.ss-cap-screen { font-size: 9px; font-weight: 700; color: rgba(255,255,255,.9); margin-bottom: 2px; }
+.ss-cap-note { font-size: 8.5px; color: rgba(255,255,255,.45); }
+.dark .ss-cap-screen, .deep .ss-cap-screen { color: rgba(255,255,255,.9); }
+.cream .ss-cap-screen, .mid .ss-cap-screen { color: rgba(0,0,0,.7); }
+.dark .ss-cap-note, .deep .ss-cap-note { color: rgba(255,255,255,.35); }
+.cream .ss-cap-note, .mid .ss-cap-note { color: rgba(0,0,0,.35); }
+
+/* Leaf SVG for logo */
+.leaf { fill: currentColor; }
+
+/* ── LEGEND BAR ── */
+.legend {
+  padding: 16px 40px 40px;
+  display: flex; gap: 24px; flex-wrap: wrap;
+}
+.legend-item { display: flex; align-items: flex-start; gap: 10px; max-width: 200px; }
+.legend-num {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  background: var(--green-500); color: #fff; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.legend-text { font-size: 11px; color: rgba(255,255,255,.5); line-height: 1.5; }
+.legend-text strong { color: rgba(255,255,255,.85); font-weight: 600; }
+
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="topbar-logo-icon">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2C5 2 2 5 2 9c0 3.86 2.74 7.07 6.4 7.84C9 14 9 12 9 12c0 2 0 3.84.6 4.84C13.26 16.07 16 12.86 16 9c0-4-3-7-7-7z" fill="#fff"/>
+      </svg>
+    </div>
+    <div>
+      <div class="topbar-name">Sprout</div>
+      <div class="topbar-sub">App Store Screenshots — Recommended Order</div>
+    </div>
+  </div>
+  <div class="topbar-badge">7 Screens · Reordered</div>
+</div>
+
+<!-- Change log -->
+<div class="changelog">
+  <div class="cl-item cl-removed">
+    <span class="cl-label">✕ Removed</span>
+    <span class="cl-from">Screen 3 · FIND — "Locate events, parks, and camps" (redundant with #4 + #7)</span>
+  </div>
+  <div class="cl-item">
+    <span class="cl-from">5</span><span class="cl-arrow">→</span><span class="cl-to">1 · Community (opens with emotional hook)</span>
+  </div>
+  <div class="cl-item">
+    <span class="cl-from">1</span><span class="cl-arrow">→</span><span class="cl-to">2 · Join (explains HOW it works)</span>
+  </div>
+  <div class="cl-item">
+    <span class="cl-from">6</span><span class="cl-arrow">→</span><span class="cl-to">3 · Connect (action after joining)</span>
+  </div>
+  <div class="cl-item">
+    <span class="cl-from">4</span><span class="cl-arrow">→</span><span class="cl-to">4 · Discover (find things together)</span>
+  </div>
+  <div class="cl-item">
+    <span class="cl-from">7</span><span class="cl-arrow">→</span><span class="cl-to">5 · Explore (plan the outing)</span>
+  </div>
+  <div class="cl-item">
+    <span class="cl-from">2</span><span class="cl-arrow">→</span><span class="cl-to">6 · Events (make it happen)</span>
+  </div>
+  <div class="cl-item">
+    <span class="cl-from">8</span><span class="cl-arrow">→</span><span class="cl-to">7 · Memories (emotional close)</span>
+  </div>
+</div>
+
+<!-- Screenshot row -->
+<div class="stage">
+
+  <!-- ══ 1 · COMMUNITY ══ -->
+  <div class="ss-card dark">
+    <div class="card-head">
+      <div class="card-num">1 / 7</div>
+      <div class="card-brand">
+        <div class="card-brand-icon">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1C3.5 1 1 3.5 1 6.5S3.5 12 6.5 12 12 9.5 12 6.5 9.5 1 6.5 1z" fill="rgba(255,255,255,.7)"/></svg>
+        </div>
+        <span class="card-brand-name">Sprout</span>
+      </div>
+      <div class="card-tag">Community</div>
+      <div class="card-headline">Find your<br><em>parenting tribe</em></div>
+      <div class="card-body">Join clubs, share moments, and grow together with local families who just get it.</div>
+    </div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-island"></div>
+        <div class="phone-inner">
+          <div class="phone-sb">
+            <span class="phone-time" style="color:#fff">9:41</span>
+            <div class="phone-icons">
+              <svg width="10" height="7" viewBox="0 0 10 7" fill="none"><rect x="0" y="3" width="2" height="4" rx=".4" fill="#fff"/><rect x="2.5" y="2" width="2" height="5" rx=".4" fill="#fff"/><rect x="5" y="1" width="2" height="6" rx=".4" fill="#fff"/><rect x="7.5" y="0" width="2" height="7" rx=".4" fill="#fff" opacity=".4"/></svg>
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><circle cx="4.5" cy="6" r=".8" fill="#fff"/><path d="M2.5 4C3.2 3.3 3.8 3 4.5 3s1.3.3 2 1" stroke="#fff" stroke-width=".8" stroke-linecap="round" fill="none"/><path d="M.8 2.3C2 1 3.2.3 4.5.3S7 1 8.2 2.3" stroke="#fff" stroke-width=".8" stroke-linecap="round" fill="none"/></svg>
+            </div>
+          </div>
+          <div class="s1-bg">
+            <div class="s1-header">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1C3.2 1 1 3.2 1 6s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5z" fill="rgba(255,255,255,.6)"/></svg>
+              <div class="s1-header-title">Clubs & Community</div>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="rgba(255,255,255,.6)" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+            <div class="s1-search">🔍 Search clubs…</div>
+            <div class="s1-sec-label">Your Clubs</div>
+            <div class="club-row">
+              <div class="club-avi" style="background:#e8f5ee">🎒</div>
+              <div class="club-info">
+                <div class="club-name">1st Grade · Ms. Rivera</div>
+                <div class="club-meta">42 parents · School</div>
+              </div>
+              <div class="club-badge">3</div>
+            </div>
+            <div class="club-row">
+              <div class="club-avi" style="background:#e8f0ff">⚽</div>
+              <div class="club-info">
+                <div class="club-name">Soccer Moms FC</div>
+                <div class="club-meta">28 parents · Sports</div>
+              </div>
+            </div>
+            <div class="club-row">
+              <div class="club-avi" style="background:#fff5e8">🎨</div>
+              <div class="club-info">
+                <div class="club-name">Weekend Art Club</div>
+                <div class="club-meta">15 parents · Arts</div>
+              </div>
+              <div class="club-badge">1</div>
+            </div>
+            <div class="s1-sec-label" style="margin-top:4px">Discover Near You</div>
+            <div class="club-row">
+              <div class="club-avi" style="background:#e8f5ee">🌿</div>
+              <div class="club-info">
+                <div class="club-name">Nature Walkers</div>
+                <div class="club-meta">31 parents · Outdoors</div>
+              </div>
+            </div>
+            <div class="club-row">
+              <div class="club-avi" style="background:#fce8e8">📚</div>
+              <div class="club-info">
+                <div class="club-name">Book Babies</div>
+                <div class="club-meta">19 parents · Education</div>
+              </div>
+            </div>
+            <div style="flex:1"></div>
+            <div class="s1-bottomnav">
+              <div class="nav-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L7 2l5 5v5H9V9H5v3H2V7z" stroke="#b3b8c1" stroke-width="1.1" stroke-linejoin="round" fill="none"/></svg><span>Home</span></div>
+              <div class="nav-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="#b3b8c1" stroke-width="1.1"/><path d="M5 7h4M7 5v4" stroke="#b3b8c1" stroke-width="1.1" stroke-linecap="round"/></svg><span>Events</span></div>
+              <div class="nav-ico active"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="5" cy="5" r="2.5" stroke="#186338" stroke-width="1.1"/><circle cx="9" cy="9" r="2.5" stroke="#186338" stroke-width="1.1"/><path d="M7 5h2M5 9h2" stroke="#186338" stroke-width="1.1" stroke-linecap="round"/></svg><span>Clubs</span></div>
+              <div class="nav-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 11V4.5L7 2l5 2.5V11" stroke="#b3b8c1" stroke-width="1.1" stroke-linejoin="round" fill="none"/><rect x="4.5" y="7" width="5" height="4" rx=".5" stroke="#b3b8c1" stroke-width="1.1"/></svg><span>Chat</span></div>
+              <div class="nav-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.5" stroke="#b3b8c1" stroke-width="1.1"/><path d="M2 12c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="#b3b8c1" stroke-width="1.1" stroke-linecap="round"/></svg><span>Profile</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-caption">
+      <div class="ss-cap-screen">Screen 1 — Emotional Hook</div>
+      <div class="ss-cap-note">First thing users see in search results — must answer "why do I need this?"</div>
+    </div>
+  </div>
+
+  <!-- ══ 2 · JOIN ══ -->
+  <div class="ss-card cream">
+    <div class="card-head">
+      <div class="card-num">2 / 7</div>
+      <div class="card-brand">
+        <div class="card-brand-icon">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1C3.5 1 1 3.5 1 6.5S3.5 12 6.5 12 12 9.5 12 6.5 9.5 1 6.5 1z" fill="#186338"/></svg>
+        </div>
+        <span class="card-brand-name">Sprout</span>
+      </div>
+      <div class="card-tag">Join</div>
+      <div class="card-headline">Discover every<br><em>parent in your</em><br>child's grade</div>
+      <div class="card-body">Hyper-local matching by school and grade. Your community, already organized.</div>
+    </div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-island"></div>
+        <div class="phone-inner">
+          <div class="phone-sb"><span class="phone-time" style="color:var(--tp)">9:41</span></div>
+          <div class="s2-bg">
+            <div class="s2-header">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M7 2L3 5l4 3" stroke="#186338" stroke-width="1.2" stroke-linecap="round"/></svg>
+              <div class="s2-header-title">Parent Discovery</div>
+              <div style="width:10px"></div>
+            </div>
+            <div style="padding:5px 8px 3px;font-size:6.5px;font-weight:700;color:var(--ts);text-transform:uppercase;letter-spacing:.5px">Parents in Emma's Grade</div>
+            <div class="profile-card">
+              <div class="profile-card-top">
+                <div class="profile-avi">👩</div>
+                <div class="profile-name">Sarah Mitchell</div>
+                <div class="profile-grade">Mom of Lily · 1st Grade · Lincoln Elem.</div>
+                <div class="profile-kids">
+                  <div class="kid-chip">🎨 Arts</div>
+                  <div class="kid-chip">⚽ Soccer</div>
+                  <div class="kid-chip">📚 Reading</div>
+                </div>
+              </div>
+              <div class="profile-card-body">
+                <div class="profile-bio">"Always looking for weekend playdate buddies! Lily loves painting and outdoor adventures."</div>
+                <div class="profile-tags">
+                  <div class="ptag">Same school</div>
+                  <div class="ptag">Same grade</div>
+                  <div class="ptag">2.1 mi away</div>
+                </div>
+                <div class="profile-actions">
+                  <div class="p-btn primary">Connect</div>
+                  <div class="p-btn secondary">View Profile</div>
+                </div>
+              </div>
+            </div>
+            <div class="discover-hint">
+              <strong>14 more parents</strong> in Emma's grade near you
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-caption" style="background:rgba(0,0,0,.06)">
+      <div class="ss-cap-screen">Screen 2 — The Unique Mechanic</div>
+      <div class="ss-cap-note">Grade-based matching is Sprout's key differentiator — show it clearly</div>
+    </div>
+  </div>
+
+  <!-- ══ 3 · CONNECT ══ -->
+  <div class="ss-card dark">
+    <div class="card-head">
+      <div class="card-num">3 / 7</div>
+      <div class="card-brand">
+        <div class="card-brand-icon"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1C3.5 1 1 3.5 1 6.5S3.5 12 6.5 12 12 9.5 12 6.5 9.5 1 6.5 1z" fill="rgba(255,255,255,.7)"/></svg></div>
+        <span class="card-brand-name">Sprout</span>
+      </div>
+      <div class="card-tag">Connect</div>
+      <div class="card-headline">Chat with<br><em>parents who</em><br>get it</div>
+      <div class="card-body">Group chats, DMs, and event threads — all in one place, just for your community.</div>
+    </div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-island"></div>
+        <div class="phone-inner">
+          <div class="phone-sb"><span class="phone-time" style="color:#fff">9:41</span></div>
+          <div class="s3-bg">
+            <div class="s3-header">
+              <div class="s3-header-title">Messages</div>
+            </div>
+            <div class="chat-row-item">
+              <div class="chat-avi sq" style="background:#2d6b45;font-size:11px">🎒</div>
+              <div class="chat-info">
+                <div class="chat-name">1st Grade · Ms. Rivera</div>
+                <div class="chat-preview">Talent Show is tomorrow — doors open at 9am!</div>
+              </div>
+              <div class="chat-meta">
+                <div class="chat-time">9:41</div>
+                <div class="chat-unread">3</div>
+              </div>
+            </div>
+            <div class="chat-row-item">
+              <div class="chat-avi" style="background:#7a6a9a">SM</div>
+              <div class="chat-info">
+                <div class="chat-name">Sarah Mitchell</div>
+                <div class="chat-preview">Are you going to the park on Saturday?</div>
+              </div>
+              <div class="chat-meta"><div class="chat-time">8:55</div></div>
+            </div>
+            <div class="chat-row-item">
+              <div class="chat-avi sq" style="background:#c46a2d;font-size:11px">⚽</div>
+              <div class="chat-info">
+                <div class="chat-name">Soccer Moms FC</div>
+                <div class="chat-preview">Practice moved to 10am this week</div>
+              </div>
+              <div class="chat-meta">
+                <div class="chat-time">Tue</div>
+                <div class="chat-unread">1</div>
+              </div>
+            </div>
+            <div style="height:6px"></div>
+            <!-- Open chat preview -->
+            <div class="open-bubble">
+              <p>Hey! Is Emma free for a playdate this weekend? Lily has been asking about her 😊</p>
+            </div>
+            <div class="reply-bubble">
+              <p>Yes!! Saturday afternoon works great for us 🎉</p>
+            </div>
+            <div style="margin:4px 8px;background:var(--cream-2);border-radius:12px;padding:6px 9px;display:flex;align-items:center;gap:5px">
+              <div style="flex:1;font-size:6.5px;color:var(--tt)">Reply to Sarah…</div>
+              <div style="width:18px;height:18px;border-radius:50%;background:var(--green-500);display:flex;align-items:center;justify-content:center">
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 7L7 4 1 1v2.5L5 4l-4 .5V7z" fill="#fff"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-caption">
+      <div class="ss-cap-screen">Screen 3 — The Core Action</div>
+      <div class="ss-cap-note">Found your people. Now talk to them. Builds on the previous two screens.</div>
+    </div>
+  </div>
+
+  <!-- ══ 4 · DISCOVER ══ -->
+  <div class="ss-card cream">
+    <div class="card-head">
+      <div class="card-num">4 / 7</div>
+      <div class="card-brand">
+        <div class="card-brand-icon"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1C3.5 1 1 3.5 1 6.5S3.5 12 6.5 12 12 9.5 12 6.5 9.5 1 6.5 1z" fill="#186338"/></svg></div>
+        <span class="card-brand-name">Sprout</span>
+      </div>
+      <div class="card-tag">Discover</div>
+      <div class="card-headline">Find events<br><em>your kids</em><br>will love</div>
+      <div class="card-body">Curated activities for every age, right in your neighbourhood. Never miss a thing.</div>
+    </div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-island"></div>
+        <div class="phone-inner">
+          <div class="phone-sb"><span class="phone-time" style="color:var(--tp)">9:41</span></div>
+          <div class="s4-bg">
+            <div class="s4-header">
+              <div class="s4-title">Discover</div>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="#818898" stroke-width="1.1"/><path d="M9.5 9.5l2.5 2.5" stroke="#818898" stroke-width="1.1" stroke-linecap="round"/></svg>
+            </div>
+            <div class="s4-chips">
+              <div class="chip active">All</div>
+              <div class="chip inactive">Parks</div>
+              <div class="chip inactive">Camps</div>
+              <div class="chip inactive">Arts</div>
+            </div>
+            <div class="event-card">
+              <div class="event-card-img" style="background:linear-gradient(135deg,#3a7d30,#1e4a16)">
+                <span style="font-size:28px;position:relative;z-index:2">🌳</span>
+                <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,.4) 100%)"></div>
+              </div>
+              <div class="event-card-body">
+                <div class="event-cat">⛺ Outdoors</div>
+                <div class="event-title">Zilker Park Family Playdate</div>
+                <div class="event-meta">📅 Sat, May 17 · 10 AM · 0.8 mi away</div>
+                <div class="event-row-going">
+                  <div class="avi-stack">
+                    <div class="avi-sm" style="background:#5c8a6a">JL</div>
+                    <div class="avi-sm" style="background:#7a6a9a">SM</div>
+                    <div class="avi-sm" style="background:#c46a2d">+9</div>
+                  </div>
+                  <div class="rsvp-btn">RSVP Free →</div>
+                </div>
+              </div>
+            </div>
+            <div class="event-card" style="margin-top:0">
+              <div class="event-card-img" style="background:linear-gradient(135deg,#7a5c2d,#4a3820)">
+                <span style="font-size:28px;position:relative;z-index:2">🎨</span>
+                <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,.4) 100%)"></div>
+              </div>
+              <div class="event-card-body">
+                <div class="event-cat">🎨 Arts & Crafts</div>
+                <div class="event-title">Toddler Art Morning</div>
+                <div class="event-meta">📅 Sun, May 18 · 9 AM · 1.2 mi away</div>
+                <div class="event-row-going">
+                  <div class="avi-stack">
+                    <div class="avi-sm" style="background:#5c8a6a">AM</div>
+                    <div class="avi-sm" style="background:#c46a2d">+5</div>
+                  </div>
+                  <div class="rsvp-btn">RSVP Free →</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-caption" style="background:rgba(0,0,0,.06)">
+      <div class="ss-cap-screen">Screen 4 — Activity Discovery</div>
+      <div class="ss-cap-note">Now that you're connected, shows what you can do together</div>
+    </div>
+  </div>
+
+  <!-- ══ 5 · EXPLORE ══ -->
+  <div class="ss-card dark">
+    <div class="card-head">
+      <div class="card-num">5 / 7</div>
+      <div class="card-brand">
+        <div class="card-brand-icon"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1C3.5 1 1 3.5 1 6.5S3.5 12 6.5 12 12 9.5 12 6.5 9.5 1 6.5 1z" fill="rgba(255,255,255,.7)"/></svg></div>
+        <span class="card-brand-name">Sprout</span>
+      </div>
+      <div class="card-tag">Explore</div>
+      <div class="card-headline">Plan the<br><em>perfect</em><br>family day</div>
+      <div class="card-body">Detailed guides, reviews, and RSVP for every outing. Everything you need to say yes.</div>
+    </div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-island"></div>
+        <div class="phone-inner">
+          <div class="phone-sb"><span class="phone-time" style="color:#fff">9:41</span></div>
+          <div class="s5-bg">
+            <div class="s5-cover">
+              <div class="s5-back-btn">
+                <svg width="8" height="10" viewBox="0 0 8 10" fill="none"><path d="M6 1L2 5l4 4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>
+              </div>
+              <div class="s5-cover-label">
+                <div class="s5-park-name">Barton Creek Greenbelt</div>
+                <div class="s5-park-sub">⭐ 4.8 · Austin, TX · Free</div>
+              </div>
+            </div>
+            <div class="s5-body">
+              <div>
+                <div class="s5-section-label">About</div>
+                <div class="s5-info-row">
+                  <div class="s5-info-icon">📍</div>
+                  <div class="s5-info-text">3755 S Capital of Texas Hwy · 2.4 mi away · Open daily 5am–10pm</div>
+                </div>
+              </div>
+              <div>
+                <div class="s5-info-row">
+                  <div class="s5-info-icon">👨‍👩‍👧</div>
+                  <div class="s5-info-text">Best for ages 2–12 · Dog friendly · Picnic tables available</div>
+                </div>
+              </div>
+              <div>
+                <div class="s5-section-label">Upcoming Events Here</div>
+                <div class="s5-events-row">
+                  <div class="s5-event-mini">
+                    <div class="s5-event-mini-img" style="background:linear-gradient(135deg,#3a7d30,#1e4a16);display:flex;align-items:center;justify-content:center;font-size:18px">🌿</div>
+                    <div class="s5-event-mini-body">
+                      <div class="s5-event-mini-title">Nature Walk</div>
+                      <div class="s5-event-mini-date">Sat · 9 AM</div>
+                    </div>
+                  </div>
+                  <div class="s5-event-mini">
+                    <div class="s5-event-mini-img" style="background:linear-gradient(135deg,#5c7a3a,#2d4a1e);display:flex;align-items:center;justify-content:center;font-size:18px">🏃</div>
+                    <div class="s5-event-mini-body">
+                      <div class="s5-event-mini-title">Family 5K</div>
+                      <div class="s5-event-mini-date">Sun · 8 AM</div>
+                    </div>
+                  </div>
+                  <div class="s5-event-mini">
+                    <div class="s5-event-mini-img" style="background:linear-gradient(135deg,#3a5c7a,#1e2d4a);display:flex;align-items:center;justify-content:center;font-size:18px">🎭</div>
+                    <div class="s5-event-mini-body">
+                      <div class="s5-event-mini-title">Story Time</div>
+                      <div class="s5-event-mini-date">Tue · 10 AM</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="background:var(--green-500);border-radius:10px;padding:6px 8px;display:flex;align-items:center;justify-content:center">
+                <span style="font-size:7px;font-weight:700;color:#fff">RSVP for Nature Walk — Free</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-caption">
+      <div class="ss-cap-screen">Screen 5 — Depth & Detail</div>
+      <div class="ss-cap-note">Shows the depth of information — reviews, hours, events at each venue</div>
+    </div>
+  </div>
+
+  <!-- ══ 6 · EVENTS ══ -->
+  <div class="ss-card cream">
+    <div class="card-head">
+      <div class="card-num">6 / 7</div>
+      <div class="card-brand">
+        <div class="card-brand-icon"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1C3.5 1 1 3.5 1 6.5S3.5 12 6.5 12 12 9.5 12 6.5 9.5 1 6.5 1z" fill="#186338"/></svg></div>
+        <span class="card-brand-name">Sprout</span>
+      </div>
+      <div class="card-tag">Events</div>
+      <div class="card-headline">Organize<br><em>playdates</em> and<br>family outings</div>
+      <div class="card-body">Pair playdates and outings with local families for lasting memories together.</div>
+    </div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-island"></div>
+        <div class="phone-inner">
+          <div class="phone-sb"><span class="phone-time" style="color:var(--tp)">9:41</span></div>
+          <div class="s6-bg">
+            <div class="s6-header">
+              <div class="s6-title">My Events</div>
+              <div style="background:var(--green-500);border-radius:99px;padding:2px 7px;font-size:6.5px;font-weight:700;color:#fff">+ Create</div>
+            </div>
+            <div class="s6-tabs">
+              <div class="s6-tab active">Upcoming</div>
+              <div class="s6-tab">Past</div>
+              <div class="s6-tab">Invites</div>
+            </div>
+            <div class="big-event-card">
+              <div class="big-event-img">
+                <div class="big-event-tag">⛳ Golf</div>
+              </div>
+              <div class="big-event-body">
+                <div class="big-event-title">Golf at Greyrock Golf Course</div>
+                <div class="big-event-row">
+                  <span>📅 Tomorrow · 2:00 PM</span>
+                </div>
+                <div class="big-event-row">
+                  <span>📍 Fort Collins, CO</span>
+                </div>
+                <div class="big-event-footer">
+                  <div class="attendees-row">
+                    <div class="avi-stack">
+                      <div class="avi-sm" style="background:#5c8a6a">JL</div>
+                      <div class="avi-sm" style="background:#7a6a9a">SM</div>
+                      <div class="avi-sm" style="background:#c46a2d">+4</div>
+                    </div>
+                    <div class="attendees-text">6 going</div>
+                  </div>
+                  <div class="rsvp-big-btn">Manage</div>
+                </div>
+              </div>
+            </div>
+            <div class="mini-events">
+              <div class="mini-event-row">
+                <div class="mini-event-thumb" style="background:#e8f5ee">🌳</div>
+                <div class="mini-event-info">
+                  <div class="mini-event-title">Zilker Park Playdate</div>
+                  <div class="mini-event-meta">Sat, May 17 · 10:00 AM · 12 going</div>
+                </div>
+              </div>
+              <div class="mini-event-row">
+                <div class="mini-event-thumb" style="background:#e8f0ff">🎨</div>
+                <div class="mini-event-info">
+                  <div class="mini-event-title">Art Morning with Lily</div>
+                  <div class="mini-event-meta">Sun, May 18 · 9:00 AM · 6 going</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-caption" style="background:rgba(0,0,0,.06)">
+      <div class="ss-cap-screen">Screen 6 — Taking Action</div>
+      <div class="ss-cap-note">From discovery to doing — shows event creation and management</div>
+    </div>
+  </div>
+
+  <!-- ══ 7 · MEMORIES ══ -->
+  <div class="ss-card dark">
+    <div class="card-head">
+      <div class="card-num">7 / 7</div>
+      <div class="card-brand">
+        <div class="card-brand-icon"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1C3.5 1 1 3.5 1 6.5S3.5 12 6.5 12 12 9.5 12 6.5 9.5 1 6.5 1z" fill="rgba(255,255,255,.7)"/></svg></div>
+        <span class="card-brand-name">Sprout</span>
+      </div>
+      <div class="card-tag">Memories</div>
+      <div class="card-headline">Every moment,<br><em>beautifully</em><br>captured</div>
+      <div class="card-body">Upload moments, relive memories, and celebrate milestones together as a community.</div>
+    </div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-island"></div>
+        <div class="phone-inner">
+          <div class="phone-sb"><span class="phone-time" style="color:#fff">9:41</span></div>
+          <div class="s7-bg">
+            <div class="s7-header">
+              <div class="s7-title">Memories</div>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="3" width="10" height="8" rx="1.5" stroke="#818898" stroke-width="1.1"/><path d="M2 8l3-3 2 2 2-2 3 3" stroke="#818898" stroke-width="1.1" stroke-linejoin="round"/><circle cx="5" cy="6" r=".8" fill="#818898"/></svg>
+            </div>
+            <div class="memory-section">
+              <div class="memory-section-label">This Week</div>
+              <div class="memory-grid">
+                <div class="memory-cell tall" style="background:linear-gradient(135deg,#3a7d30,#1a4020)">
+                  <span style="font-size:30px">🌳</span>
+                  <div class="memory-label"><span>Zilker Park</span></div>
+                </div>
+                <div class="memory-cell" style="background:linear-gradient(135deg,#7a5c2d,#3a2d15)">
+                  <span style="font-size:22px">🎨</span>
+                  <div class="memory-label"><span>Art Morning</span></div>
+                </div>
+                <div class="memory-cell" style="background:linear-gradient(135deg,#2d4a7a,#1a2d4a)">
+                  <span style="font-size:22px">⚽</span>
+                  <div class="memory-label"><span>Soccer</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="memory-section" style="padding-top:4px">
+              <div class="memory-section-label">Last Month</div>
+              <div class="memory-grid">
+                <div class="memory-cell" style="background:linear-gradient(135deg,#5c3a7a,#2d1a4a)">
+                  <span style="font-size:22px">🎭</span>
+                  <div class="memory-label"><span>Talent Show</span></div>
+                </div>
+                <div class="memory-cell" style="background:linear-gradient(135deg,#7a3a3a,#4a1a1a)">
+                  <span style="font-size:22px">🎪</span>
+                  <div class="memory-label"><span>Spring Fair</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="memory-toast">
+              <div class="memory-toast-icon">📸</div>
+              <div>
+                <div class="memory-toast-text">Memory saved!</div>
+                <div class="memory-toast-sub">Zilker Park · May 17</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-caption">
+      <div class="ss-cap-screen">Screen 7 — Emotional Close</div>
+      <div class="ss-cap-note">Ends on warmth and nostalgia — makes you feel the payoff of using Sprout</div>
+    </div>
+  </div>
+
+</div><!-- /stage -->
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-num">1</div><div class="legend-text"><strong>Community</strong> — Lead with emotion. "Find your tribe" answers why before anything else.</div></div>
+  <div class="legend-item"><div class="legend-num">2</div><div class="legend-text"><strong>Join</strong> — Grade-based matching is unique. Show the mechanic that sets Sprout apart.</div></div>
+  <div class="legend-item"><div class="legend-num">3</div><div class="legend-text"><strong>Connect</strong> — Chat is the core loop. Once you find parents, you talk to them.</div></div>
+  <div class="legend-item"><div class="legend-num">4</div><div class="legend-text"><strong>Discover</strong> — Things to do together. Keeps the momentum from screens 1–3.</div></div>
+  <div class="legend-item"><div class="legend-num">5</div><div class="legend-text"><strong>Explore</strong> — Shows depth — venue details, events, reviews. You can trust Sprout's data.</div></div>
+  <div class="legend-item"><div class="legend-num">6</div><div class="legend-text"><strong>Events</strong> — You're not just discovering, you're organizing. Shows ownership.</div></div>
+  <div class="legend-item"><div class="legend-num">7</div><div class="legend-text"><strong>Memories</strong> — Close on the emotional payoff. This is why you use Sprout.</div></div>
+</div>
+
+</body>
+</html>

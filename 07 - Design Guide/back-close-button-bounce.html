@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Back/Close Button: Bigger + Bounce (component spec)</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brand-500: #186338;
+    --brand-700: #1e3e2b;
+    --brand-50:  #e2e9e3;
+    --secondary-500: #f4f1ea;
+    --secondary-600: #eae6db;
+    --secondary-700: #dbd5c8;
+    --grey-500: #818898;
+    --grey-700: #4d525b;
+    --grey-900: #1a1b1e;
+  }
+
+  body {
+    background: #cfc8b8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 24px 80px;
+    font-family: 'Inter', sans-serif;
+    gap: 40px;
+  }
+
+  .lede { max-width: 620px; text-align: center; }
+  .lede h1 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 24px; color: var(--brand-700); }
+  .lede p { margin-top: 8px; font-size: 13.5px; color: #6a665b; line-height: 1.55; }
+
+  .row { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .col-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #8a8478; }
+  .col-label.new { color: var(--brand-600, #134f2d); }
+
+  /* mini phone frame reused from the class-hub convention */
+  .device { position: relative; width: 300px; height: 220px; border-radius: 26px; padding: 8px; background: linear-gradient(160deg,#2a2a2c,#0e0e10); box-shadow: 0 0 0 2px #000 inset, 0 16px 34px -10px rgba(0,0,0,.4); }
+  .screen { width: 100%; height: 100%; border-radius: 20px; overflow: hidden; background: var(--secondary-500); display: flex; flex-direction: column; }
+  .hdr { display: flex; align-items: center; gap: 12px; padding: 18px 16px 0; }
+  .hdr .nm { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 16px; color: var(--brand-700); }
+  .hint { text-align: center; font-size: 11.5px; color: var(--grey-500); padding: 10px 20px 0; }
+
+  /* OLD — 36px, no feedback */
+  .btn-old { width: 36px; height: 36px; border-radius: 50%; background: var(--secondary-600); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+  .btn-old svg { width: 16px; height: 16px; stroke: var(--brand-700); }
+
+  /* NEW — 44px (Apple HIG minimum touch target), bigger icon, spring bounce on tap */
+  .btn-new { width: 44px; height: 44px; border-radius: 50%; background: var(--secondary-600); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+  .btn-new svg { width: 19px; height: 19px; stroke: var(--brand-700); }
+  .btn-new.close-style { background: var(--secondary-700); }
+
+  @keyframes btnBounce {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(0.86); }
+    60%  { transform: scale(1.08); }
+    80%  { transform: scale(0.97); }
+    100% { transform: scale(1); }
+  }
+  .btn-bounce { animation: btnBounce 0.42s cubic-bezier(.34, 1.56, .64, 1) both; }
+
+  .sheet-close-demo { position: absolute; top: 14px; right: 14px; }
+
+  .specs { max-width: 640px; width: 100%; background: #fff; border-radius: 18px; padding: 24px 28px; box-shadow: 0 4px 24px rgba(0,0,0,.06); }
+  .specs h2 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 17px; color: var(--brand-700); margin-bottom: 12px; }
+  .spec-row { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--secondary-600); font-size: 13.5px; }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-row .k { color: var(--grey-700); font-weight: 600; }
+  .spec-row .v { color: var(--grey-500); text-align: right; }
+  .spec-row .v code { background: var(--secondary-600); padding: 2px 6px; border-radius: 5px; font-size: 12px; color: var(--brand-700); }
+</style>
+</head>
+<body>
+
+  <div class="lede">
+    <h1>Back / Close Buttons — Bigger + Bounce</h1>
+    <p>Tony's ask from the sync: bigger, more uniform back/close buttons with a snappy tap animation (referencing Roam's updated buttons). No reference video available yet — this is a standard spring-bounce built from the description. Tap any button below to feel it. Flag anything that doesn't match what Tony showed if the video surfaces.</p>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div class="col-label">Before — 36px, no feedback</div>
+      <div class="device"><div class="screen">
+        <div class="hdr"><button class="btn-old"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button><span class="nm">Miss Taylor's Class</span></div>
+      </div></div>
+      <div class="hint">Tap does nothing — flat, small target</div>
+    </div>
+
+    <div class="col">
+      <div class="col-label new">After — 44px, bounce on tap</div>
+      <div class="device"><div class="screen">
+        <div class="hdr"><button class="btn-new" onclick="bounce(this)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button><span class="nm">Miss Taylor's Class</span></div>
+      </div></div>
+      <div class="hint">Tap it — meets Apple's 44pt minimum touch target too</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div class="col-label new">Close (X) — same treatment</div>
+      <div class="device"><div class="screen" style="position:relative;">
+        <div class="hdr"><span class="nm">Add a link</span></div>
+        <button class="btn-new close-style sheet-close-demo" onclick="bounce(this)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div></div>
+      <div class="hint">Same size, same bounce — modal/sheet close buttons included</div>
+    </div>
+  </div>
+
+  <div class="specs">
+    <h2>Spec — for rolling this out across existing screens</h2>
+    <div class="spec-row"><span class="k">Touch target</span><span class="v">36px → <code>44px</code> diameter (meets Apple HIG minimum)</span></div>
+    <div class="spec-row"><span class="k">Icon size</span><span class="v">16–18px → <code>19px</code> stroke-width 2.4</span></div>
+    <div class="spec-row"><span class="k">Background</span><span class="v">Unchanged — <code>secondary-600</code> (back) / <code>secondary-700</code> (close), no new color</span></div>
+    <div class="spec-row"><span class="k">Animation</span><span class="v"><code>scale(1) → 0.86 → 1.08 → 0.97 → 1</code></span></div>
+    <div class="spec-row"><span class="k">Duration / easing</span><span class="v"><code>0.42s cubic-bezier(.34,1.56,.64,1)</code></span></div>
+    <div class="spec-row"><span class="k">Trigger</span><span class="v">JS class toggle on click (plays in full, not tied to press duration)</span></div>
+  </div>
+
+<script>
+  function bounce(el) {
+    el.classList.remove('btn-bounce');
+    void el.offsetWidth; // restart animation on repeat taps
+    el.classList.add('btn-bounce');
+  }
+</script>
+
+</body>
+</html>

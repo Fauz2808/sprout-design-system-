@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lunch Menu — Options 3 &amp; 4 (Tabbed / Compact-Expand) · Sprout</title>
+  <style>
+    :root {
+      --bg:        #f0ede6;
+      --surface:   #ffffff;
+      --fg:        #1a1a17;
+      --muted:     #7a7568;
+      --border:    #ddd9cf;
+      --green:     #2d5c2e;
+      --green-mid: #3d7a40;
+      --green-soft:#e8f0e8;
+      --t-lunch:   #c9691f;   --t-lunch-bg:   #fbe6d3;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+      --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {
+      background: #ddd8ce; font-family: var(--font); font-size: 15px; line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+      display: flex; align-items: flex-start; justify-content: center;
+      gap: 40px; padding: 32px 24px 90px; min-height: 100vh; flex-wrap: wrap;
+    }
+    .lede{width:100%;text-align:center;margin-bottom:6px;flex-basis:100%;}
+    .lede h1{font-size:24px;font-weight:700;color:#23271f;margin-bottom:8px;}
+    .lede p{font-size:13px;color:#7a7568;max-width:760px;margin:0 auto;line-height:1.6;}
+    .panel { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .caption {
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #8a8478; text-align: center; max-width: 340px; line-height:1.6;
+    }
+    .caption strong { color: #3a3830; font-weight: 600; }
+
+    .device {
+      position: relative; width: 390px; height: 844px; border-radius: 56px; padding: 12px;
+      background: linear-gradient(160deg, #2a2a2c 0%, #1a1a1c 50%, #0e0e10 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04) inset, 0 0 0 2px #000 inset,
+        0 28px 60px -12px rgba(0,0,0,0.45), 0 8px 20px -8px rgba(0,0,0,0.35);
+    }
+    .island { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); width: 124px; height: 36px; background: #000; border-radius: 999px; z-index: 5; }
+    .screen {
+      position: relative; width: 100%; height: 100%; background: var(--bg);
+      border-radius: 44px; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .statusbar {
+      flex: 0 0 47px; padding: 18px 26px 0; display: flex; align-items: flex-start;
+      justify-content: space-between; font-size: 15px; font-weight: 600; color: var(--fg);
+    }
+    .topbar { padding: 10px 16px 8px; display: flex; align-items: center; gap: 10px; }
+    .icon-btn {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--surface);
+      border: 1px solid var(--border); display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+    }
+    .icon-btn svg { width: 18px; height: 18px; stroke: var(--fg); fill: none; stroke-width: 2; }
+    .topbar-title .h { font-size: 18px; font-weight: 700; color: var(--fg); letter-spacing: -0.02em; margin: 0; }
+    .scroll { flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; }
+    .scroll::-webkit-scrollbar { display: none; }
+
+    .nd-wrap{padding:6px 16px 16px;}
+    .nd-date{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:14px;}
+    .nd-opt{display:flex;align-items:center;gap:11px;background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:12px 14px;margin-bottom:8px;}
+    .nd-opt .num{width:24px;height:24px;border-radius:50%;background:var(--t-lunch-bg);color:var(--t-lunch);font-size:11.5px;font-weight:700;display:grid;place-items:center;flex-shrink:0;}
+    .nd-opt .nm{flex:1;font-size:14.5px;font-weight:600;color:var(--fg);}
+    .nd-opt .icons{display:flex;gap:4px;flex-shrink:0;}
+    .nd-opt .icons span{font-size:13px;}
+    .nd-single{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:12px 14px;display:flex;align-items:center;gap:11px;margin-bottom:8px;}
+    .nd-single .ic{font-size:18px;}
+    .nd-single .nm{font-size:14.5px;font-weight:600;color:var(--fg);flex:1;}
+
+    /* ═══ OPTION 3 — segmented tabs ═══ */
+    .seg{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:4px;margin-bottom:16px;}
+    .seg-btn{flex:1;text-align:center;padding:9px 0;border-radius:10px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;}
+    .seg-btn.on{background:var(--t-lunch);color:#fff;}
+    .seg-panel{display:none;} .seg-panel.on{display:block;}
+
+    .brief-card{margin:0 16px 12px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:13px 15px;}
+    .brief-card-head{display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+    .brief-card-head .ic{width:30px;height:30px;border-radius:9px;background:var(--t-lunch-bg);display:grid;place-items:center;font-size:15px;flex-shrink:0;}
+    .brief-card-head .t{font-size:13.5px;font-weight:700;color:var(--fg);flex:1;}
+    .brief-seg{display:flex;gap:6px;margin:10px 0 10px 38px;}
+    .brief-seg-btn{font-size:11px;font-weight:700;padding:5px 11px;border-radius:99px;background:var(--bg);color:var(--muted);cursor:pointer;}
+    .brief-seg-btn.on{background:var(--t-lunch-bg);color:var(--t-lunch);}
+    .brief-opt-row{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--fg);padding:5px 0 5px 38px;}
+    .brief-opt-row .icons span{font-size:11px;margin-left:2px;}
+
+    /* ═══ OPTION 4 — compact one-line + expand ═══ */
+    .collapsed-row{display:flex;align-items:center;gap:8px;cursor:pointer;}
+    .collapsed-row .ic{width:30px;height:30px;border-radius:9px;background:var(--t-lunch-bg);display:grid;place-items:center;font-size:15px;flex-shrink:0;}
+    .collapsed-text{flex:1;font-size:12.5px;color:var(--fg);line-height:1.4;}
+    .collapsed-text b{font-weight:700;}
+    .chev{width:9px;height:9px;color:var(--muted);flex-shrink:0;transition:transform .2s;}
+    .chev.open{transform:rotate(90deg);}
+    .expand-body{max-height:0;overflow:hidden;transition:max-height .25s ease;}
+    .expand-body.open{max-height:340px;margin-top:12px;}
+    .expand-body .nd-section-lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:12px 0 7px 38px;}
+    .expand-body .nd-section-lbl:first-child{margin-top:0;}
+    .expand-body .nd-opt, .expand-body .nd-single{margin-left:38px;padding:9px 12px;}
+  </style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Lunch Menu — 2 More Options</h1>
+  <p>Continuing from the lunch-only / breakfast+lunch versions. Option 3 splits Breakfast and Lunch into a tab switch instead of stacking both — since Tony said most parents only care about lunch day-to-day, Lunch stays the default tab. Option 4 goes further on "don't let it take over the brief": a one-line summary that expands on tap, so the Daily Brief card takes almost no space until you actually want the detail.</p>
+</div>
+
+<!-- ═══ OPTION 3 — SEGMENTED TABS, NOTE DETAIL ═══ -->
+<div class="panel">
+  <div class="device"><div class="island"></div>
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span>🔋</span></div>
+      <div class="topbar"><div class="icon-btn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><div class="topbar-title"><div class="h">🍽️ Lunch Menu</div></div></div>
+      <div class="scroll">
+        <div class="nd-wrap">
+          <div class="nd-date">Wednesday, August 19</div>
+          <div class="seg">
+            <div class="seg-btn" id="segBreakfastBtn" onclick="showSeg('breakfast')">Breakfast</div>
+            <div class="seg-btn on" id="segLunchBtn" onclick="showSeg('lunch')">Lunch</div>
+          </div>
+          <div class="seg-panel on" id="segLunchPanel">
+            <div class="nd-opt"><div class="num">1</div><div class="nm">Hamburger</div></div>
+            <div class="nd-opt"><div class="num">2</div><div class="nm">Rebellyous Burger</div><div class="icons"><span>🌱</span></div></div>
+            <div class="nd-opt"><div class="num">3</div><div class="nm">SunButter &amp; Jelly Sandwich</div><div class="icons"><span>🌱</span></div></div>
+          </div>
+          <div class="seg-panel" id="segBreakfastPanel">
+            <div class="nd-single"><span class="ic">🥞</span><span class="nm">Potato, Egg &amp; Cheese Taco</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="caption"><strong>Option 3a · Note detail — tabbed</strong> — Lunch is the default tab (that's what parents check daily), Breakfast is one tap away instead of always taking up space.</span>
+</div>
+
+<!-- ═══ OPTION 3 — SEGMENTED TABS, DAILY BRIEF ═══ -->
+<div class="panel">
+  <div class="device"><div class="island"></div>
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span>🔋</span></div>
+      <div class="topbar"><div class="topbar-title"><div class="h">Good morning, Tony</div></div></div>
+      <div class="scroll">
+        <div style="padding:4px 16px 0;">
+          <div class="brief-card">
+            <div class="brief-card-head"><div class="ic">🍽️</div><div class="t">Today's Menu</div></div>
+            <div class="brief-seg">
+              <div class="brief-seg-btn" onclick="briefShow('breakfast', this)">Breakfast</div>
+              <div class="brief-seg-btn on" onclick="briefShow('lunch', this)">Lunch</div>
+            </div>
+            <div id="briefLunch">
+              <div class="brief-opt-row"><span>1. Hamburger</span></div>
+              <div class="brief-opt-row"><span>2. Rebellyous Burger</span><span class="icons"><span>🌱</span></span></div>
+              <div class="brief-opt-row"><span>3. SunButter &amp; Jelly Sandwich</span><span class="icons"><span>🌱</span></span></div>
+            </div>
+            <div id="briefBreakfast" style="display:none;">
+              <div class="brief-opt-row"><span>Potato, Egg &amp; Cheese Taco</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="caption"><strong>Option 3b · Daily Brief — tabbed</strong> — same toggle pattern in the brief card, so the card height never changes whether it's breakfast or lunch showing.</span>
+</div>
+
+<!-- ═══ OPTION 4 — COMPACT ONE-LINE, COLLAPSED (Daily Brief) ═══ -->
+<div class="panel">
+  <div class="device"><div class="island"></div>
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span>🔋</span></div>
+      <div class="topbar"><div class="topbar-title"><div class="h">Good morning, Tony</div></div></div>
+      <div class="scroll">
+        <div style="padding:4px 16px 0;">
+          <div class="brief-card">
+            <div class="collapsed-row" onclick="toggleExpand()">
+              <div class="ic">🍽️</div>
+              <div class="collapsed-text"><b>Today's lunch:</b> Hamburger, Rebellyous Burger 🌱, SunButter &amp; Jelly 🌱</div>
+              <svg class="chev" id="expandChev" viewBox="0 0 8 14" fill="none"><path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="expand-body" id="expandBody">
+              <div class="nd-section-lbl">Breakfast</div>
+              <div class="nd-single"><span class="ic">🥞</span><span class="nm">Potato, Egg &amp; Cheese Taco</span></div>
+              <div class="nd-section-lbl">Lunch</div>
+              <div class="nd-opt"><div class="num">1</div><div class="nm">Hamburger</div></div>
+              <div class="nd-opt"><div class="num">2</div><div class="nm">Rebellyous Burger</div><div class="icons"><span>🌱</span></div></div>
+              <div class="nd-opt"><div class="num">3</div><div class="nm">SunButter &amp; Jelly Sandwich</div><div class="icons"><span>🌱</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="caption"><strong>Option 4 · Compact one-line + expand</strong> — collapsed to a single line by default (closest to "doesn't take over the brief"), tap to expand into the full breakfast+lunch breakdown in place.</span>
+</div>
+
+<script>
+  function showSeg(which){
+    document.getElementById('segLunchBtn').classList.toggle('on', which==='lunch');
+    document.getElementById('segBreakfastBtn').classList.toggle('on', which==='breakfast');
+    document.getElementById('segLunchPanel').classList.toggle('on', which==='lunch');
+    document.getElementById('segBreakfastPanel').classList.toggle('on', which==='breakfast');
+  }
+  function briefShow(which, el){
+    el.parentNode.querySelectorAll('.brief-seg-btn').forEach(b=>b.classList.remove('on'));
+    el.classList.add('on');
+    document.getElementById('briefLunch').style.display = which==='lunch' ? 'block' : 'none';
+    document.getElementById('briefBreakfast').style.display = which==='breakfast' ? 'block' : 'none';
+  }
+  function toggleExpand(){
+    document.getElementById('expandBody').classList.toggle('open');
+    document.getElementById('expandChev').classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Sprout — Finally Teaser Draft</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,600&family=Inter:wght@400;500;600;700;800&display=swap');
+
+  :root{
+    --brand:#186338;
+    --brand-bold:#1e3e2b;
+    --brand-light:#77b691;
+    --cream:#f4f1ea;
+    --cream-600:#eae6db;
+    --ink:#4d525b;
+    --ink-dark:#1a1b1e;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ width:1080px; height:1920px; overflow:hidden; background:#000; font-family:'Inter',sans-serif; }
+  #stage{ position:relative; width:1080px; height:1920px; overflow:hidden; background:#0b0c0e; }
+  .scene{ position:absolute; inset:0; }
+  .fill{ width:100%; height:100%; position:relative; }
+
+  /* ---------- Chat chaos ---------- */
+  #sceneChat{ background:#e9e9eb; }
+  .chat-header{
+    position:absolute; top:0; left:0; right:0; height:196px;
+    background:#f7f7f8; border-bottom:2px solid #d9d9dc;
+    display:flex; align-items:center; padding:0 48px; gap:28px;
+  }
+  .chat-avatar{
+    width:104px; height:104px; border-radius:50%; background:#c7c9cf;
+    display:flex; align-items:center; justify-content:center;
+    font-size:48px; color:#fff; font-weight:700;
+  }
+  .chat-title{ font-size:38px; font-weight:700; color:#222; }
+  .chat-sub{ font-size:26px; color:#8a8d94; margin-top:4px; }
+  .chat-body{ position:absolute; top:230px; left:0; right:0; bottom:0; padding:36px 44px; }
+  .bubble{
+    max-width:74%; background:#fff; color:#1c1c1e; font-size:32px; line-height:1.35;
+    padding:24px 32px; border-radius:34px; border-bottom-left-radius:10px;
+    margin-bottom:26px; box-shadow:0 2px 10px rgba(0,0,0,.06);
+    font-weight:500;
+  }
+  .unread-pill{
+    position:absolute; top:60px; right:48px; background:#ff3b30; color:#fff;
+    font-size:30px; font-weight:800; padding:10px 26px; border-radius:40px;
+  }
+
+  /* ---------- B-roll placeholder ---------- */
+  .broll{
+    position:absolute; inset:0; background:#22242a;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .broll-card{
+    width:88%; padding:80px 60px; border:6px dashed #6b7280; border-radius:28px;
+    text-align:center; color:#d7dade;
+  }
+  .broll-label{ font-family:'Playfair Display',serif; font-style:italic; font-weight:700; font-size:56px; color:#fff; margin-bottom:24px; }
+  .broll-sub{ font-size:30px; color:#9aa0ad; line-height:1.5; }
+  .broll-icons{ margin-top:44px; display:flex; gap:40px; justify-content:center; font-size:64px; }
+  .broll-overlay-text{
+    position:absolute; left:60px; right:60px; top:120px;
+    display:flex; flex-direction:column; gap:20px; align-items:flex-start;
+  }
+  .toast{
+    background:rgba(255,255,255,.95); color:#1c1c1e; font-size:30px; font-weight:600;
+    padding:20px 30px; border-radius:20px; max-width:80%;
+  }
+
+  /* ---------- Freeze / silence ---------- */
+  #sceneFreeze{ background:var(--cream); display:flex; align-items:center; justify-content:center; }
+
+  /* ---------- Logo reveal ---------- */
+  #sceneLogo{ background:var(--cream); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:40px; }
+  #sceneLogo img{ width:280px; height:280px; object-fit:contain; }
+  #sceneLogo .wordmark{ font-family:'Playfair Display',serif; font-weight:800; font-size:96px; color:var(--brand-bold); }
+
+  /* ---------- Screenshot montage ---------- */
+  #sceneMontage{ background:var(--brand-bold); }
+  .montage-slide{ position:absolute; inset:0; overflow:hidden; }
+  .montage-slide img{ width:100%; height:100%; object-fit:cover; }
+  .chip{
+    position:absolute; left:50%; bottom:150px; transform:translateX(-50%);
+    background:var(--brand); color:#fff; font-weight:700; font-size:32px;
+    padding:20px 40px; border-radius:60px; display:flex; align-items:center; gap:16px;
+    box-shadow:0 8px 24px rgba(0,0,0,.35); white-space:nowrap;
+  }
+
+  /* ---------- Split screen ---------- */
+  #sceneSplit{ display:flex; }
+  .split-half{ width:50%; height:100%; position:relative; overflow:hidden; }
+  .split-left{ background:#1a1b1e; }
+  .split-left .float-icon{
+    position:absolute; font-size:70px; opacity:.85; filter:grayscale(.2);
+  }
+  .split-right img{ width:100%; height:100%; object-fit:cover; }
+  .split-divider{ position:absolute; top:0; bottom:0; left:50%; width:6px; background:#fff; opacity:.8; }
+  .split-label{
+    position:absolute; top:80px; left:0; right:0; text-align:center; font-weight:800;
+    font-size:34px; letter-spacing:2px; text-transform:uppercase;
+  }
+
+  /* ---------- End card ---------- */
+  #sceneEnd{ background:var(--cream); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:36px; text-align:center; padding:0 80px; }
+  #sceneEnd img{ width:220px; height:220px; object-fit:contain; }
+  #sceneEnd .brand{ font-family:'Playfair Display',serif; font-weight:800; font-size:80px; color:var(--brand-bold); letter-spacing:2px; }
+  #sceneEnd .tagline{ font-size:38px; color:var(--ink); font-weight:500; max-width:800px; line-height:1.4; }
+  #sceneEnd .url{ font-size:34px; color:var(--brand); font-weight:700; margin-top:12px; }
+
+  /* ---------- Caption bar ---------- */
+  #caption{
+    position:absolute; left:60px; right:60px; bottom:110px; text-align:center;
+    color:#fff; font-weight:700; font-size:42px; line-height:1.35;
+    text-shadow:0 2px 4px rgba(0,0,0,.5), 0 8px 30px rgba(0,0,0,.4);
+    z-index:50;
+  }
+  #caption .bg{
+    display:inline; background:rgba(0,0,0,.38); padding:8px 20px; border-radius:14px;
+    box-decoration-break:clone; -webkit-box-decoration-break:clone;
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <div class="scene" id="sceneChat">
+    <div class="fill">
+      <div class="chat-header">
+        <div class="chat-avatar">?</div>
+        <div>
+          <div class="chat-title">3rd Grade Parents</div>
+          <div class="chat-sub">14 members</div>
+        </div>
+      </div>
+      <div class="chat-body">
+        <div class="bubble" id="b1">Who is 512-304-7782?</div>
+        <div class="bubble" id="b2">Is that Mason's mom?</div>
+        <div class="bubble" id="b3">No, I think that's Lily's dad.</div>
+        <div class="bubble" id="b4">Wait… tomorrow is free dress?</div>
+        <div class="bubble" id="b5">What time is pickup?</div>
+        <div class="bubble" id="b6">Can someone resend the calendar?</div>
+      </div>
+      <div class="unread-pill" id="unreadPill">47 unread</div>
+    </div>
+  </div>
+
+  <div class="scene" id="sceneBroll1">
+    <div class="broll">
+      <div class="broll-card">
+        <div class="broll-label">B-ROLL PLACEHOLDER</div>
+        <div class="broll-sub">Mom scrolling frantically between two apps<br/>(insert 3–4s clip here)</div>
+        <div class="broll-icons">✉️ 🎟️</div>
+      </div>
+    </div>
+    <div class="broll-overlay-text" id="brollTexts1">
+      <div class="toast" id="t1">Was Connor's birthday on Paperless Post?</div>
+      <div class="toast" id="t2">Or was it Evite?</div>
+      <div class="toast" id="t3">I swear someone texted me the link…</div>
+    </div>
+  </div>
+
+  <div class="scene" id="sceneFreeze"></div>
+
+  <div class="scene" id="sceneLogo">
+    <img src="assets/logo.jpg" alt="Sprout logo" style="border-radius:56px;"/>
+    <div class="wordmark">Sprout</div>
+  </div>
+
+  <div class="scene" id="sceneMontage">
+    <div class="montage-slide" id="m1"><img src="assets/screen-directory.jpg"/><div class="chip">✓ Real names &amp; faces</div></div>
+    <div class="montage-slide" id="m2"><img src="assets/screen-schoolgroups.jpg"/><div class="chip">✓ School calendar upload</div></div>
+    <div class="montage-slide" id="m3"><img src="assets/screen-briefing.jpg"/><div class="chip">✓ Automatic reminders</div></div>
+    <div class="montage-slide" id="m4"><img src="assets/screen-chat.jpg"/><div class="chip">✓ Birthday invites, in one tap</div></div>
+    <div class="montage-slide" id="m5"><img src="assets/screen-discover.jpg"/><div class="chip">✓ Camps, sports &amp; playdates</div></div>
+  </div>
+
+  <div class="scene" id="sceneSplit">
+    <div class="split-half split-left">
+      <div class="float-icon" style="top:20%;left:20%;">💬</div>
+      <div class="float-icon" style="top:35%;left:60%;">✉️</div>
+      <div class="float-icon" style="top:55%;left:30%;">🎟️</div>
+      <div class="float-icon" style="top:70%;left:65%;">📱</div>
+      <div class="float-icon" style="top:15%;left:70%;">📧</div>
+      <div class="float-icon" style="top:80%;left:15%;">💬</div>
+    </div>
+    <div class="split-half split-right">
+      <img src="assets/screen-discover.jpg"/>
+    </div>
+    <div class="split-divider"></div>
+  </div>
+
+  <div class="scene" id="sceneBroll2">
+    <div class="broll">
+      <div class="broll-card">
+        <div class="broll-label">B-ROLL PLACEHOLDER</div>
+        <div class="broll-sub">Mom relaxed on the couch, coffee in hand<br/>(insert ~5s clip here)</div>
+        <div class="broll-icons">☕</div>
+      </div>
+    </div>
+    <div class="broll-overlay-text" id="brollTexts2" style="top:auto;bottom:120px;">
+      <div class="toast" id="t4">📚 Tomorrow: Library Day</div>
+      <div class="toast" id="t5">🎉 Connor's Party • RSVP by Friday</div>
+    </div>
+  </div>
+
+  <div class="scene" id="sceneEnd">
+    <img src="assets/logo.jpg" style="border-radius:44px;"/>
+    <div class="brand">SPROUT</div>
+    <div class="tagline">Finally, a group chat that actually works.</div>
+    <div class="url">joinsprout.co</div>
+  </div>
+
+  <div id="caption"><span class="bg"></span></div>
+</div>
+
+<script>
+  // ---- Timeline (seconds) ----
+  const SCENES = [
+    { id:'sceneChat',   start:0,    end:8    },
+    { id:'sceneBroll1', start:8,    end:13   },
+    { id:'sceneFreeze', start:13,   end:17   },
+    { id:'sceneLogo',   start:17,   end:22   },
+    { id:'sceneMontage',start:22,   end:35   },
+    { id:'sceneSplit',  start:35,   end:42   },
+    { id:'sceneBroll2', start:42,   end:48   },
+    { id:'sceneEnd',    start:48,   end:52   },
+  ];
+
+  const CAPTIONS = [
+    { text:'Every parent has this group chat.', start:0, end:3 },
+    { text:'The one where nobody knows who’s who… and nobody can find anything.', start:3, end:8 },
+    { text:'And somehow every birthday invite lives in a different app.', start:8, end:13 },
+    { text:'There has to be a better way.', start:13, end:17 },
+    { text:'Meet Sprout. The app built for the village it actually takes to raise a kid.', start:17, end:22 },
+    { text:'Know exactly who you’re talking to.', start:22, end:24.6 },
+    { text:'Upload your school calendar once…', start:24.6, end:27.2 },
+    { text:'…and everyone gets reminders.', start:27.2, end:29.8 },
+    { text:'Send birthday invitations right from Sprout — even to people outside your usual group.', start:29.8, end:32.4 },
+    { text:'Organize camps, sports, and playdates all in one place.', start:32.4, end:35 },
+    { text:'Because parenting already comes with enough tabs open.', start:35, end:42 },
+    { text:'Less chaos. More community.', start:42, end:48 },
+  ];
+
+  const MONTAGE = [
+    { id:'m1', start:22, end:24.6 },
+    { id:'m2', start:24.6, end:27.2 },
+    { id:'m3', start:27.2, end:29.8 },
+    { id:'m4', start:29.8, end:32.4 },
+    { id:'m5', start:32.4, end:35 },
+  ];
+
+  const BUBBLES = [
+    { id:'b1', at:0.3 }, { id:'b2', at:1.3 }, { id:'b3', at:2.3 },
+    { id:'b4', at:3.4 }, { id:'b5', at:4.4 }, { id:'b6', at:5.4 },
+  ];
+
+  const TOASTS1 = [
+    { id:'t1', at:8.4 }, { id:'t2', at:9.7 }, { id:'t3', at:11.0 },
+  ];
+  const TOASTS2 = [
+    { id:'t4', at:43.6 }, { id:'t5', at:45.6 },
+  ];
+
+  function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+  function easeOut(x){ return 1 - Math.pow(1 - x, 3); }
+  function appear(t, at, dur){
+    dur = dur || 0.35;
+    return easeOut(clamp01((t - at) / dur));
+  }
+  function sceneOpacity(t, start, end, fade){
+    fade = fade === undefined ? 0.18 : fade;
+    if (t < start || t >= end) return 0;
+    const inP = clamp01((t - start) / fade);
+    const outP = clamp01((end - t) / fade);
+    return Math.min(inP, outP);
+  }
+
+  const els = {};
+  function $(id){ return els[id] || (els[id] = document.getElementById(id)); }
+
+  window.renderAtTime = function(t){
+    // Scenes
+    SCENES.forEach(s => {
+      const el = $(s.id);
+      el.style.opacity = sceneOpacity(t, s.start, s.end);
+      el.style.pointerEvents = 'none';
+    });
+
+    // Chat bubbles
+    BUBBLES.forEach(b => {
+      const el = $(b.id);
+      const p = appear(t, b.at);
+      el.style.opacity = p;
+      el.style.transform = 'translateY(' + ((1 - p) * 24) + 'px)';
+    });
+    $('unreadPill').style.opacity = appear(t, 6.2, 0.3);
+
+    // Broll1 toasts
+    TOASTS1.forEach(x => {
+      const el = $(x.id);
+      const p = appear(t, x.at);
+      el.style.opacity = p;
+      el.style.transform = 'translateY(' + ((1 - p) * 20) + 'px)';
+    });
+    // Broll2 toasts
+    TOASTS2.forEach(x => {
+      const el = $(x.id);
+      const p = appear(t, x.at);
+      el.style.opacity = p;
+      el.style.transform = 'translateY(' + ((1 - p) * -20) + 'px)';
+    });
+
+    // Logo reveal scale
+    const logoP = appear(t, 17.2, 0.6);
+    const logoImg = document.querySelector('#sceneLogo img');
+    if (logoImg){
+      logoImg.style.transform = 'scale(' + (0.85 + logoP * 0.15) + ')';
+      logoImg.style.opacity = logoP;
+    }
+    const wordmark = document.querySelector('#sceneLogo .wordmark');
+    if (wordmark) wordmark.style.opacity = appear(t, 17.6, 0.6);
+
+    // Montage slides + Ken Burns
+    MONTAGE.forEach(m => {
+      const el = $(m.id);
+      const active = t >= m.start && t < m.end;
+      el.style.opacity = sceneOpacity(t, m.start, m.end, 0.25);
+      const img = el.querySelector('img');
+      const local = clamp01((t - m.start) / (m.end - m.start));
+      img.style.transform = 'scale(' + (1.02 + local * 0.08) + ')';
+      const chip = el.querySelector('.chip');
+      chip.style.opacity = appear(t, m.start + 0.25, 0.3);
+    });
+
+    // Split screen icon float (sine-based deterministic drift)
+    if (t >= 35 && t < 42){
+      document.querySelectorAll('#sceneSplit .float-icon').forEach((el, i) => {
+        const dy = Math.sin(t * 1.6 + i * 1.3) * 14;
+        const dx = Math.cos(t * 1.1 + i * 0.7) * 10;
+        el.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+      });
+    }
+
+    // Caption (suppressed during the montage — the chips + on-screen screenshot copy already carry that beat)
+    const inMontage = t >= 22 && t < 35;
+    const cap = inMontage ? null : CAPTIONS.find(c => t >= c.start && t < c.end);
+    const capEl = $('caption');
+    const bg = capEl.querySelector('.bg');
+    if (cap){
+      bg.textContent = cap.text;
+      const localFade = sceneOpacity(t, cap.start, cap.end, 0.15);
+      capEl.style.opacity = localFade;
+    } else {
+      bg.textContent = '';
+      capEl.style.opacity = 0;
+    }
+  };
+
+  window.renderAtTime(0);
+</script>
+</body>
+</html>

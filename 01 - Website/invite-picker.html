@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Invite — Clubs · Subgroups · Friends · Sprout</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --field:#e8e4d9; --fg:#1a1a17; --ink:#1c2a1d; --muted:#807a6c; --border:#ddd9cf;
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-soft:#e7efe6;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif; --serif:'Playfair Display',Georgia,serif; --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;height:100%;}
+  body{background:#ddd8ce;font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;padding:32px 24px;min-height:100vh;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .caption{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8478;text-align:center;} .caption strong{color:#3a3830;font-weight:600;}
+
+  .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .device::before,.device::after{content:'';position:absolute;width:3px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.06) 8%,transparent 16%,transparent 84%,rgba(255,255,255,.04) 92%,transparent);top:100px;bottom:100px;} .device::before{left:-1px;}.device::after{right:-1px;}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:5;}
+  .br{position:absolute;width:4px;background:#0a0a0c;border-radius:2px;} .br.l1{left:-3px;top:174px;height:32px;}.br.l2{left:-3px;top:220px;height:60px;}.br.l3{left:-3px;top:290px;height:60px;}.br.r1{right:-3px;top:250px;height:100px;}
+
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--fg);}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--fg);} .sb .bat{width:25px;}
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:6px 14px 8px;}
+  .ibtn{width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;flex-shrink:0;} .ibtn svg{width:20px;height:20px;stroke:var(--fg);fill:none;stroke-width:2;}
+  .top .t{flex:1;text-align:center;font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);} .top .sp{width:34px;}
+
+  .searchwrap{flex:0 0 auto;padding:2px 18px 8px;}
+  .search{display:flex;align-items:center;gap:9px;background:var(--field);border:1px solid var(--border);border-radius:13px;padding:11px 13px;}
+  .search svg{width:17px;height:17px;stroke:var(--muted);fill:none;stroke-width:2;flex-shrink:0;} .search input{flex:1;border:none;background:transparent;outline:none;font-family:var(--font);font-size:14.5px;color:var(--fg);}
+
+  .scroll{flex:1 1 auto;overflow-y:auto;padding:2px 18px 14px;} .scroll::-webkit-scrollbar{display:none;}
+  .seclbl{display:flex;align-items:baseline;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:16px 4px 9px;} .seclbl .ct{margin-left:6px;font-weight:600;text-transform:none;letter-spacing:0;font-size:12px;}
+
+  .row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1.5px solid var(--border);border-radius:15px;padding:11px 13px;margin-bottom:8px;cursor:pointer;transition:border-color .12s;}
+  .row.on{border-color:var(--green);}
+  .av{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:21px;flex-shrink:0;background:var(--green-soft);}
+  .av.letter{border-radius:50%;color:#fff;font-weight:700;font-size:15px;letter-spacing:.02em;font-family:var(--font);}
+  .av.round{border-radius:50%;color:#fff;font-weight:700;font-size:15px;}
+  .rb{flex:1;min-width:0;} .rn{font-size:14.5px;font-weight:700;color:var(--ink);} .rn.friend{font-weight:600;} .rm{font-size:12px;color:var(--muted);margin-top:1px;}
+  .chk{width:25px;height:25px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:grid;place-items:center;color:#fff;} .chk svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:3;opacity:0;}
+  .row.on .chk{background:var(--green);border-color:var(--green);} .row.on .chk svg{opacity:1;}
+
+  .dock{flex:0 0 auto;padding:12px 18px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(18px);}
+  .btn{width:100%;border:none;border-radius:15px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);background:var(--green);color:#fff;box-shadow:0 12px 26px -10px rgba(45,92,46,.6);display:flex;align-items:center;justify-content:center;gap:8px;}
+  .btn:disabled{opacity:.4;box-shadow:none;} .btn .mini{font-weight:500;opacity:.85;font-size:13px;}
+  .home{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:134px;height:5px;background:var(--fg);border-radius:999px;opacity:.18;z-index:9;}
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="caption"><strong>Invite guests</strong> · clubs + <strong>subgroups</strong> up top, friends below</div>
+  <div class="device">
+    <span class="br l1"></span><span class="br l2"></span><span class="br l3"></span><span class="br r1"></span><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg>
+        <svg viewBox="0 0 17 11"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1z"/></svg>
+        <svg class="bat" viewBox="0 0 25 11"><rect x=".5" y=".5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="22" y="3.5" width="1.5" height="4" rx=".4" fill="currentColor" fill-opacity=".45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+      </span></div>
+
+      <div class="top"><div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><div class="t">Who's invited?</div><div class="sp"></div></div>
+      <div class="searchwrap"><div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input placeholder="Search clubs, groups & friends" oninput="filter(this.value)"/></div></div>
+
+      <div class="scroll" id="scroll"></div>
+
+      <div class="dock"><button class="btn" id="cta" disabled onclick="alert('Invites sent 🎉')">Select who to invite</button></div>
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const COLORS=['#c98aa8','#6fa8d0','#8fba92','#d8a86a','#b69be0','#7a5c52','#5a8f5d','#c0857a'];
+  const colorFor=n=>{let s=0;for(const c of n)s+=c.charCodeAt(0);return COLORS[s%COLORS.length];};
+  // priority order: clubs → subgroups → friends
+  const DATA={
+    clubs:[
+      {id:'c1',emoji:'⚽',name:'Riverside Soccer',fam:12},
+      {id:'c2',emoji:'🥾',name:'Weekend Trail Kids',fam:18},
+      {id:'c3',emoji:'📚',name:'Little Readers',fam:9},
+    ],
+    subs:[
+      {id:'s1',name:'First Grade Moms',fam:27},
+      {id:'s2',name:"Ms. Taylor's Class",fam:24},
+      {id:'s3',name:'First Grade Dads',fam:12},
+    ],
+    friends:[
+      {id:'f1',name:'Sarah Jensen',rel:'Mom of Mia'},
+      {id:'f2',name:'Mike Johnson',rel:'Dad of Hawkins'},
+      {id:'f3',name:'Emily Centineo',rel:'Mom of Flora'},
+    ],
+  };
+  const ini=n=>{const p=n.split(' ');return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();};
+  const sel=new Set();
+
+  function rowHTML(it,kind){
+    let av;
+    if(kind==='club') av=`<div class="av">${it.emoji}</div>`;
+    else if(kind==='sub'){
+      // two-letter monogram so classes don't all read as "M" (Ms. Taylor → MT, First Grade Moms → FM)
+      const w=it.name.replace(/'s\b/gi,'').replace(/\bClass\b/gi,'').trim().split(/\s+/).filter(Boolean);
+      const two=(((w[0]||'')[0]||'')+((w[w.length-1]||'')[0]||'')).toUpperCase();
+      av=`<div class="av letter" style="background:${colorFor(it.name)}">${two}</div>`;
+    }
+    else av=`<div class="av round" style="background:${colorFor(it.name)}">${ini(it.name)}</div>`;
+    const meta = kind==='friend' ? it.rel : it.fam+' families';
+    return `<div class="row${sel.has(it.id)?' on':''}" data-name="${it.name.toLowerCase()}" onclick="toggle('${it.id}',${kind==='friend'?1:it.fam})">
+      ${av}<div class="rb"><div class="rn${kind==='friend'?' friend':''}">${it.name}</div><div class="rm">${meta}</div></div>
+      <div class="chk"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div></div>`;
+  }
+  function render(){
+    document.getElementById('scroll').innerHTML =
+      `<div class="seclbl">Your clubs <span class="ct">· ${DATA.clubs.length}</span></div>`+DATA.clubs.map(c=>rowHTML(c,'club')).join('')+
+      `<div class="seclbl">Subgroups <span class="ct">· classes &amp; parent groups</span></div>`+DATA.subs.map(s=>rowHTML(s,'sub')).join('')+
+      `<div class="seclbl">Friends</div>`+DATA.friends.map(f=>rowHTML(f,'friend')).join('');
+    filter(document.querySelector('.search input').value);
+  }
+  let fam=0;
+  function toggle(id,count){ if(sel.has(id)){sel.delete(id);fam-=count;} else {sel.add(id);fam+=count;} render(); updateCta(); }
+  function updateCta(){
+    const b=document.getElementById('cta');
+    b.disabled=sel.size===0;
+    b.innerHTML = sel.size? `Send invites 🎉 <span class="mini">· ${fam} famil${fam===1?'y':'ies'}</span>` : 'Select who to invite';
+  }
+  function filter(q){
+    q=(q||'').toLowerCase();
+    document.querySelectorAll('#scroll .row').forEach(r=>{ r.style.display = r.dataset.name.includes(q)?'':'none'; });
+  }
+  render(); updateCta();
+</script>
+</body>
+</html>

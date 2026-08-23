@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Summer Camps Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --brand: #186338; --brand-dark: #1e3e2b; --brand-light: #e2e9e3; --brand-mid: #d0dacf; --brand-200: #77b691;
+  --orange: #e07b39; --orange-l: #fef3eb; --orange-p: #fde8d4;
+  --bg: #f4f1ea; --l1: #eae6db; --l2: #dbd5c8;
+  --g9: #1a1b1e; --g7: #4d525b; --g5: #818898; --g4: #9aa0ad; --g3: #b3b8c1; --g1: #e6e7ea;
+}
+
+body {
+  background: #cfc8b8;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  padding: 40px 20px;
+}
+
+/* ── Phone shell ── */
+.phone {
+  width: 393px;
+  height: 852px;
+  background: var(--bg);
+  border-radius: 54px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 32px 96px rgba(0,0,0,0.28);
+  flex-shrink: 0;
+}
+
+/* ── Screens ── */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  background: var(--bg);
+  overflow: hidden;
+}
+.screen.active { display: flex; }
+
+/* ── Transitions ── */
+.screen { transition: none; }
+.screen.slide-in  { animation: slideIn  0.32s cubic-bezier(.4,0,.2,1) both; }
+.screen.slide-out { animation: slideOut 0.32s cubic-bezier(.4,0,.2,1) both; }
+.screen.slide-back-in  { animation: slideBackIn  0.32s cubic-bezier(.4,0,.2,1) both; }
+.screen.slide-back-out { animation: slideBackOut 0.32s cubic-bezier(.4,0,.2,1) both; }
+@keyframes slideIn      { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes slideOut     { from { transform: translateX(0); }    to { transform: translateX(-30%); opacity:0; } }
+@keyframes slideBackIn  { from { transform: translateX(-30%); opacity:0; } to { transform: translateX(0); } }
+@keyframes slideBackOut { from { transform: translateX(0); }    to { transform: translateX(100%); } }
+
+/* ── Status bar ── */
+.status-bar {
+  height: 54px; background: var(--bg); display: flex;
+  align-items: center; justify-content: space-between;
+  padding: 14px 28px 0; flex-shrink: 0; position: relative; z-index: 5;
+}
+.status-bar.dark { background: transparent; }
+.status-bar.dark .time { color: #fff; }
+.time { font-size: 15px; font-weight: 600; color: var(--g9); letter-spacing: -0.01em; }
+.di {
+  width: 120px; height: 36px; background: #000; border-radius: 20px;
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 10;
+}
+.bat { display: flex; align-items: center; gap: 6px; }
+.bat svg { width: 16px; height: 12px; }
+
+/* ── App header ── */
+.app-header {
+  background: var(--bg); display: flex; align-items: center;
+  justify-content: space-between; padding: 10px 20px 12px; flex-shrink: 0;
+}
+.avatar-circle { width: 38px; height: 38px; border-radius: 50%; background: var(--l2); border: 2.5px solid var(--brand-mid); }
+.location-wrap { text-align: center; }
+.loc-label { font-size: 11px; font-weight: 500; color: var(--g5); letter-spacing: 0.03em; display: block; margin-bottom: 1px; }
+.loc-city { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--g9); display: flex; align-items: center; gap: 3px; justify-content: center; }
+.icon-btn { width: 38px; height: 38px; border-radius: 50%; background: var(--l1); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+.notif-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; border-radius: 50%; background: #d64545; border: 1.5px solid var(--bg); }
+
+/* ── Segment tabs ── */
+.seg-wrap { background: var(--bg); padding: 0 20px; flex-shrink: 0; }
+.seg-tabs { display: flex; border-bottom: 1.5px solid var(--g1); }
+.seg-tab { flex: 1; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: var(--g5); cursor: pointer; position: relative; border: none; background: none; }
+.seg-tab.active { color: var(--brand); font-weight: 600; }
+.seg-tab.active::after { content: ''; position: absolute; bottom: -1.5px; left: 0; right: 0; height: 2px; background: var(--brand); border-radius: 2px 2px 0 0; }
+
+/* ── Scrollable body ── */
+.body { flex: 1; overflow-y: auto; overflow-x: hidden; }
+.body::-webkit-scrollbar { display: none; }
+
+/* ── Seasonal banner ── */
+.seasonal-banner {
+  margin: 16px 20px 4px; border-radius: 18px;
+  background: linear-gradient(135deg, #c85e20 0%, #e07b39 55%, #f0a060 100%);
+  padding: 16px; display: flex; align-items: center; justify-content: space-between;
+  overflow: hidden; position: relative; cursor: pointer;
+}
+.seasonal-banner::before { content:''; position:absolute; top:-20px; right:-20px; width:120px; height:120px; border-radius:50%; background:rgba(255,255,255,0.08); }
+.seasonal-text { position: relative; z-index: 1; }
+.s-eyebrow { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.8); margin-bottom: 4px; }
+.s-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; line-height: 1.25; }
+.s-sub { font-size: 12px; color: rgba(255,255,255,0.82); margin-bottom: 12px; }
+.s-cta { display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 12px; border-radius: 99px; background: #fff; font-size: 12px; font-weight: 700; color: var(--orange); border: none; cursor: pointer; }
+.seasonal-icon { width: 80px; height: 80px; border-radius: 14px; background: rgba(255,255,255,0.15); flex-shrink: 0; position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; font-size: 38px; }
+
+/* ── Pills ── */
+.pill-row { display: flex; gap: 8px; overflow-x: auto; padding: 14px 20px 2px; -webkit-overflow-scrolling: touch; }
+.pill-row::-webkit-scrollbar { display: none; }
+.pill { display: flex; align-items: center; gap: 5px; height: 32px; padding: 0 12px; border-radius: 99px; border: 1.5px solid var(--g1); background: #fff; font-size: 12.5px; font-weight: 500; color: var(--g7); white-space: nowrap; cursor: pointer; flex-shrink: 0; transition: all 0.15s; }
+.pill.active-camp { background: var(--orange); border-color: var(--orange); color: #fff; }
+.pill.active-green { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+/* ── Section header ── */
+.section-hdr { display: flex; align-items: baseline; justify-content: space-between; padding: 20px 20px 14px; }
+.section-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 600; color: var(--g9); }
+.see-all { font-size: 13px; font-weight: 500; color: var(--brand); cursor: pointer; border: none; background: none; }
+
+/* ── Event card ── */
+.event-list { display: flex; flex-direction: column; gap: 12px; padding: 0 20px; }
+.event-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07); cursor: pointer; }
+.event-img { width: 100%; height: 152px; background: linear-gradient(135deg, #2a6648, #60b880); position: relative; overflow: hidden; }
+.event-img-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.16)); }
+.date-badge { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); border-radius: 10px; padding: 6px 10px; }
+.date-day { font-size: 18px; font-weight: 700; color: var(--g9); line-height: 1; }
+.date-mo { font-size: 11px; font-weight: 600; color: var(--g5); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.2; }
+.event-body { padding: 14px; }
+.event-cat { font-size: 11px; font-weight: 600; color: var(--brand); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 5px; }
+.event-name { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--g9); line-height: 1.3; margin-bottom: 8px; }
+.event-meta { font-size: 12.5px; color: var(--g5); }
+
+/* ── Tab bar ── */
+.tab-bar { height: 80px; background: #fff; border-top: 1px solid var(--g1); display: flex; align-items: flex-start; padding: 10px 8px 0; flex-shrink: 0; position: relative; }
+.tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 4px 0 0; border: none; background: none; }
+.tab-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.tab-label { font-size: 10px; font-weight: 500; color: var(--g4); }
+.tab-label.on { color: var(--brand); font-weight: 600; }
+.tab-fab { width: 52px; height: 52px; border-radius: 50%; background: var(--brand); border: none; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(24,99,56,0.38); margin-top: -12px; cursor: pointer; flex-shrink: 0; }
+
+/* ─────────────────────────────────────────
+   SCREEN 2 — CAMP LIST STYLES
+───────────────────────────────────────── */
+.nav-header { background: var(--bg); display: flex; align-items: center; padding: 12px 16px 12px; gap: 10px; flex-shrink: 0; }
+.back-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--l1); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+.nav-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--g9); }
+.nav-sub { font-size: 12px; color: var(--g5); margin-top: 1px; }
+
+.filter-widget { background: #fff; border-radius: 20px; margin: 4px 20px 0; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.08); }
+.fw-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--g5); margin-bottom: 12px; }
+.kid-row { display: flex; gap: 8px; margin-bottom: 14px; }
+.kid-chip { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+.kid-av { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; color: #fff; border: 2.5px solid transparent; position: relative; transition: border-color 0.2s; }
+.kid-av.sel { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(224,123,57,0.18); }
+.kid-av.sel::after { content:'✓'; position:absolute; bottom:-2px; right:-2px; width:16px; height:16px; border-radius:50%; background:var(--orange); color:#fff; font-size:8px; font-weight:700; display:flex; align-items:center; justify-content:center; border:1.5px solid #fff; }
+.kid-name { font-size: 10.5px; font-weight: 500; color: var(--g7); white-space: nowrap; }
+.kid-name.sel { color: var(--orange); font-weight: 600; }
+
+.date-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+.date-field { flex: 1; background: var(--bg); border-radius: 12px; padding: 10px 12px; cursor: pointer; }
+.date-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--g5); margin-bottom: 3px; }
+.date-val { font-size: 14px; font-weight: 600; color: var(--g9); }
+.date-arrow { color: var(--g3); font-size: 14px; }
+
+.loc-field { background: var(--bg); border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.loc-field-text { flex: 1; }
+.loc-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--g5); margin-bottom: 2px; }
+.loc-val { font-size: 13.5px; font-weight: 600; color: var(--g9); }
+
+.search-btn { width: 100%; height: 44px; border-radius: 12px; background: var(--orange); border: none; font-size: 14px; font-weight: 700; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.15s; }
+.search-btn:active { opacity: 0.85; }
+
+.camp-list { display: flex; flex-direction: column; gap: 10px; padding: 14px 20px 24px; }
+.camp-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06); cursor: pointer; display: flex; transition: transform 0.12s, box-shadow 0.12s; }
+.camp-card:active { transform: scale(0.98); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.camp-thumb { width: 88px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 32px; min-height: 90px; }
+.camp-body { flex: 1; padding: 11px 12px; }
+.camp-tags { display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; }
+.camp-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; background: var(--orange-l); color: var(--orange); }
+.camp-tag.age { background: var(--brand-light); color: var(--brand); }
+.camp-name { font-family: 'Playfair Display', serif; font-size: 14.5px; font-weight: 600; color: var(--g9); line-height: 1.3; margin-bottom: 4px; }
+.camp-meta { font-size: 11px; color: var(--g5); line-height: 1.7; }
+.camp-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+.camp-price { font-size: 13px; font-weight: 700; color: var(--g9); }
+.camp-spots { font-size: 11px; font-weight: 600; }
+.spots-low { color: #d64545; }
+.spots-ok { color: #5c8a5c; }
+
+/* ─────────────────────────────────────────
+   SCREEN 3 — CAMP DETAIL
+───────────────────────────────────────── */
+.hero { width: 100%; height: 220px; background: linear-gradient(135deg, #1e3e2b, #186338, #2a8050); position: relative; overflow: hidden; flex-shrink: 0; }
+.hero-emoji { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 84px; opacity: 0.22; }
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, transparent 40%, transparent 55%, rgba(0,0,0,0.5) 100%); }
+.hero-back { position: absolute; top: 58px; left: 16px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.88); backdrop-filter: blur(8px); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; }
+.hero-share { position: absolute; top: 58px; right: 16px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.88); backdrop-filter: blur(8px); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; }
+.hero-label { position: absolute; bottom: 16px; left: 16px; right: 60px; z-index: 5; }
+.hero-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.8); margin-bottom: 4px; }
+.hero-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #fff; line-height: 1.2; }
+.photo-dots { position: absolute; bottom: 12px; right: 16px; display: flex; gap: 4px; z-index: 5; }
+.photo-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.45); }
+.photo-dot.on { width: 14px; border-radius: 3px; background: #fff; }
+.hero-status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 14px 28px 0; z-index: 10; }
+.hero-di { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 120px; height: 36px; background: #000; border-radius: 20px; z-index: 11; }
+
+.detail-body { flex: 1; overflow-y: auto; }
+.detail-body::-webkit-scrollbar { display: none; }
+.detail-content { padding: 18px 20px; }
+.tag-row { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.tag-pill { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
+.tag-orange { background: var(--orange-l); color: var(--orange); }
+.tag-green { background: var(--brand-light); color: var(--brand); }
+.tag-gold { background: #fff3cd; color: #7a6010; }
+.detail-org { font-size: 13px; color: var(--g5); margin-bottom: 14px; }
+.detail-org strong { color: var(--brand); font-weight: 600; }
+
+.info-chips { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.info-chip { display: flex; align-items: center; gap: 6px; background: #fff; border-radius: 10px; padding: 8px 12px; border: 1px solid var(--g1); box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.chip-icon { font-size: 14px; }
+.chip-lbl { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--g5); }
+.chip-val { font-size: 13px; font-weight: 600; color: var(--g9); }
+
+.divider { height: 1px; background: var(--g1); margin: 14px 0; }
+.section-lbl { font-size: 13px; font-weight: 700; color: var(--g9); margin-bottom: 8px; }
+.body-text { font-size: 13.5px; color: var(--g7); line-height: 1.6; margin-bottom: 14px; }
+.highlight-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
+.highlight-row { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--g7); }
+.h-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); flex-shrink: 0; margin-top: 5px; }
+
+.price-card { background: #fff; border-radius: 16px; padding: 14px 16px; border: 1px solid var(--g1); box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+.price-lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--g5); margin-bottom: 3px; }
+.price-amount { font-size: 26px; font-weight: 700; color: var(--g9); line-height: 1; }
+.price-note { font-size: 11px; color: var(--g5); margin-top: 2px; }
+.spots-badge { background: var(--brand-light); border-radius: 10px; padding: 8px 12px; text-align: center; }
+.spots-n { font-size: 20px; font-weight: 700; color: var(--brand); line-height: 1; }
+.spots-l { font-size: 10px; font-weight: 500; color: var(--brand); }
+
+.sticky-cta { padding: 12px 20px 16px; background: linear-gradient(to top, var(--bg) 80%, transparent); flex-shrink: 0; }
+.cta-btn { width: 100%; height: 52px; border-radius: 14px; background: var(--orange); border: none; font-size: 15px; font-weight: 700; color: #fff; cursor: pointer; box-shadow: 0 4px 16px rgba(224,123,57,0.4); transition: opacity 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.cta-btn:active { opacity: 0.88; }
+.cta-btn.green { background: var(--brand); box-shadow: 0 4px 14px rgba(24,99,56,0.3); }
+
+/* ─────────────────────────────────────────
+   SCREEN 4 — CONFIRM SHEET
+───────────────────────────────────────── */
+.screen-4 { background: transparent; }
+.sheet-bg { position: absolute; inset: 0; }
+.sheet-dim { position: absolute; inset: 0; background: rgba(0,0,0,0.45); z-index: 1; }
+.sheet-bg-img { position: absolute; inset: 0; background: linear-gradient(to bottom, #186338, #1e3e2b); display: flex; align-items: center; justify-content: center; font-size: 84px; opacity: 0.3; }
+.bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; z-index: 10; max-height: 88%; display: flex; flex-direction: column; animation: sheetUp 0.38s cubic-bezier(.4,0,.2,1) both; }
+@keyframes sheetUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.sheet-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--g1); margin: 10px auto 0; flex-shrink: 0; }
+.sheet-hdr { padding: 14px 20px 0; display: flex; align-items: flex-start; justify-content: space-between; flex-shrink: 0; }
+.sheet-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--g9); }
+.sheet-sub { font-size: 13px; color: var(--g5); margin-top: 3px; }
+.close-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--l1); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; margin-top: 2px; font-size: 14px; color: var(--g7); }
+.sheet-scroll { flex: 1; overflow-y: auto; padding: 14px 20px 0; }
+.sheet-scroll::-webkit-scrollbar { display: none; }
+.camp-summary { background: var(--bg); border-radius: 14px; padding: 12px 14px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+.camp-sum-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--orange-l); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.camp-sum-name { font-size: 14px; font-weight: 600; color: var(--g9); margin-bottom: 2px; }
+.camp-sum-dates { font-size: 12px; color: var(--g5); }
+.field-section { margin-bottom: 18px; }
+.field-section-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--g5); margin-bottom: 8px; }
+.form-fields { display: flex; flex-direction: column; gap: 8px; }
+.form-field { background: var(--bg); border-radius: 12px; padding: 11px 14px; display: flex; align-items: center; justify-content: space-between; }
+.ff-left { flex: 1; }
+.ff-lbl { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--g5); margin-bottom: 2px; }
+.ff-val { font-size: 14px; font-weight: 500; color: var(--g9); }
+.ff-edit { width: 28px; height: 28px; border-radius: 8px; background: #fff; border: none; font-size: 12px; color: var(--brand); cursor: pointer; flex-shrink: 0; }
+.sheet-footer { padding: 12px 20px 20px; border-top: 1px solid var(--g1); display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+.confirm-btn { width: 100%; height: 50px; border-radius: 14px; background: var(--orange); border: none; font-size: 15px; font-weight: 700; color: #fff; cursor: pointer; box-shadow: 0 4px 14px rgba(224,123,57,0.35); transition: opacity 0.15s; }
+.confirm-btn:active { opacity: 0.88; }
+.edit-btn-sheet { width: 100%; height: 44px; border-radius: 14px; background: var(--l1); border: none; font-size: 14px; font-weight: 600; color: var(--g7); cursor: pointer; }
+
+/* ─────────────────────────────────────────
+   SCREEN 5 — SAVE PROMPT
+───────────────────────────────────────── */
+.small-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; z-index: 10; padding: 0 0 20px; display: flex; flex-direction: column; animation: sheetUp 0.38s cubic-bezier(.4,0,.2,1) both; }
+.save-icon { width: 60px; height: 60px; border-radius: 18px; background: linear-gradient(135deg, var(--orange-p), var(--orange-l)); margin: 24px auto 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+.save-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--g9); text-align: center; padding: 0 24px; line-height: 1.3; margin-bottom: 8px; }
+.save-sub { font-size: 13.5px; color: var(--g5); text-align: center; padding: 0 28px; line-height: 1.55; margin-bottom: 22px; }
+.save-btns { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+.save-yes { width: 100%; height: 50px; border-radius: 14px; background: var(--brand); border: none; font-size: 15px; font-weight: 700; color: #fff; cursor: pointer; box-shadow: 0 4px 14px rgba(24,99,56,0.3); }
+.save-no { width: 100%; height: 44px; border-radius: 14px; background: var(--l1); border: none; font-size: 14px; font-weight: 600; color: var(--g7); cursor: pointer; }
+
+/* ─────────────────────────────────────────
+   SCREEN 6 — SUCCESS
+───────────────────────────────────────── */
+.success-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 28px 0; text-align: center; }
+.success-icon { width: 80px; height: 80px; border-radius: 24px; background: linear-gradient(135deg, #c85e20, var(--orange), #f0a060); display: flex; align-items: center; justify-content: center; font-size: 38px; margin-bottom: 22px; box-shadow: 0 8px 28px rgba(224,123,57,0.35); }
+.success-eyebrow { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--orange); margin-bottom: 8px; }
+.success-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--g9); line-height: 1.25; margin-bottom: 10px; }
+.success-sub { font-size: 14px; color: var(--g5); line-height: 1.6; margin-bottom: 24px; }
+.summary-card { width: 100%; background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.07); margin-bottom: 24px; text-align: left; }
+.sc-header { padding: 14px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--g1); }
+.sc-icon { width: 42px; height: 42px; border-radius: 12px; background: var(--orange-l); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.sc-name { font-size: 15px; font-weight: 700; color: var(--g9); }
+.sc-org { font-size: 12px; color: var(--g5); }
+.sc-rows { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+.sc-row { display: flex; justify-content: space-between; font-size: 13px; }
+.sc-k { color: var(--g5); }
+.sc-v { font-weight: 600; color: var(--g9); }
+.success-btns { width: 100%; display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px; }
+
+/* ─────────────────────────────────────────
+   SCREEN 7 — MY REGISTRATIONS
+───────────────────────────────────────── */
+.reg-banner { margin: 4px 20px 0; border-radius: 18px; background: linear-gradient(135deg, #c85e20 0%, var(--orange) 55%, #f0a060 100%); padding: 16px; display: flex; align-items: center; justify-content: space-between; }
+.reg-banner-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.8); margin-bottom: 4px; }
+.reg-banner-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.reg-banner-dates { font-size: 12px; color: rgba(255,255,255,0.85); margin-bottom: 10px; }
+.reg-status-pill { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 99px; background: rgba(255,255,255,0.2); font-size: 11px; font-weight: 600; color: #fff; }
+.reg-status-dot { width: 6px; height: 6px; border-radius: 50%; background: #7ee08a; }
+.reg-banner-icon { width: 56px; height: 56px; border-radius: 14px; background: rgba(255,255,255,0.15); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.reg-kid-card { background: #fff; border-radius: 14px; margin: 0 20px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06); }
+.reg-kid-av { width: 40px; height: 40px; border-radius: 50%; background: var(--orange); color: #fff; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.reg-kid-name { font-size: 14px; font-weight: 600; color: var(--g9); }
+.reg-kid-meta { font-size: 11.5px; color: var(--g5); margin-top: 1px; }
+.payment-card { background: #fff; border-radius: 14px; margin: 0 20px; padding: 12px 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06); }
+.payment-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--g7); padding: 4px 0; }
+.payment-row.total { border-top: 1px solid var(--g1); margin-top: 6px; padding-top: 10px; font-weight: 700; color: var(--g9); }
+.info-strip { background: #fff; border-radius: 14px; margin: 0 20px; padding: 4px 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06); }
+.strip-row { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; }
+.strip-row + .strip-row { border-top: 1px solid var(--g1); }
+.strip-icon { width: 28px; height: 28px; border-radius: 8px; background: var(--brand-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.strip-label { font-size: 12.5px; font-weight: 600; color: var(--g9); }
+.strip-sub { font-size: 11px; color: var(--g5); margin-top: 1px; }
+.add-camp-btn { margin: 4px 20px 0; height: 46px; border-radius: 14px; border: 1.5px dashed var(--g3); display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 13.5px; font-weight: 600; color: var(--brand); cursor: pointer; }
+
+/* ─────────────────────────────────────────
+   SHARED HELPERS
+───────────────────────────────────────── */
+.clickable { cursor: pointer; }
+.clickable:active { opacity: 0.8; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- ══════════════════════════════════
+       SCREEN 1 — DISCOVER
+  ══════════════════════════════════ -->
+  <div class="screen active" id="s1">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="di"></div>
+      <div class="bat">
+        <svg viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1b1e"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#1a1b1e" opacity="0.4"/></svg>
+      </div>
+    </div>
+    <div class="app-header">
+      <div class="avatar-circle"></div>
+      <div class="location-wrap">
+        <span class="loc-label">Exploring in</span>
+        <div class="loc-city">Sydney, NSW <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5 7l3 3 3-3" stroke="#186338" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <button class="icon-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="notif-dot"></div>
+      </button>
+    </div>
+    <div class="seg-wrap">
+      <div class="seg-tabs">
+        <button class="seg-tab">My Events</button>
+        <button class="seg-tab active">Discover</button>
+        <button class="seg-tab">Memories</button>
+      </div>
+    </div>
+    <div class="body">
+      <div class="seasonal-banner clickable" onclick="go(2)">
+        <div class="seasonal-text">
+          <div class="s-eyebrow">🌞 Seasonal</div>
+          <div class="s-title">Summer Camps<br>2025 are here!</div>
+          <div class="s-sub">Find the perfect camp for your kids</div>
+          <button class="s-cta" onclick="go(2)">Explore camps →</button>
+        </div>
+        <div class="seasonal-icon">⛺</div>
+      </div>
+
+      <div class="pill-row">
+        <div class="pill active-camp clickable" onclick="go(2)">⛺ Summer Camps</div>
+        <div class="pill active-green">🌳 Parks</div>
+        <div class="pill">🎨 Arts</div>
+        <div class="pill">🏊 Swimming</div>
+        <div class="pill">🎭 Classes</div>
+        <div class="pill">🍕 Dining</div>
+      </div>
+
+      <div class="section-hdr">
+        <div class="section-title">Parks &amp; Playgrounds</div>
+        <button class="see-all">See all</button>
+      </div>
+      <div class="event-list">
+        <div class="event-card">
+          <div class="event-img">
+            <div class="event-img-overlay"></div>
+            <div class="date-badge"><div class="date-day">23</div><div class="date-mo">Nov</div></div>
+          </div>
+          <div class="event-body">
+            <div class="event-cat">Parks &amp; Playgrounds</div>
+            <div class="event-name">Picnic Playdate at Centennial Park</div>
+            <div class="event-meta">Saturday, 23 Nov · 10:00 am · Centennial Park</div>
+          </div>
+        </div>
+        <div class="event-card">
+          <div class="event-img" style="background:linear-gradient(135deg,#1a4a3a,#3a7a5a);">
+            <div class="event-img-overlay"></div>
+            <div class="date-badge"><div class="date-day">30</div><div class="date-mo">Nov</div></div>
+          </div>
+          <div class="event-body">
+            <div class="event-cat">Outdoor Activity</div>
+            <div class="event-name">Royal Botanic Garden Playdate</div>
+            <div class="event-meta">Sunday, 30 Nov · 9:30 am · Royal Botanic Garden</div>
+          </div>
+        </div>
+      </div>
+      <div style="height:20px;"></div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21H15v-5h-6v5H3V10.5z" stroke="#9aa0ad" stroke-width="1.8" stroke-linejoin="round"/></svg></div><span class="tab-label">Home</span></button>
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#186338" stroke-width="1.8"/><path d="M16.5 16.5L21 21" stroke="#186338" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label on">Discover</span></button>
+      <button class="tab-fab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="#9aa0ad" stroke-width="1.8"/><path d="M8 2v3M16 2v3M3 10h18" stroke="#9aa0ad" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Events</span></button>
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#9aa0ad" stroke-width="1.8"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#9aa0ad" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Profile</span></button>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════
+       SCREEN 2 — CAMPS LIST + FILTER
+  ══════════════════════════════════ -->
+  <div class="screen" id="s2">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="di"></div>
+      <div class="bat"><svg viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1b1e"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#1a1b1e" opacity="0.4"/></svg></div>
+    </div>
+    <div class="nav-header">
+      <button class="back-btn" onclick="back()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div>
+        <div class="nav-title">Summer Camps</div>
+        <div class="nav-sub">🌞 Available now · Sydney</div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="filter-widget">
+        <div class="fw-title">⛺ Find a Camp For</div>
+        <div class="kid-row">
+          <div class="kid-chip">
+            <div class="kid-av sel" style="background:#e07b39;">L</div>
+            <span class="kid-name sel">Liam</span>
+          </div>
+          <div class="kid-chip">
+            <div class="kid-av" style="background:#3a7ca5;">S</div>
+            <span class="kid-name">Sofia</span>
+          </div>
+          <div class="kid-chip">
+            <div class="kid-av" style="background:#9a5aaa;">O</div>
+            <span class="kid-name">Oscar</span>
+          </div>
+          <div class="kid-chip">
+            <div class="kid-av" style="background:#5c8a5c;">A</div>
+            <span class="kid-name">Aria</span>
+          </div>
+        </div>
+        <div class="date-row">
+          <div class="date-field">
+            <div class="date-label">From</div>
+            <div class="date-val">Jul 7</div>
+          </div>
+          <div class="date-arrow">→</div>
+          <div class="date-field">
+            <div class="date-label">To</div>
+            <div class="date-val">Jul 25</div>
+          </div>
+        </div>
+        <div class="loc-field">
+          <span style="font-size:16px;">📍</span>
+          <div class="loc-field-text">
+            <div class="loc-label">Near</div>
+            <div class="loc-val">Sydney, NSW · 15 km radius</div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#b3b8c1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <button class="search-btn" onclick="go(3)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#fff" stroke-width="2.2"/><path d="M16.5 16.5L21 21" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+          Show 8 Camps
+        </button>
+      </div>
+
+      <div class="camp-list">
+        <div class="camp-card clickable" onclick="go(3)">
+          <div class="camp-thumb" style="background:linear-gradient(160deg,#2a6648,#60b880);">🌿</div>
+          <div class="camp-body">
+            <div class="camp-tags"><span class="camp-tag">Outdoor</span><span class="camp-tag age">Ages 6–12</span></div>
+            <div class="camp-name">Nature Explorers Camp</div>
+            <div class="camp-meta">Jul 7–18 · Full day<br>Centennial Park, Randwick</div>
+            <div class="camp-footer">
+              <div class="camp-price">$420 <span style="font-size:10.5px;font-weight:400;color:var(--g5);">/2wks</span></div>
+              <div class="camp-spots spots-low">4 spots left</div>
+            </div>
+          </div>
+        </div>
+        <div class="camp-card clickable" onclick="go(3)">
+          <div class="camp-thumb" style="background:linear-gradient(160deg,#c85e20,#f0a060);">🎨</div>
+          <div class="camp-body">
+            <div class="camp-tags"><span class="camp-tag">Arts</span><span class="camp-tag age">Ages 5–10</span></div>
+            <div class="camp-name">Creative Arts Summer Camp</div>
+            <div class="camp-meta">Jul 14–25 · Half day<br>Surry Hills Community Centre</div>
+            <div class="camp-footer">
+              <div class="camp-price">$280 <span style="font-size:10.5px;font-weight:400;color:var(--g5);">/2wks</span></div>
+              <div class="camp-spots spots-ok">12 spots</div>
+            </div>
+          </div>
+        </div>
+        <div class="camp-card clickable" onclick="go(3)">
+          <div class="camp-thumb" style="background:linear-gradient(160deg,#1a4a8a,#4a8aca);">🏊</div>
+          <div class="camp-body">
+            <div class="camp-tags"><span class="camp-tag" style="background:#ddeeff;color:#1a4a8a;">Sport</span><span class="camp-tag age">Ages 7–14</span></div>
+            <div class="camp-name">AquaSport Summer Academy</div>
+            <div class="camp-meta">Jul 7–11 · Full day<br>Sydney Olympic Park Aquatic</div>
+            <div class="camp-footer">
+              <div class="camp-price">$195 <span style="font-size:10.5px;font-weight:400;color:var(--g5);">/wk</span></div>
+              <div class="camp-spots spots-ok">8 spots</div>
+            </div>
+          </div>
+        </div>
+        <div class="camp-card clickable" onclick="go(3)">
+          <div class="camp-thumb" style="background:linear-gradient(160deg,#7a3a8a,#ba7aca);">🎭</div>
+          <div class="camp-body">
+            <div class="camp-tags"><span class="camp-tag" style="background:#eeddf5;color:#7a3a8a;">Drama</span><span class="camp-tag age">Ages 8–13</span></div>
+            <div class="camp-name">Stage Stars Theatre Camp</div>
+            <div class="camp-meta">Jul 21–Aug 1 · Full day<br>Newtown Arts Centre</div>
+            <div class="camp-footer">
+              <div class="camp-price">$360 <span style="font-size:10.5px;font-weight:400;color:var(--g5);">/2wks</span></div>
+              <div class="camp-spots spots-low">2 spots left</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21H15v-5h-6v5H3V10.5z" stroke="#9aa0ad" stroke-width="1.8" stroke-linejoin="round"/></svg></div><span class="tab-label">Home</span></button>
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#186338" stroke-width="1.8"/><path d="M16.5 16.5L21 21" stroke="#186338" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label on">Discover</span></button>
+      <button class="tab-fab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="#9aa0ad" stroke-width="1.8"/><path d="M8 2v3M16 2v3M3 10h18" stroke="#9aa0ad" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Events</span></button>
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#9aa0ad" stroke-width="1.8"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#9aa0ad" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Profile</span></button>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════
+       SCREEN 3 — CAMP DETAIL
+  ══════════════════════════════════ -->
+  <div class="screen" id="s3">
+    <div class="hero">
+      <div class="hero-emoji">🌿</div>
+      <div class="hero-overlay"></div>
+      <div class="hero-di"></div>
+      <div class="hero-status">
+        <span style="font-size:15px;font-weight:600;color:#fff;">9:41</span>
+      </div>
+      <button class="hero-back" onclick="back()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="#1a1b1e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="hero-share">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="#1a1b1e" stroke-width="1.8"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" stroke="#1a1b1e" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+      <div class="hero-label">
+        <div class="hero-eyebrow">⛺ Summer Camp</div>
+        <div class="hero-title">Nature Explorers Camp</div>
+      </div>
+      <div class="photo-dots">
+        <div class="photo-dot on"></div>
+        <div class="photo-dot"></div>
+        <div class="photo-dot"></div>
+        <div class="photo-dot"></div>
+      </div>
+    </div>
+    <div class="detail-body">
+      <div class="detail-content">
+        <div class="tag-row">
+          <span class="tag-pill tag-orange">Outdoor</span>
+          <span class="tag-pill tag-green">Ages 6–12</span>
+          <span class="tag-pill tag-gold">⭐ 4.9</span>
+        </div>
+        <div class="detail-org">By <strong>Green Pines Education</strong> · Sydney</div>
+        <div class="info-chips">
+          <div class="info-chip">
+            <span class="chip-icon">📅</span>
+            <div><div class="chip-lbl">Dates</div><div class="chip-val">Jul 7–18</div></div>
+          </div>
+          <div class="info-chip">
+            <span class="chip-icon">🕐</span>
+            <div><div class="chip-lbl">Hours</div><div class="chip-val">8am–4pm</div></div>
+          </div>
+          <div class="info-chip">
+            <span class="chip-icon">📍</span>
+            <div><div class="chip-lbl">Location</div><div class="chip-val">Randwick</div></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="section-lbl">About this Camp</div>
+        <div class="body-text">A hands-on outdoor adventure camp where kids explore the natural world through science, bush craft, and environmental discovery. Set in beautiful Centennial Park, your child will form lifelong friendships while building confidence in the great outdoors.</div>
+        <div class="section-lbl">What's Included</div>
+        <div class="highlight-list">
+          <div class="highlight-row"><div class="h-dot"></div>Daily nature hikes &amp; scavenger hunts</div>
+          <div class="highlight-row"><div class="h-dot"></div>Wildlife education &amp; birdwatching</div>
+          <div class="highlight-row"><div class="h-dot"></div>Bush craft skills: fire safety, navigation</div>
+          <div class="highlight-row"><div class="h-dot"></div>Healthy catered lunches included</div>
+          <div class="highlight-row"><div class="h-dot"></div>Daily end-of-day parent summary</div>
+        </div>
+        <div class="divider"></div>
+        <div class="price-card">
+          <div>
+            <div class="price-lbl">Price</div>
+            <div class="price-amount">$420 <span style="font-size:14px;font-weight:400;color:var(--g5);">/2 weeks</span></div>
+            <div class="price-note">$210 per week · Includes lunch</div>
+          </div>
+          <div class="spots-badge">
+            <div class="spots-n">4</div>
+            <div class="spots-l">spots left</div>
+          </div>
+        </div>
+        <div style="height:60px;"></div>
+      </div>
+    </div>
+    <div class="sticky-cta">
+      <button class="cta-btn" onclick="go(4)">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Register Liam for this Camp
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════
+       SCREEN 4 — CONFIRM DETAILS
+  ══════════════════════════════════ -->
+  <div class="screen" id="s4">
+    <div class="sheet-bg">
+      <div class="sheet-bg-img">🌿</div>
+      <div class="sheet-dim"></div>
+    </div>
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-hdr">
+        <div>
+          <div class="sheet-title">Confirm Details</div>
+          <div class="sheet-sub">We'll send these details to the camp</div>
+        </div>
+        <button class="close-btn" onclick="back()">✕</button>
+      </div>
+      <div class="sheet-scroll">
+        <div style="padding-top:14px;"></div>
+        <div class="camp-summary">
+          <div class="camp-sum-icon">⛺</div>
+          <div>
+            <div class="camp-sum-name">Nature Explorers Camp</div>
+            <div class="camp-sum-dates">Jul 7 – Jul 18, 2025 · Full day</div>
+          </div>
+        </div>
+        <div class="field-section">
+          <div class="field-section-lbl">👦 Child Details</div>
+          <div class="form-fields">
+            <div class="form-field"><div class="ff-left"><div class="ff-lbl">Full Name</div><div class="ff-val">Liam Ahmad</div></div><button class="ff-edit">✏️</button></div>
+            <div class="form-field"><div class="ff-left"><div class="ff-lbl">Date of Birth</div><div class="ff-val">12 Mar 2016 · Age 9</div></div><button class="ff-edit">✏️</button></div>
+            <div class="form-field"><div class="ff-left"><div class="ff-lbl">Medical Notes</div><div class="ff-val" style="color:var(--g4);font-style:italic;font-size:13px;">None specified</div></div><button class="ff-edit">✏️</button></div>
+          </div>
+        </div>
+        <div class="field-section">
+          <div class="field-section-lbl">👩 Parent / Guardian</div>
+          <div class="form-fields">
+            <div class="form-field"><div class="ff-left"><div class="ff-lbl">Parent Name</div><div class="ff-val">Ahmad Fauzan</div></div><button class="ff-edit">✏️</button></div>
+            <div class="form-field"><div class="ff-left"><div class="ff-lbl">Email</div><div class="ff-val">ahmad@joinsprout.co</div></div><button class="ff-edit">✏️</button></div>
+            <div class="form-field"><div class="ff-left"><div class="ff-lbl">Phone</div><div class="ff-val">+61 412 345 678</div></div><button class="ff-edit">✏️</button></div>
+            <div class="form-field"><div class="ff-left"><div class="ff-lbl">Home Address</div><div class="ff-val" style="font-size:13px;">12 Park St, Surry Hills NSW 2010</div></div><button class="ff-edit">✏️</button></div>
+          </div>
+        </div>
+        <div style="height:8px;"></div>
+      </div>
+      <div class="sheet-footer">
+        <button class="confirm-btn" onclick="go(5)">✓ Confirm &amp; Send Registration</button>
+        <button class="edit-btn-sheet" onclick="back()">Edit Details</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════
+       SCREEN 5 — SAVE UPDATED DETAILS
+  ══════════════════════════════════ -->
+  <div class="screen" id="s5">
+    <div class="sheet-bg">
+      <div class="sheet-bg-img" style="background:var(--bg);opacity:1;"></div>
+      <div class="sheet-dim"></div>
+    </div>
+    <div class="small-sheet">
+      <div class="sheet-handle"></div>
+      <div class="save-icon">💾</div>
+      <div class="save-title">Save updated details to<br>Liam's profile?</div>
+      <div class="save-sub">You changed Liam's home address. Save it to his profile so you don't have to re-enter it next time.</div>
+      <div class="save-btns">
+        <button class="save-yes" onclick="go(6)">✓ Yes, save to Liam's profile</button>
+        <button class="save-no" onclick="go(6)">No thanks, just this once</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════
+       SCREEN 6 — SUCCESS
+  ══════════════════════════════════ -->
+  <div class="screen" id="s6">
+    <div class="status-bar">
+      <span class="time">9:44</span>
+      <div class="di"></div>
+      <div class="bat"><svg viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1b1e"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#1a1b1e" opacity="0.4"/></svg></div>
+    </div>
+    <div class="body">
+      <div class="success-body">
+        <div class="success-icon">⛺</div>
+        <div class="success-eyebrow">Registration Sent!</div>
+        <div class="success-title">Liam's all set for<br>Nature Explorers Camp 🌿</div>
+        <div class="success-sub">Your registration details have been sent to Green Pines Education. They'll be in touch to confirm your spot.</div>
+        <div class="summary-card">
+          <div class="sc-header">
+            <div class="sc-icon">⛺</div>
+            <div>
+              <div class="sc-name">Nature Explorers Camp</div>
+              <div class="sc-org">Green Pines Education</div>
+            </div>
+          </div>
+          <div class="sc-rows">
+            <div class="sc-row"><span class="sc-k">Child</span><span class="sc-v">Liam Ahmad, age 9</span></div>
+            <div class="sc-row"><span class="sc-k">Dates</span><span class="sc-v">Jul 7 – Jul 18, 2025</span></div>
+            <div class="sc-row"><span class="sc-k">Location</span><span class="sc-v">Centennial Park</span></div>
+            <div class="sc-row"><span class="sc-k">Total</span><span class="sc-v">$420</span></div>
+          </div>
+        </div>
+        <div class="success-btns">
+          <button class="cta-btn green" onclick="go(7)">View in My Registrations</button>
+          <button class="cta-btn" style="background:var(--l1);color:var(--g7);box-shadow:none;" onclick="go(1)">Find More Camps</button>
+        </div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21H15v-5h-6v5H3V10.5z" stroke="#9aa0ad" stroke-width="1.8" stroke-linejoin="round"/></svg></div><span class="tab-label">Home</span></button>
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#186338" stroke-width="1.8"/><path d="M16.5 16.5L21 21" stroke="#186338" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label on">Discover</span></button>
+      <button class="tab-fab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="#9aa0ad" stroke-width="1.8"/><path d="M8 2v3M16 2v3M3 10h18" stroke="#9aa0ad" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Events</span></button>
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#9aa0ad" stroke-width="1.8"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#9aa0ad" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Profile</span></button>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════
+       SCREEN 7 — MY REGISTRATIONS
+  ══════════════════════════════════ -->
+  <div class="screen" id="s7">
+    <div class="status-bar">
+      <span class="time">9:44</span>
+      <div class="di"></div>
+      <div class="bat"><svg viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1b1e"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#1a1b1e" opacity="0.4"/></svg></div>
+    </div>
+    <div class="nav-header">
+      <button class="back-btn" onclick="back()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="nav-title">My Registrations</div>
+    </div>
+    <div class="body">
+      <div class="reg-banner">
+        <div>
+          <div class="reg-banner-label">Confirmed</div>
+          <div class="reg-banner-title">Nature Explorers Camp</div>
+          <div class="reg-banner-dates">Jul 7 – Jul 18 · 2 weeks · Sydney, NSW</div>
+          <div class="reg-status-pill"><div class="reg-status-dot"></div>Registration confirmed</div>
+        </div>
+        <div class="reg-banner-icon">⛺</div>
+      </div>
+
+      <div class="section-hdr"><div class="section-title" style="font-size:14px;">Registered</div></div>
+      <div class="reg-kid-card">
+        <div class="reg-kid-av">L</div>
+        <div>
+          <div class="reg-kid-name">Liam Ahmad · Age 9</div>
+          <div class="reg-kid-meta">Nature Explorers Camp · Jul 7–18</div>
+        </div>
+      </div>
+
+      <div class="section-hdr"><div class="section-title" style="font-size:14px;">Payment summary</div></div>
+      <div class="payment-card">
+        <div class="payment-row"><span>Camp fee (2 weeks)</span><span>$420</span></div>
+        <div class="payment-row"><span>Includes lunch</span><span>—</span></div>
+        <div class="payment-row total"><span>Total paid</span><span>$420</span></div>
+      </div>
+
+      <div class="section-hdr"><div class="section-title" style="font-size:14px;">Details</div></div>
+      <div class="info-strip">
+        <div class="strip-row">
+          <div class="strip-icon">📅</div>
+          <div><div class="strip-label">Jul 7 – Jul 18</div><div class="strip-sub">Full day · 8am–4pm · Drop-off &amp; pickup included</div></div>
+        </div>
+        <div class="strip-row">
+          <div class="strip-icon">📍</div>
+          <div><div class="strip-label">Centennial Park, Randwick</div><div class="strip-sub">Sydney, NSW</div></div>
+        </div>
+        <div class="strip-row">
+          <div class="strip-icon">✉️</div>
+          <div><div class="strip-label">Confirmation sent</div><div class="strip-sub">Receipt emailed to ahmad@joinsprout.co</div></div>
+        </div>
+      </div>
+
+      <div class="add-camp-btn" onclick="go(1)">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="#186338" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Browse more camps
+      </div>
+      <div style="height:20px;"></div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21H15v-5h-6v5H3V10.5z" stroke="#9aa0ad" stroke-width="1.8" stroke-linejoin="round"/></svg></div><span class="tab-label">Home</span></button>
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#186338" stroke-width="1.8"/><path d="M16.5 16.5L21 21" stroke="#186338" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label on">Discover</span></button>
+      <button class="tab-fab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="#9aa0ad" stroke-width="1.8"/><path d="M8 2v3M16 2v3M3 10h18" stroke="#9aa0ad" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Events</span></button>
+      <button class="tab-item"><div class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#9aa0ad" stroke-width="1.8"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#9aa0ad" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="tab-label">Profile</span></button>
+    </div>
+  </div>
+
+</div><!-- end phone -->
+
+<script>
+let current = 1;
+const history = [1];
+
+function go(n) {
+  const from = document.getElementById('s' + current);
+  const to   = document.getElementById('s' + n);
+  if (!to || n === current) return;
+
+  from.classList.remove('active');
+  from.classList.add('slide-out');
+  to.style.display = 'flex';
+  to.classList.add('slide-in');
+
+  setTimeout(() => {
+    from.classList.remove('slide-out');
+    from.style.display = 'none';
+    to.classList.remove('slide-in');
+    to.classList.add('active');
+  }, 320);
+
+  history.push(n);
+  current = n;
+}
+
+function back() {
+  if (history.length <= 1) return;
+  history.pop();
+  const prev = history[history.length - 1];
+
+  const from = document.getElementById('s' + current);
+  const to   = document.getElementById('s' + prev);
+
+  from.classList.remove('active');
+  from.classList.add('slide-back-out');
+  to.style.display = 'flex';
+  to.classList.add('slide-back-in');
+
+  setTimeout(() => {
+    from.classList.remove('slide-back-out');
+    from.style.display = 'none';
+    to.classList.remove('slide-back-in');
+    to.classList.add('active');
+  }, 320);
+
+  current = prev;
+}
+</script>
+
+</body>
+</html>

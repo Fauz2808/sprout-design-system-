@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Add Note — Lunch Type, Matched to Real UI · Sprout</title>
+  <style>
+    :root {
+      --bg:        #efe9db;
+      --field:     #e4dcc7;
+      --field-active: #ffffff;
+      --fg:        #23271f;
+      --muted:     #8a8272;
+      --border:    #ded5bf;
+      --green:     #5f9163;
+      --green-dk:  #2d5c2e;
+      --t-noschool:#c0533d;
+      --t-special: #c08a2d;
+      --t-todo:    #3d7a40;
+      --t-lunch:   #c9691f; --t-lunch-bg:#fbe6d3;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+      --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {
+      background: #ddd8ce; font-family: var(--font); font-size: 15px; line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+      display: flex; align-items: flex-start; justify-content: center;
+      gap: 40px; padding: 32px 24px 90px; min-height: 100vh; flex-wrap: wrap;
+    }
+    .lede{width:100%;text-align:center;margin-bottom:6px;flex-basis:100%;}
+    .lede h1{font-size:24px;font-weight:700;color:#23271f;margin-bottom:8px;}
+    .lede p{font-size:13px;color:#7a7568;max-width:760px;margin:0 auto;line-height:1.6;}
+    .panel { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .caption {
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #8a8478; text-align: center; max-width: 340px; line-height:1.6;
+    }
+    .caption strong { color: #3a3830; font-weight: 600; }
+
+    .device {
+      position: relative; width: 390px; height: 844px; border-radius: 56px; padding: 12px;
+      background: linear-gradient(160deg, #2a2a2c 0%, #1a1a1c 50%, #0e0e10 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04) inset, 0 0 0 2px #000 inset,
+        0 28px 60px -12px rgba(0,0,0,0.45), 0 8px 20px -8px rgba(0,0,0,0.35);
+    }
+    .island { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); width: 124px; height: 36px; background: #000; border-radius: 999px; z-index: 5; }
+    .screen {
+      position: relative; width: 100%; height: 100%; background: var(--bg);
+      border-radius: 44px; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .statusbar {
+      flex: 0 0 47px; padding: 18px 26px 0; display: flex; align-items: flex-start;
+      justify-content: space-between; font-size: 15px; font-weight: 600; color: var(--fg);
+    }
+
+    .top{flex:0 0 auto;position:relative;display:flex;align-items:center;justify-content:center;padding:8px 16px 14px;}
+    .back{position:absolute;left:16px;width:34px;height:34px;border-radius:50%;background:#dbe5da;display:grid;place-items:center;cursor:pointer;}
+    .back svg{width:15px;height:15px;stroke:var(--green-dk);fill:none;stroke-width:2.2;}
+    .top .title{font-size:16.5px;font-weight:600;color:var(--fg);}
+
+    .scroll{flex:1;overflow-y:auto;padding:2px 18px 16px;}
+    .scroll::-webkit-scrollbar{display:none;}
+
+    .field-box{background:var(--field);border-radius:14px;padding:10px 14px;margin-bottom:14px;}
+    .field-box .lbl{font-size:10.5px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:2px;}
+    .field-box .lbl svg{width:12px;height:12px;stroke:var(--muted);fill:none;stroke-width:1.8;}
+    .field-box .val{font-size:15px;font-weight:600;color:var(--fg);}
+
+    .sec-lbl{font-size:12.5px;color:var(--fg);font-weight:500;margin:2px 0 9px;}
+
+    .pillrow{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;}
+    .pill{flex:1 1 auto;min-width:64px;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--field);border-radius:12px;padding:9px 4px 8px;cursor:pointer;}
+    .pill.on{background:var(--field-active);box-shadow:0 2px 6px rgba(0,0,0,.08);}
+    .pill .ic{font-size:15px;}
+    .pill .lb{font-size:10.5px;font-weight:600;}
+    .pill.noschool .lb, .pill.noschool .ic{color:var(--t-noschool);}
+    .pill.special .lb, .pill.special .ic{color:var(--t-special);}
+    .pill.todo .lb, .pill.todo .ic{color:var(--t-todo);}
+    .pill.event .lb, .pill.event .ic{color:var(--green-dk);}
+    .pill.lunch .lb, .pill.lunch .ic{color:var(--t-lunch);}
+    .pill:not(.on) .lb, .pill:not(.on) .ic{opacity:.55;}
+
+    .input-box{background:var(--field);border-radius:14px;padding:12px 14px;margin-bottom:14px;}
+    .input-box.focus{box-shadow:0 0 0 2px var(--green) inset;}
+    .input-box .lbl{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:3px;}
+    .input-box input, .input-box textarea{width:100%;border:none;background:transparent;outline:none;font-family:var(--font);font-size:14.5px;color:var(--fg);font-weight:500;padding:0;resize:none;}
+    .input-box textarea{min-height:70px;}
+
+    .opt-box{background:var(--field);border-radius:14px;padding:12px 14px;margin-bottom:14px;}
+    .opt-box .lbl{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:9px;}
+    .opt-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+    .opt-row:last-of-type{margin-bottom:0;}
+    .opt-num{width:20px;height:20px;border-radius:50%;background:var(--t-lunch-bg);color:var(--t-lunch);font-size:10.5px;font-weight:700;display:grid;place-items:center;flex-shrink:0;}
+    .opt-row input{flex:1;border:none;background:#fff;border-radius:9px;padding:8px 10px;font-family:var(--font);font-size:13.5px;color:var(--fg);outline:none;}
+    .diet-tag{width:28px;height:28px;border-radius:8px;background:#fff;display:grid;place-items:center;font-size:13px;flex-shrink:0;cursor:pointer;opacity:.4;}
+    .diet-tag.on{opacity:1;background:#e3efe1;}
+    .add-opt{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--t-lunch);padding-top:2px;cursor:pointer;}
+    .add-opt svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.4;}
+
+    .save-btn{width:100%;height:50px;border-radius:99px;background:var(--green);color:#fff;border:none;font-size:15px;font-weight:700;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;margin-top:4px;}
+    .save-btn svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:3;}
+  </style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Add Note — "Lunch" Type Matched to the Real UI</h1>
+  <p>Redone against your actual Add Note screen (segmented pill row for type, not stacked cards like my first pass) — Lunch added as a 5th pill, wraps to a second row alongside the existing four. Fields below swap to Breakfast + numbered Lunch Options only when Lunch is selected; Start/End Time drops out since it doesn't apply. Everything else — Selected Date field, Save Note button — stays exactly as it already is.</p>
+</div>
+
+<!-- ═══ STATE 1 — Lunch added to the type row, Event still selected (proves it doesn't break the existing layout) ═══ -->
+<div class="panel">
+  <div class="device"><div class="island"></div>
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span>🔋</span></div>
+      <div class="top"><div class="back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><div class="title">Add Note</div></div>
+      <div class="scroll">
+        <div class="field-box">
+          <div class="lbl"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Selected Date</div>
+          <div class="val">Wednesday, August 19</div>
+        </div>
+
+        <div class="sec-lbl">Note type</div>
+        <div class="pillrow">
+          <div class="pill event on"><span class="ic">✏️</span><span class="lb">Event</span></div>
+          <div class="pill noschool"><span class="ic">🚫</span><span class="lb">No School</span></div>
+          <div class="pill special"><span class="ic">⭐</span><span class="lb">Special</span></div>
+          <div class="pill todo"><span class="ic">✅</span><span class="lb">To-Do</span></div>
+          <div class="pill lunch"><span class="ic">🍽️</span><span class="lb">Lunch</span></div>
+        </div>
+
+        <div class="input-box focus"><div class="lbl">Title</div><input placeholder="e.g. Field Trip to the Zoo"></div>
+        <div class="input-box"><div class="lbl">Set Start and End Time (optional)</div><input placeholder="Add a time"></div>
+        <div class="input-box"><div class="lbl">Details (optional)</div><textarea placeholder="Add details"></textarea></div>
+
+        <button class="save-btn"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Save Note</button>
+      </div>
+    </div>
+  </div>
+  <span class="caption"><strong>State 1 — Lunch added to the row</strong> — wraps to a second line under the existing four pills; Event stays selected and the form is untouched.</span>
+</div>
+
+<!-- ═══ STATE 2 — Lunch selected, fields swap ═══ -->
+<div class="panel">
+  <div class="device"><div class="island"></div>
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span>🔋</span></div>
+      <div class="top"><div class="back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><div class="title">Add Note</div></div>
+      <div class="scroll">
+        <div class="field-box">
+          <div class="lbl"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Selected Date</div>
+          <div class="val">Wednesday, August 19</div>
+        </div>
+
+        <div class="sec-lbl">Note type</div>
+        <div class="pillrow">
+          <div class="pill event"><span class="ic">✏️</span><span class="lb">Event</span></div>
+          <div class="pill noschool"><span class="ic">🚫</span><span class="lb">No School</span></div>
+          <div class="pill special"><span class="ic">⭐</span><span class="lb">Special</span></div>
+          <div class="pill todo"><span class="ic">✅</span><span class="lb">To-Do</span></div>
+          <div class="pill lunch on"><span class="ic">🍽️</span><span class="lb">Lunch</span></div>
+        </div>
+
+        <div class="input-box"><div class="lbl">Breakfast</div><input value="Potato, Egg &amp; Cheese Taco"></div>
+
+        <div class="opt-box">
+          <div class="lbl">Lunch options</div>
+          <div class="opt-row"><div class="opt-num">1</div><input value="Hamburger"><div class="diet-tag">🌱</div></div>
+          <div class="opt-row"><div class="opt-num">2</div><input value="Rebellyous Burger"><div class="diet-tag on">🌱</div></div>
+          <div class="opt-row"><div class="opt-num">3</div><input value="SunButter &amp; Jelly Sandwich"><div class="diet-tag on">🌱</div></div>
+          <div class="add-opt"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add another option</div>
+        </div>
+
+        <button class="save-btn"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Save Note</button>
+      </div>
+    </div>
+  </div>
+  <span class="caption"><strong>State 2 — Lunch selected</strong> — Title becomes Breakfast, Start/End Time disappears (not relevant here), Details becomes the numbered Lunch Options block. Save Note stays identical.</span>
+</div>
+
+</body>
+</html>

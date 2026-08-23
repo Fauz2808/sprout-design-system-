@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Class Hub — Header Segments · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff; --field:#e8e2d6;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e; --green:#186338; --brand-mid:#4fa472;
+    --brand-light:#e2e9e3; --brand-border:#77b691; --border-light:#d0dacf; --border:#e6e7ea;
+    --link:#3a7ca5; --link-subtle:#d8e5ed;
+    --shadow-m:1px 4px 25px rgba(13,13,18,.05); --shadow-l:1px 4px 25px rgba(13,13,18,.12);
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:26px 44px;padding:40px 22px 60px;}
+  .lede{flex:1 0 100%;text-align:center;max-width:760px;margin:0 auto 6px;}
+  .lede h1{font-family:var(--serif);font-weight:600;font-size:23px;color:#23271f;margin:0 0 5px;}
+  .lede p{font-size:12.5px;color:#6a665b;margin:0;line-height:1.5;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:12px;}
+  .cap{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:393px;line-height:1.5;}
+  .cap b{color:#3a3830;}
+  .ph{display:inline-block;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+
+  .device{position:relative;width:415px;height:874px;border-radius:56px;padding:11px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 2px #000 inset,0 24px 50px -14px rgba(0,0,0,.45);}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:60;}
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .sb{flex:0 0 44px;padding:16px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--ink);} .sb .bat{width:25px;}
+
+  /* header: title row + segment tabs */
+  .hdr{flex:0 0 auto;background:var(--bg);box-shadow:var(--shadow-m);z-index:10;}
+  .hrow{display:flex;align-items:center;gap:10px;padding:2px 12px 8px;}
+  .hrow .ib{width:34px;height:34px;display:grid;place-items:center;color:var(--ink);flex-shrink:0;}
+  .hrow .ib .ph{width:23px;height:23px;}
+  .hrow .av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:12px;background:linear-gradient(145deg,#1e3e2b,#4fa472);flex-shrink:0;}
+  .hrow .nm{flex:1;font-family:var(--serif);font-weight:600;font-size:16px;color:var(--ink);}
+  .tabs{display:flex;border-bottom:1px solid var(--border-light);padding:0 6px;}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 9px;cursor:pointer;color:var(--muted);position:relative;}
+  .tab .ph{width:22px;height:22px;}
+  .tab .tl{font-family:var(--sans);font-size:11px;font-weight:500;}
+  .tab.on{color:var(--green);}
+  .tab.on .tl{font-weight:600;}
+  .tab.on::after{content:"";position:absolute;left:16%;right:16%;bottom:-1px;height:2.5px;background:var(--green);border-radius:2px;}
+  .tab .dot{position:absolute;top:4px;right:calc(50% - 16px);width:7px;height:7px;border-radius:50%;background:var(--green);}
+  .tab .badge{position:absolute;top:1px;right:calc(50% - 19px);min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:var(--green);color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center;border:1.5px solid var(--bg);}
+
+  /* segments */
+  .seg{display:none;flex:1;min-height:0;flex-direction:column;}
+  .seg.on{display:flex;}
+  .scroll{flex:1;overflow-y:auto;padding:14px 16px;}
+  .scroll::-webkit-scrollbar{display:none;}
+
+  /* chat */
+  .day{align-self:center;font-size:11px;color:var(--muted);background:rgba(0,0,0,.04);padding:3px 12px;border-radius:999px;margin:0 auto 10px;display:table;}
+  .b{max-width:78%;padding:8px 12px;border-radius:15px;font-size:13.5px;line-height:1.4;box-shadow:var(--shadow-m);margin-bottom:9px;}
+  .b .w{font-size:11px;font-weight:600;color:var(--green);margin-bottom:2px;}
+  .b.them{background:var(--card);color:var(--body);border-bottom-left-radius:5px;margin-right:auto;}
+  .b.me{background:var(--ink);color:#fff;border-bottom-right-radius:5px;margin-left:auto;}
+  .composer{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:10px 16px 24px;}
+  .composer .f{flex:1;background:var(--field);border-radius:999px;padding:11px 16px;color:#9c9788;font-size:13.5px;}
+  .composer .snd{width:40px;height:40px;border-radius:50%;background:var(--green);display:grid;place-items:center;color:#fff;flex-shrink:0;}
+  .composer .snd .ph{width:18px;height:18px;}
+
+  /* section label */
+  .slbl{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 10px;}
+  .slbl .t{font-family:var(--serif);font-weight:500;font-size:14px;color:var(--ink);}
+  .slbl .s{font-size:11px;color:var(--muted);}
+
+  /* calendar agenda */
+  .agrow{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:14px;padding:11px 13px;box-shadow:var(--shadow-m);margin-bottom:8px;}
+  .agrow .dt{width:44px;text-align:center;flex-shrink:0;}
+  .agrow .dt .d{font-family:var(--serif);font-weight:600;font-size:18px;color:var(--ink);line-height:1;}
+  .agrow .dt .mo{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+  .agrow .ai{flex:1;} .agrow .ai .n{font-family:var(--sans);font-weight:600;font-size:14px;color:var(--ink);} .agrow .ai .tm{font-size:12px;color:var(--muted);margin-top:1px;}
+  .agrow .pill{font-size:10px;font-weight:600;color:var(--muted);background:var(--field);padding:3px 8px;border-radius:999px;}
+
+  /* updates cards */
+  .ucard{background:var(--card);border-radius:14px;padding:13px;box-shadow:var(--shadow-m);margin-bottom:9px;}
+  .ucard .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .ucard .from{display:inline-flex;align-items:center;gap:7px;font-weight:600;font-size:12.5px;color:var(--ink);}
+  .ucard .fav{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:9px;background:linear-gradient(145deg,#1e3e2b,#4fa472);}
+  .ucard .dt{font-size:11px;color:var(--muted);}
+  .ucard h3{font-family:var(--serif);font-weight:600;font-size:15px;color:var(--ink);margin:0 0 3px;}
+  .ucard p{font-size:12.5px;color:#5f5849;line-height:1.45;margin:0;}
+
+  /* pinned links */
+  .lrow{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:14px;padding:12px 13px;box-shadow:var(--shadow-m);margin-bottom:8px;}
+  .lrow .editbtn{width:28px;height:28px;border-radius:50%;background:var(--field);border:none;display:grid;place-items:center;color:var(--body);cursor:pointer;flex-shrink:0;}
+  .lrow .editbtn .ph{width:14px;height:14px;}
+  .lrow .lic{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;flex-shrink:0;background:var(--brand-light);color:var(--green);}
+  .lrow .lic .ph{width:21px;height:21px;}
+  .lrow .lt{flex:1;min-width:0;} .lrow .lt .n{font-family:var(--sans);font-weight:600;font-size:14px;color:var(--ink);}
+  .lrow .lt .u{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--link);margin-top:1px;}
+  .lrow .lt .u .ph{width:12px;height:12px;}
+  .lrow .go{width:18px;height:18px;color:#c3bdae;flex-shrink:0;}
+  .addlink{display:flex;align-items:center;gap:9px;justify-content:center;background:var(--brand-light);border:1px dashed var(--brand-border);border-radius:14px;padding:13px;color:var(--green);font-weight:600;font-size:13.5px;cursor:pointer;margin-top:2px;}
+  .addlink .ph{width:19px;height:19px;}
+  .adminnote{display:flex;gap:8px;align-items:flex-start;font-size:11.5px;color:var(--muted);line-height:1.4;margin-top:12px;padding:0 4px;}
+  .adminnote .ph{width:15px;height:15px;color:var(--muted);flex-shrink:0;margin-top:1px;}
+
+  /* add-link sheet */
+  .dim{position:absolute;inset:0;background:rgba(20,20,18,.45);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s;}
+  .dim.on{opacity:1;pointer-events:auto;}
+  .sheet{position:absolute;left:0;right:0;bottom:0;z-index:50;background:var(--card);border-radius:22px 22px 0 0;padding:10px 18px 22px;
+    box-shadow:0 -8px 30px rgba(0,0,0,.18);transform:translateY(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);}
+  .sheet.on{transform:translateY(0);}
+  .sheet .handle{width:36px;height:4px;border-radius:3px;background:var(--border-light);margin:0 auto 14px;}
+  .sheet h3{font-family:var(--serif);font-weight:600;font-size:17px;color:var(--ink);margin:0 0 3px;}
+  .sheet .sd{font-size:12px;color:var(--muted);margin:0 0 14px;line-height:1.4;}
+  .iconpick{display:flex;gap:8px;margin-bottom:14px;}
+  .iconpick .ic{width:40px;height:40px;border-radius:11px;background:var(--field);display:grid;place-items:center;color:var(--muted);cursor:pointer;border:2px solid transparent;flex-shrink:0;}
+  .iconpick .ic .ph{width:19px;height:19px;}
+  .iconpick .ic.on{background:var(--brand-light);color:var(--green);border-color:var(--brand-border);}
+  .flabel{font-family:var(--sans);font-weight:600;font-size:11.5px;color:var(--ink);margin:0 0 6px;}
+  .finput{display:flex;align-items:center;gap:9px;background:var(--field);border-radius:12px;padding:12px 13px;margin-bottom:14px;}
+  .finput .ph{width:17px;height:17px;color:var(--muted);flex-shrink:0;}
+  .finput input{border:none;background:transparent;flex:1;font-family:var(--sans);font-size:13.5px;color:var(--ink);min-width:0;}
+  .finput input:focus{outline:none;} .finput input::placeholder{color:#9c9788;}
+  .sheetbtns{display:flex;gap:9px;margin-top:2px;}
+  .sbtn{flex:1;border:none;border-radius:13px;padding:13px;font-family:var(--sans);font-weight:600;font-size:14px;cursor:pointer;}
+  .sbtn.primary{background:var(--green);color:#fff;}
+  .sbtn.ghost{background:var(--field);color:var(--body);}
+  .sbtn.danger{background:#f7dada;color:#b3372e;}
+
+  /* connected-account sheet */
+  .acct{display:flex;align-items:center;gap:11px;background:var(--bg);border:1px solid var(--border-light);border-radius:14px;padding:12px;margin-bottom:14px;}
+  .acct .av{width:40px;height:40px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:15px;flex-shrink:0;}
+  .acct .ai{flex:1;min-width:0;} .acct .ai .n{font-weight:600;font-size:14px;color:var(--ink);} .acct .ai .e{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .acct .chk{width:20px;height:20px;color:var(--green);flex-shrink:0;}
+  .acctnote{display:flex;gap:8px;align-items:flex-start;font-size:11.5px;color:var(--muted);line-height:1.4;margin-bottom:16px;}
+  .acctnote .ph{width:15px;height:15px;color:var(--muted);flex-shrink:0;margin-top:1px;}
+
+  /* sheet section label */
+  .sheet-sub{font-family:var(--sans);font-weight:600;font-size:12px;color:var(--ink);margin:4px 0 8px;display:flex;align-items:center;justify-content:space-between;}
+  .sheet-sub .cnt{font-weight:500;color:var(--muted);font-size:11px;}
+
+  /* scraped sender rows inside the connected-account sheet */
+  .sendrow{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--border-light);border-radius:12px;padding:9px 10px;margin-bottom:8px;}
+  .sendrow .sav{width:30px;height:30px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:11px;flex-shrink:0;}
+  .sendrow .si{flex:1;min-width:0;}
+  .sendrow .si .sn{display:flex;align-items:center;gap:6px;font-weight:600;font-size:12.5px;color:var(--ink);}
+  .sendrow .si .srole{font-size:9px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;background:var(--brand-light);color:var(--green);padding:2px 6px;border-radius:6px;}
+  .sendrow .si .se{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px;}
+  .sendrow .sacts{display:flex;gap:4px;flex-shrink:0;}
+  .sendrow .sabtn{width:26px;height:26px;border-radius:50%;background:var(--field);border:none;display:grid;place-items:center;color:var(--body);cursor:pointer;}
+  .sendrow .sabtn .ph{width:13px;height:13px;}
+  .sendrow .sabtn.del{background:#f7dada;color:#b3372e;}
+  .addsender{display:flex;align-items:center;gap:8px;justify-content:center;background:var(--brand-light);border:1px dashed var(--brand-border);border-radius:12px;padding:10px;color:var(--green);font-weight:600;font-size:12.5px;cursor:pointer;margin-bottom:14px;}
+  .addsender .ph{width:16px;height:16px;}
+
+  /* switch-account sub-view */
+  .sheet-head{display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+  .sheet-back{width:26px;height:26px;border-radius:50%;background:var(--field);border:none;display:grid;place-items:center;color:var(--ink);flex-shrink:0;cursor:pointer;}
+  .sheet-back .ph{width:13px;height:13px;}
+  .acct-row{display:flex;align-items:center;gap:10px;background:var(--bg);border:1.5px solid var(--border-light);border-radius:12px;padding:10px 11px;margin-bottom:8px;cursor:pointer;}
+  .acct-row.picked{border-color:var(--green);background:var(--brand-light);}
+  .acct-row .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:11px;flex-shrink:0;}
+  .acct-row .ai{flex:1;min-width:0;} .acct-row .ai .n{font-weight:600;font-size:12px;color:var(--ink);} .acct-row .ai .e{font-size:10.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .acct-row .rd{width:18px;height:18px;border-radius:50%;border:2px solid var(--border-light);flex-shrink:0;position:relative;}
+  .acct-row.picked .rd{border-color:var(--green);}
+  .acct-row.picked .rd::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--green);}
+  .acct-row.addnew{border-style:dashed;color:var(--green);align-items:center;justify-content:center;font-weight:600;font-size:12.5px;gap:7px;}
+  .acct-row.addnew .ph{width:16px;height:16px;}
+
+  /* email pill trigger (Option C — chosen) */
+  .email-pill{display:inline-flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--border-light);border-radius:999px;padding:4px 9px 4px 6px;cursor:pointer;box-shadow:var(--shadow-m);flex-shrink:0;max-width:172px;}
+  .email-pill .av{width:16px;height:16px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);color:#fff;font-family:var(--serif);font-weight:600;font-size:7.5px;display:grid;place-items:center;flex-shrink:0;}
+  .email-pill .e{font-size:10px;color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .email-pill .chev{width:9px;height:9px;color:var(--muted);flex-shrink:0;}
+  .connect-pill{display:inline-flex;align-items:center;gap:5px;background:none;border:1.5px dashed var(--brand-border);border-radius:999px;padding:5px 11px 5px 8px;cursor:pointer;color:var(--green);font-weight:600;font-size:11px;flex-shrink:0;}
+  .connect-pill .ph{width:13px;height:13px;}
+
+  /* inline not-connected / add-senders views (fit INSIDE the Updates tab, never full-screen) */
+  .upd-empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:18px 10px 8px;}
+  .upd-empty .hero{width:52px;height:52px;border-radius:15px;background:var(--brand-light);display:grid;place-items:center;color:var(--green);margin-bottom:12px;}
+  .upd-empty .hero .ph{width:26px;height:26px;}
+  .upd-empty h4{font-family:var(--serif);font-weight:600;font-size:16px;color:var(--ink);margin:0 0 6px;}
+  .upd-empty p{font-size:12px;color:var(--muted);line-height:1.5;max-width:250px;margin:0 0 14px;}
+  .upd-empty .feat{display:flex;gap:8px;align-items:flex-start;text-align:left;margin-bottom:8px;width:100%;max-width:270px;}
+  .upd-empty .feat .fi{width:24px;height:24px;border-radius:7px;background:var(--brand-light);display:grid;place-items:center;color:var(--green);flex-shrink:0;}
+  .upd-empty .feat .fi .ph{width:13px;height:13px;}
+  .upd-empty .feat .ft{font-size:11px;color:var(--body);line-height:1.4;padding-top:2px;}
+  .upd-empty .cbtn{border:none;border-radius:12px;padding:11px 22px;background:var(--green);color:#fff;font-weight:600;font-size:13px;cursor:pointer;margin-top:6px;}
+
+  .upd-add h4{font-family:var(--serif);font-weight:600;font-size:15px;color:var(--ink);margin:2px 0 4px;text-align:left;}
+  .upd-add p.sd2{font-size:11.5px;color:var(--muted);margin:0 0 14px;line-height:1.4;}
+  .senderform{background:var(--card);border-radius:14px;padding:12px;box-shadow:var(--shadow-m);margin-bottom:10px;}
+  .roletoggle{display:flex;gap:6px;margin-bottom:10px;}
+  .roletoggle .ro{flex:1;text-align:center;padding:7px 4px;border-radius:9px;background:var(--field);color:var(--body);font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid transparent;}
+  .roletoggle .ro.on{background:var(--brand-light);color:var(--green);border-color:var(--brand-border);}
+  .upd-add .cta{border:none;border-radius:13px;padding:13px;width:100%;background:var(--green);color:#fff;font-weight:600;font-size:14px;cursor:pointer;margin-top:2px;}
+  .upd-add .cta:disabled{background:var(--field);color:#9c9788;cursor:not-allowed;}
+
+  /* selector-style comparison panel */
+  .cmp{display:flex;flex-direction:column;gap:16px;width:400px;}
+  .cmp .opt{background:var(--card);border-radius:18px;padding:14px;box-shadow:var(--shadow-m);}
+  .cmp .oh{font-family:var(--serif);font-weight:600;font-size:14px;color:var(--ink);margin:0 0 3px;}
+  .cmp .od{font-size:11.5px;color:var(--muted);margin:0 0 12px;line-height:1.4;}
+  .mini{background:var(--bg);border-radius:12px;overflow:hidden;border:1px solid var(--border-light);}
+  .mini .mrow{display:flex;align-items:center;gap:8px;padding:8px 12px 6px;}
+  .mini .mav{width:26px;height:26px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);color:#fff;display:grid;place-items:center;font-family:var(--serif);font-weight:600;font-size:10px;}
+  .mini .mnm{font-family:var(--serif);font-weight:600;font-size:14px;color:var(--ink);}
+  /* A: icon+label */
+  .tA{display:flex;border-top:1px solid var(--border-light);}
+  .tA .t{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0 8px;color:var(--muted);position:relative;}
+  .tA .t .ph{width:20px;height:20px;} .tA .t span{font-size:10px;font-weight:500;}
+  .tA .t.on{color:var(--green);} .tA .t.on::after{content:"";position:absolute;left:20%;right:20%;bottom:0;height:2.5px;background:var(--green);border-radius:2px;}
+  /* B: icon-only segmented */
+  .tB{display:flex;gap:6px;padding:9px 12px;border-top:1px solid var(--border-light);}
+  .tB .t{width:38px;height:34px;border-radius:10px;display:grid;place-items:center;color:var(--muted);}
+  .tB .t .ph{width:20px;height:20px;} .tB .t.on{background:var(--brand-light);color:var(--green);}
+  .tB .lbl{flex:1;display:flex;align-items:center;font-size:12px;color:var(--muted);padding-left:4px;}
+  /* C: text tabs */
+  .tC{display:flex;gap:16px;padding:9px 14px 8px;border-top:1px solid var(--border-light);overflow-x:auto;}
+  .tC .t{font-family:var(--sans);font-weight:500;font-size:13.5px;color:var(--muted);white-space:nowrap;position:relative;padding-bottom:6px;}
+  .tC .t.on{color:var(--ink);font-weight:600;} .tC .t.on::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2.5px;background:var(--ink);border-radius:2px;}
+</style>
+</head>
+<body>
+<div class="lede">
+  <h1>Class Hub — Header Segments</h1>
+  <p>Header kelas jadi navigator 4 segmen: <b>Chat · Calendar · Updates · Pinned Links</b>. Chat/Calendar/Updates hard-coded; Pinned Links = admin-configurable (pin + link), generik buat sekolah maupun sport league. Phone kiri interaktif — tap tab-nya.</p>
+</div>
+
+<!-- ===== INTERACTIVE HUB ===== -->
+<div class="panel">
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="hdr">
+      <div class="hrow">
+        <div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+        <div class="av" id="hubAv">MT</div>
+        <div class="nm" id="hubName">Miss Taylor's Class</div>
+        <div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M140 128a12 12 0 1 1-12-12 12 12 0 0 1 12 12m-12-56a12 12 0 1 0-12-12 12 12 0 0 0 12 12m0 112a12 12 0 1 0 12 12 12 12 0 0 0-12-12"/></svg></span></div>
+      </div>
+      <div class="tabs">
+        <div class="tab on" data-seg="chat" onclick="seg(this)"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24m0 192a87.87 87.87 0 0 1-44.06-11.81 8 8 0 0 0-6.54-.67L40 216l12.47-37.4a8 8 0 0 0-.66-6.54A88 88 0 1 1 128 216"/></svg></span><span class="tl">Chat</span></div>
+        <div class="tab" data-seg="cal" onclick="seg(this)"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span><span class="tl">Calendar</span></div>
+        <div class="tab" data-seg="upd" onclick="seg(this)"><span class="badge" id="updBadge">3</span><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span><span class="tl">Updates</span></div>
+        <div class="tab" data-seg="lnk" onclick="seg(this)"><span class="ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224h1.13a15.93 15.93 0 0 0 11.64-6.33c19.64-26.1 17.75-47.32 13.19-60L235.33 104a16 16 0 0 0-.01-22.63M224 92.69l-57.27 57.46a8 8 0 0 0-1.49 9.22c9.46 18.93-1.8 38.59-9.34 48.62L48 100.08c12.08-9.74 23.64-12.31 32.48-12.31A40.1 40.1 0 0 1 96.81 91a8 8 0 0 0 9.25-1.51L163.32 32 224 92.68Z"/></svg></span><span class="tl">Links</span></div>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="seg on" id="s-chat">
+      <div class="scroll">
+        <div class="day">Today</div>
+        <div class="b them"><div class="w">Ana Michel</div>Did everyone get their art bags sent in? 🎨</div>
+        <div class="b them"><div class="w">Marcus Reed</div>Sent ours this morning!</div>
+        <div class="b me">On it 👍</div>
+      </div>
+      <div class="composer"><div class="f">Message Miss Taylor's Class…</div><div class="snd"><span class="ph"><svg viewBox="0 0 256 256"><path d="M227.32 28.68a16 16 0 0 0-15.66-4.08h-.15L19.57 82.84a16 16 0 0 0-2.49 29.8L102 154l41.3 84.87a15.86 15.86 0 0 0 14.44 9.13q.69 0 1.38-.06a15.88 15.88 0 0 0 14-11.51l58.2-191.94v-.15a16 16 0 0 0-4-15.66m-69.49 203.17-.05.14v-.07l-40.06-82.3 48-48a8 8 0 0 0-11.31-11.31l-48 48-82.33-40.06h-.07.14L216 40Z"/></svg></span></div></div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="seg" id="s-cal">
+      <div class="scroll">
+        <div class="slbl"><span class="t">This week</span><span class="s">Miss Taylor's Class</span></div>
+        <div class="agrow"><div class="dt"><div class="d">21</div><div class="mo">Tue</div></div><div class="ai"><div class="n">Career Day on Wheels</div><div class="tm">All day · campus</div></div></div>
+        <div class="agrow"><div class="dt"><div class="d">23</div><div class="mo">Thu</div></div><div class="ai"><div class="n">Library books due</div><div class="tm">Before dismissal</div></div></div>
+        <div class="slbl" style="margin-top:16px"><span class="t">Upcoming</span></div>
+        <div class="agrow"><div class="dt"><div class="d">25</div><div class="mo">Sat</div></div><div class="ai"><div class="n">End of Year Celebration</div><div class="tm">8:15–9:30 AM</div></div><span class="pill">RSVP</span></div>
+        <div class="agrow"><div class="dt"><div class="d">28</div><div class="mo">Tue</div></div><div class="ai"><div class="n">Last day of school</div><div class="tm">No school after</div></div></div>
+      </div>
+    </div>
+
+    <!-- UPDATES — 3 inline states, all living inside this one tab (never a full-screen page) -->
+    <div class="seg" id="s-upd">
+      <div class="scroll">
+        <div class="slbl">
+          <span class="t">Updates</span>
+          <span id="updTrigger"></span>
+        </div>
+
+        <!-- STATE 1: not connected (intro + connect merged into one inline view) -->
+        <div id="upd-empty" class="upd-empty" style="display:none;">
+          <div class="hero"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span></div>
+          <h4>Teacher updates, automatically</h4>
+          <p>Connect your inbox and Sprout pulls your teacher's emails in here — no new app for them to use.</p>
+          <div class="feat"><div class="fi"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 40H48a16 16 0 0 0-16 16v56c0 52.72 25.52 84.67 46.93 102.19 23.06 18.86 46 25.26 47 25.53a8 8 0 0 0 4.2 0c1-.27 23.91-6.67 47-25.53C198.48 196.67 224 164.72 224 112V56a16 16 0 0 0-16-16m-34.34 69.66-56 56a8 8 0 0 1-11.32 0l-24-24a8 8 0 0 1 11.32-11.32L112 148.69l50.34-50.35a8 8 0 0 1 11.32 11.32"/></svg></span></div><div class="ft"><b>Private &amp; read-only.</b> Only the senders you choose — disconnect anytime.</div></div>
+          <button class="cbtn" onclick="startConnect()">Connect email</button>
+        </div>
+
+        <!-- STATE 2: add senders (page 2 of 2 — lands straight on the list after, no extra "all set" step) -->
+        <div id="upd-add" class="upd-add" style="display:none;">
+          <h4>Whose emails should we pull in?</h4>
+          <p class="sd2">Add your teacher and any room parents. You can add, edit, or remove these anytime from the account menu.</p>
+          <div id="senderFormList"></div>
+          <div class="addsender" onclick="addSenderField()"><span class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Add another email</div>
+          <button class="cta" id="startPullingBtn" onclick="finishAddSenders()" disabled>Start pulling updates</button>
+        </div>
+
+        <!-- STATE 3: connected — real update cards -->
+        <div id="upd-connected" style="display:none;">
+          <div id="updateCardList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PINNED LINKS -->
+    <div class="seg" id="s-lnk">
+      <div class="scroll">
+        <div class="slbl"><span class="t">Pinned links</span><span class="s">set by your admin</span></div>
+        <div class="lrow" data-icon="globe" data-url="https://www.austinisd.org"><div class="lic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24m87.62 96h-39.83c-1.79-36.51-15.85-62.33-27.38-77.6a88.19 88.19 0 0 1 67.22 77.6ZM96.23 136h63.54c-2.31 41.61-22.23 67.11-31.77 77-9.55-9.9-29.46-35.4-31.77-77m0-16c2.31-41.61 22.23-67.11 31.77-77 9.55 9.93 29.46 35.43 31.77 77Zm11.36-77.6C96.06 57.67 82 83.49 80.21 120H40.37a88.19 88.19 0 0 1 67.22-77.6M40.37 136h39.84c1.82 36.51 15.85 62.33 27.38 77.6A88.19 88.19 0 0 1 40.37 136m108 77.6c11.53-15.27 25.56-41.09 27.38-77.6h39.84a88.19 88.19 0 0 1-67.18 77.6Z"/></svg></span></div><div class="lt"><div class="n">School Website</div><div class="u"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 104a8 8 0 0 1-16 0V59.32l-66.33 66.34a8 8 0 0 1-11.32-11.32L196.68 48H152a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8Zm-40 24a8 8 0 0 0-8 8v72H48V80h72a8 8 0 0 0 0-16H48a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-72a8 8 0 0 0-8-8"/></svg></span>austinisd.org</div></div><button class="editbtn" onclick="openLinkSheet(this.closest('.lrow'))"><span class="ph"><svg viewBox="0 0 256 256"><path d="M227.31 73.37 182.63 28.7a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63Z"/></svg></span></button></div>
+        <div class="lrow" data-icon="gift" data-url="https://www.amazon.com/wishlist"><div class="lic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M216 72h-35.08c.39-.33.79-.65 1.17-1A29.53 29.53 0 0 0 192 49.57 32.62 32.62 0 0 0 158.44 16 29.53 29.53 0 0 0 137 25.91a55 55 0 0 0-9 14.48 55 55 0 0 0-9-14.48A29.53 29.53 0 0 0 97.56 16 32.62 32.62 0 0 0 64 49.57 29.53 29.53 0 0 0 73.91 71c.38.33.78.65 1.17 1H40a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16v64a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16v-64a16 16 0 0 0 16-16V88a16 16 0 0 0-16-16m-96 128H56v-64h64Zm0-80H40V88h80zm16-38.49c1.2-10.59 4.5-25.98 12.5-34.97a13.7 13.7 0 0 1 10-4.5h.49A16.62 16.62 0 0 1 176 49.08a13.7 13.7 0 0 1-4.5 10c-9.49 8.4-25.24 11.36-35 12.4ZM200 120h-80V88h80z"/></svg></span></div><div class="lt"><div class="n">Ms. Taylor's Wish List</div><div class="u"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 104a8 8 0 0 1-16 0V59.32l-66.33 66.34a8 8 0 0 1-11.32-11.32L196.68 48H152a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8Zm-40 24a8 8 0 0 0-8 8v72H48V80h72a8 8 0 0 0 0-16H48a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-72a8 8 0 0 0-8-8"/></svg></span>amazon.com</div></div><button class="editbtn" onclick="openLinkSheet(this.closest('.lrow'))"><span class="ph"><svg viewBox="0 0 256 256"><path d="M227.31 73.37 182.63 28.7a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63Z"/></svg></span></button></div>
+        <div class="lrow" data-icon="donate" data-url="https://venmo.com/room-parent"><div class="lic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M230.33 141.06a24.43 24.43 0 0 0-21.24-4.23l-41.84 9.62A28 28 0 0 0 140 112H89.94a31.82 31.82 0 0 0-22.63 9.37L44.69 144H16a16 16 0 0 0-16 16v40a16 16 0 0 0 16 16h104a8 8 0 0 0 1.94-.24l64-16a7 7 0 0 0 1.19-.4L226 182.82l.44-.2a24.6 24.6 0 0 0 3.93-41.56ZM16 160h24v40H16Zm203.43 8.21-38 16.18L119 200H56v-44.69l22.63-22.62A15.86 15.86 0 0 1 89.94 128H140a12 12 0 0 1 0 24h-28a8 8 0 0 0 0 16h32a8.3 8.3 0 0 0 1.79-.2l67-15.41.31-.08a8.6 8.6 0 0 1 6.3 15.9ZM164 96a36 36 0 0 0 5.9-.48 36 36 0 1 0 28.22-47A36 36 0 1 0 164 96m60-12a20 20 0 1 1-20-20 20 20 0 0 1 20 20m-60-44a20 20 0 0 1 19.25 14.61 36 36 0 0 0-15 24.93A20.4 20.4 0 0 1 164 80a20 20 0 0 1 0-40"/></svg></span></div><div class="lt"><div class="n">Class Donations</div><div class="u"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 104a8 8 0 0 1-16 0V59.32l-66.33 66.34a8 8 0 0 1-11.32-11.32L196.68 48H152a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8Zm-40 24a8 8 0 0 0-8 8v72H48V80h72a8 8 0 0 0 0-16H48a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-72a8 8 0 0 0-8-8"/></svg></span>venmo.com/room-parent</div></div><button class="editbtn" onclick="openLinkSheet(this.closest('.lrow'))"><span class="ph"><svg viewBox="0 0 256 256"><path d="M227.31 73.37 182.63 28.7a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63Z"/></svg></span></button></div>
+        <div class="lrow" data-icon="store" data-url="https://kikerspirit.com"><div class="lic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M232 96a7.9 7.9 0 0 0-.3-2.2l-14.35-50.2A16.07 16.07 0 0 0 202 32H54a16.07 16.07 0 0 0-15.35 11.6L24.31 93.8A7.9 7.9 0 0 0 24 96v16a40 40 0 0 0 16 32v72a8 8 0 0 0 8 8h160a8 8 0 0 0 8-8v-72a40 40 0 0 0 16-32zM54 48h148l11.42 40H42.61Zm50 56h48v8a24 24 0 0 1-48 0Zm-16 0v8a24 24 0 0 1-35.12 21.26 7.9 7.9 0 0 0-1.82-1.06A24 24 0 0 1 40 112v-8Zm112 104H56v-56.8a40.6 40.6 0 0 0 8 .8 40 40 0 0 0 32-16 40 40 0 0 0 64 0 40 40 0 0 0 32 16 40.6 40.6 0 0 0 8-.8Zm4.93-75.8a8 8 0 0 0-1.8 1.05A24 24 0 0 1 168 112v-8h48v8a24 24 0 0 1-11.07 20.2"/></svg></span></div><div class="lt"><div class="n">Spirit Merch Store</div><div class="u"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 104a8 8 0 0 1-16 0V59.32l-66.33 66.34a8 8 0 0 1-11.32-11.32L196.68 48H152a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8Zm-40 24a8 8 0 0 0-8 8v72H48V80h72a8 8 0 0 0 0-16H48a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-72a8 8 0 0 0-8-8"/></svg></span>kikerspirit.com</div></div><button class="editbtn" onclick="openLinkSheet(this.closest('.lrow'))"><span class="ph"><svg viewBox="0 0 256 256"><path d="M227.31 73.37 182.63 28.7a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63Z"/></svg></span></button></div>
+        <div class="addlink" id="addlinkList" onclick="openLinkSheet()"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m48 104a8 8 0 0 1-8 8h-32v32a8 8 0 0 1-16 0v-32H88a8 8 0 0 1 0-16h32V88a8 8 0 0 1 16 0v32h32a8 8 0 0 1 8 8"/></svg></span>Add a link</div>
+        <div class="adminnote"><span class="ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224h1.13a15.93 15.93 0 0 0 11.64-6.33c19.64-26.1 17.75-47.32 13.19-60L235.33 104a16 16 0 0 0-.01-22.63M224 92.69l-57.27 57.46a8 8 0 0 0-1.49 9.22c9.46 18.93-1.8 38.59-9.34 48.62L48 100.08c12.08-9.74 23.64-12.31 32.48-12.31A40.1 40.1 0 0 1 96.81 91a8 8 0 0 0 9.25-1.51L163.32 32 224 92.68Z"/></svg></span>Admins can add & label links — school site, wishlist, donate, merch, or anything else your group needs.</div>
+      </div>
+    </div>
+
+    <!-- ADD-A-LINK SHEET -->
+    <div class="dim" id="linkDim" onclick="closeLinkSheet()"></div>
+    <div class="sheet" id="linkSheet">
+      <div class="handle"></div>
+      <h3 id="linkSheetTitle">Add a link</h3>
+      <p class="sd">Give it a label parents will recognize, then paste the URL.</p>
+
+      <div class="flabel">Icon</div>
+      <div class="iconpick" id="iconpick">
+        <div class="ic on" data-icon="link" onclick="pickIcon(this)"><span class="ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224h1.13a15.93 15.93 0 0 0 11.64-6.33c19.64-26.1 17.75-47.32 13.19-60L235.33 104a16 16 0 0 0-.01-22.63M224 92.69l-57.27 57.46a8 8 0 0 0-1.49 9.22c9.46 18.93-1.8 38.59-9.34 48.62L48 100.08c12.08-9.74 23.64-12.31 32.48-12.31A40.1 40.1 0 0 1 96.81 91a8 8 0 0 0 9.25-1.51L163.32 32 224 92.68Z"/></svg></span></div>
+        <div class="ic" data-icon="globe" onclick="pickIcon(this)"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24m87.62 96h-39.83c-1.79-36.51-15.85-62.33-27.38-77.6a88.19 88.19 0 0 1 67.22 77.6ZM96.23 136h63.54c-2.31 41.61-22.23 67.11-31.77 77-9.55-9.9-29.46-35.4-31.77-77m0-16c2.31-41.61 22.23-67.11 31.77-77 9.55 9.93 29.46 35.43 31.77 77Zm11.36-77.6C96.06 57.67 82 83.49 80.21 120H40.37a88.19 88.19 0 0 1 67.22-77.6M40.37 136h39.84c1.82 36.51 15.85 62.33 27.38 77.6A88.19 88.19 0 0 1 40.37 136m108 77.6c11.53-15.27 25.56-41.09 27.38-77.6h39.84a88.19 88.19 0 0 1-67.18 77.6Z"/></svg></span></div>
+        <div class="ic" data-icon="gift" onclick="pickIcon(this)"><span class="ph"><svg viewBox="0 0 256 256"><path d="M216 72h-35.08c.39-.33.79-.65 1.17-1A29.53 29.53 0 0 0 192 49.57 32.62 32.62 0 0 0 158.44 16 29.53 29.53 0 0 0 137 25.91a55 55 0 0 0-9 14.48 55 55 0 0 0-9-14.48A29.53 29.53 0 0 0 97.56 16 32.62 32.62 0 0 0 64 49.57 29.53 29.53 0 0 0 73.91 71c.38.33.78.65 1.17 1H40a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16v64a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16v-64a16 16 0 0 0 16-16V88a16 16 0 0 0-16-16M120 200H56v-64h64Zm0-80H40V88h80zm16-38.49c1.2-10.59 4.5-25.98 12.5-34.97a13.7 13.7 0 0 1 10-4.5h.49A16.62 16.62 0 0 1 176 49.08a13.7 13.7 0 0 1-4.5 10c-9.49 8.4-25.24 11.36-35 12.4ZM200 120h-80V88h80Z"/></svg></span></div>
+        <div class="ic" data-icon="donate" onclick="pickIcon(this)"><span class="ph"><svg viewBox="0 0 256 256"><path d="M230.33 141.06a24.43 24.43 0 0 0-21.24-4.23l-41.84 9.62A28 28 0 0 0 140 112H89.94a31.82 31.82 0 0 0-22.63 9.37L44.69 144H16a16 16 0 0 0-16 16v40a16 16 0 0 0 16 16h104a8 8 0 0 0 1.94-.24l64-16a7 7 0 0 0 1.19-.4L226 182.82l.44-.2a24.6 24.6 0 0 0 3.93-41.56ZM16 160h24v40H16Zm203.43 8.21-38 16.18L119 200H56v-44.69l22.63-22.62A15.86 15.86 0 0 1 89.94 128H140a12 12 0 0 1 0 24h-28a8 8 0 0 0 0 16h32a8.3 8.3 0 0 0 1.79-.2l67-15.41.31-.08a8.6 8.6 0 0 1 6.3 15.9ZM164 96a36 36 0 0 0 5.9-.48 36 36 0 1 0 28.22-47A36 36 0 1 0 164 96m60-12a20 20 0 1 1-20-20 20 20 0 0 1 20 20m-60-44a20 20 0 0 1 19.25 14.61 36 36 0 0 0-15 24.93A20.4 20.4 0 0 1 164 80a20 20 0 0 1 0-40"/></svg></span></div>
+        <div class="ic" data-icon="store" onclick="pickIcon(this)"><span class="ph"><svg viewBox="0 0 256 256"><path d="M232 96a7.9 7.9 0 0 0-.3-2.2l-14.35-50.2A16.07 16.07 0 0 0 202 32H54a16.07 16.07 0 0 0-15.35 11.6L24.31 93.8A7.9 7.9 0 0 0 24 96v16a40 40 0 0 0 16 32v72a8 8 0 0 0 8 8h160a8 8 0 0 0 8-8v-72a40 40 0 0 0 16-32zM54 48h148l11.42 40H42.61Zm50 56h48v8a24 24 0 0 1-48 0Zm-16 0v8a24 24 0 0 1-35.12 21.26 7.9 7.9 0 0 0-1.82-1.06A24 24 0 0 1 40 112v-8Zm112 104H56v-56.8a40.6 40.6 0 0 0 8 .8 40 40 0 0 0 32-16 40 40 0 0 0 64 0 40 40 0 0 0 32 16 40.6 40.6 0 0 0 8-.8Zm4.93-75.8a8 8 0 0 0-1.8 1.05A24 24 0 0 1 168 112v-8h48v8a24 24 0 0 1-11.07 20.2"/></svg></span></div>
+      </div>
+
+      <div class="flabel">Label</div>
+      <div class="finput"><span class="ph"><svg viewBox="0 0 256 256"><path d="m227.31 73.37-44.68-44.69a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63M92.69 208H48v-44.69l88-88L180.69 120ZM192 108.68 147.31 64l24-24L216 84.68Z"/></svg></span><input id="linkLabel" placeholder="e.g. Spirit Wear Store" autocomplete="off"></div>
+
+      <div class="flabel">Link</div>
+      <div class="finput"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 104a8 8 0 0 1-16 0V59.32l-66.33 66.34a8 8 0 0 1-11.32-11.32L196.68 48H152a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8Zm-40 24a8 8 0 0 0-8 8v72H48V80h72a8 8 0 0 0 0-16H48a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-72a8 8 0 0 0-8-8"/></svg></span><input id="linkUrl" placeholder="Paste a URL" autocomplete="off"></div>
+
+      <div class="sheetbtns">
+        <button class="sbtn danger" id="deleteLinkBtn" onclick="deleteLink()" style="display:none;">Delete</button>
+        <button class="sbtn ghost" id="cancelLinkBtn" onclick="closeLinkSheet()">Cancel</button>
+        <button class="sbtn primary" onclick="saveLink()">Save link</button>
+      </div>
+    </div>
+
+    <!-- CONNECTED ACCOUNT SHEET (the "little dot dot dot button" from the meeting) -->
+    <div class="dim" id="acctDim" onclick="closeAcctSheet()"></div>
+    <div class="sheet" id="acctSheet">
+      <div class="handle"></div>
+
+      <div id="acctSheet-default">
+        <h3>Connected Account</h3>
+        <p class="sd">This is the Gmail Sprout uses to sign in and pull updates from for this class.</p>
+        <div class="acct">
+          <div class="av" id="acctPrimaryAv">AM</div>
+          <div class="ai"><div class="n" id="acctPrimaryName">Anthony Martin</div><div class="e" id="acctPrimaryEmail">anthonyjohnmartin@gmail.com</div></div>
+          <span class="chk ph"><svg viewBox="0 0 256 256"><path d="M173.66 98.34a8 8 0 0 1 0 11.32l-56 56a8 8 0 0 1-11.32 0l-24-24a8 8 0 0 1 11.32-11.32L112 148.69l50.34-50.35a8 8 0 0 1 11.32 0M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88"/></svg></span>
+        </div>
+
+        <div class="sheet-sub">Pulling updates from <span class="cnt" id="senderCount">2 emails</span></div>
+        <div id="sheetSenderList"></div>
+        <div class="addsender" onclick="openEditSender(null)"><span class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Add another email</div>
+
+        <div class="acctnote"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24m0 168a8 8 0 0 1-8-8v-56a8 8 0 0 1 16 0v56a8 8 0 0 1-8 8m0-88a10 10 0 1 1 10-10 10 10 0 0 1-10 10"/></svg></span>Disconnecting stops new emails from being pulled in, but keeps what's already here.</div>
+
+        <div class="sheetbtns">
+          <button class="sbtn ghost" id="switchBtn" onclick="showSwitch()">Switch email</button>
+          <button class="sbtn danger" onclick="disconnectAcct()">Disconnect</button>
+        </div>
+      </div>
+
+      <!-- switch-account sub-view -->
+      <div id="acctSheet-switch" style="display:none;">
+        <div class="sheet-head"><button class="sheet-back" onclick="backToAcctDefault()"><span class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></span></button><h3>Switch Email</h3></div>
+        <p class="sd">Pick another Google account already signed in, or add a new one.</p>
+        <div id="switchAcctList"></div>
+        <div class="acct-row addnew" onclick="pickSwitch(null)"><span class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Use a different Google email</div>
+        <div class="sheetbtns"><button class="sbtn primary" id="confirmSwitchBtn" onclick="confirmSwitch()" disabled>Switch to this email</button></div>
+      </div>
+    </div>
+
+    <!-- EDIT/ADD SENDER SHEET -->
+    <div class="dim" id="senderDim" onclick="closeEditSender()"></div>
+    <div class="sheet" id="senderSheet">
+      <div class="handle"></div>
+      <h3 id="senderSheetTitle">Add Email</h3>
+      <p class="sd">Who is this, and what should we label their emails as?</p>
+      <div class="flabel">Role</div>
+      <div class="roletoggle" id="senderRoleToggle">
+        <div class="ro on" data-role="Teacher" onclick="pickRole(this)">Teacher</div>
+        <div class="ro" data-role="Room Parent" onclick="pickRole(this)">Room Parent</div>
+      </div>
+      <div class="flabel">Name</div>
+      <div class="finput"><span class="ph"><svg viewBox="0 0 256 256"><path d="M230.93 220a8 8 0 0 1-6.93 4H32a8 8 0 0 1-6.92-12c15.23-26.33 38.7-45.21 66.09-54.16a72 72 0 1 1 73.66 0c27.39 8.95 50.86 27.83 66.09 54.16a8 8 0 0 1 .01 8"/></svg></span><input id="senderName" placeholder="e.g. Ms. Taylor" autocomplete="off"></div>
+      <div class="flabel">Email</div>
+      <div class="finput"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span><input id="senderEmail" placeholder="name@school.org" autocomplete="off"></div>
+      <div class="sheetbtns">
+        <button class="sbtn danger" id="removeSenderBtn" onclick="removeSender()" style="display:none;">Remove</button>
+        <button class="sbtn primary" onclick="saveSender()">Save</button>
+      </div>
+    </div>
+  </div></div>
+  <div class="cap"><b>Interaktif.</b> Tap Chat / Calendar / Updates / Links. Updates badge hilang saat dibuka. "Add a link" → sheet berfungsi (isi label+URL → Save).</div>
+</div>
+
+<!-- ===== SELECTOR STYLE COMPARISON ===== -->
+<div class="panel">
+  <div class="cmp">
+    <div class="opt">
+      <div class="oh">A · Icon + label (rekomendasi)</div>
+      <div class="od">Paling jelas & discoverable. 4 muat pas di 393px. Yang aku pakai di kiri.</div>
+      <div class="mini">
+        <div class="mrow"><div class="mav">MT</div><div class="mnm">Miss Taylor's Class</div></div>
+        <div class="tA">
+          <div class="t on"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24m0 192a87.87 87.87 0 0 1-44.06-11.81 8 8 0 0 0-6.54-.67L40 216l12.47-37.4a8 8 0 0 0-.66-6.54A88 88 0 1 1 128 216"/></svg></span><span>Chat</span></div>
+          <div class="t"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span><span>Calendar</span></div>
+          <div class="t"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span><span>Updates</span></div>
+          <div class="t"><span class="ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224h1.13a15.93 15.93 0 0 0 11.64-6.33c19.64-26.1 17.75-47.32 13.19-60L235.33 104a16 16 0 0 0-.01-22.63M224 92.69l-57.27 57.46a8 8 0 0 0-1.49 9.22c9.46 18.93-1.8 38.59-9.34 48.62L48 100.08c12.08-9.74 23.64-12.31 32.48-12.31A40.1 40.1 0 0 1 96.81 91a8 8 0 0 0 9.25-1.51L163.32 32 224 92.68Z"/></svg></span><span>Links</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="opt">
+      <div class="oh">B · Icon-only + judul segmen</div>
+      <div class="od">Paling ringkas — icon segmented, nama segmen aktif tampil di samping. Skalabel kalau segmen nambah.</div>
+      <div class="mini">
+        <div class="tB">
+          <div class="t on"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24m0 192a87.87 87.87 0 0 1-44.06-11.81 8 8 0 0 0-6.54-.67L40 216l12.47-37.4a8 8 0 0 0-.66-6.54A88 88 0 1 1 128 216"/></svg></span></div>
+          <div class="t"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span></div>
+          <div class="t"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span></div>
+          <div class="t"><span class="ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224h1.13a15.93 15.93 0 0 0 11.64-6.33c19.64-26.1 17.75-47.32 13.19-60L235.33 104a16 16 0 0 0-.01-22.63M224 92.69l-57.27 57.46a8 8 0 0 0-1.49 9.22c9.46 18.93-1.8 38.59-9.34 48.62L48 100.08c12.08-9.74 23.64-12.31 32.48-12.31A40.1 40.1 0 0 1 96.81 91a8 8 0 0 0 9.25-1.51L163.32 32 224 92.68Z"/></svg></span></div>
+          <div class="lbl">Chat</div>
+        </div>
+      </div>
+    </div>
+    <div class="opt">
+      <div class="oh">C · Text tabs (gaya GameChanger)</div>
+      <div class="od">Rapi tapi makan lebar; kalau segmen nambah harus scroll. Kekhawatiran Tony soal teks kepanjangan.</div>
+      <div class="mini">
+        <div class="tC"><div class="t on">Chat</div><div class="t">Calendar</div><div class="t">Updates</div><div class="t">Links</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="cap"><b>Eksplorasi selector.</b> Icon vs teks — pilih salah satu.</div>
+</div>
+
+<script>
+  function seg(el){
+    var id=el.getAttribute('data-seg');
+    el.parentNode.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+    el.classList.add('on');
+    document.querySelectorAll('.seg').forEach(function(s){s.classList.remove('on');});
+    document.getElementById('s-'+id).classList.add('on');
+    if(id==='upd'){var b=document.getElementById('updBadge');if(b)b.style.display='none';renderUpdView();}
+  }
+
+  /* ══════════ EMAIL / UPDATES STATE ══════════
+     Scoped to this one class hub. In the real app this whole object lives per
+     subgroup (see the write-up on chat) — moving between subgroups means
+     navigating to a different hub screen entirely, each with its own copy of
+     this state, not switching context within one screen. */
+  var hubData = {
+    emailConnected: true,
+    primaryAcct: { name:'Anthony Martin', email:'anthonyjohnmartin@gmail.com', initials:'AM' },
+    altAccounts: [ { name:'Anthony Martin', email:'ajmartin.work@gmail.com', initials:'AM' } ],
+    senders: [
+      { name:'Ms. Taylor', role:'Teacher', email:'taylor.k@austinisd.org', initials:'MT' },
+      { name:'Ana Michel', role:'Room Parent', email:'anamichel82@gmail.com', initials:'AM' }
+    ],
+    updates: [
+      { senderIdx:0, date:'Today', time:'8:14 AM', title:'Art Bags', body:'Send a labeled reusable bag tomorrow so your child can bring their artwork home.' },
+      { senderIdx:0, date:'May 27', time:'3:40 PM', title:'Newsletter · Week of May 18', body:'MAP results sent home, summer reading, and a look ahead to next year.' },
+      { senderIdx:1, date:'May 11', time:'10:02 AM', title:'End of the Year Class Party', body:'Sat May 16, 10:30–12:30 at Vintage Place Playground. RSVP inside.' }
+    ]
+  };
+  function hub(){ return hubData; }
+
+  var pendingSenderForm = [];
+  var editingSenderIdx = null; // null = adding new, number = editing senders[idx]
+  var pendingSwitchAcct = null;
+
+  function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  function renderUpdView(){
+    document.getElementById('upd-empty').style.display = 'none';
+    document.getElementById('upd-add').style.display = 'none';
+    document.getElementById('upd-connected').style.display = 'none';
+    var trigger = document.getElementById('updTrigger');
+    if(!hub().emailConnected){
+      document.getElementById('upd-empty').style.display = 'flex';
+      trigger.innerHTML = '<button class="connect-pill" onclick="startConnect()"><span class="ph"><svg viewBox="0 0 256 256"><path d="M221.66 133.66l-72 72a8 8 0 0 1-11.32-11.32L196.69 136H40a8 8 0 0 1 0-16h156.69l-58.35-58.34a8 8 0 0 1 11.32-11.32l72 72a8 8 0 0 1 0 11.32"/></svg></span>Connect email</button>';
+      return;
+    }
+    document.getElementById('upd-connected').style.display = 'block';
+    trigger.innerHTML = '<div class="email-pill" onclick="openAcctSheet()"><div class="av">'+hub().primaryAcct.initials+'</div><span class="e">'+truncEmail(hub().primaryAcct.email)+'</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>';
+    renderUpdateCards();
+  }
+
+  function truncEmail(e){ return e.length > 20 ? e.slice(0,17) + '…' : e; }
+
+  function renderUpdateCards(){
+    var list = document.getElementById('updateCardList');
+    if(!hub().updates.length){ list.innerHTML = '<p style="font-size:12.5px;color:var(--muted);text-align:center;padding:20px 0;">No updates yet — they\'ll show up here as they come in.</p>'; return; }
+    list.innerHTML = hub().updates.map(function(u){
+      var s = hub().senders[u.senderIdx] || { name:'Unknown', initials:'?' };
+      return '<div class="ucard"><div class="top"><span class="from"><span class="fav">'+s.initials+'</span>'+escapeHtml(s.name)+'</span><span class="dt">'+u.date+' · '+u.time+'</span></div><h3>'+escapeHtml(u.title)+'</h3><p>'+escapeHtml(u.body)+'</p></div>';
+    }).join('');
+  }
+
+  /* ── Connect flow (inline, 2 pages, no full-screen navigation) ── */
+  function startConnect(){
+    pendingSenderForm = [ { role:'Teacher', name:'', email:'' } ];
+    renderSenderForm();
+    document.getElementById('upd-empty').style.display = 'none';
+    document.getElementById('upd-add').style.display = 'block';
+  }
+  function renderSenderForm(){
+    var wrap = document.getElementById('senderFormList');
+    wrap.innerHTML = pendingSenderForm.map(function(f, i){
+      return '<div class="senderform">'
+        + '<div class="roletoggle">'
+        +   '<div class="ro'+(f.role==='Teacher'?' on':'')+'" onclick="setFormRole('+i+',\'Teacher\')">Teacher</div>'
+        +   '<div class="ro'+(f.role==='Room Parent'?' on':'')+'" onclick="setFormRole('+i+',\'Room Parent\')">Room Parent</div>'
+        + '</div>'
+        + '<div class="finput"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span><input placeholder="name@school.org" value="'+escapeHtml(f.email)+'" oninput="setFormEmail('+i+',this.value)"></div>'
+        + '</div>';
+    }).join('');
+    var btn = document.getElementById('startPullingBtn');
+    btn.disabled = !pendingSenderForm.some(function(f){ return f.email.trim().length > 3; });
+  }
+  function setFormRole(i, role){ pendingSenderForm[i].role = role; renderSenderForm(); }
+  function setFormEmail(i, val){
+    // don't call renderSenderForm() here — rebuilding the input's innerHTML on every
+    // keystroke would blow away its own focus after the first character typed.
+    pendingSenderForm[i].email = val;
+    document.getElementById('startPullingBtn').disabled = !pendingSenderForm.some(function(f){ return f.email.trim().length > 3; });
+  }
+  function addSenderField(){ pendingSenderForm.push({ role:'Room Parent', name:'', email:'' }); renderSenderForm(); }
+  function finishAddSenders(){
+    var valid = pendingSenderForm.filter(function(f){ return f.email.trim().length > 3; });
+    if(!valid.length) return;
+    hub().senders = valid.map(function(f){
+      var label = f.email.split('@')[0].replace(/[._]/g,' ');
+      return { name: f.name.trim() || label, role: f.role, email: f.email.trim(), initials: (f.name.trim() || label).split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase() };
+    });
+    hub().updates = []; // fresh connection — starts empty, loads in as real emails arrive (no fake placeholder data)
+    hub().emailConnected = true;
+    if(!hub().primaryAcct){ hub().primaryAcct = { name:'Anthony Martin', email:'anthonyjohnmartin@gmail.com', initials:'AM' }; }
+    document.getElementById('upd-add').style.display = 'none';
+    renderUpdView();
+  }
+
+  /* ── Connected Account sheet ── */
+  function renderPrimaryAcctCard(){
+    document.getElementById('acctPrimaryAv').textContent = hub().primaryAcct.initials;
+    document.getElementById('acctPrimaryName').textContent = hub().primaryAcct.name;
+    document.getElementById('acctPrimaryEmail').textContent = hub().primaryAcct.email;
+  }
+  function openAcctSheet(){
+    renderPrimaryAcctCard();
+    renderSheetSenderList();
+    backToAcctDefault();
+    document.getElementById('acctDim').classList.add('on');
+    document.getElementById('acctSheet').classList.add('on');
+  }
+  function closeAcctSheet(){
+    document.getElementById('acctDim').classList.remove('on');
+    document.getElementById('acctSheet').classList.remove('on');
+  }
+  function renderSheetSenderList(){
+    document.getElementById('senderCount').textContent = hub().senders.length + (hub().senders.length===1?' email':' emails');
+    document.getElementById('sheetSenderList').innerHTML = hub().senders.map(function(s, i){
+      return '<div class="sendrow">'
+        + '<div class="sav">'+s.initials+'</div>'
+        + '<div class="si"><div class="sn">'+escapeHtml(s.name)+' <span class="srole">'+s.role+'</span></div><div class="se">'+escapeHtml(s.email)+'</div></div>'
+        + '<div class="sacts">'
+        +   '<button class="sabtn" onclick="openEditSender('+i+')"><span class="ph"><svg viewBox="0 0 256 256"><path d="M227.31 73.37 182.63 28.7a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63Z"/></svg></span></button>'
+        +   '<button class="sabtn del" onclick="quickRemoveSender('+i+')"><span class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></span></button>'
+        + '</div></div>';
+    }).join('');
+    var switchBtn = document.getElementById('switchBtn');
+    switchBtn.textContent = hub().altAccounts.length ? 'Switch email' : 'Use a different Google email';
+  }
+  function quickRemoveSender(i){
+    if(!confirm('Stop pulling updates from '+hub().senders[i].name+'? Past updates from them stay put.')) return;
+    hub().senders.splice(i,1);
+    renderSheetSenderList();
+    hub().updates = hub().updates.filter(function(u){ return u.senderIdx < hub().senders.length; });
+    renderUpdateCards();
+  }
+
+  /* ── Edit / Add sender sheet (shared by the sheet's "+ Add another" and each row's edit icon) ── */
+  function openEditSender(idx){
+    editingSenderIdx = idx;
+    var s = idx===null ? { name:'', role:'Teacher', email:'' } : hub().senders[idx];
+    document.getElementById('senderSheetTitle').textContent = idx===null ? 'Add Email' : 'Edit Email';
+    document.getElementById('removeSenderBtn').style.display = idx===null ? 'none' : 'block';
+    document.getElementById('senderName').value = s.name;
+    document.getElementById('senderEmail').value = s.email;
+    document.querySelectorAll('#senderRoleToggle .ro').forEach(function(r){ r.classList.toggle('on', r.dataset.role === s.role); });
+    document.getElementById('senderDim').classList.add('on');
+    document.getElementById('senderSheet').classList.add('on');
+  }
+  function closeEditSender(){
+    document.getElementById('senderDim').classList.remove('on');
+    document.getElementById('senderSheet').classList.remove('on');
+  }
+  function pickRole(el){
+    document.querySelectorAll('#senderRoleToggle .ro').forEach(function(r){ r.classList.remove('on'); });
+    el.classList.add('on');
+  }
+  function saveSender(){
+    var name = document.getElementById('senderName').value.trim();
+    var email = document.getElementById('senderEmail').value.trim();
+    var role = document.querySelector('#senderRoleToggle .ro.on').dataset.role;
+    if(!email){ document.getElementById('senderEmail').focus(); return; }
+    var initials = (name || email.split('@')[0]).split(/[ ._]/).filter(Boolean).map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
+    var record = { name: name || email.split('@')[0], role: role, email: email, initials: initials };
+    if(editingSenderIdx===null){ hub().senders.push(record); }
+    else { hub().senders[editingSenderIdx] = record; }
+    renderSheetSenderList();
+    renderUpdateCards();
+    closeEditSender();
+  }
+  function removeSender(){
+    if(editingSenderIdx===null) return;
+    hub().senders.splice(editingSenderIdx,1);
+    hub().updates = hub().updates.filter(function(u){ return u.senderIdx < hub().senders.length; });
+    renderSheetSenderList();
+    renderUpdateCards();
+    closeEditSender();
+  }
+
+  /* ── Switch account sub-view ── */
+  function showSwitch(){
+    pendingSwitchAcct = null;
+    document.getElementById('confirmSwitchBtn').disabled = true;
+    document.getElementById('switchAcctList').innerHTML = hub().altAccounts.map(function(a, i){
+      return '<div class="acct-row" onclick="pickSwitch('+i+')"><div class="av">'+a.initials+'</div><div class="ai"><div class="n">'+escapeHtml(a.name)+'</div><div class="e">'+escapeHtml(a.email)+'</div></div><div class="rd"></div></div>';
+    }).join('');
+    document.getElementById('acctSheet-default').style.display = 'none';
+    document.getElementById('acctSheet-switch').style.display = 'block';
+    if(!hub().altAccounts.length){ pickSwitch(null); } // nothing to pick from — go straight to "use a different Google email"
+  }
+  function backToAcctDefault(){
+    document.getElementById('acctSheet-switch').style.display = 'none';
+    document.getElementById('acctSheet-default').style.display = 'block';
+  }
+  function pickSwitch(i){
+    document.querySelectorAll('#switchAcctList .acct-row').forEach(function(r){ r.classList.remove('picked'); });
+    if(i===null){
+      pendingSwitchAcct = 'new';
+      document.getElementById('confirmSwitchBtn').disabled = false;
+      document.getElementById('confirmSwitchBtn').textContent = 'Continue with Google';
+    } else {
+      document.querySelectorAll('#switchAcctList .acct-row')[i].classList.add('picked');
+      pendingSwitchAcct = hub().altAccounts[i];
+      document.getElementById('confirmSwitchBtn').disabled = false;
+      document.getElementById('confirmSwitchBtn').textContent = 'Switch to this email';
+    }
+  }
+  function confirmSwitch(){
+    if(!pendingSwitchAcct) return;
+    if(pendingSwitchAcct === 'new'){
+      alert('Would hand off to Google sign-in, then return here with the new account connected.');
+      backToAcctDefault();
+      return;
+    }
+    hub().primaryAcct = pendingSwitchAcct;
+    renderUpdView();
+    renderPrimaryAcctCard();
+    backToAcctDefault();
+  }
+  function disconnectAcct(){
+    if(!confirm('Disconnect '+hub().primaryAcct.email+'? Sprout will stop pulling in new updates.')) return;
+    closeAcctSheet();
+    hub().emailConnected = false;
+    hub().primaryAcct = null;
+    hub().senders = [];
+    hub().updates = [];
+    renderUpdView();
+  }
+
+  var ICON_PATHS={
+    link:'m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224h1.13a15.93 15.93 0 0 0 11.64-6.33c19.64-26.1 17.75-47.32 13.19-60L235.33 104a16 16 0 0 0-.01-22.63M224 92.69l-57.27 57.46a8 8 0 0 0-1.49 9.22c9.46 18.93-1.8 38.59-9.34 48.62L48 100.08c12.08-9.74 23.64-12.31 32.48-12.31A40.1 40.1 0 0 1 96.81 91a8 8 0 0 0 9.25-1.51L163.32 32 224 92.68Z',
+    globe:'M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24m87.62 96h-39.83c-1.79-36.51-15.85-62.33-27.38-77.6a88.19 88.19 0 0 1 67.22 77.6ZM96.23 136h63.54c-2.31 41.61-22.23 67.11-31.77 77-9.55-9.9-29.46-35.4-31.77-77m0-16c2.31-41.61 22.23-67.11 31.77-77 9.55 9.93 29.46 35.43 31.77 77Zm11.36-77.6C96.06 57.67 82 83.49 80.21 120H40.37a88.19 88.19 0 0 1 67.22-77.6M40.37 136h39.84c1.82 36.51 15.85 62.33 27.38 77.6A88.19 88.19 0 0 1 40.37 136m108 77.6c11.53-15.27 25.56-41.09 27.38-77.6h39.84a88.19 88.19 0 0 1-67.18 77.6Z',
+    gift:'M216 72h-35.08c.39-.33.79-.65 1.17-1A29.53 29.53 0 0 0 192 49.57 32.62 32.62 0 0 0 158.44 16 29.53 29.53 0 0 0 137 25.91a55 55 0 0 0-9 14.48 55 55 0 0 0-9-14.48A29.53 29.53 0 0 0 97.56 16 32.62 32.62 0 0 0 64 49.57 29.53 29.53 0 0 0 73.91 71c.38.33.78.65 1.17 1H40a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16v64a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16v-64a16 16 0 0 0 16-16V88a16 16 0 0 0-16-16M120 200H56v-64h64Zm0-80H40V88h80zm16-38.49c1.2-10.59 4.5-25.98 12.5-34.97a13.7 13.7 0 0 1 10-4.5h.49A16.62 16.62 0 0 1 176 49.08a13.7 13.7 0 0 1-4.5 10c-9.49 8.4-25.24 11.36-35 12.4ZM200 120h-80V88h80Z',
+    donate:'M230.33 141.06a24.43 24.43 0 0 0-21.24-4.23l-41.84 9.62A28 28 0 0 0 140 112H89.94a31.82 31.82 0 0 0-22.63 9.37L44.69 144H16a16 16 0 0 0-16 16v40a16 16 0 0 0 16 16h104a8 8 0 0 0 1.94-.24l64-16a7 7 0 0 0 1.19-.4L226 182.82l.44-.2a24.6 24.6 0 0 0 3.93-41.56ZM16 160h24v40H16Zm203.43 8.21-38 16.18L119 200H56v-44.69l22.63-22.62A15.86 15.86 0 0 1 89.94 128H140a12 12 0 0 1 0 24h-28a8 8 0 0 0 0 16h32a8.3 8.3 0 0 0 1.79-.2l67-15.41.31-.08a8.6 8.6 0 0 1 6.3 15.9ZM164 96a36 36 0 0 0 5.9-.48 36 36 0 1 0 28.22-47A36 36 0 1 0 164 96m60-12a20 20 0 1 1-20-20 20 20 0 0 1 20 20m-60-44a20 20 0 0 1 19.25 14.61 36 36 0 0 0-15 24.93A20.4 20.4 0 0 1 164 80a20 20 0 0 1 0-40',
+    store:'M232 96a7.9 7.9 0 0 0-.3-2.2l-14.35-50.2A16.07 16.07 0 0 0 202 32H54a16.07 16.07 0 0 0-15.35 11.6L24.31 93.8A7.9 7.9 0 0 0 24 96v16a40 40 0 0 0 16 32v72a8 8 0 0 0 8 8h160a8 8 0 0 0 8-8v-72a40 40 0 0 0 16-32zM54 48h148l11.42 40H42.61Zm50 56h48v8a24 24 0 0 1-48 0Zm-16 0v8a24 24 0 0 1-35.12 21.26 7.9 7.9 0 0 0-1.82-1.06A24 24 0 0 1 40 112v-8Zm112 104H56v-56.8a40.6 40.6 0 0 0 8 .8 40 40 0 0 0 32-16 40 40 0 0 0 64 0 40 40 0 0 0 32 16 40.6 40.6 0 0 0 8-.8Zm4.93-75.8a8 8 0 0 0-1.8 1.05A24 24 0 0 1 168 112v-8h48v8a24 24 0 0 1-11.07 20.2'
+  };
+  var GO_PATH='m181.66 133.66-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32';
+  var chosenIcon='link';
+
+  var editingLinkRow = null;
+  function openLinkSheet(rowEl){
+    editingLinkRow = rowEl || null;
+    document.getElementById('linkSheetTitle').textContent = editingLinkRow ? 'Edit link' : 'Add a link';
+    document.getElementById('deleteLinkBtn').style.display = editingLinkRow ? 'block' : 'none';
+    document.getElementById('cancelLinkBtn').style.display = editingLinkRow ? 'none' : 'block';
+    if(editingLinkRow){
+      document.getElementById('linkLabel').value = editingLinkRow.querySelector('.n').textContent;
+      document.getElementById('linkUrl').value = editingLinkRow.dataset.url || '';
+      pickIcon(document.querySelector('#iconpick .ic[data-icon="'+(editingLinkRow.dataset.icon||'link')+'"]'));
+    } else {
+      document.getElementById('linkLabel').value = '';
+      document.getElementById('linkUrl').value = '';
+      pickIcon(document.querySelector('#iconpick .ic[data-icon="link"]'));
+    }
+    document.getElementById('linkDim').classList.add('on');
+    document.getElementById('linkSheet').classList.add('on');
+  }
+  function closeLinkSheet(){
+    document.getElementById('linkDim').classList.remove('on');
+    document.getElementById('linkSheet').classList.remove('on');
+  }
+  function pickIcon(el){
+    document.querySelectorAll('#iconpick .ic').forEach(function(i){i.classList.remove('on');});
+    el.classList.add('on');
+    chosenIcon=el.getAttribute('data-icon');
+  }
+  function hostFromUrl(u){
+    u=u.trim().replace(/^https?:\/\//i,'').replace(/^www\./i,'');
+    return u.split('/')[0]||u;
+  }
+  function buildEditBtn(){
+    return '<button class="editbtn" onclick="openLinkSheet(this.closest(\'.lrow\'))"><span class="ph"><svg viewBox="0 0 256 256"><path d="M227.31 73.37 182.63 28.7a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63Z"/></svg></span></button>';
+  }
+  function saveLink(){
+    var label=document.getElementById('linkLabel').value.trim();
+    var url=document.getElementById('linkUrl').value.trim();
+    if(!label||!url){ return; }
+    var host=hostFromUrl(url);
+    var iconPath=ICON_PATHS[chosenIcon]||ICON_PATHS.link;
+    var row = editingLinkRow || document.createElement('div');
+    row.className='lrow';
+    row.dataset.icon = chosenIcon;
+    row.dataset.url = url;
+    row.innerHTML='<div class="lic"><span class="ph"><svg viewBox="0 0 256 256"><path d="'+iconPath+'"/></svg></span></div>'+
+      '<div class="lt"><div class="n"></div><div class="u"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 104a8 8 0 0 1-16 0V59.32l-66.33 66.34a8 8 0 0 1-11.32-11.32L196.68 48H152a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8Zm-40 24a8 8 0 0 0-8 8v72H48V80h72a8 8 0 0 0 0-16H48a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-72a8 8 0 0 0-8-8"/></svg></span></div></div>'+
+      buildEditBtn();
+    row.querySelector('.n').textContent=label;
+    row.querySelector('.u').appendChild(document.createTextNode(host));
+    if(!editingLinkRow){
+      var list=document.getElementById('addlinkList');
+      list.parentNode.insertBefore(row,list);
+    }
+    document.getElementById('linkLabel').value='';
+    document.getElementById('linkUrl').value='';
+    pickIcon(document.querySelector('#iconpick .ic[data-icon="link"]'));
+    closeLinkSheet();
+  }
+  function deleteLink(){
+    if(!editingLinkRow) return;
+    if(!confirm('Remove this link for everyone in the class?')) return;
+    editingLinkRow.remove();
+    closeLinkSheet();
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Top 10 Parks: 3 More Concepts (Podium / Leaderboard / Editorial Rail)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --brand-500:#186338; --brand-600:#134f2d; --brand-700:#1e3e2b; --brand-50:#e2e9e3;
+    --bg:#f4f1ea; --surf-1:#eee9dc; --surf-2:#e4ddc9;
+    --grey-900:#1a1b1e; --grey-700:#4d525b; --grey-500:#818898; --grey-300:#b3b8c1; --grey-100:#e6e7ea;
+    --gold:#c99a2e; --gold-l:#f8eecb; --silver:#8c95a0; --silver-l:#eceff2; --bronze:#a8703f; --bronze-l:#f3e3d3;
+    --serif:'Playfair Display',serif; --sans:'Inter',sans-serif;
+  }
+  body{background:#cfc8b8;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:48px 32px 90px;font-family:var(--sans);gap:48px;flex-wrap:wrap;}
+  .lede{width:100%;text-align:center;margin-bottom:6px;flex-basis:100%;}
+  .lede h1{font-family:var(--serif);font-size:27px;font-weight:700;color:#3a332a;margin-bottom:8px;}
+  .lede p{font-size:13px;color:#7a7060;max-width:760px;margin:0 auto;line-height:1.6;}
+  .variant-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .variant-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5a5347;text-align:center;max-width:340px;line-height:1.6;}
+
+  .phone{width:393px;height:852px;background:var(--bg);border-radius:54px;overflow:hidden;position:relative;box-shadow:0 0 0 1px rgba(0,0,0,.07),0 24px 80px rgba(0,0,0,.22);display:flex;flex-direction:column;}
+  .island{width:120px;height:36px;background:#000;border-radius:20px;position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:10;}
+  .sb{height:54px;display:flex;align-items:center;justify-content:space-between;padding:14px 28px 0;flex-shrink:0;}
+  .sb span{font-size:15px;font-weight:600;color:var(--grey-900);}
+
+  .nav{display:flex;align-items:center;justify-content:center;position:relative;padding:8px 16px 14px;flex-shrink:0;}
+  .back-btn{position:absolute;left:16px;width:36px;height:36px;border-radius:50%;background:var(--brand-50);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .back-btn svg{width:16px;height:16px;color:var(--brand-700);}
+  .nav-title{display:flex;align-items:center;gap:5px;font-family:var(--serif);font-size:19px;font-weight:600;color:var(--brand-700);}
+  .nav-title svg{width:13px;height:13px;color:var(--brand-700);margin-top:2px;}
+
+  .search-wrap{padding:0 20px 16px;flex-shrink:0;}
+  .search{display:flex;align-items:center;gap:9px;background:var(--surf-1);border-radius:14px;padding:12px 15px;}
+  .search svg{width:16px;height:16px;color:var(--grey-500);flex-shrink:0;}
+  .search span{font-size:14px;color:var(--grey-500);}
+
+  .scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:8px;}
+  .scroll::-webkit-scrollbar{display:none;}
+  .sec-title{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--brand-700);padding:2px 20px 12px;}
+
+  .share-chip{display:inline-flex;align-items:center;gap:5px;background:#fff;border-radius:99px;padding:5px 11px 5px 5px;font-size:12px;font-weight:600;color:var(--grey-900);}
+  .share-chip .dot{width:20px;height:20px;border-radius:50%;background:var(--brand-500);display:flex;align-items:center;justify-content:center;font-size:11px;}
+
+  .ph1{background:linear-gradient(155deg,#9fc4e0 0%,#bcd8a8 42%,#5c8a4f 78%,#3a6b3e 100%);}
+  .ph2{background:linear-gradient(155deg,#a8c9e8 0%,#c7d9a0 40%,#6a8f52 75%,#2f5c38 100%);}
+  .ph3{background:linear-gradient(155deg,#f0d9a8 0%,#e0b978 45%,#8a6a45 80%,#5c4530 100%);}
+  .ph4{background:linear-gradient(155deg,#c9b8e0 0%,#a894c8 45%,#6b5590 80%,#453862 100%);}
+  .ph5{background:linear-gradient(155deg,#b8dcc9 0%,#8fc4a3 45%,#4a8a63 80%,#2e5c40 100%);}
+  .ph-ic{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px;opacity:.32;}
+
+  /* ═══ Nearby Parks — shared, matches the real build exactly ═══ */
+  .nearby-title{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--brand-700);padding:18px 20px 12px;}
+  .nearby-grid{display:flex;gap:12px;padding:0 20px;overflow-x:auto;}
+  .nearby-grid::-webkit-scrollbar{display:none;}
+  .nearby-card{flex:0 0 158px;height:190px;border-radius:20px;position:relative;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.08);}
+  .nearby-shade{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 55%,rgba(0,0,0,.55) 100%);}
+  .nearby-body{position:absolute;left:12px;right:10px;bottom:11px;}
+  .nearby-name{font-family:var(--serif);font-size:14.5px;font-weight:700;color:#fff;margin-bottom:5px;}
+  .nearby-meta-row{display:flex;align-items:center;justify-content:space-between;}
+  .nearby-dist{font-size:11.5px;color:#fff;}
+  .nearby-share{width:22px;height:22px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+
+  /* ═══ CONCEPT C — Podium: #1 hero, #2+#3 runner-up row, #4-10 compact rail ═══ */
+  .pod-hero{margin:0 20px 12px;height:230px;border-radius:22px;position:relative;overflow:hidden;box-shadow:0 8px 22px rgba(0,0,0,.14);}
+  .pod-hero .rank-badge{position:absolute;left:14px;top:14px;width:40px;height:40px;border-radius:50%;background:var(--gold);color:#fff;font-family:var(--serif);font-weight:800;font-size:19px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,.2);}
+  .pod-hero .shade{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,.6) 100%);}
+  .pod-hero .body{position:absolute;left:16px;right:16px;bottom:14px;display:flex;align-items:flex-end;justify-content:space-between;}
+  .pod-hero .name{font-family:var(--serif);font-size:20px;font-weight:700;color:#fff;}
+  .pod-hero .dist{font-size:12.5px;color:rgba(255,255,255,.85);margin-top:3px;}
+
+  .pod-row{display:flex;gap:12px;margin:0 20px 16px;}
+  .pod-card{flex:1;height:150px;border-radius:18px;position:relative;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.1);}
+  .pod-card .rank-badge{position:absolute;left:10px;top:10px;width:30px;height:30px;border-radius:50%;color:#fff;font-family:var(--serif);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;}
+  .pod-card .shade{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,.6) 100%);}
+  .pod-card .body{position:absolute;left:10px;right:10px;bottom:9px;}
+  .pod-card .name{font-family:var(--serif);font-size:13.5px;font-weight:700;color:#fff;line-height:1.2;}
+  .pod-card .dist{font-size:10.5px;color:rgba(255,255,255,.85);margin-top:2px;}
+
+  .pod-rest-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--grey-500);padding:0 20px 8px;}
+  .pod-rest{display:flex;gap:10px;overflow-x:auto;padding:0 20px 4px;}
+  .pod-rest::-webkit-scrollbar{display:none;}
+  .pod-mini{flex:0 0 74px;display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .pod-mini-photo{width:74px;height:74px;border-radius:16px;position:relative;overflow:hidden;}
+  .pod-mini-photo .n{position:absolute;left:5px;top:5px;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.92);color:var(--brand-700);font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .pod-mini-name{font-size:10px;font-weight:600;color:var(--grey-900);text-align:center;line-height:1.2;}
+
+  /* ═══ CONCEPT D — Leaderboard stack, medal accents, vertical scroll ═══ */
+  .lb-row{display:flex;align-items:center;gap:13px;margin:0 20px 12px;background:#fff;border-radius:18px;padding:10px;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+  .lb-photo{width:78px;height:78px;border-radius:14px;flex-shrink:0;position:relative;overflow:hidden;}
+  .lb-body{flex:1;min-width:0;}
+  .lb-medal{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:3px 9px 3px 7px;border-radius:99px;margin-bottom:6px;}
+  .lb-medal.gold{background:var(--gold-l);color:var(--gold);} .lb-medal.silver{background:var(--silver-l);color:var(--silver);} .lb-medal.bronze{background:var(--bronze-l);color:var(--bronze);}
+  .lb-medal.plain{background:var(--brand-50);color:var(--brand-600);}
+  .lb-name{font-family:var(--serif);font-size:15.5px;font-weight:700;color:var(--grey-900);margin-bottom:3px;}
+  .lb-dist{font-size:11.5px;color:var(--grey-500);}
+
+  /* ═══ CONCEPT E — Editorial rail, compact & quiet, small corner badges ═══ */
+  .er-rail{display:flex;gap:11px;overflow-x:auto;padding:0 20px 6px;}
+  .er-rail::-webkit-scrollbar{display:none;}
+  .er-card{flex:0 0 118px;display:flex;flex-direction:column;gap:8px;}
+  .er-photo{width:118px;height:150px;border-radius:16px;position:relative;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,.08);}
+  .er-photo .n{position:absolute;left:8px;top:8px;width:24px;height:24px;border-radius:8px;background:rgba(255,255,255,.94);color:var(--brand-700);font-family:var(--serif);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .er-name{font-size:12.5px;font-weight:700;color:var(--grey-900);line-height:1.25;}
+  .er-dist{font-size:10.5px;color:var(--grey-500);margin-top:1px;}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Top 10 Parks — 3 More Concepts</h1>
+  <p>Building on your carousel build (already shipped and looking great) — here are three more directions that change the information hierarchy, not just the card shape. Concept C tiers 1 → 2/3 → 4-10 like a podium reveal. Concept D drops the swipe gesture entirely and reads as a scrollable leaderboard with medal accents. Concept E goes quieter/denser, closer to an App Store "Charts" rail for comparison at the other end of the boldness spectrum. All three keep your exact Home/search header and Nearby Parks card style below.</p>
+</div>
+
+<!-- ═══ CONCEPT C — PODIUM ═══ -->
+<div class="variant-wrap">
+  <div class="phone">
+    <div class="island"></div>
+    <div class="sb"><span>9:41</span><span>🔋</span></div>
+    <div class="nav">
+      <button class="back-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="nav-title">Home <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="search-wrap"><div class="search"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Search</span></div></div>
+    <div class="scroll">
+      <div class="sec-title">Top 10 Parks</div>
+
+      <div class="pod-hero ph1"><div class="ph-ic">🏞️</div><div class="rank-badge">1</div><div class="shade"></div>
+        <div class="body"><div><div class="name">Zilker Park</div><div class="dist">2.1 mi</div></div><span class="share-chip"><span class="dot">🍀</span>Share</span></div>
+      </div>
+
+      <div class="pod-row">
+        <div class="pod-card ph2"><div class="ph-ic">🧗</div><div class="rank-badge" style="background:var(--silver);">2</div><div class="shade"></div><div class="body"><div class="name">Mueller Park</div><div class="dist">2.1 mi</div></div></div>
+        <div class="pod-card ph3"><div class="ph-ic">🌳</div><div class="rank-badge" style="background:var(--bronze);">3</div><div class="shade"></div><div class="body"><div class="name">Republic Square</div><div class="dist">2.6 mi</div></div></div>
+      </div>
+
+      <div class="pod-rest-lbl">#4 – 10</div>
+      <div class="pod-rest">
+        <div class="pod-mini"><div class="pod-mini-photo ph4"><div class="ph-ic" style="font-size:22px;">🌉</div><span class="n">4</span></div><div class="pod-mini-name">Pease Park</div></div>
+        <div class="pod-mini"><div class="pod-mini-photo ph5"><div class="ph-ic" style="font-size:22px;">🛝</div><span class="n">5</span></div><div class="pod-mini-name">Shipe Park</div></div>
+        <div class="pod-mini"><div class="pod-mini-photo ph1"><div class="ph-ic" style="font-size:22px;">🌲</div><span class="n">6</span></div><div class="pod-mini-name">Bartholomew</div></div>
+        <div class="pod-mini"><div class="pod-mini-photo ph2"><div class="ph-ic" style="font-size:22px;">🏕️</div><span class="n">7</span></div><div class="pod-mini-name">Ramsey Park</div></div>
+      </div>
+
+      <div class="nearby-title">Nearby Parks</div>
+      <div class="nearby-grid">
+        <div class="nearby-card ph1"><div class="ph-ic">🛝</div><div class="nearby-shade"></div><div class="nearby-body"><div class="nearby-name">Zilker Park</div><div class="nearby-meta-row"><span class="nearby-dist">2 mi</span><span class="nearby-share">🍀</span></div></div></div>
+        <div class="nearby-card ph2"><div class="ph-ic">🛝</div><div class="nearby-shade"></div><div class="nearby-body"><div class="nearby-name">Mueller Park</div><div class="nearby-meta-row"><span class="nearby-dist">4 mi</span><span class="nearby-share">🍀</span></div></div></div>
+      </div>
+      <div style="height:20px;"></div>
+    </div>
+  </div>
+  <span class="variant-label">Concept C — Podium reveal: #1 hero, #2/#3 runners-up, #4–10 in a compact rail. No swipe needed to see the full top 3 at a glance.</span>
+</div>
+
+<!-- ═══ CONCEPT D — LEADERBOARD ═══ -->
+<div class="variant-wrap">
+  <div class="phone">
+    <div class="island"></div>
+    <div class="sb"><span>9:41</span><span>🔋</span></div>
+    <div class="nav">
+      <button class="back-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="nav-title">Home <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="search-wrap"><div class="search"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Search</span></div></div>
+    <div class="scroll">
+      <div class="sec-title">Top 10 Parks</div>
+
+      <div class="lb-row"><div class="lb-photo ph1"><div class="ph-ic">🏞️</div></div><div class="lb-body"><span class="lb-medal gold">🥇 #1</span><div class="lb-name">Zilker Park</div><div class="lb-dist">2.1 mi</div></div></div>
+      <div class="lb-row"><div class="lb-photo ph2"><div class="ph-ic">🧗</div></div><div class="lb-body"><span class="lb-medal silver">🥈 #2</span><div class="lb-name">Mueller Park</div><div class="lb-dist">2.1 mi</div></div></div>
+      <div class="lb-row"><div class="lb-photo ph3"><div class="ph-ic">🌳</div></div><div class="lb-body"><span class="lb-medal bronze">🥉 #3</span><div class="lb-name">Republic Square</div><div class="lb-dist">2.6 mi</div></div></div>
+      <div class="lb-row"><div class="lb-photo ph4"><div class="ph-ic">🌉</div></div><div class="lb-body"><span class="lb-medal plain">#4</span><div class="lb-name">Pease Park</div><div class="lb-dist">3.1 mi</div></div></div>
+      <div class="lb-row"><div class="lb-photo ph5"><div class="ph-ic">🛝</div></div><div class="lb-body"><span class="lb-medal plain">#5</span><div class="lb-name">Shipe Park</div><div class="lb-dist">3.3 mi</div></div></div>
+
+      <div class="nearby-title">Nearby Parks</div>
+      <div class="nearby-grid">
+        <div class="nearby-card ph1"><div class="ph-ic">🛝</div><div class="nearby-shade"></div><div class="nearby-body"><div class="nearby-name">Zilker Park</div><div class="nearby-meta-row"><span class="nearby-dist">2 mi</span><span class="nearby-share">🍀</span></div></div></div>
+        <div class="nearby-card ph2"><div class="ph-ic">🛝</div><div class="nearby-shade"></div><div class="nearby-body"><div class="nearby-name">Mueller Park</div><div class="nearby-meta-row"><span class="nearby-dist">4 mi</span><span class="nearby-share">🍀</span></div></div></div>
+      </div>
+      <div style="height:20px;"></div>
+    </div>
+  </div>
+  <span class="variant-label">Concept D — Leaderboard: no swipe gesture at all, just scrolls down like a list. Gold/silver/bronze medal chips for #1–3, plain numeral chip after that.</span>
+</div>
+
+<!-- ═══ CONCEPT E — EDITORIAL RAIL ═══ -->
+<div class="variant-wrap">
+  <div class="phone">
+    <div class="island"></div>
+    <div class="sb"><span>9:41</span><span>🔋</span></div>
+    <div class="nav">
+      <button class="back-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="nav-title">Home <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="search-wrap"><div class="search"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Search</span></div></div>
+    <div class="scroll">
+      <div class="sec-title">Top 10 Parks</div>
+      <div class="er-rail">
+        <div class="er-card"><div class="er-photo ph1"><div class="ph-ic">🏞️</div><span class="n">1</span></div><div><div class="er-name">Zilker Park</div><div class="er-dist">2.1 mi</div></div></div>
+        <div class="er-card"><div class="er-photo ph2"><div class="ph-ic">🧗</div><span class="n">2</span></div><div><div class="er-name">Mueller Park</div><div class="er-dist">2.1 mi</div></div></div>
+        <div class="er-card"><div class="er-photo ph3"><div class="ph-ic">🌳</div><span class="n">3</span></div><div><div class="er-name">Republic Square</div><div class="er-dist">2.6 mi</div></div></div>
+        <div class="er-card"><div class="er-photo ph4"><div class="ph-ic">🌉</div><span class="n">4</span></div><div><div class="er-name">Pease Park</div><div class="er-dist">3.1 mi</div></div></div>
+        <div class="er-card"><div class="er-photo ph5"><div class="ph-ic">🛝</div><span class="n">5</span></div><div><div class="er-name">Shipe Park</div><div class="er-dist">3.3 mi</div></div></div>
+      </div>
+
+      <div class="nearby-title">Nearby Parks</div>
+      <div class="nearby-grid">
+        <div class="nearby-card ph1"><div class="ph-ic">🛝</div><div class="nearby-shade"></div><div class="nearby-body"><div class="nearby-name">Zilker Park</div><div class="nearby-meta-row"><span class="nearby-dist">2 mi</span><span class="nearby-share">🍀</span></div></div></div>
+        <div class="nearby-card ph2"><div class="ph-ic">🛝</div><div class="nearby-shade"></div><div class="nearby-body"><div class="nearby-name">Mueller Park</div><div class="nearby-meta-row"><span class="nearby-dist">4 mi</span><span class="nearby-share">🍀</span></div></div></div>
+      </div>
+      <div style="height:20px;"></div>
+    </div>
+  </div>
+  <span class="variant-label">Concept E — Editorial rail: quiet & compact, small corner rank badge instead of a giant numeral. Closer to an App Store "Charts" widget — good contrast point against the bold carousel.</span>
+</div>
+
+</body>
+</html>

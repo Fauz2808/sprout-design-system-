@@ -1,0 +1,29 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="scene-system.css">
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; display:grid; place-items:center; font-family:Arial,sans-serif; }
+  .frame { position:relative; overflow:hidden; background:#15251c; }
+  video { width:100%; height:100%; object-fit:cover; object-position:52% center; }
+  .veil { position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.24)); }
+  .beat { position:absolute; left:54px; right:54px; bottom:136px; color:#fff; font-size:21px; letter-spacing:.02em; opacity:.84; text-align:center; }
+</style></head>
+<body>
+<div class="frame">
+  <video id="turn" autoplay muted playsinline preload="auto" src="../../Mother_overwhelmed_by_parenting_…_202607312033.mp4"></video>
+  <div class="veil"></div>
+  <div class="beat">One quiet breath.</div>
+</div>
+<script>
+  const video = document.getElementById('turn');
+  video.addEventListener('loadedmetadata', () => {
+    video.currentTime = Math.max(0, video.duration - 2.1);
+    video.playbackRate = .72;
+  }, { once:true });
+  video.addEventListener('timeupdate', () => {
+    if (video.duration && video.currentTime >= video.duration - .12) video.pause();
+  });
+</script>
+</body></html>

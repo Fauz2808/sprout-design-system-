@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Onboarding — Voice AI Profile Explainer · Sprout</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --field:#e8e4d9; --fg:#1a1a17; --ink:#1c2a1d; --muted:#807a6c; --border:#ddd9cf;
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-soft:#e7efe6; --gold:#c79a3a;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif; --serif:'Playfair Display',Georgia,serif; --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;height:100%;}
+  body{background:#ddd8ce;font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;padding:32px 24px;min-height:100vh;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .caption{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:360px;line-height:1.5;} .caption strong{color:#3a3830;font-weight:600;}
+
+  .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .device::before,.device::after{content:'';position:absolute;width:3px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.06) 8%,transparent 16%,transparent 84%,rgba(255,255,255,.04) 92%,transparent);top:100px;bottom:100px;} .device::before{left:-1px;}.device::after{right:-1px;}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:5;}
+  .br{position:absolute;width:4px;background:#0a0a0c;border-radius:2px;} .br.l1{left:-3px;top:174px;height:32px;}.br.l2{left:-3px;top:220px;height:60px;}.br.l3{left:-3px;top:290px;height:60px;}.br.r1{right:-3px;top:250px;height:100px;}
+
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:radial-gradient(120% 48% at 50% 4%, #e7f0e5 0%, var(--bg) 46%);}
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--fg);}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--fg);} .sb .bat{width:25px;}
+  .top{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:6px 22px 0;}
+  .steps{display:flex;gap:5px;} .steps i{width:20px;height:4px;border-radius:2px;background:var(--border);} .steps i.on{background:var(--green);} .steps i.cur{background:var(--green);width:28px;}
+  .skip{font-size:13px;color:var(--muted);cursor:pointer;font-weight:600;}
+
+  .scroll{flex:1 1 auto;overflow-y:auto;padding:12px 24px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;} .scroll::-webkit-scrollbar{display:none;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--green-mid);margin-top:6px;}
+  .h1{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--ink);line-height:1.16;letter-spacing:-.01em;margin:8px 0 8px;} .h1 em{font-style:italic;color:var(--green);}
+  .sub{font-size:14px;color:var(--muted);line-height:1.55;max-width:300px;}
+
+  /* end-result profile preview (the payoff) */
+  .profile{width:100%;margin-top:20px;background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:18px 16px 16px;box-shadow:0 18px 38px -18px rgba(40,40,30,.5);text-align:left;position:relative;}
+  .p-foot{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.02em;color:var(--green-mid);margin-top:13px;}
+  .p-top{display:flex;align-items:center;gap:13px;}
+  .p-av{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#5a8f5d,#2d5c2e);display:grid;place-items:center;color:#fff;font-weight:700;font-size:22px;flex-shrink:0;}
+  .p-nm{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--ink);line-height:1.1;} .p-role{font-size:12.5px;color:var(--muted);margin-top:2px;} .p-loc{font-size:12px;color:var(--muted);margin-top:3px;}
+  .p-kids{display:flex;gap:8px;margin:14px 0 0;}
+  .kid{flex:1;display:flex;align-items:center;gap:8px;background:var(--field);border-radius:12px;padding:9px 10px;}
+  .kid .ke{font-size:20px;} .kid .kn{font-size:12.5px;font-weight:700;color:var(--ink);} .kid .ka{font-size:10.5px;color:var(--muted);}
+  .p-bio{font-size:12.5px;color:var(--fg);line-height:1.5;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+  .p-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;}
+  .tag{font-size:11px;font-weight:600;color:var(--green);background:var(--green-soft);border-radius:999px;padding:5px 10px;}
+
+  /* voice CTA dock */
+  .dock{flex:0 0 auto;padding:10px 24px calc(14px + env(safe-area-inset-bottom));text-align:center;}
+  .orbcta{width:100%;border:none;border-radius:16px;padding:15px;background:var(--green);color:#fff;font-size:15.5px;font-weight:700;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:11px;cursor:pointer;box-shadow:0 14px 30px -10px rgba(45,92,46,.6);position:relative;}
+  .orbcta .orb{width:30px;height:30px;border-radius:50%;position:relative;flex-shrink:0;background:radial-gradient(circle at 38% 32%,#a7e0a9,#5a8f5d 60%,#2d5c2e);box-shadow:inset 0 1px 4px rgba(255,255,255,.4);}
+  .orbcta .orb::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(255,255,255,.55);animation:ring 1.6s ease-out infinite;} @keyframes ring{0%{transform:scale(.9);opacity:.7}100%{transform:scale(1.5);opacity:0}}
+  .hinttime{font-size:11.5px;color:var(--muted);margin-top:12px;} .hinttime b{color:var(--green-mid);}
+  .manual{font-size:13px;color:var(--muted);margin-top:14px;text-decoration:underline;cursor:pointer;}
+  .home{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:134px;height:5px;background:var(--fg);border-radius:999px;opacity:.18;z-index:9;}
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="caption"><strong>Onboarding · voice-AI profile</strong> — shown right before the AI setup step</div>
+  <div class="device">
+    <span class="br l1"></span><span class="br l2"></span><span class="br l3"></span><span class="br r1"></span><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg>
+        <svg viewBox="0 0 17 11"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1z"/></svg>
+        <svg class="bat" viewBox="0 0 25 11"><rect x=".5" y=".5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="22" y="3.5" width="1.5" height="4" rx=".4" fill="currentColor" fill-opacity=".45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+      </span></div>
+
+      <div class="top">
+        <div class="steps"><i class="on"></i><i class="on"></i><i class="on"></i><i class="cur"></i></div>
+        <div class="skip">Skip</div>
+      </div>
+
+      <div class="scroll">
+        <div class="eyebrow">Your parent profile</div>
+        <div class="h1">Set up your profile<br>in seconds — <em>just talk</em></div>
+        <div class="sub">Chat with Sprout's AI and it fills your profile in as you go. No forms, no typing.</div>
+
+        <div class="profile">
+          <div class="p-top">
+            <div class="p-av">TM</div>
+            <div><div class="p-nm">Tony Martin</div><div class="p-role">Dad of two · joined today</div><div class="p-loc">📍 Zilker · Austin, TX</div></div>
+          </div>
+          <div class="p-kids">
+            <div class="kid"><span class="ke">🧒</span><div><div class="kn">Kennedy</div><div class="ka">5 years old</div></div></div>
+            <div class="kid"><span class="ke">👦</span><div><div class="kn">Cooper</div><div class="ka">3 years old</div></div></div>
+          </div>
+          <div class="p-bio">Weekend-soccer dad, always up for a park meetup. New to the neighborhood and looking to find our people.</div>
+          <div class="p-tags"><span class="tag">⚽ Soccer</span><span class="tag">🥾 Hiking</span><span class="tag">📚 Story time</span><span class="tag">🎨 Arts &amp; crafts</span></div>
+          <div class="p-foot">✨ Built by voice — edit anything anytime</div>
+        </div>
+      </div>
+
+      <div class="dock">
+        <button class="orbcta"><span class="orb"></span> Tap to talk with AI</button>
+        <div class="hinttime">Takes about <b>30 seconds</b> · you can edit anything after</div>
+        <div class="manual">Prefer to type? Fill it in manually</div>
+      </div>
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Android UI Parity QA · Sprout</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --field:#e8e4d9; --fg:#1a1a17; --ink:#1c2a1d; --muted:#807a6c; --border:#ddd9cf;
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-soft:#e7efe6; --red:#c0392b; --red-soft:#fbe6e3; --amber:#9a6b16; --amber-soft:#f6edd8; --blue:#2c5aa0; --blue-soft:#e6edf7;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif; --serif:'Playfair Display',Georgia,serif; --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:var(--bg);font-family:var(--font);color:var(--fg);font-size:15px;-webkit-font-smoothing:antialiased;line-height:1.5;}
+  .wrap{max-width:880px;margin:0 auto;padding:34px 22px 90px;}
+
+  header.hd{margin-bottom:22px;}
+  .eyebrow{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--green-mid);}
+  h1{font-family:var(--serif);font-size:34px;font-weight:600;color:var(--ink);margin:6px 0 6px;line-height:1.08;}
+  .sub{font-size:14px;color:var(--muted);max-width:640px;}
+  .sub b{color:var(--ink);}
+
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 0;}
+  .meta label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
+  .meta input{font-family:var(--font);font-size:14px;color:var(--fg);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 12px;min-width:160px;}
+
+  /* progress + controls bar */
+  .bar{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);padding:14px 0 12px;margin:18px 0 6px;border-bottom:1px solid var(--border);}
+  .stats{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:11px;}
+  .chip{font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--border);color:var(--ink);}
+  .chip b{font-family:var(--mono);}
+  .chip.pass{background:var(--green-soft);color:var(--green);border-color:transparent;}
+  .chip.flag{background:var(--red-soft);color:var(--red);border-color:transparent;}
+  .chip.left{background:var(--field);color:var(--muted);border-color:transparent;}
+  .progress{height:8px;border-radius:999px;background:var(--field);overflow:hidden;}
+  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green-mid),var(--green));transition:width .3s;}
+  .ctrls{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px;align-items:center;}
+  .seg{display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:11px;overflow:hidden;}
+  .seg button{border:none;background:transparent;font-family:var(--font);font-size:13px;font-weight:600;color:var(--muted);padding:8px 14px;cursor:pointer;}
+  .seg button.on{background:var(--green);color:#fff;}
+  .act{margin-left:auto;display:flex;gap:8px;}
+  .act button{font-family:var(--font);font-size:13px;font-weight:700;border-radius:11px;padding:9px 15px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--ink);}
+  .act button.primary{background:var(--green);color:#fff;border-color:var(--green);}
+
+  /* sections */
+  section.grp{margin-top:24px;}
+  .grp-h{display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none;padding:6px 2px;}
+  .grp-h .gem{width:38px;height:38px;border-radius:11px;background:var(--green-soft);display:grid;place-items:center;font-size:19px;flex-shrink:0;}
+  .grp-h h2{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);margin:0;flex:1;}
+  .grp-h .gct{font-family:var(--mono);font-size:12px;color:var(--muted);}
+  .grp-h .caret{color:var(--muted);transition:transform .2s;} .grp.closed .caret{transform:rotate(-90deg);}
+  .grp.closed .items{display:none;}
+  .items{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+
+  .item{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 13px;transition:border-color .15s,background .15s;}
+  .item.done{background:#fbfaf7;border-color:#d4e2cf;}
+  .item.flagged{border-color:#e7c4bf;background:#fdf6f4;}
+  .item .row{display:flex;gap:11px;align-items:flex-start;}
+  .check{width:24px;height:24px;border-radius:7px;border:2px solid var(--border);flex-shrink:0;display:grid;place-items:center;cursor:pointer;background:var(--surface);margin-top:1px;transition:all .15s;}
+  .item.done .check{background:var(--green);border-color:var(--green);}
+  .check svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:3;opacity:0;} .item.done .check svg{opacity:1;}
+  .body{flex:1;min-width:0;}
+  .txt{font-size:14px;color:var(--ink);} .item.done .txt{color:var(--muted);}
+  .hintx{font-size:12px;color:var(--muted);margin-top:3px;}
+  .tags{display:flex;gap:6px;flex-shrink:0;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
+  .sev{font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:3px 7px;border-radius:6px;}
+  .sev.p0{background:var(--red-soft);color:var(--red);} .sev.p1{background:var(--amber-soft);color:var(--amber);} .sev.p2{background:var(--blue-soft);color:var(--blue);} .sev.p3{background:var(--field);color:var(--muted);}
+  .flagbtn{font-family:var(--font);font-size:11.5px;font-weight:700;border:1px solid var(--border);background:var(--surface);color:var(--muted);border-radius:8px;padding:5px 9px;cursor:pointer;white-space:nowrap;}
+  .item.flagged .flagbtn{background:var(--red);color:#fff;border-color:var(--red);}
+  .noteline{margin:10px 0 0 35px;display:none;}
+  .item.flagged .noteline{display:block;}
+  .noteline textarea{width:100%;font-family:var(--font);font-size:13px;color:var(--fg);background:var(--surface);border:1px solid #e7c4bf;border-radius:10px;padding:9px 11px;resize:vertical;min-height:42px;outline:none;}
+
+  .legend{font-size:12px;color:var(--muted);margin-top:10px;display:flex;gap:14px;flex-wrap:wrap;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+
+  /* export modal */
+  .scrim{position:fixed;inset:0;background:rgba(20,24,18,.5);display:none;align-items:center;justify-content:center;z-index:50;padding:24px;}
+  .scrim.on{display:flex;}
+  .modal{background:var(--surface);border-radius:20px;max-width:640px;width:100%;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 70px -20px rgba(0,0,0,.5);}
+  .modal h3{font-family:var(--serif);font-size:20px;margin:0;padding:18px 20px 0;color:var(--ink);}
+  .modal .mp{padding:12px 20px;overflow:auto;}
+  .modal textarea{width:100%;min-height:340px;font-family:var(--mono);font-size:12px;line-height:1.5;border:1px solid var(--border);border-radius:12px;padding:13px;background:var(--field);color:var(--fg);resize:vertical;}
+  .modal .mf{display:flex;gap:8px;justify-content:flex-end;padding:12px 20px 18px;border-top:1px solid var(--border);}
+  .modal .mf button{font-family:var(--font);font-size:13px;font-weight:700;border-radius:11px;padding:10px 16px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--ink);}
+  .modal .mf button.primary{background:var(--green);color:#fff;border-color:var(--green);}
+
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:11px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:all .25s;z-index:60;}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+  @media print{.bar,.act,.flagbtn,.meta input{display:none;} body{background:#fff;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <div class="eyebrow">Release QA · Android parity</div>
+    <h1>Android UI Parity Checklist</h1>
+    <p class="sub">Run this against the published Android build, screen-by-screen, comparing to the iOS build as the reference. Tick what matches; <b>Flag</b> anything that looks or behaves differently, set a severity, and add a note. Hit <b>Export report</b> to copy a markdown summary for Mohit &amp; Syed. Progress saves automatically in this browser.</p>
+    <div class="meta">
+      <label>Android build<input id="m-and" placeholder="e.g. 0.x.x (123)"></label>
+      <label>iOS reference<input id="m-ios" placeholder="e.g. 0.x.x (123)"></label>
+      <label>Device tested<input id="m-dev" placeholder="e.g. Pixel 7 · Android 14"></label>
+      <label>Tester<input id="m-by" placeholder="Ahmad"></label>
+    </div>
+  </header>
+
+  <div class="bar">
+    <div class="stats">
+      <span class="chip"><b id="s-total">0</b> checks</span>
+      <span class="chip pass"><b id="s-pass">0</b> pass</span>
+      <span class="chip flag"><b id="s-flag">0</b> flagged</span>
+      <span class="chip left"><b id="s-left">0</b> left</span>
+    </div>
+    <div class="progress"><i id="pbar"></i></div>
+    <div class="ctrls">
+      <div class="seg">
+        <button class="on" data-filter="all" onclick="setFilter(this)">All</button>
+        <button data-filter="left" onclick="setFilter(this)">Unchecked</button>
+        <button data-filter="flagged" onclick="setFilter(this)">Flagged</button>
+      </div>
+      <div class="act">
+        <button onclick="toggleAll(false)">Collapse all</button>
+        <button class="primary" onclick="openExport()">Export report</button>
+        <button onclick="resetAll()">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><span class="sev p0">P0</span> blocks release / broken</span>
+    <span><span class="sev p1">P1</span> obvious visual break</span>
+    <span><span class="sev p2">P2</span> noticeable polish gap</span>
+    <span><span class="sev p3">P3</span> nitpick</span>
+  </div>
+
+  <div id="list"></div>
+</div>
+
+<div class="scrim" id="scrim">
+  <div class="modal">
+    <h3>Discrepancy report — Markdown</h3>
+    <div class="mp"><textarea id="reportOut" readonly></textarea></div>
+    <div class="mf">
+      <button onclick="closeExport()">Close</button>
+      <button class="primary" onclick="copyReport()">Copy to clipboard</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Saved ✓</div>
+
+<script>
+/* ── checklist data ── id, text, severity, optional hint ── */
+const GROUPS=[
+  {id:'platform',icon:'🤖',title:'Platform foundations (Android-specific)',items:[
+    ['plat-safe','Status bar height, notch/punch-hole & safe-area insets — no content clipped or floating',1,'Test a punch-hole (Pixel) and a notch device'],
+    ['plat-nav','System navigation bar (3-button & gesture) doesn\'t overlap bottom tab bar / docks / FABs',0,'Toggle both nav modes in Android settings'],
+    ['plat-back','Hardware/gesture System Back works on every screen & matches the in-app back (e.g. Calendar → Daily Brief, not the brief→loop bug)',0,'Critical — Android has system back, iOS doesn\'t'],
+    ['plat-back-sheet','System Back dismisses bottom sheets / modals first, not the whole screen',1],
+    ['plat-rotate','Rotation locked to portrait (or handled) — no broken landscape layouts',2],
+    ['plat-density','Layout holds on small (≤5.5"), large & high-DPI screens — no clipped text or overflow',1,'Android device fragmentation is wide'],
+    ['plat-darkmode','Dark mode renders correctly (or is forced light to match iOS)',2],
+    ['plat-splash','Android 12+ splash screen shows correct icon/color, no flash-of-white before app loads',2],
+    ['plat-icon','Adaptive launcher icon is correct shape/padding (round, squircle, etc.)',2],
+  ]},
+  {id:'typo',icon:'🔤',title:'Typography & theming',items:[
+    ['typo-serif','Playfair Display headings load & render (not falling back to a serif/Roboto)',1,'Confirm the font ships in the APK'],
+    ['typo-body','Body font matches design — no unexpected Roboto substitution or wrong weights',1],
+    ['typo-spacing','Letter-spacing, line-height & heading sizes match iOS (Android renders type ~tighter)',2],
+    ['typo-truncate','Long names / titles truncate with ellipsis, don\'t wrap-break layouts (e.g. class names, event titles)',2],
+    ['typo-emoji','Emoji render in colour & consistent size (class icons 🍀🌻, reactions, event types)',2],
+    ['typo-fontscale','Respects or caps OS font-scaling (Android "largest" text size doesn\'t shatter layouts)',2],
+  ]},
+  {id:'interact',icon:'👆',title:'Interaction & motion',items:[
+    ['int-ripple','Tap feedback is consistent — Material ripple vs iOS opacity is acceptable, not jarring/missing',3],
+    ['int-touch','Touch targets ≥ 48dp (icon buttons, toggles, tab bar items, remove/approve buttons)',1],
+    ['int-scroll','Scroll physics & overscroll glow feel right; no nested-scroll jank in chat / long lists',2],
+    ['int-sheet','Bottom sheets animate & drag-dismiss the same; grab handle present',2],
+    ['int-toast','Toasts/snackbars appear in the right place and don\'t sit under the nav bar',2],
+    ['int-haptic','Haptics fire on key actions (send, approve, toggle) if used on iOS',3],
+    ['int-shadow','Card elevation/shadows look intentional (Material elevation vs iOS soft shadow) — not harsh or missing',2],
+  ]},
+  {id:'onboard',icon:'🌱',title:'Onboarding & auth',items:[
+    ['onb-flow','Full onboarding flow renders & advances correctly end-to-end',1],
+    ['onb-phone','Phone-number / OTP input + native keyboard & autofill behave',1],
+    ['onb-perms','Permission prompts (notifications, contacts) use Android dialogs & copy is correct',1],
+    ['onb-voice','AI/voice onboarding screens (orb, conversational) render & mic works',1],
+  ]},
+  {id:'home',icon:'🏠',title:'Home / Daily Brief',items:[
+    ['home-brief','Daily Brief layout, cards & spacing match iOS',1],
+    ['home-tabs','Bottom tab bar: icons, labels, active state, and it sits above the system nav bar',1],
+    ['home-empty','Empty states (no events this week, etc.) render correctly',2],
+    ['home-pull','Pull-to-refresh works and the spinner looks native-correct',2],
+  ]},
+  {id:'chat',icon:'💬',title:'Chat & Subgroups',items:[
+    ['chat-list','Message list, bubbles (sent/received), avatars, timestamps & read ticks match',1],
+    ['chat-kbd','Keyboard avoidance: input bar rises with the Android keyboard, no covered messages',0,'Android keyboard resize is a classic break'],
+    ['chat-input','Input bar, camera & send buttons aligned; emoji/keyboard switch works',1],
+    ['chat-tabs','Subgroup tab strip scrolls & switches; "+" / discover entry reachable',1],
+    ['chat-discover','Discover / Add subgroup list, join & request states render',1],
+    ['chat-admin','Admin approve/decline & make-admin actions work and look right',1],
+    ['chat-attach','Photo attach opens Android picker/camera and previews correctly',1],
+  ]},
+  {id:'clubs',icon:'🎟️',title:'Clubs & Events',items:[
+    ['club-list','Club list & details, member lists, badges render',1],
+    ['club-cal','Club calendar / feature views match',2],
+    ['evt-create','Create-event flow steps render & validate; date/time pickers are native Android pickers',1,'iOS wheel vs Android picker differ — check both'],
+    ['evt-detail','Event details, RSVPs, invite flow & deep links open correctly',1],
+    ['evt-share','Share uses the Android share sheet (intent), link copies correctly',2],
+  ]},
+  {id:'calendar',icon:'📅',title:'Calendar / Schedule',items:[
+    ['cal-intro','Calendar intro / marketing page + preview render',2],
+    ['cal-oauth','Google Calendar connect uses the native Android Google sign-in & returns to the app cleanly',0,'OAuth redirect handling differs on Android'],
+    ['cal-view','Day/schedule grid: time gutter, now-line, colour-coded blocks align correctly',1],
+    ['cal-back','After connect you land ON the calendar; Back returns to Daily Brief (the fixed flow)',0],
+    ['cal-settings','Calendar settings: toggles, disconnect sheet & "View calendar" button work',1],
+  ]},
+  {id:'birthday',icon:'🎂',title:'Birthday flow & media',items:[
+    ['bd-flow','Birthday event creation flow (AI agent prompts) renders & advances',1],
+    ['bd-upload','Photo upload from gallery/camera works; progress & comparison views render',1],
+    ['bd-gen','Generated birthday card/image displays at correct size & aspect, no distortion',1],
+    ['bd-voice','ElevenLabs voice/agent playback works (audio routing, mute) on Android',1],
+  ]},
+  {id:'profile',icon:'⚙️',title:'Profile, settings & notifications',items:[
+    ['prof-settings','Settings list, profile & kids, rows & chevrons match',2],
+    ['prof-toggle','Native-styled switches read correctly (on/off states, disabled "always on")',2],
+    ['notif-push','Push notifications: icon (Android needs a monochrome status icon), title/body, channel & tap-through deep link',0,'Android requires a small white notification icon — common miss'],
+    ['notif-perms','Android 13+ runtime notification permission requested correctly',1],
+    ['notif-badge','App badge / unread counts behave',3],
+  ]},
+  {id:'perf',icon:'⚡',title:'Performance & stability',items:[
+    ['perf-cold','Cold start time acceptable; no extended white screen',1],
+    ['perf-scroll','No dropped frames scrolling chat / long lists / calendar',2],
+    ['perf-images','Images & avatars load without layout shift or memory crashes on low-end devices',1],
+    ['perf-rotate','Backgrounding & resuming the app restores state correctly',2],
+    ['perf-crash','No crashes across a full pass — capture logcat for any',0],
+  ]},
+];
+
+const KEY='sprout-android-qa-v1';
+let state=JSON.parse(localStorage.getItem(KEY)||'{}');  // {id:{done,flagged,note}}, plus _meta
+let filter='all';
+
+function st(id){ return state[id]||(state[id]={done:false,flagged:false,note:''}); }
+function save(){ localStorage.setItem(KEY,JSON.stringify(state)); }
+
+function build(){
+  const list=document.getElementById('list');
+  list.innerHTML=GROUPS.map(g=>`
+    <section class="grp" id="grp-${g.id}">
+      <div class="grp-h" onclick="toggleGrp('${g.id}')">
+        <div class="gem">${g.icon}</div>
+        <h2>${g.title}</h2>
+        <span class="gct" id="gct-${g.id}"></span>
+        <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></span>
+      </div>
+      <div class="items">
+        ${g.items.map(it=>{const[id,txt,sev,hint]=it;const s=st(id);return `
+          <div class="item${s.done?' done':''}${s.flagged?' flagged':''}" id="it-${id}" data-grp="${g.id}">
+            <div class="row">
+              <div class="check" onclick="toggleDone('${id}')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+              <div class="body">
+                <div class="txt">${txt}</div>
+                ${hint?`<div class="hintx">${hint}</div>`:''}
+              </div>
+              <div class="tags">
+                <span class="sev p${sev}">P${sev}</span>
+                <button class="flagbtn" onclick="toggleFlag('${id}')">${s.flagged?'⚑ Flagged':'⚐ Flag'}</button>
+              </div>
+            </div>
+            <div class="noteline"><textarea placeholder="What's different on Android? (screen, expected vs actual)" oninput="setNote('${id}',this.value)">${s.note||''}</textarea></div>
+          </div>`;}).join('')}
+      </div>
+    </section>`).join('');
+  // restore meta
+  ['and','ios','dev','by'].forEach(k=>{const el=document.getElementById('m-'+k);if(state._meta&&state._meta[k])el.value=state._meta[k];el.oninput=()=>{state._meta=state._meta||{};state._meta[k]=el.value;save();};});
+  refresh();
+}
+
+function toggleDone(id){const s=st(id);s.done=!s.done;if(s.done)s.flagged=false;save();sync(id);refresh();}
+function toggleFlag(id){const s=st(id);s.flagged=!s.flagged;if(s.flagged)s.done=false;save();sync(id);refresh();}
+function setNote(id,v){st(id).note=v;save();}
+function sync(id){const el=document.getElementById('it-'+id);const s=st(id);el.classList.toggle('done',s.done);el.classList.toggle('flagged',s.flagged);el.querySelector('.flagbtn').textContent=s.flagged?'⚑ Flagged':'⚐ Flag';}
+
+function allIds(){return GROUPS.flatMap(g=>g.items.map(i=>i[0]));}
+function refresh(){
+  const ids=allIds();const total=ids.length;
+  const pass=ids.filter(i=>st(i).done).length;
+  const flag=ids.filter(i=>st(i).flagged).length;
+  const left=total-pass-flag;
+  document.getElementById('s-total').textContent=total;
+  document.getElementById('s-pass').textContent=pass;
+  document.getElementById('s-flag').textContent=flag;
+  document.getElementById('s-left').textContent=left;
+  document.getElementById('pbar').style.width=Math.round((pass+flag)/total*100)+'%';
+  GROUPS.forEach(g=>{const p=g.items.filter(i=>st(i[0]).done).length;document.getElementById('gct-'+g.id).textContent=p+'/'+g.items.length;});
+  applyFilter();
+}
+function setFilter(btn){document.querySelectorAll('.seg button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');filter=btn.dataset.filter;applyFilter();}
+function applyFilter(){
+  allIds().forEach(id=>{const s=st(id);const el=document.getElementById('it-'+id);let show=true;
+    if(filter==='left')show=!s.done&&!s.flagged; if(filter==='flagged')show=s.flagged;
+    el.style.display=show?'':'none';});
+  // hide empty groups under filter
+  GROUPS.forEach(g=>{const any=g.items.some(i=>document.getElementById('it-'+i[0]).style.display!=='none');document.getElementById('grp-'+g.id).style.display=any?'':'none';});
+}
+function toggleGrp(id){document.getElementById('grp-'+id).classList.toggle('closed');}
+function toggleAll(open){document.querySelectorAll('.grp').forEach(g=>g.classList.toggle('closed',!open));}
+function resetAll(){if(!confirm('Clear all checks, flags & notes?'))return;state={_meta:state._meta||{}};save();build();toast('Reset');}
+
+/* ── export markdown ── */
+function buildReport(){
+  const m=state._meta||{};
+  const ids=allIds();const pass=ids.filter(i=>st(i).done).length;const flag=ids.filter(i=>st(i).flagged).length;
+  let out=`# Sprout — Android UI Parity QA\n\n`;
+  out+=`- **Android build:** ${m.and||'—'}\n- **iOS reference:** ${m.ios||'—'}\n- **Device:** ${m.dev||'—'}\n- **Tester:** ${m.by||'—'}\n`;
+  out+=`- **Result:** ${pass}/${ids.length} pass · ${flag} flagged · ${ids.length-pass-flag} not checked\n\n`;
+  const flagged=[];
+  GROUPS.forEach(g=>{g.items.forEach(it=>{const[id,txt,sev]=it;const s=st(id);if(s.flagged)flagged.push({g:g.title,txt,sev,note:s.note});});});
+  if(flagged.length){
+    out+=`## 🚩 Discrepancies to fix (${flagged.length})\n\n`;
+    flagged.sort((a,b)=>a.sev-b.sev);
+    flagged.forEach(f=>{out+=`- **[P${f.sev}]** _(${f.g})_ ${f.txt}\n`+(f.note?`  - ${f.note.replace(/\n/g,' ')}\n`:'');});
+  } else { out+=`## 🚩 Discrepancies\n\nNone flagged. 🎉\n`; }
+  out+=`\n---\n_Generated from the Android UI Parity checklist._\n`;
+  return out;
+}
+function openExport(){document.getElementById('reportOut').value=buildReport();document.getElementById('scrim').classList.add('on');}
+function closeExport(){document.getElementById('scrim').classList.remove('on');}
+function copyReport(){const t=document.getElementById('reportOut');t.select();navigator.clipboard.writeText(t.value).then(()=>toast('Report copied ✓')).catch(()=>{document.execCommand('copy');toast('Report copied ✓');});}
+document.getElementById('scrim').addEventListener('click',e=>{if(e.target.id==='scrim')closeExport();});
+
+let tT;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('on'),1700);}
+
+build();
+</script>
+</body>
+</html>

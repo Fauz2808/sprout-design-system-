@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Subgroups · Added Notification + Leave · Sprout</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --field:#e8e4d9; --fg:#1a1a17; --ink:#1c2a1d; --muted:#807a6c; --border:#ddd9cf;
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-soft:#e7efe6; --red:#c0392b; --red-soft:#fbe6e3;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif; --serif:'Playfair Display',Georgia,serif; --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:34px 26px;padding:40px 24px 60px;}
+  .lede{flex-basis:100%;max-width:820px;text-align:center;margin:0 auto 6px;}
+  .lede h1{font-family:var(--serif);font-size:26px;font-weight:600;color:#23271f;margin:0 0 6px;}
+  .lede p{font-size:13.5px;color:#6a665b;margin:0;line-height:1.55;}
+  .lede .modelbox{margin:14px auto 0;max-width:560px;background:#e7e2d8;border:1px solid var(--border);border-radius:14px;padding:13px 16px;font-family:var(--mono);font-size:11.5px;color:#4a463d;line-height:1.7;text-align:left;white-space:pre;overflow-x:auto;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .caption{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:390px;line-height:1.5;}
+  .caption strong{color:#3a3830;font-weight:600;}
+
+  .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:5;}
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--fg);}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--fg);} .sb .bat{width:25px;}
+
+  .view{flex:1 1 auto;display:none;flex-direction:column;min-height:0;} .view.on{display:flex;}
+
+  /* CLUB header (matches the shipped build) */
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:6px 14px 6px;}
+  .ibtn{width:36px;height:36px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;flex-shrink:0;} .ibtn svg{width:20px;height:20px;stroke:var(--fg);fill:none;stroke-width:2;}
+  .hdr-mid{flex:1;display:flex;align-items:center;gap:9px;justify-content:center;}
+  .hdr-logo{width:36px;height:36px;border-radius:50%;background:#dceaf4;border:1px solid #bcd4e6;display:grid;place-items:center;font-size:16px;flex-shrink:0;}
+  .hdr-tx{line-height:1.05;text-align:left;}
+  .hdr-tx .t{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);}
+  .hdr-tx .s{font-size:11px;color:var(--green-mid);margin-top:1px;display:flex;align-items:center;gap:4px;}
+  .hdr-tx .s i{width:6px;height:6px;border-radius:50%;background:var(--green-mid);display:inline-block;}
+  .cal-btn{display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;flex-shrink:0;}
+  .cal-btn .cbx{width:34px;height:34px;border-radius:10px;background:var(--green);display:grid;place-items:center;} .cal-btn .cbx svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:1.8;}
+  .cal-btn span{font-size:9px;font-weight:600;color:var(--green);}
+
+  /* SUBGROUP TAB STRIP — underline style, matches shipped app */
+  .tabs2{flex:0 0 auto;display:flex;gap:2px;padding:2px 10px 0;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+  .tabs2::-webkit-scrollbar{display:none;}
+  .tab2{flex:0 0 auto;font-family:var(--serif);font-size:15px;color:var(--muted);padding:8px 12px 11px;position:relative;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;}
+  .tab2.on{color:var(--ink);font-weight:600;}
+  .tab2.on::after{content:'';position:absolute;left:10px;right:10px;bottom:-1px;height:2.5px;background:var(--ink);border-radius:2px;}
+  .tab2 .info{font-size:11px;color:var(--green-mid);opacity:0;transition:opacity .15s;}
+  .tab2.on .info{opacity:.9;}
+  .tab2.addt{font-family:var(--font);color:var(--green);font-weight:700;font-size:18px;padding:6px 12px 10px;}
+
+  /* chat body */
+  .chat{flex:1 1 auto;overflow-y:auto;padding:10px 16px;display:flex;flex-direction:column;gap:10px;background-image:radial-gradient(circle at 12% 18%,rgba(45,92,46,.035),transparent 40%),radial-gradient(circle at 80% 60%,rgba(45,92,46,.03),transparent 35%);}
+  .chat::-webkit-scrollbar{display:none;}
+  .daydiv{align-self:center;font-size:11px;font-weight:600;color:var(--muted);background:var(--surface);border:1px solid var(--border);padding:4px 13px;border-radius:999px;margin:2px 0;}
+  .msg{display:flex;gap:9px;max-width:84%;}
+  .msg .mav{width:34px;height:34px;border-radius:50%;flex-shrink:0;}
+  .who{font-size:12.5px;font-weight:700;color:var(--green-mid);margin:0 0 3px 2px;}
+  .bub{background:var(--surface);border:1px solid var(--border);border-radius:4px 14px 14px 14px;padding:7px 11px;display:inline-flex;align-items:baseline;gap:8px;}
+  .bub .tx{font-size:14px;color:var(--ink);} .bub .tm{font-size:10px;color:var(--muted);}
+  .hint-tap{align-self:center;font-size:11px;color:var(--muted);background:var(--field);border-radius:999px;padding:5px 12px;margin-top:2px;}
+  .hint-tap b{color:var(--green-mid);}
+
+  /* "you were added" system message */
+  .sysmsg{align-self:center;text-align:center;background:#eef4ec;border:1px solid #d4e4d1;border-radius:14px;padding:9px 14px;max-width:82%;}
+  .sysmsg .si{font-size:12.5px;color:var(--green-mid);font-weight:600;line-height:1.4;}
+  .sysmsg .sd{font-size:10.5px;color:var(--muted);margin-top:2px;}
+  .leavebar{align-self:center;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 13px;max-width:90%;margin-top:2px;}
+  .leavebar .lt{font-size:12px;color:var(--muted);flex:1;line-height:1.35;}
+  .leavebar .lt b{color:var(--ink);}
+  .leavebar button{flex-shrink:0;background:var(--red-soft);color:var(--red);border:none;border-radius:9px;padding:8px 13px;font-size:12.5px;font-weight:700;font-family:var(--font);cursor:pointer;}
+
+  /* input */
+  .inputbar{flex:0 0 auto;display:flex;align-items:center;gap:9px;padding:10px 14px calc(12px + env(safe-area-inset-bottom));}
+  .inputbar .ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;border:1px solid var(--border);background:var(--surface);}
+  .inputbar .pill{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:11px 16px;font-size:13.5px;color:var(--muted);}
+  .inputbar .ib.send svg{width:18px;height:18px;stroke:var(--green);fill:none;stroke-width:1.8;}
+  .inputbar .ib.cam svg{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.6;}
+
+  /* push notification */
+  .notif{position:absolute;top:60px;left:12px;right:12px;z-index:40;background:rgba(250,249,246,.86);backdrop-filter:blur(22px);border:1px solid rgba(0,0,0,.06);border-radius:22px;padding:12px 14px;display:flex;gap:11px;align-items:flex-start;box-shadow:0 18px 40px -14px rgba(0,0,0,.4);transform:translateY(-160%);transition:transform .5s cubic-bezier(.22,1,.36,1);cursor:pointer;}
+  .notif.on{transform:translateY(0);}
+  .notif .nico{width:38px;height:38px;border-radius:10px;background:var(--green);display:grid;place-items:center;flex-shrink:0;font-size:19px;}
+  .notif .nbody{flex:1;min-width:0;}
+  .notif .nhead{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+  .notif .ntitle{font-size:13.5px;font-weight:700;color:var(--ink);margin:2px 0 1px;}
+  .notif .ntx{font-size:12.5px;color:#4a463d;line-height:1.35;}
+
+  /* GROUP INFO (subgroup) */
+  .scroll{flex:1 1 auto;overflow-y:auto;padding:4px 18px 18px;} .scroll::-webkit-scrollbar{display:none;}
+  .gi-top{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:6px 14px 8px;}
+  .gi-top .t{flex:1;text-align:center;font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);} .gi-top .sp{width:36px;}
+  .gi-crumb{text-align:center;font-size:11px;color:var(--muted);margin:-2px 0 4px;}
+  .gi-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:6px 0 6px;}
+  .gi-ic{width:72px;height:72px;border-radius:22px;background:var(--green-soft);display:grid;place-items:center;font-size:34px;margin-bottom:10px;}
+  .gi-nm{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);}
+  .gi-sub{font-size:12.5px;color:var(--muted);margin-top:3px;}
+  .gi-meta{font-size:11.5px;color:var(--green-mid);margin-top:7px;background:var(--green-soft);padding:5px 11px;border-radius:999px;}
+  .seclbl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:18px 4px 9px;}
+  .qrow{display:flex;gap:9px;margin:6px 0 2px;}
+  .qbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:13px 6px;cursor:pointer;}
+  .qbtn svg{width:21px;height:21px;stroke:var(--ink);fill:none;stroke-width:1.8;}
+  .qbtn span{font-size:11.5px;font-weight:600;color:var(--ink);}
+  .mlist{display:flex;flex-direction:column;gap:8px;}
+  .mrow{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 13px;}
+  .av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px;flex-shrink:0;}
+  .mrow .nm{font-size:14px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:7px;}
+  .mrow .you{font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:var(--green);color:#fff;padding:2px 7px;border-radius:999px;}
+  .mrow .sub{font-size:11.5px;color:var(--muted);margin-top:1px;}
+  .mrow .chip{margin-left:auto;font-size:10px;font-weight:700;color:var(--green-mid);background:var(--green-soft);padding:4px 9px;border-radius:999px;}
+  .leave{width:100%;border:1.5px solid #e6c8c4;background:var(--surface);color:var(--red);border-radius:15px;padding:15px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer;margin-top:20px;display:flex;align-items:center;justify-content:center;gap:9px;}
+  .leave svg{width:19px;height:19px;stroke:var(--red);fill:none;stroke-width:2;}
+  .reportnote{font-size:11px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.5;}
+
+  .home{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:134px;height:5px;background:var(--fg);border-radius:999px;opacity:.18;z-index:9;}
+
+  .scrim{position:absolute;inset:0;background:rgba(20,24,18,.45);opacity:0;pointer-events:none;transition:opacity .25s;z-index:20;border-radius:44px;}
+  .scrim.on{opacity:1;pointer-events:auto;}
+  .sheet{position:absolute;left:0;right:0;bottom:0;z-index:21;background:var(--surface);border-radius:26px 26px 0 0;padding:10px 22px calc(22px + env(safe-area-inset-bottom));transform:translateY(115%);visibility:hidden;transition:transform .32s cubic-bezier(.22,1,.36,1),visibility .32s;box-shadow:0 -16px 40px -16px rgba(0,0,0,.3);text-align:center;}
+  .sheet.on{transform:translateY(0);visibility:visible;}
+  .grab{width:38px;height:5px;border-radius:999px;background:var(--border);margin:8px auto 14px;}
+  .sheet .warn-ic{width:54px;height:54px;border-radius:50%;background:#f7e7e4;display:grid;place-items:center;font-size:26px;margin:0 auto 12px;}
+  .sheet h3{font-family:var(--serif);font-size:20px;color:var(--ink);margin:0 0 6px;}
+  .sheet p{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 18px;padding:0 4px;}
+  .sheet .acts{display:flex;gap:10px;}
+  .sheet .acts button{flex:1;border:none;border-radius:14px;padding:14px;font-size:14.5px;font-weight:700;font-family:var(--font);cursor:pointer;}
+  .sheet .cancel{background:var(--field);color:var(--ink);} .sheet .confirm{background:var(--red);color:#fff;}
+
+  .toast{position:absolute;left:50%;bottom:34px;transform:translateX(-50%) translateY(12px);background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:11px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:all .25s;z-index:30;box-shadow:0 10px 24px -8px rgba(0,0,0,.5);max-width:300px;text-align:center;}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+  .replay{font-family:var(--mono);font-size:11px;border:1px solid var(--border);background:var(--surface);color:#3a3830;border-radius:9px;padding:7px 13px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>How a subgroup behaves — one club, switchable tabs</h1>
+  <p>The <strong>club</strong> (Kindergarten) is the shell. The subgroups you belong to are <strong>tabs</strong> under the header. Switch with the tabs, add more with <strong>+</strong>, and open <strong>group info / Leave</strong> by tapping the active tab.</p>
+  <div class="modelbox">CLUB ───────── "Kindergarten"        ← header: school logo + Calendar
+ ├─ tab  All Kindergarten   ← everyone · base membership (can't leave)
+ ├─ tab  Mrs. Taylor        ← a class
+ ├─ tab  1st Class  ⓘ       ← active · tap again → Group info → Leave
+ └─  +                      ← discover / join / create more subgroups</div>
+</div>
+
+<!-- ════════════ DEVICE 1 — NOTIFICATION + SYSTEM MESSAGE (inside the tabbed shell) ════════════ -->
+<div class="panel">
+  <div class="caption"><strong>1 · "How did I get added?"</strong> — tab strip on top · push + in-chat system message</div>
+  <div class="device">
+    <span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>4:57</span><span class="r">
+        <svg viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg>
+        <svg viewBox="0 0 17 11"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1z"/></svg>
+        <svg class="bat" viewBox="0 0 25 11"><rect x=".5" y=".5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="22" y="3.5" width="1.5" height="4" rx=".4" fill="currentColor" fill-opacity=".45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+      </span></div>
+
+      <section class="view on" id="d1-chat">
+        <div class="top">
+          <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="hdr-mid">
+            <div class="hdr-logo">🚀</div>
+            <div class="hdr-tx"><div class="t">Kindergarten</div><div class="s"><i></i>1 online</div></div>
+          </div>
+          <div class="cal-btn"><div class="cbx"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div><span>Calendar</span></div>
+        </div>
+        <div class="tabs2">
+          <div class="tab2">All Kindergarten</div>
+          <div class="tab2">Mrs. Taylor</div>
+          <div class="tab2 on">1st Class</div>
+          <div class="tab2 addt">＋</div>
+        </div>
+
+        <div class="chat">
+          <div class="daydiv">Thu, Jun 25</div>
+          <div class="sysmsg">
+            <div class="si">🔔 Mohit Rai added you to 1st&nbsp;Class</div>
+            <div class="sd">Today 7:14 PM · admins can add families from your school</div>
+          </div>
+          <div class="leavebar">
+            <div class="lt"><b>Not your class?</b> Tap the <b>1st Class</b> tab → Leave. No one is notified.</div>
+            <button onclick="toast1('→ Group info → Leave group')">Leave</button>
+          </div>
+          <div class="msg"><div class="mav" style="background:linear-gradient(135deg,#c0857a,#9a6f9a)"></div><div><div class="who">Mohit Rai</div><div class="bub"><span class="tx">Hi 👋</span><span class="tm">19:16</span></div></div></div>
+        </div>
+
+        <div class="inputbar">
+          <div class="ib cam"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><circle cx="12" cy="12.5" r="3.4"/></svg></div>
+          <div class="pill">Type Message</div>
+          <div class="ib send"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+        </div>
+
+        <div class="notif" id="notif" onclick="this.classList.remove('on')">
+          <div class="nico">🌱</div>
+          <div class="nbody">
+            <div class="nhead"><span>Sprout</span><span>now</span></div>
+            <div class="ntitle">You were added to 1st Class</div>
+            <div class="ntx">Mohit Rai added you · Kindergarten, Riker Elementary. Tap to view or leave.</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="toast" id="toast1">Notification replayed</div>
+      <div class="home"></div>
+    </div>
+  </div>
+  <button class="replay" onclick="document.getElementById('notif').classList.add('on');toast1('Notification replayed')">▸ replay notification</button>
+</div>
+
+<!-- ════════════ DEVICE 2 — TABS → ACTIVE TAB → GROUP INFO → LEAVE ════════════ -->
+<div class="panel">
+  <div class="caption"><strong>2 · Leave a subgroup</strong> — tap active "1st Class" tab → Group info → Leave → tab removed</div>
+  <div class="device">
+    <span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>4:57</span><span class="r">
+        <svg viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg>
+        <svg viewBox="0 0 17 11"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1z"/></svg>
+        <svg class="bat" viewBox="0 0 25 11"><rect x=".5" y=".5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="22" y="3.5" width="1.5" height="4" rx=".4" fill="currentColor" fill-opacity=".45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+      </span></div>
+
+      <!-- club shell, 1st Class active -->
+      <section class="view on" id="d2-chat">
+        <div class="top">
+          <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="hdr-mid">
+            <div class="hdr-logo">🚀</div>
+            <div class="hdr-tx"><div class="t">Kindergarten</div><div class="s"><i></i>1 online</div></div>
+          </div>
+          <div class="cal-btn"><div class="cbx"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div><span>Calendar</span></div>
+        </div>
+        <div class="tabs2" id="d2-tabs">
+          <div class="tab2" onclick="toast2('Switched to All Kindergarten')">All Kindergarten</div>
+          <div class="tab2" onclick="toast2('Switched to Mrs. Taylor')">Mrs. Taylor</div>
+          <div class="tab2 on" id="d2-1stclass" onclick="showD2('d2-info')">1st Class <span class="info">ⓘ</span></div>
+          <div class="tab2 addt" onclick="toast2('Discover / add subgroup')">＋</div>
+        </div>
+        <div class="chat">
+          <div class="daydiv">Thu, Jun 25</div>
+          <div class="hint-tap">Tap the active <b>1st Class</b> tab again for group info &amp; Leave</div>
+          <div class="msg"><div class="mav" style="background:linear-gradient(135deg,#c0857a,#9a6f9a)"></div><div><div class="who">Mohit Rai</div><div class="bub"><span class="tx">Hi 👋</span><span class="tm">19:16</span></div></div></div>
+          <div class="msg"><div class="mav" style="background:linear-gradient(135deg,#6fa8d0,#5a8f5d)"></div><div><div class="who">Mrs. Taylor</div><div class="bub"><span class="tx">Welcome everyone! 🎉</span><span class="tm">19:20</span></div></div></div>
+        </div>
+        <div class="inputbar">
+          <div class="ib cam"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><circle cx="12" cy="12.5" r="3.4"/></svg></div>
+          <div class="pill">Type Message</div>
+          <div class="ib send"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+        </div>
+      </section>
+
+      <!-- GROUP INFO for the 1st Class subgroup -->
+      <section class="view" id="d2-info">
+        <div class="gi-top">
+          <div class="ibtn" onclick="showD2('d2-chat')"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="t">Subgroup info</div>
+          <div class="sp"></div>
+        </div>
+        <div class="gi-crumb">Kindergarten › 1st Class</div>
+        <div class="scroll">
+          <div class="gi-hero">
+            <div class="gi-ic">🚀</div>
+            <div class="gi-nm">1st Class</div>
+            <div class="gi-sub">A class in Kindergarten · Riker Elementary</div>
+            <div class="gi-meta">You were added by Mohit Rai · Jun 25</div>
+          </div>
+          <div class="qrow">
+            <div class="qbtn" onclick="toast2('Muted')"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M23 9l-6 6M17 9l6 6"/></svg><span>Mute</span></div>
+            <div class="qbtn" onclick="toast2('Invite link copied ✓')"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg><span>Invite</span></div>
+            <div class="qbtn" onclick="toast2('Search')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><span>Search</span></div>
+          </div>
+          <div class="seclbl">Members · 24 families</div>
+          <div class="mlist">
+            <div class="mrow"><div class="av" style="background:#5a8f5d">TM</div><div><div class="nm">Tony Martin <span class="you">You</span></div><div class="sub">Dad of Cooper</div></div></div>
+            <div class="mrow"><div class="av" style="background:#6fa8d0">ET</div><div><div class="nm">Mrs. Taylor</div><div class="sub">Teacher</div></div><div class="chip">Admin</div></div>
+            <div class="mrow"><div class="av" style="background:#c0857a">MR</div><div><div class="nm">Mohit Rai</div><div class="sub">Dad of Aarav · added you</div></div><div class="chip">Admin</div></div>
+            <div class="mrow"><div class="av" style="background:#c98aa8">SJ</div><div><div class="nm">Sarah Jensen</div><div class="sub">Mom of Mia</div></div></div>
+          </div>
+          <button class="leave" onclick="openLeave()">
+            <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+            Leave 1st Class
+          </button>
+          <div class="reportnote">Leaving removes the <b>1st Class</b> tab from Kindergarten. Your <b>All Kindergarten</b> membership stays. Admins aren't notified — re-join anytime with <b>＋</b>.</div>
+        </div>
+      </section>
+
+      <!-- after leaving: back in the shell, 1st Class tab gone, All Kindergarten active -->
+      <section class="view" id="d2-after">
+        <div class="top">
+          <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="hdr-mid">
+            <div class="hdr-logo">🚀</div>
+            <div class="hdr-tx"><div class="t">Kindergarten</div><div class="s"><i></i>1 online</div></div>
+          </div>
+          <div class="cal-btn"><div class="cbx"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div><span>Calendar</span></div>
+        </div>
+        <div class="tabs2">
+          <div class="tab2 on">All Kindergarten</div>
+          <div class="tab2">Mrs. Taylor</div>
+          <div class="tab2 addt" onclick="showD2('d2-chat')">＋</div>
+        </div>
+        <div class="chat">
+          <div class="daydiv">Thu, Jun 25</div>
+          <div class="hint-tap">✓ You left <b>1st Class</b> — its tab is gone. You're back in <b>All Kindergarten</b>.</div>
+          <div class="msg"><div class="mav" style="background:linear-gradient(135deg,#8fba92,#5a8f5d)"></div><div><div class="who">Principal Adams</div><div class="bub"><span class="tx">Reminder: school photos next week 📸</span><span class="tm">18:02</span></div></div></div>
+        </div>
+        <div class="inputbar">
+          <div class="ib cam"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><circle cx="12" cy="12.5" r="3.4"/></svg></div>
+          <div class="pill">Type Message</div>
+          <div class="ib send"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+        </div>
+      </section>
+
+      <div class="scrim" id="scrim2" onclick="closeLeave()"></div>
+      <div class="sheet" id="sheet2">
+        <div class="grab"></div>
+        <div class="warn-ic">👋</div>
+        <h3>Leave 1st Class?</h3>
+        <p>The <b>1st Class</b> tab will be removed from Kindergarten. You'll stop getting its messages &amp; events. <b>Admins won't be notified.</b> You can re-join anytime.</p>
+        <div class="acts">
+          <button class="cancel" onclick="closeLeave()">Cancel</button>
+          <button class="confirm" onclick="doLeave()">Leave 1st Class</button>
+        </div>
+      </div>
+
+      <div class="toast" id="toast2">Done ✓</div>
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let t1;function toast1(m){const t=document.getElementById('toast1');t.textContent=m;t.classList.add('on');clearTimeout(t1);t1=setTimeout(()=>t.classList.remove('on'),1800);}
+setTimeout(()=>document.getElementById('notif').classList.add('on'),600);
+setTimeout(()=>document.getElementById('notif').classList.remove('on'),4400);
+
+function showD2(id){const scr=document.getElementById(id).closest('.screen');scr.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));}
+function openLeave(){document.getElementById('scrim2').classList.add('on');document.getElementById('sheet2').classList.add('on');}
+function closeLeave(){document.getElementById('scrim2').classList.remove('on');document.getElementById('sheet2').classList.remove('on');}
+function doLeave(){closeLeave();showD2('d2-after');toast2('You left 1st Class');}
+let t2;function toast2(m){const t=document.getElementById('toast2');t.textContent=m;t.classList.add('on');clearTimeout(t2);t2=setTimeout(()=>t.classList.remove('on'),1800);}
+</script>
+</body>
+</html>

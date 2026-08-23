@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Birthday — Generating + Editable Preview · Sprout</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --field:#e8e4d9; --fg:#1a1a17; --ink:#1c2a1d; --muted:#807a6c; --border:#e3ded2;
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-soft:#e7efe6;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif; --serif:'Playfair Display',Georgia,serif; --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;height:100%;}
+  body{background:#ddd8ce;font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;padding:32px 24px;min-height:100vh;gap:30px;flex-wrap:wrap;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .caption{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:360px;line-height:1.5;} .caption strong{color:#3a3830;font-weight:600;} .caption em{color:var(--green);font-style:normal;font-weight:600;}
+
+  .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .device::before,.device::after{content:'';position:absolute;width:3px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.06) 8%,transparent 16%,transparent 84%,rgba(255,255,255,.04) 92%,transparent);top:100px;bottom:100px;} .device::before{left:-1px;}.device::after{right:-1px;}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:5;}
+  .br{position:absolute;width:4px;background:#0a0a0c;border-radius:2px;} .br.l1{left:-3px;top:174px;height:32px;}.br.l2{left:-3px;top:220px;height:60px;}.br.l3{left:-3px;top:290px;height:60px;}.br.r1{right:-3px;top:250px;height:100px;}
+
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:radial-gradient(120% 60% at 50% 8%, #eef3ea 0%, var(--bg) 50%);}
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--fg);}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--fg);} .sb .bat{width:25px;}
+  .top{flex:0 0 auto;padding:6px 16px 6px;display:flex;align-items:center;gap:10px;}
+  .ibtn{width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;} .ibtn svg{width:18px;height:18px;stroke:var(--fg);fill:none;stroke-width:2;}
+  .top .t{flex:1;text-align:center;font-weight:700;font-size:15px;}
+  /* Apple-style done check — disabled while generating, active once the cover is ready */
+  .donebtn{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);display:grid;place-items:center;cursor:not-allowed;transition:background .2s,border-color .2s;}
+  .donebtn svg{width:19px;height:19px;stroke:#c2bcae;fill:none;stroke-width:2.6;transition:stroke .2s;}
+  .donebtn.on{background:var(--green);border-color:var(--green);cursor:pointer;box-shadow:0 8px 18px -8px rgba(45,92,46,.6);} .donebtn.on svg{stroke:#fff;}
+  .prog-bar{height:3px;background:var(--border);border-radius:2px;margin:0 18px;overflow:hidden;} .prog-bar i{display:block;height:100%;width:88%;background:var(--green);border-radius:2px;}
+
+  .content{flex:1;overflow-y:auto;padding:14px 20px 28px;} .content::-webkit-scrollbar{display:none;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--green-mid);}
+  .h1{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--ink);line-height:1.2;margin:5px 0 12px;}
+
+  /* cover slot (square 1:1) */
+  .cover{position:relative;aspect-ratio:1/1;border-radius:20px;overflow:hidden;box-shadow:0 18px 40px -16px rgba(0,0,0,.4);background:linear-gradient(155deg,#2f6f48,#16412a);color:#fff;}
+  .cover .gen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 24px;z-index:3;}
+  .cover .glow{position:absolute;inset:0;z-index:2;background:radial-gradient(60% 50% at 50% 42%,rgba(255,255,255,.14),transparent 70%);animation:pulse 2.6s ease-in-out infinite;} @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+  .ring{width:76px;height:76px;transform:rotate(-90deg);} .ring .track{fill:none;stroke:rgba(255,255,255,.22);stroke-width:6;} .ring .prog{fill:none;stroke:#fff;stroke-width:6;stroke-linecap:round;stroke-dasharray:213.6;stroke-dashoffset:213.6;transition:stroke-dashoffset .3s linear;}
+  .ring-pct{position:absolute;font-size:15px;font-weight:800;font-family:var(--mono);} .ring-wrap{position:relative;display:grid;place-items:center;margin-bottom:14px;}
+  .gen-t{font-family:var(--serif);font-size:18px;font-weight:600;} .gen-s{font-size:12.5px;opacity:.85;margin-top:5px;line-height:1.4;} .gen-s b{color:#ffe08a;font-weight:700;}
+  .cover .done{position:absolute;inset:0;display:none;flex-direction:column;justify-content:space-between;padding:20px;z-index:3;}
+  .cover.ready .done{display:flex;} .cover.ready .gen,.cover.ready .glow{display:none;}
+  .cover .done .num{font-family:var(--serif);font-size:120px;font-weight:800;line-height:.78;letter-spacing:-.03em;}
+  .cover .done .ch{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.85;} .cover .done .nm{font-family:var(--serif);font-size:30px;font-weight:700;line-height:1;margin-top:2px;}
+  .cover .done .face{position:absolute;right:18px;top:44%;width:74px;height:74px;border-radius:50%;border:3px solid rgba(255,255,255,.6);background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:38px;}
+  /* change-style is the only cover action (no regenerate) */
+  .changestyle{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:5;display:none;align-items:center;gap:6px;background:rgba(0,0,0,.32);backdrop-filter:blur(6px);color:#fff;border:none;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;} .cover.ready .changestyle{display:flex;} .changestyle svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.2;}
+
+  .editcue{display:flex;align-items:center;gap:9px;background:var(--green-soft);border:1px solid #cfe0cf;border-radius:13px;padding:10px 13px;margin:13px 0 4px;font-size:12.5px;color:var(--green);font-weight:600;} .editcue.hide{display:none;} .editcue svg{width:16px;height:16px;stroke:var(--green-mid);fill:none;stroke-width:2;flex-shrink:0;}
+  .donecue{display:none;align-items:center;gap:9px;background:#eef7ee;border:1px solid #cfe0cf;border-radius:13px;padding:10px 13px;margin:13px 0 4px;font-size:12.5px;color:var(--green);font-weight:600;} .cover.ready ~ .donecue{display:flex;} .donecue svg{width:16px;height:16px;stroke:var(--green-mid);fill:none;stroke-width:2.6;flex-shrink:0;}
+
+  .flabel{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:16px 3px 8px;}
+  .tinput{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:13px 14px;font-size:15px;font-weight:600;color:var(--ink);font-family:var(--font);outline:none;transition:border-color .15s;} .tinput:focus{border-color:var(--green-mid);}
+  .drow{display:flex;gap:9px;}
+  .field{flex:1;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 13px;cursor:pointer;transition:border-color .15s;} .field:active{border-color:var(--green-mid);}
+  .field .ic{font-size:15px;} .field .fb{flex:1;min-width:0;} .field .l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;} .field .v{font-size:14px;font-weight:600;color:var(--ink);margin-top:1px;}
+  .descbox{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:12px 14px;} .descbox:focus-within{border-color:var(--green-mid);}
+  .descbox textarea{width:100%;border:none;background:transparent;resize:none;font-family:var(--font);font-size:14px;line-height:1.5;color:var(--ink);outline:none;min-height:66px;}
+
+  /* Options — advanced, tucked at the very bottom (Luma-style) */
+  .options{margin-top:22px;border-top:1px solid var(--border);padding-top:6px;}
+  .optrow{display:flex;align-items:center;gap:12px;padding:14px 2px;border-bottom:1px solid var(--border);} .optrow:last-child{border-bottom:none;}
+  .optrow .oi{font-size:16px;width:20px;text-align:center;}
+  .optrow .ob{flex:1;} .optrow .ob b{font-size:14px;color:var(--ink);font-weight:600;} .optrow .ob span{display:block;font-size:11.5px;color:var(--muted);margin-top:1px;}
+  .toggle{width:44px;height:26px;border-radius:999px;background:var(--border);position:relative;cursor:pointer;flex-shrink:0;transition:background .2s;} .toggle::after{content:'';position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s;} .toggle.on{background:var(--green);} .toggle.on::after{left:20px;}
+  .optval{font-size:13.5px;font-weight:600;color:var(--muted);}
+  .home{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:134px;height:5px;background:var(--fg);border-radius:999px;opacity:.18;z-index:9;}
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="caption"><strong>Birthday · generate + edit</strong> <em>v2</em><br>✓ top-right (locked until ready) · <em>Options</em> at the bottom · no regenerate · medium quality ~1 min</div>
+  <div class="device">
+    <span class="br l1"></span><span class="br l2"></span><span class="br l3"></span><span class="br r1"></span><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg>
+        <svg viewBox="0 0 17 11"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1z"/></svg>
+        <svg class="bat" viewBox="0 0 25 11"><rect x=".5" y=".5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="22" y="3.5" width="1.5" height="4" rx=".4" fill="currentColor" fill-opacity=".45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+      </span></div>
+
+      <div class="top">
+        <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+        <div class="t">New Birthday</div>
+        <button class="donebtn" id="doneBtn" title="Create event"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button>
+      </div>
+      <div class="prog-bar"><i></i></div>
+
+      <div class="content">
+        <div class="eyebrow">Almost there</div>
+        <div class="h1">Your cover's rendering —<br>set the details meanwhile</div>
+
+        <div class="cover" id="cover">
+          <div class="glow"></div>
+          <div class="gen">
+            <div class="ring-wrap">
+              <svg class="ring" viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="34"/><circle class="prog" id="ring" cx="40" cy="40" r="34"/></svg>
+              <span class="ring-pct" id="pct">0%</span>
+            </div>
+            <div class="gen-t">Painting Kennedy's cover ✨</div>
+            <div class="gen-s">Medium quality · about <b id="eta">a minute</b><br>Edit everything below while it finishes</div>
+          </div>
+          <div class="done">
+            <div><div class="ch">Chapter Five</div><div class="nm">Kennedy</div></div>
+            <div class="num">5</div>
+            <div class="face">🧒</div>
+          </div>
+          <button class="changestyle" onclick="alert('Back to styles')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>Change style</button>
+        </div>
+
+        <div class="editcue" id="editcue"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>No need to wait — fill in the details now.</div>
+        <div class="donecue"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Cover's ready! Tap ✓ up top to send it live.</div>
+
+        <div class="flabel">Event title</div>
+        <input class="tinput" value="Kennedy's 5th Birthday 🎉"/>
+
+        <div class="flabel">When &amp; where</div>
+        <div class="drow">
+          <div class="field"><span class="ic">📅</span><div class="fb"><div class="l">Date</div><div class="v">Sat, Jun 28</div></div></div>
+          <div class="field"><span class="ic">🕑</span><div class="fb"><div class="l">Time</div><div class="v">2:00 PM</div></div></div>
+        </div>
+        <div class="field" style="margin-top:9px"><span class="ic">📍</span><div class="fb"><div class="l">Location</div><div class="v">Zilker Park · Shelter 3</div></div></div>
+
+        <div class="flabel">Description</div>
+        <div class="descbox"><textarea>Come celebrate Kennedy's 5th birthday! 🎉 Cake, games and plenty of running around. Drinks &amp; snacks provided — just bring the kids.</textarea></div>
+
+        <div class="options">
+          <div class="flabel" style="margin-top:8px">Options</div>
+          <div class="optrow"><span class="oi">✅</span><div class="ob"><b>Require approval</b><span>You approve each guest before they join</span></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          <div class="optrow"><span class="oi">👥</span><div class="ob"><b>Limit spots</b><span>Cap the guest list</span></div><div class="optval">Off ›</div></div>
+        </div>
+      </div>
+
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const CIRC=213.6, DUR=7000; // demo: 7s stands in for ~1 min (medium quality)
+  const ring=document.getElementById('ring'), pct=document.getElementById('pct'), cover=document.getElementById('cover'),
+        doneBtn=document.getElementById('doneBtn'), editcue=document.getElementById('editcue'), eta=document.getElementById('eta');
+  let t0, raf;
+  function run(){
+    cover.classList.remove('ready'); editcue.classList.remove('hide');
+    doneBtn.classList.remove('on');           // ✓ locked while rendering
+    t0=performance.now(); tick();
+  }
+  function tick(){
+    const p=Math.min((performance.now()-t0)/DUR,1);
+    ring.style.strokeDashoffset=CIRC*(1-p); pct.textContent=Math.round(p*100)+'%';
+    const remain=Math.max(0,Math.round((1-p)*60));   // pretend ~60s total (medium)
+    eta.textContent = remain>40 ? 'a minute' : remain>15 ? Math.ceil(remain/10)*10+' sec' : 'a few sec';
+    if(p<1){ raf=requestAnimationFrame(tick); } else { finish(); }
+  }
+  function finish(){
+    cover.classList.add('ready'); editcue.classList.add('hide');
+    doneBtn.classList.add('on');               // ✓ now tappable
+    doneBtn.onclick=()=>alert('→ Continue to invites');
+  }
+  run();
+</script>
+</body>
+</html>

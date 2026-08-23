@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprout – 19.10 Live Activities · Photo Upload Progress</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --brand:   #186338;
+      --bg:      #f4f1ea;
+      --s1:      #eae6db;
+      --s2:      #dbd5c8;
+      --tp:      #4d525b;
+      --ts:      #818898;
+      --tt:      #b3b8c1;
+    }
+
+    body {
+      background: #b0a898;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 56px 40px 80px;
+      gap: 56px;
+    }
+
+    /* ── Page header ── */
+    .page-title {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.5);
+    }
+    .page-title strong { color: #fff; }
+
+    /* ── Section labels ── */
+    .section-title {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: rgba(255,255,255,0.55);
+      align-self: flex-start;
+      margin-bottom: -40px;
+    }
+
+    /* ── Row of phone + annotation ── */
+    .row {
+      display: flex;
+      gap: 48px;
+      align-items: flex-start;
+    }
+
+    /* ── Phone shell (same as existing screens) ── */
+    .phone {
+      width: 393px; height: 852px;
+      background: var(--bg);
+      border-radius: 54px; overflow: hidden; position: relative;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.08),
+        0 0 0 10px #1c1c1e, 0 0 0 12px #2c2c2e,
+        0 50px 100px rgba(0,0,0,.5);
+    }
+    .phone::before {
+      content:''; position:absolute; left:-13px; top:120px;
+      width:4px; height:32px; background:#2a2a2a; border-radius:2px 0 0 2px;
+      box-shadow:0 44px 0 #2a2a2a,0 88px 0 #2a2a2a;
+    }
+    .phone::after {
+      content:''; position:absolute; right:-13px; top:148px;
+      width:4px; height:66px; background:#2a2a2a; border-radius:0 2px 2px 0;
+    }
+
+    /* ── Dynamic Island ── */
+    .island {
+      position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      background: #000; border-radius: 99px; z-index: 100;
+      transition: all 0.5s cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+    .island.compact  { width: 120px; height: 34px; }
+    .island.expanded { width: 350px; height: 84px; }
+
+    /* ── Status bar ── */
+    .status-bar {
+      position: absolute; top: 0; left: 0; right: 0; height: 52px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 26px 0; z-index: 30;
+    }
+    .s-time { font-size: 15px; font-weight: 600; color: var(--tp); }
+    .s-icons { display: flex; align-items: center; gap: 5px; }
+
+    /* ── Lock screen base ── */
+    .lockscreen-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(175deg, #1a2e22 0%, #0d1a14 45%, #0a120e 100%);
+    }
+    .lockscreen-bg::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 20%, rgba(24,99,56,.25) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(15,70,38,.2) 0%, transparent 50%);
+    }
+
+    /* Lock screen time */
+    .lock-time {
+      position: absolute; top: 120px; left: 0; right: 0;
+      text-align: center;
+    }
+    .lock-hhmm {
+      font-size: 78px; font-weight: 300; color: #fff;
+      letter-spacing: -3px; line-height: 1;
+      font-family: -apple-system, 'SF Pro Display', sans-serif;
+    }
+    .lock-date {
+      font-size: 17px; color: rgba(255,255,255,0.75);
+      margin-top: 6px; letter-spacing: 0.01em;
+    }
+
+    /* ── Lock screen Live Activity card ── */
+    .la-card {
+      position: absolute;
+      left: 20px; right: 20px;
+      background: rgba(28,28,30,0.82);
+      backdrop-filter: blur(28px) saturate(1.6);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 26px;
+      overflow: hidden;
+    }
+    .la-card.uploading { top: 310px; }
+    .la-card.done      { top: 310px; }
+
+    /* Inner layout */
+    .la-inner {
+      padding: 16px 18px 14px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .la-top {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .la-app-icon {
+      width: 32px; height: 32px; border-radius: 9px;
+      background: var(--brand);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .la-app-icon svg { width: 18px; height: 18px; }
+    .la-app-name {
+      font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.55);
+      letter-spacing: 0.01em;
+    }
+    .la-status-pill {
+      margin-left: auto;
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 99px; padding: 4px 10px;
+    }
+    .la-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #4ade80;
+      animation: laDot 1.2s ease-in-out infinite;
+    }
+    @keyframes laDot {
+      0%,100% { opacity:.4; transform:scale(.75); }
+      50%      { opacity:1;  transform:scale(1.3); }
+    }
+    .la-status-text {
+      font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7);
+    }
+
+    .la-body {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .la-thumb {
+      width: 54px; height: 54px; border-radius: 12px;
+      background: linear-gradient(155deg, #2d5f3b 0%, #1a3d27 50%, #0f2318 100%);
+      flex-shrink: 0; overflow: hidden; position: relative;
+    }
+    .la-thumb::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 50% at 50% 40%, rgba(60,140,80,.3) 0%, transparent 60%);
+    }
+    .la-thumb-dim {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.3);
+      transition: opacity 0.4s;
+    }
+    .la-info { flex: 1; }
+    .la-headline {
+      font-size: 15px; font-weight: 700; color: #fff;
+      margin-bottom: 3px; letter-spacing: -0.01em;
+    }
+    .la-subline {
+      font-size: 13px; color: rgba(255,255,255,0.5);
+    }
+
+    /* Progress bar inside card */
+    .la-prog-wrap {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .la-prog-row {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .la-prog-label {
+      font-size: 12px; font-weight: 600;
+      color: rgba(255,255,255,0.5); letter-spacing: 0.01em;
+    }
+    .la-prog-pct {
+      font-size: 12px; font-weight: 700; color: #4ade80;
+      font-family: ui-monospace, monospace;
+    }
+    .la-track {
+      height: 4px; background: rgba(255,255,255,0.12);
+      border-radius: 99px; overflow: hidden;
+    }
+    .la-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, #4ade80, #22c55e);
+      animation: laFill 4s cubic-bezier(.45,.05,.55,.95) infinite;
+    }
+    @keyframes laFill {
+      0%   { width:18%; }
+      35%  { width:62%; }
+      60%  { width:68%; }
+      85%  { width:74%; }
+      100% { width:62%; }
+    }
+    /* Done state */
+    .la-fill.done { width: 100%; animation: none; background: #4ade80; }
+    .la-prog-pct.done { color: #4ade80; }
+
+    /* ── Dynamic Island internals ── */
+    /* Compact state */
+    .di-compact {
+      position: absolute; inset: 0;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      opacity: 1; transition: opacity 0.2s;
+    }
+    .di-c-left {
+      display: flex; align-items: center; gap: 5px;
+    }
+    .di-c-icon {
+      width: 18px; height: 18px; border-radius: 5px;
+      background: var(--brand);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .di-c-icon svg { width: 11px; height: 11px; }
+    .di-c-label {
+      font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.8);
+    }
+    .di-c-arc {
+      width: 22px; height: 22px; position: relative; flex-shrink: 0;
+    }
+    .di-c-arc svg { position: absolute; inset: 0; }
+
+    /* Expanded state */
+    .di-expanded {
+      position: absolute; inset: 0;
+      display: none;
+      align-items: center;
+      padding: 0 14px;
+      gap: 12px;
+      opacity: 0; transition: opacity 0.2s 0.15s;
+    }
+    .di-expanded.show { display: flex; opacity: 1; }
+    .di-e-thumb {
+      width: 48px; height: 48px; border-radius: 10px;
+      background: linear-gradient(155deg, #2d5f3b, #0f2318);
+      flex-shrink: 0; overflow: hidden; position: relative;
+    }
+    .di-e-thumb::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 50% at 50% 40%, rgba(60,140,80,.3) 0%, transparent 60%);
+    }
+    .di-e-info { flex: 1; }
+    .di-e-title {
+      font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 4px;
+    }
+    .di-e-track {
+      height: 3px; background: rgba(255,255,255,0.15); border-radius: 99px; overflow: hidden;
+    }
+    .di-e-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, #4ade80, #22c55e);
+      animation: laFill 4s cubic-bezier(.45,.05,.55,.95) infinite;
+    }
+    .di-e-pct {
+      font-size: 13px; font-weight: 700; color: #4ade80;
+      font-family: ui-monospace, monospace; flex-shrink: 0;
+      animation: pctCount 4s cubic-bezier(.45,.05,.55,.95) infinite;
+    }
+    @keyframes pctCount {
+      0%   { opacity: 1; }
+      100% { opacity: 1; }
+    }
+
+    /* ── Home screen (phone 3) ── */
+    .home-wallpaper {
+      position: absolute; inset: 0;
+      background: linear-gradient(175deg, #1a2e22 0%, #0d1a14 45%, #0a120e 100%);
+    }
+    .home-wallpaper::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 20%, rgba(24,99,56,.25) 0%, transparent 60%);
+    }
+
+    /* App grid */
+    .app-grid {
+      position: absolute; top: 90px; left: 0; right: 0;
+      padding: 0 24px;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 0;
+    }
+    .app-icon-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .app-icon {
+      width: 60px; height: 60px; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .app-label {
+      font-size: 11px; color: rgba(255,255,255,0.75); text-align: center;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── Annotation sidebar ── */
+    .annotations {
+      display: flex; flex-direction: column; gap: 20px;
+      max-width: 320px; padding-top: 20px;
+    }
+    .ann {
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 16px; padding: 16px 18px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .ann-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.4);
+    }
+    .ann-title { font-size: 14px; font-weight: 700; color: #fff; }
+    .ann-body { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.55; }
+    .ann-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(24,99,56,0.2); border: 1px solid rgba(24,99,56,0.4);
+      color: #4ade80; font-size: 11px; font-weight: 600;
+      padding: 3px 9px; border-radius: 99px; width: fit-content;
+      margin-top: 2px;
+    }
+    .ann-badge::before {
+      content: ''; width: 5px; height: 5px; border-radius: 50%; background: #4ade80;
+    }
+
+    /* ── "Done" card ── */
+    .la-done-body {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .la-done-check {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: rgba(74,222,128,0.15);
+      border: 2px solid rgba(74,222,128,0.4);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .la-done-check svg { width: 22px; height: 22px; stroke: #4ade80; fill: none; stroke-width: 2.5; }
+  </style>
+</head>
+<body>
+
+<div class="page-title"><strong>Sprout</strong> · 19.10 — Live Activities · Photo Upload Progress</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     ROW 1 — Dynamic Island (compact + expanded)
+════════════════════════════════════════════════════════════ -->
+<div class="section-title">Dynamic Island</div>
+<div class="row" style="align-items: flex-start;">
+
+  <!-- Phone A: Compact DI -->
+  <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:rgba(255,255,255,0.5);">Compact — while browsing</div>
+    <div class="phone">
+      <!-- Lock screen / Home wallpaper -->
+      <div class="home-wallpaper"></div>
+
+      <!-- Island — COMPACT -->
+      <div class="island compact" id="di-compact">
+        <div class="di-compact">
+          <div class="di-c-left">
+            <div class="di-c-icon">
+              <!-- Sprout leaf SVG -->
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 22C12 22 4 16 4 9C4 5.13 7.58 2 12 2C16.42 2 20 5.13 20 9C20 16 12 22 12 22Z" fill="white" opacity="0.9"/>
+                <path d="M12 22V10" stroke="#186338" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="di-c-label">Uploading…</span>
+          </div>
+          <!-- Arc progress indicator -->
+          <div class="di-c-arc">
+            <svg viewBox="0 0 22 22" fill="none">
+              <circle cx="11" cy="11" r="8" stroke="rgba(255,255,255,0.15)" stroke-width="2.5"/>
+              <circle cx="11" cy="11" r="8"
+                stroke="#4ade80" stroke-width="2.5"
+                stroke-dasharray="50.27"
+                stroke-dashoffset="18"
+                stroke-linecap="round"
+                transform="rotate(-90 11 11)"
+                style="animation: arcAnim 4s cubic-bezier(.45,.05,.55,.95) infinite;">
+              </circle>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <style>
+        @keyframes arcAnim {
+          0%   { stroke-dashoffset: 42; }
+          35%  { stroke-dashoffset: 19; }
+          60%  { stroke-dashoffset: 16; }
+          85%  { stroke-dashoffset: 13; }
+          100% { stroke-dashoffset: 19; }
+        }
+      </style>
+
+      <!-- Status bar (adapted for dark wallpaper) -->
+      <div class="status-bar">
+        <span class="s-time" style="color:#fff;">9:41</span>
+        <div class="s-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+            <rect x="0" y="4" width="3" height="8" rx="1" fill="#fff" opacity=".35"/>
+            <rect x="4.5" y="2.5" width="3" height="9.5" rx="1" fill="#fff" opacity=".55"/>
+            <rect x="9" y="0" width="3" height="12" rx="1" fill="#fff"/>
+            <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#fff"/>
+          </svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+            <path d="M8 9.5C8.8 9.5 9.5 10.2 9.5 11C9.5 11.8 8.8 12.5 8 12.5C7.2 12.5 6.5 11.8 6.5 11C6.5 10.2 7.2 9.5 8 9.5Z" fill="#fff"/>
+            <path d="M2.3 6.2C3.8 4.7 5.8 3.8 8 3.8C10.2 3.8 12.2 4.7 13.7 6.2L14.8 5.1C13 3.3 10.6 2.2 8 2.2C5.4 2.2 3 3.3 1.2 5.1L2.3 6.2Z" fill="#fff"/>
+            <path d="M4.6 8.3C5.5 7.4 6.7 6.9 8 6.9C9.3 6.9 10.5 7.4 11.4 8.3L12.5 7.2C11.3 6 9.7 5.3 8 5.3C6.3 5.3 4.7 6 3.5 7.2L4.6 8.3Z" fill="#fff"/>
+          </svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+            <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity=".35"/>
+            <rect x="2" y="2" width="17" height="8" rx="2" fill="#fff"/>
+            <path d="M23 4.5V7.5C23.8 7.2 24.5 6.5 24.5 6C24.5 5.5 23.8 4.8 23 4.5Z" fill="#fff" opacity=".4"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- App grid (simplified) -->
+      <div class="app-grid">
+        <div class="app-icon-wrap"><div class="app-icon" style="background:linear-gradient(135deg,#186338,#0f3d22);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 22C12 22 4 16 4 9C4 5.13 7.58 2 12 2C16.42 2 20 5.13 20 9C20 16 12 22 12 22Z" fill="white" opacity="0.9"/></svg></div><span class="app-label">Sprout</span></div>
+        <div class="app-icon-wrap"><div class="app-icon" style="background:linear-gradient(135deg,#1c6ef5,#0a4bcc);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="2" stroke="white" stroke-width="1.8" fill="none"/><path d="M2 8l10 7 10-7" stroke="white" stroke-width="1.8"/></svg></div><span class="app-label">Mail</span></div>
+        <div class="app-icon-wrap"><div class="app-icon" style="background:linear-gradient(135deg,#34c759,#28a84a);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.72 16z" stroke="white" stroke-width="1.8" fill="none"/></svg></div><span class="app-label">Phone</span></div>
+        <div class="app-icon-wrap"><div class="app-icon" style="background:linear-gradient(135deg,#ff9500,#e67c00);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="1.8" fill="none"/><path d="M12 6v6l4 2" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="app-label">Clock</span></div>
+      </div>
+
+      <!-- Home indicator -->
+      <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:99px;background:rgba(255,255,255,0.3);"></div>
+    </div>
+  </div>
+
+  <!-- Phone B: Expanded DI -->
+  <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:rgba(255,255,255,0.5);">Expanded — on long press</div>
+    <div class="phone">
+      <div class="home-wallpaper"></div>
+
+      <!-- Island — EXPANDED -->
+      <div class="island expanded">
+        <div class="di-expanded show">
+          <div class="di-e-thumb"></div>
+          <div class="di-e-info">
+            <div class="di-e-title">Uploading Moment…</div>
+            <div class="di-e-track">
+              <div class="di-e-fill"></div>
+            </div>
+          </div>
+          <div class="di-e-pct">62%</div>
+        </div>
+      </div>
+
+      <!-- Status bar -->
+      <div class="status-bar">
+        <span class="s-time" style="color:#fff;">9:41</span>
+        <div class="s-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="4" width="3" height="8" rx="1" fill="#fff" opacity=".35"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1" fill="#fff" opacity=".55"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#fff"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#fff"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 9.5C8.8 9.5 9.5 10.2 9.5 11C9.5 11.8 8.8 12.5 8 12.5C7.2 12.5 6.5 11.8 6.5 11C6.5 10.2 7.2 9.5 8 9.5Z" fill="#fff"/><path d="M2.3 6.2C3.8 4.7 5.8 3.8 8 3.8C10.2 3.8 12.2 4.7 13.7 6.2L14.8 5.1C13 3.3 10.6 2.2 8 2.2C5.4 2.2 3 3.3 1.2 5.1L2.3 6.2Z" fill="#fff"/><path d="M4.6 8.3C5.5 7.4 6.7 6.9 8 6.9C9.3 6.9 10.5 7.4 11.4 8.3L12.5 7.2C11.3 6 9.7 5.3 8 5.3C6.3 5.3 4.7 6 3.5 7.2L4.6 8.3Z" fill="#fff"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity=".35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="#fff"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.5 24.5 6C24.5 5.5 23.8 4.8 23 4.5Z" fill="#fff" opacity=".4"/></svg>
+        </div>
+      </div>
+
+      <div class="app-grid">
+        <div class="app-icon-wrap"><div class="app-icon" style="background:linear-gradient(135deg,#186338,#0f3d22);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 22C12 22 4 16 4 9C4 5.13 7.58 2 12 2C16.42 2 20 5.13 20 9C20 16 12 22 12 22Z" fill="white" opacity="0.9"/></svg></div><span class="app-label">Sprout</span></div>
+        <div class="app-icon-wrap"><div class="app-icon" style="background:linear-gradient(135deg,#1c6ef5,#0a4bcc);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="2" stroke="white" stroke-width="1.8" fill="none"/><path d="M2 8l10 7 10-7" stroke="white" stroke-width="1.8"/></svg></div><span class="app-label">Mail</span></div>
+        <div class="app-icon-wrap"><div class="app-icon" style="background:linear-gradient(135deg,#34c759,#28a84a);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.72 16z" stroke="white" stroke-width="1.8" fill="none"/></svg></div><span class="app-label">Phone</span></div>
+        <div class="app-icon-wrap"><div class="app-icon" style="background:linear-gradient(135deg,#ff9500,#e67c00);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="1.8" fill="none"/><path d="M12 6v6l4 2" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg></div><span class="app-label">Clock</span></div>
+      </div>
+
+      <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:99px;background:rgba(255,255,255,0.3);"></div>
+    </div>
+  </div>
+
+  <!-- Annotations -->
+  <div class="annotations">
+    <div class="ann">
+      <div class="ann-label">Compact state</div>
+      <div class="ann-title">Always visible, zero friction</div>
+      <div class="ann-body">A circular arc progress indicator + "Uploading…" label lives in the Dynamic Island while the user navigates anywhere in the app or switches apps entirely.</div>
+      <div class="ann-badge">iOS 16.1+ · ActivityKit</div>
+    </div>
+    <div class="ann">
+      <div class="ann-label">Expanded state</div>
+      <div class="ann-title">Long-press to see detail</div>
+      <div class="ann-body">The island expands to show the photo thumbnail, a labelled progress bar, and the live percentage. Collapses back automatically.</div>
+    </div>
+    <div class="ann">
+      <div class="ann-label">Behaviour</div>
+      <div class="ann-title">No blocking, no popups</div>
+      <div class="ann-body">User taps "Post Moment" → instantly navigated away → Live Activity fires in the background. The app doesn't need to be open or even in the foreground.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     ROW 2 — Lock Screen (uploading + done)
+════════════════════════════════════════════════════════════ -->
+<div class="section-title">Lock Screen</div>
+<div class="row">
+
+  <!-- Phone C: Lock Screen — uploading -->
+  <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:rgba(255,255,255,0.5);">Uploading — 62%</div>
+    <div class="phone">
+      <div class="island compact">
+        <div class="di-compact">
+          <div class="di-c-left">
+            <div class="di-c-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 22C12 22 4 16 4 9C4 5.13 7.58 2 12 2C16.42 2 20 5.13 20 9C20 16 12 22 12 22Z" fill="white" opacity="0.9"/><path d="M12 22V10" stroke="#186338" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <span class="di-c-label">Uploading…</span>
+          </div>
+          <div class="di-c-arc">
+            <svg viewBox="0 0 22 22" fill="none">
+              <circle cx="11" cy="11" r="8" stroke="rgba(255,255,255,0.15)" stroke-width="2.5"/>
+              <circle cx="11" cy="11" r="8" stroke="#4ade80" stroke-width="2.5" stroke-dasharray="50.27" stroke-dashoffset="19" stroke-linecap="round" transform="rotate(-90 11 11)" style="animation:arcAnim 4s cubic-bezier(.45,.05,.55,.95) infinite;"></circle>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="lockscreen-bg"></div>
+      <div class="status-bar">
+        <span class="s-time" style="color:#fff;">9:41</span>
+        <div class="s-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="4" width="3" height="8" rx="1" fill="#fff" opacity=".35"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1" fill="#fff" opacity=".55"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#fff"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#fff"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 9.5C8.8 9.5 9.5 10.2 9.5 11C9.5 11.8 8.8 12.5 8 12.5C7.2 12.5 6.5 11.8 6.5 11C6.5 10.2 7.2 9.5 8 9.5Z" fill="#fff"/><path d="M2.3 6.2C3.8 4.7 5.8 3.8 8 3.8C10.2 3.8 12.2 4.7 13.7 6.2L14.8 5.1C13 3.3 10.6 2.2 8 2.2C5.4 2.2 3 3.3 1.2 5.1L2.3 6.2Z" fill="#fff"/><path d="M4.6 8.3C5.5 7.4 6.7 6.9 8 6.9C9.3 6.9 10.5 7.4 11.4 8.3L12.5 7.2C11.3 6 9.7 5.3 8 5.3C6.3 5.3 4.7 6 3.5 7.2L4.6 8.3Z" fill="#fff"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity=".35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="#fff"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.5 24.5 6C24.5 5.5 23.8 4.8 23 4.5Z" fill="#fff" opacity=".4"/></svg>
+        </div>
+      </div>
+
+      <div class="lock-time">
+        <div class="lock-hhmm">9:41</div>
+        <div class="lock-date">Tuesday, May 27</div>
+      </div>
+
+      <!-- Live Activity card — uploading -->
+      <div class="la-card uploading">
+        <div class="la-inner">
+          <div class="la-top">
+            <div class="la-app-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 22C12 22 4 16 4 9C4 5.13 7.58 2 12 2C16.42 2 20 5.13 20 9C20 16 12 22 12 22Z" fill="white" opacity="0.9"/><path d="M12 22V10" stroke="#186338" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <span class="la-app-name">Sprout</span>
+            <div class="la-status-pill">
+              <div class="la-dot"></div>
+              <span class="la-status-text">Uploading</span>
+            </div>
+          </div>
+          <div class="la-body">
+            <div class="la-thumb">
+              <div class="la-thumb-dim"></div>
+            </div>
+            <div class="la-info">
+              <div class="la-headline">Posting your Moment</div>
+              <div class="la-subline">Emma · Lincoln Park · Today</div>
+            </div>
+          </div>
+          <div class="la-prog-wrap">
+            <div class="la-prog-row">
+              <span class="la-prog-label">Upload progress</span>
+              <span class="la-prog-pct">62%</span>
+            </div>
+            <div class="la-track"><div class="la-fill"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:99px;background:rgba(255,255,255,0.3);"></div>
+    </div>
+  </div>
+
+  <!-- Phone D: Lock Screen — done -->
+  <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:rgba(255,255,255,0.5);">Complete — moment live</div>
+    <div class="phone">
+      <div class="island compact">
+        <div class="di-compact">
+          <div class="di-c-left">
+            <div class="di-c-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 22C12 22 4 16 4 9C4 5.13 7.58 2 12 2C16.42 2 20 5.13 20 9C20 16 12 22 12 22Z" fill="white" opacity="0.9"/><path d="M12 22V10" stroke="#186338" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <span class="di-c-label">Posted!</span>
+          </div>
+          <div class="di-c-arc">
+            <svg viewBox="0 0 22 22" fill="none">
+              <circle cx="11" cy="11" r="8" stroke="rgba(74,222,128,0.3)" stroke-width="2.5"/>
+              <circle cx="11" cy="11" r="8" stroke="#4ade80" stroke-width="2.5" stroke-dasharray="50.27" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 11 11)"></circle>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="lockscreen-bg"></div>
+      <div class="status-bar">
+        <span class="s-time" style="color:#fff;">9:43</span>
+        <div class="s-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="4" width="3" height="8" rx="1" fill="#fff" opacity=".35"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1" fill="#fff" opacity=".55"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#fff"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#fff"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 9.5C8.8 9.5 9.5 10.2 9.5 11C9.5 11.8 8.8 12.5 8 12.5C7.2 12.5 6.5 11.8 6.5 11C6.5 10.2 7.2 9.5 8 9.5Z" fill="#fff"/><path d="M2.3 6.2C3.8 4.7 5.8 3.8 8 3.8C10.2 3.8 12.2 4.7 13.7 6.2L14.8 5.1C13 3.3 10.6 2.2 8 2.2C5.4 2.2 3 3.3 1.2 5.1L2.3 6.2Z" fill="#fff"/><path d="M4.6 8.3C5.5 7.4 6.7 6.9 8 6.9C9.3 6.9 10.5 7.4 11.4 8.3L12.5 7.2C11.3 6 9.7 5.3 8 5.3C6.3 5.3 4.7 6 3.5 7.2L4.6 8.3Z" fill="#fff"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity=".35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="#fff"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.5 24.5 6C24.5 5.5 23.8 4.8 23 4.5Z" fill="#fff" opacity=".4"/></svg>
+        </div>
+      </div>
+
+      <div class="lock-time">
+        <div class="lock-hhmm">9:43</div>
+        <div class="lock-date">Tuesday, May 27</div>
+      </div>
+
+      <!-- Live Activity card — done -->
+      <div class="la-card done">
+        <div class="la-inner">
+          <div class="la-top">
+            <div class="la-app-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 22C12 22 4 16 4 9C4 5.13 7.58 2 12 2C16.42 2 20 5.13 20 9C20 16 12 22 12 22Z" fill="white" opacity="0.9"/><path d="M12 22V10" stroke="#186338" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <span class="la-app-name">Sprout</span>
+            <div class="la-status-pill" style="background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.25);">
+              <div class="la-dot" style="animation:none;opacity:1;background:#4ade80;"></div>
+              <span class="la-status-text" style="color:#4ade80;">Live</span>
+            </div>
+          </div>
+          <div class="la-done-body">
+            <div class="la-done-check">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="la-info">
+              <div class="la-headline">Moment is live!</div>
+              <div class="la-subline" style="color:rgba(255,255,255,0.45);">Emma · Lincoln Park · Tap to view</div>
+            </div>
+          </div>
+          <div class="la-prog-wrap">
+            <div class="la-prog-row">
+              <span class="la-prog-label">Upload complete</span>
+              <span class="la-prog-pct done">100%</span>
+            </div>
+            <div class="la-track"><div class="la-fill done"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:99px;background:rgba(255,255,255,0.3);"></div>
+    </div>
+  </div>
+
+  <!-- Annotations -->
+  <div class="annotations">
+    <div class="ann">
+      <div class="ann-label">Lock Screen card</div>
+      <div class="ann-title">Always-on visibility</div>
+      <div class="ann-body">The Live Activity card appears below the clock on the Lock Screen — no need to unlock the phone or open the app to know the upload is in progress.</div>
+    </div>
+    <div class="ann">
+      <div class="ann-label">Done state</div>
+      <div class="ann-title">Checkmark + "Moment is live!"</div>
+      <div class="ann-body">When the upload completes the card transitions: progress bar fills to 100%, the pulsing dot goes solid green, headline updates to "Moment is live!" — and disappears automatically after 4 seconds.</div>
+    </div>
+    <div class="ann">
+      <div class="ann-label">Implementation</div>
+      <div class="ann-title">iOS ActivityKit + WidgetKit</div>
+      <div class="ann-body">Uses <strong style="color:#fff;">ActivityKit</strong> to start/update/end the Live Activity from the app or a background push. No special App Store approval needed — standard iOS 16.1+ API.</div>
+      <div class="ann-badge">Mohit → ActivityKit</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

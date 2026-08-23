@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Address Flow v2 (Fixed)</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+
+/* ─── Tokens (from existing Sprout palette) ────────────────────────────── */
+:root {
+  --cream-bg:       #EFE9DC;
+  --cream-surface:  #F5F1E6;
+  --cream-field:    #E7E1D2;
+  --cream-field-ro: #DDD8CB;
+  --cream-divider:  #DAD3C1;
+  --sage-primary:   #8FB09F;
+  --sage-deep:      #5E8775;
+  --sage-muted:     #B5CFC3;
+  --ink:            #1A1A1A;
+  --ink-soft:       #6B6659;
+  --ink-faint:      #9A9482;
+  --star-gold:      #C8962A;
+  --delete-red:     #C44040;
+  --page-bg:        #1B1812;
+  --page-fg:        #E8E2D5;
+  --page-fg-soft:   #948D7E;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: var(--page-bg);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  color: var(--page-fg);
+}
+
+/* ─── Page layout ───────────────────────────────────────────────────────── */
+.layout {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 48px 32px 80px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 52px;
+  align-items: start;
+}
+@media (max-width: 820px) { .layout { grid-template-columns: 1fr; } }
+
+/* ─── Phone frame ───────────────────────────────────────────────────────── */
+.phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+
+.phone {
+  width: 375px;
+  height: 812px;
+  background: #000;
+  border-radius: 54px;
+  padding: 12px;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow:
+    0 0 0 2px #2A2620,
+    0 0 0 3px #3A352D,
+    0 60px 120px -30px rgba(0,0,0,0.7),
+    inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+.phone-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 42px;
+  overflow: hidden;
+  position: relative;
+  background: var(--cream-bg);
+}
+
+.dyn-island {
+  position: absolute;
+  top: 13px; left: 50%;
+  transform: translateX(-50%);
+  width: 100px; height: 28px;
+  background: #000;
+  border-radius: 14px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+/* Status bar */
+.status-bar {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px 0;
+  z-index: 90;
+  color: var(--ink);
+  font-size: 14px; font-weight: 600;
+  pointer-events: none;
+}
+.status-bar .sb-right { display: flex; gap: 5px; align-items: center; }
+
+/* ─── Screens ───────────────────────────────────────────────────────────── */
+.pscreen {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--cream-bg);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  transition: bottom 0.36s cubic-bezier(.32,.72,.23,1);
+}
+.pscreen.active { display: flex; }
+.pscreen.kb-up  { bottom: 258px; }
+
+/* Nav bar */
+.nav-bar {
+  height: 52px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 16px;
+  position: relative;
+  margin-top: 52px;
+}
+.nav-bar h1 {
+  font-size: 17px; font-weight: 600;
+  color: var(--ink); letter-spacing: -0.01em;
+}
+.back-btn {
+  position: absolute; left: 14px;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--cream-field);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink);
+  transition: background 0.12s;
+}
+.back-btn:hover { background: var(--cream-divider); }
+.back-btn:active { background: var(--cream-divider); transform: scale(0.94); }
+
+/* Scrollable body */
+.pscreen-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex; flex-direction: column;
+}
+.pscreen-body::-webkit-scrollbar { display: none; }
+
+/* Home indicator */
+.home-ind {
+  height: 30px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.home-ind-bar {
+  width: 130px; height: 5px;
+  background: var(--ink); border-radius: 3px; opacity: 0.18;
+}
+
+/* ─── Components ────────────────────────────────────────────────────────── */
+
+/* Search bar */
+.search-bar {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--cream-field);
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: border-color 0.15s;
+}
+.search-bar.focused { border-color: var(--sage-primary); }
+.search-bar input {
+  flex: 1; border: none; background: transparent; outline: none;
+  font-family: inherit; font-size: 15px; color: var(--ink); cursor: pointer;
+}
+.search-bar input::placeholder { color: var(--ink-faint); }
+
+/* Action rows */
+.action-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 13px 0;
+  cursor: pointer;
+  border-bottom: 1px solid var(--cream-divider);
+  -webkit-tap-highlight-color: transparent;
+}
+.action-row:last-of-type { border-bottom: none; }
+.action-row:active { opacity: 0.7; }
+.action-icon {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--cream-field);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.t1 { font-size: 15px; font-weight: 500; color: var(--ink); }
+.t2 { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+
+/* Section label */
+.section-divider { height: 1px; background: var(--cream-divider); margin: 6px 0; }
+.section-label {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ink-soft);
+  margin: 14px 0 10px;
+}
+
+/* ─── Address card (FIXED: standardized — same layout for any count) ─── */
+.addr-card {
+  display: flex; align-items: flex-start; gap: 12px;
+  background: var(--cream-field);
+  border-radius: 14px;
+  padding: 13px 12px 13px 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background 0.12s, transform 0.08s;
+  -webkit-tap-highlight-color: transparent;
+  border: 1.5px solid transparent;
+}
+.addr-card:hover  { background: #DDD8C9; }
+.addr-card:active { transform: scale(0.985); background: #DDD8C9; }
+.addr-card.selected { border-color: var(--sage-primary); }
+
+.card-pin {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(94,135,117,0.12);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 2px;
+}
+.card-pin.dim { background: rgba(94,135,117,0.05); }
+
+.card-body { flex: 1; min-width: 0; }
+/* FIXED: label (nickname) shown FIRST, most prominent */
+.card-nick {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 12px; font-style: italic;
+  color: var(--sage-deep);
+  margin-bottom: 3px; line-height: 1.3;
+}
+.card-street {
+  font-size: 15px; font-weight: 500; color: var(--ink);
+  margin-bottom: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card-city { font-size: 12px; color: var(--ink-soft); }
+
+.card-actions {
+  display: flex; align-items: center; gap: 2px;
+  flex-shrink: 0; margin-top: 1px;
+}
+
+/* Star + edit buttons */
+.icon-btn {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: transparent; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.icon-btn:hover  { background: rgba(0,0,0,0.06); }
+.icon-btn:active { background: rgba(0,0,0,0.1); }
+
+/* Search results */
+.result-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 0;
+  cursor: pointer;
+  border-bottom: 1px solid var(--cream-divider);
+  -webkit-tap-highlight-color: transparent;
+}
+.result-row:last-child { border-bottom: none; }
+.result-row:active { opacity: 0.7; }
+.result-icon {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--cream-field);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: var(--ink-soft);
+}
+.r1 { font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+.r2 { font-size: 12px; color: var(--ink-soft); }
+
+/* ─── Form (Enter / Edit) ───────────────────────────────────────────────── */
+.form-body {
+  flex: 1; overflow-y: auto;
+  padding: 16px 20px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.form-body::-webkit-scrollbar { display: none; }
+
+.field-block {
+  background: var(--cream-field);
+  border-radius: 14px;
+  padding: 13px 16px;
+  display: flex; flex-direction: column; gap: 4px;
+  border: 1.5px solid transparent;
+  transition: border-color 0.15s;
+}
+.field-block:focus-within { border-color: var(--sage-primary); }
+.field-block.readonly {
+  background: var(--cream-field-ro);
+  opacity: 0.72;
+}
+
+.fl {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.03em;
+  color: var(--ink-soft);
+  display: flex; align-items: center; gap: 2px;
+}
+.req { color: var(--delete-red); margin-left: 1px; }
+
+.fv { font-size: 15px; color: var(--ink); min-height: 22px; }
+.fv input {
+  width: 100%; border: none; background: transparent; outline: none;
+  font-family: 'DM Sans', inherit; font-size: 15px; color: var(--ink);
+  caret-color: var(--sage-deep);
+}
+.fv input::placeholder { color: var(--ink-faint); }
+
+/* FIXED: "Change" affordance on read-only address field */
+.f-change {
+  font-size: 12px; color: var(--sage-deep); font-weight: 500;
+  cursor: pointer; margin-top: 2px;
+  display: inline-block;
+}
+.f-change:hover { text-decoration: underline; }
+
+/* FIXED: helper text explains what the label field is for */
+.f-hint { font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
+
+/* Bottom button bar */
+.form-footer {
+  padding: 12px 20px 18px;
+  display: flex; gap: 10px;
+  flex-shrink: 0;
+  background: var(--cream-bg);
+}
+
+.btn {
+  flex: 1; height: 52px; border-radius: 26px;
+  border: none; cursor: pointer;
+  font-family: 'DM Sans', inherit; font-size: 15px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, opacity 0.15s, transform 0.08s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active:not(:disabled) { transform: scale(0.97); }
+
+.btn-primary { background: var(--sage-deep); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: #4d7163; }
+.btn-primary:disabled {
+  background: var(--sage-muted); opacity: 0.65; cursor: not-allowed;
+}
+
+/* FIXED: Set as Default uses outline style to be visually secondary */
+.btn-outline {
+  background: transparent; color: var(--sage-deep);
+  border: 1.5px solid var(--sage-deep);
+}
+.btn-outline:disabled {
+  color: var(--ink-faint); border-color: var(--cream-divider); cursor: not-allowed;
+}
+.btn-outline.toggled {
+  background: rgba(94,135,117,0.1);
+}
+
+/* FIXED: Delete is outline-style (visually subordinated), not co-equal filled */
+.btn-delete-outline {
+  background: transparent; color: var(--delete-red);
+  border: 1.5px solid var(--delete-red);
+  flex: 0.8;
+}
+.btn-delete-outline:hover { background: rgba(196,64,64,0.06); }
+
+/* ─── Shared iOS keyboard ────────────────────────────────────────────────── */
+.ios-kb {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 258px;
+  background: #D1D5DB;
+  z-index: 60;
+  transform: translateY(108%);
+  transition: transform 0.36s cubic-bezier(.32,.72,.23,1);
+  user-select: none;
+  flex-shrink: 0;
+}
+.ios-kb.show { transform: translateY(0); }
+
+.kb-sug-row {
+  display: flex; height: 38px; border-bottom: 1px solid rgba(0,0,0,0.1);
+  align-items: center;
+}
+.kb-sug {
+  flex: 1; text-align: center;
+  font-size: 13px; color: var(--ink);
+  border-right: 1px solid rgba(0,0,0,0.12);
+  padding: 0 6px;
+}
+.kb-sug:last-child { border-right: none; }
+.kb-row {
+  display: flex; justify-content: center;
+  gap: 5px; padding: 0 3px; margin: 4px 0;
+}
+.k {
+  background: white; height: 34px; flex: 1;
+  max-width: 31px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; color: var(--ink);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.35);
+  cursor: pointer;
+}
+.k.dark { background: #ABB2BC; max-width: 40px; font-size: 13px; }
+.k.space { max-width: 166px; font-size: 14px; }
+.k.go-btn { max-width: 44px; background: #4E69F0; color: #fff; font-weight: 600; font-size: 14px; }
+.kb-bottom { display: flex; justify-content: space-between; padding: 4px 16px 6px; }
+
+/* Inline keyboard for search screen (static / always visible) */
+.kb-inline {
+  background: #D1D5DB;
+  flex-shrink: 0;
+  user-select: none;
+  padding-top: 2px;
+}
+
+/* ─── Delete confirmation overlay ───────────────────────────────────────── */
+.overlay {
+  position: absolute; inset: 0;
+  background: rgba(20,15,8,0.55);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+  backdrop-filter: blur(2px);
+}
+.overlay.active { display: flex; }
+
+.confirm-sheet {
+  width: 100%;
+  background: var(--cream-surface);
+  border-radius: 24px 24px 0 0;
+  padding: 10px 24px 44px;
+}
+.confirm-handle {
+  width: 40px; height: 4px; background: var(--cream-divider);
+  border-radius: 2px; margin: 0 auto 24px;
+}
+.confirm-title {
+  font-size: 20px; font-weight: 700;
+  color: var(--ink); margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+.confirm-body {
+  font-size: 14px; line-height: 1.55; color: var(--ink-soft); margin-bottom: 28px;
+}
+.confirm-actions { display: flex; flex-direction: column; gap: 10px; }
+.confirm-btn {
+  width: 100%; height: 52px; border-radius: 26px; border: none;
+  font-family: 'DM Sans', inherit; font-size: 15px; font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.12s, transform 0.08s;
+}
+.confirm-btn:active { transform: scale(0.98); }
+.confirm-del { background: var(--delete-red); color: #fff; }
+.confirm-cancel { background: var(--cream-field); color: var(--ink); }
+
+/* ─── Toast (success + undo) ────────────────────────────────────────────── */
+.toast {
+  position: absolute;
+  bottom: 72px; left: 16px; right: 16px;
+  background: #1A1A1A; color: #F5F1E6;
+  border-radius: 14px; padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 14px; z-index: 300;
+  opacity: 0; transform: translateY(14px);
+  transition: all 0.28s cubic-bezier(.32,.72,.23,1);
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); pointer-events: all; }
+.toast-undo {
+  color: var(--sage-primary); font-weight: 600;
+  background: none; border: none;
+  font-family: 'DM Sans', inherit; font-size: 14px; cursor: pointer;
+  padding: 0; display: none;
+}
+
+/* ─── Right panel ────────────────────────────────────────────────────────── */
+.panel {
+  background: #22201A;
+  border: 1px solid #3A352D;
+  border-radius: 20px;
+  padding: 28px 24px 32px;
+  position: sticky; top: 32px;
+  max-width: 360px;
+}
+.panel-eyebrow {
+  text-transform: uppercase; letter-spacing: 0.13em;
+  font-size: 11px; color: var(--page-fg-soft); font-weight: 600; margin-bottom: 20px;
+}
+.panel-section-title {
+  font-size: 12px; font-weight: 700; color: var(--page-fg); margin: 22px 0 12px;
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+
+.state-list { list-style: none; padding: 0; margin: 0; }
+.state-list li {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 12px; border-radius: 10px; cursor: pointer;
+  transition: background 0.12s; margin-bottom: 3px;
+  border: 1px solid transparent;
+}
+.state-list li:hover { background: #2A2620; }
+.state-list li.active { background: #2A2620; border-color: var(--sage-primary); }
+.state-dot {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #3A352D; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--page-fg);
+  flex-shrink: 0; margin-top: 1px;
+}
+.state-list li.active .state-dot { background: var(--sage-primary); color: #fff; }
+.state-info .si-name { font-size: 13px; font-weight: 600; color: var(--page-fg); margin-bottom: 2px; }
+.state-info .si-desc { font-size: 11px; color: var(--page-fg-soft); line-height: 1.45; }
+
+.fix-list { list-style: none; padding: 0; margin: 0; }
+.fix-list li {
+  font-size: 12px; color: var(--page-fg-soft); line-height: 1.5;
+  padding: 8px 0; border-bottom: 1px solid #2A2620;
+  display: flex; gap: 8px; align-items: flex-start;
+}
+.fix-list li:last-child { border-bottom: none; }
+.fix-badge {
+  font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;
+  flex-shrink: 0; height: 18px; margin-top: 1px; display: flex; align-items: center;
+}
+.fix-badge.p0 { background: #C44040; color: #fff; }
+.fix-badge.p1 { background: #9A6030; color: #fff; }
+.fix-badge.p2 { background: var(--sage-deep); color: #fff; }
+.fix-badge.minor { background: #3A352D; color: var(--page-fg-soft); }
+
+/* ─── Select Address screen ─────────────────────────────────────────────── */
+
+/* Map placeholder */
+.map-placeholder {
+  width: 100%; border-radius: 16px; overflow: hidden;
+  margin-bottom: 16px; flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.map-placeholder svg { display: block; width: 100%; height: auto; }
+
+/* Map pin pulse animation */
+@keyframes pulse {
+  0%   { transform: scale(1);   opacity: 0.6; }
+  50%  { transform: scale(1.5); opacity: 0; }
+  100% { transform: scale(1);   opacity: 0; }
+}
+.map-pulse {
+  animation: pulse 2s ease-out infinite;
+  transform-origin: center;
+}
+
+/* Selected address confirm card */
+.select-card {
+  background: var(--cream-surface);
+  border: 1.5px solid var(--sage-primary);
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex; align-items: flex-start; gap: 14px;
+  margin-bottom: 12px;
+}
+.select-card .sc-pin {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(94,135,117,0.15);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.select-card .sc-text { flex: 1; }
+.select-card .sc-street {
+  font-size: 16px; font-weight: 600; color: var(--ink);
+  margin-bottom: 3px; letter-spacing: -0.01em;
+}
+.select-card .sc-city { font-size: 13px; color: var(--ink-soft); }
+.select-card .sc-badge {
+  background: rgba(94,135,117,0.12); color: var(--sage-deep);
+  font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px;
+  flex-shrink: 0; align-self: flex-start; margin-top: 2px;
+  letter-spacing: 0.02em;
+}
+
+/* Search again link */
+.search-again {
+  text-align: center; font-size: 13px; color: var(--ink-soft);
+  margin-top: 4px; cursor: pointer; padding: 8px;
+}
+.search-again span {
+  color: var(--sage-deep); font-weight: 500; text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.15s;
+}
+.search-again:hover span { text-decoration-color: var(--sage-deep); }
+
+/* Hint below phone */
+.phone-hint {
+  font-size: 12px; color: var(--page-fg-soft); text-align: center;
+}
+
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       PHONE
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner" id="phone-inner">
+        <div class="dyn-island"></div>
+
+        <!-- Status bar (shared, above all screens) -->
+        <div class="status-bar">
+          <span>9:41</span>
+          <div class="sb-right">
+            <svg width="17" height="11" viewBox="0 0 18 12" fill="currentColor">
+              <rect x="0" y="7" width="3" height="5" rx="0.5"/>
+              <rect x="4" y="5" width="3" height="7" rx="0.5"/>
+              <rect x="8" y="2" width="3" height="10" rx="0.5"/>
+              <rect x="12" y="0" width="3" height="12" rx="0.5" opacity="0.3"/>
+            </svg>
+            <svg width="15" height="11" viewBox="0 0 15 11" fill="currentColor">
+              <path d="M7.5 1C4.5 1 2 2.5 0.5 4L1.5 5C2.7 3.8 5 2.5 7.5 2.5S12.3 3.8 13.5 5L14.5 4C13 2.5 10.5 1 7.5 1ZM7.5 4C5.7 4 4 4.8 3 6L4 7C4.8 6.2 6.1 5.5 7.5 5.5S10.2 6.2 11 7L12 6C11 4.8 9.3 4 7.5 4ZM7.5 7.5C6.7 7.5 6 8.2 6 9S6.7 10.5 7.5 10.5 9 9.8 9 9 8.3 7.5 7.5 7.5Z"/>
+            </svg>
+            <svg width="25" height="12" viewBox="0 0 26 12" fill="none">
+              <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" opacity="0.4"/>
+              <rect x="2" y="2" width="14" height="8" rx="1.5" fill="currentColor"/>
+              <path d="M23 4v4a2 2 0 000-4z" fill="currentColor" opacity="0.4"/>
+            </svg>
+          </div>
+        </div>
+
+
+        <!-- ╔══════════════════════════════════╗
+             ║  SCREEN 1 · Set Address — Empty  ║
+             ╚══════════════════════════════════╝ -->
+        <div class="pscreen active" id="s-empty">
+          <div class="nav-bar">
+            <button class="back-btn" aria-label="Back">
+              <svg width="9" height="15" viewBox="0 0 9 15" fill="none">
+                <path d="M8 1L1 7.5L8 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <h1>Set Address</h1>
+          </div>
+          <div class="pscreen-body">
+            <!-- FIXED: single placeholder, no redundant label above -->
+            <div class="search-bar" onclick="goTo('s-search')">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="7" cy="7" r="5" stroke="#6B6659" stroke-width="1.6"/>
+                <path d="M11 11L14.5 14.5" stroke="#6B6659" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+              <input type="text" placeholder="Search for an address" readonly>
+            </div>
+
+            <div class="action-row" onclick="showToast('Location set', false)">
+              <div class="action-icon">
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="7.5" stroke="#5E8775" stroke-width="1.6"/>
+                  <circle cx="10" cy="10" r="2.5" stroke="#5E8775" stroke-width="1.6"/>
+                  <line x1="10" y1="2" x2="10" y2="5" stroke="#5E8775" stroke-width="1.6" stroke-linecap="round"/>
+                  <line x1="10" y1="15" x2="10" y2="18" stroke="#5E8775" stroke-width="1.6" stroke-linecap="round"/>
+                  <line x1="2" y1="10" x2="5" y2="10" stroke="#5E8775" stroke-width="1.6" stroke-linecap="round"/>
+                  <line x1="15" y1="10" x2="18" y2="10" stroke="#5E8775" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div>
+                <div class="t1">Use current location</div>
+                <div class="t2">10212 Austin, TX 78739, USA</div>
+              </div>
+            </div>
+
+            <div class="action-row" onclick="goTo('s-search')">
+              <div class="action-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 2V14M2 8H14" stroke="#5E8775" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="t1">Add new address</div>
+            </div>
+          </div>
+          <div class="home-ind"><div class="home-ind-bar"></div></div>
+        </div>
+
+
+        <!-- ╔═══════════════════════════════════╗
+             ║  SCREEN 2 · Set Address — Saved   ║
+             ╚═══════════════════════════════════╝ -->
+        <div class="pscreen" id="s-saved">
+          <div class="nav-bar">
+            <button class="back-btn" onclick="goTo('s-empty')" aria-label="Back">
+              <svg width="9" height="15" viewBox="0 0 9 15" fill="none">
+                <path d="M8 1L1 7.5L8 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <h1>Set Address</h1>
+          </div>
+          <div class="pscreen-body">
+            <div class="search-bar" onclick="goTo('s-search')">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="7" cy="7" r="5" stroke="#6B6659" stroke-width="1.6"/>
+                <path d="M11 11L14.5 14.5" stroke="#6B6659" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+              <input type="text" placeholder="Search for an address" readonly>
+            </div>
+
+            <div class="action-row" onclick="showToast('Location set', false)">
+              <div class="action-icon">
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="7.5" stroke="#5E8775" stroke-width="1.6"/>
+                  <circle cx="10" cy="10" r="2.5" stroke="#5E8775" stroke-width="1.6"/>
+                  <line x1="10" y1="2" x2="10" y2="5" stroke="#5E8775" stroke-width="1.6" stroke-linecap="round"/>
+                  <line x1="10" y1="15" x2="10" y2="18" stroke="#5E8775" stroke-width="1.6" stroke-linecap="round"/>
+                  <line x1="2" y1="10" x2="5" y2="10" stroke="#5E8775" stroke-width="1.6" stroke-linecap="round"/>
+                  <line x1="15" y1="10" x2="18" y2="10" stroke="#5E8775" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div>
+                <div class="t1">Use current location</div>
+                <div class="t2">10212 Austin, TX 78739, USA</div>
+              </div>
+            </div>
+            <div class="action-row" onclick="goTo('s-search')">
+              <div class="action-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 2V14M2 8H14" stroke="#5E8775" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="t1">Add new address</div>
+            </div>
+
+            <div class="section-divider"></div>
+            <div class="section-label">Saved Addresses</div>
+
+            <!-- Card 1: Home (default)
+                 FIXED: standardized 3-line layout, label first, star always visible -->
+            <div class="addr-card" onclick="showToast('Home address selected', false)">
+              <div class="card-pin">
+                <!-- Filled pin = default -->
+                <svg width="13" height="17" viewBox="0 0 14 18" fill="none">
+                  <path d="M7 0C3.13 0 0 3.13 0 7C0 12.25 7 18 7 18S14 12.25 14 7C14 3.13 10.87 0 7 0ZM7 9.5C5.62 9.5 4.5 8.38 4.5 7S5.62 4.5 7 4.5 9.5 5.62 9.5 7 8.38 9.5 7 9.5Z" fill="#5E8775"/>
+                </svg>
+              </div>
+              <div class="card-body">
+                <div class="card-nick">Home</div>
+                <div class="card-street">10221 Banks Ct</div>
+                <div class="card-city">10212 Austin, TX 78739, USA</div>
+              </div>
+              <div class="card-actions">
+                <!-- FIXED: star always present, gold = default -->
+                <button class="icon-btn star-btn default-star"
+                  onclick="event.stopPropagation(); setDefault(this)"
+                  title="Default address">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="#C8962A">
+                    <path d="M8 1L9.8 5.8L15 6.2L11.2 9.8L12.4 15L8 12.5L3.6 15L4.8 9.8L1 6.2L6.2 5.8L8 1Z" stroke="#C8962A" stroke-width="0.8"/>
+                  </svg>
+                </button>
+                <button class="icon-btn" onclick="event.stopPropagation(); goTo('s-edit')" title="Edit">
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <path d="M10.5 2L13 4.5L5 12.5H2.5V10L10.5 2Z" stroke="#6B6659" stroke-width="1.4" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Card 2: Work
+                 FIXED: exact same layout as Card 1 — consistent regardless of count -->
+            <div class="addr-card" onclick="showToast('Work address selected', false)">
+              <div class="card-pin dim">
+                <!-- Outline pin = not default -->
+                <svg width="13" height="17" viewBox="0 0 14 18" fill="none">
+                  <path d="M7 0C3.13 0 0 3.13 0 7C0 12.25 7 18 7 18S14 12.25 14 7C14 3.13 10.87 0 7 0ZM7 9.5C5.62 9.5 4.5 8.38 4.5 7S5.62 4.5 7 4.5 9.5 5.62 9.5 7 8.38 9.5 7 9.5Z" fill="#9AA49E"/>
+                </svg>
+              </div>
+              <div class="card-body">
+                <div class="card-nick">Work</div>
+                <div class="card-street">10221 Banks Ct</div>
+                <div class="card-city">10212 Austin, TX 78739, USA</div>
+              </div>
+              <div class="card-actions">
+                <button class="icon-btn star-btn"
+                  onclick="event.stopPropagation(); setDefault(this)"
+                  title="Set as default">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M8 1L9.8 5.8L15 6.2L11.2 9.8L12.4 15L8 12.5L3.6 15L4.8 9.8L1 6.2L6.2 5.8L8 1Z" stroke="#9AA49E" stroke-width="1.3"/>
+                  </svg>
+                </button>
+                <button class="icon-btn" onclick="event.stopPropagation(); goTo('s-edit')" title="Edit">
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <path d="M10.5 2L13 4.5L5 12.5H2.5V10L10.5 2Z" stroke="#6B6659" stroke-width="1.4" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="home-ind"><div class="home-ind-bar"></div></div>
+        </div>
+
+
+        <!-- ╔══════════════════════════════════╗
+             ║  SCREEN 3 · Search (keyboard up) ║
+             ╚══════════════════════════════════╝ -->
+        <div class="pscreen" id="s-search">
+          <div class="nav-bar">
+            <button class="back-btn" onclick="goTo('s-saved')" aria-label="Back">
+              <svg width="9" height="15" viewBox="0 0 9 15" fill="none">
+                <path d="M8 1L1 7.5L8 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <h1>Set Address</h1>
+          </div>
+          <!-- Scrollable area above keyboard -->
+          <div class="pscreen-body" style="padding-bottom:8px;">
+            <div class="search-bar focused">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="7" cy="7" r="5" stroke="#6B6659" stroke-width="1.6"/>
+                <path d="M11 11L14.5 14.5" stroke="#6B6659" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+              <input type="text" value="10212" style="pointer-events:none;">
+            </div>
+
+            <div class="action-row">
+              <div class="action-icon">
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="7.5" stroke="#5E8775" stroke-width="1.6"/>
+                  <circle cx="10" cy="10" r="2.5" stroke="#5E8775" stroke-width="1.6"/>
+                  <line x1="10" y1="2" x2="10" y2="5" stroke="#5E8775" stroke-width="1.6" stroke-linecap="round"/>
+                  <line x1="10" y1="15" x2="10" y2="18" stroke="#5E8775" stroke-width="1.6" stroke-linecap="round"/>
+                  <line x1="2" y1="10" x2="5" y2="10" stroke="#5E8775" stroke-width="1.6" stroke-linecap="round"/>
+                  <line x1="15" y1="10" x2="18" y2="10" stroke="#5E8775" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div>
+                <div class="t1">Use current location</div>
+                <div class="t2">10212 Austin, TX 78739, USA</div>
+              </div>
+            </div>
+            <div class="section-divider"></div>
+
+            <!-- Search results — each tap goes to s-select (Confirm Address), not directly to the form -->
+            <div class="result-row" onclick="selectAddress('10212 Banks Ct', '10212 Austin, TX 78739, USA')">
+              <div class="result-icon">
+                <svg width="13" height="16" viewBox="0 0 14 18" fill="none">
+                  <path d="M7 0C3.13 0 0 3.13 0 7C0 12.25 7 18 7 18S14 12.25 14 7C14 3.13 10.87 0 7 0ZM7 9.5C5.62 9.5 4.5 8.38 4.5 7S5.62 4.5 7 4.5 9.5 5.62 9.5 7 8.38 9.5 7 9.5Z" fill="#9AA49E"/>
+                </svg>
+              </div>
+              <div><div class="r1">10212 Banks Ct</div><div class="r2">10212 Austin, TX 78739, USA</div></div>
+            </div>
+            <div class="result-row" onclick="selectAddress('10220 Banks Ct', '10220 Austin, TX 78739, USA')">
+              <div class="result-icon">
+                <svg width="13" height="16" viewBox="0 0 14 18" fill="none">
+                  <path d="M7 0C3.13 0 0 3.13 0 7C0 12.25 7 18 7 18S14 12.25 14 7C14 3.13 10.87 0 7 0ZM7 9.5C5.62 9.5 4.5 8.38 4.5 7S5.62 4.5 7 4.5 9.5 5.62 9.5 7 8.38 9.5 7 9.5Z" fill="#9AA49E"/>
+                </svg>
+              </div>
+              <div><div class="r1">10220 Banks Ct</div><div class="r2">10220 Austin, TX 78739, USA</div></div>
+            </div>
+            <div class="result-row" onclick="selectAddress('10221 Banks Ct', '10221 Austin, TX 78739, USA')">
+              <div class="result-icon">
+                <svg width="13" height="16" viewBox="0 0 14 18" fill="none">
+                  <path d="M7 0C3.13 0 0 3.13 0 7C0 12.25 7 18 7 18S14 12.25 14 7C14 3.13 10.87 0 7 0ZM7 9.5C5.62 9.5 4.5 8.38 4.5 7S5.62 4.5 7 4.5 9.5 5.62 9.5 7 8.38 9.5 7 9.5Z" fill="#9AA49E"/>
+                </svg>
+              </div>
+              <div><div class="r1">10221 Banks Ct</div><div class="r2">10221 Austin, TX 78739, USA</div></div>
+            </div>
+          </div>
+
+          <!-- Keyboard embedded inline for this screen -->
+          <div class="kb-inline">
+            <div class="kb-sug-row">
+              <div class="kb-sug">Banks</div>
+              <div class="kb-sug">10212</div>
+              <div class="kb-sug">Austin</div>
+            </div>
+            <div class="kb-row" style="margin-top:5px">
+              <div class="k">Q</div><div class="k">W</div><div class="k">E</div><div class="k">R</div>
+              <div class="k">T</div><div class="k">Y</div><div class="k">U</div><div class="k">I</div>
+              <div class="k">O</div><div class="k">P</div>
+            </div>
+            <div class="kb-row" style="padding:0 16px">
+              <div class="k">A</div><div class="k">S</div><div class="k">D</div><div class="k">F</div>
+              <div class="k">G</div><div class="k">H</div><div class="k">J</div><div class="k">K</div>
+              <div class="k">L</div>
+            </div>
+            <div class="kb-row">
+              <div class="k dark">⇧</div><div class="k">Z</div><div class="k">X</div><div class="k">C</div>
+              <div class="k">V</div><div class="k">B</div><div class="k">N</div><div class="k">M</div>
+              <div class="k dark">⌫</div>
+            </div>
+            <div class="kb-row">
+              <div class="k dark" style="max-width:52px">123</div>
+              <div class="k space">space</div>
+              <div class="k go-btn" onclick="goTo('s-enter')">Go</div>
+            </div>
+            <div class="kb-bottom" style="font-size:18px">
+              <span>☺</span><span style="font-size:14px">⏺</span>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- ╔═══════════════════════════════════════════════════════════════╗
+             ║  SCREEN 4 · Select Address (NEW — was missing)               ║
+             ║  Bridge between search results and the label form.           ║
+             ║  Shows the picked address so user can confirm before         ║
+             ║  proceeding. This is what makes the form auto-fill feel      ║
+             ║  intentional instead of magical.                             ║
+             ╚═══════════════════════════════════════════════════════════════╝ -->
+        <div class="pscreen" id="s-select">
+          <div class="nav-bar">
+            <button class="back-btn" onclick="goTo('s-search')" aria-label="Back">
+              <svg width="9" height="15" viewBox="0 0 9 15" fill="none">
+                <path d="M8 1L1 7.5L8 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <h1>Confirm Address</h1>
+          </div>
+          <div class="pscreen-body" style="gap:0;">
+
+            <!-- Map placeholder — shows where the pin landed -->
+            <div class="map-placeholder">
+              <svg viewBox="0 0 335 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Map background -->
+                <rect width="335" height="200" fill="#E8E3D5"/>
+                <!-- Block fills (land parcels) -->
+                <rect x="0"   y="0"   width="72"  height="56"  fill="#DEDAD0"/>
+                <rect x="0"   y="64"  width="72"  height="56"  fill="#DEDAD0"/>
+                <rect x="0"   y="128" width="72"  height="72"  fill="#DEDAD0"/>
+                <rect x="80"  y="0"   width="64"  height="56"  fill="#DEDAD0"/>
+                <rect x="152" y="0"   width="80"  height="56"  fill="#DEDAD0"/>
+                <rect x="240" y="0"   width="95"  height="56"  fill="#DEDAD0"/>
+                <rect x="80"  y="64"  width="64"  height="128" fill="#DEDAD0"/>
+                <rect x="152" y="64"  width="80"  height="128" fill="#DEDAD0"/>
+                <rect x="240" y="64"  width="95"  height="128" fill="#DEDAD0"/>
+                <!-- Roads (horizontal) -->
+                <rect x="0"   y="56"  width="335" height="8"   fill="#F0EBE0"/>
+                <rect x="0"   y="120" width="335" height="8"   fill="#F0EBE0"/>
+                <!-- Roads (vertical) -->
+                <rect x="72"  y="0"   width="8"   height="200" fill="#F0EBE0"/>
+                <rect x="144" y="0"   width="8"   height="200" fill="#F0EBE0"/>
+                <rect x="232" y="0"   width="8"   height="200" fill="#F0EBE0"/>
+                <!-- Road center lines -->
+                <line x1="0" y1="60" x2="335" y2="60" stroke="#E8E3D5" stroke-width="1" stroke-dasharray="8 6"/>
+                <line x1="0" y1="124" x2="335" y2="124" stroke="#E8E3D5" stroke-width="1" stroke-dasharray="8 6"/>
+                <line x1="76" y1="0" x2="76" y2="200" stroke="#E8E3D5" stroke-width="1" stroke-dasharray="8 6"/>
+                <line x1="148" y1="0" x2="148" y2="200" stroke="#E8E3D5" stroke-width="1" stroke-dasharray="8 6"/>
+                <line x1="236" y1="0" x2="236" y2="200" stroke="#E8E3D5" stroke-width="1" stroke-dasharray="8 6"/>
+                <!-- A few building shapes to suggest density -->
+                <rect x="8"   y="6"  width="28" height="18" rx="2" fill="#D4CFBF"/>
+                <rect x="40"  y="6"  width="24" height="26" rx="2" fill="#D4CFBF"/>
+                <rect x="8"   y="30" width="56" height="18" rx="2" fill="#CCCAB8"/>
+                <rect x="88"  y="6"  width="48" height="44" rx="2" fill="#D4CFBF"/>
+                <rect x="160" y="6"  width="36" height="22" rx="2" fill="#D4CFBF"/>
+                <rect x="200" y="6"  width="24" height="44" rx="2" fill="#CCCAB8"/>
+                <!-- Pulse ring (animated) -->
+                <circle class="map-pulse" cx="167" cy="88" r="22" stroke="#5E8775" stroke-width="2" fill="none" opacity="0.5"/>
+                <!-- Pin shadow -->
+                <ellipse cx="167" cy="112" rx="7" ry="3" fill="rgba(0,0,0,0.14)"/>
+                <!-- Pin body -->
+                <path d="M167 72C158.72 72 152 78.72 152 87C152 98.25 167 114 167 114C167 114 182 98.25 182 87C182 78.72 175.28 72 167 72Z" fill="#5E8775"/>
+                <path d="M167 72C158.72 72 152 78.72 152 87C152 98.25 167 114 167 114C167 114 182 98.25 182 87C182 78.72 175.28 72 167 72Z" fill="url(#pinGrad)"/>
+                <!-- Pin hole -->
+                <circle cx="167" cy="87" r="5" fill="#F5F1E6"/>
+                <defs>
+                  <linearGradient id="pinGrad" x1="152" y1="72" x2="182" y2="114" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="rgba(255,255,255,0.2)"/>
+                    <stop offset="100%" stop-color="rgba(0,0,0,0.1)"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+
+            <!-- Selected address card — clearly shows what was picked -->
+            <div class="select-card">
+              <div class="sc-pin">
+                <svg width="14" height="18" viewBox="0 0 14 18" fill="none">
+                  <path d="M7 0C3.13 0 0 3.13 0 7C0 12.25 7 18 7 18S14 12.25 14 7C14 3.13 10.87 0 7 0ZM7 9.5C5.62 9.5 4.5 8.38 4.5 7S5.62 4.5 7 4.5 9.5 5.62 9.5 7 8.38 9.5 7 9.5Z" fill="#5E8775"/>
+                </svg>
+              </div>
+              <div class="sc-text">
+                <div class="sc-street" id="select-street">10212 Banks Ct</div>
+                <div class="sc-city" id="select-city">10212 Austin, TX 78739, USA</div>
+              </div>
+              <div class="sc-badge">Selected</div>
+            </div>
+
+            <div class="search-again" onclick="goTo('s-search')">
+              Not the right place? <span>Search again</span>
+            </div>
+          </div>
+
+          <div class="form-footer">
+            <button class="btn btn-primary" onclick="confirmSelection()" style="flex:1;">
+              Add this address
+            </button>
+          </div>
+          <div class="home-ind"><div class="home-ind-bar"></div></div>
+        </div>
+
+
+        <!-- ╔═══════════════════════════════════════════════════════════════╗
+             ║  SCREEN 5 · Enter Address (Set Address)                      ║
+             ║  FIXES: Continue disabled until label filled                 ║
+             ║         "Name" → "Street address"                            ║
+             ║         "Change →" on read-only field                        ║
+             ║         Helper text on label field                           ║
+             ╚═══════════════════════════════════════════════════════════════╝ -->
+        <div class="pscreen" id="s-enter">
+          <div class="nav-bar">
+            <!-- Back goes to s-select so user can see what they confirmed -->
+            <button class="back-btn" onclick="goTo('s-select')" aria-label="Back">
+              <svg width="9" height="15" viewBox="0 0 9 15" fill="none">
+                <path d="M8 1L1 7.5L8 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <h1>Set Address</h1>
+          </div>
+          <div class="form-body">
+            <!-- Auto-filled from the address selected in s-select -->
+            <div class="field-block">
+              <div class="fl">Street address <span class="req">*</span></div>
+              <div class="fv" id="enter-street-val">10212 Banks Ct</div>
+            </div>
+            <!-- Read-only: came from the confirmed selection. "Change" goes back to search. -->
+            <div class="field-block readonly">
+              <div class="fl">Full address</div>
+              <div class="fv" id="enter-city-val">10212 Austin, TX 78739, USA</div>
+              <div class="f-change" onclick="goTo('s-search')">Change →</div>
+            </div>
+            <!-- FIXED: consistent required marker + helper text -->
+            <div class="field-block">
+              <div class="fl">Address label <span class="req">*</span></div>
+              <div class="fv">
+                <input type="text" id="label-enter" placeholder="e.g. Home, Work, Mom's house"
+                  oninput="onLabelChange(this.value, 'enter')" autocomplete="off">
+              </div>
+              <div class="f-hint">Give this address a nickname so you can find it quickly</div>
+            </div>
+          </div>
+          <div class="form-footer">
+            <!-- FIXED: both buttons disabled until label has a value -->
+            <button class="btn btn-outline" id="btn-default-enter" disabled
+              onclick="toggleDefault(this)">Set as Default</button>
+            <button class="btn btn-primary" id="btn-continue-enter" disabled
+              onclick="saveNewAddress()">Continue</button>
+          </div>
+        </div>
+
+
+        <!-- ╔═══════════════════════════════════════════════════════════════╗
+             ║  SCREEN 5 · Edit Address                                     ║
+             ║  FIXES: asterisk consistent with Enter form                  ║
+             ║         Delete subordinated (outline, not filled)            ║
+             ║         Delete → confirmation sheet, not instant             ║
+             ╚═══════════════════════════════════════════════════════════════╝ -->
+        <div class="pscreen" id="s-edit">
+          <div class="nav-bar">
+            <button class="back-btn" onclick="goTo('s-saved')" aria-label="Back">
+              <svg width="9" height="15" viewBox="0 0 9 15" fill="none">
+                <path d="M8 1L1 7.5L8 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <h1>Edit Address</h1>
+          </div>
+          <div class="form-body">
+            <div class="field-block">
+              <div class="fl">Street address <span class="req">*</span></div>
+              <div class="fv"><input type="text" id="edit-street" value="10221 Banks Ct"></div>
+            </div>
+            <div class="field-block readonly">
+              <div class="fl">Full address</div>
+              <div class="fv">10212 Austin, TX 78739, USA</div>
+              <div class="f-change" onclick="goTo('s-search')">Change →</div>
+            </div>
+            <!-- FIXED: asterisk now consistent with Enter form -->
+            <div class="field-block">
+              <div class="fl">Address label <span class="req">*</span></div>
+              <div class="fv"><input type="text" id="label-edit" value="Home"></div>
+            </div>
+          </div>
+          <div class="form-footer">
+            <!-- FIXED: Delete is outline-style (visually secondary to Save), not co-equal filled -->
+            <button class="btn btn-delete-outline" onclick="showDeleteConfirm()">Delete</button>
+            <button class="btn btn-primary" onclick="saveEdit()">Save</button>
+          </div>
+        </div>
+
+
+        <!-- ╔════════════════════════════════════════╗
+             ║  OVERLAY · Delete confirmation sheet   ║
+             ║  FIXED: no more instant-delete         ║
+             ╚════════════════════════════════════════╝ -->
+        <div class="overlay" id="overlay-delete">
+          <div class="confirm-sheet">
+            <div class="confirm-handle"></div>
+            <div class="confirm-title">Remove "Home"?</div>
+            <div class="confirm-body">
+              This address will be permanently deleted.
+              You can always add it again from search.
+            </div>
+            <div class="confirm-actions">
+              <button class="confirm-btn confirm-del" onclick="confirmDelete()">
+                Remove address
+              </button>
+              <button class="confirm-btn confirm-cancel" onclick="hideDeleteConfirm()">
+                Keep address
+              </button>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- ╔════════════════════════════════════════════════╗
+             ║  SHARED KEYBOARD (Enter + Edit screens)       ║
+             ╚════════════════════════════════════════════════╝ -->
+        <div class="ios-kb" id="main-kb">
+          <div class="kb-sug-row" id="kb-suggestions">
+            <div class="kb-sug">Home</div>
+            <div class="kb-sug">Work</div>
+            <div class="kb-sug">Mom's</div>
+          </div>
+          <div class="kb-row" style="margin-top:5px">
+            <div class="k">Q</div><div class="k">W</div><div class="k">E</div><div class="k">R</div>
+            <div class="k">T</div><div class="k">Y</div><div class="k">U</div><div class="k">I</div>
+            <div class="k">O</div><div class="k">P</div>
+          </div>
+          <div class="kb-row" style="padding:0 16px">
+            <div class="k">A</div><div class="k">S</div><div class="k">D</div><div class="k">F</div>
+            <div class="k">G</div><div class="k">H</div><div class="k">J</div><div class="k">K</div>
+            <div class="k">L</div>
+          </div>
+          <div class="kb-row">
+            <div class="k dark">⇧</div><div class="k">Z</div><div class="k">X</div><div class="k">C</div>
+            <div class="k">V</div><div class="k">B</div><div class="k">N</div><div class="k">M</div>
+            <div class="k dark">⌫</div>
+          </div>
+          <div class="kb-row">
+            <div class="k dark" style="max-width:52px">123</div>
+            <div class="k space">space</div>
+            <div class="k go-btn" id="kb-go" onclick="kbGo()">Go</div>
+          </div>
+          <div class="kb-bottom" style="font-size:18px">
+            <span>☺</span><span style="font-size:14px">⏺</span>
+          </div>
+        </div>
+
+
+        <!-- Toast (success + undo snackbar) -->
+        <div class="toast" id="toast">
+          <span id="toast-msg">Address saved</span>
+          <button class="toast-undo" id="toast-undo" onclick="undoDelete()">Undo</button>
+        </div>
+
+      </div><!-- /phone-inner -->
+    </div><!-- /phone -->
+
+    <div class="phone-hint">
+      Click screens or use the panel → to navigate the flow
+    </div>
+  </div><!-- /phone-wrap -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       RIGHT PANEL
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div class="panel">
+    <div class="panel-eyebrow">Address flow · v2 — fixes applied</div>
+
+    <ul class="state-list">
+      <li class="active" data-screen="s-empty" onclick="goTo('s-empty')">
+        <div class="state-dot">1</div>
+        <div class="state-info">
+          <div class="si-name">Set Address — Empty</div>
+          <div class="si-desc">No saved addresses. Tap "Add new address" or the search bar.</div>
+        </div>
+      </li>
+      <li data-screen="s-saved" onclick="goTo('s-saved')">
+        <div class="state-dot">2</div>
+        <div class="state-info">
+          <div class="si-name">Set Address — Saved</div>
+          <div class="si-desc">Two standardized cards. Star always visible. Tap star to set default. Tap edit → screen 5.</div>
+        </div>
+      </li>
+      <li data-screen="s-search" onclick="goTo('s-search')">
+        <div class="state-dot">3</div>
+        <div class="state-info">
+          <div class="si-name">Find Address</div>
+          <div class="si-desc">Keyboard up, results visible. Tap any result → Confirm Address (step 4).</div>
+        </div>
+      </li>
+      <li data-screen="s-select" onclick="goTo('s-select')">
+        <div class="state-dot">4</div>
+        <div class="state-info">
+          <div class="si-name">Select Address (new)</div>
+          <div class="si-desc">Confirms the picked address with a map view. "Add this address" pre-fills and advances to Set Address.</div>
+        </div>
+      </li>
+      <li data-screen="s-enter" onclick="goTo('s-enter')">
+        <div class="state-dot">5</div>
+        <div class="state-info">
+          <div class="si-name">Set Address</div>
+          <div class="si-desc">Street + full address auto-filled from selection. User only adds a label.</div>
+        </div>
+      </li>
+      <li data-screen="s-edit" onclick="goTo('s-edit')">
+        <div class="state-dot">6</div>
+        <div class="state-info">
+          <div class="si-name">Edit Address</div>
+          <div class="si-desc">Asterisk consistent with Set form. Delete is outline-style, triggers confirmation sheet.</div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="panel-section-title">Fixes in this build</div>
+    <ul class="fix-list">
+      <li>
+        <span class="fix-badge p0">P0</span>
+        Delete shows confirmation sheet before removing address
+      </li>
+      <li>
+        <span class="fix-badge p0">P0</span>
+        5-second undo snackbar after confirmed delete
+      </li>
+      <li>
+        <span class="fix-badge p1">P1</span>
+        Continue + Set as Default disabled until label has a value
+      </li>
+      <li>
+        <span class="fix-badge p1">P1</span>
+        Address cards: single standardized layout, same for 1 or 2
+      </li>
+      <li>
+        <span class="fix-badge p1">P1</span>
+        Star (default indicator) always visible — not hidden in single-card view
+      </li>
+      <li>
+        <span class="fix-badge p2">P2</span>
+        Address label asterisk consistent across Enter and Edit forms
+      </li>
+      <li>
+        <span class="fix-badge p2">P2</span>
+        "Name" field renamed to "Street address"
+      </li>
+      <li>
+        <span class="fix-badge minor">minor</span>
+        Read-only Full address field has a "Change →" link
+      </li>
+      <li>
+        <span class="fix-badge minor">minor</span>
+        Label field has helper text ("Give this address a nickname…")
+      </li>
+      <li>
+        <span class="fix-badge minor">minor</span>
+        Single search placeholder — no redundant label above bar
+      </li>
+      <li>
+        <span class="fix-badge minor">minor</span>
+        Delete button is outline (subordinated) not filled equal-to-Save
+      </li>
+      <li>
+        <span class="fix-badge minor">minor</span>
+        Card nickname shown first (label hierarchy: nick → street → city)
+      </li>
+    </ul>
+  </div>
+
+</div><!-- /layout -->
+
+
+<script>
+// ─── State ──────────────────────────────────────────────────────────────────
+let currentScreen = 's-empty';
+// Screens that need the shared keyboard
+const KB_SCREENS = new Set(['s-enter', 's-edit']);
+// Address selected on the search screen, passed to s-select then s-enter
+let selectedAddress = { street: '10212 Banks Ct', city: '10212 Austin, TX 78739, USA' };
+
+// ─── Select Address (Find → Select bridge) ───────────────────────────────────
+// Called when user taps a search result. Stores the pick, shows confirmation.
+function selectAddress(street, city) {
+  selectedAddress = { street, city };
+  // Update the confirm screen
+  document.getElementById('select-street').textContent = street;
+  document.getElementById('select-city').textContent   = city;
+  goTo('s-select');
+}
+
+// Called when user taps "Add this address" on s-select.
+// Pre-fills the form fields and advances to Set Address.
+function confirmSelection() {
+  document.getElementById('enter-street-val').textContent = selectedAddress.street;
+  document.getElementById('enter-city-val').textContent   = selectedAddress.city;
+  // Reset label field and button states for a clean form
+  const labelInput = document.getElementById('label-enter');
+  if (labelInput) { labelInput.value = ''; onLabelChange(''); }
+  goTo('s-enter');
+}
+
+// ─── Navigation ─────────────────────────────────────────────────────────────
+function goTo(id) {
+  // Tear down old screen
+  const prev = document.getElementById(currentScreen);
+  if (prev) {
+    prev.classList.remove('active', 'kb-up');
+  }
+
+  // Activate new screen
+  const next = document.getElementById(id);
+  if (!next) return;
+  next.classList.add('active');
+  currentScreen = id;
+
+  // Shared keyboard
+  const kb = document.getElementById('main-kb');
+  if (KB_SCREENS.has(id)) {
+    kb.classList.add('show');
+    next.classList.add('kb-up');
+    // Tune keyboard Go behaviour per-screen
+    document.getElementById('kb-go').onclick = kbGo;
+    // Tune suggestions
+    const sug = document.getElementById('kb-suggestions');
+    if (id === 's-enter') {
+      sug.innerHTML = '<div class="kb-sug">Home</div><div class="kb-sug">Work</div><div class="kb-sug">Mom\'s</div>';
+    } else {
+      sug.innerHTML = '<div class="kb-sug">Home</div><div class="kb-sug">Work</div><div class="kb-sug">The</div>';
+    }
+  } else {
+    kb.classList.remove('show');
+  }
+
+  // Update panel active state
+  document.querySelectorAll('.state-list li').forEach(li => {
+    li.classList.toggle('active', li.dataset.screen === id);
+  });
+}
+
+// ─── Enter Address — label drives button states ──────────────────────────────
+function onLabelChange(val) {
+  const filled = val.trim().length > 0;
+  document.getElementById('btn-continue-enter').disabled = !filled;
+  document.getElementById('btn-default-enter').disabled  = !filled;
+}
+
+// ─── Set as Default toggle ────────────────────────────────────────────────────
+function toggleDefault(btn) {
+  const on = btn.classList.toggle('toggled');
+  btn.textContent = on ? '✓ Default' : 'Set as Default';
+}
+
+// ─── Save new address ─────────────────────────────────────────────────────────
+function saveNewAddress() {
+  const val = (document.getElementById('label-enter').value || '').trim();
+  if (!val) return;
+  // Reset input for next time
+  document.getElementById('label-enter').value = '';
+  onLabelChange('');
+  goTo('s-saved');
+  showToast('Address saved as "' + val + '"', false);
+}
+
+// ─── Save edit ────────────────────────────────────────────────────────────────
+function saveEdit() {
+  goTo('s-saved');
+  showToast('Address updated', false);
+}
+
+// ─── Delete flow (FIXED: confirmation before action) ─────────────────────────
+function showDeleteConfirm() {
+  document.getElementById('overlay-delete').classList.add('active');
+}
+function hideDeleteConfirm() {
+  document.getElementById('overlay-delete').classList.remove('active');
+}
+function confirmDelete() {
+  hideDeleteConfirm();
+  goTo('s-empty');
+  // FIXED: undo snackbar with 6-second window
+  showToast('"Home" address removed', true, 6000);
+}
+function undoDelete() {
+  hideToast();
+  goTo('s-saved');
+  showToast('"Home" restored', false, 2500);
+}
+
+// ─── Star (set default) ───────────────────────────────────────────────────────
+function setDefault(clickedBtn) {
+  const screen = clickedBtn.closest('.pscreen');
+  const starSvgFilled = `<svg width="16" height="16" viewBox="0 0 16 16" fill="#C8962A"><path d="M8 1L9.8 5.8L15 6.2L11.2 9.8L12.4 15L8 12.5L3.6 15L4.8 9.8L1 6.2L6.2 5.8L8 1Z" stroke="#C8962A" stroke-width="0.8"/></svg>`;
+  const starSvgEmpty = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L9.8 5.8L15 6.2L11.2 9.8L12.4 15L8 12.5L3.6 15L4.8 9.8L1 6.2L6.2 5.8L8 1Z" stroke="#9AA49E" stroke-width="1.3"/></svg>`;
+
+  // Clear all stars in this screen
+  screen.querySelectorAll('.star-btn').forEach(btn => {
+    btn.classList.remove('default-star');
+    btn.innerHTML = starSvgEmpty;
+    // Dim the pin of non-default cards
+    const pin = btn.closest('.addr-card').querySelector('.card-pin');
+    if (pin) {
+      pin.classList.add('dim');
+      pin.querySelector('path').setAttribute('fill', '#9AA49E');
+    }
+  });
+
+  // Set clicked as default
+  clickedBtn.classList.add('default-star');
+  clickedBtn.innerHTML = starSvgFilled;
+  const pin = clickedBtn.closest('.addr-card').querySelector('.card-pin');
+  if (pin) {
+    pin.classList.remove('dim');
+    pin.querySelector('path').setAttribute('fill', '#5E8775');
+  }
+
+  showToast('Default address updated', false);
+}
+
+// ─── Keyboard Go button ───────────────────────────────────────────────────────
+function kbGo() {
+  if (currentScreen === 's-enter') saveNewAddress();
+  else if (currentScreen === 's-edit') saveEdit();
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+let toastTimer = null;
+
+function showToast(msg, hasUndo, duration) {
+  clearTimeout(toastTimer);
+  const toast    = document.getElementById('toast');
+  const msgEl    = document.getElementById('toast-msg');
+  const undoBtn  = document.getElementById('toast-undo');
+
+  msgEl.textContent    = msg;
+  undoBtn.style.display = hasUndo ? 'block' : 'none';
+  toast.classList.add('show');
+
+  const ms = duration || (hasUndo ? 6000 : 2500);
+  toastTimer = setTimeout(hideToast, ms);
+}
+
+function hideToast() {
+  document.getElementById('toast').classList.remove('show');
+}
+</script>
+
+</body>
+</html>

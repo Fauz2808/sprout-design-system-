@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Daily Brief — Empty States · Sprout</title>
+  <style>
+    :root {
+      --bg:        #f0ede6;
+      --surface:   #ffffff;
+      --fg:        #1a1a17;
+      --muted:     #7a7568;
+      --border:    #ddd9cf;
+      --green:     #2d5c2e;
+      --green-mid: #3d7a40;
+      --green-soft:#e8f0e8;
+      --tag-bg:    #ece9e2;
+      --t-todo:    #3b6ea5;  --t-todo-bg: #e1ecf7;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+      --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+      --radius: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body { background: #ddd8ce; font-family: var(--font); font-size: 15px; line-height: 1.4; -webkit-font-smoothing: antialiased; display: flex; align-items: flex-start; justify-content: center; gap: 40px; padding: 40px 24px; min-height: 100vh; flex-wrap: wrap; }
+    .panel { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+    .caption { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #8a8478; text-align: center; max-width: 320px; }
+    .caption strong { color: #3a3830; font-weight: 600; }
+    .subcap { font-size: 12px; color: #6a665a; text-align: center; max-width: 300px; line-height: 1.5; }
+
+    .device { position: relative; width: 360px; height: 780px; border-radius: 52px; padding: 11px;
+      background: linear-gradient(160deg, #2a2a2c 0%, #1a1a1c 50%, #0e0e10 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04) inset, 0 0 0 2px #000 inset, 0 28px 60px -12px rgba(0,0,0,0.45), 0 8px 20px -8px rgba(0,0,0,0.35); }
+    .device::before, .device::after { content: ''; position: absolute; width: 3px; background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.06) 8%, transparent 16%, transparent 84%, rgba(255,255,255,0.04) 92%, transparent 100%); top: 95px; bottom: 95px; pointer-events: none; }
+    .device::before { left: -1px; } .device::after { right: -1px; }
+    .island { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 115px; height: 33px; background: #000; border-radius: 999px; z-index: 5; }
+    .btn-rail { position: absolute; width: 4px; background: #0a0a0c; border-radius: 2px; }
+    .btn-rail.l1 { left:-3px; top:160px; height:30px; } .btn-rail.l2 { left:-3px; top:205px; height:55px; }
+    .btn-rail.l3 { left:-3px; top:270px; height:55px; } .btn-rail.r1 { right:-3px; top:232px; height:92px; }
+
+    .screen { position: relative; width: 100%; height: 100%; background: var(--bg); border-radius: 42px; overflow: hidden; display: flex; flex-direction: column; }
+    .statusbar { flex: 0 0 44px; padding: 17px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; font-size: 15px; font-weight: 600; color: var(--fg); }
+    .statusbar .right { display: inline-flex; align-items: center; gap: 6px; }
+    .statusbar svg { width: 16px; height: 10px; fill: var(--fg); } .statusbar .bat { width: 24px; }
+    .scroll { flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; }
+    .scroll::-webkit-scrollbar { display: none; }
+    .home-bar { flex: 0 0 26px; position: relative; }
+    .home-bar::after { content: ''; position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); width: 124px; height: 5px; background: var(--fg); border-radius: 999px; opacity: 0.2; }
+
+    .brief-topbar { padding: 10px 18px 8px; display: flex; align-items: center; gap: 12px; }
+    .back-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); display: grid; place-items: center; }
+    .back-btn svg { width: 17px; height: 17px; stroke: var(--fg); fill: none; stroke-width: 2; }
+    .brief-topbar .t { flex: 1; text-align: center; }
+    .brief-topbar .t .lbl { font-size: 12px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .brief-topbar .t .lbl .dot { width: 5px; height: 5px; background: var(--green-mid); border-radius: 50%; }
+    .brief-topbar .t .nm { font-size: 17px; font-weight: 600; color: var(--fg); margin: 0; }
+    .brief-spacer { width: 32px; }
+
+    .brief-page { padding: 8px 18px 24px; }
+    .brief-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 16px; }
+    .greeting { font-size: 16px; font-weight: 700; color: var(--fg); margin: 0 0 2px; }
+    .subline { font-size: 14px; color: var(--muted); margin: 0 0 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+
+    /* weather (always shown) */
+    .weather { margin-bottom: 14px; }
+    .weather .box { background: linear-gradient(135deg, #e4f0e6 0%, #d0e8d4 100%); border: 1px solid #b8d8be; border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 14px; }
+    .weather .ic { font-size: 34px; line-height: 1; flex-shrink: 0; }
+    .weather .info { flex: 1; }
+    .weather .cond { font-size: 13px; font-weight: 700; color: #1a1a17; margin-bottom: 2px; }
+    .weather .tip { font-size: 12px; color: #3d7052; font-weight: 500; }
+    .weather .rng { text-align: right; flex-shrink: 0; }
+    .weather .rng .r { font-size: 15px; font-weight: 700; color: #1a1a17; font-family: var(--font-mono); }
+    .weather .rng .r .d { color: #aec9b4; margin: 0 2px; }
+    .weather .rng .lab { font-size: 11px; color: #3d7052; margin-top: 2px; }
+
+    .group { margin-bottom: 14px; }
+    .group:last-child { margin-bottom: 0; }
+    .group-title { font-size: 14px; font-weight: 700; color: var(--fg); margin: 0 0 6px; display: flex; align-items: center; gap: 5px; }
+    .group ol { margin: 0; padding-left: 18px; }
+    .group ol li { font-size: 14px; line-height: 1.55; color: var(--fg); margin-bottom: 3px; }
+    .bday-hi { background: linear-gradient(135deg, #fff8e6 0%, #fef0cc 100%); border: 1px solid #f5d98a; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+    .bday-hi .e { font-size: 22px; } .bday-hi .n { font-size: 13.5px; font-weight: 700; color: #1a1a17; } .bday-hi .s { font-size: 12px; color: #a07820; margin-top: 1px; }
+    .todo-row { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; }
+    .todo-row .cb { width: 18px; height: 18px; border-radius: 6px; border: 2px solid var(--t-todo); flex-shrink: 0; margin-top: 1px; }
+    .todo-row .x { font-size: 14px; color: var(--fg); }
+
+    /* empty-state fallback card */
+    .empty { text-align: center; padding: 18px 14px 6px; }
+    .empty .emoji { font-size: 42px; line-height: 1; }
+    .empty .et { font-size: 16px; font-weight: 700; color: var(--fg); margin: 12px 0 5px; }
+    .empty .ed { font-size: 13.5px; color: var(--muted); line-height: 1.5; max-width: 250px; margin: 0 auto; }
+    .empty .cta { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; padding: 11px 18px; border-radius: 999px; background: var(--green-soft); color: var(--green); font-size: 13.5px; font-weight: 600; }
+    .empty .cta svg { width: 15px; height: 15px; stroke: var(--green); fill: none; stroke-width: 2.2; }
+
+    .timestamp { text-align: center; font-family: var(--font-mono); font-size: 11px; color: #b0ab9f; letter-spacing: 0.04em; margin-top: 12px; }
+
+    .ghost-note { margin-top: 12px; font-size: 11.5px; color: #8a8478; font-style: italic; text-align: center; }
+
+    /* copy options block */
+    .copybox { max-width: 760px; margin: 44px auto 0; }
+    .copybox h2 { font-family: Georgia, serif; font-weight: normal; font-size: 18px; text-align: center; margin: 0 0 6px; }
+    .copybox .ch { text-align: center; font-size: 13px; color: #6a665a; margin: 0 0 18px; }
+    .copygrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .copycard { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+    .copycard .tag { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 6px; }
+    .copycard .ttl { font-size: 14px; font-weight: 700; color: var(--fg); margin-bottom: 3px; }
+    .copycard .bd { font-size: 13px; color: #4a4740; line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+  <!-- ── A: Completely empty ── -->
+  <div class="panel">
+    <div class="caption"><strong>Empty state</strong> · No data yet</div>
+    <div class="subcap">Early days / quiet day. Weather always stays; everything else is replaced by one warm message.</div>
+    <div class="device">
+      <span class="btn-rail l1"></span><span class="btn-rail l2"></span><span class="btn-rail l3"></span><span class="btn-rail r1"></span>
+      <span class="island"></span>
+      <div class="screen">
+        <div class="statusbar">
+          <span>9:41</span>
+          <span class="right">
+            <svg viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6"/><rect x="4" y="5" width="3" height="6" rx="0.6"/><rect x="8" y="3" width="3" height="8" rx="0.6"/><rect x="12" y="0" width="3" height="11" rx="0.6"/></svg>
+            <svg viewBox="0 0 17 11"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1zM3.5 7.6L5 9.1c1-0.9 2.2-1.4 3.5-1.4 1.3 0 2.5 0.5 3.5 1.4l1.5-1.5c-1.4-1.3-3.1-2-5-2-1.9 0-3.6 0.7-5 2zM6.5 10.6l2 2 2-2c-0.5-0.5-1.2-0.8-2-0.8s-1.5 0.3-2 0.8z"/></svg>
+            <svg class="bat" viewBox="0 0 25 11"><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity="0.45"/><rect x="22" y="3.5" width="1.5" height="4" rx="0.4" fill="currentColor" fill-opacity="0.45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+          </span>
+        </div>
+
+        <div class="scroll">
+          <div class="brief-topbar">
+            <div class="back-btn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="t"><div class="lbl"><span class="dot"></span>Live</div><p class="nm">Daily Brief</p></div>
+            <div class="brief-spacer"></div>
+          </div>
+
+          <div class="brief-page">
+            <div class="brief-card">
+              <p class="greeting">Good morning, Tony.</p>
+              <p class="subline">Here's your Thursday:</p>
+
+              <!-- weather always shown -->
+              <div class="weather">
+                <div class="box">
+                  <div class="ic">☀️</div>
+                  <div class="info">
+                    <div class="cond">Sunny · Austin, TX</div>
+                    <div class="tip">👕 Light jacket this morning, t-shirt by afternoon</div>
+                  </div>
+                  <div class="rng">
+                    <div class="r">68°<span class="d">–</span>86°</div>
+                    <div class="lab">Today's range</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- single warm fallback in place of all empty sections -->
+              <div class="empty">
+                <div class="emoji">🌿</div>
+                <div class="et">A calm one today.</div>
+                <div class="ed">Nothing on the calendar yet — no events, birthdays, or to-dos. We'll pop things here the moment they come in. Enjoy the quiet ☕</div>
+                <div class="cta">Discover activities nearby <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+              </div>
+
+              <p class="timestamp">Updated 7:31 AM · Thursday, June 12</p>
+            </div>
+          </div>
+        </div>
+        <div class="home-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── B: Partial (empty sections hidden) ── -->
+  <div class="panel">
+    <div class="caption"><strong>Light day</strong> · Some sections hidden</div>
+    <div class="subcap">Only sections with data appear. No "nothing here" placeholders — empty ones are simply dropped.</div>
+    <div class="device">
+      <span class="btn-rail l1"></span><span class="btn-rail l2"></span><span class="btn-rail l3"></span><span class="btn-rail r1"></span>
+      <span class="island"></span>
+      <div class="screen">
+        <div class="statusbar">
+          <span>9:41</span>
+          <span class="right">
+            <svg viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6"/><rect x="4" y="5" width="3" height="6" rx="0.6"/><rect x="8" y="3" width="3" height="8" rx="0.6"/><rect x="12" y="0" width="3" height="11" rx="0.6"/></svg>
+            <svg viewBox="0 0 17 11"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1zM3.5 7.6L5 9.1c1-0.9 2.2-1.4 3.5-1.4 1.3 0 2.5 0.5 3.5 1.4l1.5-1.5c-1.4-1.3-3.1-2-5-2-1.9 0-3.6 0.7-5 2zM6.5 10.6l2 2 2-2c-0.5-0.5-1.2-0.8-2-0.8s-1.5 0.3-2 0.8z"/></svg>
+            <svg class="bat" viewBox="0 0 25 11"><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity="0.45"/><rect x="22" y="3.5" width="1.5" height="4" rx="0.4" fill="currentColor" fill-opacity="0.45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+          </span>
+        </div>
+
+        <div class="scroll">
+          <div class="brief-topbar">
+            <div class="back-btn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="t"><div class="lbl"><span class="dot"></span>Live</div><p class="nm">Daily Brief</p></div>
+            <div class="brief-spacer"></div>
+          </div>
+
+          <div class="brief-page">
+            <div class="brief-card">
+              <p class="greeting">Good morning, Tony.</p>
+              <p class="subline">Here's your Thursday:</p>
+
+              <div class="weather">
+                <div class="box">
+                  <div class="ic">⛅</div>
+                  <div class="info">
+                    <div class="cond">Partly cloudy · Austin, TX</div>
+                    <div class="tip">🧥 Cooler this morning — grab a layer</div>
+                  </div>
+                  <div class="rng">
+                    <div class="r">62°<span class="d">–</span>78°</div>
+                    <div class="lab">Today's range</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- only Birthdays + To do have data; Reminders/Happening/Messages are simply absent -->
+              <div class="group">
+                <div class="group-title">🎂 Birthdays</div>
+                <div class="bday-hi">
+                  <span class="e">🎉</span>
+                  <div><div class="n">Kennedy turns 5 today!</div><div class="s">Say happy birthday at drop-off 👋</div></div>
+                </div>
+              </div>
+
+              <div class="group">
+                <div class="group-title">✅ To do</div>
+                <div class="todo-row"><div class="cb"></div><div class="x">Sign Jake's permission slip</div></div>
+              </div>
+
+              <p class="timestamp">Updated 7:31 AM · Thursday, June 12</p>
+            </div>
+
+            <p class="ghost-note">↑ No Reminders, Happening-today, or Messages sections — they're hidden because there's no data, not shown as empty.</p>
+          </div>
+        </div>
+        <div class="home-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Fallback copy options for Tony ── -->
+  <div class="copybox">
+    <h2>Fallback copy — pick one</h2>
+    <p class="ch">For the full-empty state (weather always sits above it). Tony to choose / tweak.</p>
+    <div class="copygrid">
+      <div class="copycard">
+        <div class="tag">Option 1 · Calm</div>
+        <div class="ttl">A calm one today. 🌿</div>
+        <div class="bd">Nothing on the calendar yet — no events, birthdays, or to-dos. We'll pop things here the moment they come in. Enjoy the quiet ☕</div>
+      </div>
+      <div class="copycard">
+        <div class="tag">Option 2 · Warm</div>
+        <div class="ttl">Clear skies, clear schedule. ☀️</div>
+        <div class="bd">No plans on the books today. Soak up the slow morning — your brief will fill up as your week takes shape.</div>
+      </div>
+      <div class="copycard">
+        <div class="tag">Option 3 · Action</div>
+        <div class="ttl">Your day's wide open.</div>
+        <div class="bd">Nothing scheduled yet. Want to make plans? There are family activities happening near you this week.</div>
+      </div>
+      <div class="copycard">
+        <div class="tag">Option 4 · Playful</div>
+        <div class="ttl">Nice and quiet today. 😌</div>
+        <div class="bd">No birthdays, events, or to-dos on deck. We'll give you a heads-up the second something lands.</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

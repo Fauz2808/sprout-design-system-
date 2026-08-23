@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Notifications — filters · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* AUTHORITATIVE tokens — full set + type ramp classes (.h1-.h6/.p1-.p3/.s1-.s3/.c1-.c3) in 04 - Design System & Storybook/tokens/tokens.css. */
+  :root{
+    --bg:#f4f1ea;            /* background/primary — page */
+    --surface:#ffffff;       /* elevated card (white) */
+    --card:#ffffff;
+    --field:#e8e2d6;         /* input / search fields */
+    --ink:#1e3e2b;           /* content/brand-bold — headings */
+    --ink-2:#23271f;         /* near-black — row titles */
+    --body:#4d525b;          /* content/primary — body text (cool grey) */
+    --muted:#7d715e;         /* content/secondary — subtext (warm) */
+    --brand:#186338;         /* content/brand — links, active, accents */
+    --brand-bold:#1e3e2b;
+    --brand-mid:#4fa472;     /* avatar gradient end */
+    --brand-light:#e2e9e3;   /* background/brand-light — chips, badges, unread */
+    --brand-border:#77b691;
+    --border:#e2dccf;
+    --shadow-sm:1px 3px 9px rgba(13,13,18,.06);
+    --radius:16px;
+    --serif:'Playfair Display',Georgia,serif;    /* headings + BUTTON labels (weight 500) */
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  .ph{display:inline-block;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:30px 40px;padding:40px 24px 60px;}
+
+  .lede{flex:1 0 100%;text-align:center;max-width:640px;margin:0 auto 8px;}
+  .lede h1{font-family:var(--serif);font-size:23px;font-weight:600;color:#23271f;margin:0 0 6px;}
+  .lede p{font-size:13px;color:#6a665b;margin:0;line-height:1.55;}
+
+  /* device */
+  .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:50;}
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);z-index:20;}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;}
+  .sb svg{width:17px;height:11px;fill:var(--ink);} .sb .bat{width:25px;}
+
+  /* top bar */
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:4px 16px 8px;}
+  .ibtn{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1px solid var(--border);
+    display:grid;place-items:center;cursor:pointer;flex-shrink:0;box-shadow:var(--shadow-sm);}
+  .ibtn svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .top .tt{flex:1;line-height:1.1;} .top .tt.center{text-align:center;}
+  .top .tt .t{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);}
+  .top .sp{width:40px;flex-shrink:0;}
+
+  /* filter chips — segmented tabs (Direction A) */
+  .filters{flex:0 0 auto;display:flex;gap:8px;overflow-x:auto;padding:2px 16px 12px;}
+  .filters::-webkit-scrollbar{display:none;}
+  .fchip{flex:0 0 auto;font-family:var(--sans);font-size:13px;font-weight:500;background:var(--surface);border:1px solid var(--border);
+    color:var(--ink-2);border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow-sm);
+    transition:background .12s,color .12s,border-color .12s;}
+  .fchip .n{opacity:.62;margin-left:2px;}
+  .fchip.on{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .fchip.on .n{opacity:.8;}
+
+  .body{flex:1 1 auto;overflow-y:auto;padding:2px 12px 28px;}
+  .body::-webkit-scrollbar{display:none;}
+
+  /* notification row */
+  .nrow{display:flex;gap:12px;padding:13px 12px;border-radius:14px;cursor:pointer;}
+  .nrow.unread{background:var(--brand-light);}
+  .ico{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;flex-shrink:0;font-size:19px;color:#fff;}
+  .ico.club{background:linear-gradient(144deg,#dd7a37,#f0aa63);font-family:var(--serif);font-weight:600;font-size:19px;}
+  .ico.photo{background:linear-gradient(144deg,#1e3e2b,#4fa472);}
+  .avatar{border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;
+    background:linear-gradient(144deg,#1e3e2b 5%,#4fa472 100%);width:44px;height:44px;font-size:16px;flex-shrink:0;}
+  .ntxt{flex:1;min-width:0;padding-top:1px;}
+  .ntxt .row1{display:flex;align-items:flex-start;gap:8px;}
+  .ntxt .ti{font-family:var(--sans);font-weight:700;font-size:13.5px;color:var(--ink-2);flex:1;}
+  .ntxt .tm{font-family:var(--sans);font-size:11px;color:var(--muted);flex-shrink:0;padding-top:1px;}
+  .ntxt .de{font-family:var(--sans);font-size:12.5px;color:var(--body);line-height:1.42;margin-top:2px;}
+  .ntxt .de b{font-weight:600;color:var(--ink-2);}
+
+  /* empty state (daily brief) */
+  .empty{display:none;flex-direction:column;align-items:center;text-align:center;padding:52px 30px 20px;}
+  .empty.on{display:flex;}
+  .empty .eic{width:56px;height:56px;border-radius:50%;background:var(--brand-light);display:grid;place-items:center;margin-bottom:14px;color:var(--brand);}
+  .empty .eic .ph{width:26px;height:26px;}
+  .empty h3{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin:0 0 6px;}
+  .empty p{font-size:12.5px;color:var(--muted);line-height:1.55;margin:0;max-width:240px;}
+
+  /* footer note */
+  .fnote{display:flex;gap:7px;align-items:flex-start;justify-content:center;text-align:center;padding:18px 20px 6px;color:var(--muted);}
+  .fnote .ph{width:13px;height:13px;flex-shrink:0;margin-top:2px;}
+  .fnote span{font-size:11px;line-height:1.5;}
+</style>
+</head>
+<body>
+
+  <div class="lede">
+    <h1>Notifications — segmented filters</h1>
+    <p>Direction A from the review: tabs (All / Events / Clubs / Daily Brief) replace the flat list. Counts update per tab; unread stays highlighted. Daily Brief is empty today — it's reserved for the notification revamp from the team sync, not built yet.</p>
+  </div>
+
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+
+      <div class="top">
+        <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+        <div class="tt center"><div class="t">Notifications</div></div>
+        <div class="sp"></div>
+      </div>
+
+      <div class="filters" id="filters">
+        <span class="fchip on" data-tab="all">All<span class="n">· 8</span></span>
+        <span class="fchip" data-tab="events">Events<span class="n">· 5</span></span>
+        <span class="fchip" data-tab="clubs">Clubs<span class="n">· 3</span></span>
+        <span class="fchip" data-tab="daily">Daily Brief<span class="n">· 0</span></span>
+      </div>
+
+      <div class="body">
+        <div id="list">
+          <div class="nrow unread" data-cat="clubs">
+            <div class="ico club">Y</div>
+            <div class="ntxt">
+              <div class="row1"><div class="ti">Removed from Club</div><div class="tm">1h</div></div>
+              <div class="de">"Guy Hawkins admin from Y Combinator has removed you from the club"</div>
+            </div>
+          </div>
+
+          <div class="nrow" data-cat="events">
+            <div class="ico photo">⛳</div>
+            <div class="ntxt">
+              <div class="row1"><div class="ti">New Event</div><div class="tm">1h</div></div>
+              <div class="de">"Come Join me for Golf" November 18, 2025, at 8:00 – 9:00 AM (CST)</div>
+            </div>
+          </div>
+
+          <div class="nrow" data-cat="clubs">
+            <div class="avatar">NL</div>
+            <div class="ntxt">
+              <div class="row1"><div class="ti">Join Request</div><div class="tm">1d</div></div>
+              <div class="de">Noah LaRonde has request to join "Y Combinator Social Club"</div>
+            </div>
+          </div>
+
+          <div class="nrow" data-cat="events">
+            <div class="avatar">A</div>
+            <div class="ntxt">
+              <div class="row1"><div class="ti">Join Request</div><div class="tm">1d</div></div>
+              <div class="de">Angelina has request to join your "Come Join me for Golf" event!</div>
+            </div>
+          </div>
+
+          <div class="nrow" data-cat="events">
+            <div class="ico photo">🎉</div>
+            <div class="ntxt">
+              <div class="row1"><div class="ti">Event Completed!</div><div class="tm">2w</div></div>
+              <div class="de">"Y Combinator Happy hour After Work On Monday" has wrapped up! Share your best moments.</div>
+            </div>
+          </div>
+
+          <div class="nrow" data-cat="clubs">
+            <div class="ico club">Y</div>
+            <div class="ntxt">
+              <div class="row1"><div class="ti">New Member</div><div class="tm">1mo</div></div>
+              <div class="de">Noah LaRonde joined "Y Combinator"</div>
+            </div>
+          </div>
+
+          <div class="nrow" data-cat="events">
+            <div class="ico photo">🥂</div>
+            <div class="ntxt">
+              <div class="row1"><div class="ti">Almost Time!</div><div class="tm">2w</div></div>
+              <div class="de">"Y Combinator Happy hour Event" starts at 5:30 PM CDT.</div>
+            </div>
+          </div>
+
+          <div class="nrow" data-cat="events">
+            <div class="avatar">A</div>
+            <div class="ntxt">
+              <div class="row1"><div class="ti">Event Accepted</div><div class="tm"></div></div>
+              <div class="de">You're in! 🎉 Angelina approved your registration to "Come Join me for Golf".</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty" id="empty-daily">
+          <div class="eic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12"/></svg></span></div>
+          <h3>Nothing here yet</h3>
+          <p>Your daily brief will show up here once it's live — a quiet, once-a-day summary instead of a ping every time something happens.</p>
+        </div>
+
+        <div class="fnote">
+          <span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12"/></svg></span>
+          <span>Notifications that are over 30 days old will be removed.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  var filters = document.getElementById('filters');
+  var rows = Array.prototype.slice.call(document.querySelectorAll('#list .nrow'));
+  var emptyDaily = document.getElementById('empty-daily');
+
+  filters.addEventListener('click', function(e){
+    var chip = e.target.closest('.fchip');
+    if(!chip) return;
+    var tab = chip.dataset.tab;
+    var scroller = chip.closest('.filters');
+    var top = scroller.parentElement.querySelector('.body');
+    var prevScroll = top.scrollTop;
+
+    Array.prototype.forEach.call(filters.querySelectorAll('.fchip'), function(c){ c.classList.remove('on'); });
+    chip.classList.add('on');
+
+    var anyVisible = false;
+    rows.forEach(function(r){
+      var show = tab === 'all' || r.dataset.cat === tab;
+      r.style.display = show ? 'flex' : 'none';
+      if(show) anyVisible = true;
+    });
+    document.getElementById('list').style.display = (tab === 'daily') ? 'none' : 'block';
+    emptyDaily.classList.toggle('on', tab === 'daily');
+
+    top.scrollTop = prevScroll;
+  });
+</script>
+</body>
+</html>

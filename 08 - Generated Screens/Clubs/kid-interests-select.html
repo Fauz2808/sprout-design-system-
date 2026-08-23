@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Kid Interests (full picker)</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brand-500: #186338;
+    --brand-600: #134f2d;
+    --brand-700: #1e3e2b;
+    --brand-200: #77b691;
+    --brand-50:  #e2e9e3;
+    --secondary-500: #f4f1ea;
+    --secondary-600: #eae6db;
+    --secondary-700: #dbd5c8;
+    --grey-300: #b3b8c1;
+    --grey-500: #818898;
+    --grey-700: #4d525b;
+    --grey-900: #1a1b1e;
+  }
+
+  body {
+    background: #cfc8b8;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 24px 64px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .variant-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .variant-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #5a5347; text-align: center; max-width: 393px; }
+
+  .phone {
+    width: 393px; height: 852px;
+    background: var(--secondary-500);
+    border-radius: 54px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04), 0 24px 80px rgba(0,0,0,0.24);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dynamic-island { width: 120px; height: 36px; background: #000; border-radius: 20px; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 10; }
+
+  .status-bar { height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 14px 28px 0; flex-shrink: 0; }
+  .status-time { font-size: 15px; font-weight: 600; color: var(--grey-900); }
+  .status-icons { display: flex; align-items: center; gap: 7px; }
+
+  .nav-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px 0; flex-shrink: 0; }
+  .back-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--secondary-600); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .back-btn svg { width: 18px; height: 18px; stroke: var(--brand-700); }
+  .nav-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 18px; color: var(--brand-700); }
+  .save-link { font-size: 15px; font-weight: 700; color: var(--brand-600); background: none; border: none; cursor: pointer; }
+
+  .scroll-area { flex: 1; overflow-y: auto; padding: 16px 24px 28px; }
+  .scroll-area::-webkit-scrollbar { display: none; }
+
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--brand-600); }
+  h1 { margin-top: 6px; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 30px; color: var(--brand-700); line-height: 1.1; }
+  .rationale { margin-top: 10px; font-size: 14px; line-height: 1.5; color: var(--grey-700); }
+
+  .search {
+    margin-top: 16px;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--secondary-700); border-radius: 16px;
+    padding: 14px 16px;
+  }
+  .search svg { width: 18px; height: 18px; stroke: var(--grey-500); flex-shrink: 0; }
+  .search span { font-size: 15px; color: var(--grey-500); }
+
+  .create-btn {
+    margin-top: 12px;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--secondary-700); border-radius: 14px; border: none;
+    padding: 12px 18px; font-size: 15px; font-weight: 700;
+    color: var(--brand-700); cursor: pointer;
+  }
+  .create-btn svg { width: 15px; height: 15px; stroke: var(--brand-700); stroke-width: 2.6; }
+
+  .category { margin-top: 24px; }
+  .cat-header { font-size: 16px; font-weight: 700; color: var(--brand-700); margin-bottom: 12px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 9px; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; background: var(--secondary-700); border-radius: 99px; padding: 10px 15px; font-size: 13.5px; font-weight: 600; color: var(--brand-700); cursor: pointer; border: 1.5px solid transparent; white-space: nowrap; }
+  .chip.active { background: var(--brand-50); border-color: var(--brand-200); }
+
+  .count-bar { flex-shrink: 0; padding: 10px 24px 24px; }
+  .count-text { text-align: center; font-size: 12.5px; color: var(--grey-500); margin-bottom: 10px; }
+  .save-btn { width: 100%; padding: 17px; border: none; border-radius: 99px; background: var(--brand-500); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; }
+</style>
+</head>
+<body>
+
+  <div class="variant-wrap">
+    <div class="variant-label">Kid Interests — full picker, all the things kids like to do (6 categories, tap any chip to toggle)</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="11" viewBox="0 0 17 11" fill="var(--grey-900)"><rect x="0" y="7" width="3" height="4" rx="0.6"/><rect x="4" y="5" width="3" height="6" rx="0.6"/><rect x="8" y="3" width="3" height="8" rx="0.6"/><rect x="12" y="0" width="3" height="11" rx="0.6"/></svg>
+          <svg width="15" height="11" viewBox="0 0 17 11" fill="var(--grey-900)"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1zM3.5 7.6L5 9.1c1-0.9 2.2-1.4 3.5-1.4 1.3 0 2.5 0.5 3.5 1.4l1.5-1.5c-1.4-1.3-3.1-2-5-2-1.9 0-3.6 0.7-5 2zM6.5 10.6l2 2 2-2c-0.5-0.5-1.2-0.8-2-0.8s-1.5 0.3-2 0.8z"/></svg>
+          <svg width="25" height="11" viewBox="0 0 25 11"><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" fill="none" stroke="var(--grey-900)" stroke-opacity="0.45"/><rect x="22" y="3.5" width="1.5" height="4" rx="0.4" fill="var(--grey-900)" fill-opacity="0.45"/><rect x="2" y="2" width="18" height="7" rx="1.4" fill="var(--grey-900)"/></svg>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="back-btn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div class="nav-title">Interests</div>
+        <button class="save-link" onclick="updateCount()">Save</button>
+      </div>
+
+      <div class="scroll-area">
+        <div class="eyebrow">Mia's Profile</div>
+        <h1>What does Mia like?</h1>
+        <div class="rationale">Add what she's into — this helps Sprout suggest the right playdates, camps, and events for her, and helps other kids find friends who like the same things.</div>
+
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <span>Search</span>
+        </div>
+        <button class="create-btn"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Create Interest</button>
+
+        <div class="category">
+          <div class="cat-header">⚽ Sports &amp; Movement</div>
+          <div class="chips">
+            <div class="chip" onclick="toggleChip(this)">⚽ Soccer</div>
+            <div class="chip" onclick="toggleChip(this)">🏀 Basketball</div>
+            <div class="chip" onclick="toggleChip(this)">⚾ Baseball</div>
+            <div class="chip" onclick="toggleChip(this)">🏊 Swimming</div>
+            <div class="chip" onclick="toggleChip(this)">🤸 Gymnastics</div>
+            <div class="chip" onclick="toggleChip(this)">💃 Dance</div>
+            <div class="chip" onclick="toggleChip(this)">🥋 Martial Arts</div>
+            <div class="chip" onclick="toggleChip(this)">🎾 Tennis</div>
+            <div class="chip" onclick="toggleChip(this)">🛹 Skateboarding</div>
+            <div class="chip" onclick="toggleChip(this)">🚲 Biking</div>
+            <div class="chip" onclick="toggleChip(this)">⛸️ Ice Skating</div>
+            <div class="chip" onclick="toggleChip(this)">📣 Cheerleading</div>
+            <div class="chip" onclick="toggleChip(this)">🏃 Track &amp; Field</div>
+            <div class="chip" onclick="toggleChip(this)">⛳ Golf</div>
+          </div>
+        </div>
+
+        <div class="category">
+          <div class="cat-header">🎨 Creative &amp; Arts</div>
+          <div class="chips">
+            <div class="chip" onclick="toggleChip(this)">🎨 Drawing</div>
+            <div class="chip" onclick="toggleChip(this)">🖌️ Painting</div>
+            <div class="chip" onclick="toggleChip(this)">🎹 Music</div>
+            <div class="chip" onclick="toggleChip(this)">🎤 Singing</div>
+            <div class="chip" onclick="toggleChip(this)">🎭 Theater</div>
+            <div class="chip" onclick="toggleChip(this)">📸 Photography</div>
+            <div class="chip" onclick="toggleChip(this)">✂️ Crafts</div>
+            <div class="chip" onclick="toggleChip(this)">🧵 Sewing</div>
+          </div>
+        </div>
+
+        <div class="category">
+          <div class="cat-header">🧩 Games &amp; Play</div>
+          <div class="chips">
+            <div class="chip" onclick="toggleChip(this)">🧱 Legos</div>
+            <div class="chip" onclick="toggleChip(this)">🎮 Video Games</div>
+            <div class="chip" onclick="toggleChip(this)">🎲 Board Games</div>
+            <div class="chip" onclick="toggleChip(this)">🧩 Puzzles</div>
+            <div class="chip" onclick="toggleChip(this)">♟️ Chess</div>
+            <div class="chip" onclick="toggleChip(this)">🪆 Dolls &amp; Action Figures</div>
+            <div class="chip" onclick="toggleChip(this)">🚗 Cars &amp; Trucks</div>
+          </div>
+        </div>
+
+        <div class="category">
+          <div class="cat-header">🦕 Curiosity &amp; Nature</div>
+          <div class="chips">
+            <div class="chip" onclick="toggleChip(this)">🦕 Dinosaurs</div>
+            <div class="chip" onclick="toggleChip(this)">🚀 Space</div>
+            <div class="chip" onclick="toggleChip(this)">🐛 Bugs &amp; Animals</div>
+            <div class="chip" onclick="toggleChip(this)">🔬 Science Experiments</div>
+            <div class="chip" onclick="toggleChip(this)">🌱 Gardening</div>
+            <div class="chip" onclick="toggleChip(this)">🏕️ Camping</div>
+            <div class="chip" onclick="toggleChip(this)">🎣 Fishing</div>
+            <div class="chip" onclick="toggleChip(this)">🥾 Hiking</div>
+          </div>
+        </div>
+
+        <div class="category">
+          <div class="cat-header">📚 Reading &amp; Learning</div>
+          <div class="chips">
+            <div class="chip" onclick="toggleChip(this)">📚 Reading</div>
+            <div class="chip" onclick="toggleChip(this)">✍️ Writing Stories</div>
+            <div class="chip" onclick="toggleChip(this)">💻 Coding</div>
+            <div class="chip" onclick="toggleChip(this)">🧠 History &amp; Trivia</div>
+          </div>
+        </div>
+
+        <div class="category">
+          <div class="cat-header">🎉 Just for Fun</div>
+          <div class="chips">
+            <div class="chip" onclick="toggleChip(this)">👗 Dress Up</div>
+            <div class="chip" onclick="toggleChip(this)">🪄 Magic Tricks</div>
+            <div class="chip" onclick="toggleChip(this)">🧁 Cooking &amp; Baking</div>
+            <div class="chip" onclick="toggleChip(this)">🃏 Collecting</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="count-bar">
+        <div class="count-text" id="countText">Tap the things Mia loves</div>
+        <button class="save-btn" onclick="updateCount()">Save Interests</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function toggleChip(el) { el.classList.toggle('active'); updateCount(); }
+  function updateCount() {
+    const n = document.querySelectorAll('.chip.active').length;
+    document.getElementById('countText').textContent = n === 0 ? "Tap the things Mia loves" : `${n} interest${n === 1 ? '' : 's'} selected`;
+  }
+</script>
+
+</body>
+</html>

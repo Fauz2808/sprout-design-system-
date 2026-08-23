@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Sprout – Class Admin Setup Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+/* ── TOKENS ── */
+:root {
+  --brand:    #186338;
+  --brand-d:  #134f2d;
+  --brand-dd: #1e3e2b;
+  --brand-l:  #e2e9e3;
+  --bg:       #f4f1ea;
+  --s1:       #eae6db;
+  --s2:       #dbd5c8;
+  --s3:       #ccc5b5;
+  --tp:       #4d525b;
+  --ts:       #818898;
+  --tt:       #b3b8c1;
+  --border:   rgba(0,0,0,.07);
+  --online:   #30d158;
+}
+
+/* ── PAGE ── */
+body {
+  min-height: 100vh;
+  background: linear-gradient(140deg, #aca49a 0%, #c9c2b4 50%, #a9a296 100%);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 48px 0 80px;
+  font-family: 'Inter', -apple-system, sans-serif;
+  user-select: none;
+}
+
+/* ── HEADER ── */
+.page-header { text-align: center; margin-bottom: 28px; }
+.page-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px; font-weight: 600;
+  color: var(--brand-dd); margin-bottom: 5px;
+}
+.page-header p { font-size: 13px; color: var(--tp); opacity: .75; }
+
+/* ── STEP INDICATOR ── */
+.steps {
+  display: flex; align-items: center;
+  gap: 0; margin-bottom: 28px;
+}
+.step { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.step-num {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(255,255,255,.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: var(--tp);
+  transition: all .3s;
+}
+.step-num.active { background: var(--brand); color: #fff; box-shadow: 0 4px 12px rgba(24,99,56,.35); }
+.step-num.done   { background: rgba(24,99,56,.55); color: #fff; }
+.step-label { font-size: 10.5px; font-weight: 500; color: var(--tp); opacity: .65; white-space: nowrap; }
+.step-label.active { opacity: 1; color: var(--brand-dd); font-weight: 600; }
+.step-line { width: 36px; height: 1px; background: rgba(255,255,255,.45); margin-bottom: 20px; flex-shrink: 0; }
+
+/* ── PHONE FRAME ── */
+.phone {
+  width: 393px; height: 852px;
+  background: var(--bg);
+  border-radius: 54px; overflow: hidden; position: relative;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.12),
+    0 0 0 10px #1c1c1e,
+    0 0 0 12px #2c2c2e,
+    0 60px 130px rgba(0,0,0,.55);
+  flex-shrink: 0;
+}
+.phone::before {
+  content: ''; position: absolute; left: -13px; top: 120px;
+  width: 4px; height: 32px; background: #2a2a2a;
+  border-radius: 2px 0 0 2px;
+  box-shadow: 0 44px 0 #2a2a2a, 0 88px 0 #2a2a2a; z-index: 200;
+}
+.phone::after {
+  content: ''; position: absolute; right: -13px; top: 148px;
+  width: 4px; height: 66px; background: #2a2a2a;
+  border-radius: 0 2px 2px 0; z-index: 200;
+}
+.island {
+  position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 34px; background: #0a0a0a;
+  border-radius: 18px; z-index: 150; pointer-events: none;
+}
+
+/* ── SCREEN SYSTEM ── */
+.sc-wrap { position: absolute; inset: 0; overflow: hidden; border-radius: 54px; }
+
+.screen {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  background: var(--bg);
+  will-change: transform;
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+}
+.screen.hidden-r { transform: translateX(100%);  pointer-events: none; }
+.screen.hidden-l { transform: translateX(-100%); pointer-events: none; }
+.screen.active   { transform: translateX(0); }
+
+/* Modal (s2) always slides from bottom */
+.screen.bottom-modal.hidden-r { transform: translateY(100%) !important; background: rgba(0,0,0,.45); }
+.screen.bottom-modal           { background: rgba(0,0,0,.45); z-index: 10; }
+
+/* ── STATUS BAR ── */
+.sb {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 26px 0; height: 52px;
+  background: var(--bg); flex-shrink: 0; z-index: 5;
+}
+.sb-time { font-size: 15px; font-weight: 600; color: var(--tp); letter-spacing: -.01em; }
+.sb-icons { display: flex; align-items: center; gap: 6px; }
+
+/* ── NAV BAR ── */
+.nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 14px 10px;
+  background: var(--bg);
+  border-bottom: .5px solid var(--border);
+  flex-shrink: 0; gap: 8px;
+}
+.nav-back {
+  background: none; border: none; cursor: pointer;
+  display: flex; align-items: center;
+  width: 44px; height: 44px; transition: opacity .15s;
+}
+.nav-back:active { opacity: .4; }
+.nav-center {
+  flex: 1; display: flex; align-items: center; gap: 10px;
+  justify-content: center; min-width: 0;
+}
+.nav-icon {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.nav-text { display: flex; flex-direction: column; }
+.nav-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; font-weight: 700;
+  color: var(--brand-dd); line-height: 1.2;
+}
+.nav-sub { font-size: 11.5px; color: var(--ts); margin-top: 1px; display: flex; align-items: center; gap: 4px; }
+.nav-action {
+  background: none; border: none; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50%; transition: background .15s;
+}
+.nav-action:active { background: var(--s1); }
+
+/* ── SCOPE TOGGLE ── */
+.scope-bar {
+  padding: 10px 16px 8px;
+  background: var(--bg);
+  border-bottom: .5px solid var(--border);
+  flex-shrink: 0;
+}
+.scope-seg {
+  display: flex; background: var(--s1);
+  border-radius: 11px; padding: 3px; gap: 2px;
+}
+.seg-opt {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 8px 8px; border-radius: 9px;
+  font-size: 13px; font-weight: 500; color: var(--ts);
+  cursor: pointer; border: none; background: none;
+  transition: all .2s; white-space: nowrap;
+}
+.seg-opt.active {
+  background: var(--bg); color: var(--tp);
+  box-shadow: 0 1px 4px rgba(0,0,0,.10), 0 0 0 .5px rgba(0,0,0,.05);
+}
+
+/* ── CHAT AREA ── */
+.chat-area {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  background: #f0ece1; position: relative;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.chat-area::-webkit-scrollbar { display: none; }
+.chat-area::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23186338' stroke-opacity='0.055' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 110 C20 82 44 68 64 75 C44 75 27 89 20 110Z'/%3E%3Cpath d='M20 110 L64 75'/%3E%3Cpath d='M90 32 C90 18 104 13 114 19 C104 19 93 25 90 32Z'/%3E%3Cpath d='M90 32 L114 19'/%3E%3Ccircle cx='130' cy='100' r='5'/%3E%3Ccircle cx='140' cy='100' r='5'/%3E%3Ccircle cx='135' cy='93' r='5'/%3E%3Ccircle cx='135' cy='107' r='5'/%3E%3Cline x1='135' y1='112' x2='135' y2='122'/%3E%3Cpath d='M42 26 C50 33 47 44 40 48'/%3E%3Cpath d='M46 34 C55 28 61 31 59 39'/%3E%3Cpath d='M108 65 C108 57 118 53 124 57 C118 57 111 61 108 65Z'/%3E%3Cpath d='M108 65 L124 57'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+.msg-feed { position: relative; z-index: 1; padding: 10px 0 10px; display: flex; flex-direction: column; gap: 2px; }
+.date-row { display: flex; justify-content: center; padding: 10px 0 8px; }
+.date-row span {
+  font-size: 12px; font-weight: 500; color: var(--ts);
+  background: rgba(218,212,198,.9); backdrop-filter: blur(8px);
+  padding: 5px 16px; border-radius: 99px;
+}
+.mrow { display: flex; align-items: flex-end; gap: 10px; padding: 2px 14px; }
+.mrow.sent { flex-direction: row-reverse; }
+.mrow.gap  { margin-top: 10px; }
+.mavi {
+  width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px;
+}
+.mavi.ghost { visibility: hidden; }
+.bcol { display: flex; flex-direction: column; max-width: 70%; gap: 3px; }
+.mrow.recv .bcol { align-items: flex-start; }
+.mrow.sent .bcol { align-items: flex-end; }
+.sname { font-size: 12px; font-weight: 500; color: var(--ts); padding: 0 4px; margin-bottom: 1px; }
+.bbl {
+  padding: 10px 13px 8px; border-radius: 18px;
+  cursor: pointer; transition: transform .15s;
+}
+.bbl:active { transform: scale(.97); }
+.bbl.recv { background: var(--s1); color: var(--tp); }
+.bbl.sent { background: var(--brand-l); color: var(--brand-dd); }
+.bbl-txt { font-size: 15px; line-height: 1.44; word-break: break-word; }
+.bbl-foot { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; }
+.bbl-time { font-size: 10.5px; color: var(--tt); }
+.bbl.sent .bbl-time { color: rgba(30,62,43,.4); }
+
+/* ── ADMIN BANNER ── */
+.admin-banner {
+  margin: 6px 14px 10px;
+  background: var(--brand-l);
+  border: 1px solid rgba(24,99,56,.18);
+  border-radius: 16px; padding: 13px 14px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: all .18s;
+  position: relative; z-index: 1;
+}
+.admin-banner:active { transform: scale(.98); background: #d4e8da; }
+.banner-icon {
+  width: 42px; height: 42px;
+  background: var(--brand); border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.banner-text { flex: 1; }
+.banner-title { font-size: 13.5px; font-weight: 600; color: var(--brand-dd); margin-bottom: 2px; }
+.banner-sub   { font-size: 12px; color: var(--ts); line-height: 1.35; }
+.banner-chev  { flex-shrink: 0; color: var(--brand); }
+
+/* ── INPUT BAR ── */
+.input-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px 30px;
+  background: var(--bg);
+  border-top: .5px solid var(--border); flex-shrink: 0;
+}
+.input-photo-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: none; border: none; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; transition: all .15s;
+}
+.input-photo-btn:active { background: var(--s1); }
+.input-pill {
+  flex: 1; background: var(--s1); border-radius: 22px;
+  padding: 10px 16px; min-height: 42px;
+  display: flex; align-items: center;
+}
+.input-pill span { font-size: 15px; color: var(--tt); }
+.send-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--brand); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all .15s;
+}
+.send-btn:active { transform: scale(.88); background: var(--brand-d); }
+
+/* ── S2: BOTTOM SHEET ── */
+.modal-overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: flex-end;
+  border-radius: 54px; overflow: hidden;
+  cursor: pointer;
+}
+.bottom-sheet {
+  background: var(--bg);
+  border-radius: 28px 28px 0 0;
+  padding: 0 0 44px; width: 100%;
+  cursor: default;
+}
+.sheet-handle { display: flex; justify-content: center; padding: 12px 0 6px; }
+.sheet-handle-bar { width: 36px; height: 4px; background: var(--s3); border-radius: 99px; }
+.sheet-content { padding: 10px 28px 0; }
+.sheet-emoji { font-size: 50px; margin-bottom: 14px; display: block; text-align: center; }
+.sheet-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px; font-weight: 600;
+  color: var(--brand-dd); text-align: center;
+  margin-bottom: 10px; line-height: 1.3;
+}
+.sheet-desc { font-size: 14px; color: var(--ts); text-align: center; line-height: 1.6; margin-bottom: 28px; }
+.sheet-btn-p {
+  width: 100%; background: var(--brand); color: #fff;
+  border: none; border-radius: 14px; padding: 16px;
+  font-size: 16px; font-weight: 600; cursor: pointer;
+  margin-bottom: 10px; transition: all .15s;
+}
+.sheet-btn-p:active { transform: scale(.98); background: var(--brand-d); }
+.sheet-btn-s {
+  width: 100%; background: none; color: var(--ts);
+  border: none; padding: 12px; font-size: 15px;
+  font-weight: 500; cursor: pointer;
+}
+
+/* ── S3 & S4: SCREEN BODY ── */
+.screen-body {
+  flex: 1; padding: 28px 24px 0;
+  overflow-y: auto; scrollbar-width: none;
+}
+.screen-body::-webkit-scrollbar { display: none; }
+.screen-emoji { font-size: 46px; margin-bottom: 18px; display: block; }
+.screen-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 25px; font-weight: 600;
+  color: var(--brand-dd); line-height: 1.3; margin-bottom: 8px;
+}
+.screen-desc { font-size: 14px; color: var(--ts); line-height: 1.6; margin-bottom: 28px; }
+.input-label {
+  font-size: 11px; font-weight: 600; color: var(--ts);
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px;
+}
+.text-input {
+  width: 100%; background: var(--s1);
+  border: 1.5px solid transparent; border-radius: 14px;
+  padding: 15px 18px; font-size: 16px;
+  font-family: 'Inter', sans-serif; color: var(--tp);
+  outline: none; transition: all .2s;
+}
+.text-input:focus {
+  border-color: var(--brand); background: #fff;
+  box-shadow: 0 0 0 4px rgba(24,99,56,.08);
+}
+.text-input::placeholder { color: var(--tt); }
+.input-hint { font-size: 12px; color: var(--tt); margin-top: 8px; }
+
+.screen-footer {
+  padding: 14px 24px 40px; background: var(--bg);
+  border-top: .5px solid var(--border); flex-shrink: 0;
+}
+.btn-p {
+  width: 100%; background: var(--brand); color: #fff;
+  border: none; border-radius: 14px; padding: 17px;
+  font-size: 16px; font-weight: 600; cursor: pointer; transition: all .15s;
+}
+.btn-p:active  { transform: scale(.98); background: var(--brand-d); }
+.btn-p:disabled { background: var(--s2); color: var(--tt); cursor: default; transform: none; }
+
+/* ── S4: PARENT LIST ── */
+.search-wrap {
+  padding: 10px 16px; background: var(--bg);
+  border-bottom: .5px solid var(--border); flex-shrink: 0;
+}
+.search-bar {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--s1); border-radius: 12px; padding: 10px 14px;
+}
+.search-bar span { font-size: 14px; color: var(--tt); }
+.parent-list {
+  flex: 1; overflow-y: auto; scrollbar-width: none; padding: 8px 0;
+}
+.parent-list::-webkit-scrollbar { display: none; }
+.list-section-label {
+  font-size: 11px; font-weight: 600; color: var(--tt);
+  text-transform: uppercase; letter-spacing: .06em;
+  padding: 10px 18px 6px;
+}
+.parent-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 11px 18px; cursor: pointer; transition: background .12s;
+}
+.parent-item:active { background: var(--s1); }
+.parent-avatar {
+  width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 700; color: #fff;
+}
+.parent-info { flex: 1; min-width: 0; }
+.parent-name  { font-size: 15px; font-weight: 600; color: var(--tp); margin-bottom: 2px; }
+.parent-child { font-size: 12.5px; color: var(--ts); }
+.parent-check {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid var(--s3);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .18s;
+}
+.parent-check.checked { background: var(--brand); border-color: var(--brand); }
+/* ── INVITE LINK CARD ── */
+.link-card {
+  display: flex; align-items: center; gap: 12px;
+  margin: 10px 16px 2px;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 12px 14px;
+  cursor: pointer; transition: all .18s;
+  flex-shrink: 0;
+}
+.link-card:active { transform: scale(.98); background: var(--s2); }
+.link-card-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--brand); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.link-card-text { flex: 1; min-width: 0; }
+.link-card-title { font-size: 13.5px; font-weight: 600; color: var(--tp); margin-bottom: 2px; }
+.link-card-sub   { font-size: 12px; color: var(--ts); line-height: 1.3; }
+.link-card-action {
+  flex-shrink: 0;
+  background: var(--brand-l);
+  color: var(--brand);
+  font-size: 12.5px; font-weight: 600;
+  padding: 6px 12px; border-radius: 99px;
+  transition: all .2s;
+}
+.link-card-action.copied {
+  background: var(--brand);
+  color: #fff;
+}
+
+.invite-footer {
+  padding: 12px 18px 40px; background: var(--bg);
+  border-top: .5px solid var(--border); flex-shrink: 0;
+}
+.invite-count { font-size: 13px; color: var(--ts); text-align: center; margin-bottom: 12px; }
+.invite-count strong { color: var(--brand); }
+
+/* ── S5: SUCCESS ── */
+.toast {
+  position: absolute; top: 62px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--brand-dd); color: #fff;
+  padding: 10px 18px; border-radius: 99px;
+  font-size: 13px; font-weight: 500; white-space: nowrap;
+  z-index: 100; display: flex; align-items: center; gap: 7px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.22);
+  animation: toastIn .45s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.class-welcome {
+  margin: 10px 14px 8px;
+  background: var(--brand); border-radius: 18px;
+  padding: 16px 18px; position: relative; z-index: 1;
+}
+.class-welcome-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 4px;
+}
+.class-welcome-sub { font-size: 13px; color: rgba(255,255,255,.75); line-height: 1.4; }
+.class-welcome-members { display: flex; align-items: center; margin-top: 12px; gap: 4px; }
+.mini-av {
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #fff;
+  border: 2px solid var(--brand);
+  margin-left: -8px;
+}
+.mini-av:first-child { margin-left: 0; }
+.members-label { font-size: 12px; color: rgba(255,255,255,.8); margin-left: 8px; }
+.system-msg { display: flex; justify-content: center; padding: 6px 20px; }
+.system-msg span {
+  font-size: 12px; color: var(--ts);
+  background: rgba(218,212,198,.85); padding: 5px 14px;
+  border-radius: 99px; text-align: center; line-height: 1.4;
+}
+
+/* ── HINT ── */
+.hint {
+  margin-top: 22px; font-size: 12px; color: var(--tp);
+  opacity: .5; text-align: center;
+  display: flex; align-items: center; gap: 6px;
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Class Admin Setup Flow</h1>
+  <p>5-step flow · Grade Chat → Miss Taylor's Class</p>
+</div>
+
+<div class="steps" id="stepIndicator"></div>
+
+<div class="phone">
+  <div class="island"></div>
+  <div class="sc-wrap">
+
+    <!-- ══════════════════════════════
+         S1 — Kindergarten Grade Chat
+    ══════════════════════════════ -->
+    <div class="screen active" id="s1">
+      <div class="sb">
+        <span class="sb-time">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="#4d525b"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="#4d525b"><path d="M8 2.4C10.3 2.4 12.4 3.4 13.8 5L15.2 3.5C13.4 1.6 10.8.4 8 .4 5.2.4 2.6 1.6.8 3.5L2.2 5C3.6 3.4 5.7 2.4 8 2.4Z"/><path d="M8 5.2C9.6 5.2 11 5.9 12 7L13.4 5.5C12 4.1 10.1 3.2 8 3.2 5.9 3.2 4 4.1 2.6 5.5L4 7C5 5.9 6.4 5.2 8 5.2Z"/><circle cx="8" cy="10" r="2"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="nav-back"><svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1 8.5L9 16" stroke="#186338" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="nav-center">
+          <div class="nav-icon" style="background:#fef3c7;">🏫</div>
+          <div class="nav-text">
+            <span class="nav-title">Kindergarten</span>
+            <div class="nav-sub">
+              <span style="width:7px;height:7px;border-radius:50%;background:#30d158;flex-shrink:0;display:inline-block;"></span>
+              <span>Kiker Elementary · 48 parents</span>
+            </div>
+          </div>
+        </div>
+        <button class="nav-action"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 12.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM5 12.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM17 12.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" fill="#818898"/></svg></button>
+      </div>
+      <div class="chat-area">
+        <div class="msg-feed">
+          <div class="date-row"><span>Today</span></div>
+          <div class="mrow recv gap">
+            <div class="mavi" style="background:#7c6fcd;">SJ</div>
+            <div class="bcol">
+              <span class="sname">Sarah J.</span>
+              <div class="bbl recv"><span class="bbl-txt">Is there a field trip form we need to sign? I haven't received anything 🤔</span><div class="bbl-foot"><span class="bbl-time">8:42 AM</span></div></div>
+            </div>
+          </div>
+          <div class="mrow recv">
+            <div class="mavi ghost"></div>
+            <div class="bcol">
+              <div class="bbl recv"><span class="bbl-txt">It should come home in the backpack today I think 🎒</span><div class="bbl-foot"><span class="bbl-time">8:44 AM</span></div></div>
+            </div>
+          </div>
+          <div class="mrow recv gap">
+            <div class="mavi" style="background:#e67e22;">MC</div>
+            <div class="bcol">
+              <span class="sname">Michael C.</span>
+              <div class="bbl recv"><span class="bbl-txt">Reminder: bake sale this Friday! All donations welcome 🍪</span><div class="bbl-foot"><span class="bbl-time">8:51 AM</span></div></div>
+            </div>
+          </div>
+          <div class="mrow sent gap">
+            <div class="mavi ghost"></div>
+            <div class="bcol">
+              <div class="bbl sent"><span class="bbl-txt">Thanks for the heads up! 🙌</span><div class="bbl-foot"><span class="bbl-time">9:02 AM</span><svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M1 5.5L5 9.5L10 4" stroke="rgba(30,62,43,.5)" stroke-width="1.5" stroke-linecap="round"/><path d="M6 9.5L15 1" stroke="rgba(30,62,43,.5)" stroke-width="1.5" stroke-linecap="round"/></svg></div></div>
+            </div>
+          </div>
+          <div class="mrow recv gap">
+            <div class="mavi" style="background:#e74c3c;">LW</div>
+            <div class="bcol">
+              <span class="sname">Lisa W.</span>
+              <div class="bbl recv"><span class="bbl-txt">Does anyone know what time dismissal is on Friday?</span><div class="bbl-foot"><span class="bbl-time">9:31 AM</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Admin Banner — tap to start flow -->
+      <div class="admin-banner" onclick="go('s2')">
+        <div class="banner-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 2.5L13.5 8.5H20L14.75 12.5L17 19L11 15.25L5 19L7.25 12.5L2 8.5H8.5L11 2.5Z" fill="white" stroke="white" stroke-width=".5" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="banner-text">
+          <div class="banner-title">Are you a class admin?</div>
+          <div class="banner-sub">Set up a dedicated chat for your classroom</div>
+        </div>
+        <div class="banner-chev">
+          <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M1 1L7 7L1 13" stroke="#186338" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="input-bar">
+        <button class="input-photo-btn"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="5" width="18" height="14" rx="3" stroke="#818898" stroke-width="1.5"/><circle cx="11" cy="12" r="3.5" stroke="#818898" stroke-width="1.5"/><path d="M7 5l1.5-2.5h5L15 5" stroke="#818898" stroke-width="1.5" stroke-linejoin="round"/></svg></button>
+        <div class="input-pill"><span>Message Kindergarten…</span></div>
+        <button class="send-btn"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M16 9L2 3l3 6-3 6 14-6Z" fill="white"/></svg></button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         S2 — Bottom Sheet Modal
+    ══════════════════════════════ -->
+    <div class="screen bottom-modal hidden-r" id="s2">
+      <div class="modal-overlay" onclick="go('s1')">
+        <div class="bottom-sheet" onclick="event.stopPropagation()">
+          <div class="sheet-handle"><div class="sheet-handle-bar"></div></div>
+          <div class="sheet-content">
+            <span class="sheet-emoji">🌱</span>
+            <div class="sheet-title">Organize your class</div>
+            <div class="sheet-desc">Class admins can create a dedicated space for their classroom — invite parents, share updates, and keep everyone connected.</div>
+            <button class="sheet-btn-p" onclick="go('s3')">Yes, I'm a class admin</button>
+            <button class="sheet-btn-s" onclick="go('s1')">Not right now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         S3 — Name Your Class
+    ══════════════════════════════ -->
+    <div class="screen hidden-r" id="s3">
+      <div class="sb">
+        <span class="sb-time">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="#4d525b"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="#4d525b"><path d="M8 2.4C10.3 2.4 12.4 3.4 13.8 5L15.2 3.5C13.4 1.6 10.8.4 8 .4 5.2.4 2.6 1.6.8 3.5L2.2 5C3.6 3.4 5.7 2.4 8 2.4Z"/><path d="M8 5.2C9.6 5.2 11 5.9 12 7L13.4 5.5C12 4.1 10.1 3.2 8 3.2 5.9 3.2 4 4.1 2.6 5.5L4 7C5 5.9 6.4 5.2 8 5.2Z"/><circle cx="8" cy="10" r="2"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="nav-back" onclick="go('s2')"><svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1 8.5L9 16" stroke="#186338" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <span style="font-size:15px;font-weight:600;color:var(--tp);">New Class</span>
+        <div style="width:44px;"></div>
+      </div>
+      <div class="screen-body">
+        <span class="screen-emoji">🏫</span>
+        <div class="screen-title">What's your class called?</div>
+        <div class="screen-desc">This creates a dedicated chat for your classroom. Parents you invite will see this name.</div>
+        <div class="input-label">Class Name</div>
+        <input
+          class="text-input" type="text" id="classNameInput"
+          placeholder="e.g. Miss Taylor's Class"
+          oninput="onClassNameInput(this.value)"
+          autocomplete="off" autocorrect="off" spellcheck="false"
+        />
+        <div class="input-hint">You can rename this later in class settings</div>
+      </div>
+      <div class="screen-footer">
+        <button class="btn-p" id="nextBtn" disabled onclick="go('s4')">Next</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         S4 — Invite Parents
+    ══════════════════════════════ -->
+    <div class="screen hidden-r" id="s4">
+      <div class="sb">
+        <span class="sb-time">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="#4d525b"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="#4d525b"><path d="M8 2.4C10.3 2.4 12.4 3.4 13.8 5L15.2 3.5C13.4 1.6 10.8.4 8 .4 5.2.4 2.6 1.6.8 3.5L2.2 5C3.6 3.4 5.7 2.4 8 2.4Z"/><path d="M8 5.2C9.6 5.2 11 5.9 12 7L13.4 5.5C12 4.1 10.1 3.2 8 3.2 5.9 3.2 4 4.1 2.6 5.5L4 7C5 5.9 6.4 5.2 8 5.2Z"/><circle cx="8" cy="10" r="2"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="nav-back" onclick="go('s3')"><svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1 8.5L9 16" stroke="#186338" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="nav-center">
+          <div class="nav-text">
+            <span class="nav-title">Invite Parents</span>
+            <div class="nav-sub"><span>Kindergarten · 48 parents</span></div>
+          </div>
+        </div>
+        <div style="width:44px;"></div>
+      </div>
+      <div class="search-wrap">
+        <div class="search-bar">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4.5" stroke="#b3b8c1" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="#b3b8c1" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span>Search parents…</span>
+        </div>
+      </div>
+      <!-- Invite via link card -->
+      <div class="link-card" id="linkCard" onclick="copyInviteLink()">
+        <div class="link-card-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M8.5 11.5a4.5 4.5 0 0 0 6.364.136l2-2a4.5 4.5 0 0 0-6.364-6.364l-1.143 1.143" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.5 8.5a4.5 4.5 0 0 0-6.364-.136l-2 2a4.5 4.5 0 0 0 6.364 6.364l1.136-1.136" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="link-card-text">
+          <div class="link-card-title">Invite parents not on Sprout</div>
+          <div class="link-card-sub">Copy a link to share via WhatsApp or SMS</div>
+        </div>
+        <div class="link-card-action" id="linkAction">
+          <span id="linkBtnLabel">Copy link</span>
+        </div>
+      </div>
+      <div class="parent-list" id="parentList"></div>
+      <div class="invite-footer">
+        <div class="invite-count" id="inviteCount">Select parents to add to <strong id="classLabel">your class</strong></div>
+        <button class="btn-p" id="addBtn" onclick="go('s5')">Add Parents</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         S5 — Class Created
+    ══════════════════════════════ -->
+    <div class="screen hidden-r" id="s5">
+      <div class="toast">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#30d158"/><path d="M4.5 8L7 10.5L11.5 6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="toastMsg">Class created!</span>
+      </div>
+      <div class="sb">
+        <span class="sb-time">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="#4d525b"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="#4d525b"><path d="M8 2.4C10.3 2.4 12.4 3.4 13.8 5L15.2 3.5C13.4 1.6 10.8.4 8 .4 5.2.4 2.6 1.6.8 3.5L2.2 5C3.6 3.4 5.7 2.4 8 2.4Z"/><path d="M8 5.2C9.6 5.2 11 5.9 12 7L13.4 5.5C12 4.1 10.1 3.2 8 3.2 5.9 3.2 4 4.1 2.6 5.5L4 7C5 5.9 6.4 5.2 8 5.2Z"/><circle cx="8" cy="10" r="2"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="nav-back" onclick="go('s1')"><svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1L1 8.5L9 16" stroke="#186338" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="nav-center">
+          <div class="nav-icon" style="background:#fef3c7;">🏫</div>
+          <div class="nav-text">
+            <span class="nav-title">Kindergarten</span>
+            <div class="nav-sub"><span>Kiker Elementary · 48 parents</span></div>
+          </div>
+        </div>
+        <button class="nav-action"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 12.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM5 12.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM17 12.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" fill="#818898"/></svg></button>
+      </div>
+      <!-- Toggle with new class tab -->
+      <div class="scope-bar">
+        <div class="scope-seg">
+          <button class="seg-opt" id="tabAll" onclick="setTab(0)">All Kindergarten</button>
+          <button class="seg-opt active" id="tabClass" onclick="setTab(1)"><span id="tabClassLabel">Miss Taylor's Class</span></button>
+        </div>
+      </div>
+      <!-- Class chat area -->
+      <div class="chat-area">
+        <div class="msg-feed">
+          <div class="class-welcome">
+            <div class="class-welcome-title" id="welcomeTitle">Miss Taylor's Class 🎉</div>
+            <div class="class-welcome-sub">Class chat is live. Added parents will be notified to join.</div>
+            <div class="class-welcome-members">
+              <div class="mini-av" style="background:#7c6fcd;">SJ</div>
+              <div class="mini-av" style="background:#e67e22;">MC</div>
+              <div class="mini-av" style="background:#27ae60;">JW</div>
+              <div class="mini-av" style="background:#3498db;"><span id="extraCount">+5</span></div>
+              <span class="members-label" id="membersLabel">8 parents added</span>
+            </div>
+          </div>
+          <div class="system-msg"><span>You created this class · Just now</span></div>
+        </div>
+      </div>
+      <div class="input-bar">
+        <button class="input-photo-btn"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="5" width="18" height="14" rx="3" stroke="#818898" stroke-width="1.5"/><circle cx="11" cy="12" r="3.5" stroke="#818898" stroke-width="1.5"/><path d="M7 5l1.5-2.5h5L15 5" stroke="#818898" stroke-width="1.5" stroke-linejoin="round"/></svg></button>
+        <div class="input-pill"><span id="chatPlaceholder">Message Miss Taylor's Class…</span></div>
+        <button class="send-btn"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M16 9L2 3l3 6-3 6 14-6Z" fill="white"/></svg></button>
+      </div>
+    </div>
+
+  </div><!-- /sc-wrap -->
+</div><!-- /phone -->
+
+<div class="hint">
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M7 6v4M7 4.5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+  Tap the banner in the chat to start the flow
+</div>
+
+<script>
+/* ── Data ── */
+const SCREENS     = ['s1','s2','s3','s4','s5'];
+const STEP_LABELS = ['Grade Chat','Admin Prompt','Name Class','Invite Parents','Class Live'];
+
+const PARENTS = [
+  { initials:'SJ', name:'Sarah Johnson',    child:'Emma · Kindergarten',   color:'#7c6fcd' },
+  { initials:'MC', name:'Michael Chen',     child:'Lily · Kindergarten',   color:'#e67e22' },
+  { initials:'JW', name:'Jennifer Williams',child:'Noah · Kindergarten',   color:'#27ae60' },
+  { initials:'DM', name:'David Martinez',   child:'Sophia · Kindergarten', color:'#3498db' },
+  { initials:'AT', name:'Amanda Thompson',  child:'Liam · Kindergarten',   color:'#e74c3c' },
+  { initials:'RD', name:'Robert Davis',     child:'Olivia · Kindergarten', color:'#9b59b6' },
+  { initials:'LA', name:'Lisa Anderson',    child:'Ethan · Kindergarten',  color:'#1abc9c' },
+  { initials:'KW', name:'Kevin Wilson',     child:'Ava · Kindergarten',    color:'#f39c12' },
+];
+
+let current  = 's1';
+let selected = new Set([0, 1, 2]);
+let className = 'Miss Taylor\'s Class';
+
+/* ── Navigation ── */
+function go(next) {
+  if (next === current) return;
+
+  const prevEl = document.getElementById(current);
+  const nextEl = document.getElementById(next);
+  const prevIdx = SCREENS.indexOf(current);
+  const nextIdx = SCREENS.indexOf(next);
+  const fwd = nextIdx > prevIdx;
+
+  /* Capture class name when leaving s3 forward */
+  if (current === 's3' && fwd) {
+    const v = document.getElementById('classNameInput').value.trim();
+    if (v) { className = v; applyClassName(); }
+  }
+
+  /* Modal (s2) has special slide-from-bottom; s1 stays in place */
+  if (next === 's2') {
+    nextEl.classList.remove('hidden-r','hidden-l');
+    nextEl.classList.add('active');
+    current = next;
+    renderSteps();
+    return;
+  }
+  if (current === 's2') {
+    prevEl.classList.remove('active');
+    prevEl.classList.add('hidden-r');
+    if (next === 's1') {
+      document.getElementById('s1').className = 'screen active';
+    } else {
+      nextEl.classList.remove('hidden-r','hidden-l');
+      nextEl.classList.add('active');
+    }
+    current = next;
+    renderSteps();
+    return;
+  }
+
+  /* Regular left/right slide */
+  prevEl.classList.remove('active');
+  prevEl.classList.add(fwd ? 'hidden-l' : 'hidden-r');
+  nextEl.classList.remove(fwd ? 'hidden-r' : 'hidden-l');
+  nextEl.classList.add('active');
+  current = next;
+  renderSteps();
+}
+
+/* ── Step Indicator ── */
+function renderSteps() {
+  const idx = SCREENS.indexOf(current);
+  let html = '';
+  STEP_LABELS.forEach((lbl, i) => {
+    if (i > 0) html += '<div class="step-line"></div>';
+    const done   = i < idx;
+    const active = i === idx;
+    html += `<div class="step">
+      <div class="step-num ${active?'active':''} ${done?'done':''}">
+        ${done ? '<svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>' : i+1}
+      </div>
+      <span class="step-label ${active?'active':''}">${lbl}</span>
+    </div>`;
+  });
+  document.getElementById('stepIndicator').innerHTML = html;
+}
+
+/* ── Class Name ── */
+function onClassNameInput(val) {
+  document.getElementById('nextBtn').disabled = val.trim().length < 2;
+}
+
+function applyClassName() {
+  const n = className;
+  document.getElementById('tabClassLabel').textContent   = n;
+  document.getElementById('welcomeTitle').textContent    = n + ' 🎉';
+  document.getElementById('toastMsg').textContent        = `"${n}" created!`;
+  document.getElementById('chatPlaceholder').textContent = `Message ${n}…`;
+  const lbl = document.getElementById('classLabel');
+  if (lbl) lbl.textContent = n;
+}
+
+/* ── Parent List ── */
+function renderParents() {
+  let html = '<div class="list-section-label">Kindergarten Parents</div>';
+  PARENTS.forEach((p, i) => {
+    const chk = selected.has(i);
+    html += `
+    <div class="parent-item" onclick="toggleParent(${i})">
+      <div class="parent-avatar" style="background:${p.color}">${p.initials}</div>
+      <div class="parent-info">
+        <div class="parent-name">${p.name}</div>
+        <div class="parent-child">${p.child}</div>
+      </div>
+      <div class="parent-check ${chk?'checked':''}" id="chk${i}">
+        ${chk ? checkSvg() : ''}
+      </div>
+    </div>`;
+  });
+  document.getElementById('parentList').innerHTML = html;
+  syncInviteFooter();
+}
+
+function checkSvg() {
+  return '<svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>';
+}
+
+function toggleParent(i) {
+  selected.has(i) ? selected.delete(i) : selected.add(i);
+  const el = document.getElementById(`chk${i}`);
+  const on = selected.has(i);
+  el.className = `parent-check ${on?'checked':''}`;
+  el.innerHTML = on ? checkSvg() : '';
+  syncInviteFooter();
+}
+
+function syncInviteFooter() {
+  const n   = selected.size;
+  const btn = document.getElementById('addBtn');
+  const cnt = document.getElementById('inviteCount');
+  if (n === 0) {
+    btn.textContent = 'Add Parents'; btn.disabled = true;
+    cnt.innerHTML = `Select parents to add to <strong id="classLabel">${className}</strong>`;
+  } else {
+    btn.textContent = `Add ${n} Parent${n > 1 ? 's' : ''}`; btn.disabled = false;
+    cnt.innerHTML = `<strong>${n} selected</strong>`;
+    /* update s5 members count */
+    const extra = Math.max(0, n - 3);
+    document.getElementById('extraCount').textContent = extra > 0 ? `+${extra}` : '';
+    document.getElementById('membersLabel').textContent = `${n} parent${n>1?'s':''} added`;
+  }
+}
+
+/* ── Copy Invite Link ── */
+function copyInviteLink() {
+  const action = document.getElementById('linkAction');
+  const label  = document.getElementById('linkBtnLabel');
+  if (action.classList.contains('copied')) return;
+  const link = `joinsprout.co/join/${className.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-')}`;
+  navigator.clipboard?.writeText(`Join ${className} on Sprout: https://${link}`);
+  action.classList.add('copied');
+  label.textContent = '✓ Copied!';
+  setTimeout(() => {
+    action.classList.remove('copied');
+    label.textContent = 'Copy link';
+  }, 2200);
+}
+
+function setTab(idx) {
+  document.getElementById('tabAll').classList.toggle('active', idx === 0);
+  document.getElementById('tabClass').classList.toggle('active', idx === 1);
+}
+
+/* ── Init ── */
+renderSteps();
+renderParents();
+applyClassName();
+</script>
+</body>
+</html>

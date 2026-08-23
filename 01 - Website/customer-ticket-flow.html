@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Buy Tickets — Customer Flow · Sprout</title>
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --fg:#1a1a17; --muted:#7a7568; --border:#ddd9cf;
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-soft:#e8f0e8; --tag-bg:#ece9e2;
+    --amber:#c08a2d; --amber-bg:#fbf0d8;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace; --radius:16px;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;height:100%;}
+  body{background:#ddd8ce;font-family:var(--font);font-size:15px;line-height:1.4;-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;gap:40px;padding:32px 24px;min-height:100vh;flex-wrap:wrap;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .caption{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8478;text-align:center;}
+  .caption strong{color:#3a3830;font-weight:600;}
+
+  .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .device::before,.device::after{content:'';position:absolute;width:3px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.06) 8%,transparent 16%,transparent 84%,rgba(255,255,255,.04) 92%,transparent);top:100px;bottom:100px;}
+  .device::before{left:-1px;}.device::after{right:-1px;}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:5;}
+  .br{position:absolute;width:4px;background:#0a0a0c;border-radius:2px;}
+  .br.l1{left:-3px;top:174px;height:32px;}.br.l2{left:-3px;top:220px;height:60px;}.br.l3{left:-3px;top:290px;height:60px;}.br.r1{right:-3px;top:250px;height:100px;}
+
+  .screen{position:relative;width:100%;height:100%;background:var(--bg);border-radius:44px;overflow:hidden;display:flex;flex-direction:column;}
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--fg);}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--fg);} .sb .bat{width:25px;}
+  .scroll{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;} .scroll::-webkit-scrollbar{display:none;}
+  .home{flex:0 0 26px;position:relative;} .home::after{content:'';position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:134px;height:5px;background:var(--fg);border-radius:999px;opacity:.2;}
+
+  .topbar{padding:8px 14px 6px;display:flex;align-items:center;gap:10px;}
+  .ibtn{width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;flex-shrink:0;}
+  .ibtn svg{width:18px;height:18px;stroke:var(--fg);fill:none;stroke-width:2;}
+  .topbar .tt{flex:1;text-align:center;font-size:15px;font-weight:600;color:var(--fg);}
+  .topbar .sp{width:34px;}
+
+  /* event hero */
+  .hero{height:200px;background:linear-gradient(135deg,#b8d4c0,#5a8f5d);display:grid;place-items:center;position:relative;}
+  .hero .emoji{font-size:74px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.2));}
+  .hero .pill{position:absolute;top:14px;left:14px;background:rgba(255,255,255,.92);color:var(--green);font-size:11px;font-weight:700;font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em;padding:5px 11px;border-radius:999px;}
+  .hero .heart{position:absolute;top:12px;right:14px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;}
+  .hero .heart svg{width:18px;height:18px;stroke:var(--green);fill:none;stroke-width:2;}
+
+  .ev{padding:16px;}
+  .ev h1{font-size:21px;font-weight:700;color:var(--fg);letter-spacing:-0.01em;margin:0 0 8px;line-height:1.2;}
+  .org{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+  .org .av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8fba92,#5a8f5d);display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;}
+  .org .nm{font-size:13px;font-weight:600;color:var(--fg);}
+  .org .vf{color:var(--green-mid);} .org .vf svg{width:13px;height:13px;fill:var(--green-mid);}
+  .meta{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px;}
+  .mrow{display:flex;align-items:center;gap:11px;}
+  .mrow .mi{width:34px;height:34px;border-radius:9px;background:var(--green-soft);display:grid;place-items:center;font-size:16px;flex-shrink:0;}
+  .mrow .mt{font-size:13.5px;font-weight:600;color:var(--fg);} .mrow .ms{font-size:12px;color:var(--muted);margin-top:1px;}
+  .desc{font-size:13.5px;color:#4a4740;line-height:1.55;}
+  .desc h3{font-size:13px;font-weight:700;color:var(--fg);margin:0 0 6px;}
+
+  /* bottom bar */
+  .bbar{flex:0 0 auto;border-top:1px solid var(--border);background:color-mix(in srgb,var(--surface) 96%,transparent);backdrop-filter:blur(14px);padding:12px 16px 14px;display:flex;align-items:center;gap:12px;}
+  .bbar .price{flex-shrink:0;} .bbar .price .from{font-size:11px;color:var(--muted);} .bbar .price .amt{font-size:19px;font-weight:700;color:var(--fg);font-family:var(--mono);}
+  .cta{flex:1;padding:15px;border:none;border-radius:14px;background:var(--green);color:#fff;font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .cta svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2.4;}
+  .cta.full{flex:1;}
+
+  /* tickets select */
+  .sec{padding:14px 16px;}
+  .sec-h{font-size:13px;font-weight:700;color:var(--fg);margin:0 0 10px;}
+  .tier{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:13px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+  .tier.eb{border-color:#ecd9a6;background:linear-gradient(135deg,#fffaf0,#fbf0d8);}
+  .tier .ti{flex:1;}
+  .tier .tn{font-size:14.5px;font-weight:700;color:var(--fg);display:flex;align-items:center;gap:7px;}
+  .tier .badge{font-size:9.5px;font-family:var(--mono);font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#fff;background:var(--amber);padding:2px 7px;border-radius:999px;}
+  .tier .tp{font-size:12.5px;color:var(--muted);margin-top:2px;} .tier .tp b{color:var(--fg);font-family:var(--mono);font-size:14px;}
+  .tier .tp .strike{text-decoration:line-through;color:var(--muted);margin-left:5px;font-size:12px;}
+  .stepper{display:flex;align-items:center;gap:0;flex-shrink:0;background:var(--bg);border:1px solid var(--border);border-radius:999px;}
+  .stepper button{width:32px;height:32px;border:none;background:transparent;font-size:19px;color:var(--green);cursor:pointer;border-radius:50%;display:grid;place-items:center;}
+  .stepper button:disabled{color:#c8c3b6;cursor:default;}
+  .stepper .q{width:26px;text-align:center;font-size:15px;font-weight:700;font-family:var(--mono);color:var(--fg);}
+
+  .who{display:flex;gap:8px;flex-wrap:wrap;}
+  .kid{display:flex;align-items:center;gap:7px;padding:8px 12px;border:1.5px solid var(--border);border-radius:999px;background:var(--surface);cursor:pointer;font-size:13px;font-weight:600;color:var(--fg);}
+  .kid .ka{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#8fba92,#5a8f5d);display:grid;place-items:center;font-size:10px;color:#fff;}
+  .kid.sel{border-color:var(--green);background:var(--green-soft);}
+
+  .summary{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;}
+  .srow{display:flex;justify-content:space-between;font-size:13.5px;color:#4a4740;padding:5px 0;}
+  .srow.tot{border-top:1px solid var(--border);margin-top:6px;padding-top:11px;font-size:16px;font-weight:700;color:var(--fg);}
+  .srow .num{font-family:var(--mono);}
+  .empty-note{font-size:12.5px;color:var(--muted);text-align:center;padding:8px 0;}
+
+  /* checkout */
+  .mini{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:14px;}
+  .mini .mt{width:48px;height:48px;border-radius:11px;background:linear-gradient(135deg,#b8d4c0,#5a8f5d);display:grid;place-items:center;font-size:24px;flex-shrink:0;}
+  .mini .mn{font-size:14px;font-weight:700;color:var(--fg);} .mini .md{font-size:12px;color:var(--muted);margin-top:2px;}
+  .field{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:11px 13px;margin-bottom:10px;}
+  .field .l{font-size:11px;color:var(--muted);} .field .v{font-size:14.5px;color:var(--fg);font-weight:500;margin-top:2px;}
+  .pay{display:flex;align-items:center;gap:11px;background:var(--surface);border:1.5px solid var(--green);border-radius:12px;padding:12px 13px;margin-bottom:10px;}
+  .pay .pi{font-size:20px;} .pay .pn{flex:1;font-size:14px;font-weight:600;color:var(--fg);} .pay .pc{width:20px;height:20px;border-radius:50%;background:var(--green);display:grid;place-items:center;}
+  .pay .pc svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:3;}
+  .applepay{width:100%;padding:14px;border:none;border-radius:12px;background:#000;color:#fff;font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:12px;cursor:pointer;}
+
+  /* confirmation */
+  .conf{padding:30px 20px;text-align:center;}
+  .check{width:78px;height:78px;border-radius:50%;background:var(--green-soft);border:2px solid var(--green);display:grid;place-items:center;margin:8px auto 18px;}
+  .check svg{width:38px;height:38px;stroke:var(--green);fill:none;stroke-width:3;}
+  .conf h2{font-size:22px;font-weight:700;color:var(--fg);margin:0 0 6px;}
+  .conf p{font-size:14px;color:var(--muted);margin:0 0 22px;}
+  .ticket{background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden;text-align:left;box-shadow:0 6px 20px -8px rgba(0,0,0,.15);}
+  .ticket .th{background:linear-gradient(135deg,#2d5c2e,#3d7a40);padding:16px;color:#fff;}
+  .ticket .th .tn{font-size:16px;font-weight:700;} .ticket .th .td{font-size:12.5px;color:rgba(255,255,255,.82);margin-top:3px;}
+  .ticket .perf{height:1px;border-top:2px dashed var(--border);position:relative;}
+  .ticket .qr{padding:18px;display:flex;align-items:center;gap:14px;}
+  .ticket .qrbox{width:78px;height:78px;border-radius:10px;background:
+    repeating-linear-gradient(0deg,#1a1a17 0 4px,transparent 4px 8px),
+    repeating-linear-gradient(90deg,#1a1a17 0 4px,#fff 4px 8px);
+    background-blend-mode:multiply;flex-shrink:0;border:3px solid #fff;box-shadow:0 0 0 1px var(--border);}
+  .ticket .qi .ql{font-size:11px;color:var(--muted);} .ticket .qi .qv{font-size:13.5px;font-weight:700;color:var(--fg);margin-top:1px;}
+  .ticket .qi .qrow{margin-bottom:8px;}
+  .conf-actions{display:flex;flex-direction:column;gap:9px;margin-top:18px;}
+  .ghost{padding:13px;border:1.5px solid var(--border);border-radius:13px;background:var(--surface);font-family:var(--font);font-size:14px;font-weight:600;color:var(--fg);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;}
+  .ghost svg{width:16px;height:16px;stroke:var(--fg);fill:none;stroke-width:2;}
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="caption"><strong>Buy Tickets</strong> · Event → Select → Checkout → Confirmed</div>
+  <div class="device">
+    <span class="br l1"></span><span class="br l2"></span><span class="br l3"></span><span class="br r1"></span><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg>
+        <svg viewBox="0 0 17 11"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1zM3.5 7.6L5 9.1c1-0.9 2.2-1.4 3.5-1.4 1.3 0 2.5 0.5 3.5 1.4l1.5-1.5c-1.4-1.3-3.1-2-5-2-1.9 0-3.6 0.7-5 2zM6.5 10.6l2 2 2-2c-0.5-0.5-1.2-0.8-2-0.8s-1.5 0.3-2 0.8z"/></svg>
+        <svg class="bat" viewBox="0 0 25 11"><rect x=".5" y=".5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="22" y="3.5" width="1.5" height="4" rx=".4" fill="currentColor" fill-opacity=".45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+      </span></div>
+
+      <div class="scroll" id="scroll">
+
+        <!-- ═══ V1: EVENT DETAILS ═══ -->
+        <div id="v-event">
+          <div class="topbar">
+            <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="tt">Event</div>
+            <div class="ibtn"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></div>
+          </div>
+          <div class="hero">
+            <div class="pill">This weekend</div>
+            <div class="heart"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></div>
+            <div class="emoji">🎨</div>
+          </div>
+          <div class="ev">
+            <h1>Spring Art &amp; Craft Workshop</h1>
+            <div class="org">
+              <div class="av">SE</div>
+              <span class="nm">Sarah's Events</span>
+              <span class="vf"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 1.8 3 .2.9 2.9L20.6 9l-1 2.9.9 2.9-2.3 2-.6 3-3-.2L12 22l-2.6-1.4-3 .2-.6-3-2.3-2 .9-2.9L3 9l1.3-1.9.9-2.9 3-.2z"/></svg></span>
+            </div>
+            <div class="meta">
+              <div class="mrow"><div class="mi">📅</div><div><div class="mt">Saturday, June 14</div><div class="ms">10:00 – 11:30 AM</div></div></div>
+              <div class="mrow"><div class="mi">📍</div><div><div class="mt">Zilker Studio</div><div class="ms">2100 Barton Springs Rd, Austin</div></div></div>
+              <div class="mrow"><div class="mi">🧒</div><div><div class="mt">Ages 4–8 · 1.5 hours</div><div class="ms">18 of 24 spots left</div></div></div>
+            </div>
+            <div class="desc">
+              <h3>About this event</h3>
+              A hands-on morning of painting, clay and collage led by local artist Sarah. All materials included — just bring a smock! Parents welcome to stay or drop off.
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ V2: SELECT TICKETS ═══ -->
+        <div id="v-select" style="display:none;">
+          <div class="topbar">
+            <div class="ibtn" onclick="go('event')"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="tt">Select tickets</div>
+            <div class="sp"></div>
+          </div>
+          <div class="sec">
+            <div class="sec-h">Tickets</div>
+            <div class="tier eb">
+              <div class="ti">
+                <div class="tn">Early Bird <span class="badge">Ends Jun 10</span></div>
+                <div class="tp"><b>$14</b><span class="strike">$18</span> · per child</div>
+              </div>
+              <div class="stepper">
+                <button onclick="dec('eb')" id="eb-minus" disabled>−</button>
+                <span class="q" id="eb-q">1</span>
+                <button onclick="inc('eb')">+</button>
+              </div>
+            </div>
+            <div class="tier">
+              <div class="ti">
+                <div class="tn">General Admission</div>
+                <div class="tp"><b>$18</b> · per child</div>
+              </div>
+              <div class="stepper">
+                <button onclick="dec('gen')" id="gen-minus" disabled>−</button>
+                <span class="q" id="gen-q">0</span>
+                <button onclick="inc('gen')">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sec" style="padding-top:0;">
+            <div class="sec-h">Who's going? <span style="font-weight:400;color:var(--muted);">(optional)</span></div>
+            <div class="who">
+              <div class="kid sel" onclick="this.classList.toggle('sel')"><span class="ka">KP</span>Kennedy</div>
+              <div class="kid" onclick="this.classList.toggle('sel')"><span class="ka">CP</span>Cooper</div>
+              <div class="kid" onclick="this.classList.toggle('sel')">+ Add child</div>
+            </div>
+          </div>
+
+          <div class="sec" style="padding-top:0;">
+            <div class="summary">
+              <div class="srow"><span id="sum-eb-l">Early Bird × 1</span><span class="num" id="sum-eb">$14.00</span></div>
+              <div class="srow" id="sum-gen-row" style="display:none;"><span id="sum-gen-l">General × 0</span><span class="num" id="sum-gen">$0.00</span></div>
+              <div class="srow"><span>Service fee</span><span class="num" id="sum-fee">$1.50</span></div>
+              <div class="srow tot"><span>Total</span><span class="num" id="sum-tot">$15.50</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ V3: CHECKOUT ═══ -->
+        <div id="v-checkout" style="display:none;">
+          <div class="topbar">
+            <div class="ibtn" onclick="go('select')"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="tt">Checkout</div>
+            <div class="sp"></div>
+          </div>
+          <div class="sec">
+            <div class="mini">
+              <div class="mt">🎨</div>
+              <div><div class="mn">Spring Art &amp; Craft Workshop</div><div class="md">Sat, Jun 14 · 10:00 AM · <span id="co-qty">1 ticket</span></div></div>
+            </div>
+
+            <div class="sec-h">Your details</div>
+            <div class="field"><div class="l">Name</div><div class="v">Tony Martin</div></div>
+            <div class="field"><div class="l">Email · ticket sent here</div><div class="v">tony@example.com</div></div>
+
+            <div class="sec-h" style="margin-top:6px;">Payment</div>
+            <button class="applepay"> Pay</button>
+            <div class="pay">
+              <span class="pi">💳</span>
+              <span class="pn">Visa ···· 4242</span>
+              <span class="pc"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+            </div>
+
+            <div class="summary" style="margin-top:6px;">
+              <div class="srow"><span id="co-sub-l">Subtotal</span><span class="num" id="co-sub">$14.00</span></div>
+              <div class="srow"><span>Service fee</span><span class="num">$1.50</span></div>
+              <div class="srow tot"><span>Total</span><span class="num" id="co-tot">$15.50</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ V4: CONFIRMATION ═══ -->
+        <div id="v-confirm" style="display:none;">
+          <div class="conf">
+            <div class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+            <h2>You're all set! 🎉</h2>
+            <p>Your ticket is confirmed and sent to your email.</p>
+
+            <div class="ticket">
+              <div class="th"><div class="tn">Spring Art &amp; Craft Workshop</div><div class="td">Sat, Jun 14 · 10:00 AM · Zilker Studio</div></div>
+              <div class="perf"></div>
+              <div class="qr">
+                <div class="qrbox"></div>
+                <div class="qi">
+                  <div class="qrow"><div class="ql">Attendee</div><div class="qv">Kennedy Park</div></div>
+                  <div class="qrow"><div class="ql">Tickets</div><div class="qv" id="cf-qty">1 × Early Bird</div></div>
+                  <div class="qrow" style="margin-bottom:0;"><div class="ql">Order</div><div class="qv">#SPR-4821</div></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="conf-actions">
+              <button class="ghost"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Add to calendar</button>
+              <button class="ghost" onclick="go('event')"><svg viewBox="0 0 24 24"><path d="M3 12 12 3l9 9"/><path d="M5 10v10h14V10"/></svg>View in My Events</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /scroll -->
+
+      <!-- dynamic bottom bar -->
+      <div class="bbar" id="bbar">
+        <div class="price"><div class="from">From</div><div class="amt">$14</div></div>
+        <button class="cta" onclick="go('select')">Get tickets <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const PRICE={eb:14,gen:18}, FEE=1.5;
+  const qty={eb:1,gen:0};
+  const fmt=n=>'$'+n.toFixed(2);
+  function totals(){const sub=qty.eb*PRICE.eb+qty.gen*PRICE.gen; return {sub,tot:sub+(sub>0?FEE:0)};}
+  function count(){return qty.eb+qty.gen;}
+
+  function renderSelect(){
+    document.getElementById('eb-q').textContent=qty.eb;
+    document.getElementById('gen-q').textContent=qty.gen;
+    document.getElementById('eb-minus').disabled=qty.eb<=0;
+    document.getElementById('gen-minus').disabled=qty.gen<=0;
+    document.getElementById('sum-eb-l').textContent=`Early Bird × ${qty.eb}`;
+    document.getElementById('sum-eb').textContent=fmt(qty.eb*PRICE.eb);
+    const genRow=document.getElementById('sum-gen-row');
+    genRow.style.display=qty.gen>0?'flex':'none';
+    document.getElementById('sum-gen-l').textContent=`General × ${qty.gen}`;
+    document.getElementById('sum-gen').textContent=fmt(qty.gen*PRICE.gen);
+    const {sub,tot}=totals();
+    document.getElementById('sum-fee').textContent=fmt(sub>0?FEE:0);
+    document.getElementById('sum-tot').textContent=fmt(tot);
+  }
+  function inc(k){qty[k]++;renderSelect();renderBar();}
+  function dec(k){if(qty[k]>0)qty[k]--;renderSelect();renderBar();}
+
+  function renderBar(){
+    const bar=document.getElementById('bbar');
+    const v=current; const {sub,tot}=totals(); const n=count();
+    if(v==='event'){
+      bar.style.display='flex';
+      bar.innerHTML=`<div class="price"><div class="from">From</div><div class="amt">$14</div></div>
+        <button class="cta" onclick="go('select')">Get tickets <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>`;
+    } else if(v==='select'){
+      bar.style.display='flex';
+      const disabled=n===0?'disabled style="opacity:.5"':'';
+      bar.innerHTML=`<div class="price"><div class="from">${n} ticket${n!==1?'s':''}</div><div class="amt">${fmt(tot)}</div></div>
+        <button class="cta" ${disabled} onclick="${n>0?"go('checkout')":''}">Continue <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>`;
+    } else if(v==='checkout'){
+      bar.style.display='flex';
+      bar.innerHTML=`<button class="cta full" onclick="go('confirm')"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> Pay ${fmt(tot)}</button>`;
+    } else { bar.style.display='none'; }
+  }
+
+  let current='event';
+  function go(v){
+    current=v;
+    ['event','select','checkout','confirm'].forEach(x=>document.getElementById('v-'+x).style.display=(x===v)?'block':'none');
+    document.getElementById('scroll').scrollTop=0;
+    if(v==='select') renderSelect();
+    if(v==='checkout'){
+      const {sub,tot}=totals(); const n=count();
+      document.getElementById('co-qty').textContent=`${n} ticket${n!==1?'s':''}`;
+      document.getElementById('co-sub-l').textContent=`Subtotal (${n} ticket${n!==1?'s':''})`;
+      document.getElementById('co-sub').textContent=fmt(sub);
+      document.getElementById('co-tot').textContent=fmt(tot);
+    }
+    if(v==='confirm'){
+      const parts=[]; if(qty.eb)parts.push(`${qty.eb} × Early Bird`); if(qty.gen)parts.push(`${qty.gen} × General`);
+      document.getElementById('cf-qty').textContent=parts.join(' · ');
+    }
+    renderBar();
+  }
+  renderBar();
+</script>
+</body>
+</html>

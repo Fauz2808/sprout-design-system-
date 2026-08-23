@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout Table Signage — Foam Board & Table Tent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --green:      #186338;
+  --green-dark: #0d3b20;
+  --green-mid:  #134f2d;
+  --cream:      #f4f1ea;
+  --cream-sign: #f5f1e8;
+  --yellow:     #f4b843;
+  --text:       #1a1a1a;
+  --muted:      #777;
+  --rule:       #d8d4cc;
+}
+
+body {
+  background: var(--cream);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 64px 60px 96px;
+}
+
+.page-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 46px; font-weight: 900;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin: 0 0 10px; color: var(--text);
+}
+.page-subtitle { font-size: 15px; color: var(--muted); margin: 0 0 60px; line-height: 1.55; }
+
+/* ── Section headers ── */
+.section { margin-bottom: 72px; }
+.section-num {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--green);
+  margin-bottom: 5px;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; font-weight: 800;
+  letter-spacing: -0.015em; margin: 0 0 4px; color: var(--text);
+}
+.section-desc { font-size: 14px; color: var(--muted); margin: 0 0 32px; line-height: 1.55; }
+
+.format-label {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #aaa; margin-bottom: 12px;
+}
+.format-label::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+
+/* ── Signs ── */
+.sign {
+  border-radius: 6px; overflow: hidden; position: relative;
+  display: flex; flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.14), 0 1px 4px rgba(0,0,0,0.08);
+  flex-shrink: 0;
+}
+
+/* Foam board 24×36 = 2:3 ratio */
+.foam-board { width: 280px; height: 420px; }
+
+/* Tent sides: 6×4 landscape = 3:2 */
+.tent-side { width: 300px; height: 200px; }
+
+.sign-green { background: var(--green-mid); padding: 22px 22px 18px; }
+.sign-cream { background: var(--cream-sign); padding: 22px 22px 18px; border: 1px solid rgba(0,0,0,0.08); }
+
+/* ── Foam board elements ── */
+.fb-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 16px; flex-shrink: 0;
+}
+.fb-eyebrow {
+  font-size: 9px; font-weight: 800; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--yellow);
+}
+.free-badge {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--yellow);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.free-badge .free-text {
+  font-size: 14px; font-weight: 900; color: #1a1a1a;
+  letter-spacing: -0.02em; line-height: 1;
+}
+.free-badge .free-sub {
+  font-size: 7px; font-weight: 700; color: #1a1a1a;
+  letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.2;
+  text-align: center; margin-top: 1px;
+}
+
+.fb-headline {
+  font-family: 'Inter', sans-serif;
+  font-size: 52px; font-weight: 900;
+  line-height: 0.95; color: #fff;
+  letter-spacing: -0.03em; flex: 1;
+  margin-bottom: 10px;
+}
+.fb-subhead {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px; font-weight: 700; font-style: italic;
+  color: rgba(255,255,255,0.82); line-height: 1.4;
+  margin-bottom: 20px; flex-shrink: 0;
+}
+
+.value-list { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.value-line {
+  font-family: 'Inter', sans-serif;
+  font-size: 18px; font-weight: 800;
+  color: #fff; letter-spacing: -0.01em; line-height: 1.25;
+}
+.value-line .accent { color: var(--yellow); }
+
+.sign-footer {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-top: auto; padding-top: 14px; flex-shrink: 0;
+}
+.logo-lockup { display: flex; align-items: center; gap: 8px; }
+.logo-wordmark { display: flex; flex-direction: column; }
+.logo-name-w  { font-size: 13px; font-weight: 800; color: #fff; letter-spacing: 0.01em; line-height: 1.1; }
+.logo-sub-w   { font-size: 6.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.52); margin-top: 1.5px; }
+.logo-name-g  { font-size: 13px; font-weight: 800; color: var(--green); letter-spacing: 0.01em; line-height: 1.1; }
+.logo-sub-g   { font-size: 6.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(24,99,56,0.52); margin-top: 1.5px; }
+
+/* QR placeholder */
+.qr-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
+.qr {
+  border-radius: 4px; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.qr-w { width: 52px; height: 52px; background: #fff; }
+.qr-g { width: 52px; height: 52px; background: var(--green-mid); }
+.qr-g-out { background: var(--cream-sign); border: 1.5px solid var(--green); }
+.qr-label { font-size: 6px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.qr-label-w { color: rgba(255,255,255,0.55); }
+.qr-label-g { color: rgba(24,99,56,0.55); }
+
+/* ── Table tent elements ── */
+.tent-pair { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+.tent-col  { display: flex; flex-direction: column; gap: 8px; }
+.side-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #bbb;
+}
+
+/* Tent Side A — cream */
+.tent-free-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.tent-eyebrow {
+  font-size: 8px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--green);
+}
+.tent-badge-sm {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--yellow);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.tent-badge-sm .t-free { font-size: 10px; font-weight: 900; color: #1a1a1a; letter-spacing: -0.01em; }
+
+.tent-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 900;
+  line-height: 1.05; letter-spacing: -0.015em;
+  color: var(--green); margin-bottom: 8px; flex: 1;
+}
+.tent-body {
+  font-size: 10px; font-weight: 500;
+  color: rgba(0,0,0,0.5); line-height: 1.5; margin-bottom: 10px;
+}
+
+/* Tent Side B — green */
+.tent-eyebrow-y { font-size: 8px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--yellow); margin-bottom: 10px; }
+.tent-headline-w {
+  font-family: 'Inter', sans-serif;
+  font-size: 17px; font-weight: 900;
+  line-height: 1.15; letter-spacing: -0.01em;
+  color: #fff; flex: 1;
+}
+.tent-headline-w .accent { color: var(--yellow); }
+
+/* ── Notes block ── */
+.notes-block {
+  background: #fff;
+  border-left: 3px solid var(--green);
+  border-radius: 0 8px 8px 0;
+  padding: 22px 24px;
+  margin-bottom: 24px;
+}
+.notes-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 800; margin-bottom: 14px; color: var(--text); }
+.notes-item { margin-bottom: 12px; font-size: 14px; line-height: 1.6; color: #444; }
+.notes-item strong { color: var(--text); }
+
+.production-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 20px; margin-top: 24px;
+}
+.prod-card {
+  background: #fff; border-radius: 10px;
+  padding: 18px 20px;
+  border: 1px solid rgba(0,0,0,0.07);
+}
+.prod-card-title { font-size: 13px; font-weight: 700; color: var(--green); margin-bottom: 8px; letter-spacing: 0.02em; }
+.prod-card-body  { font-size: 13px; color: #555; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── PAGE HEADER ── -->
+  <h1 class="page-title">Table Signage</h1>
+  <p class="page-subtitle">School pickup setup: large foam board pulls parents in,<br>table tent confirms the offer up close.</p>
+
+  <!-- ════════════════════════════════════════
+       SIGN 1 — FOAM BOARD 24"×36"
+  ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-num">1 · Foam Board</div>
+    <h2 class="section-title">24" × 36"</h2>
+    <p class="section-desc">Stands on easel behind the table. Read from 10–20 feet as parents approach.</p>
+
+    <div class="format-label">Foam Board · 24×36" · Behind Table on Easel</div>
+
+    <div class="sign sign-green foam-board">
+      <!-- Top row: eyebrow + FREE badge -->
+      <div class="fb-top">
+        <span class="fb-eyebrow">Take something home</span>
+        <div class="free-badge">
+          <span class="free-text">FREE</span>
+          <span class="free-sub">for parents</span>
+        </div>
+      </div>
+
+      <!-- Headline -->
+      <div class="fb-headline">Hi,<br>parent.</div>
+
+      <!-- Subheading -->
+      <div class="fb-subhead">We made you something.<br>Help yourself.</div>
+
+      <!-- Value list -->
+      <div class="value-list">
+        <div class="value-line">Make <span class="accent">friends.</span></div>
+        <div class="value-line">Plan <span class="accent">playdates.</span></div>
+        <div class="value-line">Build your <span class="accent">village.</span></div>
+      </div>
+
+      <!-- Footer -->
+      <div class="sign-footer">
+        <div class="logo-lockup">
+          <!-- Sprout mark -->
+          <svg width="22" height="22" viewBox="0 0 40 40" fill="none">
+            <path d="M20 4C20 4 8 10 8 22C8 29.7 13.5 36 20 36C26.5 36 32 29.7 32 22C32 10 20 4 20 4Z" fill="#f4b843"/>
+            <path d="M20 14C20 14 12 18 12 25C12 29.4 15.6 33 20 33C24.4 33 28 29.4 28 25C28 18 20 14 20 14Z" fill="#186338"/>
+          </svg>
+          <div class="logo-wordmark">
+            <span class="logo-name-w">Sprout</span>
+            <span class="logo-sub-w">joinsprout.co</span>
+          </div>
+        </div>
+        <div class="qr-wrap">
+          <div class="qr qr-w">
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+              <rect x="2" y="2" width="16" height="16" rx="2" fill="#000"/><rect x="5" y="5" width="10" height="10" rx="1" fill="#fff"/>
+              <rect x="7" y="7" width="6" height="6" fill="#000"/>
+              <rect x="26" y="2" width="16" height="16" rx="2" fill="#000"/><rect x="29" y="5" width="10" height="10" rx="1" fill="#fff"/>
+              <rect x="31" y="7" width="6" height="6" fill="#000"/>
+              <rect x="2" y="26" width="16" height="16" rx="2" fill="#000"/><rect x="5" y="29" width="10" height="10" rx="1" fill="#fff"/>
+              <rect x="7" y="31" width="6" height="6" fill="#000"/>
+              <rect x="22" y="20" width="4" height="4" fill="#000"/><rect x="28" y="20" width="4" height="4" fill="#000"/>
+              <rect x="34" y="20" width="4" height="4" fill="#000"/><rect x="40" y="20" width="4" height="4" fill="#000"/>
+              <rect x="22" y="26" width="4" height="4" fill="#000"/><rect x="30" y="26" width="4" height="4" fill="#000"/>
+              <rect x="38" y="26" width="4" height="4" fill="#000"/>
+              <rect x="24" y="32" width="4" height="4" fill="#000"/><rect x="32" y="32" width="4" height="4" fill="#000"/>
+              <rect x="36" y="32" width="4" height="4" fill="#000"/>
+              <rect x="22" y="38" width="4" height="4" fill="#000"/><rect x="28" y="38" width="4" height="4" fill="#000"/>
+              <rect x="34" y="38" width="4" height="4" fill="#000"/>
+            </svg>
+          </div>
+          <span class="qr-label qr-label-w">Scan to Join</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Why it works note -->
+    <div style="margin-top:28px;">
+      <div class="notes-block">
+        <div class="notes-title">Why this works</div>
+        <div class="notes-item"><strong>"Hi, parent."</strong> The most disarming opener possible. Names the audience instantly, sounds like a person not a brand. Parents walking with kids will recognize themselves in three seconds — exactly the time you have.</div>
+        <div class="notes-item"><strong>"We made you something. Help yourself."</strong> Reframes the table from "marketing booth" to "gift." No ask, no pitch, no signup. The merch is the message; the message is welcome.</div>
+        <div class="notes-item"><strong>The FREE stamp</strong> earns its space because at distance, "FREE" is the single most important word. The yellow circle pops against green and signals "no catch" before the parent even reads the headline.</div>
+        <div class="notes-item" style="margin-bottom:0;"><strong>The list at the bottom</strong> is the same triad from the yard sign — building brand consistency across touchpoints. Repetition is recognition.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SIGN 2 — TABLE TENT 6"×8"
+  ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-num">2 · Table Tent</div>
+    <h2 class="section-title">6" × 8"</h2>
+    <p class="section-desc">Folds in half, stands on table edge. Both sides visible to parents on either side of the table.</p>
+
+    <div class="tent-pair">
+
+      <!-- Side A — Cream -->
+      <div class="tent-col">
+        <div class="sign sign-cream tent-side">
+          <div class="tent-free-row">
+            <span class="tent-eyebrow">For you, parent</span>
+            <div class="tent-badge-sm">
+              <span class="t-free">FREE</span>
+            </div>
+          </div>
+          <div class="tent-headline">Take one.<br>It's yours.</div>
+          <div class="tent-body">No signup. No catch.<br>Just a little gift from us.</div>
+          <div class="sign-footer" style="padding-top:8px;">
+            <div class="logo-lockup">
+              <svg width="18" height="18" viewBox="0 0 40 40" fill="none">
+                <path d="M20 4C20 4 8 10 8 22C8 29.7 13.5 36 20 36C26.5 36 32 29.7 32 22C32 10 20 4 20 4Z" fill="#f4b843"/>
+                <path d="M20 14C20 14 12 18 12 25C12 29.4 15.6 33 20 33C24.4 33 28 29.4 28 25C28 18 20 14 20 14Z" fill="#186338"/>
+              </svg>
+              <div class="logo-wordmark">
+                <span class="logo-name-g">Sprout</span>
+                <span class="logo-sub-g">joinsprout.co</span>
+              </div>
+            </div>
+            <div class="qr-wrap">
+              <div class="qr" style="width:40px;height:40px;background:var(--green-mid);border-radius:4px;display:flex;align-items:center;justify-content:center;">
+                <svg width="34" height="34" viewBox="0 0 44 44" fill="none">
+                  <rect x="2" y="2" width="16" height="16" rx="2" fill="#fff"/><rect x="5" y="5" width="10" height="10" rx="1" fill="#134f2d"/>
+                  <rect x="7" y="7" width="6" height="6" fill="#fff"/>
+                  <rect x="26" y="2" width="16" height="16" rx="2" fill="#fff"/><rect x="29" y="5" width="10" height="10" rx="1" fill="#134f2d"/>
+                  <rect x="31" y="7" width="6" height="6" fill="#fff"/>
+                  <rect x="2" y="26" width="16" height="16" rx="2" fill="#fff"/><rect x="5" y="29" width="10" height="10" rx="1" fill="#134f2d"/>
+                  <rect x="7" y="31" width="6" height="6" fill="#fff"/>
+                  <rect x="22" y="20" width="4" height="4" fill="#fff"/><rect x="28" y="20" width="4" height="4" fill="#fff"/>
+                  <rect x="34" y="20" width="4" height="4" fill="#fff"/>
+                  <rect x="22" y="26" width="4" height="4" fill="#fff"/><rect x="30" y="26" width="4" height="4" fill="#fff"/>
+                  <rect x="22" y="32" width="4" height="4" fill="#fff"/><rect x="32" y="32" width="4" height="4" fill="#fff"/>
+                  <rect x="22" y="38" width="4" height="4" fill="#fff"/><rect x="28" y="38" width="4" height="4" fill="#fff"/>
+                </svg>
+              </div>
+              <span class="qr-label" style="color:rgba(24,99,56,0.45);">Scan</span>
+            </div>
+          </div>
+        </div>
+        <span class="side-label">Side A</span>
+      </div>
+
+      <!-- Side B — Green -->
+      <div class="tent-col">
+        <div class="sign sign-green tent-side">
+          <div class="tent-eyebrow-y">Curious?</div>
+          <div class="value-list" style="gap:1px;">
+            <div class="value-line" style="font-size:15px;">Make <span class="accent">friends.</span></div>
+            <div class="value-line" style="font-size:15px;">Plan <span class="accent">playdates.</span></div>
+            <div class="value-line" style="font-size:15px;">Build your <span class="accent">village.</span></div>
+          </div>
+          <div class="sign-footer" style="padding-top:8px;">
+            <div class="logo-lockup">
+              <svg width="18" height="18" viewBox="0 0 40 40" fill="none">
+                <path d="M20 4C20 4 8 10 8 22C8 29.7 13.5 36 20 36C26.5 36 32 29.7 32 22C32 10 20 4 20 4Z" fill="#f4b843"/>
+                <path d="M20 14C20 14 12 18 12 25C12 29.4 15.6 33 20 33C24.4 33 28 29.4 28 25C28 18 20 14 20 14Z" fill="#134f2d"/>
+              </svg>
+              <div class="logo-wordmark">
+                <span class="logo-name-w">Sprout</span>
+                <span class="logo-sub-w">joinsprout.co</span>
+              </div>
+            </div>
+            <div class="qr-wrap">
+              <div class="qr qr-w" style="width:40px;height:40px;">
+                <svg width="34" height="34" viewBox="0 0 44 44" fill="none">
+                  <rect x="2" y="2" width="16" height="16" rx="2" fill="#000"/><rect x="5" y="5" width="10" height="10" rx="1" fill="#fff"/>
+                  <rect x="7" y="7" width="6" height="6" fill="#000"/>
+                  <rect x="26" y="2" width="16" height="16" rx="2" fill="#000"/><rect x="29" y="5" width="10" height="10" rx="1" fill="#fff"/>
+                  <rect x="31" y="7" width="6" height="6" fill="#000"/>
+                  <rect x="2" y="26" width="16" height="16" rx="2" fill="#000"/><rect x="5" y="29" width="10" height="10" rx="1" fill="#fff"/>
+                  <rect x="7" y="31" width="6" height="6" fill="#000"/>
+                  <rect x="22" y="20" width="4" height="4" fill="#000"/><rect x="28" y="20" width="4" height="4" fill="#000"/>
+                  <rect x="34" y="20" width="4" height="4" fill="#000"/>
+                  <rect x="22" y="26" width="4" height="4" fill="#000"/>
+                  <rect x="22" y="32" width="4" height="4" fill="#000"/><rect x="32" y="32" width="4" height="4" fill="#000"/>
+                  <rect x="22" y="38" width="4" height="4" fill="#000"/><rect x="30" y="38" width="4" height="4" fill="#000"/>
+                </svg>
+              </div>
+              <span class="qr-label qr-label-w">Scan</span>
+            </div>
+          </div>
+        </div>
+        <span class="side-label">Side B</span>
+      </div>
+
+    </div>
+
+    <!-- Tent notes -->
+    <div style="margin-top:28px;">
+      <div class="notes-block">
+        <div class="notes-title">Tent design notes</div>
+        <div class="notes-item"><strong>Side A handles the offer:</strong> "Take one. It's yours." removes any uncertainty about whether they need to talk to someone, sign up, or pay. "No signup. No catch." preempts the default parent skepticism at any school-adjacent booth.</div>
+        <div class="notes-item"><strong>Side B handles the brand:</strong> Same three-line value prop from the foam board, in case the parent picks something up and wants to know what Sprout actually is before walking away.</div>
+        <div class="notes-item" style="margin-bottom:0;"><strong>Why two sides matter:</strong> Tents on table edges are visible from two directions — the side you're standing on and the side facing the table. Each side serves a different role rather than duplicating the same message.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       PRODUCTION & SETUP
+  ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-num">Production & Setup</div>
+    <h2 class="section-title">Printing & logistics</h2>
+
+    <div class="production-grid">
+      <div class="prod-card">
+        <div class="prod-card-title">📋 Foam Board — 24×36"</div>
+        <div class="prod-card-body">White foam board with full-bleed print, mounted to a folding tabletop easel ($15–25 on Amazon). GotPrint or PrintRunner: 3–5 days for ~$25–40 per board. Order 3–4 so you always have spares.</div>
+      </div>
+      <div class="prod-card">
+        <div class="prod-card-title">🗂 Table Tent — 6×8" folded</div>
+        <div class="prod-card-body">16pt cardstock or thicker. VistaPrint, Moo, or PrintRunner all stock this format. ~$2–4 per piece at low volumes. Print 6–10 per table so you can scatter them around the merch piles.</div>
+      </div>
+      <div class="prod-card">
+        <div class="prod-card-title">📐 Table Setup Ratio</div>
+        <div class="prod-card-body">1 foam board behind the table on easel. 2–3 tents on the table surface — one at each merch grouping. Keep it simple; too much signage looks like a sales pitch.</div>
+      </div>
+      <div class="prod-card">
+        <div class="prod-card-title">⏱ Lead Time</div>
+        <div class="prod-card-body">Allow 7–10 days for first run if doing school pickup events. Reorder takes 3–5 days once you have the print files. Order before the first event — don't scramble at the last minute.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

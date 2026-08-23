@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Sprout – Club Calendar Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+
+/* ── RESET ── */
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* ── TOKENS ── */
+:root {
+  --brand:   #186338;
+  --brand-d: #145530;
+  --brand-dd:#1e3e2b;
+  --brand-l: #e2e9e3;
+  --bg:      #f4f1ea;
+  --s1:      #eae6db;
+  --s2:      #dbd5c8;
+  --s3:      #ccc5b5;
+  --tp:      #4d525b;
+  --ts:      #818898;
+  --tt:      #b3b8c1;
+  --border:  rgba(0,0,0,.08);
+  --chat-bg: #f0ece1;
+  --red:     #c0392b;
+  --red-l:   #fff0ef;
+  --orange:  #e67e22;
+  --orange-l:#fff6ed;
+}
+
+/* ── STAGE ── */
+body {
+  min-height: 100vh;
+  background: linear-gradient(140deg,#aca49a 0%,#c9c2b4 50%,#a9a296 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  padding: 52px 0 80px;
+  font-family: 'Inter', -apple-system, sans-serif;
+  gap: 18px;
+}
+
+.flow-label {
+  color: rgba(255,255,255,.75);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: .8px; text-transform: uppercase;
+}
+
+/* ── FLOW MAP ── */
+.flow-map {
+  display: flex; align-items: center; gap: 0;
+  background: rgba(255,255,255,.12); backdrop-filter: blur(12px);
+  border-radius: 14px; padding: 4px;
+}
+.flow-step {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 10px;
+  font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,.55);
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.flow-step.active {
+  background: rgba(255,255,255,.18); color: #fff;
+}
+.flow-step .step-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,.3);
+}
+.flow-step.active .step-dot { background: #fff; }
+.flow-arrow {
+  color: rgba(255,255,255,.3); font-size: 11px; padding: 0 2px;
+}
+
+/* ── PHONE ── */
+.phone {
+  width: 393px; height: 852px;
+  background: var(--bg); border-radius: 54px;
+  overflow: hidden; position: relative;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.12),
+    0 0 0 10px #1c1c1e,
+    0 0 0 12px #2c2c2e,
+    0 60px 130px rgba(0,0,0,.55);
+}
+.phone::before {
+  content:''; position:absolute; left:-13px; top:120px;
+  width:4px; height:32px; background:#2a2a2a;
+  border-radius:2px 0 0 2px;
+  box-shadow:0 44px 0 #2a2a2a,0 88px 0 #2a2a2a; z-index:200;
+}
+.phone::after {
+  content:''; position:absolute; right:-13px; top:148px;
+  width:4px; height:66px; background:#2a2a2a;
+  border-radius:0 2px 2px 0; z-index:200;
+}
+.island {
+  position:absolute; top:14px; left:50%; transform:translateX(-50%);
+  width:120px; height:34px; background:#0a0a0a;
+  border-radius:18px; z-index:150; pointer-events:none;
+}
+
+/* ── SCREEN STACK ── */
+.sc-wrap { position:absolute; inset:0; overflow:hidden; border-radius:54px; }
+
+.screen {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  background:var(--bg);
+  will-change:transform; backface-visibility:hidden;
+}
+.screen.right { transform:translateX(100%); pointer-events:none; }
+.screen.left  { transform:translateX(-28%); filter:brightness(.88); pointer-events:none; }
+
+@keyframes pushIn  { from{transform:translateX(100%)} to{transform:translateX(0)} }
+@keyframes pushOut { from{transform:translateX(0);filter:brightness(1)} to{transform:translateX(-28%);filter:brightness(.88)} }
+@keyframes popIn   { from{transform:translateX(-28%);filter:brightness(.88)} to{transform:translateX(0);filter:brightness(1)} }
+@keyframes popOut  { from{transform:translateX(0)} to{transform:translateX(100%)} }
+
+.anim-push-in  { animation:pushIn  .36s cubic-bezier(.25,.46,.45,.94) forwards }
+.anim-push-out { animation:pushOut .36s cubic-bezier(.25,.46,.45,.94) forwards }
+.anim-pop-in   { animation:popIn   .34s cubic-bezier(.25,.46,.45,.94) forwards }
+.anim-pop-out  { animation:popOut  .34s cubic-bezier(.25,.46,.45,.94) forwards }
+
+/* ── STATUS BAR ── */
+.sb {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 26px 0; height:52px; flex-shrink:0;
+}
+.sb-time { font-size:15px; font-weight:600; color:var(--tp); }
+.sb-icons { display:flex; align-items:center; gap:6px; }
+
+/* ── CHAT NAV ── */
+.chat-nav {
+  background:rgba(244,241,234,.97); backdrop-filter:blur(20px);
+  border-bottom:.5px solid var(--border); flex-shrink:0; z-index:10;
+}
+.chat-nav-row {
+  display:flex; align-items:center; padding:6px 10px; gap:6px; min-height:52px;
+}
+.back-btn {
+  display:flex; align-items:center; gap:2px;
+  color:var(--brand); font-size:15px; font-weight:500;
+  cursor:pointer; border:none; background:none; padding:6px 4px;
+  transition:opacity .15s; flex-shrink:0;
+}
+.back-btn:active { opacity:.4; }
+.nav-avi {
+  width:34px; height:34px; border-radius:11px; font-size:18px;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.nav-text { flex:1; min-width:0; }
+.nav-name {
+  font-size:14.5px; font-weight:600; color:var(--tp);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.nav-sub { font-size:11px; color:var(--ts); }
+.act-btn {
+  width:34px; height:34px; border-radius:50%;
+  border:none; background:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .15s;
+}
+.act-btn:active { transform:scale(.85); background:var(--s1); }
+
+/* ── CALENDAR STRIP (on chat screen) ── */
+.cal-strip {
+  background:var(--s1); margin:10px 14px; border-radius:14px;
+  border:.5px solid var(--border); flex-shrink:0; cursor:pointer;
+  transition:all .15s;
+}
+.cal-strip:active { opacity:.7; transform:scale(.99); }
+.cal-strip-inner {
+  display:flex; align-items:center; padding:11px 13px; gap:11px;
+}
+.cal-strip-icon {
+  width:36px; height:36px; border-radius:11px; flex-shrink:0;
+  background:var(--brand-l);
+  display:flex; align-items:center; justify-content:center;
+}
+.cal-strip-info { flex:1; min-width:0; }
+.cal-strip-label {
+  font-size:10.5px; font-weight:700; letter-spacing:.4px;
+  text-transform:uppercase; color:var(--ts);
+}
+.cal-strip-value {
+  font-size:14px; font-weight:600; color:var(--tp); margin-top:2px;
+}
+.cal-strip-badge {
+  background:var(--brand); color:#fff;
+  font-size:11px; font-weight:700;
+  padding:4px 9px; border-radius:99px; flex-shrink:0;
+}
+
+/* ── MESSAGES ── */
+.msg-area {
+  flex:1; overflow-y:auto; overflow-x:hidden;
+  scrollbar-width:none; background:var(--chat-bg);
+}
+.msg-area::-webkit-scrollbar { display:none; }
+.msg-inner { padding:10px 0 14px; display:flex; flex-direction:column; gap:1px; }
+
+.date-div {
+  display:flex; align-items:center; justify-content:center; padding:10px 0 4px;
+}
+.date-div span {
+  font-size:11.5px; font-weight:500; color:var(--ts);
+  background:rgba(228,222,206,.9); padding:4px 13px; border-radius:99px;
+}
+
+.mw { display:flex; align-items:flex-end; gap:5px; padding:2px 10px; }
+.mw.sent { flex-direction:row-reverse; }
+
+.msg-avi {
+  width:26px; height:26px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:700; color:#fff; margin-bottom:1px;
+}
+.msg-avi.ghost { visibility:hidden; }
+.bc { display:flex; flex-direction:column; max-width:72%; }
+.mw.sent .bc { align-items:flex-end; }
+.mw.recv .bc { align-items:flex-start; }
+.sender-name { font-size:11px; font-weight:600; color:#1a7040; margin-bottom:2px; padding-left:2px; }
+
+.bubble {
+  padding:8px 11px; border-radius:18px;
+  font-size:14px; line-height:1.45; color:var(--tp);
+}
+.mw.recv .bubble { background:#fff; border-bottom-left-radius:5px; }
+.mw.sent .bubble { background:var(--brand); color:#fff; border-bottom-right-radius:5px; }
+.bubble-meta { font-size:10.5px; color:var(--tt); margin-top:3px; padding:0 2px; }
+
+/* ── INPUT BAR ── */
+.input-bar {
+  background:rgba(244,241,234,.97); backdrop-filter:blur(20px);
+  border-top:.5px solid var(--border); padding:8px 12px 28px;
+  display:flex; align-items:center; gap:8px; flex-shrink:0;
+}
+.input-field {
+  flex:1; background:#fff; border:1px solid var(--border);
+  border-radius:22px; padding:9px 14px;
+  font-size:14px; color:var(--ts); min-height:38px;
+}
+
+/* ── CALENDAR SCREEN NAV ── */
+.cal-screen-nav {
+  background:rgba(244,241,234,.97); backdrop-filter:blur(20px);
+  border-bottom:.5px solid var(--border); flex-shrink:0;
+}
+.cal-screen-nav-row {
+  display:flex; align-items:center; padding:8px 10px; gap:6px; min-height:52px;
+}
+.cal-screen-title {
+  font-size:14px; font-weight:600; color:var(--tp); flex:1; text-align:center;
+}
+.cal-edit-btn {
+  font-size:14.5px; font-weight:600; color:var(--brand); cursor:pointer;
+  border:none; background:none; padding:6px 4px; transition:opacity .15s;
+}
+.cal-edit-btn:active { opacity:.4; }
+
+/* ── CALENDAR MONTH NAV ── */
+.month-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 18px 6px; flex-shrink:0;
+}
+.month-title {
+  font-family:'Playfair Display',serif;
+  font-size:18px; font-weight:700; color:var(--brand-dd);
+}
+.month-btns { display:flex; gap:6px; }
+.month-btn {
+  width:30px; height:30px; border-radius:50%;
+  background:var(--s1); border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .15s;
+}
+.month-btn:active { background:var(--s2); transform:scale(.9); }
+
+/* ── CALENDAR GRID ── */
+.day-labels {
+  display:grid; grid-template-columns:repeat(7,1fr);
+  padding:0 14px; flex-shrink:0;
+}
+.day-label {
+  text-align:center; font-size:10px; font-weight:700;
+  letter-spacing:.3px; color:var(--tt); padding:4px 0 6px;
+}
+
+.cal-grid {
+  display:grid; grid-template-columns:repeat(7,1fr);
+  grid-auto-rows:40px; gap:2px;
+  padding:0 14px; flex-shrink:0;
+}
+.cd {
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; border-radius:10px;
+  cursor:pointer; gap:3px; transition:background .12s, transform .1s;
+  position:relative; user-select:none;
+}
+.cd:active:not(.empty) { transform:scale(.88); }
+.cd.empty { pointer-events:none; }
+.cd-num { font-size:13px; font-weight:500; color:var(--tp); line-height:1; }
+.cd.past .cd-num { color:var(--tt); }
+.cd.today { background:var(--brand); }
+.cd.today .cd-num { color:#fff; font-weight:700; }
+.cd.sel:not(.today) { background:var(--brand-l); }
+.cd.sel:not(.today) .cd-num { color:var(--brand); font-weight:700; }
+.cd.no-school { background:var(--red-l); }
+.cd.no-school .cd-num { color:var(--red); font-weight:600; }
+.cd.no-school.today { background:var(--brand); }
+.cd.no-school.today .cd-num { color:#fff; }
+.cd.no-school.sel:not(.today) { background:#ffe8e7; }
+.cd.special { }
+
+.cd-dot { width:4px; height:4px; border-radius:50%; background:var(--brand); }
+.cd.today .cd-dot { background:rgba(255,255,255,.7); }
+.cd.no-school .cd-dot { background:var(--red); }
+.cd.no-school.today .cd-dot { background:rgba(255,255,255,.7); }
+.cd.sel:not(.today) .cd-dot { background:var(--brand); }
+.cd.special .cd-dot { background:var(--orange); }
+
+/* ── LEGEND ── */
+.legend {
+  display:flex; align-items:center; gap:14px;
+  padding:8px 18px 6px; flex-shrink:0;
+}
+.leg-item { display:flex; align-items:center; gap:5px; }
+.leg-swatch { width:10px; height:10px; border-radius:3px; }
+.leg-label { font-size:10px; color:var(--ts); }
+
+/* ── DIVIDER ── */
+.divider { height:.5px; background:var(--border); margin:0 14px; flex-shrink:0; }
+
+/* ── NOTES PANEL ── */
+.notes-panel {
+  flex:1; overflow-y:auto; scrollbar-width:none;
+}
+.notes-panel::-webkit-scrollbar { display:none; }
+.notes-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 18px 8px;
+}
+.notes-date-label {
+  font-size:11px; font-weight:700; letter-spacing:.4px;
+  text-transform:uppercase; color:var(--ts);
+}
+.notes-add-btn {
+  display:flex; align-items:center; gap:4px;
+  font-size:12.5px; font-weight:600; color:var(--brand);
+  border:none; background:none; cursor:pointer;
+  transition:opacity .15s;
+}
+.notes-add-btn:active { opacity:.5; }
+
+.notes-list { padding:0 14px 20px; display:flex; flex-direction:column; gap:8px; }
+
+.note-card {
+  background:#fff; border-radius:14px; padding:11px 13px;
+  border-left:3.5px solid var(--brand);
+  box-shadow:0 1px 4px rgba(0,0,0,.05);
+  cursor:pointer; transition:transform .1s;
+}
+.note-card:active { transform:scale(.98); }
+.note-card.no-school { border-left-color:var(--red); background:var(--red-l); }
+.note-card.special   { border-left-color:var(--orange); }
+.note-card-top { display:flex; align-items:center; gap:7px; margin-bottom:3px; }
+.note-icon { font-size:15px; line-height:1; }
+.note-title { font-size:13.5px; font-weight:700; color:var(--tp); }
+.note-body { font-size:12.5px; color:var(--ts); line-height:1.5; }
+.note-card.no-school .note-title { color:var(--red); }
+
+/* ── NOTE AUTHOR FOOTER ── */
+.note-author-row {
+  display:flex; align-items:center; gap:6px;
+  margin-top:9px; padding-top:8px;
+  border-top:.5px solid var(--border);
+}
+.note-avi {
+  width:20px; height:20px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:8px; font-weight:700; color:#fff;
+}
+.note-author-name {
+  font-size:11.5px; font-weight:600; color:var(--ts); flex:1;
+}
+/* Admin badge — green pill */
+.admin-badge {
+  display:inline-flex; align-items:center; gap:3px;
+  background:var(--brand); color:#fff;
+  font-size:10px; font-weight:700; letter-spacing:.2px;
+  padding:2px 8px 2px 5px; border-radius:99px; flex-shrink:0;
+}
+.admin-badge svg { opacity:.9; }
+/* Parent tag — subtle */
+.parent-tag {
+  display:inline-flex; align-items:center; gap:3px;
+  background:var(--s1); color:var(--ts);
+  font-size:10px; font-weight:600; letter-spacing:.1px;
+  padding:2px 8px 2px 6px; border-radius:99px; flex-shrink:0;
+  border:.5px solid var(--border);
+}
+
+.notes-empty {
+  padding:28px 18px; text-align:center;
+}
+.notes-empty-icon { font-size:32px; margin-bottom:10px; }
+.notes-empty-text { font-size:13px; color:var(--tt); line-height:1.55; }
+
+/* ── NOTE DETAIL SCREEN ── */
+.nd-body { flex:1; overflow-y:auto; padding:20px 20px 32px; scrollbar-width:none; }
+.nd-body::-webkit-scrollbar { display:none; }
+.nd-type-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:99px; font-size:12px; font-weight:700; background:var(--brand-l); color:var(--brand); margin-bottom:16px; }
+.nd-type-badge.no-school { background:var(--red-l); color:var(--red); }
+.nd-type-badge.special { background:var(--orange-l); color:var(--orange); }
+.nd-hero { width:64px; height:64px; border-radius:20px; background:var(--brand-l); display:flex; align-items:center; justify-content:center; font-size:32px; margin-bottom:16px; }
+.nd-hero.no-school { background:var(--red-l); }
+.nd-hero.special { background:var(--orange-l); }
+.nd-title { font-family:'Playfair Display',serif; font-size:24px; font-weight:700; color:var(--brand-dd); line-height:1.25; margin-bottom:10px; }
+.nd-date-row { display:flex; align-items:center; gap:7px; font-size:13px; color:var(--ts); margin-bottom:20px; }
+.nd-date-row svg { flex-shrink:0; }
+.nd-divider { height:.5px; background:var(--border); margin:0 0 20px; }
+.nd-text { font-size:14.5px; color:var(--tp); line-height:1.65; margin-bottom:26px; white-space:pre-line; }
+.nd-posted-label { font-size:11px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:var(--tt); margin-bottom:10px; }
+.nd-author-row { display:flex; align-items:center; gap:10px; background:var(--s1); border-radius:14px; padding:12px 14px; }
+.nd-avi { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff; flex-shrink:0; }
+.nd-author-name { font-size:13.5px; font-weight:700; color:var(--tp); }
+
+/* ── ADMIN SCREEN ── */
+.admin-nav {
+  background:rgba(244,241,234,.97); backdrop-filter:blur(20px);
+  border-bottom:.5px solid var(--border); flex-shrink:0;
+}
+.admin-nav-row {
+  display:flex; align-items:center; padding:8px 10px; gap:6px; min-height:52px;
+}
+.admin-nav-title {
+  font-size:14.5px; font-weight:700; color:var(--tp); flex:1; text-align:center;
+}
+.save-btn {
+  font-size:14.5px; font-weight:700; color:var(--brand);
+  border:none; background:none; cursor:pointer; padding:6px 4px;
+  transition:opacity .15s;
+}
+.save-btn:active { opacity:.4; }
+
+.admin-body {
+  flex:1; overflow-y:auto; scrollbar-width:none; padding:0 20px;
+}
+.admin-body::-webkit-scrollbar { display:none; }
+
+.admin-date-card {
+  margin:16px 0 0;
+  background:var(--s1); border-radius:14px; padding:13px 14px;
+  display:flex; align-items:center; gap:12px;
+}
+.admin-date-icon {
+  width:38px; height:38px; border-radius:11px; background:var(--brand-l);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.admin-date-text { flex:1; }
+.admin-date-label { font-size:11px; font-weight:600; color:var(--ts); text-transform:uppercase; letter-spacing:.3px; }
+.admin-date-value { font-size:15px; font-weight:700; color:var(--brand-dd); margin-top:2px; }
+
+.admin-sec { margin-top:20px; }
+.admin-sec-label {
+  font-size:10.5px; font-weight:700; letter-spacing:.5px;
+  text-transform:uppercase; color:var(--ts); margin-bottom:8px;
+}
+
+.type-toggle {
+  display:flex; background:var(--s1); border-radius:12px; padding:3px; gap:3px;
+}
+.type-opt {
+  flex:1; padding:8px 4px; border-radius:9px;
+  text-align:center; font-size:12px; font-weight:500;
+  color:var(--ts); cursor:pointer; transition:all .2s;
+}
+.type-opt.active {
+  background:#fff; color:var(--brand); font-weight:700;
+  box-shadow:0 1px 4px rgba(0,0,0,.1);
+}
+
+.field-lbl { font-size:11px; font-weight:600; color:var(--ts); margin-bottom:5px; }
+.text-f {
+  width:100%; background:var(--s1); border:1.5px solid transparent;
+  border-radius:12px; padding:11px 13px; font-size:14px;
+  color:var(--tp); font-family:'Inter',sans-serif; outline:none; resize:none;
+  transition:all .2s;
+}
+.text-f:focus { border-color:var(--brand); background:#fff; }
+.text-f::placeholder { color:var(--tt); }
+
+/* ── ADMIN NOTE ROWS (clickable) ── */
+.an-row {
+  border-radius: 12px; padding: 10px 12px;
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; transition: all .15s; position: relative;
+}
+.an-row:active { opacity: .7; transform: scale(.99); }
+.an-row.editing {
+  outline: 2px solid var(--brand);
+  background: var(--brand-l) !important;
+}
+.an-row.editing .an-title { color: var(--brand-dd) !important; }
+.an-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.an-content { flex: 1; min-width: 0; }
+.an-title { font-size: 13px; font-weight: 600; color: var(--tp); }
+.an-date  { font-size: 11px; color: var(--tt); margin-top: 1px; }
+.an-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.an-edit-icon {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(24,99,56,.1); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s; flex-shrink: 0;
+}
+.an-edit-icon:active { background: rgba(24,99,56,.22); }
+.an-delete-icon {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(192,57,43,.1); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s; flex-shrink: 0;
+}
+.an-delete-icon:active { background: rgba(192,57,43,.22); }
+.an-confirm {
+  border-radius: 12px; padding: 10px 12px;
+  background: var(--red-l); border: 1.5px solid rgba(192,57,43,.25);
+  display: none; align-items: center; gap: 10px; margin-top: -2px;
+}
+.an-confirm.show { display: flex; }
+.an-confirm-text { flex: 1; font-size: 13px; font-weight: 600; color: var(--red); }
+.an-confirm-cancel {
+  font-size: 12.5px; font-weight: 600; color: var(--ts);
+  border: none; background: none; cursor: pointer; padding: 4px 8px;
+}
+.an-confirm-delete {
+  font-size: 12.5px; font-weight: 700; color: #fff;
+  background: var(--red); border: none; border-radius: 8px;
+  padding: 5px 12px; cursor: pointer;
+}
+
+.admin-footer {
+  background:rgba(244,241,234,.97); backdrop-filter:blur(20px);
+  border-top:.5px solid var(--border); padding:10px 16px 28px;
+  display:flex; gap:10px; align-items:center; flex-shrink:0;
+}
+.primary-btn {
+  flex:1; height:48px; background:var(--brand); border:none; border-radius:14px;
+  color:#fff; font-size:15px; font-weight:600; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  transition:all .15s;
+}
+.primary-btn:active { transform:scale(.97); background:var(--brand-d); }
+
+/* ── TOAST ── */
+.toast {
+  position:absolute; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:rgba(24,99,56,.95); backdrop-filter:blur(16px);
+  color:#fff; font-size:13px; font-weight:600;
+  padding:10px 20px; border-radius:99px; white-space:nowrap;
+  opacity:0; transition:all .3s; z-index:300; pointer-events:none;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+</style>
+</head>
+<body>
+
+<!-- Flow indicator -->
+<div class="flow-map" id="flowMap">
+  <div class="flow-step active" data-screen="s-chat" onclick="jumpTo('s-chat')">
+    <div class="step-dot"></div> Club Chat
+  </div>
+  <div class="flow-arrow">›</div>
+  <div class="flow-step" data-screen="s-calendar" onclick="jumpTo('s-calendar')">
+    <div class="step-dot"></div> Club Calendar
+  </div>
+  <div class="flow-arrow">›</div>
+  <div class="flow-step" data-screen="s-admin" onclick="jumpTo('s-admin')">
+    <div class="step-dot"></div> Admin Editor
+  </div>
+</div>
+
+<!-- Phone -->
+<div class="phone">
+  <div class="island"></div>
+  <div class="sc-wrap">
+
+    <!-- ════════════════════════════
+         S1 · CLUB GROUP CHAT
+         ════════════════════════════ -->
+    <div class="screen" id="s-chat">
+
+      <!-- Status bar -->
+      <div class="sb">
+        <span class="sb-time">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".35"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" fill="none"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+        </div>
+      </div>
+
+      <!-- Chat nav -->
+      <div class="chat-nav">
+        <div class="chat-nav-row">
+          <button class="back-btn">
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8 2L2 8l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Clubs
+          </button>
+          <div style="display:flex;align-items:center;gap:9px;flex:1;min-width:0;cursor:pointer">
+            <div class="nav-avi" style="background:#e8f5ee">🎒</div>
+            <div class="nav-text">
+              <div class="nav-name">1st Grade — Ms. Rivera</div>
+              <div class="nav-sub">42 members · School</div>
+            </div>
+          </div>
+          <button class="act-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="1.5" fill="#818898"/><circle cx="10" cy="5" r="1.5" fill="#818898"/><circle cx="10" cy="15" r="1.5" fill="#818898"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Calendar strip — tap to open calendar -->
+      <div class="cal-strip" onclick="push('s-chat','s-calendar')">
+        <div class="cal-strip-inner">
+          <div class="cal-strip-icon">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <rect x="1.5" y="3" width="15" height="13" rx="3" stroke="#186338" stroke-width="1.5"/>
+              <path d="M1.5 7.5h15" stroke="#186338" stroke-width="1.5"/>
+              <path d="M5.5 1.5V4M12.5 1.5V4" stroke="#186338" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="6" cy="11" r="1.1" fill="#186338"/>
+              <circle cx="9" cy="11" r="1.1" fill="#186338"/>
+              <circle cx="12" cy="11" r="1.1" fill="#186338"/>
+            </svg>
+          </div>
+          <div class="cal-strip-info">
+            <div class="cal-strip-label">Class Calendar</div>
+            <div class="cal-strip-value">May 2026 · 4 upcoming events</div>
+          </div>
+          <div class="cal-strip-badge">View →</div>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="msg-area">
+        <div class="msg-inner">
+
+          <div class="date-div"><span>Tuesday, May 12</span></div>
+
+          <div class="mw recv">
+            <div class="msg-avi" style="background:#5c8a6a">SR</div>
+            <div class="bc">
+              <div class="sender-name">Ms. Rivera</div>
+              <div class="bubble">Good morning, families! 🌿 Just a reminder that tomorrow is our class Talent Show. Doors open at 9am!</div>
+              <div class="bubble-meta">9:02 AM</div>
+            </div>
+          </div>
+
+          <div class="mw recv">
+            <div class="msg-avi ghost"></div>
+            <div class="bc">
+              <div class="bubble">Feel free to bring a small snack — they've been working so hard 🎭</div>
+              <div class="bubble-meta">9:04 AM</div>
+            </div>
+          </div>
+
+          <div class="mw sent">
+            <div class="bc">
+              <div class="bubble">That's so exciting! My daughter can't wait 😊</div>
+              <div class="bubble-meta">9:18 AM · Delivered</div>
+            </div>
+          </div>
+
+          <div class="mw recv">
+            <div class="msg-avi" style="background:#7a6a9a">JL</div>
+            <div class="bc">
+              <div class="sender-name">Jamie L.</div>
+              <div class="bubble">What time does it wrap up?</div>
+              <div class="bubble-meta">9:22 AM</div>
+            </div>
+          </div>
+
+          <div class="mw recv">
+            <div class="msg-avi" style="background:#5c8a6a">SR</div>
+            <div class="bc">
+              <div class="sender-name">Ms. Rivera</div>
+              <div class="bubble">Should be done by 10:30! I've updated the May calendar with all the notes — check the Calendar tab above 📅</div>
+              <div class="bubble-meta">9:25 AM</div>
+            </div>
+          </div>
+
+          <div class="date-div"><span>Today, May 13</span></div>
+
+          <div class="mw recv">
+            <div class="msg-avi" style="background:#5c8a6a">SR</div>
+            <div class="bc">
+              <div class="sender-name">Ms. Rivera</div>
+              <div class="bubble">🎭 Talent Show day is here! See you all soon. Also updated the calendar with notes for the last two weeks of May.</div>
+              <div class="bubble-meta">8:45 AM</div>
+            </div>
+          </div>
+
+          <div class="mw sent">
+            <div class="bc">
+              <div class="bubble">On our way! 🌟</div>
+              <div class="bubble-meta">8:52 AM · Read</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Input bar -->
+      <div class="input-bar">
+        <button class="act-btn" style="background:var(--s1);border-radius:50%;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v14M2 9h14" stroke="#818898" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <div class="input-field">Message 1st Grade Class…</div>
+        <button class="act-btn" style="background:var(--s1);border-radius:50%;flex-shrink:0">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#818898" stroke-width="1.5"/><path d="M7 10.5l2 2 4-4" stroke="#818898" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+    </div><!-- /s-chat -->
+
+
+    <!-- ════════════════════════════
+         S2 · CLUB CALENDAR
+         ════════════════════════════ -->
+    <div class="screen right" id="s-calendar">
+
+      <!-- Status bar -->
+      <div class="sb">
+        <span class="sb-time">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".35"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" fill="none"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+        </div>
+      </div>
+
+      <!-- Cal screen nav -->
+      <div class="cal-screen-nav">
+        <div class="cal-screen-nav-row">
+          <button class="back-btn" onclick="pop('s-calendar','s-chat')">
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8 2L2 8l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Chat
+          </button>
+          <div class="cal-screen-title">Class Calendar</div>
+          <button class="cal-edit-btn" onclick="push('s-calendar','s-admin')">Edit</button>
+        </div>
+      </div>
+
+      <!-- Month nav -->
+      <div class="month-nav">
+        <div class="month-title" id="monthTitle">May 2026</div>
+        <div class="month-btns">
+          <button class="month-btn" onclick="prevMonth()">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="#4d525b" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <button class="month-btn" onclick="nextMonth()">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2L8 6l-4 4" stroke="#4d525b" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Day labels -->
+      <div class="day-labels">
+        <div class="day-label">S</div><div class="day-label">M</div>
+        <div class="day-label">T</div><div class="day-label">W</div>
+        <div class="day-label">T</div><div class="day-label">F</div>
+        <div class="day-label">S</div>
+      </div>
+
+      <!-- Calendar grid (rendered by JS) -->
+      <div class="cal-grid" id="calGrid"></div>
+
+      <!-- Legend -->
+      <div class="legend">
+        <div class="leg-item">
+          <div class="leg-swatch" style="background:var(--brand)"></div>
+          <span class="leg-label">Today</span>
+        </div>
+        <div class="leg-item">
+          <div class="leg-swatch" style="background:var(--brand-l)"></div>
+          <span class="leg-label">Selected</span>
+        </div>
+        <div class="leg-item">
+          <div class="leg-swatch" style="background:var(--red-l);border:1px solid #ffc9c6"></div>
+          <span class="leg-label">No school</span>
+        </div>
+        <div class="leg-item">
+          <div style="width:6px;height:6px;border-radius:50%;background:var(--brand)"></div>
+          <span class="leg-label">Has notes</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Notes panel -->
+      <div class="notes-panel">
+        <div class="notes-header">
+          <div class="notes-date-label" id="notesDateLabel">Wednesday, May 13</div>
+          <button class="notes-add-btn" onclick="push('s-calendar','s-admin')">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="#186338" stroke-width="1.6" stroke-linecap="round"/></svg>
+            Add note
+          </button>
+        </div>
+        <div class="notes-list" id="notesList"></div>
+      </div>
+
+    </div><!-- /s-calendar -->
+
+
+    <!-- ════════════════════════════
+         S2B · NOTE DETAIL
+         ════════════════════════════ -->
+    <div class="screen right" id="s-note-detail">
+
+      <!-- Status bar -->
+      <div class="sb">
+        <span class="sb-time">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".35"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" fill="none"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+        </div>
+      </div>
+
+      <!-- Nav -->
+      <div class="cal-screen-nav">
+        <div class="cal-screen-nav-row">
+          <button class="back-btn" onclick="pop('s-note-detail','s-calendar')">
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8 2L2 8l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Calendar
+          </button>
+          <div class="cal-screen-title">Note</div>
+          <button class="cal-edit-btn" onclick="editFromDetail()">Edit</button>
+        </div>
+      </div>
+
+      <!-- Detail body -->
+      <div class="nd-body">
+        <div class="nd-type-badge" id="ndTypeBadge">📝 Event</div>
+        <div class="nd-hero" id="ndHero">🎭</div>
+        <div class="nd-title" id="ndTitle">Talent Show</div>
+        <div class="nd-date-row">
+          <svg width="14" height="14" viewBox="0 0 18 18" fill="none"><rect x="1.5" y="3" width="15" height="13" rx="3" stroke="#818898" stroke-width="1.4"/><path d="M1.5 7.5h15" stroke="#818898" stroke-width="1.4"/><path d="M5.5 1.5V4M12.5 1.5V4" stroke="#818898" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span id="ndDate">Wednesday, May 13, 2026</span>
+        </div>
+        <div class="nd-divider"></div>
+        <div class="nd-text" id="ndBody">Show off your skills! Doors open at 9 AM — wraps up by 10:30 AM.</div>
+        <div class="nd-posted-label">Posted by</div>
+        <div class="nd-author-row">
+          <div class="nd-avi" id="ndAvi">SR</div>
+          <div class="nd-author-name" id="ndAuthorName">Ms. Rivera</div>
+          <div id="ndAuthorBadge" style="margin-left:auto;"></div>
+        </div>
+      </div>
+
+    </div><!-- /s-note-detail -->
+
+
+    <!-- ════════════════════════════
+         S3 · ADMIN EDITOR
+         ════════════════════════════ -->
+    <div class="screen right" id="s-admin">
+
+      <!-- Status bar -->
+      <div class="sb">
+        <span class="sb-time">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".35"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" fill="none"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+        </div>
+      </div>
+
+      <!-- Admin nav -->
+      <div class="admin-nav">
+        <div class="admin-nav-row">
+          <button class="back-btn" onclick="pop('s-admin','s-calendar')">
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8 2L2 8l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Calendar
+          </button>
+          <div class="admin-nav-title" id="adminNavTitle">Add Note</div>
+          <button class="save-btn" id="adminSaveBtn" onclick="saveNote()">Save</button>
+        </div>
+      </div>
+
+      <!-- Admin body -->
+      <div class="admin-body">
+
+        <!-- Date card (reflects selected day) -->
+        <div class="admin-date-card">
+          <div class="admin-date-icon">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <rect x="1.5" y="3" width="15" height="13" rx="3" stroke="#186338" stroke-width="1.5"/>
+              <path d="M1.5 7.5h15" stroke="#186338" stroke-width="1.5"/>
+              <path d="M5.5 1.5V4M12.5 1.5V4" stroke="#186338" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="admin-date-text">
+            <div class="admin-date-label">Selected date</div>
+            <div class="admin-date-value" id="adminDateVal">Wednesday, May 13</div>
+          </div>
+        </div>
+
+        <!-- Note type -->
+        <div class="admin-sec">
+          <div class="admin-sec-label">Note type</div>
+          <div class="type-toggle">
+            <div class="type-opt active" onclick="setType(this,'event')">📝 Event</div>
+            <div class="type-opt" onclick="setType(this,'no-school')">🚫 No School</div>
+            <div class="type-opt" onclick="setType(this,'special')">⭐ Special</div>
+          </div>
+        </div>
+
+        <!-- Title -->
+        <div class="admin-sec">
+          <div class="field-lbl">Title</div>
+          <input class="text-f" id="noteTitle" type="text" placeholder="e.g. Talent Show, Field Trip, No School…">
+        </div>
+
+        <!-- Body -->
+        <div class="admin-sec">
+          <div class="field-lbl">Details <span style="color:var(--tt);font-weight:400">(optional)</span></div>
+          <textarea class="text-f" id="noteBody" rows="4" placeholder="Add context for parents — time, materials needed, what to bring…"></textarea>
+        </div>
+
+        <!-- Existing notes this month (dynamic) -->
+        <div class="admin-sec">
+          <div class="admin-sec-label" style="display:flex;justify-content:space-between;align-items:center">
+            <span>May notes</span>
+            <span style="color:var(--brand);text-transform:none;letter-spacing:0;font-weight:600;font-size:11px">tap to edit</span>
+          </div>
+          <div id="adminNotesList" style="display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+
+        <div style="height:20px"></div>
+      </div>
+
+      <!-- Footer -->
+      <div class="admin-footer">
+        <button class="primary-btn" id="adminFooterBtn" onclick="saveNote()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 8l4 4 7-7" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="adminFooterLabel">Save Note</span>
+        </button>
+      </div>
+
+    </div><!-- /s-admin -->
+
+    <!-- Toast -->
+    <div class="toast" id="toast">✓ Note saved to May calendar</div>
+
+  </div><!-- /sc-wrap -->
+</div><!-- /phone -->
+
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+// Author presets
+const AUTHOR_ADMIN   = { name:'Ms. Rivera', initials:'SR', color:'#5c8a6a', isAdmin:true  };
+const AUTHOR_PARENT1 = { name:'Jamie L.',   initials:'JL', color:'#7a6a9a', isAdmin:false };
+const AUTHOR_PARENT2 = { name:'Alex M.',    initials:'AM', color:'#6a7a9a', isAdmin:false };
+
+const NOTES = {
+  6:  [{ type:'event',     icon:'🤝', title:'Kindness Day',          body:'Do something to spread kindness in our classroom and beyond.',                          author:AUTHOR_ADMIN }],
+  13: [{ type:'event',     icon:'🎭', title:'Talent Show',           body:'Show off your skills! Doors open at 9 AM — wraps up by 10:30 AM.',                     author:AUTHOR_ADMIN }],
+  19: [{ type:'no-school', icon:'🏖️', title:'No School',            body:'Memorial Day Weekend — Enjoy the long weekend with your family!',                      author:AUTHOR_ADMIN }],
+  20: [{ type:'no-school', icon:'🏖️', title:'No School',            body:'Memorial Day Weekend — School resumes Tuesday May 21st.',                              author:AUTHOR_ADMIN }],
+  21: [{ type:'no-school', icon:'🏖️', title:'No School',            body:'Memorial Day — Federal Holiday. See you Wednesday!',                                   author:AUTHOR_ADMIN }],
+  22: [
+    { type:'event', icon:'🎨', title:'Free Choice Day',    body:'Choose your center from the classroom whiteboard. Bring your creativity!',                       author:AUTHOR_ADMIN  },
+    { type:'event', icon:'👕', title:'Spirit Wear Friday', body:'Wear school colors. Optional $1 donation for the class garden fund.',                            author:AUTHOR_PARENT1 }
+  ],
+  27: [{ type:'event',   icon:'😄', title:'Joke Day',              body:'Share a joke with the class — bring your best material!',                                author:AUTHOR_PARENT2 }],
+  29: [{ type:'special', icon:'🐠', title:'Field Trip — Aquarium', body:'Permission slips due May 24. Pack a sack lunch. Bus departs 8:45 AM.',                  author:AUTHOR_ADMIN }],
+};
+
+const NO_SCHOOL = new Set([19,20,21]);
+const SPECIAL   = new Set([29]);
+const TODAY_DAY = 13;
+const MONTH_YEAR = 'May 2026';
+
+// State
+let selectedDay = TODAY_DAY;
+let currentScreen = 's-chat';
+
+// May 2026: May 1 = Friday (day index 5, 0=Sun)
+const MAY_START_DOW = 5;
+const MAY_DAYS = 31;
+
+// ── NAVIGATION ────────────────────────────────────────────────
+function push(from, to) {
+  const fEl = document.getElementById(from);
+  const tEl = document.getElementById(to);
+  fEl.classList.remove('anim-pop-in','anim-push-out','left','right');
+  tEl.classList.remove('anim-push-in','anim-pop-out','left','right');
+  fEl.classList.add('anim-push-out');
+  tEl.classList.add('anim-push-in');
+  fEl.addEventListener('animationend', () => {
+    fEl.classList.remove('anim-push-out');
+    fEl.classList.add('left');
+  }, { once: true });
+  tEl.addEventListener('animationend', () => {
+    tEl.classList.remove('anim-push-in');
+  }, { once: true });
+  currentScreen = to;
+  updateFlowMap(to);
+  if (to === 's-admin') syncAdminDate();
+}
+
+function pop(from, to) {
+  const fEl = document.getElementById(from);
+  const tEl = document.getElementById(to);
+  fEl.classList.remove('anim-push-in','anim-pop-in','anim-push-out','left','right');
+  tEl.classList.remove('anim-push-out','anim-pop-out','left','right');
+  fEl.classList.add('anim-pop-out');
+  tEl.classList.add('anim-pop-in');
+  fEl.addEventListener('animationend', () => {
+    fEl.classList.remove('anim-pop-out');
+    fEl.classList.add('right');
+  }, { once: true });
+  tEl.addEventListener('animationend', () => {
+    tEl.classList.remove('anim-pop-in');
+  }, { once: true });
+  currentScreen = to;
+  updateFlowMap(to);
+}
+
+function jumpTo(target) {
+  const screens = ['s-chat','s-calendar','s-admin'];
+  const ci = screens.indexOf(currentScreen);
+  const ti = screens.indexOf(target);
+  if (ci === ti) return;
+  if (ti > ci) {
+    // push forward
+    for (let i = ci; i < ti; i++) {
+      const f = document.getElementById(screens[i]);
+      const t = document.getElementById(screens[i+1]);
+      f.className = 'screen left';
+      t.className = 'screen';
+    }
+  } else {
+    // pop back
+    for (let i = ci; i > ti; i--) {
+      const f = document.getElementById(screens[i]);
+      const t = document.getElementById(screens[i-1]);
+      f.className = 'screen right';
+      t.className = 'screen';
+    }
+  }
+  currentScreen = target;
+  updateFlowMap(target);
+  if (target === 's-admin') syncAdminDate();
+}
+
+function updateFlowMap(screen) {
+  document.querySelectorAll('.flow-step').forEach(el => {
+    el.classList.toggle('active', el.dataset.screen === screen);
+  });
+}
+
+// ── CALENDAR ─────────────────────────────────────────────────
+function buildCalendar() {
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  // Empty cells before May 1
+  for (let i = 0; i < MAY_START_DOW; i++) {
+    const el = document.createElement('div');
+    el.className = 'cd empty';
+    grid.appendChild(el);
+  }
+
+  for (let d = 1; d <= MAY_DAYS; d++) {
+    const el = document.createElement('div');
+    const classes = ['cd'];
+
+    if (d < TODAY_DAY)  classes.push('past');
+    if (d === TODAY_DAY) classes.push('today');
+    if (d === selectedDay && d !== TODAY_DAY) classes.push('sel');
+    if (d === selectedDay && d === TODAY_DAY) classes.push('today','sel');
+    if (NO_SCHOOL.has(d)) classes.push('no-school');
+    if (SPECIAL.has(d))   classes.push('special');
+
+    el.className = classes.join(' ');
+
+    // Number
+    const num = document.createElement('span');
+    num.className = 'cd-num';
+    num.textContent = d;
+    el.appendChild(num);
+
+    // Dot if has notes
+    if (NOTES[d]) {
+      const dot = document.createElement('div');
+      dot.className = 'cd-dot';
+      el.appendChild(dot);
+    }
+
+    el.addEventListener('click', () => selectDay(d));
+    grid.appendChild(el);
+  }
+}
+
+function selectDay(d) {
+  selectedDay = d;
+  buildCalendar();
+  renderNotes(d);
+  updateNotesLabel(d);
+}
+
+function renderNotes(d) {
+  const list = document.getElementById('notesList');
+  const notes = NOTES[d];
+
+  if (!notes || notes.length === 0) {
+    list.innerHTML = `
+      <div class="notes-empty">
+        <div class="notes-empty-icon">📭</div>
+        <div class="notes-empty-text">No notes for this day yet.<br>Admins can tap <strong>Add note</strong> to add one.</div>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = notes.map((n, i) => {
+    const a = n.author || AUTHOR_ADMIN;
+    const authorTag = a.isAdmin
+      ? `<span class="admin-badge">
+           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+             <path d="M5 1L6.5 3.5 9 4 7 6l.5 3L5 7.5 2.5 9 3 6 1 4l2.5-.5L5 1z" fill="#fff" opacity=".9"/>
+           </svg>Admin</span>`
+      : `<span class="parent-tag">
+           <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+             <circle cx="4.5" cy="3" r="1.7" stroke="#818898" stroke-width="1.1"/>
+             <path d="M1.5 8c0-1.657 1.343-3 3-3s3 1.343 3 3" stroke="#818898" stroke-width="1.1" stroke-linecap="round"/>
+           </svg>Parent</span>`;
+    return `
+    <div class="note-card ${n.type}" onclick="openNoteDetail(${d},${i})">
+      <div class="note-card-top">
+        <span class="note-icon">${n.icon}</span>
+        <span class="note-title">${n.title}</span>
+      </div>
+      <div class="note-body">${n.body}</div>
+      <div class="note-author-row">
+        <div class="note-avi" style="background:${a.color}">${a.initials}</div>
+        <span class="note-author-name">${a.name}</span>
+        ${authorTag}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── NOTE DETAIL ─────────────────────────────────────────────────
+let currentDetailRef = null;
+
+function openNoteDetail(day, idx) {
+  const note = NOTES[day] && NOTES[day][idx];
+  if (!note) return;
+  currentDetailRef = { day, idx };
+
+  const dow = DAYS_LONG[dayOfWeek(day)];
+  document.getElementById('ndDate').textContent = `${dow}, May ${day}, 2026`;
+  document.getElementById('ndTitle').textContent = note.title;
+  document.getElementById('ndBody').textContent = note.body;
+
+  const typeSuffix = note.type === 'event' ? '' : ' ' + note.type;
+  document.getElementById('ndHero').textContent = note.icon;
+  document.getElementById('ndHero').className = 'nd-hero' + typeSuffix;
+
+  const typeLabels = { 'event':'📝 Event', 'no-school':'🚫 No School', 'special':'⭐ Special' };
+  const badge = document.getElementById('ndTypeBadge');
+  badge.textContent = typeLabels[note.type] || typeLabels.event;
+  badge.className = 'nd-type-badge' + typeSuffix;
+
+  const a = note.author || AUTHOR_ADMIN;
+  const avi = document.getElementById('ndAvi');
+  avi.textContent = a.initials;
+  avi.style.background = a.color;
+  document.getElementById('ndAuthorName').textContent = a.name;
+  document.getElementById('ndAuthorBadge').innerHTML = a.isAdmin
+    ? `<span class="admin-badge"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1L6.5 3.5 9 4 7 6l.5 3L5 7.5 2.5 9 3 6 1 4l2.5-.5L5 1z" fill="#fff" opacity=".9"/></svg>Admin</span>`
+    : `<span class="parent-tag"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><circle cx="4.5" cy="3" r="1.7" stroke="#818898" stroke-width="1.1"/><path d="M1.5 8c0-1.657 1.343-3 3-3s3 1.343 3 3" stroke="#818898" stroke-width="1.1" stroke-linecap="round"/></svg>Parent</span>`;
+
+  push('s-calendar', 's-note-detail');
+}
+
+function editFromDetail() {
+  if (!currentDetailRef) return;
+  const { day, idx } = currentDetailRef;
+  const listIdx = ADMIN_MONTH_NOTES.findIndex(n => n.day === day && n.idx === idx);
+  push('s-note-detail', 's-admin');
+  if (listIdx > -1) {
+    editNote(day, idx, listIdx, { stopPropagation(){} });
+  }
+}
+
+const DAYS_LONG = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DOW_FOR_DAY_1 = 5; // May 1 = Friday
+
+function dayOfWeek(d) {
+  return (DOW_FOR_DAY_1 + d - 1) % 7;
+}
+
+function updateNotesLabel(d) {
+  const dow = DAYS_LONG[dayOfWeek(d)];
+  document.getElementById('notesDateLabel').textContent = `${dow}, May ${d}`;
+}
+
+function prevMonth() {
+  // UI-only for demo — just flash the label
+  flashMonthNav();
+}
+function nextMonth() {
+  flashMonthNav();
+}
+function flashMonthNav() {
+  const t = document.getElementById('monthTitle');
+  t.style.opacity = '.4';
+  setTimeout(() => t.style.opacity = '1', 200);
+}
+
+// ── ADMIN ─────────────────────────────────────────────────────
+let editingNote = null; // { day, idx } when editing, null when adding
+
+// Flat list of all notes for the "May notes" sidebar
+const ADMIN_MONTH_NOTES = [
+  { day:6,  idx:0, dotColor:'var(--brand)',  bg:'var(--s1)',      titleColor:'var(--tp)', label:'Kindness Day 🤝',         date:'May 6 · past',   author:AUTHOR_ADMIN   },
+  { day:13, idx:0, dotColor:'var(--brand)',  bg:'var(--s1)',      titleColor:'var(--tp)', label:'Talent Show 🎭',          date:'May 13 · today', author:AUTHOR_ADMIN   },
+  { day:19, idx:0, dotColor:'var(--red)',    bg:'var(--red-l)',   titleColor:'var(--red)', label:'No School — Memorial Day',date:'May 19–21',      author:AUTHOR_ADMIN   },
+  { day:22, idx:0, dotColor:'var(--brand)',  bg:'var(--s1)',      titleColor:'var(--tp)', label:'Free Choice Day 🎨',      date:'May 22',         author:AUTHOR_ADMIN   },
+  { day:22, idx:1, dotColor:'var(--brand)',  bg:'var(--s1)',      titleColor:'var(--tp)', label:'Spirit Wear Friday 👕',   date:'May 22',         author:AUTHOR_PARENT1 },
+  { day:27, idx:0, dotColor:'var(--brand)',  bg:'var(--s1)',      titleColor:'var(--tp)', label:'Joke Day 😄',             date:'May 27',         author:AUTHOR_PARENT2 },
+  { day:29, idx:0, dotColor:'var(--orange)', bg:'var(--orange-l)',titleColor:'var(--tp)', label:'Field Trip — Aquarium 🐠',date:'May 29',         author:AUTHOR_ADMIN   },
+];
+
+function syncAdminDate() {
+  editingNote = null;
+  const dow = DAYS_LONG[dayOfWeek(selectedDay)];
+  document.getElementById('adminDateVal').textContent = `${dow}, May ${selectedDay}`;
+  document.getElementById('adminNavTitle').textContent = 'Add Note';
+  document.getElementById('adminSaveBtn').textContent = 'Save';
+  document.getElementById('adminFooterLabel').textContent = 'Save Note';
+  document.getElementById('noteTitle').value = '';
+  document.getElementById('noteBody').value = '';
+  document.querySelectorAll('.type-opt').forEach((el,i) => el.classList.toggle('active', i===0));
+  renderAdminNotes();
+}
+
+function renderAdminNotes() {
+  const container = document.getElementById('adminNotesList');
+  container.innerHTML = '';
+
+  ADMIN_MONTH_NOTES.forEach((n, listIdx) => {
+    const isEditing = editingNote && editingNote.day === n.day && editingNote.idx === n.idx;
+
+    // Note row
+    const row = document.createElement('div');
+    row.className = 'an-row' + (isEditing ? ' editing' : '');
+    const a = n.author || AUTHOR_ADMIN;
+    const authorChip = a.isAdmin
+      ? `<span style="display:inline-flex;align-items:center;gap:2px;background:var(--brand);color:#fff;font-size:9px;font-weight:700;padding:1px 6px 1px 4px;border-radius:99px;flex-shrink:0">
+           <svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M5 1L6.5 3.5 9 4 7 6l.5 3L5 7.5 2.5 9 3 6 1 4l2.5-.5L5 1z" fill="#fff"/></svg>Admin</span>`
+      : `<span style="display:inline-flex;align-items:center;gap:2px;background:var(--s2);color:var(--ts);font-size:9px;font-weight:600;padding:1px 6px 1px 5px;border-radius:99px;flex-shrink:0;border:.5px solid var(--border)">Parent</span>`;
+
+    row.style.background = n.bg;
+    row.innerHTML = `
+      <div class="an-dot" style="background:${n.dotColor}"></div>
+      <div class="an-content">
+        <div class="an-title" style="color:${n.titleColor};display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span>${n.label}</span>${authorChip}
+        </div>
+        <div class="an-date" style="display:flex;align-items:center;gap:5px;margin-top:3px">
+          <div style="width:14px;height:14px;border-radius:50%;background:${a.color};display:inline-flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:#fff;flex-shrink:0">${a.initials}</div>
+          <span>${a.name} · ${n.date}</span>
+        </div>
+      </div>
+      <div class="an-actions">
+        <button class="an-edit-icon" onclick="editNote(${n.day},${n.idx},${listIdx},event)" title="Edit">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="#186338" stroke-width="1.3" stroke-linejoin="round"/><path d="M7.5 3.5l2 2" stroke="#186338" stroke-width="1.3"/></svg>
+        </button>
+        <button class="an-delete-icon" onclick="promptDelete(${n.day},${n.idx},${listIdx},event)" title="Delete">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 3.5h9M5 3.5V2.5h3V3.5M5.5 6v3M7.5 6v3" stroke="#c0392b" stroke-width="1.3" stroke-linecap="round"/><path d="M3 3.5l.7 7h5.6l.7-7" stroke="#c0392b" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>`;
+    container.appendChild(row);
+
+    // Confirm-delete row (hidden by default)
+    const confirm = document.createElement('div');
+    confirm.className = 'an-confirm';
+    confirm.id = `confirm-${listIdx}`;
+    confirm.innerHTML = `
+      <div class="an-confirm-text">🗑 Delete "${n.label.split(' ')[0]}…"?</div>
+      <button class="an-confirm-cancel" onclick="cancelDelete(${listIdx})">Cancel</button>
+      <button class="an-confirm-delete" onclick="confirmDelete(${n.day},${n.idx},${listIdx})">Delete</button>`;
+    container.appendChild(confirm);
+  });
+}
+
+function editNote(day, idx, listIdx, e) {
+  e.stopPropagation();
+  editingNote = { day, idx };
+
+  // Populate form with existing data
+  const note = NOTES[day] && NOTES[day][idx];
+  if (!note) return;
+
+  const dow = DAYS_LONG[dayOfWeek(day)];
+  document.getElementById('adminDateVal').textContent = `${dow}, May ${day}`;
+  document.getElementById('noteTitle').value = note.title;
+  document.getElementById('noteBody').value = note.body || '';
+
+  // Set type toggle
+  const typeMap = { 'event':0, 'no-school':1, 'special':2 };
+  document.querySelectorAll('.type-opt').forEach((el,i) => el.classList.toggle('active', i === (typeMap[note.type] || 0)));
+
+  // Update nav + button labels
+  document.getElementById('adminNavTitle').textContent = 'Edit Note';
+  document.getElementById('adminSaveBtn').textContent = 'Update';
+  document.getElementById('adminFooterLabel').textContent = 'Save Changes';
+
+  // Highlight the row being edited
+  renderAdminNotes();
+
+  // Scroll form into view
+  document.getElementById('adminDateVal').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function promptDelete(day, idx, listIdx, e) {
+  e.stopPropagation();
+  // Hide any other open confirms
+  document.querySelectorAll('.an-confirm').forEach(el => el.classList.remove('show'));
+  document.getElementById(`confirm-${listIdx}`).classList.add('show');
+}
+
+function cancelDelete(listIdx) {
+  document.getElementById(`confirm-${listIdx}`).classList.remove('show');
+}
+
+function confirmDelete(day, idx, listIdx) {
+  // Remove from NOTES data
+  if (NOTES[day]) {
+    NOTES[day].splice(idx, 1);
+    if (NOTES[day].length === 0) delete NOTES[day];
+  }
+  // Remove from admin list
+  ADMIN_MONTH_NOTES.splice(listIdx, 1);
+
+  // Reset form if we were editing this note
+  if (editingNote && editingNote.day === day && editingNote.idx === idx) {
+    editingNote = null;
+    document.getElementById('adminNavTitle').textContent = 'Add Note';
+    document.getElementById('adminSaveBtn').textContent = 'Save';
+    document.getElementById('adminFooterLabel').textContent = 'Save Note';
+    document.getElementById('noteTitle').value = '';
+    document.getElementById('noteBody').value = '';
+  }
+
+  renderAdminNotes();
+  buildCalendar();
+  renderNotes(selectedDay);
+  showToast('🗑 Note deleted');
+}
+
+function setType(el, type) {
+  document.querySelectorAll('.type-opt').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function saveNote() {
+  const title = document.getElementById('noteTitle').value.trim();
+  if (!title) {
+    const input = document.getElementById('noteTitle');
+    input.focus();
+    input.style.borderColor = 'var(--red)';
+    setTimeout(() => input.style.borderColor = '', 1200);
+    return;
+  }
+
+  const activeType = document.querySelector('.type-opt.active');
+  const typeStr = activeType ? activeType.textContent.trim().split(' ')[1].toLowerCase() : 'event';
+  const body = document.getElementById('noteBody').value.trim();
+  const icon = typeStr === 'no-school' ? '🚫' : typeStr === 'special' ? '⭐' : '📝';
+  const type = typeStr === 'school' ? 'no-school' : typeStr;
+  const dotColor = type === 'no-school' ? 'var(--red)' : type === 'special' ? 'var(--orange)' : 'var(--brand)';
+  const bg = type === 'no-school' ? 'var(--red-l)' : type === 'special' ? 'var(--orange-l)' : 'var(--s1)';
+  const titleColor = type === 'no-school' ? 'var(--red)' : 'var(--tp)';
+  const dow = DAYS_LONG[dayOfWeek(selectedDay)];
+
+  if (editingNote) {
+    // UPDATE existing note in NOTES data
+    const note = NOTES[editingNote.day] && NOTES[editingNote.day][editingNote.idx];
+    if (note) {
+      note.title = title;
+      note.body  = body;
+      note.type  = type;
+      note.icon  = icon;
+    }
+    // Update ADMIN_MONTH_NOTES display entry
+    const entry = ADMIN_MONTH_NOTES.find(n => n.day === editingNote.day && n.idx === editingNote.idx);
+    if (entry) {
+      entry.label = `${icon} ${title}`;
+      entry.dotColor = dotColor;
+      entry.bg = bg;
+      entry.titleColor = titleColor;
+    }
+    editingNote = null;
+    pop('s-admin', 's-calendar');
+    setTimeout(() => {
+      buildCalendar();
+      renderNotes(selectedDay);
+      showToast('✓ Note updated');
+    }, 380);
+  } else {
+    // ADD new note (admin-authored by default from this editor)
+    if (!NOTES[selectedDay]) NOTES[selectedDay] = [];
+    NOTES[selectedDay].push({ type, icon, title, body, author: AUTHOR_ADMIN });
+    ADMIN_MONTH_NOTES.push({
+      day: selectedDay, idx: NOTES[selectedDay].length - 1,
+      dotColor, bg, titleColor,
+      label: `${icon} ${title}`,
+      date: `May ${selectedDay}`,
+      author: AUTHOR_ADMIN,
+    });
+    pop('s-admin', 's-calendar');
+    setTimeout(() => {
+      buildCalendar();
+      renderNotes(selectedDay);
+      showToast('✓ Note saved to May calendar');
+    }, 380);
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+buildCalendar();
+renderNotes(selectedDay);
+updateNotesLabel(selectedDay);
+
+// Set starting screen
+document.getElementById('s-chat').classList.remove('right','left');
+document.getElementById('s-calendar').classList.add('right');
+document.getElementById('s-admin').classList.add('right');
+</script>
+
+</body>
+</html>

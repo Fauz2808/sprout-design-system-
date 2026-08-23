@@ -1,0 +1,113 @@
+:root {
+  --stage-w: 540px;
+  --stage-h: 960px;
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+}
+
+body {
+  padding: 0 !important;
+  background: #f4f1ea !important;
+}
+
+.frame {
+  width: var(--stage-w) !important;
+  height: var(--stage-h) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  isolation: isolate;
+}
+
+/* Default state stays visible if animation playback is unavailable. */
+body.motion-ready .frame > * {
+  animation: scene-enter 560ms var(--ease-out) both;
+}
+
+body.motion-ready .frame > *:nth-child(2) { animation-delay: 90ms; }
+body.motion-ready .frame > *:nth-child(3) { animation-delay: 160ms; }
+body.motion-ready .frame > *:nth-child(4) { animation-delay: 230ms; }
+body.motion-ready .frame > *:nth-child(5) { animation-delay: 300ms; }
+body.motion-ready .frame > *:nth-child(n+6) { animation-delay: 360ms; }
+
+.scene01 .row,
+.scene02 .message,
+.scene06 .card,
+.scene08 .row {
+  animation: item-resolve 440ms var(--ease-out) both;
+}
+
+.scene01 .row:nth-of-type(1),
+.scene02 .message:nth-of-type(1),
+.scene06 .card:nth-of-type(1),
+.scene08 .row:nth-of-type(1) { animation-delay: 180ms; }
+
+.scene01 .row:nth-of-type(2),
+.scene02 .message:nth-of-type(2),
+.scene06 .card:nth-of-type(2),
+.scene08 .row:nth-of-type(2) { animation-delay: 300ms; }
+
+.scene01 .row:nth-of-type(n+3),
+.scene02 .message:nth-of-type(n+3),
+.scene06 .card:nth-of-type(n+3),
+.scene08 .row:nth-of-type(3) { animation-delay: 420ms; }
+
+.scene04 .mark { animation: logo-settle 760ms var(--ease-out) both !important; }
+.scene04 .wordmark { animation: wordmark-in 620ms 260ms var(--ease-out) both !important; }
+.scene07 .notif { animation: notification-in 520ms var(--ease-out) both; }
+.scene07 .notif:nth-child(2) { animation-delay: 420ms; }
+.scene09 .rsvpbtn { animation: soft-pulse 1800ms 800ms ease-in-out infinite; }
+.scene10 .deliveredtitle .check { animation: check-in 300ms var(--ease-out) both; }
+.scene12 .mark { animation: logo-settle 620ms var(--ease-out) both !important; }
+.scene12 .wordmark { animation: wordmark-in 520ms 180ms var(--ease-out) both !important; }
+.scene12 .tagline { animation: wordmark-in 520ms 360ms var(--ease-out) both !important; }
+.scene12 .url { animation: wordmark-in 520ms 560ms var(--ease-out) both !important; }
+
+@keyframes scene-enter {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes item-resolve {
+  from { opacity: 0; transform: translateY(18px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes logo-settle {
+  from { opacity: 0; transform: scale(.9); filter: blur(8px); }
+  to { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+
+@keyframes wordmark-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes notification-in {
+  from { opacity: 0; transform: translateY(-26px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes soft-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.018); }
+}
+
+@keyframes check-in {
+  from { opacity: 0; transform: scale(.55); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: .01ms !important;
+  }
+}

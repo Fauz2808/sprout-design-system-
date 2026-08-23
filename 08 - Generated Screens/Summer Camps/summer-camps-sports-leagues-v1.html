@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Summer Camps &amp; Sports Leagues v1 (List + Link-out)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brand-500: #186338; --brand-600: #134f2d; --brand-700: #1e3e2b; --brand-50: #e2e9e3; --brand-100: #d0dacf; --brand-200: #77b691;
+    --secondary-500: #f4f1ea; --secondary-600: #eae6db; --secondary-700: #dbd5c8; --secondary-800: #c2b9a6; --secondary-900: #aa9e83;
+    --grey-100: #e6e7ea; --grey-200: #cdcfd6; --grey-300: #b3b8c1; --grey-400: #9aa0ad; --grey-500: #818898; --grey-700: #4d525b; --grey-900: #1a1b1e;
+    --bg-primary: #f4f1ea; --content-primary: #4d525b; --content-secondary: #818898; --content-brand: #186338;
+    --surface-l0: #f4f1ea; --surface-l1: #eae6db; --surface-l2: #dbd5c8;
+    --camp-orange: #e07b39; --camp-orange-light: #fef3eb; --camp-orange-50: #fde8d4;
+    --league-blue: #1a4a8a; --league-blue-light: #eaf1fb; --league-blue-50: #ddeeff;
+  }
+
+  body { background: #cfc8b8; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 48px 32px 80px; font-family: 'Inter', sans-serif; gap: 48px; flex-wrap: wrap; }
+  .variant-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .variant-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #5a5347; text-align: center; max-width: 320px; }
+
+  .phone { width: 393px; height: 852px; background: var(--bg-primary); border-radius: 54px; overflow: hidden; position: relative; box-shadow: 0 0 0 1px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04), 0 24px 80px rgba(0,0,0,0.22); display: flex; flex-direction: column; }
+
+  .status-bar { height: 54px; background: var(--bg-primary); display: flex; align-items: center; justify-content: space-between; padding: 14px 28px 0; flex-shrink: 0; position: relative; z-index: 5; }
+  .status-time { font-size: 15px; font-weight: 600; color: var(--grey-900); letter-spacing: -0.01em; }
+  .status-icons { display: flex; align-items: center; gap: 7px; }
+  .dynamic-island { width: 120px; height: 36px; background: #000; border-radius: 20px; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 10; }
+
+  .nav-header { background: var(--bg-primary); display: flex; align-items: center; padding: 8px 16px 12px; flex-shrink: 0; gap: 10px; }
+  .back-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-l1); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+  .back-btn svg { width: 16px; height: 16px; color: var(--content-primary); }
+  .nav-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--grey-900); }
+
+  .screen-body { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; padding-bottom: 8px; position: relative; z-index: 1; background: transparent; }
+  .screen-body::-webkit-scrollbar { display: none; }
+
+  /* v1 note banner — explains the punch-out scope */
+  .v1-note { margin: 0 20px 4px; background: var(--surface-l1); border: 1px solid var(--grey-100); border-radius: 12px; padding: 10px 12px; display: flex; gap: 8px; align-items: flex-start; }
+  .v1-note svg { width: 14px; height: 14px; color: var(--content-secondary); flex-shrink: 0; margin-top: 1px; }
+  .v1-note-text { font-size: 11px; color: var(--content-secondary); line-height: 1.5; }
+
+  /* list card — shared by camps + leagues, theme via --accent/--accent-light */
+  .list-wrap { display: flex; flex-direction: column; gap: 10px; padding: 12px 20px 0; }
+  .list-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06); cursor: pointer; display: flex; }
+  .list-thumb { width: 88px; flex-shrink: 0; position: relative; overflow: hidden; }
+  .list-body { flex: 1; padding: 12px 14px; }
+  .list-tags { display: flex; gap: 5px; margin-bottom: 6px; flex-wrap: wrap; }
+  .list-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; background: var(--tag-bg); color: var(--tag-fg); }
+  .list-tag.age { background: var(--brand-50); color: var(--brand-600); }
+  .list-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--grey-900); line-height: 1.3; margin-bottom: 5px; }
+  .list-meta { display: flex; flex-direction: column; gap: 3px; margin-bottom: 8px; }
+  .list-meta-row { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--content-secondary); }
+  .list-meta-row svg { width: 12px; height: 12px; color: var(--grey-400); flex-shrink: 0; }
+  .list-footer { display: flex; align-items: center; justify-content: space-between; }
+  .list-org { font-size: 11.5px; font-weight: 600; color: var(--accent); }
+  .list-link { font-size: 11px; font-weight: 600; color: var(--content-secondary); display: flex; align-items: center; gap: 3px; }
+  .list-link svg { width: 11px; height: 11px; }
+
+  .thumb-c1 { background: linear-gradient(160deg, #2a6648, #60b880); }
+  .thumb-c2 { background: linear-gradient(160deg, #c85e20, #f0a060); }
+  .thumb-c3 { background: linear-gradient(160deg, #1a4a8a, #4a8aca); }
+  .thumb-c4 { background: linear-gradient(160deg, #7a3a8a, #ba7aca); }
+  .thumb-c5 { background: linear-gradient(160deg, #3a7ca5, #7ec8e3); }
+  .thumb-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 32px; opacity: 0.5; }
+
+  /* pinned hero — sits behind the scroll, matches detail page's 220px hero exactly (Tony's ask) */
+  .hero-pin { position: absolute; top: 0; left: 0; right: 0; height: 220px; overflow: hidden; z-index: 0; }
+  .hero-pin.camp { background: linear-gradient(135deg, #1e5c38 0%, #186338 40%, #2a8050 100%); }
+  .hero-pin.league { background: linear-gradient(135deg, #123a66 0%, #1a4a8a 40%, #3a72b8 100%); }
+  .hero-pin-icon { position: absolute; right: 10px; bottom: -10px; font-size: 110px; opacity: 0.18; }
+  .hero-pin-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, transparent 55%, rgba(0,0,0,0.1) 100%); }
+  .hero-pin-label { position: absolute; left: 20px; top: 128px; font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 700; color: #fff; line-height: 1.2; }
+  .hero-pin-label span { display: block; font-family: 'Inter', sans-serif; font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,0.85); margin-top: 3px; }
+
+  .status-bar.float { position: absolute; top: 0; left: 0; right: 0; z-index: 3; background: transparent; }
+  .hero-back-btn { position: absolute; top: 62px; left: 20px; z-index: 3; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.9); backdrop-filter: blur(8px); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .hero-back-btn svg { width: 16px; height: 16px; color: var(--grey-900); }
+
+  .hero-spacer { height: 172px; flex-shrink: 0; }
+
+  /* "Find a Camp" card — slides up over the pinned hero as the list scrolls */
+  .find-card { position: relative; z-index: 1; background: var(--bg-primary); border-radius: 24px 24px 0 0; padding: 18px 20px 6px; box-shadow: 0 -12px 24px rgba(0,0,0,0.08); flex-shrink: 0; }
+  .find-card-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 600; color: var(--grey-900); margin-bottom: 10px; }
+  .loc-wrap { position: relative; }
+  .loc-row { display: flex; align-items: center; gap: 9px; background: #fff; border: 1px solid var(--grey-100); border-radius: 12px; padding: 11px 13px; cursor: pointer; }
+  .loc-row svg.pin { width: 15px; height: 15px; color: var(--accent); flex-shrink: 0; }
+  .loc-row span { flex: 1; font-size: 13.5px; font-weight: 600; color: var(--grey-900); }
+  .loc-row svg.chev { width: 12px; height: 12px; color: var(--grey-300); flex-shrink: 0; transition: transform 0.2s ease; }
+  .loc-row.open svg.chev { transform: rotate(90deg); }
+  .loc-row.open { border-color: var(--accent); }
+
+  /* change-location dropdown — anchored right under the search field, per Tony's "like a dropdown, autofills as I type" */
+  .loc-dropdown { position: absolute; left: 0; right: 0; top: calc(100% + 8px); background: #fff; border: 1px solid var(--grey-100); border-radius: 16px; box-shadow: 0 16px 32px rgba(0,0,0,0.16); padding: 10px 14px 6px; z-index: 6; max-height: 0; opacity: 0; overflow: hidden; pointer-events: none; transition: max-height 0.22s ease, opacity 0.18s ease, padding 0.22s ease; }
+  .loc-dropdown.on { max-height: 280px; opacity: 1; pointer-events: auto; overflow-y: auto; padding: 10px 14px 8px; }
+  .loc-search { display: flex; align-items: center; gap: 8px; background: var(--surface-l0); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+  .loc-search svg { width: 14px; height: 14px; color: var(--content-secondary); flex-shrink: 0; }
+  .loc-search input { border: none; background: transparent; outline: none; flex: 1; font-family: 'Inter', sans-serif; font-size: 13.5px; color: var(--grey-900); }
+  .loc-current { display: flex; align-items: center; gap: 9px; padding: 9px 2px; cursor: pointer; border-bottom: 1px solid var(--grey-100); margin-bottom: 2px; }
+  .loc-current svg { width: 14px; height: 14px; color: var(--accent); flex-shrink: 0; }
+  .loc-current span { font-size: 13px; font-weight: 600; color: var(--accent); }
+  .loc-suggest-row { display: flex; align-items: center; gap: 10px; padding: 9px 2px; cursor: pointer; }
+  .loc-suggest-row svg { width: 13px; height: 13px; color: var(--grey-400); flex-shrink: 0; }
+  .loc-suggest-row .lname { font-size: 13px; font-weight: 600; color: var(--grey-900); }
+
+  /* detail page */
+  .detail-header-img { width: 100%; height: 220px; position: relative; overflow: hidden; flex-shrink: 0; }
+  .detail-header-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.45) 100%); }
+  .detail-back-btn { position: absolute; top: 16px; left: 16px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.88); backdrop-filter: blur(8px); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .detail-back-btn svg { width: 16px; height: 16px; color: var(--grey-900); }
+  .detail-scroll { flex: 1; overflow-y: auto; }
+  .detail-scroll::-webkit-scrollbar { display: none; }
+  .detail-content { padding: 20px; }
+  .detail-eyebrow { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .detail-eyebrow-tag { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); padding: 3px 8px; border-radius: 99px; background: var(--accent-light); }
+  .detail-eyebrow-age { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brand-600); padding: 3px 8px; border-radius: 99px; background: var(--brand-50); }
+  .detail-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--grey-900); line-height: 1.25; margin-bottom: 6px; }
+  .detail-org { font-size: 13px; font-weight: 500; color: var(--content-secondary); margin-bottom: 14px; }
+  .detail-org span { color: var(--accent); font-weight: 600; }
+  .detail-info-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .detail-info-chip { display: flex; align-items: center; gap: 5px; flex: 1; min-width: 0; background: #fff; border-radius: 10px; padding: 8px 12px; border: 1px solid var(--grey-100); box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .detail-info-chip svg { width: 14px; height: 14px; color: var(--accent); flex-shrink: 0; }
+  .detail-info-chip-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--content-secondary); }
+  .detail-info-chip-value { font-size: 13px; font-weight: 600; color: var(--grey-900); }
+  .detail-divider { height: 1px; background: var(--grey-100); margin: 16px 0; }
+  .detail-section-label { font-size: 13px; font-weight: 700; color: var(--grey-900); margin-bottom: 8px; }
+  .detail-desc { font-size: 13.5px; color: var(--content-primary); line-height: 1.6; margin-bottom: 16px; }
+  .location-card { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--grey-100); border-radius: 14px; padding: 12px 14px; margin: 4px 0 16px; }
+  .location-card-icon { width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0; background: var(--accent-light); display: flex; align-items: center; justify-content: center; }
+  .location-card-icon svg { width: 17px; height: 17px; color: var(--accent); }
+  .location-card-text { flex: 1; min-width: 0; }
+  .location-card-address { font-size: 13px; font-weight: 600; color: var(--grey-900); line-height: 1.35; }
+  .location-card-sub { font-size: 11px; color: var(--content-secondary); margin-top: 2px; }
+
+  /* v1: informational price/season strip, not a checkout CTA */
+  .info-hero-row { display: flex; align-items: center; justify-content: space-between; background: var(--accent-light); border: 1px solid var(--grey-100); border-radius: 16px; padding: 14px 16px; margin: 14px 0; }
+  .info-hero-amount { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--grey-900); line-height: 1; }
+  .info-hero-amount span { font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 400; color: var(--content-secondary); }
+  .info-hero-note { font-size: 11.5px; color: var(--content-secondary); margin-top: 4px; }
+  .info-hero-badge { font-size: 10.5px; font-weight: 700; color: var(--accent); background: #fff; padding: 5px 10px; border-radius: 99px; white-space: nowrap; }
+
+  /* external-link CTA — replaces "Register" for v1 */
+  .detail-cta { position: sticky; bottom: 0; padding: 12px 20px 16px; background: linear-gradient(to top, var(--bg-primary) 80%, transparent); flex-shrink: 0; }
+  .website-btn { width: 100%; height: 52px; border-radius: 14px; background: var(--accent); border: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; font-weight: 700; color: #fff; cursor: pointer; }
+  .website-btn svg { width: 16px; height: 16px; }
+  .website-note { text-align: center; font-size: 11px; color: var(--content-secondary); margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div style="width:100%;text-align:center;padding-bottom:8px;flex-basis:100%;">
+  <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#3a332a;margin-bottom:6px;">
+    ⛺ Summer Camps &amp; 🏆 Sports Leagues — v1 (Discovery Only)
+  </div>
+  <div style="font-size:13px;color:#7a7060;max-width:680px;margin:0 auto 4px;line-height:1.6;">
+    Per Tony: real camp/league partnerships and in-app one-tap registration are Fall/Jan work. This v1 is browse-and-link-out only —
+    same list-view pattern for both categories, no kid selector, no week picker, no in-app checkout. Tapping a card opens a detail page
+    ending in "Go to website," not "Register." Content below uses 5 placeholder entries per category — swap in Tony's real list once he sends it.
+  </div>
+</div>
+
+<!-- ═══ SUMMER CAMPS — LIST v1 ═══ -->
+<div class="variant-wrap">
+  <div class="phone">
+    <div class="hero-pin camp">
+      <div class="hero-pin-icon">⛺</div>
+      <div class="hero-pin-overlay"></div>
+      <div class="hero-pin-label">Summer Camps<span>🌞 Browse camps, then head to their site to enrol</span></div>
+    </div>
+    <div class="status-bar float">
+      <span class="status-time" style="color:#fff;">9:41</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#fff"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#fff"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#fff"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="#fff" opacity="0.4"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity="0.6"/><rect x="2" y="2" width="14" height="8" rx="2" fill="#fff"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#fff" opacity="0.5"/></svg>
+      </div>
+    </div>
+    <button class="hero-back-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+
+    <div class="screen-body">
+      <div class="hero-spacer"></div>
+      <div class="find-card" style="--accent:var(--camp-orange);">
+        <div class="find-card-title">Find a Camp</div>
+        <div class="loc-wrap">
+          <div class="loc-row" id="locRow-camp" onclick="toggleLocDropdown('camp')">
+            <svg class="pin" viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+            <span id="locText-camp">Near Sydney, NSW</span>
+            <svg class="chev" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="loc-dropdown" id="locDropdown-camp">
+            <div class="loc-search"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input placeholder="Search a suburb or city" oninput="filterLoc(this,'camp')"></div>
+            <div class="loc-current" onclick="pickLoc('camp','Current Location')"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="8" r="3.5" stroke="currentColor" stroke-width="1.6"/></svg><span>Use current location</span></div>
+            <div class="loc-suggest" id="locSuggest-camp"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v1-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v.5M12 11v5" stroke-linecap="round"/></svg>
+        <div class="v1-note-text">Browsing only for now — tap a camp to see details, then continue on the organiser's own website to enrol.</div>
+      </div>
+
+      <div class="list-wrap" style="--tag-bg:var(--camp-orange-light);--tag-fg:var(--camp-orange);--accent:var(--camp-orange);">
+        <div class="list-card">
+          <div class="list-thumb thumb-c1"><div class="thumb-icon">🌿</div></div>
+          <div class="list-body">
+            <div class="list-tags"><span class="list-tag">Outdoor</span><span class="list-tag age">Ages 6–12</span></div>
+            <div class="list-name">Nature Explorers Camp</div>
+            <div class="list-meta">
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Jul 7 – Jul 18 · Full day</div>
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>Centennial Park, Randwick</div>
+            </div>
+            <div class="list-footer"><span class="list-org">Wild Kids Co.</span><span class="list-link">Details<svg viewBox="0 0 16 16" fill="none"><path d="M6 3l6 5-6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          </div>
+        </div>
+
+        <div class="list-card">
+          <div class="list-thumb thumb-c2"><div class="thumb-icon">🎨</div></div>
+          <div class="list-body">
+            <div class="list-tags"><span class="list-tag" style="background:#fde8d4;color:#c85e20;">Arts</span><span class="list-tag age">Ages 5–10</span></div>
+            <div class="list-name">Creative Arts Summer Camp</div>
+            <div class="list-meta">
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Jul 14 – Jul 25 · Half day</div>
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>Surry Hills Community Centre</div>
+            </div>
+            <div class="list-footer"><span class="list-org">Little Picassos</span><span class="list-link">Details<svg viewBox="0 0 16 16" fill="none"><path d="M6 3l6 5-6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          </div>
+        </div>
+
+        <div class="list-card">
+          <div class="list-thumb thumb-c3"><div class="thumb-icon">🏊</div></div>
+          <div class="list-body">
+            <div class="list-tags"><span class="list-tag" style="background:#ddeeff;color:#1a4a8a;">Sport</span><span class="list-tag age">Ages 7–14</span></div>
+            <div class="list-name">AquaSport Summer Academy</div>
+            <div class="list-meta">
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Jul 7 – Jul 11 · Full day</div>
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>Sydney Olympic Park Aquatic</div>
+            </div>
+            <div class="list-footer"><span class="list-org">AquaSport Academy</span><span class="list-link">Details<svg viewBox="0 0 16 16" fill="none"><path d="M6 3l6 5-6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          </div>
+        </div>
+
+        <div class="list-card">
+          <div class="list-thumb thumb-c4"><div class="thumb-icon">🎭</div></div>
+          <div class="list-body">
+            <div class="list-tags"><span class="list-tag" style="background:#eeddf5;color:#7a3a8a;">Drama</span><span class="list-tag age">Ages 8–13</span></div>
+            <div class="list-name">Stage Stars Theatre Camp</div>
+            <div class="list-meta">
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Jul 21 – Aug 1 · Full day</div>
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>Newtown Arts Centre</div>
+            </div>
+            <div class="list-footer"><span class="list-org">Stage Stars</span><span class="list-link">Details<svg viewBox="0 0 16 16" fill="none"><path d="M6 3l6 5-6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          </div>
+        </div>
+
+        <div class="list-card">
+          <div class="list-thumb thumb-c5"><div class="thumb-icon">🔬</div></div>
+          <div class="list-body">
+            <div class="list-tags"><span class="list-tag" style="background:#e2eef8;color:#2f6f9e;">STEM</span><span class="list-tag age">Ages 8–12</span></div>
+            <div class="list-name">Young Scientists Camp</div>
+            <div class="list-meta">
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Jul 7 – Jul 11 · Full day</div>
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>UNSW Kensington Campus</div>
+            </div>
+            <div class="list-footer"><span class="list-org">Curious Minds Lab</span><span class="list-link">Details<svg viewBox="0 0 16 16" fill="none"><path d="M6 3l6 5-6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          </div>
+        </div>
+      </div>
+      <div style="height:20px;"></div>
+    </div>
+  </div>
+  <span class="variant-label">Summer Camps — v1 List (no kid/week filters, tap → detail → external link)</span>
+</div>
+
+<!-- ═══ SUMMER CAMP — DETAIL v1 ═══ -->
+<div class="variant-wrap">
+  <div class="phone">
+    <div class="status-bar" style="background:transparent;position:absolute;top:0;left:0;right:0;z-index:10;">
+      <span class="status-time" style="color:#fff;">9:41</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#fff"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#fff"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#fff"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="#fff" opacity="0.4"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity="0.6"/><rect x="2" y="2" width="14" height="8" rx="2" fill="#fff"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#fff" opacity="0.5"/></svg>
+      </div>
+    </div>
+    <div class="detail-header-img" style="margin-top:0;">
+      <div style="width:100%;height:100%;position:relative;background:linear-gradient(135deg, #1e5c38 0%, #186338 40%, #2a8050 100%);">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:0.22;">🌿</div>
+      </div>
+      <div class="detail-header-overlay"></div>
+      <button class="detail-back-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <div class="detail-scroll" style="--accent:var(--camp-orange);--accent-light:var(--camp-orange-light);">
+      <div class="detail-content">
+        <div class="detail-eyebrow"><span class="detail-eyebrow-tag">Outdoor</span><span class="detail-eyebrow-age">Ages 6–12</span></div>
+        <div class="detail-title">Nature Explorers Camp</div>
+        <div class="detail-org">Run by <span>Wild Kids Co.</span></div>
+
+        <div class="detail-info-row">
+          <div class="detail-info-chip"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><div><div class="detail-info-chip-label">Dates</div><div class="detail-info-chip-value">Jul 7–18</div></div></div>
+          <div class="detail-info-chip"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><div><div class="detail-info-chip-label">Hours</div><div class="detail-info-chip-value">Full day</div></div></div>
+          <div class="detail-info-chip"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5 13.5 14 8 11 2.5 14 8 1.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><div><div class="detail-info-chip-label">Distance</div><div class="detail-info-chip-value">2.3 km</div></div></div>
+        </div>
+
+        <div class="info-hero-row">
+          <div><div class="info-hero-amount">$420 <span>/ 2 weeks</span></div><div class="info-hero-note">Estimated — confirm on organiser's site</div></div>
+          <div class="info-hero-badge">⛺ Camp</div>
+        </div>
+
+        <div class="detail-section-label">About this camp</div>
+        <div class="detail-desc">Two weeks of bushwalking, wildlife spotting, campfire cooking, and outdoor survival basics for curious kids. Small groups, all gear included.</div>
+
+        <div class="location-card">
+          <div class="location-card-icon"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5 13.5 14 8 11 2.5 14 8 1.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
+          <div class="location-card-text"><div class="location-card-address">Centennial Park, Grand Dr, Randwick NSW 2031</div><div class="location-card-sub">Street parking available</div></div>
+        </div>
+
+        <div class="detail-divider"></div>
+        <div class="detail-section-label">Enrolling</div>
+        <div class="detail-desc">Sprout doesn't handle sign-ups for this camp yet — tap below to enrol directly with Wild Kids Co.</div>
+      </div>
+    </div>
+    <div class="detail-cta" style="--accent:var(--camp-orange);">
+      <button class="website-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M6 3H3v10h10v-3M9 3h4v4M7 9l6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Go to Wild Kids Co. website</button>
+      <div class="website-note">You'll leave the Sprout app to enrol</div>
+    </div>
+  </div>
+  <span class="variant-label">Summer Camp Detail — v1 (CTA is "Go to website," not "Register")</span>
+</div>
+
+<!-- ═══ SPORTS LEAGUES — LIST v1 ═══ -->
+<div class="variant-wrap">
+  <div class="phone">
+    <div class="hero-pin league">
+      <div class="hero-pin-icon">⚽</div>
+      <div class="hero-pin-overlay"></div>
+      <div class="hero-pin-label">Sports Leagues<span>🏆 Browse leagues, then sign up on their own site</span></div>
+    </div>
+    <div class="status-bar float">
+      <span class="status-time" style="color:#fff;">9:41</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#fff"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#fff"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#fff"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="#fff" opacity="0.4"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity="0.6"/><rect x="2" y="2" width="14" height="8" rx="2" fill="#fff"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#fff" opacity="0.5"/></svg>
+      </div>
+    </div>
+    <button class="hero-back-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+
+    <div class="screen-body">
+      <div class="hero-spacer"></div>
+      <div class="find-card" style="--accent:var(--league-blue);">
+        <div class="find-card-title">Find a League</div>
+        <div class="loc-wrap">
+          <div class="loc-row" id="locRow-league" onclick="toggleLocDropdown('league')">
+            <svg class="pin" viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+            <span id="locText-league">Near Sydney, NSW</span>
+            <svg class="chev" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="loc-dropdown" id="locDropdown-league">
+            <div class="loc-search"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input placeholder="Search a suburb or city" oninput="filterLoc(this,'league')"></div>
+            <div class="loc-current" onclick="pickLoc('league','Current Location')"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="8" r="3.5" stroke="currentColor" stroke-width="1.6"/></svg><span>Use current location</span></div>
+            <div class="loc-suggest" id="locSuggest-league"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v1-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v.5M12 11v5" stroke-linecap="round"/></svg>
+        <div class="v1-note-text">Browsing only for now — tap a league to see details, then continue on the organiser's own website to sign up.</div>
+      </div>
+
+      <div class="list-wrap" style="--tag-bg:var(--league-blue-50);--tag-fg:var(--league-blue);--accent:var(--league-blue);">
+        <div class="list-card">
+          <div class="list-thumb thumb-c3"><div class="thumb-icon">⚽</div></div>
+          <div class="list-body">
+            <div class="list-tags"><span class="list-tag">Soccer</span><span class="list-tag age">Ages 5–8</span></div>
+            <div class="list-name">Randwick Junior Soccer League</div>
+            <div class="list-meta">
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Term 3 · Sat mornings</div>
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>Coogee Oval</div>
+            </div>
+            <div class="list-footer"><span class="list-org">Eastern Suburbs FC</span><span class="list-link">Details<svg viewBox="0 0 16 16" fill="none"><path d="M6 3l6 5-6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          </div>
+        </div>
+
+        <div class="list-card">
+          <div class="list-thumb thumb-c1"><div class="thumb-icon">🏀</div></div>
+          <div class="list-body">
+            <div class="list-tags"><span class="list-tag">Basketball</span><span class="list-tag age">Ages 8–12</span></div>
+            <div class="list-name">Little Ballers Basketball Club</div>
+            <div class="list-meta">
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Term 3 · Wed evenings</div>
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>Prince Alfred Park Courts</div>
+            </div>
+            <div class="list-footer"><span class="list-org">Little Ballers</span><span class="list-link">Details<svg viewBox="0 0 16 16" fill="none"><path d="M6 3l6 5-6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          </div>
+        </div>
+
+        <div class="list-card">
+          <div class="list-thumb thumb-c5"><div class="thumb-icon">🏊</div></div>
+          <div class="list-body">
+            <div class="list-tags"><span class="list-tag">Swimming</span><span class="list-tag age">Ages 4–10</span></div>
+            <div class="list-name">Bondi Swim Squad</div>
+            <div class="list-meta">
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Ongoing · Tue &amp; Thu</div>
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>Bondi Icebergs Pool</div>
+            </div>
+            <div class="list-footer"><span class="list-org">Bondi Swim Squad</span><span class="list-link">Details<svg viewBox="0 0 16 16" fill="none"><path d="M6 3l6 5-6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          </div>
+        </div>
+
+        <div class="list-card">
+          <div class="list-thumb thumb-c4"><div class="thumb-icon">🎾</div></div>
+          <div class="list-body">
+            <div class="list-tags"><span class="list-tag">Tennis</span><span class="list-tag age">Ages 6–14</span></div>
+            <div class="list-name">Eastside Junior Tennis</div>
+            <div class="list-meta">
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Term 3 · Sat mornings</div>
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>Waverley Park Courts</div>
+            </div>
+            <div class="list-footer"><span class="list-org">Eastside Tennis Academy</span><span class="list-link">Details<svg viewBox="0 0 16 16" fill="none"><path d="M6 3l6 5-6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          </div>
+        </div>
+
+        <div class="list-card">
+          <div class="list-thumb thumb-c2"><div class="thumb-icon">🏈</div></div>
+          <div class="list-body">
+            <div class="list-tags"><span class="list-tag">AFL</span><span class="list-tag age">Ages 7–12</span></div>
+            <div class="list-name">Eastern Suburbs Auskick</div>
+            <div class="list-meta">
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Term 3 · Sun mornings</div>
+              <div class="list-meta-row"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>Queens Park Oval</div>
+            </div>
+            <div class="list-footer"><span class="list-org">Eastern Suburbs AFL</span><span class="list-link">Details<svg viewBox="0 0 16 16" fill="none"><path d="M6 3l6 5-6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          </div>
+        </div>
+      </div>
+      <div style="height:20px;"></div>
+    </div>
+  </div>
+  <span class="variant-label">Sports Leagues — v1 List (new — same pattern as Summer Camps list)</span>
+</div>
+
+<!-- ═══ SPORTS LEAGUE — DETAIL v1 ═══ -->
+<div class="variant-wrap">
+  <div class="phone">
+    <div class="status-bar" style="background:transparent;position:absolute;top:0;left:0;right:0;z-index:10;">
+      <span class="status-time" style="color:#fff;">9:41</span>
+      <div class="dynamic-island"></div>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#fff"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#fff"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#fff"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="#fff" opacity="0.4"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity="0.6"/><rect x="2" y="2" width="14" height="8" rx="2" fill="#fff"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#fff" opacity="0.5"/></svg>
+      </div>
+    </div>
+    <div class="detail-header-img" style="margin-top:0;">
+      <div style="width:100%;height:100%;position:relative;background:linear-gradient(135deg, #123a66 0%, #1a4a8a 40%, #3a72b8 100%);">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:0.22;">⚽</div>
+      </div>
+      <div class="detail-header-overlay"></div>
+      <button class="detail-back-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <div class="detail-scroll" style="--accent:var(--league-blue);--accent-light:var(--league-blue-light);">
+      <div class="detail-content">
+        <div class="detail-eyebrow"><span class="detail-eyebrow-tag">Soccer</span><span class="detail-eyebrow-age">Ages 5–8</span></div>
+        <div class="detail-title">Randwick Junior Soccer League</div>
+        <div class="detail-org">Run by <span>Eastern Suburbs FC</span></div>
+
+        <div class="detail-info-row">
+          <div class="detail-info-chip"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><div><div class="detail-info-chip-label">Season</div><div class="detail-info-chip-value">Term 3</div></div></div>
+          <div class="detail-info-chip"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><div><div class="detail-info-chip-label">Schedule</div><div class="detail-info-chip-value">Sat mornings</div></div></div>
+          <div class="detail-info-chip"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5 13.5 14 8 11 2.5 14 8 1.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><div><div class="detail-info-chip-label">Distance</div><div class="detail-info-chip-value">1.8 km</div></div></div>
+        </div>
+
+        <div class="info-hero-row">
+          <div><div class="info-hero-amount">$180 <span>/ term</span></div><div class="info-hero-note">Estimated — confirm on club's site</div></div>
+          <div class="info-hero-badge">🏆 League</div>
+        </div>
+
+        <div class="detail-section-label">About this league</div>
+        <div class="detail-desc">Non-competitive junior soccer for beginners — small-sided games, all skill levels welcome. Uniform and ball provided in registration fee.</div>
+
+        <div class="location-card">
+          <div class="location-card-icon"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5 13.5 14 8 11 2.5 14 8 1.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
+          <div class="location-card-text"><div class="location-card-address">Coogee Oval, Byron St, Coogee NSW 2034</div><div class="location-card-sub">Free parking on-site</div></div>
+        </div>
+
+        <div class="detail-divider"></div>
+        <div class="detail-section-label">Signing up</div>
+        <div class="detail-desc">Sprout doesn't handle sign-ups for this league yet — tap below to register directly with Eastern Suburbs FC.</div>
+      </div>
+    </div>
+    <div class="detail-cta" style="--accent:var(--league-blue);">
+      <button class="website-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M6 3H3v10h10v-3M9 3h4v4M7 9l6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Go to Eastern Suburbs FC website</button>
+      <div class="website-note">You'll leave the Sprout app to sign up</div>
+    </div>
+  </div>
+  <span class="variant-label">Sports League Detail — v1 (new — mirrors Camp Detail, CTA is "Go to website")</span>
+</div>
+
+<script>
+const LOCATIONS = ['Sydney, NSW','Randwick, NSW','Bondi, NSW','Coogee, NSW','Parramatta, NSW','Newcastle, NSW','Melbourne, VIC'];
+
+function closeAllLocDropdowns(exceptKey){
+  ['camp','league'].forEach(k=>{
+    if(k===exceptKey) return;
+    document.getElementById('locDropdown-'+k).classList.remove('on');
+    document.getElementById('locRow-'+k).classList.remove('open');
+  });
+}
+function toggleLocDropdown(key){
+  const dd = document.getElementById('locDropdown-'+key);
+  const row = document.getElementById('locRow-'+key);
+  const isOpen = dd.classList.contains('on');
+  closeAllLocDropdowns(null);
+  if(!isOpen){
+    dd.classList.add('on'); row.classList.add('open');
+    const input = dd.querySelector('input');
+    input.value=''; filterLoc(input,key);
+  }
+}
+function pickLoc(key,name){
+  document.getElementById('locText-'+key).textContent = 'Near ' + name;
+  document.getElementById('locDropdown-'+key).classList.remove('on');
+  document.getElementById('locRow-'+key).classList.remove('open');
+}
+function filterLoc(input,key){
+  const q = (input.value||'').toLowerCase();
+  const matches = q ? LOCATIONS.filter(l=>l.toLowerCase().includes(q)) : LOCATIONS.slice(0,5);
+  const list = document.getElementById('locSuggest-'+key);
+  list.innerHTML = matches.length ? matches.map(l=>`<div class="loc-suggest-row" onclick="pickLoc('${key}','${l}')"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="currentColor" stroke-width="1.4"/></svg><div class="lname">${l}</div></div>`).join('')
+    : '<div style="padding:14px 2px;color:var(--content-secondary);font-size:13px;">No matches</div>';
+}
+document.addEventListener('click', function(e){
+  ['camp','league'].forEach(k=>{
+    const wrap = document.getElementById('locRow-'+k).closest('.loc-wrap');
+    if(!wrap.contains(e.target)){
+      document.getElementById('locDropdown-'+k).classList.remove('on');
+      document.getElementById('locRow-'+k).classList.remove('open');
+    }
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Update Card — Unread/Read, 4 Variants · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff; --field:#e8e2d6;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e; --green:#186338; --brand-mid:#4fa472;
+    --brand-light:#e2e9e3; --brand-border:#77b691; --border-light:#d0dacf; --border:#e6e7ea;
+    --shadow-m:1px 4px 25px rgba(13,13,18,.05);
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:30px 34px;padding:40px 22px 80px;}
+  .lede{flex:1 0 100%;text-align:center;max-width:800px;margin:0 auto 6px;}
+  .lede h1{font-family:var(--serif);font-weight:700;font-size:23px;color:#23271f;margin:0 0 6px;}
+  .lede p{font-size:12.5px;color:#6a665b;margin:0;line-height:1.55;}
+  .ph{display:inline-block;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+
+  .panel{display:flex;flex-direction:column;align-items:center;gap:11px;}
+  .panel-label{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:330px;line-height:1.55;}
+  .panel-label b{color:#3a3830;}
+
+  .device{position:relative;width:335px;height:660px;border-radius:44px;padding:9px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 2px #000 inset,0 20px 42px -12px rgba(0,0,0,.42);}
+  .island{position:absolute;top:16px;left:50%;transform:translateX(-50%);width:100px;height:28px;background:#000;border-radius:999px;z-index:60;}
+  .screen{position:relative;width:100%;height:100%;border-radius:35px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .sb{flex:0 0 38px;padding:13px 22px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:13px;font-weight:600;color:var(--ink);}
+  .sb .r{display:inline-flex;gap:5px;align-items:center;} .sb svg{width:15px;height:10px;fill:var(--ink);} .sb .bat{width:22px;}
+
+  .hrow2{display:flex;align-items:center;justify-content:space-between;padding:4px 14px 0;}
+  .hrow2 .ib{width:30px;height:30px;border-radius:50%;background:var(--brand-light);display:grid;place-items:center;color:var(--green);flex-shrink:0;}
+  .hrow2 .ib .ph{width:15px;height:15px;}
+  .hidb{display:flex;flex-direction:column;align-items:center;text-align:center;padding:2px 0 8px;}
+  .hidb .av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:17px;background:linear-gradient(145deg,#1e3e2b,#4fa472);}
+  .hidb .nm{font-family:var(--serif);font-weight:600;font-size:15px;color:var(--ink);margin-top:6px;}
+  .hidb .mt{font-size:10.5px;color:var(--muted);margin-top:1px;}
+
+  .tabs{display:flex;border-bottom:1px solid var(--border-light);padding:0 6px;margin-top:4px;}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 8px;color:var(--muted);position:relative;}
+  .tab .ph{width:17px;height:17px;}
+  .tab .tl{font-size:9px;font-weight:500;}
+  .tab.on{color:var(--green);}
+  .tab.on .tl{font-weight:600;}
+  .tab.on::after{content:"";position:absolute;left:16%;right:16%;bottom:-1px;height:2.5px;background:var(--green);border-radius:2px;}
+
+  .scroll{flex:1;overflow-y:auto;padding:12px 13px;}
+  .slbl{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 10px;}
+  .slbl .t{font-family:var(--serif);font-weight:600;font-size:13px;color:var(--ink);}
+  .email-pill{display:inline-flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--border-light);border-radius:999px;padding:4px 9px 4px 6px;box-shadow:var(--shadow-m);}
+  .email-pill .av{width:16px;height:16px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);color:#fff;font-family:var(--serif);font-weight:600;font-size:7.5px;display:grid;place-items:center;}
+  .email-pill .e{font-size:10px;color:var(--body);}
+
+  /* shared card anatomy */
+  .ucard{border-radius:14px;padding:12px 13px;margin-bottom:9px;position:relative;}
+  .ucard .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+  .ucard h3{font-family:var(--serif);font-size:14px;margin:0;}
+  .ucard .dt{font-size:10.5px;color:var(--muted);flex-shrink:0;}
+  .ucard p{font-size:11.5px;color:#5f5849;line-height:1.42;margin:0 0 8px;}
+  .ucard .snd{display:flex;align-items:center;justify-content:space-between;}
+  .ucard .who{display:inline-flex;align-items:center;gap:6px;}
+  .ucard .fav{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:8.5px;background:linear-gradient(145deg,#1e3e2b,#4fa472);flex-shrink:0;}
+  .ucard .wname{font-size:11px;font-weight:600;color:var(--ink);}
+  .ucard .tm{font-size:10.5px;color:var(--muted);}
+
+  /* ── A: left accent bar + corner dot ── */
+  .cardA{background:var(--card);box-shadow:var(--shadow-m);border-left:3px solid transparent;}
+  .cardA.unread{border-left-color:var(--green);}
+  .cardA.unread h3{color:var(--ink);font-weight:700;}
+  .cardA.read h3{color:var(--body);font-weight:600;}
+  .dotA{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;margin-right:5px;vertical-align:middle;}
+
+  /* ── B: bold weight + corner dot + faint tint ── */
+  .cardB{box-shadow:var(--shadow-m);}
+  .cardB.unread{background:#eef4ee;}
+  .cardB.unread h3{color:var(--ink);font-weight:700;}
+  .cardB.unread .wname{font-weight:700;}
+  .cardB.read{background:var(--card);}
+  .cardB.read h3{color:var(--body);font-weight:600;}
+  .cardB.read .wname{font-weight:500;color:var(--muted);}
+  .dotB{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;}
+
+  /* ── C: density — unread full, read collapses ── */
+  .cardC.unread{background:var(--card);box-shadow:var(--shadow-m);}
+  .cardC.unread h3{color:var(--ink);font-weight:700;}
+  .cardC.read{background:transparent;box-shadow:none;padding:9px 4px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border-light);border-radius:0;margin-bottom:0;}
+  .cardC.read .cav{width:26px;height:26px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);color:#fff;font-family:var(--serif);font-weight:600;font-size:10px;display:grid;place-items:center;flex-shrink:0;}
+  .cardC.read .ctext{flex:1;min-width:0;font-size:12px;color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .cardC.read .ctext b{color:var(--ink);font-weight:600;}
+  .cardC.read .ctm{font-size:10px;color:var(--muted);flex-shrink:0;}
+
+  /* ── D: grouped sections, unread count badge ── */
+  .sechead{display:flex;align-items:center;gap:7px;margin:4px 2px 9px;}
+  .sechead .st{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+  .sechead .cnt{min-width:16px;height:16px;padding:0 5px;border-radius:999px;background:var(--green);color:#fff;font-size:9.5px;font-weight:700;display:grid;place-items:center;}
+  .cardD{background:var(--card);box-shadow:var(--shadow-m);}
+  .cardD.unread h3{color:var(--ink);font-weight:700;}
+  .cardD.unread .dotD{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;margin-right:5px;}
+  .cardD.read h3{color:var(--body);font-weight:600;}
+  .cardD.read .dotD{display:none;}
+</style>
+</head>
+<body>
+<div class="lede">
+  <h1>Update Card — Unread vs Read, 4 Variants</h1>
+  <p>Konten sama semua (judul, tanggal, preview, pengirim, waktu) — yang beda cuma cara nunjukin status. Sender diganti nama ramah ("Ms. Taylor") dari email mentah, biar konsisten sama kartu update yang lain di app.</p>
+</div>
+
+<!-- A -->
+<div class="panel">
+  <div class="panel-label"><b>A · Accent bar + dot</b> — gak nyentuh warna background sama sekali. Garis hijau tipis di kiri + titik kecil = unread. Aman dari masalah "warna doang" (accessibility), dan gak numpuk arti baru ke warna hijau brand yang udah dipake buat hal lain.</div>
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="hrow2"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M227.31 73.37 182.63 28.7a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63Z"/></svg></span></div></div>
+    <div class="hidb"><div class="av">MT</div><div class="nm">Miss Taylor Class</div><div class="mt">10 members</div></div>
+    <div class="tabs">
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24"/></svg></span><span class="tl">Chat</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16"/></svg></span><span class="tl">Calendar</span></div>
+      <div class="tab on"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span><span class="tl">Updates</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224"/></svg></span><span class="tl">Links</span></div>
+    </div>
+    <div class="scroll">
+      <div class="slbl"><span class="t">Updates</span><div class="email-pill"><div class="av">AM</div><span class="e">anthonyjohn…@gmail.com</span></div></div>
+      <div class="ucard cardA unread"><div class="top"><h3><span class="dotA"></span>Thank you</h3><span class="dt">May 29</span></div><p>A heartfelt end-of-year thank-you to families for their support, gifts, and a wonderful year together.</p><div class="snd"><div class="who"><div class="fav">MT</div><span class="wname">Ms. Taylor</span></div><span class="tm">1:00 PM</span></div></div>
+      <div class="ucard cardA read"><div class="top"><h3>Thank you</h3><span class="dt">May 29</span></div><p>A heartfelt end-of-year thank-you to families for their support, gifts, and a wonderful year together.</p><div class="snd"><div class="who"><div class="fav">MT</div><span class="wname">Ms. Taylor</span></div><span class="tm">1:00 PM</span></div></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- B -->
+<div class="panel">
+  <div class="panel-label"><b>B · Bold weight + dot + faint tint</b> — pola paling familiar (persis Mail app/WhatsApp). Bold + dot adalah sinyal utama, tint ijo pucat cuma penguat sekunder, jadi tetep kebaca walau dilihat sekilas/hitam-putih.</div>
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="hrow2"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M227.31 73.37 182.63 28.7a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63Z"/></svg></span></div></div>
+    <div class="hidb"><div class="av">MT</div><div class="nm">Miss Taylor Class</div><div class="mt">10 members</div></div>
+    <div class="tabs">
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24"/></svg></span><span class="tl">Chat</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16"/></svg></span><span class="tl">Calendar</span></div>
+      <div class="tab on"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span><span class="tl">Updates</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224"/></svg></span><span class="tl">Links</span></div>
+    </div>
+    <div class="scroll">
+      <div class="slbl"><span class="t">Updates</span><div class="email-pill"><div class="av">AM</div><span class="e">anthonyjohn…@gmail.com</span></div></div>
+      <div class="ucard cardB unread"><div class="top"><h3>Thank you</h3><span class="dt">May 29</span></div><p>A heartfelt end-of-year thank-you to families for their support, gifts, and a wonderful year together.</p><div class="snd"><div class="who"><div class="fav">MT</div><span class="wname">Ms. Taylor</span></div><span style="display:flex;align-items:center;gap:6px;"><span class="tm">1:00 PM</span><span class="dotB"></span></span></div></div>
+      <div class="ucard cardB read"><div class="top"><h3>Thank you</h3><span class="dt">May 29</span></div><p>A heartfelt end-of-year thank-you to families for their support, gifts, and a wonderful year together.</p><div class="snd"><div class="who"><div class="fav">MT</div><span class="wname">Ms. Taylor</span></div><span class="tm">1:00 PM</span></div></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- C -->
+<div class="panel">
+  <div class="panel-label"><b>C · Density — read cards collapse</b> — unread tetep full card kayak sekarang. Begitu dibuka, kartu menyusut jadi satu baris ringkas (avatar+judul+waktu doang). List makin lama makin rapi karena yang udah dibaca gak makan tempat — bagus kalau update-nya bakal numpuk banyak.</div>
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="hrow2"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M227.31 73.37 182.63 28.7a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63Z"/></svg></span></div></div>
+    <div class="hidb"><div class="av">MT</div><div class="nm">Miss Taylor Class</div><div class="mt">10 members</div></div>
+    <div class="tabs">
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24"/></svg></span><span class="tl">Chat</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16"/></svg></span><span class="tl">Calendar</span></div>
+      <div class="tab on"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span><span class="tl">Updates</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224"/></svg></span><span class="tl">Links</span></div>
+    </div>
+    <div class="scroll">
+      <div class="slbl"><span class="t">Updates</span><div class="email-pill"><div class="av">AM</div><span class="e">anthonyjohn…@gmail.com</span></div></div>
+      <div class="ucard cardC unread"><div class="top"><h3 style="color:var(--ink);">Thank you</h3><span class="dt">May 29</span></div><p>A heartfelt end-of-year thank-you to families for their support, gifts, and a wonderful year together.</p><div class="snd"><div class="who"><div class="fav">MT</div><span class="wname">Ms. Taylor</span></div><span class="tm">1:00 PM</span></div></div>
+      <div class="cardC read"><div class="cav">MT</div><div class="ctext"><b>Ms. Taylor</b> — Thank you: A heartfelt end-of-year thank-you...</div><div class="ctm">1:00 PM</div></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- D -->
+<div class="panel">
+  <div class="panel-label"><b>D · Grouped sections</b> — "NEW" vs "EARLIER" jadi section terpisah dengan badge count. Status ditunjukin di level struktur, bukan per-kartu — enak buat scan cepat "ada berapa yang baru" tanpa harus baca tiap kartu satu-satu.</div>
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="hrow2"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M227.31 73.37 182.63 28.7a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63Z"/></svg></span></div></div>
+    <div class="hidb"><div class="av">MT</div><div class="nm">Miss Taylor Class</div><div class="mt">10 members</div></div>
+    <div class="tabs">
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24"/></svg></span><span class="tl">Chat</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16"/></svg></span><span class="tl">Calendar</span></div>
+      <div class="tab on"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span><span class="tl">Updates</span></div>
+      <div class="tab"><span class="ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224"/></svg></span><span class="tl">Links</span></div>
+    </div>
+    <div class="scroll">
+      <div class="slbl"><span class="t">Updates</span><div class="email-pill"><div class="av">AM</div><span class="e">anthonyjohn…@gmail.com</span></div></div>
+      <div class="sechead"><span class="st">New</span><span class="cnt">1</span></div>
+      <div class="ucard cardD unread"><div class="top"><h3><span class="dotD"></span>Thank you</h3><span class="dt">May 29</span></div><p>A heartfelt end-of-year thank-you to families for their support, gifts, and a wonderful year together.</p><div class="snd"><div class="who"><div class="fav">MT</div><span class="wname">Ms. Taylor</span></div><span class="tm">1:00 PM</span></div></div>
+      <div class="sechead" style="margin-top:14px;"><span class="st">Earlier</span></div>
+      <div class="ucard cardD read"><div class="top"><h3>Thank you</h3><span class="dt">May 29</span></div><p>A heartfelt end-of-year thank-you to families for their support, gifts, and a wonderful year together.</p><div class="snd"><div class="who"><div class="fav">MT</div><span class="wname">Ms. Taylor</span></div><span class="tm">1:00 PM</span></div></div>
+    </div>
+  </div></div>
+</div>
+
+</body>
+</html>

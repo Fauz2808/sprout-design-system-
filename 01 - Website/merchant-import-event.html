@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Import Event from a Link · Sprout Merchant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-light:#e8f0e8;
+    --bg:#f0ede6; --surface:#fff; --surface-2:#f6f4ee; --fg:#1f1d18; --muted:#7c7768;
+    --border:#e2ded4; --blue:#3b6ea5; --blue-pale:#e1ecf7; --amber:#c08a2d; --amber-bg:#fbf0d8;
+    --serif:'Playfair Display',Georgia,serif; --sans:'Jost',-apple-system,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:var(--bg);font-family:var(--sans);color:var(--fg);font-size:15px;-webkit-font-smoothing:antialiased;min-height:100vh;}
+
+  .topbar{background:var(--green);color:#fff;padding:14px 28px;display:flex;align-items:center;gap:12px;}
+  .topbar .logo{width:32px;height:32px;border-radius:9px;background:#f0ede6;display:grid;place-items:center;font-size:18px;}
+  .topbar .nm{font-family:var(--serif);font-size:18px;font-weight:600;}
+  .topbar .sub{font-size:12px;color:rgba(255,255,255,.7);border-left:1px solid rgba(255,255,255,.25);padding-left:12px;}
+
+  .wrap{max-width:780px;margin:0 auto;padding:34px 24px 60px;}
+  .crumb{font-size:12px;color:var(--muted);margin-bottom:6px;letter-spacing:.02em;}
+  .h1{font-family:var(--serif);font-size:30px;font-weight:600;margin:0 0 6px;letter-spacing:-0.01em;}
+  .lead{font-size:15px;color:var(--muted);margin:0 0 26px;}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:26px;}
+
+  /* import card */
+  .import-ic{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--blue),#5a8fc0);display:grid;place-items:center;margin-bottom:16px;}
+  .import-ic svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:2;}
+  .import-h{font-family:var(--serif);font-size:21px;font-weight:600;margin:0 0 6px;}
+  .import-p{font-size:14px;color:var(--muted);margin:0 0 20px;line-height:1.5;}
+  .urlrow{display:flex;gap:10px;}
+  .urlfield{flex:1;display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:12px;padding:0 14px;background:var(--surface-2);}
+  .urlfield:focus-within{border-color:var(--green-mid);background:#fff;}
+  .urlfield svg{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;flex-shrink:0;}
+  .urlfield input{flex:1;border:none;background:transparent;font-family:var(--sans);font-size:15px;color:var(--fg);padding:14px 0;}
+  .urlfield input:focus{outline:none;}
+  .btn{border:none;border-radius:12px;font-family:var(--sans);font-size:15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;}
+  .btn-primary{background:var(--green);color:#fff;padding:14px 22px;}
+  .btn-primary svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2.2;}
+  .btn-ghost{background:transparent;color:var(--fg);border:1px solid var(--border);padding:12px 20px;}
+  .sources{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);}
+  .src-chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:5px 11px;font-size:12px;}
+  .or{display:flex;align-items:center;gap:12px;margin:22px 0;color:var(--muted);font-size:12px;}
+  .or::before,.or::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* loading */
+  .loading{display:none;text-align:center;padding:18px 0 6px;}
+  .loading.show{display:block;}
+  .spinner{width:46px;height:46px;border:4px solid var(--green-light);border-top-color:var(--green);border-radius:50%;margin:0 auto 18px;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading .lh{font-family:var(--serif);font-size:19px;font-weight:600;margin:0 0 6px;}
+  .loading .lp{font-size:13.5px;color:var(--muted);margin:0 0 18px;}
+  .steps{max-width:340px;margin:0 auto;text-align:left;}
+  .step{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--muted);padding:6px 0;}
+  .step .sd{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:grid;place-items:center;}
+  .step .sd svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:3;opacity:0;}
+  .step.done{color:var(--fg);} .step.done .sd{background:var(--green);border-color:var(--green);} .step.done .sd svg{opacity:1;}
+
+  /* result form */
+  .result{display:none;}
+  .result.show{display:block;}
+  .imported-banner{display:flex;align-items:center;gap:12px;background:var(--green-light);border:1px solid #cfe0d0;border-radius:13px;padding:13px 16px;margin-bottom:22px;}
+  .imported-banner .bi{font-size:20px;}
+  .imported-banner .bt{flex:1;}
+  .imported-banner .bt b{font-size:13.5px;color:var(--green);}
+  .imported-banner .bt span{display:block;font-size:12px;color:var(--green-mid);margin-top:1px;word-break:break-all;}
+  .imported-banner .redo{font-size:12.5px;font-weight:600;color:var(--green);background:#fff;border:1px solid #cfe0d0;border-radius:9px;padding:7px 12px;cursor:pointer;white-space:nowrap;}
+
+  .cover{height:170px;border-radius:14px;background:linear-gradient(135deg,#b8d4c0,#5a8f5d);display:grid;place-items:center;position:relative;margin-bottom:18px;overflow:hidden;}
+  .cover .ce{font-size:54px;} .cover .ctag{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.92);color:var(--green);font-size:10.5px;font-weight:700;padding:4px 9px;border-radius:999px;display:flex;align-items:center;gap:4px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .fg{margin-bottom:14px;} .fg.span2{grid-column:1/-1;}
+  .fg label{display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:var(--fg);}
+  .fg .ai{font-size:9.5px;font-weight:700;color:var(--blue);background:var(--blue-pale);padding:1px 6px;border-radius:999px;margin-left:6px;vertical-align:1px;}
+  .fg input,.fg select,.fg textarea{width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:10px;font-family:var(--sans);font-size:14.5px;color:var(--fg);background:var(--surface);}
+  .fg input:focus,.fg textarea:focus,.fg select:focus{outline:none;border-color:var(--green-mid);}
+  .fg textarea{min-height:84px;resize:none;line-height:1.5;}
+  .prefix{display:flex;align-items:center;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .prefix span{padding:11px 12px;background:var(--surface-2);color:var(--muted);font-size:14px;border-right:1px solid var(--border);}
+  .prefix input{border:none;border-radius:0;}
+  .actions{display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);}
+
+  .miss{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--amber);background:var(--amber-bg);border:1px solid #ecd9a6;border-radius:11px;padding:11px 13px;margin-bottom:18px;}
+  .miss svg{width:15px;height:15px;stroke:var(--amber);fill:none;stroke-width:2;flex-shrink:0;margin-top:1px;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="logo">🌱</div>
+    <div class="nm">Sprout</div>
+    <div class="sub">Merchant Portal · Create Event</div>
+  </div>
+
+  <div class="wrap">
+    <div class="crumb">Create Event › Import</div>
+    <h1 class="h1">Add an event you've already made</h1>
+    <p class="lead">Already listed this on your website or Eventbrite? Paste the link and AI will pull in the details — you just review and publish.</p>
+
+    <div class="card">
+      <!-- STATE A: paste link -->
+      <div id="paste">
+        <div class="import-ic"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg></div>
+        <h2 class="import-h">Import from a link</h2>
+        <p class="import-p">We'll read the page and fill in the event name, date, time, venue, price, description and cover image automatically.</p>
+        <div class="urlrow">
+          <div class="urlfield">
+            <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+            <input id="url" type="text" value="eventbrite.com/e/kids-coding-camp-summer-2025" placeholder="Paste your event URL…"/>
+          </div>
+          <button class="btn btn-primary" onclick="scan()">
+            <svg viewBox="0 0 24 24"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg>
+            Scan with AI
+          </button>
+        </div>
+        <div class="sources">
+          Works with
+          <span class="src-chip">🎟️ Eventbrite</span>
+          <span class="src-chip">🌐 Your website</span>
+          <span class="src-chip">📘 Facebook events</span>
+          <span class="src-chip">📷 Instagram</span>
+        </div>
+        <div class="or">or</div>
+        <button class="btn btn-ghost" style="width:100%;">Fill in manually instead</button>
+      </div>
+
+      <!-- STATE B: loading -->
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p class="lh">Reading the page…</p>
+        <p class="lp" id="loadingUrl">eventbrite.com/e/kids-coding-camp-summer-2025</p>
+        <div class="steps">
+          <div class="step" id="st1"><span class="sd"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>Fetching the page</div>
+          <div class="step" id="st2"><span class="sd"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>Extracting name, date &amp; venue</div>
+          <div class="step" id="st3"><span class="sd"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>Pulling price &amp; description</div>
+          <div class="step" id="st4"><span class="sd"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>Grabbing the cover image</div>
+        </div>
+      </div>
+
+      <!-- STATE C: imported, review & edit -->
+      <div id="result" class="result">
+        <div class="imported-banner">
+          <span class="bi">✨</span>
+          <div class="bt"><b>Imported with AI — review &amp; edit</b><span id="srcLink">eventbrite.com/e/kids-coding-camp-summer-2025</span></div>
+          <button class="redo" onclick="reset()">Change link</button>
+        </div>
+
+        <div class="cover">
+          <span class="ctag">✨ AI-pulled cover</span>
+          <span class="ce">💻</span>
+        </div>
+
+        <div class="grid2">
+          <div class="fg span2"><label>Event name <span class="ai">AI</span></label><input value="Kids Coding Camp — Summer Edition"/></div>
+          <div class="fg"><label>Date <span class="ai">AI</span></label><input type="date" value="2025-07-14"/></div>
+          <div class="fg"><label>Category <span class="ai">AI</span></label><select><option>Arts &amp; Crafts</option><option selected>Education</option><option>Sports</option><option>Outdoor</option></select></div>
+          <div class="fg"><label>Start time <span class="ai">AI</span></label><input type="time" value="10:00"/></div>
+          <div class="fg"><label>End time <span class="ai">AI</span></label><input type="time" value="14:00"/></div>
+          <div class="fg span2"><label>Venue / Location <span class="ai">AI</span></label><input value="Riverside Community Hall, Austin TX"/></div>
+          <div class="fg span2"><label>Description <span class="ai">AI</span></label><textarea>A hands-on coding camp for kids aged 7–12. Learn programming basics through fun games and creative projects — no experience needed. Bring a packed lunch!</textarea></div>
+          <div class="fg"><label>Ticket price <span class="ai">AI</span></label><div class="prefix"><span>$</span><input type="number" value="20"/></div></div>
+          <div class="fg"><label>Age range <span class="ai">AI</span></label><input value="7–12 years"/></div>
+        </div>
+
+        <div class="miss" style="margin-top:18px;">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <span><b>2 fields need your input</b> — we couldn't find <b>max capacity</b> or an <b>early-bird price</b> on the page. Add them below before publishing.</span>
+        </div>
+        <div class="grid2">
+          <div class="fg"><label>Max capacity</label><input type="number" placeholder="e.g. 50"/></div>
+          <div class="fg"><label>Early-bird price (optional)</label><div class="prefix"><span>$</span><input type="number" placeholder="15"/></div></div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" style="padding:13px 26px;"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> Publish Event</button>
+          <button class="btn btn-ghost">Save as Draft</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function scan(){
+      const url=document.getElementById('url').value||'your event link';
+      document.getElementById('loadingUrl').textContent=url;
+      document.getElementById('srcLink').textContent=url;
+      document.getElementById('paste').style.display='none';
+      document.getElementById('result').classList.remove('show');
+      const L=document.getElementById('loading'); L.classList.add('show');
+      ['st1','st2','st3','st4'].forEach(id=>document.getElementById(id).classList.remove('done'));
+      const t=[400,900,1500,2050];
+      ['st1','st2','st3','st4'].forEach((id,i)=>setTimeout(()=>document.getElementById(id).classList.add('done'),t[i]));
+      setTimeout(()=>{ L.classList.remove('show'); document.getElementById('result').classList.add('show'); },2550);
+    }
+    function reset(){
+      document.getElementById('result').classList.remove('show');
+      document.getElementById('paste').style.display='block';
+    }
+  </script>
+</body>
+</html>

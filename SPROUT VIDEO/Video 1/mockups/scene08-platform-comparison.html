@@ -1,0 +1,106 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#c9c4b6; display:flex; justify-content:center; align-items:center; padding:60px; font-family:'Inter',sans-serif; }
+  .frame { width:393px; height:852px; background:#f4f1ea; border-radius:52px; overflow:hidden; position:relative; box-shadow:0 40px 80px rgba(0,0,0,0.35); }
+  .statusbar { height:47px; display:flex; align-items:center; justify-content:space-between; padding:0 28px 0 32px; font-weight:600; font-size:15px; color:#2a2e25; }
+  .statusicons { display:flex; align-items:center; gap:5px; }
+  .signal { display:flex; gap:2px; align-items:flex-end; }
+  .signal span { width:3px; background:#2a2e25; border-radius:1px; }
+  .signal span:nth-child(1){height:4px;} .signal span:nth-child(2){height:6px;} .signal span:nth-child(3){height:8px;} .signal span:nth-child(4){height:10px;}
+  .wifi { width:15px; height:11px; border:2px solid #2a2e25; border-radius:50% 50% 0 0 / 100% 100% 0 0; border-bottom:none; }
+  .battery { width:24px; height:12px; border:1.4px solid #2a2e25; border-radius:3px; position:relative; }
+  .battery::after { content:''; position:absolute; right:-3px; top:3px; width:2px; height:6px; background:#2a2e25; border-radius:0 1px 1px 0; }
+  .battery::before { content:''; position:absolute; top:1.5px; left:1.5px; bottom:1.5px; width:16px; background:#2a2e25; border-radius:1.5px; }
+
+  .header { padding:10px 24px 4px; text-align:center; }
+  .header .eyebrow { font-size:13px; font-weight:600; color:#818898; text-transform:uppercase; letter-spacing:0.06em; }
+  .header h1 { font-family:'Playfair Display',serif; font-weight:700; font-size:27px; color:#0f2218; margin-top:2px; }
+
+  .rows { padding:22px 20px 0; display:flex; flex-direction:column; gap:14px; }
+  .row { background:#ffffff; border-radius:18px; padding:15px 16px; display:flex; align-items:center; gap:14px; box-shadow:0 6px 18px rgba(15,34,24,0.05); position:relative; }
+  .row.bad { opacity:0.88; }
+  .iconwrap { width:46px; height:46px; border-radius:13px; flex-shrink:0; display:flex; align-items:center; justify-content:center; position:relative; }
+
+  /* generic bubble glyph - not Apple's icon */
+  .bubbleicon { position:relative; width:26px; height:20px; }
+  .bubbleicon .b1 { position:absolute; width:20px; height:15px; border-radius:8px 8px 8px 2px; background:#2e8bf0; left:0; top:0; }
+  .bubbleicon .b2 { position:absolute; width:15px; height:11px; border-radius:6px 6px 2px 6px; background:#3ac95e; right:0; bottom:0; }
+  .icon.imsg { background:#eaf1fb; }
+
+  /* generic chat glyph - not WhatsApp's icon */
+  .chaticon { width:24px; height:24px; border-radius:50%; border:2.5px solid #ffffff; background:#3ac95e; position:relative; }
+  .chaticon::after { content:''; position:absolute; bottom:-5px; left:5px; width:0; height:0; border:5px solid transparent; border-top-color:#3ac95e; border-bottom:0; }
+  .icon.wa { background:#e6f7ea; }
+
+  .icon.sprout { background:#e2e9e3; }
+  .icon.sprout img { width:30px; height:30px; border-radius:8px; object-fit:cover; }
+
+  .badge { position:absolute; top:-6px; right:-6px; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
+  .badge.x { background:#d9534f; }
+  .badge.check { background:#186338; }
+
+  .rowbody { flex:1; }
+  .rowtitle { font-size:16px; font-weight:700; color:#2a2e25; }
+  .rowtext { font-size:13.5px; color:#818898; margin-top:1px; line-height:1.3; }
+  .row.good .rowtitle { color:#186338; }
+
+  .footnote { padding:22px 30px 0; font-size:15px; color:#2a2e25; text-align:center; font-family:'Playfair Display',serif; font-style:italic; line-height:1.4; }
+</style><link rel="stylesheet" href="scene-system.css"></head>
+<body class="motion-ready scene08">
+<div class="frame">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="statusicons">
+      <div class="signal"><span></span><span></span><span></span><span></span></div>
+      <div class="wifi"></div>
+      <div class="battery"></div>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="eyebrow">Built different</div>
+    <h1>Built for all of you</h1>
+  </div>
+
+  <div class="rows">
+    <div class="row bad">
+      <div class="iconwrap icon imsg">
+        <div class="bubbleicon"><div class="b1"></div><div class="b2"></div></div>
+        <div class="badge x">✕</div>
+      </div>
+      <div class="rowbody">
+        <div class="rowtitle">iMessage</div>
+        <div class="rowtext">Drops Android users to plain green texts</div>
+      </div>
+    </div>
+
+    <div class="row bad">
+      <div class="iconwrap icon wa">
+        <div class="chaticon"></div>
+        <div class="badge x">✕</div>
+      </div>
+      <div class="rowbody">
+        <div class="rowtitle">WhatsApp</div>
+        <div class="rowtext">Zero community, zero events</div>
+      </div>
+    </div>
+
+    <div class="row good">
+      <div class="iconwrap icon sprout">
+        <img src="../../Sprout_Logo123.png_202607312032.jpeg">
+        <div class="badge check">✓</div>
+      </div>
+      <div class="rowbody">
+        <div class="rowtitle">Sprout</div>
+        <div class="rowtext">Built for every phone, every parent</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footnote">"Sprout was built for all of you."</div>
+</div>
+</body></html>

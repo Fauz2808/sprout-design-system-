@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Sprout – Event Invite Flow (Non-User)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+
+:root {
+  --brand:    #186338;
+  --brand-d:  #145530;
+  --brand-dd: #1e3e2b;
+  --brand-l:  #e2e9e3;
+  --brand-ll: #f0f5f1;
+  --bg:       #f4f1ea;
+  --s1:       #eae6db;
+  --s2:       #dbd5c8;
+  --s3:       #ccc5b5;
+  --tp:       #4d525b;
+  --ts:       #818898;
+  --tt:       #b3b8c1;
+  --border:   rgba(0,0,0,.08);
+  --g1:       #e6e7ea;
+  --g2:       #cdcfd6;
+  --white:    #ffffff;
+  --red:      #d64545;
+  --red-l:    #f7dada;
+}
+
+/* ── STAGE ── */
+body {
+  min-height:100vh;
+  background:linear-gradient(140deg,#aca49a 0%,#c9c2b4 50%,#a9a296 100%);
+  display:flex; flex-direction:column; align-items:center;
+  padding:40px 0 80px; gap:20px;
+  font-family:'Inter',-apple-system,sans-serif;
+}
+
+/* ── FLOW MAP ── */
+.flow-map {
+  display:flex; align-items:center; gap:0;
+  background:rgba(255,255,255,.12); backdrop-filter:blur(12px);
+  border-radius:16px; padding:5px; flex-wrap:wrap; max-width:800px;
+  justify-content:center;
+}
+.flow-section { display:flex; align-items:center; }
+.flow-section-label {
+  font-size:9px; font-weight:700; letter-spacing:.8px;
+  text-transform:uppercase; padding:0 8px;
+}
+.flow-section-label.web { color:rgba(255,255,255,.35); }
+.flow-section-label.app { color:rgba(255,255,255,.35); }
+.flow-step {
+  display:flex; align-items:center; gap:5px;
+  padding:6px 12px; border-radius:10px; cursor:pointer;
+  font-size:11px; font-weight:600; color:rgba(255,255,255,.45);
+  transition:all .2s; white-space:nowrap;
+}
+.flow-step.active { background:rgba(255,255,255,.18); color:#fff; }
+.flow-step.web-step.active { background:rgba(59,130,246,.25); color:#93c5fd; }
+.flow-step.app-step.active { background:rgba(24,99,56,.35); color:#86efac; }
+.flow-dot { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.25); }
+.flow-step.active .flow-dot { background:currentColor; }
+.flow-divider {
+  width:1px; height:28px; background:rgba(255,255,255,.15); margin:0 4px;
+}
+.flow-arrow { color:rgba(255,255,255,.25); font-size:10px; padding:0 2px; }
+
+/* context badge */
+.context-badge {
+  padding:5px 14px; border-radius:99px; font-size:11px; font-weight:700;
+  letter-spacing:.3px; transition:all .4s;
+}
+.context-badge.web { background:rgba(59,130,246,.2); color:#93c5fd; border:1px solid rgba(59,130,246,.3); }
+.context-badge.app { background:rgba(24,99,56,.3); color:#86efac; border:1px solid rgba(24,99,56,.4); }
+
+/* ── PHONE ── */
+.phone {
+  width:393px; height:852px;
+  background:var(--bg); border-radius:54px; overflow:hidden;
+  position:relative;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.12),
+    0 0 0 10px #1c1c1e, 0 0 0 12px #2c2c2e,
+    0 60px 130px rgba(0,0,0,.55);
+}
+.phone::before {
+  content:''; position:absolute; left:-13px; top:120px;
+  width:4px; height:32px; background:#2a2a2a; border-radius:2px 0 0 2px;
+  box-shadow:0 44px 0 #2a2a2a,0 88px 0 #2a2a2a; z-index:200;
+}
+.phone::after {
+  content:''; position:absolute; right:-13px; top:148px;
+  width:4px; height:66px; background:#2a2a2a; border-radius:0 2px 2px 0; z-index:200;
+}
+.island {
+  position:absolute; top:14px; left:50%; transform:translateX(-50%);
+  width:120px; height:34px; background:#0a0a0a; border-radius:18px; z-index:150; pointer-events:none;
+}
+
+/* ── SCREENS ── */
+.sc-wrap { position:absolute; inset:0; overflow:hidden; border-radius:54px; }
+.screen {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  will-change:transform; backface-visibility:hidden;
+}
+.screen.right { transform:translateX(100%); pointer-events:none; }
+.screen.left  { transform:translateX(-28%); filter:brightness(.88); pointer-events:none; }
+
+@keyframes pushIn  { from{transform:translateX(100%)} to{transform:translateX(0)} }
+@keyframes pushOut { from{transform:translateX(0);filter:brightness(1)} to{transform:translateX(-28%);filter:brightness(.88)} }
+@keyframes popIn   { from{transform:translateX(-28%);filter:brightness(.88)} to{transform:translateX(0);filter:brightness(1)} }
+@keyframes popOut  { from{transform:translateX(0)} to{transform:translateX(100%)} }
+.anim-push-in  { animation:pushIn  .36s cubic-bezier(.25,.46,.45,.94) forwards }
+.anim-push-out { animation:pushOut .36s cubic-bezier(.25,.46,.45,.94) forwards }
+.anim-pop-in   { animation:popIn   .34s cubic-bezier(.25,.46,.45,.94) forwards }
+.anim-pop-out  { animation:popOut  .34s cubic-bezier(.25,.46,.45,.94) forwards }
+
+/* ═══════════════════════════
+   WEB CHROME (mobile browser)
+═══════════════════════════ */
+.web-chrome {
+  background:#f1f1f1; flex-shrink:0;
+  border-bottom:1px solid rgba(0,0,0,.1);
+}
+.web-chrome-bar {
+  height:52px; padding:0 14px;
+  display:flex; align-items:center; gap:10px;
+}
+.web-url-bar {
+  flex:1; background:#fff; border-radius:10px;
+  padding:7px 11px; display:flex; align-items:center; gap:6px;
+  border:1px solid rgba(0,0,0,.1);
+}
+.web-lock { color:#818898; }
+.web-url-text { font-size:12px; color:#4d525b; flex:1; font-family:'Inter',sans-serif; }
+.web-url-text .domain { font-weight:600; color:#1a1b1e; }
+.web-nav-btns { display:flex; gap:8px; }
+.web-nav-btn { color:#818898; }
+
+/* ── Web Status Bar ── */
+.web-sb {
+  height:44px; background:#f1f1f1;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 22px;
+}
+.web-sb-time { font-size:14px; font-weight:600; color:#1a1b1e; }
+.web-sb-icons { display:flex; align-items:center; gap:5px; }
+
+/* ── WEB BODY ── */
+.web-body {
+  flex:1; overflow-y:auto; scrollbar-width:none; background:#fff;
+}
+.web-body::-webkit-scrollbar { display:none; }
+
+/* ═══════════════════════════
+   S1 — EVENT LANDING PAGE
+═══════════════════════════ */
+.event-hero {
+  width:100%; height:240px; position:relative; overflow:hidden; flex-shrink:0;
+  background:linear-gradient(135deg,#2d6b45 0%,#1a4030 50%,#0f2a1e 100%);
+  display:flex; align-items:center; justify-content:center;
+}
+.event-hero::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(to bottom, transparent 30%, rgba(0,0,0,.6) 100%);
+}
+.event-hero-emoji { font-size:72px; position:relative; z-index:1; }
+.event-hero-bottom {
+  position:absolute; bottom:16px; left:18px; right:18px; z-index:2;
+  display:flex; align-items:flex-end; justify-content:space-between;
+}
+.event-tag {
+  background:rgba(255,255,255,.18); backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.3); border-radius:99px;
+  padding:5px 12px; font-size:11.5px; font-weight:700; color:#fff;
+}
+.event-share-btn {
+  width:36px; height:36px; border-radius:50%;
+  background:rgba(255,255,255,.18); backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.3);
+  display:flex; align-items:center; justify-content:center;
+}
+
+.event-content { padding:20px 18px 0; }
+.event-title {
+  font-family:'Playfair Display',serif;
+  font-size:22px; font-weight:700; color:var(--brand-dd); line-height:1.25; margin-bottom:4px;
+}
+.event-host {
+  display:flex; align-items:center; gap:7px; margin-bottom:16px;
+}
+.host-avi {
+  width:24px; height:24px; border-radius:50%;
+  background:var(--brand); display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; color:#fff; flex-shrink:0;
+}
+.host-text { font-size:12.5px; color:var(--ts); }
+.host-text strong { color:var(--tp); font-weight:600; }
+
+.event-details { display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
+.event-detail-row {
+  display:flex; align-items:center; gap:11px;
+  background:var(--s1); border-radius:12px; padding:11px 13px;
+}
+.ed-icon { font-size:17px; flex-shrink:0; }
+.ed-main { font-size:13.5px; font-weight:600; color:var(--tp); }
+.ed-sub { font-size:11px; color:var(--ts); margin-top:1px; }
+
+.going-row {
+  display:flex; align-items:center; gap:10px; margin-bottom:20px;
+}
+.going-avis { display:flex; }
+.going-avi {
+  width:28px; height:28px; border-radius:50%;
+  border:2px solid #fff; margin-left:-6px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; color:#fff;
+}
+.going-avi:first-child { margin-left:0; }
+.going-text { font-size:12.5px; color:var(--ts); }
+.going-text strong { color:var(--tp); font-weight:600; }
+
+.event-cta-wrap { padding:0 18px 20px; }
+.event-cta-btn {
+  width:100%; height:52px; background:var(--brand); border:none; border-radius:16px;
+  color:#fff; font-size:16px; font-weight:700; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  font-family:'Inter',sans-serif; transition:all .15s;
+  box-shadow:0 4px 20px rgba(24,99,56,.35);
+}
+.event-cta-btn:active { background:var(--brand-d); transform:scale(.98); }
+
+.event-app-link {
+  text-align:center; padding:14px 0 0;
+  font-size:13px; color:var(--ts);
+}
+.event-app-link a { color:var(--brand); font-weight:600; text-decoration:none; cursor:pointer; }
+
+/* ═══════════════════════════
+   S2 — PHONE NUMBER (WEB)
+═══════════════════════════ */
+.web-form-screen { background:#fff; flex:1; display:flex; flex-direction:column; overflow-y:auto; }
+.web-form-screen::-webkit-scrollbar { display:none; }
+
+.web-form-header {
+  padding:24px 22px 0;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.web-back-btn {
+  width:36px; height:36px; border-radius:50%;
+  background:var(--s1); border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+.web-sprout-logo {
+  display:flex; align-items:center; gap:7px;
+}
+.web-logo-icon {
+  width:28px; height:28px; background:var(--brand); border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+}
+.web-logo-name { font-size:14px; font-weight:700; color:var(--brand-dd); }
+.web-skip { font-size:13px; color:var(--ts); cursor:pointer; }
+
+.web-form-body { flex:1; padding:28px 22px 0; display:flex; flex-direction:column; }
+
+.web-step-tag {
+  display:inline-flex; align-items:center; gap:5px;
+  background:var(--brand-ll); border-radius:99px;
+  padding:5px 12px; font-size:11px; font-weight:700; color:var(--brand);
+  margin-bottom:16px; align-self:flex-start;
+}
+.web-step-dot { width:5px; height:5px; border-radius:50%; background:var(--brand); }
+
+.web-form-heading {
+  font-family:'Playfair Display',serif;
+  font-size:26px; font-weight:700; color:var(--brand-dd);
+  line-height:1.2; margin-bottom:8px;
+}
+.web-form-heading em { font-style:italic; }
+.web-form-sub {
+  font-size:13.5px; color:var(--ts); line-height:1.55; margin-bottom:28px;
+}
+
+/* Phone field */
+.phone-field-wrap {
+  display:flex; align-items:center; gap:0;
+  background:var(--s1); border:1.5px solid var(--g1); border-radius:14px;
+  overflow:hidden; margin-bottom:10px; transition:border-color .2s;
+}
+.phone-field-wrap.focused { border-color:var(--brand); background:#fff; }
+.phone-flag { padding:0 12px 0 14px; font-size:18px; border-right:1px solid var(--g1); height:52px; display:flex; align-items:center; gap:5px; }
+.phone-flag span { font-size:12px; color:var(--ts); font-weight:600; }
+.phone-field-input {
+  flex:1; height:52px; padding:0 14px;
+  font-size:18px; font-weight:600; color:var(--brand-dd);
+  background:transparent; border:none; outline:none;
+  font-family:'Playfair Display',serif; letter-spacing:1px;
+}
+.phone-field-input::placeholder { color:var(--tt); font-weight:400; letter-spacing:0; }
+
+.phone-notice {
+  display:flex; align-items:flex-start; gap:7px;
+  background:var(--s1); border-radius:12px; padding:10px 12px; margin-bottom:24px;
+}
+.phone-notice-icon { font-size:14px; flex-shrink:0; margin-top:1px; }
+.phone-notice-text { font-size:12px; color:var(--ts); line-height:1.5; }
+
+.web-cta-btn {
+  width:100%; height:52px; background:var(--brand); border:none; border-radius:14px;
+  color:#fff; font-size:15px; font-weight:700; cursor:pointer;
+  font-family:'Inter',sans-serif; transition:all .15s;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+}
+.web-cta-btn:active { background:var(--brand-d); transform:scale(.98); }
+.web-cta-btn.dim { background:var(--s2); color:var(--ts); pointer-events:none; }
+
+/* Progress dots */
+.web-progress {
+  display:flex; gap:6px; justify-content:center; padding:20px 0 0;
+}
+.wp-dot {
+  width:7px; height:7px; border-radius:50%; background:var(--g1);
+  transition:all .3s;
+}
+.wp-dot.active { background:var(--brand); width:20px; border-radius:99px; }
+.wp-dot.done { background:var(--brand-l); }
+
+/* Keyboard */
+.web-keyboard {
+  background:#d1d5db; margin-top:auto;
+  display:grid; grid-template-columns:repeat(3,1fr);
+}
+.kbd-key {
+  height:44px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  border-right:.5px solid rgba(0,0,0,.09); border-bottom:.5px solid rgba(0,0,0,.09);
+  background:#fff; cursor:pointer; gap:1px;
+  font-size:20px; font-weight:300; color:#0d0d12;
+  font-family:'Inter',sans-serif;
+}
+.kbd-key .kbd-sub { font-size:7px; font-weight:700; letter-spacing:1.5px; color:#0d0d12; }
+.kbd-key.dark { background:#acb4bb; }
+.kbd-key.dark svg { color:#1a1b1e; }
+.kbd-bottom { height:20px; background:#d1d5db; display:flex; align-items:flex-end; justify-content:center; padding-bottom:4px; }
+
+/* ═══════════════════════════
+   S3 — BASIC INFO (WEB)
+═══════════════════════════ */
+.info-form { display:flex; flex-direction:column; gap:14px; }
+
+.field-group { display:flex; flex-direction:column; gap:5px; }
+.field-label-text { font-size:11px; font-weight:700; letter-spacing:.3px; color:var(--ts); text-transform:uppercase; }
+.field-input {
+  height:50px; background:var(--s1); border:1.5px solid var(--g1);
+  border-radius:13px; padding:0 14px;
+  font-size:15px; color:var(--tp); font-family:'Inter',sans-serif;
+  outline:none; transition:all .2s;
+}
+.field-input.focused { border-color:var(--brand); background:#fff; }
+.field-input::placeholder { color:var(--tt); }
+
+.field-row { display:flex; gap:10px; }
+.field-row .field-group { flex:1; }
+
+/* Role selector */
+.role-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.role-btn {
+  background:var(--s1); border:1.5px solid var(--g1);
+  border-radius:13px; padding:12px 14px;
+  display:flex; align-items:center; gap:10px;
+  cursor:pointer; transition:all .2s;
+}
+.role-btn.selected {
+  background:var(--brand-ll); border-color:var(--brand);
+}
+.role-check {
+  width:18px; height:18px; border-radius:50%; flex-shrink:0;
+  border:1.5px solid var(--g2); background:var(--white);
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s;
+}
+.role-btn.selected .role-check {
+  background:var(--brand); border-color:var(--brand);
+}
+.role-emoji { font-size:18px; }
+.role-label-wrap { flex:1; }
+.role-name { font-size:13.5px; font-weight:600; color:var(--tp); }
+.role-sub { font-size:11px; color:var(--ts); margin-top:1px; }
+
+/* ═══════════════════════════
+   S4 — JOINED! (WEB)
+═══════════════════════════ */
+.joined-screen { background:#fff; flex:1; display:flex; flex-direction:column; }
+
+.joined-hero {
+  background:linear-gradient(135deg, var(--brand-dd) 0%, var(--brand) 100%);
+  padding:36px 24px 28px; text-align:center; flex-shrink:0;
+}
+.joined-check {
+  width:72px; height:72px; border-radius:50%;
+  background:rgba(255,255,255,.15); border:3px solid rgba(255,255,255,.4);
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 16px; font-size:32px;
+}
+.joined-heading {
+  font-family:'Playfair Display',serif;
+  font-size:26px; font-weight:700; color:#fff; margin-bottom:6px;
+}
+.joined-sub { font-size:14px; color:rgba(255,255,255,.7); line-height:1.5; }
+
+.joined-body { flex:1; padding:20px 18px; display:flex; flex-direction:column; gap:16px; overflow-y:auto; scrollbar-width:none; }
+.joined-body::-webkit-scrollbar { display:none; }
+
+.joined-event-card {
+  background:var(--s1); border-radius:16px; padding:14px 14px; overflow:hidden;
+  border-left:4px solid var(--brand);
+}
+.joined-event-title {
+  font-family:'Playfair Display',serif;
+  font-size:17px; font-weight:700; color:var(--brand-dd); margin-bottom:4px;
+}
+.joined-event-meta { font-size:12.5px; color:var(--ts); }
+.joined-event-meta span { margin-right:10px; }
+
+.download-section { display:flex; flex-direction:column; gap:10px; }
+.download-heading { font-size:15px; font-weight:700; color:var(--tp); }
+.download-sub { font-size:13px; color:var(--ts); line-height:1.5; }
+.store-btns { display:flex; gap:10px; }
+.store-btn {
+  flex:1; height:48px; border-radius:13px; border:1.5px solid var(--g1);
+  background:var(--white); display:flex; align-items:center; justify-content:center;
+  gap:8px; cursor:pointer; transition:all .15s;
+}
+.store-btn:active { background:var(--s1); }
+.store-btn-label { display:flex; flex-direction:column; align-items:flex-start; }
+.store-btn-sub { font-size:9px; color:var(--ts); font-weight:500; }
+.store-btn-name { font-size:13px; font-weight:700; color:var(--tp); }
+
+.web-hint {
+  background:var(--brand-ll); border-radius:13px; padding:12px 13px;
+  display:flex; align-items:flex-start; gap:9px;
+}
+.web-hint-icon { font-size:16px; flex-shrink:0; margin-top:1px; }
+.web-hint-text { font-size:12.5px; color:var(--brand-dd); line-height:1.5; }
+
+/* ═══════════════════════════
+   CONTEXT BREAK SCREEN
+═══════════════════════════ */
+.break-screen {
+  background:var(--brand-dd); flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; padding:32px 24px; gap:20px; text-align:center;
+}
+.break-app-icon {
+  width:80px; height:80px; border-radius:22px; background:var(--brand);
+  display:flex; align-items:center; justify-content:center; font-size:40px;
+  box-shadow:0 12px 40px rgba(0,0,0,.3);
+}
+.break-heading {
+  font-family:'Playfair Display',serif;
+  font-size:22px; font-weight:700; color:#fff; line-height:1.3;
+}
+.break-sub { font-size:13.5px; color:rgba(255,255,255,.55); line-height:1.6; max-width:280px; }
+.break-steps { display:flex; flex-direction:column; gap:10px; width:100%; }
+.break-step {
+  display:flex; align-items:center; gap:12px;
+  background:rgba(255,255,255,.08); border-radius:13px; padding:12px 14px; text-align:left;
+}
+.break-step-num {
+  width:26px; height:26px; border-radius:50%; background:var(--brand);
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; color:#fff; flex-shrink:0;
+}
+.break-step-text { font-size:13px; color:rgba(255,255,255,.75); line-height:1.4; }
+.break-step-text strong { color:#fff; font-weight:600; }
+.break-cta-btn {
+  width:100%; height:52px; background:#fff; border:none; border-radius:14px;
+  color:var(--brand-dd); font-size:15px; font-weight:700; cursor:pointer;
+  font-family:'Inter',sans-serif; transition:all .15s;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+}
+.break-cta-btn:active { background:var(--brand-l); }
+
+/* ═══════════════════════════
+   S5 — APP: PHONE ENTRY
+═══════════════════════════ */
+.app-screen { background:var(--bg); flex:1; display:flex; flex-direction:column; }
+.app-sb {
+  height:52px; display:flex; align-items:center; justify-content:space-between;
+  padding:16px 26px 0; flex-shrink:0;
+}
+.app-sb-time { font-size:15px; font-weight:600; color:var(--tp); }
+.app-sb-icons { display:flex; gap:6px; }
+
+.app-progress {
+  display:flex; gap:3px; padding:0 20px; margin-bottom:4px; flex-shrink:0;
+}
+.app-prog-bar { flex:1; height:2.5px; border-radius:99px; background:rgba(24,99,56,.12); }
+.app-prog-bar.on { background:var(--brand); }
+
+.app-content { flex:1; padding:8px 22px 0; display:flex; flex-direction:column; overflow-y:auto; scrollbar-width:none; }
+.app-content::-webkit-scrollbar { display:none; }
+
+.app-heading {
+  font-family:'Playfair Display',serif;
+  font-size:26px; font-weight:600; color:var(--brand-dd);
+  line-height:1.25; margin-bottom:6px;
+}
+.app-heading em { font-style:italic; }
+.app-sub { font-size:13.5px; color:var(--ts); line-height:1.55; margin-bottom:24px; }
+
+.app-phone-field {
+  background:var(--s1); border:1.5px solid var(--g1);
+  border-radius:14px; height:58px;
+  display:flex; align-items:center; padding:0 16px; gap:10px;
+  margin-bottom:12px; transition:border-color .2s;
+}
+.app-phone-field.focused { border-color:var(--brand); background:#fff; }
+.flag-code { font-size:18px; }
+.flag-divider { width:1px; height:24px; background:var(--g1); }
+.phone-number-display {
+  font-family:'Playfair Display',serif; font-size:20px; font-weight:600;
+  color:var(--brand-dd); flex:1; letter-spacing:.5px;
+}
+.cursor-blink {
+  display:inline-block; width:1.5px; height:20px;
+  background:var(--brand); vertical-align:middle; margin-left:1px;
+  animation:cursorBlink 1s step-end infinite;
+}
+@keyframes cursorBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* Recognized user banner */
+.user-recognized {
+  display:flex; align-items:center; gap:9px;
+  background:var(--brand-ll); border:1.5px solid var(--brand-l);
+  border-radius:13px; padding:10px 13px; margin-bottom:16px;
+}
+.user-recognized-icon { font-size:20px; flex-shrink:0; }
+.user-recognized-text { flex:1; }
+.user-recognized-title { font-size:13px; font-weight:700; color:var(--brand-dd); }
+.user-recognized-sub { font-size:11.5px; color:var(--brand); margin-top:2px; }
+
+.app-cta-btn {
+  width:100%; height:52px; background:var(--brand); border:none; border-radius:14px;
+  color:#fff; font-size:16px; font-weight:600; cursor:pointer;
+  font-family:'Playfair Display',serif; transition:all .15s; margin-bottom:12px;
+}
+.app-cta-btn:active { background:var(--brand-d); transform:scale(.98); }
+
+.app-terms { font-size:11.5px; color:var(--tt); text-align:center; line-height:1.6; }
+.app-terms a { color:var(--ts); }
+
+/* App keyboard (styled) */
+.app-keyboard {
+  background:#d1d5db; margin-top:auto; flex-shrink:0;
+  display:grid; grid-template-columns:repeat(3,1fr);
+}
+.app-kbd-key {
+  height:48px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  border-right:.5px solid rgba(0,0,0,.09); border-bottom:.5px solid rgba(0,0,0,.09);
+  background:#fff; cursor:pointer; gap:0;
+  font-size:22px; font-weight:300; color:#0d0d12;
+  font-family:'Inter',sans-serif; transition:background .1s;
+}
+.app-kbd-key:active { background:#e5e7eb; }
+.app-kbd-key .app-kbd-sub { font-size:7.5px; font-weight:700; letter-spacing:1.5px; }
+.app-kbd-key.dark { background:#acb4bb; }
+.app-kbd-bottom { height:22px; background:#d1d5db; display:flex; align-items:flex-end; justify-content:center; padding-bottom:5px; }
+.app-kbd-pill { width:110px; height:4px; background:rgba(0,0,0,.25); border-radius:99px; }
+
+/* ═══════════════════════════
+   S6 — APP: ADD KIDS (SKIP)
+═══════════════════════════ */
+.skip-banner {
+  background:var(--brand); padding:12px 16px; flex-shrink:0;
+  display:flex; align-items:center; gap:10px;
+}
+.skip-banner-icon { font-size:18px; }
+.skip-banner-text { font-size:12.5px; font-weight:600; color:#fff; flex:1; }
+.skip-banner-sub { font-size:11px; color:rgba(255,255,255,.7); margin-top:1px; }
+
+.kids-content { flex:1; padding:8px 22px 0; display:flex; flex-direction:column; overflow-y:auto; scrollbar-width:none; }
+.kids-content::-webkit-scrollbar { display:none; }
+
+.kids-heading { font-family:'Playfair Display',serif; font-size:24px; font-weight:600; color:var(--brand-dd); margin-bottom:5px; line-height:1.25; }
+.kids-heading em { font-style:italic; }
+.kids-sub { font-size:13px; color:var(--ts); line-height:1.55; margin-bottom:22px; }
+
+.kid-form-card {
+  background:var(--white); border:1.5px solid var(--g1);
+  border-radius:16px; padding:14px; margin-bottom:12px;
+}
+.kid-form-title {
+  font-size:11px; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
+  color:var(--ts); margin-bottom:10px;
+}
+.kid-fields { display:flex; flex-direction:column; gap:9px; }
+.kid-field {
+  background:var(--s1); border:1.5px solid var(--g1); border-radius:11px;
+  padding:10px 12px; display:flex; align-items:center; justify-content:space-between;
+}
+.kid-field.focused { border-color:var(--brand); background:#fff; }
+.kid-field-val { font-size:14px; font-weight:600; color:var(--brand-dd); }
+.kid-field-ph { font-size:14px; color:var(--tt); }
+.kid-field-label { font-size:10px; color:var(--ts); font-weight:600; }
+
+.grade-chips { display:flex; gap:6px; flex-wrap:wrap; }
+.grade-chip {
+  padding:6px 12px; border-radius:99px; font-size:12px; font-weight:600;
+  cursor:pointer; transition:all .2s;
+}
+.grade-chip.sel { background:var(--brand); color:#fff; }
+.grade-chip.unsel { background:var(--s1); color:var(--ts); }
+
+.add-kid-link {
+  display:flex; align-items:center; gap:6px; padding:10px 0;
+  font-size:13.5px; font-weight:600; color:var(--brand); cursor:pointer;
+}
+
+.app-footer { padding:10px 22px 28px; flex-shrink:0; }
+.app-footer-btn {
+  width:100%; height:52px; background:var(--brand); border:none; border-radius:14px;
+  color:#fff; font-size:16px; font-weight:600; cursor:pointer;
+  font-family:'Playfair Display',serif; transition:all .15s;
+}
+.app-footer-btn:active { background:var(--brand-d); transform:scale(.98); }
+
+/* ── TOAST ── */
+.toast {
+  position:absolute; bottom:90px; left:50%; transform:translateX(-50%) translateY(16px);
+  background:rgba(24,99,56,.95); backdrop-filter:blur(12px);
+  color:#fff; font-size:13px; font-weight:600;
+  padding:10px 20px; border-radius:99px; white-space:nowrap;
+  opacity:0; transition:all .3s; z-index:300; pointer-events:none;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+</style>
+</head>
+<body>
+
+<!-- Flow map -->
+<div class="flow-map" id="flowMap">
+  <div class="flow-section">
+    <div class="flow-section-label web">🌐 Web</div>
+    <div class="flow-step web-step active" data-screen="s-event" onclick="jumpTo('s-event')"><div class="flow-dot"></div>Event Page</div>
+    <div class="flow-arrow">›</div>
+    <div class="flow-step web-step" data-screen="s-phone" onclick="jumpTo('s-phone')"><div class="flow-dot"></div>Phone</div>
+    <div class="flow-arrow">›</div>
+    <div class="flow-step web-step" data-screen="s-info" onclick="jumpTo('s-info')"><div class="flow-dot"></div>Your Info</div>
+    <div class="flow-arrow">›</div>
+    <div class="flow-step web-step" data-screen="s-joined" onclick="jumpTo('s-joined')"><div class="flow-dot"></div>Joined!</div>
+    <div class="flow-arrow">›</div>
+    <div class="flow-step web-step" data-screen="s-break" onclick="jumpTo('s-break')"><div class="flow-dot"></div>Download App</div>
+  </div>
+  <div class="flow-divider"></div>
+  <div class="flow-section">
+    <div class="flow-section-label app">📱 App</div>
+    <div class="flow-step app-step" data-screen="s-app-phone" onclick="jumpTo('s-app-phone')"><div class="flow-dot"></div>App Login</div>
+    <div class="flow-arrow">›</div>
+    <div class="flow-step app-step" data-screen="s-app-kids" onclick="jumpTo('s-app-kids')"><div class="flow-dot"></div>Add Kids</div>
+  </div>
+</div>
+
+<!-- Context badge -->
+<div class="context-badge web" id="ctxBadge">🌐 Mobile Web Browser</div>
+
+<!-- Phone -->
+<div class="phone">
+  <div class="island"></div>
+  <div class="sc-wrap">
+
+    <!-- ═══════════════════════════════
+         S-EVENT · Event Landing Page
+    ═══════════════════════════════ -->
+    <div class="screen" id="s-event" style="background:#fff">
+
+      <!-- Web browser chrome -->
+      <div class="web-chrome">
+        <div class="web-sb">
+          <span class="web-sb-time">9:41</span>
+          <div class="web-sb-icons">
+            <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#1a1b1e"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#1a1b1e"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#1a1b1e"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#1a1b1e" opacity=".35"/></svg>
+            <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#1a1b1e" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1b1e"/></svg>
+          </div>
+        </div>
+        <div class="web-chrome-bar">
+          <div class="web-url-bar">
+            <svg class="web-lock" width="11" height="13" viewBox="0 0 11 13" fill="none"><rect x="1" y="5.5" width="9" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 5.5V4a2.5 2.5 0 0 1 5 0v1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+            <div class="web-url-text"><span class="domain">sprout.app</span>/event/zilker-picnic</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scrollable content -->
+      <div class="web-body">
+        <!-- Hero -->
+        <div class="event-hero">
+          <div class="event-hero-emoji">🌳</div>
+          <div class="event-hero-bottom">
+            <div class="event-tag">⛺ Outdoors · Free</div>
+            <div class="event-share-btn">
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="11" cy="3" r="2" stroke="#fff" stroke-width="1.3"/><circle cx="11" cy="12" r="2" stroke="#fff" stroke-width="1.3"/><circle cx="3" cy="7.5" r="2" stroke="#fff" stroke-width="1.3"/><path d="M5 8.5l4 2M5 6.5l4-2" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div class="event-content">
+          <div class="event-title">Family Picnic at Zilker Park</div>
+          <div class="event-host">
+            <div class="host-avi">SM</div>
+            <div class="host-text">Hosted by <strong>Sarah Mitchell</strong> · 1 mutual friend</div>
+          </div>
+
+          <div class="event-details">
+            <div class="event-detail-row">
+              <div class="ed-icon">📅</div>
+              <div>
+                <div class="ed-main">Saturday, May 17</div>
+                <div class="ed-sub">10:00 AM – 1:00 PM</div>
+              </div>
+            </div>
+            <div class="event-detail-row">
+              <div class="ed-icon">📍</div>
+              <div>
+                <div class="ed-main">Zilker Metropolitan Park</div>
+                <div class="ed-sub">2100 Barton Springs Rd · 1.2 mi away</div>
+              </div>
+            </div>
+            <div class="event-detail-row">
+              <div class="ed-icon">👨‍👩‍👧</div>
+              <div>
+                <div class="ed-main">Families with kids 3–8 welcome</div>
+                <div class="ed-sub">Bring a blanket and snacks to share</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="going-row">
+            <div class="going-avis">
+              <div class="going-avi" style="background:#5c8a6a">SM</div>
+              <div class="going-avi" style="background:#7a6a9a">JL</div>
+              <div class="going-avi" style="background:#c46a2d">AM</div>
+              <div class="going-avi" style="background:#3a7ca5">+9</div>
+            </div>
+            <div class="going-text"><strong>12 parents</strong> are going · 3 from your area</div>
+          </div>
+        </div>
+
+        <div class="event-cta-wrap">
+          <button class="event-cta-btn" onclick="push('s-event','s-phone')">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1v16M1 9h16" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+            Join This Event
+          </button>
+          <div class="event-app-link">
+            Already on Sprout? <a onclick="showToast('Opening in app…')">Open in app →</a>
+          </div>
+        </div>
+
+        <div style="height:20px"></div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════
+         S-PHONE · Phone Number (Web)
+    ═══════════════════════════════ -->
+    <div class="screen right" id="s-phone" style="background:#fff">
+      <div class="web-chrome">
+        <div class="web-sb"><span class="web-sb-time">9:41</span></div>
+        <div class="web-chrome-bar">
+          <div class="web-url-bar">
+            <svg class="web-lock" width="11" height="13" viewBox="0 0 11 13" fill="none"><rect x="1" y="5.5" width="9" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 5.5V4a2.5 2.5 0 0 1 5 0v1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+            <div class="web-url-text"><span class="domain">sprout.app</span>/event/join</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="web-form-screen">
+        <div class="web-form-header">
+          <button class="web-back-btn" onclick="pop('s-phone','s-event')">
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8 2L2 8l6 6" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="web-sprout-logo">
+            <div class="web-logo-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1C4 1 1.5 3.5 1.5 7s2.5 6 5.5 6 5.5-2.5 5.5-6S10 1 7 1z" fill="#fff"/></svg></div>
+            <span class="web-logo-name">Sprout</span>
+          </div>
+          <div style="width:36px"></div>
+        </div>
+
+        <div class="web-form-body">
+          <div class="web-step-tag"><div class="web-step-dot"></div>Step 1 of 3</div>
+          <div class="web-form-heading">What's your<br><em>phone number?</em></div>
+          <div class="web-form-sub">We'll check if you already have a Sprout account — if so, we'll log you right in.</div>
+
+          <div class="phone-field-wrap focused">
+            <div class="phone-flag">🇺🇸 <span>+1</span></div>
+            <input class="phone-field-input" type="tel" value="(555) 012-3" placeholder="(555) 000-0000" readonly>
+          </div>
+
+          <div class="phone-notice">
+            <div class="phone-notice-icon">🔒</div>
+            <div class="phone-notice-text">Your number is only used to verify your identity and connect you with your community. We never share it.</div>
+          </div>
+
+          <button class="web-cta-btn" onclick="push('s-phone','s-info')">
+            Continue
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 8h8M9 4l4 4-4 4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+
+          <div class="web-progress" style="margin-top:20px">
+            <div class="wp-dot done"></div>
+            <div class="wp-dot active"></div>
+            <div class="wp-dot"></div>
+          </div>
+        </div>
+
+        <!-- Numeric keyboard -->
+        <div class="web-keyboard">
+          <div class="kbd-key">1<span class="kbd-sub"></span></div>
+          <div class="kbd-key">2<span class="kbd-sub">ABC</span></div>
+          <div class="kbd-key">3<span class="kbd-sub">DEF</span></div>
+          <div class="kbd-key">4<span class="kbd-sub">GHI</span></div>
+          <div class="kbd-key">5<span class="kbd-sub">JKL</span></div>
+          <div class="kbd-key">6<span class="kbd-sub">MNO</span></div>
+          <div class="kbd-key">7<span class="kbd-sub">PQRS</span></div>
+          <div class="kbd-key">8<span class="kbd-sub">TUV</span></div>
+          <div class="kbd-key">9<span class="kbd-sub">WXYZ</span></div>
+          <div class="kbd-key dark"></div>
+          <div class="kbd-key">0</div>
+          <div class="kbd-key dark">
+            <svg width="20" height="14" viewBox="0 0 20 14" fill="none"><path d="M8 1H18a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H8L1 7l7-6z" stroke="#1a1b1e" stroke-width="1.3" stroke-linejoin="round" fill="none"/><path d="M13 5l-5 4M8 5l5 4" stroke="#1a1b1e" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <div class="kbd-bottom" style="grid-column:1/-1"><div style="width:110px;height:4px;background:rgba(0,0,0,.25);border-radius:99px"></div></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════
+         S-INFO · Basic Info Form (Web)
+    ═══════════════════════════════ -->
+    <div class="screen right" id="s-info" style="background:#fff">
+      <div class="web-chrome">
+        <div class="web-sb"><span class="web-sb-time">9:41</span></div>
+        <div class="web-chrome-bar">
+          <div class="web-url-bar">
+            <svg class="web-lock" width="11" height="13" viewBox="0 0 11 13" fill="none"><rect x="1" y="5.5" width="9" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 5.5V4a2.5 2.5 0 0 1 5 0v1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+            <div class="web-url-text"><span class="domain">sprout.app</span>/event/setup</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="web-form-screen">
+        <div class="web-form-header">
+          <button class="web-back-btn" onclick="pop('s-info','s-phone')">
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8 2L2 8l6 6" stroke="#4d525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="web-sprout-logo">
+            <div class="web-logo-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1C4 1 1.5 3.5 1.5 7s2.5 6 5.5 6 5.5-2.5 5.5-6S10 1 7 1z" fill="#fff"/></svg></div>
+            <span class="web-logo-name">Sprout</span>
+          </div>
+          <div style="width:36px"></div>
+        </div>
+
+        <div class="web-form-body">
+          <div class="web-step-tag"><div class="web-step-dot"></div>Step 2 of 3</div>
+          <div class="web-form-heading">Quick setup<br>to <em>join</em></div>
+          <div class="web-form-sub">Just a few basics so parents at the event can connect with you.</div>
+
+          <div class="info-form">
+            <div class="field-row">
+              <div class="field-group">
+                <div class="field-label-text">First Name</div>
+                <input class="field-input focused" type="text" value="Jessica" readonly>
+              </div>
+              <div class="field-group">
+                <div class="field-label-text">Last Name</div>
+                <input class="field-input" type="text" placeholder="Last name" readonly>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <div class="field-label-text">Zip Code</div>
+              <input class="field-input" type="text" placeholder="e.g. 78701" readonly>
+            </div>
+
+            <div class="field-group">
+              <div class="field-label-text">I am a…</div>
+              <div class="role-grid" id="roleGrid">
+                <div class="role-btn selected" onclick="selectRole(this)">
+                  <div class="role-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  <div class="role-emoji">👩</div>
+                  <div class="role-label-wrap">
+                    <div class="role-name">Mom</div>
+                  </div>
+                </div>
+                <div class="role-btn" onclick="selectRole(this)">
+                  <div class="role-check"></div>
+                  <div class="role-emoji">👨</div>
+                  <div class="role-label-wrap">
+                    <div class="role-name">Dad</div>
+                  </div>
+                </div>
+                <div class="role-btn" onclick="selectRole(this)">
+                  <div class="role-check"></div>
+                  <div class="role-emoji">🧑</div>
+                  <div class="role-label-wrap">
+                    <div class="role-name">Guardian</div>
+                  </div>
+                </div>
+                <div class="role-btn" onclick="selectRole(this)">
+                  <div class="role-check"></div>
+                  <div class="role-emoji">💛</div>
+                  <div class="role-label-wrap">
+                    <div class="role-name">Step Parent</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button class="web-cta-btn" onclick="push('s-info','s-joined')" style="margin-top:4px">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M8 2l6 6-6 6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Join Event
+            </button>
+          </div>
+
+          <div class="web-progress" style="margin-top:18px;padding-bottom:20px">
+            <div class="wp-dot done"></div>
+            <div class="wp-dot done"></div>
+            <div class="wp-dot active"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════
+         S-JOINED · You're In! (Web)
+    ═══════════════════════════════ -->
+    <div class="screen right" id="s-joined">
+      <div class="web-chrome">
+        <div class="web-sb"><span class="web-sb-time">9:41</span></div>
+        <div class="web-chrome-bar">
+          <div class="web-url-bar">
+            <svg class="web-lock" width="11" height="13" viewBox="0 0 11 13" fill="none"><rect x="1" y="5.5" width="9" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 5.5V4a2.5 2.5 0 0 1 5 0v1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+            <div class="web-url-text"><span class="domain">sprout.app</span>/event/confirmed</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="joined-screen">
+        <div class="joined-hero">
+          <div class="joined-check">🎉</div>
+          <div class="joined-heading">You're going!</div>
+          <div class="joined-sub">You've joined the event. We've saved your info so downloading Sprout is super quick.</div>
+        </div>
+
+        <div class="joined-body">
+          <div class="joined-event-card">
+            <div class="joined-event-title">Family Picnic at Zilker Park</div>
+            <div class="joined-event-meta">
+              <span>📅 Sat, May 17 · 10 AM</span>
+              <span>📍 Zilker Park</span>
+            </div>
+          </div>
+
+          <div class="download-section">
+            <div class="download-heading">Get the full experience</div>
+            <div class="download-sub">Download Sprout to chat with other parents, get event updates, and see who else is going.</div>
+            <div class="store-btns">
+              <div class="store-btn" onclick="push('s-joined','s-break')">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M14.5 10.8c0-1.4.8-2.7 2-3.3-.8-1.1-2-1.8-3.3-1.8-.7 0-1.7.4-2.5.4-.8 0-1.7-.4-2.4-.4-2.5 0-5.3 2-5.3 5.8 0 2.3 1 4.8 2.2 6.4.6.8 1.2 1.6 2.1 1.6.8 0 1.2-.5 2.2-.5 1.1 0 1.4.5 2.2.5.9 0 1.6-.8 2.1-1.6.4-.6.8-1.2 1-1.9-1.4-.6-2.3-2-2.3-3.2z" fill="#1a1b1e"/><path d="M13 2c0 1.7-1.3 3-3 3" stroke="#1a1b1e" stroke-width="1.3" stroke-linecap="round"/></svg>
+                <div class="store-btn-label">
+                  <div class="store-btn-sub">Download on the</div>
+                  <div class="store-btn-name">App Store</div>
+                </div>
+              </div>
+              <div class="store-btn" onclick="push('s-joined','s-break')">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 17L10 10 3 3" stroke="#4CAF50" stroke-width="2" stroke-linecap="round"/><path d="M17 17L10 10 17 3" stroke="#2196F3" stroke-width="2" stroke-linecap="round"/><path d="M3 3h14" stroke="#F44336" stroke-width="2" stroke-linecap="round"/><path d="M3 17h14" stroke="#FFEB3B" stroke-width="2" stroke-linecap="round"/></svg>
+                <div class="store-btn-label">
+                  <div class="store-btn-sub">Get it on</div>
+                  <div class="store-btn-name">Google Play</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="web-hint">
+            <div class="web-hint-icon">✨</div>
+            <div class="web-hint-text"><strong>Skip the onboarding.</strong> When you download Sprout and enter your phone number, your info is already saved — you'll go straight to adding your kids.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════
+         S-BREAK · Context bridge
+    ═══════════════════════════════ -->
+    <div class="screen right" id="s-break">
+      <div class="web-chrome">
+        <div class="web-sb"><span class="web-sb-time">9:41</span></div>
+      </div>
+
+      <div class="break-screen">
+        <div class="break-app-icon">🌱</div>
+        <div class="break-heading">Now open Sprout<br>on your phone</div>
+        <div class="break-sub">You've already filled in the basics on web. Here's what happens when you open the app for the first time:</div>
+
+        <div class="break-steps">
+          <div class="break-step">
+            <div class="break-step-num">1</div>
+            <div class="break-step-text">Enter your <strong>phone number</strong> — Sprout recognizes you instantly</div>
+          </div>
+          <div class="break-step">
+            <div class="break-step-num">2</div>
+            <div class="break-step-text"><strong>Skip the basic info</strong> — name, zip, and role are already saved from the web</div>
+          </div>
+          <div class="break-step">
+            <div class="break-step-num">3</div>
+            <div class="break-step-text">Jump straight to <strong>adding your kids</strong> and you're in the community</div>
+          </div>
+        </div>
+
+        <button class="break-cta-btn" onclick="push('s-break','s-app-phone')">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 8h8M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          See it in the app →
+        </button>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════
+         S-APP-PHONE · App Phone Entry
+    ═══════════════════════════════ -->
+    <div class="screen right" id="s-app-phone" style="background:var(--bg)">
+      <div class="app-sb">
+        <span class="app-sb-time">9:41</span>
+        <div class="app-sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".35"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/></svg>
+        </div>
+      </div>
+
+      <div class="app-progress">
+        <div class="app-prog-bar on"></div>
+        <div class="app-prog-bar"></div>
+        <div class="app-prog-bar"></div>
+      </div>
+
+      <div class="app-content">
+        <div style="margin-bottom:24px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:20px">
+            <div style="width:36px;height:36px;background:var(--brand);border-radius:10px;display:flex;align-items:center;justify-content:center">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5C5 1.5 1.5 5 1.5 9s3.5 7.5 7.5 7.5S16.5 13 16.5 9 13 1.5 9 1.5z" fill="#fff"/></svg>
+            </div>
+            <div style="font-size:16px;font-weight:700;color:var(--brand-dd)">Sprout</div>
+          </div>
+        </div>
+
+        <div class="app-heading">Welcome<br><em>back!</em></div>
+        <div class="app-sub">Enter your phone number and we'll pick up right where you left off on the web.</div>
+
+        <div class="app-phone-field focused">
+          <span class="flag-code">🇺🇸</span>
+          <div class="flag-divider"></div>
+          <div class="phone-number-display">(555) 012-3<span class="cursor-blink"></span></div>
+        </div>
+
+        <!-- Recognized user banner (appears after number entry) -->
+        <div class="user-recognized">
+          <div class="user-recognized-icon">✅</div>
+          <div class="user-recognized-text">
+            <div class="user-recognized-title">We found your account!</div>
+            <div class="user-recognized-sub">Your info from the web is saved. Skipping ahead to Add Kids →</div>
+          </div>
+        </div>
+
+        <button class="app-cta-btn" onclick="push('s-app-phone','s-app-kids')">Continue</button>
+        <div class="app-terms">By continuing you agree to our <a>Terms of Service</a> &amp; <a>Privacy Policy</a></div>
+      </div>
+
+      <div class="app-keyboard">
+        <div class="app-kbd-key">1<div class="app-kbd-sub"></div></div>
+        <div class="app-kbd-key">2<div class="app-kbd-sub">ABC</div></div>
+        <div class="app-kbd-key">3<div class="app-kbd-sub">DEF</div></div>
+        <div class="app-kbd-key">4<div class="app-kbd-sub">GHI</div></div>
+        <div class="app-kbd-key">5<div class="app-kbd-sub">JKL</div></div>
+        <div class="app-kbd-key">6<div class="app-kbd-sub">MNO</div></div>
+        <div class="app-kbd-key">7<div class="app-kbd-sub">PQRS</div></div>
+        <div class="app-kbd-key">8<div class="app-kbd-sub">TUV</div></div>
+        <div class="app-kbd-key">9<div class="app-kbd-sub">WXYZ</div></div>
+        <div class="app-kbd-key dark"></div>
+        <div class="app-kbd-key">0</div>
+        <div class="app-kbd-key dark">
+          <svg width="20" height="14" viewBox="0 0 20 14" fill="none"><path d="M8 1H18a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H8L1 7l7-6z" stroke="#1a1b1e" stroke-width="1.3" stroke-linejoin="round" fill="none"/><path d="M13 5l-5 4M8 5l5 4" stroke="#1a1b1e" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="app-kbd-bottom" style="grid-column:1/-1"><div class="app-kbd-pill"></div></div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════
+         S-APP-KIDS · Add Kids (App)
+    ═══════════════════════════════ -->
+    <div class="screen right" id="s-app-kids" style="background:var(--bg)">
+      <div class="app-sb">
+        <span class="app-sb-time">9:41</span>
+        <div class="app-sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".35"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/></svg>
+        </div>
+      </div>
+
+      <!-- Skip banner -->
+      <div class="skip-banner">
+        <div class="skip-banner-icon">⚡</div>
+        <div>
+          <div class="skip-banner-text">Basic info already saved from web</div>
+          <div class="skip-banner-sub">Name · Zip code · Role — all done. Just add your kids!</div>
+        </div>
+      </div>
+
+      <div class="app-progress" style="margin-top:6px">
+        <div class="app-prog-bar on"></div>
+        <div class="app-prog-bar on"></div>
+        <div class="app-prog-bar"></div>
+      </div>
+
+      <div class="kids-content">
+        <div style="margin-top:10px;margin-bottom:20px">
+          <div class="kids-heading">Now tell us<br>about your <em>kids</em></div>
+          <div class="kids-sub">This helps us match you with the right events, clubs, and parents in your community.</div>
+        </div>
+
+        <div class="kid-form-card">
+          <div class="kid-form-title">👧 Child 1</div>
+          <div class="kid-fields">
+            <div class="kid-field focused">
+              <div class="kid-field-val">Emma</div>
+              <div class="kid-field-label">First name</div>
+            </div>
+            <div class="kid-field">
+              <div class="kid-field-ph">Date of birth</div>
+              <div class="kid-field-label">Tap to set</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div class="kid-field-label" style="padding:0 2px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--ts)">Grade</div>
+              <div class="grade-chips">
+                <div class="grade-chip unsel">PreK</div>
+                <div class="grade-chip sel">1st</div>
+                <div class="grade-chip unsel">2nd</div>
+                <div class="grade-chip unsel">3rd</div>
+                <div class="grade-chip unsel">4th</div>
+                <div class="grade-chip unsel">5th</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="add-kid-link" onclick="showToast('Add another child…')">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7.5" stroke="#186338" stroke-width="1.4"/><path d="M9 5.5v7M5.5 9h7" stroke="#186338" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Add another child
+        </div>
+
+        <div style="height:10px"></div>
+      </div>
+
+      <div class="app-footer">
+        <button class="app-footer-btn" onclick="showToast('🎉 Welcome to Sprout! Joining your event…')">
+          Done — Join the Event 🎉
+        </button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+  </div><!-- /sc-wrap -->
+</div><!-- /phone -->
+
+
+<script>
+const SCREENS = ['s-event','s-phone','s-info','s-joined','s-break','s-app-phone','s-app-kids'];
+const WEB_SCREENS  = new Set(['s-event','s-phone','s-info','s-joined','s-break']);
+const APP_SCREENS  = new Set(['s-app-phone','s-app-kids']);
+let currentScreen = 's-event';
+
+function push(from, to) {
+  const f = document.getElementById(from);
+  const t = document.getElementById(to);
+  f.classList.remove('anim-pop-in','anim-push-out','left','right');
+  t.classList.remove('anim-push-in','anim-pop-out','left','right');
+  f.classList.add('anim-push-out');
+  t.classList.add('anim-push-in');
+  f.addEventListener('animationend', () => { f.classList.remove('anim-push-out'); f.classList.add('left'); }, {once:true});
+  t.addEventListener('animationend', () => { t.classList.remove('anim-push-in'); }, {once:true});
+  currentScreen = to;
+  updateUI(to);
+}
+
+function pop(from, to) {
+  const f = document.getElementById(from);
+  const t = document.getElementById(to);
+  f.classList.remove('anim-push-in','anim-pop-in','left','right');
+  t.classList.remove('anim-push-out','anim-pop-out','left','right');
+  f.classList.add('anim-pop-out');
+  t.classList.add('anim-pop-in');
+  f.addEventListener('animationend', () => { f.classList.remove('anim-pop-out'); f.classList.add('right'); }, {once:true});
+  t.addEventListener('animationend', () => { t.classList.remove('anim-pop-in'); }, {once:true});
+  currentScreen = to;
+  updateUI(to);
+}
+
+function jumpTo(target) {
+  const ci = SCREENS.indexOf(currentScreen);
+  const ti = SCREENS.indexOf(target);
+  if (ci === ti) return;
+  SCREENS.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = 'screen' + (i < ti ? ' left' : i > ti ? ' right' : '');
+  });
+  currentScreen = target;
+  updateUI(target);
+}
+
+function updateUI(screen) {
+  // Flow map
+  document.querySelectorAll('.flow-step').forEach(el => {
+    el.classList.toggle('active', el.dataset.screen === screen);
+  });
+  // Context badge
+  const badge = document.getElementById('ctxBadge');
+  if (APP_SCREENS.has(screen)) {
+    badge.textContent = '📱 Sprout App';
+    badge.className = 'context-badge app';
+  } else {
+    badge.textContent = '🌐 Mobile Web Browser';
+    badge.className = 'context-badge web';
+  }
+}
+
+function selectRole(btn) {
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  // Animate checkmark in
+  const check = btn.querySelector('.role-check');
+  check.innerHTML = '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  document.querySelectorAll('.role-btn:not(.selected) .role-check').forEach(c => c.innerHTML = '');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// Init
+SCREENS.forEach((id, i) => {
+  const el = document.getElementById(id);
+  el.className = 'screen' + (i === 0 ? '' : ' right');
+});
+</script>
+
+</body>
+</html>

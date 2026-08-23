@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Notifications v2 — full taxonomy · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --surface:#ffffff; --card:#ffffff; --field:#e8e2d6;
+    --ink:#1e3e2b; --ink-2:#23271f; --body:#4d525b; --muted:#7d715e;
+    --brand:#186338; --brand-bold:#1e3e2b; --brand-mid:#4fa472; --brand-light:#e2e9e3; --brand-border:#77b691;
+    --border:#e2dccf; --shadow-sm:1px 3px 9px rgba(13,13,18,.06); --radius:16px;
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace;
+    /* calendar-note type colors — reused verbatim from 01 - Website/calendar-todo.html, do not reinvent */
+    --t-event:#2d5c2e;   --t-event-bg:#e4f0e6;
+    --t-noschool:#c0533d;--t-noschool-bg:#fae3dd;
+    --t-special:#c08a2d; --t-special-bg:#fbf0d8;
+    --t-todo:#3b6ea5;    --t-todo-bg:#e1ecf7;
+  }
+  .ph{display:inline-block;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:30px 40px;padding:40px 24px 60px;}
+
+  .lede{flex:1 0 100%;text-align:center;max-width:720px;margin:0 auto 8px;}
+  .lede h1{font-family:var(--serif);font-size:23px;font-weight:600;color:#23271f;margin:0 0 6px;}
+  .lede p{font-size:13px;color:#6a665b;margin:0;line-height:1.6;}
+
+  .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:50;}
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);z-index:20;}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;}
+  .sb svg{width:17px;height:11px;fill:var(--ink);} .sb .bat{width:25px;}
+
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:4px 16px 8px;}
+  .ibtn{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1px solid var(--border);
+    display:grid;place-items:center;cursor:pointer;flex-shrink:0;box-shadow:var(--shadow-sm);}
+  .ibtn svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .top .tt{flex:1;line-height:1.1;} .top .tt.center{text-align:center;}
+  .top .tt .t{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);}
+  .top .sp{width:40px;flex-shrink:0;}
+
+  .filters{flex:0 0 auto;display:flex;gap:7px;overflow-x:auto;padding:2px 16px 11px;}
+  .filters::-webkit-scrollbar{display:none;}
+  .fchip{position:relative;flex:0 0 auto;font-family:var(--sans);font-size:12.5px;font-weight:500;background:var(--surface);border:1px solid var(--border);
+    color:var(--ink-2);border-radius:999px;padding:7px 13px;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow-sm);
+    transition:background .12s,color .12s,border-color .12s;}
+  .fchip .n{opacity:.6;margin-left:2px;}
+  .fchip.on{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .fchip.on .n{opacity:.8;}
+  /* urgent tab (to-do) gets its own signal — a distinct dot, not the ambient count style */
+  .fchip.urgent{border-color:var(--t-todo);}
+  .fchip.urgent .n{opacity:1;color:var(--t-todo);font-weight:700;}
+  .fchip.urgent.on{background:var(--t-todo);border-color:var(--t-todo);}
+  .fchip.urgent.on .n{color:#fff;}
+  .fchip .dot{position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:var(--t-noschool);border:2px solid var(--bg);}
+  .fchip.urgent.on .dot,.fchip[data-count="0"] .dot{display:none;}
+
+  .body{flex:1 1 auto;overflow-y:auto;padding:2px 12px 28px;}
+  .body::-webkit-scrollbar{display:none;}
+
+  .seclbl{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:14px 11px 6px;}
+  .seclbl:first-child{margin-top:4px;}
+
+  .nrow{display:flex;gap:11px;padding:12px 11px;border-radius:14px;cursor:pointer;}
+  .nrow.unread{background:var(--brand-light);}
+  .ico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;font-size:18px;color:#fff;}
+  .ico.club{background:linear-gradient(144deg,#dd7a37,#f0aa63);font-family:var(--serif);font-weight:600;font-size:18px;}
+  .ico.photo{background:linear-gradient(144deg,#1e3e2b,#4fa472);}
+  .ico.bday{background:linear-gradient(144deg,#b8446c,#e18aa8);}
+  .ico.camp{background:linear-gradient(144deg,#a37426,#d3a852);}
+  .avatar{border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;
+    background:linear-gradient(144deg,#1e3e2b 5%,#4fa472 100%);width:42px;height:42px;font-size:15px;flex-shrink:0;}
+
+  .ico.note{font-size:18px;}
+  .ico.note.t-event{background:var(--t-event-bg);color:var(--t-event);}
+  .ico.note.t-noschool{background:var(--t-noschool-bg);color:var(--t-noschool);}
+  .ico.note.t-special{background:var(--t-special-bg);color:var(--t-special);}
+
+  .todobox{width:42px;height:42px;border-radius:12px;flex-shrink:0;display:grid;place-items:center;background:var(--t-todo-bg);}
+  .cb{width:24px;height:24px;border-radius:7px;border:2px solid var(--t-todo);display:grid;place-items:center;background:transparent;transition:background .12s;}
+  .cb svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:3;opacity:0;transition:opacity .12s;}
+  .nrow.done .cb{background:var(--t-todo);}
+  .nrow.done .cb svg{opacity:1;}
+  .nrow.done .ti{color:var(--muted);text-decoration:line-through;}
+
+  .ntxt{flex:1;min-width:0;padding-top:1px;}
+  .ntxt .row1{display:flex;align-items:flex-start;gap:6px;}
+  .ntxt .ti{font-family:var(--sans);font-weight:700;font-size:13.5px;color:var(--ink-2);flex:1;min-width:0;}
+  .ntxt .tm{font-family:var(--sans);font-size:10.5px;color:var(--muted);flex-shrink:0;padding-top:1px;white-space:nowrap;}
+  .ntxt .de{font-family:var(--sans);font-size:12px;color:var(--body);line-height:1.42;margin-top:2px;}
+
+  .tag{flex-shrink:0;font-size:9.5px;font-weight:700;border-radius:6px;padding:2px 7px;white-space:nowrap;align-self:flex-start;margin-top:1px;}
+  .tag.bday{background:#f7e3ea;color:#b8446c;}
+  .tag.camp{background:#f3e6cd;color:#a37426;}
+  .tag.t-event{background:var(--t-event-bg);color:var(--t-event);}
+  .tag.t-noschool{background:var(--t-noschool-bg);color:var(--t-noschool);}
+  .tag.t-special{background:var(--t-special-bg);color:var(--t-special);}
+  .tag.t-todo{background:var(--t-todo-bg);color:var(--t-todo);}
+
+  /* ============ PINNED — "needs your attention" (open to-dos, ignores time order) ============ */
+  .pinned{display:none;margin:4px 0 16px;border-radius:18px;overflow:hidden;border:1.5px solid var(--t-todo);background:var(--t-todo-bg);}
+  .pinned.show{display:block;}
+  .pinned-head{display:flex;align-items:center;justify-content:space-between;padding:11px 13px 8px;}
+  .pinned-head .lbl{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--t-todo);}
+  .pinned-head .lbl .ph{width:13px;height:13px;}
+  .pinned-head .cnt{font-size:10.5px;font-weight:700;color:var(--t-todo);background:#fff;padding:2px 9px;border-radius:999px;}
+  .pinned .nrow{background:var(--surface);margin:0 8px 8px;box-shadow:var(--shadow-sm);}
+  .pinned .nrow:last-child{margin-bottom:9px;}
+  .pinned-empty{display:none;padding:16px 16px 18px;text-align:center;font-size:12px;color:var(--t-todo);}
+  .pinned-empty.show{display:block;}
+
+  .completed-sec{display:none;margin-top:6px;}
+  .completed-sec.show{display:block;}
+  .completed-sec .nrow{opacity:.62;}
+
+  .empty{display:none;flex-direction:column;align-items:center;text-align:center;padding:52px 30px 20px;}
+  .empty.on{display:flex;}
+  .empty .eic{width:56px;height:56px;border-radius:50%;background:var(--brand-light);display:grid;place-items:center;margin-bottom:14px;color:var(--brand);}
+  .empty .eic .ph{width:26px;height:26px;}
+  .empty h3{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin:0 0 6px;}
+  .empty p{font-size:12.5px;color:var(--muted);line-height:1.55;margin:0;max-width:240px;}
+
+  .fnote{display:flex;gap:7px;align-items:flex-start;justify-content:center;text-align:center;padding:18px 20px 6px;color:var(--muted);}
+  .fnote .ph{width:13px;height:13px;flex-shrink:0;margin-top:2px;}
+  .fnote span{font-size:11px;line-height:1.5;}
+</style>
+</head>
+<body>
+
+  <div class="lede">
+    <h1>Notifications v2 — to-do gets pinned, not buried</h1>
+    <p>Three changes from the last round: (1) To-do is its own top-level tab, split out of Calendar — it's actionable, Event/No School/Special are just FYI. (2) Open to-dos live in a pinned "Needs your attention" strip that ignores chronological order and sits above everything else, in <em>All</em> and in <em>To-do</em>. (3) The To-do tab carries its own red dot + colored count — a different urgency signal from the ambient grey counts on the other tabs. Tap a checkbox: it leaves the pinned strip and drops into Completed.</p>
+  </div>
+
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+
+      <div class="top">
+        <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+        <div class="tt center"><div class="t">Notifications</div></div>
+        <div class="sp"></div>
+      </div>
+
+      <div class="filters" id="filters">
+        <span class="fchip on" data-tab="all">All<span class="n">· 15</span></span>
+        <span class="fchip" data-tab="events">Events<span class="n">· 7</span></span>
+        <span class="fchip" data-tab="clubs">Clubs<span class="n">· 3</span></span>
+        <span class="fchip" data-tab="calendar">Calendar<span class="n">· 3</span></span>
+        <span class="fchip urgent" data-tab="todo" data-count="2">To-do<span class="n" id="todoTabCount">· 2</span><span class="dot"></span></span>
+        <span class="fchip" data-tab="daily">Daily Brief<span class="n">· 0</span></span>
+      </div>
+
+      <div class="body">
+
+        <div class="pinned" id="pinned">
+          <div class="pinned-head">
+            <div class="lbl"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12"/></svg></span>Needs your attention</div>
+            <div class="cnt" id="pinnedCount">2 open</div>
+          </div>
+          <div id="pinnedList">
+            <div class="nrow" data-todo="1"><div class="todobox"><div class="cb"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div></div><div class="ntxt"><div class="row1"><div class="ti">Bring towels for water day</div><span class="tag t-todo">To-do</span><div class="tm">Due tomorrow</div></div></div></div>
+            <div class="nrow" data-todo="1"><div class="todobox"><div class="cb"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div></div><div class="ntxt"><div class="row1"><div class="ti">Sign Jake's permission slip</div><span class="tag t-todo">To-do</span><div class="tm">Due Fri</div></div></div></div>
+          </div>
+          <div class="pinned-empty" id="pinnedEmpty">All caught up — nothing needs action right now.</div>
+        </div>
+
+        <div id="list">
+
+          <div class="nrow" data-cat="events"><div class="ico photo">⛳</div><div class="ntxt"><div class="row1"><div class="ti">New Event</div><div class="tm">1h</div></div><div class="de">"Come Join me for Golf" Nov 18, 8:00–9:00 AM (CST)</div></div></div>
+
+          <div class="nrow" data-cat="events"><div class="ico bday">🎂</div><div class="ntxt"><div class="row1"><div class="ti">Birthday Coming Up</div><span class="tag bday">Birthday</span><div class="tm">3h</div></div><div class="de">Alex turns 5 in 3 days — want to plan something?</div></div></div>
+
+          <div class="nrow" data-cat="events"><div class="ico camp">⛺</div><div class="ntxt"><div class="row1"><div class="ti">Camp Registration Confirmed</div><span class="tag camp">Camp</span><div class="tm">5h</div></div><div class="de">You're registered for Camp Wildwood — Week of July 14</div></div></div>
+
+          <div class="nrow unread" data-cat="clubs"><div class="ico club">Y</div><div class="ntxt"><div class="row1"><div class="ti">Removed from Club</div><div class="tm">1h</div></div><div class="de">"Guy Hawkins admin from Y Combinator has removed you from the club"</div></div></div>
+
+          <div class="nrow" data-cat="calendar"><div class="ico note t-event">🗓️</div><div class="ntxt"><div class="row1"><div class="ti">Field trip to the zoo</div><span class="tag t-event">Event</span><div class="tm">Today</div></div><div class="de">1st Grade Class · added by Ms. Rivera</div></div></div>
+
+          <div class="nrow" data-cat="events"><div class="avatar">A</div><div class="ntxt"><div class="row1"><div class="ti">Join Request</div><div class="tm">1d</div></div><div class="de">Angelina requested to join your "Come Join me for Golf" event!</div></div></div>
+
+          <div class="nrow" data-cat="calendar"><div class="ico note t-noschool">🚫</div><div class="ntxt"><div class="row1"><div class="ti">Teacher in-service — no school</div><span class="tag t-noschool">No School</span><div class="tm">Tomorrow</div></div></div></div>
+
+          <div class="nrow" data-cat="clubs"><div class="avatar">NL</div><div class="ntxt"><div class="row1"><div class="ti">Join Request</div><div class="tm">1d</div></div><div class="de">Noah LaRonde requested to join "Y Combinator Social Club"</div></div></div>
+
+          <div class="nrow" data-cat="events"><div class="ico bday">🎂</div><div class="ntxt"><div class="row1"><div class="ti">Party Invites Sent</div><span class="tag bday">Birthday</span><div class="tm">1d</div></div><div class="de">Alex's party is live! Invites just went out to your saved families.</div></div></div>
+
+          <div class="nrow" data-cat="calendar"><div class="ico note t-special">✨</div><div class="ntxt"><div class="row1"><div class="ti">Pajama day! 🩳</div><span class="tag t-special">Special</span><div class="tm">Fri</div></div></div></div>
+
+          <div class="nrow" data-cat="events"><div class="ico photo">🥂</div><div class="ntxt"><div class="row1"><div class="ti">Almost Time!</div><div class="tm">2w</div></div><div class="de">"Y Combinator Happy hour" starts at 5:30 PM CDT.</div></div></div>
+
+          <div class="nrow" data-cat="clubs"><div class="ico club">Y</div><div class="ntxt"><div class="row1"><div class="ti">New Member</div><div class="tm">1mo</div></div><div class="de">Noah LaRonde joined "Y Combinator"</div></div></div>
+
+          <div class="nrow" data-cat="events"><div class="ico photo">🎉</div><div class="ntxt"><div class="row1"><div class="ti">Event Completed!</div><div class="tm">2w</div></div><div class="de">"Y Combinator Happy hour" wrapped up! Share your best moments.</div></div></div>
+
+        </div>
+
+        <div class="completed-sec" id="completedSec">
+          <div class="seclbl">Completed</div>
+          <div id="completedList"></div>
+        </div>
+
+        <div class="empty" id="empty-daily">
+          <div class="eic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12"/></svg></span></div>
+          <h3>Nothing here yet</h3>
+          <p>Your daily brief will show up here once it's live — a quiet, once-a-day summary instead of a ping every time something happens.</p>
+        </div>
+
+        <div class="fnote">
+          <span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12"/></svg></span>
+          <span>Notifications that are over 30 days old will be removed.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  var filters = document.getElementById('filters');
+  var list = document.getElementById('list');
+  var pinned = document.getElementById('pinned');
+  var pinnedList = document.getElementById('pinnedList');
+  var pinnedEmpty = document.getElementById('pinnedEmpty');
+  var completedSec = document.getElementById('completedSec');
+  var completedList = document.getElementById('completedList');
+  var emptyDaily = document.getElementById('empty-daily');
+  var todoTabChip = document.querySelector('.fchip[data-tab="todo"]');
+  var todoTabCount = document.getElementById('todoTabCount');
+  var allChip = document.querySelector('.fchip[data-tab="all"]');
+  var rows = Array.prototype.slice.call(document.querySelectorAll('#list .nrow'));
+  var baseAllCount = 13; // events(7) + clubs(3) + calendar(3), excluding to-do — to-do is added dynamically
+  var currentTab = 'all';
+
+  function openTodoCount(){ return pinnedList.querySelectorAll('.nrow').length; }
+
+  function updateCounts(){
+    var open = openTodoCount();
+    todoTabCount.textContent = '· ' + open;
+    todoTabChip.dataset.count = open;
+    allChip.querySelector('.n').textContent = '· ' + (baseAllCount + open);
+    pinnedEmpty.classList.toggle('show', open === 0);
+    document.getElementById('pinnedCount').textContent = open + ' open';
+    document.getElementById('pinnedCount').style.display = open === 0 ? 'none' : 'inline-block';
+  }
+
+  function render(){
+    var showPinned = (currentTab === 'all' || currentTab === 'todo');
+    pinned.classList.toggle('show', showPinned);
+
+    if(currentTab === 'todo'){
+      list.style.display = 'none';
+      completedSec.classList.toggle('show', completedList.children.length > 0);
+      emptyDaily.classList.remove('on');
+    } else if(currentTab === 'daily'){
+      list.style.display = 'none';
+      completedSec.classList.remove('show');
+      emptyDaily.classList.add('on');
+    } else {
+      list.style.display = 'block';
+      completedSec.classList.remove('show');
+      emptyDaily.classList.remove('on');
+      rows.forEach(function(r){ r.style.display = (currentTab === 'all' || r.dataset.cat === currentTab) ? 'flex' : 'none'; });
+    }
+  }
+
+  filters.addEventListener('click', function(e){
+    var chip = e.target.closest('.fchip');
+    if(!chip) return;
+    currentTab = chip.dataset.tab;
+    Array.prototype.forEach.call(filters.querySelectorAll('.fchip'), function(c){ c.classList.remove('on'); });
+    chip.classList.add('on');
+    render();
+  });
+
+  document.querySelector('.body').addEventListener('click', function(e){
+    var row = e.target.closest('.nrow[data-todo]');
+    if(!row) return;
+    if(row.parentElement === pinnedList){
+      row.classList.add('done');
+      completedList.appendChild(row);
+    } else {
+      row.classList.remove('done');
+      pinnedList.appendChild(row);
+    }
+    updateCounts();
+    render();
+  });
+
+  updateCounts();
+  render();
+</script>
+</body>
+</html>

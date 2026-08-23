@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=393, initial-scale=1.0">
+<title>Summer Camps – Interactive Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: #d8d4cc;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 48px 20px 80px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── Phone shell ─────────────────────────────────────────── */
+.phone {
+  width: 393px;
+  min-height: 852px;
+  background: #f4f1ea;
+  border-radius: 50px;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 40px 100px rgba(0,0,0,0.28),
+    0 0 0 1px rgba(0,0,0,0.10),
+    inset 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+/* ── Status bar ──────────────────────────────────────────── */
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px 8px;
+}
+.status-time {
+  font-weight: 600;
+  font-size: 15px;
+  color: #1e3e2b;
+  letter-spacing: -0.4px;
+}
+.status-icons { display: flex; gap: 6px; align-items: center; }
+
+/* ── Nav header ──────────────────────────────────────────── */
+.nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 16px 14px;
+}
+.back-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border-radius: 50%;
+  transition: background 0.15s;
+}
+.back-btn:active { background: rgba(30,62,43,0.08); }
+.nav-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+  font-size: 17px;
+  color: #1e3e2b;
+  letter-spacing: -0.2px;
+}
+
+/* ── Scroll content ──────────────────────────────────────── */
+.scroll-content {
+  padding: 0 16px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  max-height: calc(852px - 90px);
+}
+
+/* ── Filter card ─────────────────────────────────────────── */
+.filter-card {
+  background: #f4f1ea;
+  border: 1px solid #e2e3e6;
+  border-radius: 24px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  box-shadow: 1px 4px 14px rgba(13,13,18,0.06);
+}
+.filter-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+  font-size: 12px;
+  color: #111;
+  line-height: 1.4;
+}
+
+/* ── Kids selector ───────────────────────────────────────── */
+.kids-row {
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.kid-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 56px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: opacity 0.2s ease;
+  position: relative;
+}
+.kid-chip.unselected { opacity: 0.22; }
+
+.kid-avatar {
+  width: 48px; height: 48px;
+  background: #eae6db;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  position: relative;
+  border: 2.5px solid transparent;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.kid-chip.selected .kid-avatar {
+  border-color: rgba(24,99,56,0.6);
+  box-shadow: 0 0 0 3.5px rgba(24,99,56,0.10);
+}
+
+/* Green check badge */
+.kid-check {
+  position: absolute;
+  bottom: -1px; right: -1px;
+  width: 17px; height: 17px;
+  background: #186338;
+  border-radius: 50%;
+  border: 2px solid #f4f1ea;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.kid-chip.selected .kid-check { display: flex; }
+.kid-check svg { display: block; }
+
+.kid-name {
+  font-size: 10px;
+  font-weight: 500;
+  color: #1e3e2b;
+  text-align: center;
+}
+
+/* ── Active filter label ─────────────────────────────────── */
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 16px;
+  transition: opacity 0.2s;
+}
+.filter-label-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #186338;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.filter-label.has-selection .filter-label-dot { opacity: 1; }
+.filter-label-text {
+  font-size: 11px;
+  color: #7d715e;
+}
+.filter-label-names {
+  font-size: 11px;
+  font-weight: 600;
+  color: #186338;
+}
+
+/* ── Date row ────────────────────────────────────────────── */
+.date-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.date-field {
+  flex: 1;
+  background: #eae6db;
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.field-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #1e3e2b;
+}
+.field-value {
+  font-size: 12px;
+  color: #7d715e;
+}
+
+/* ── Location row ────────────────────────────────────────── */
+.location-row {
+  background: #eae6db;
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.location-left { display: flex; flex-direction: column; gap: 2px; }
+.location-place { display: flex; align-items: center; gap: 4px; }
+
+/* ── CTA button ──────────────────────────────────────────── */
+.cta-btn {
+  background: #186338;
+  border-radius: 99px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 1px 1px rgba(13,13,18,0.06);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  user-select: none;
+}
+.cta-btn:active { background: #134f2d; transform: scale(0.99); }
+.cta-btn-text {
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+  font-size: 15.5px;
+  color: white;
+  transition: opacity 0.2s;
+}
+
+/* ── Camp list ───────────────────────────────────────────── */
+.camps-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+.camps-count-text {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #7d715e;
+}
+.camps-count-num {
+  font-weight: 600;
+  color: #1e3e2b;
+}
+
+.camp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Camp card */
+.camp-card {
+  background: #f4f1ea;
+  border: 1px solid #d0dacf;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  padding: 8px;
+  gap: 0;
+  box-shadow: 1px 4px 25px 2px rgba(13,13,18,0.05);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.3s, max-height 0.35s ease, margin-bottom 0.35s, padding 0.35s;
+  max-height: 200px;
+  opacity: 1;
+  overflow: hidden;
+}
+.camp-card:active { transform: scale(0.98); }
+
+.camp-card.hidden {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-bottom: -10px;
+  pointer-events: none;
+  border-width: 0;
+}
+
+/* Camp image placeholder */
+.camp-img {
+  width: 118px;
+  height: 118px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+.camp-img-bg {
+  width: 100%; height: 100%;
+  display: flex; align-items: flex-end; justify-content: center;
+}
+
+/* Camp image styles */
+.img-nature { background: linear-gradient(170deg, #5a8e6a 0%, #2d5c3c 50%, #1a3a25 100%); }
+.img-art    { background: linear-gradient(170deg, #7aaa80 0%, #3a7a50 50%, #254833 100%); }
+.img-stem   { background: linear-gradient(170deg, #6a8caa 0%, #3a5c7a 50%, #1a3048 100%); }
+.img-chef   { background: linear-gradient(170deg, #c8a870 0%, #a07840 50%, #704820 100%); }
+.img-leader { background: linear-gradient(170deg, #8a9870 0%, #5a7040 50%, #3a5020 100%); }
+
+.img-silhouette {
+  width: 100%; height: 100%;
+  position: absolute;
+  top: 0; left: 0;
+}
+
+/* Camp info */
+.camp-info {
+  flex: 1;
+  padding: 0 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+.camp-top { display: flex; flex-direction: column; gap: 4px; }
+.badge-row { display: flex; gap: 4px; flex-wrap: wrap; }
+
+.badge {
+  padding: 2px 7px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 500;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.b-sport    { background: #d8e5ed; border-color: #3a7ca5; color: #234a63; }
+.b-arts     { background: #f6ecd1; border-color: #d4a017; color: #7f600e; }
+.b-science  { background: #d8e5ed; border-color: #3a7ca5; color: #234a63; }
+.b-cooking  { background: #fde8d8; border-color: #c8622a; color: #7a3a12; }
+.b-leader   { background: #ede2f5; border-color: #8a4ab0; color: #5a2480; }
+.b-age      { background: #e2e9e3; border-color: #134f2d; color: #1e3e2b; }
+
+.camp-name {
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: #1e3e2b;
+  line-height: 1.45;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.camp-meta { display: flex; flex-direction: column; gap: 3px; margin-top: 1px; }
+.meta-row  { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #7d715e; }
+
+.camp-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+.camp-price .p-big  { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 500; color: #1e3e2b; }
+.camp-price .p-small { font-size: 10px; color: #7d715e; }
+.camp-spots { font-size: 10px; font-weight: 500; color: #186338; }
+
+/* Empty state */
+.empty-state {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  gap: 10px;
+  text-align: center;
+}
+.empty-state.visible { display: flex; }
+.empty-icon { font-size: 36px; margin-bottom: 4px; }
+.empty-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1e3e2b;
+}
+.empty-sub { font-size: 12px; color: #7d715e; line-height: 1.5; }
+
+/* ── Home indicator ──────────────────────────────────────── */
+.home-bar {
+  position: fixed;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 393px;
+  padding-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(transparent, #f4f1ea 60%);
+  pointer-events: none;
+}
+.home-indicator {
+  width: 134px; height: 5px;
+  background: #1e3e2b;
+  border-radius: 99px;
+  opacity: 0.18;
+}
+
+/* ── Date field active state ─────────────────────────────── */
+.date-field {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.date-field:active { background: #dedad2; }
+.date-field.active-field {
+  background: #dedad2;
+  outline: 1.5px solid rgba(24,99,56,0.4);
+}
+.location-row { cursor: pointer; transition: background 0.15s; }
+.location-row:active { background: #dedad2; }
+
+/* ── Bottom sheet overlay ────────────────────────────────── */
+.sheet-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10,20,14,0.45);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+.sheet-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── Bottom sheet base ───────────────────────────────────── */
+.bottom-sheet {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: #f4f1ea;
+  border-radius: 28px 28px 0 0;
+  z-index: 101;
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.32,0.72,0,1);
+  padding-bottom: 32px;
+}
+.bottom-sheet.open { transform: translateY(0); }
+
+.sheet-handle {
+  width: 40px; height: 4px;
+  background: #c8c4bc;
+  border-radius: 99px;
+  margin: 12px auto 0;
+}
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 8px;
+}
+.sheet-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: #1e3e2b;
+}
+.sheet-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: #eae6db;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.sheet-close:active { background: #dedad2; }
+
+/* ── Calendar ────────────────────────────────────────────── */
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 20px 12px;
+}
+.cal-month-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1e3e2b;
+}
+.cal-nav-btn {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: #eae6db;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cal-nav-btn:active { background: #dedad2; }
+
+.cal-grid {
+  padding: 0 16px;
+}
+.cal-dow-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 4px;
+}
+.cal-dow {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: #a09888;
+  padding: 4px 0;
+}
+.cal-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px 0;
+}
+.cal-day {
+  position: relative;
+  height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 13px;
+  color: #1e3e2b;
+  font-weight: 400;
+  transition: color 0.1s;
+  z-index: 1;
+}
+.cal-day.empty { pointer-events: none; }
+.cal-day.other-month { color: #c0bbb2; }
+.cal-day.today .cal-day-num { border: 1.5px solid #186338; }
+
+.cal-day-num {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 2;
+  transition: background 0.15s, color 0.15s;
+}
+.cal-day:active .cal-day-num { background: #dedad2; }
+
+/* Range fill (behind the circle) */
+.cal-day-range-fill {
+  position: absolute;
+  top: 3px; bottom: 3px;
+  left: 0; right: 0;
+  background: transparent;
+  z-index: 0;
+  transition: background 0.15s;
+}
+
+.cal-day.range-start .cal-day-range-fill { left: 50%; background: rgba(24,99,56,0.12); }
+.cal-day.range-end   .cal-day-range-fill { right: 50%; background: rgba(24,99,56,0.12); }
+.cal-day.in-range    .cal-day-range-fill { background: rgba(24,99,56,0.12); }
+
+.cal-day.selected-from .cal-day-num,
+.cal-day.selected-to   .cal-day-num {
+  background: #186338;
+  color: white;
+  font-weight: 600;
+}
+
+/* Calendar confirm btn */
+.cal-confirm-wrap { padding: 14px 20px 0; }
+.cal-confirm-btn {
+  background: #186338;
+  color: white;
+  border-radius: 99px;
+  height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cal-confirm-btn:active { background: #134f2d; }
+
+/* ── Location search sheet ───────────────────────────────── */
+.loc-search-wrap {
+  padding: 4px 20px 12px;
+}
+.loc-search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #eae6db;
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+.loc-search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #1e3e2b;
+}
+.loc-search-input::placeholder { color: #a09888; }
+
+.loc-list { padding: 0 20px; }
+.loc-section-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #a09888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 0 6px;
+}
+.loc-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.loc-item:last-child { border-bottom: none; }
+.loc-item:active { opacity: 0.6; }
+.loc-item.selected .loc-name { color: #186338; font-weight: 600; }
+.loc-icon {
+  width: 36px; height: 36px;
+  background: #eae6db;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.loc-item.selected .loc-icon { background: rgba(24,99,56,0.1); }
+.loc-text { flex: 1; }
+.loc-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e3e2b;
+}
+.loc-dist {
+  font-size: 11px;
+  color: #a09888;
+  margin-top: 1px;
+}
+.loc-check {
+  color: #186338;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.loc-item.selected .loc-check { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="18" height="11" viewBox="0 0 18 11" fill="none">
+        <rect x="0" y="6" width="3" height="5" rx="0.8" fill="#1e3e2b"/>
+        <rect x="4.5" y="4" width="3" height="7" rx="0.8" fill="#1e3e2b"/>
+        <rect x="9" y="2" width="3" height="9" rx="0.8" fill="#1e3e2b"/>
+        <rect x="13.5" y="0" width="3" height="11" rx="0.8" fill="#1e3e2b"/>
+      </svg>
+      <svg width="16" height="11" viewBox="0 0 16 11" fill="none">
+        <path d="M8 8a1.3 1.3 0 1 1 0 2.6A1.3 1.3 0 0 1 8 8z" fill="#1e3e2b"/>
+        <path d="M4.7 6A4.8 4.8 0 0 1 8 4.7c1.3 0 2.5.5 3.3 1.3l1.1-1.1A6.3 6.3 0 0 0 8 3.2c-1.8 0-3.4.7-4.5 1.8l1.2 1z" fill="#1e3e2b"/>
+        <path d="M1.4 3.3A8.8 8.8 0 0 1 8 .5c2.6 0 4.9 1 6.6 2.8l1.1-1.1A10.3 10.3 0 0 0 8 0C5.1 0 2.4 1.1.4 2.9l1 1.4z" fill="#1e3e2b" opacity="0.5"/>
+      </svg>
+      <svg width="27" height="13" viewBox="0 0 27 13" fill="none">
+        <rect x="0.5" y="0.5" width="23" height="12" rx="3" stroke="#1e3e2b" stroke-opacity="0.35"/>
+        <rect x="2" y="2" width="19" height="9" rx="1.5" fill="#1e3e2b"/>
+        <path d="M24.5 4.5v4a2 2 0 0 0 0-4z" fill="#1e3e2b" opacity="0.4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <div class="nav-header">
+    <div class="back-btn">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <path d="M14 17l-6-6 6-6" stroke="#1e3e2b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="nav-title">Summer Camps</span>
+    <div style="width:36px"></div>
+  </div>
+
+  <!-- Scroll area -->
+  <div class="scroll-content">
+
+    <!-- Filter Card -->
+    <div class="filter-card">
+      <div class="filter-title">⛺️ Check Out Nearby Camps</div>
+
+      <!-- Kids chips -->
+      <div class="kids-row" id="kidsRow"></div>
+
+      <!-- Filter label -->
+      <div class="filter-label" id="filterLabel">
+        <div class="filter-label-dot"></div>
+        <span class="filter-label-text" id="filterLabelText">Tap a child to filter camps by their age</span>
+      </div>
+
+      <!-- Date Range -->
+      <div class="date-row">
+        <div class="date-field" id="fromField" onclick="openDateSheet('from')">
+          <span class="field-label">From</span>
+          <span class="field-value" id="fromDisplay">Jun 1</span>
+        </div>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="flex-shrink:0">
+          <path d="M4 10h12M12.5 6.5l3.5 3.5-3.5 3.5" stroke="#7d715e" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="date-field" id="toField" onclick="openDateSheet('to')">
+          <span class="field-label">To</span>
+          <span class="field-value" id="toDisplay">Sep 30</span>
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="location-row" onclick="openLocSheet()">
+        <div class="location-left">
+          <span class="field-label">Near Camps</span>
+          <div class="location-place">
+            <svg width="13" height="14" viewBox="0 0 13 14" fill="none"><path d="M6.5 1C4.57 1 3 2.57 3 4.5c0 2.7 3.5 7.5 3.5 7.5S10 7.2 10 4.5C10 2.57 8.43 1 6.5 1z" stroke="#7d715e" stroke-width="1.1" stroke-linejoin="round"/><circle cx="6.5" cy="4.5" r="1.3" stroke="#7d715e" stroke-width="1.1"/></svg>
+            <span class="field-value" id="locDisplay">Austin, Texas</span>
+          </div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#7d715e" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-btn" id="ctaBtn">
+        <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+          <circle cx="7.5" cy="7.5" r="5" stroke="white" stroke-width="1.5"/>
+          <path d="M11.5 11.5l3.5 3.5" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span class="cta-btn-text" id="ctaText">Show 7 Camps in Area</span>
+      </div>
+    </div>
+
+    <!-- Results header -->
+    <div class="camps-header" id="campsHeader" style="display:none">
+      <span class="camps-count-text">
+        <span class="camps-count-num" id="campCountNum">0</span> camps found
+      </span>
+      <span style="font-size:11px; color:#186338; font-weight:500; cursor:pointer">See all</span>
+    </div>
+
+    <!-- Camp cards -->
+    <div class="camp-list" id="campList"></div>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">No camps for this combo</div>
+      <div class="empty-sub">No single camp covers all selected kids' ages.<br>Try selecting fewer kids.</div>
+    </div>
+
+  </div>
+
+  <!-- Home bar -->
+  <div class="home-bar"><div class="home-indicator"></div></div>
+
+  <!-- ── Overlay ── -->
+  <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheets()"></div>
+
+  <!-- ── Date Picker Sheet ── -->
+  <div class="bottom-sheet" id="dateSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <span class="sheet-title" id="dateSheetTitle">Select From Date</span>
+      <div class="sheet-close" onclick="closeSheets()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M1 1l12 12M13 1L1 13" stroke="#1e3e2b" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="cal-nav">
+      <div class="cal-nav-btn" onclick="calPrev()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="#1e3e2b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="cal-month-label" id="calMonthLabel">July 2026</span>
+      <div class="cal-nav-btn" onclick="calNext()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#1e3e2b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <div class="cal-grid">
+      <div class="cal-dow-row" id="calDow"></div>
+      <div class="cal-days-grid" id="calDays"></div>
+    </div>
+    <div class="cal-confirm-wrap">
+      <div class="cal-confirm-btn" id="calConfirmBtn" onclick="confirmDate()">Confirm Date</div>
+    </div>
+  </div>
+
+  <!-- ── Location Sheet ── -->
+  <div class="bottom-sheet" id="locSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <span class="sheet-title">Search Location</span>
+      <div class="sheet-close" onclick="closeSheets()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M1 1l12 12M13 1L1 13" stroke="#1e3e2b" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="loc-search-wrap">
+      <div class="loc-search-box">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="7" cy="7" r="5" stroke="#a09888" stroke-width="1.5"/>
+          <path d="M11 11l3 3" stroke="#a09888" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input class="loc-search-input" id="locSearchInput" placeholder="City, state or zip code…" oninput="filterLocs(this.value)" />
+      </div>
+    </div>
+    <div class="loc-list" id="locList"></div>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════════════════════════════
+const KIDS = [
+  { id: 'erick',  name: 'Erick',  emoji: '👦', age: 8  },
+  { id: 'etan',   name: 'Etan',   emoji: '👦', age: 10 },
+  { id: 'olivia', name: 'Olivia', emoji: '👧', age: 12 },
+  { id: 'angel',  name: 'Angel',  emoji: '👧', age: 6  },
+];
+
+const CAMPS = [
+  {
+    id: 1, name: 'Art Nature Camp', category: 'Arts', badgeClass: 'b-arts',
+    minAge: 4, maxAge: 8, price: '$420', duration: '/ 2 wks',
+    date: 'Jul 7 – Jul 18 · Full day', location: 'Centennial Park',
+    spots: 4, imgClass: 'img-art',
+    startInt: 20260607, endInt: 20260618, cities: ['austin','houston'],
+  },
+  {
+    id: 2, name: 'Nature Explorers Camp', category: 'Sport', badgeClass: 'b-sport',
+    minAge: 6, maxAge: 12, price: '$420', duration: '/ 2 wks',
+    date: 'Jul 7 – Jul 18 · Full day', location: 'Barton Springs',
+    spots: 4, imgClass: 'img-nature',
+    startInt: 20260607, endInt: 20260618, cities: ['austin','dallas'],
+  },
+  {
+    id: 3, name: 'STEM Discovery Camp', category: 'Science', badgeClass: 'b-science',
+    minAge: 10, maxAge: 14, price: '$500', duration: '/ 1 wk',
+    date: 'Sep 5 – Sep 12 · Full day', location: 'Tech Hub, Downtown',
+    spots: 3, imgClass: 'img-stem',
+    startInt: 20260905, endInt: 20260912, cities: ['austin','nyc','chicago'],
+  },
+  {
+    id: 4, name: 'Little Chefs Camp', category: 'Cooking', badgeClass: 'b-cooking',
+    minAge: 4, maxAge: 7, price: '$280', duration: '/ 1 wk',
+    date: 'Jul 14 – Jul 18 · Half day', location: 'Community Kitchen',
+    spots: 6, imgClass: 'img-chef',
+    startInt: 20260614, endInt: 20260618, cities: ['austin','houston','miami'],
+  },
+  {
+    id: 5, name: 'Young Leaders Camp', category: 'Leadership', badgeClass: 'b-leader',
+    minAge: 9, maxAge: 14, price: '$550', duration: '/ 2 wks',
+    date: 'Aug 4 – Aug 15 · Full day', location: 'Camp Horizon',
+    spots: 2, imgClass: 'img-leader',
+    startInt: 20260804, endInt: 20260815, cities: ['austin','denver','dallas'],
+  },
+  {
+    id: 6, name: 'Junior Artists Studio', category: 'Arts', badgeClass: 'b-arts',
+    minAge: 5, maxAge: 12, price: '$320', duration: '/ 1 wk',
+    date: 'Aug 18 – Aug 22 · Half day', location: 'Arts Centre',
+    spots: 8, imgClass: 'img-art',
+    startInt: 20260818, endInt: 20260822, cities: ['austin','nyc','la','chicago'],
+  },
+  {
+    id: 7, name: 'Outdoor Adventure Camp', category: 'Sport', badgeClass: 'b-sport',
+    minAge: 7, maxAge: 14, price: '$480', duration: '/ 2 wks',
+    date: 'Sep 1 – Sep 12 · Full day', location: 'National Park',
+    spots: 5, imgClass: 'img-nature',
+    startInt: 20260901, endInt: 20260912, cities: ['austin','denver','la'],
+  },
+];
+
+// ════════════════════════════════════════════════════════════════════════════
+// STATE — all vars declared up front so every function can access them
+// ════════════════════════════════════════════════════════════════════════════
+const selected = new Set(); // selected kid ids
+
+// Date state
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DOW_LABELS  = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+let fromDate    = { year: 2026, month: 5, day: 1  }; // Jun 1
+let toDate      = { year: 2026, month: 8, day: 30 }; // Sep 30
+let calYear     = 2026;
+let calMonth    = 6; // July (0-based)
+let pickingMode = 'from';
+
+// Location state
+const LOCATIONS = [
+  { id: 'austin',  name: 'Austin, Texas',       dist: 'Current location', emoji: '📍' },
+  { id: 'houston', name: 'Houston, Texas',       dist: '165 miles away',   emoji: '🤠' },
+  { id: 'dallas',  name: 'Dallas, Texas',        dist: '195 miles away',   emoji: '🌵' },
+  { id: 'nyc',     name: 'New York, NY',         dist: '1,748 miles away', emoji: '🗽' },
+  { id: 'la',      name: 'Los Angeles, CA',      dist: '1,232 miles away', emoji: '🌴' },
+  { id: 'chicago', name: 'Chicago, IL',          dist: '1,091 miles away', emoji: '🏙️' },
+  { id: 'miami',   name: 'Miami, FL',            dist: '1,308 miles away', emoji: '🌊' },
+  { id: 'denver',  name: 'Denver, CO',           dist: '878 miles away',   emoji: '⛰️' },
+];
+let selectedLocId = 'austin';
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function dateToInt(d) { return d.year * 10000 + d.month * 100 + d.day; }
+function dayInt(y, m, d) { return y * 10000 + m * 100 + d; }
+function fmtDate(d) { return `${MONTH_NAMES[d.month].slice(0,3)} ${d.day}`; }
+
+// ════════════════════════════════════════════════════════════════════════════
+// BUILD UI
+// ════════════════════════════════════════════════════════════════════════════
+function buildKids() {
+  const row = document.getElementById('kidsRow');
+  KIDS.forEach(kid => {
+    const chip = document.createElement('div');
+    chip.className = 'kid-chip unselected';
+    chip.id = 'kid-' + kid.id;
+    chip.innerHTML = `
+      <div class="kid-avatar">
+        ${kid.emoji}
+        <div class="kid-check">
+          <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+            <path d="M1.5 4l2 2 3-3" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <span class="kid-name">${kid.name}</span>
+    `;
+    chip.addEventListener('click', () => toggleKid(kid.id));
+    row.appendChild(chip);
+  });
+}
+
+function buildCamps() {
+  const list = document.getElementById('campList');
+  CAMPS.forEach(camp => {
+    const card = document.createElement('div');
+    card.className = 'camp-card';
+    card.id = 'camp-' + camp.id;
+    card.innerHTML = `
+      <div class="camp-img ${camp.imgClass}">
+        <div class="camp-img-bg"></div>
+      </div>
+      <div class="camp-info">
+        <div class="camp-top">
+          <div class="badge-row">
+            <span class="badge ${camp.badgeClass}">${camp.category}</span>
+            <span class="badge b-age">Ages ${camp.minAge}-${camp.maxAge}</span>
+          </div>
+          <span class="camp-name">${camp.name}</span>
+          <div class="camp-meta">
+            <div class="meta-row">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <rect x="1" y="1.5" width="10" height="9.5" rx="1.5" stroke="#7d715e" stroke-width="1"/>
+                <path d="M1 5h10" stroke="#7d715e" stroke-width="1"/>
+                <path d="M4 0.5v2M8 0.5v2" stroke="#7d715e" stroke-width="1" stroke-linecap="round"/>
+              </svg>
+              ${camp.date}
+            </div>
+            <div class="meta-row">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M6 1C4.34 1 3 2.34 3 4c0 2.5 3 7 3 7s3-4.5 3-7c0-1.66-1.34-3-3-3z" stroke="#7d715e" stroke-width="1" stroke-linejoin="round"/>
+                <circle cx="6" cy="4" r="1.2" stroke="#7d715e" stroke-width="1"/>
+              </svg>
+              ${camp.location}
+            </div>
+          </div>
+        </div>
+        <div class="camp-bottom">
+          <div class="camp-price">
+            <span class="p-big">${camp.price} </span><span class="p-small">${camp.duration}</span>
+          </div>
+          <span class="camp-spots">${camp.spots} spots left</span>
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+// ── Toggle kid selection ──────────────────────────────────────────────────────
+function toggleKid(kidId) {
+  if (selected.has(kidId)) {
+    selected.delete(kidId);
+  } else {
+    selected.add(kidId);
+  }
+  updateUI();
+}
+
+// ── Filter logic: camp must work for ALL selected kids ────────────────────────
+function campFitsAllKids(camp, selectedKids) {
+  return selectedKids.every(kid => kid.age >= camp.minAge && kid.age <= camp.maxAge);
+}
+
+// ── Update UI ─────────────────────────────────────────────────────────────────
+function updateUI() {
+  const selectedKids = KIDS.filter(k => selected.has(k.id));
+  const noSelection = selectedKids.length === 0;
+
+  // Update kid chips
+  KIDS.forEach(kid => {
+    const chip = document.getElementById('kid-' + kid.id);
+    if (noSelection) {
+      // All full opacity, none selected
+      chip.className = 'kid-chip unselected';
+    } else if (selected.has(kid.id)) {
+      chip.className = 'kid-chip selected';
+    } else {
+      chip.className = 'kid-chip unselected';
+    }
+  });
+
+  // Filter label
+  const label = document.getElementById('filterLabel');
+  const labelText = document.getElementById('filterLabelText');
+  if (noSelection) {
+    label.classList.remove('has-selection');
+    labelText.innerHTML = `<span style="color:#7d715e">Tap a child to filter camps by their age</span>`;
+  } else {
+    label.classList.add('has-selection');
+    const names = selectedKids.map(k => k.name);
+    const nameStr = names.length === 1
+      ? `<span style="font-weight:600;color:#186338">${names[0]}</span>`
+      : names.slice(0, -1).map(n => `<span style="font-weight:600;color:#186338">${n}</span>`).join(', ')
+        + ` &amp; <span style="font-weight:600;color:#186338">${names[names.length - 1]}</span>`;
+    labelText.innerHTML = `<span style="color:#7d715e">Showing camps for </span>${nameStr}`;
+  }
+
+  // Filter camps — kids age + date range + location
+  const fromInt = dateToInt(fromDate);
+  const toInt   = dateToInt(toDate);
+  const visibleCamps = CAMPS.filter(c => {
+    // 1. Age filter (must work for ALL selected kids)
+    if (!noSelection && !campFitsAllKids(c, selectedKids)) return false;
+    // 2. Date filter — camp must overlap with selected range
+    if (c.endInt < fromInt || c.startInt > toInt) return false;
+    // 3. Location filter
+    if (!c.cities.includes(selectedLocId)) return false;
+    return true;
+  });
+
+  const visibleIds = new Set(visibleCamps.map(c => c.id));
+
+  // Animate camp cards
+  CAMPS.forEach(camp => {
+    const card = document.getElementById('camp-' + camp.id);
+    if (visibleIds.has(camp.id)) {
+      card.classList.remove('hidden');
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+
+  // Empty state
+  const emptyState = document.getElementById('emptyState');
+  if (!noSelection && visibleCamps.length === 0) {
+    emptyState.classList.add('visible');
+  } else {
+    emptyState.classList.remove('visible');
+  }
+
+  // Camps header
+  const header = document.getElementById('campsHeader');
+  const countNum = document.getElementById('campCountNum');
+  if (!noSelection) {
+    header.style.display = 'flex';
+    countNum.textContent = visibleCamps.length;
+  } else {
+    header.style.display = 'none';
+  }
+
+  // CTA button
+  const ctaText = document.getElementById('ctaText');
+  if (noSelection) {
+    ctaText.textContent = `Show ${CAMPS.length} Camps in Area`;
+  } else if (visibleCamps.length === 0) {
+    ctaText.textContent = `No Camps Match — Adjust Selection`;
+  } else {
+    const count = visibleCamps.length;
+    const names = selectedKids.map(k => k.name);
+    const nameStr = names.length <= 2
+      ? names.join(' & ')
+      : `${names.slice(0, 2).join(', ')} +${names.length - 2}`;
+    ctaText.textContent = `Show ${count} Camp${count !== 1 ? 's' : ''} for ${nameStr}`;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// DATE PICKER
+// ════════════════════════════════════════════════════════════════════════════
+
+function openDateSheet(mode) {
+  pickingMode = mode;
+  const title = mode === 'from' ? 'Select Start Date' : 'Select End Date';
+  document.getElementById('dateSheetTitle').textContent = title;
+  // Navigate to the relevant month
+  const d = mode === 'from' ? fromDate : toDate;
+  calYear = d.year; calMonth = d.month;
+  renderCalendar();
+  document.getElementById('sheetOverlay').classList.add('open');
+  document.getElementById('dateSheet').classList.add('open');
+}
+
+function calPrev() {
+  calMonth--;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+function calNext() {
+  calMonth++;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+function renderCalendar() {
+  document.getElementById('calMonthLabel').textContent = `${MONTH_NAMES[calMonth]} ${calYear}`;
+
+  // DOW headers
+  const dowRow = document.getElementById('calDow');
+  dowRow.innerHTML = DOW_LABELS.map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+  // Days
+  const firstDow = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const prevDays = new Date(calYear, calMonth, 0).getDate();
+  const today = new Date();
+  const todayInt = dayInt(today.getFullYear(), today.getMonth(), today.getDate());
+  const fromInt = dateToInt(fromDate);
+  const toInt = dateToInt(toDate);
+
+  const daysGrid = document.getElementById('calDays');
+  let html = '';
+
+  // Prev month fillers
+  for (let i = firstDow - 1; i >= 0; i--) {
+    const d = prevDays - i;
+    const m = calMonth === 0 ? 11 : calMonth - 1;
+    const y = calMonth === 0 ? calYear - 1 : calYear;
+    const di = dayInt(y, m, d);
+    html += dayCell(d, di, fromInt, toInt, todayInt, 'other-month');
+  }
+
+  // Current month
+  for (let d = 1; d <= daysInMonth; d++) {
+    const di = dayInt(calYear, calMonth, d);
+    html += dayCell(d, di, fromInt, toInt, todayInt, '');
+  }
+
+  // Next month fillers
+  const total = firstDow + daysInMonth;
+  const nextFill = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let d = 1; d <= nextFill; d++) {
+    const m = calMonth === 11 ? 0 : calMonth + 1;
+    const y = calMonth === 11 ? calYear + 1 : calYear;
+    const di = dayInt(y, m, d);
+    html += dayCell(d, di, fromInt, toInt, todayInt, 'other-month');
+  }
+
+  daysGrid.innerHTML = html;
+  // Update confirm btn label
+  const confirmBtn = document.getElementById('calConfirmBtn');
+  const pd = pickingMode === 'from' ? fromDate : toDate;
+  confirmBtn.textContent = `Confirm — ${MONTH_NAMES[pd.month].slice(0,3)} ${pd.day}`;
+}
+
+function dayCell(d, di, fromInt, toInt, todayInt, extraClass) {
+  let classes = ['cal-day'];
+  if (extraClass) classes.push(extraClass);
+  if (di === todayInt) classes.push('today');
+  if (di === fromInt) classes.push('selected-from', 'range-start');
+  if (di === toInt)   classes.push('selected-to', 'range-end');
+  if (di > fromInt && di < toInt) classes.push('in-range');
+  const onclick = extraClass === 'other-month' ? '' : `onclick="pickDay(${calYear},${calMonth},${d})"`;
+  return `<div class="${classes.join(' ')}" ${onclick}>
+    <div class="cal-day-range-fill"></div>
+    <div class="cal-day-num">${d}</div>
+  </div>`;
+}
+
+function pickDay(y, m, d) {
+  if (pickingMode === 'from') {
+    fromDate = { year: y, month: m, day: d };
+    // If from > to, push to date forward by 7 days
+    if (dateToInt(fromDate) > dateToInt(toDate)) {
+      const nd = new Date(y, m, d + 7);
+      toDate = { year: nd.getFullYear(), month: nd.getMonth(), day: nd.getDate() };
+    }
+  } else {
+    toDate = { year: y, month: m, day: d };
+    // If to < from, pull from date back by 7 days
+    if (dateToInt(toDate) < dateToInt(fromDate)) {
+      const nd = new Date(y, m, d - 7);
+      fromDate = { year: nd.getFullYear(), month: nd.getMonth(), day: nd.getDate() };
+    }
+  }
+  renderCalendar();
+  // Update confirm btn
+  const pd = pickingMode === 'from' ? fromDate : toDate;
+  document.getElementById('calConfirmBtn').textContent =
+    `Confirm — ${MONTH_NAMES[pd.month].slice(0,3)} ${pd.day}`;
+}
+
+function confirmDate() {
+  document.getElementById('fromDisplay').textContent = fmtDate(fromDate);
+  document.getElementById('toDisplay').textContent   = fmtDate(toDate);
+  closeSheets();
+  updateUI();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// LOCATION SEARCH
+// ════════════════════════════════════════════════════════════════════════════
+function openLocSheet() {
+  renderLocList('');
+  document.getElementById('locSearchInput').value = '';
+  document.getElementById('sheetOverlay').classList.add('open');
+  document.getElementById('locSheet').classList.add('open');
+  setTimeout(() => document.getElementById('locSearchInput').focus(), 350);
+}
+
+function renderLocList(query) {
+  const q = query.toLowerCase();
+  const filtered = LOCATIONS.filter(l =>
+    !q || l.name.toLowerCase().includes(q)
+  );
+  const list = document.getElementById('locList');
+  if (!filtered.length) {
+    list.innerHTML = `<div style="text-align:center;padding:32px 0;color:#a09888;font-size:13px;">No locations found</div>`;
+    return;
+  }
+  list.innerHTML = `
+    <div class="loc-section-label">${query ? 'Results' : 'Nearby & Popular'}</div>
+    ${filtered.map(l => `
+      <div class="loc-item ${l.id === selectedLocId ? 'selected' : ''}" onclick="selectLoc('${l.id}')">
+        <div class="loc-icon">${l.emoji}</div>
+        <div class="loc-text">
+          <div class="loc-name">${l.name}</div>
+          <div class="loc-dist">${l.dist}</div>
+        </div>
+        <div class="loc-check">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8l4 4 6-7" stroke="#186338" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function filterLocs(val) { renderLocList(val); }
+
+function selectLoc(id) {
+  selectedLocId = id;
+  const loc = LOCATIONS.find(l => l.id === id);
+  document.getElementById('locDisplay').textContent = loc.name;
+  closeSheets();
+  updateUI();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// SHEET CONTROLS
+// ════════════════════════════════════════════════════════════════════════════
+function closeSheets() {
+  document.getElementById('sheetOverlay').classList.remove('open');
+  document.getElementById('dateSheet').classList.remove('open');
+  document.getElementById('locSheet').classList.remove('open');
+  document.getElementById('fromField').classList.remove('active-field');
+  document.getElementById('toField').classList.remove('active-field');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// INIT — must be last, after all functions + state are defined
+// ════════════════════════════════════════════════════════════════════════════
+buildKids();
+buildCamps();
+updateUI();
+
+// ════════════════════════════════════════════════════════════════════════════
+// COPY TO FIGMA
+// ════════════════════════════════════════════════════════════════════════════
+async function copyToFigma() {
+  const btn = document.getElementById('copyFigmaBtn');
+  const toast = document.getElementById('copyToast');
+
+  btn.classList.add('loading');
+  btn.querySelector('.btn-label').textContent = 'Rendering…';
+
+  try {
+    const phone = document.getElementById('phone');
+    const canvas = await html2canvas(phone, {
+      scale: 3,           // 3× for retina quality
+      useCORS: true,
+      backgroundColor: null,
+      logging: false,
+      allowTaint: false,
+    });
+
+    canvas.toBlob(async (blob) => {
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]);
+        // Success
+        btn.classList.remove('loading');
+        btn.classList.add('success');
+        btn.querySelector('.btn-label').textContent = '✓ Copied!';
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+          btn.classList.remove('success');
+          btn.querySelector('.btn-label').textContent = 'Copy to Figma';
+        }, 3000);
+      } catch (e) {
+        // Fallback: download as PNG
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'summer-camps-screen.png'; a.click();
+        URL.revokeObjectURL(url);
+        btn.classList.remove('loading');
+        btn.querySelector('.btn-label').textContent = 'Copy to Figma';
+        toast.querySelector('.toast-title').textContent = '📥 Downloaded!';
+        toast.querySelector('.toast-sub').textContent = 'Drag the PNG into Figma to paste';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3500);
+      }
+    }, 'image/png');
+  } catch (e) {
+    btn.classList.remove('loading');
+    btn.querySelector('.btn-label').textContent = 'Copy to Figma';
+    alert('Error: ' + e.message);
+  }
+}
+</script>
+
+<!-- ── Copy to Figma floating button ── -->
+<style>
+#copyFigmaBtn {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1e3e2b;
+  color: white;
+  border: none;
+  border-radius: 99px;
+  padding: 12px 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  transition: background 0.15s, transform 0.1s, opacity 0.2s;
+  z-index: 9999;
+  white-space: nowrap;
+}
+#copyFigmaBtn:hover  { background: #186338; transform: translateY(-1px); }
+#copyFigmaBtn:active { transform: scale(0.97); }
+#copyFigmaBtn.loading { opacity: 0.7; pointer-events: none; }
+#copyFigmaBtn.success { background: #186338; }
+
+.figma-icon { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* Toast */
+#copyToast {
+  position: fixed;
+  bottom: 90px;
+  right: 32px;
+  background: #1e3e2b;
+  color: white;
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  z-index: 9999;
+  transform: translateY(12px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s;
+  min-width: 220px;
+}
+#copyToast.show { opacity: 1; transform: translateY(0); }
+.toast-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.toast-sub   { font-size: 11px; opacity: 0.75; line-height: 1.4; }
+</style>
+
+<button id="copyFigmaBtn" onclick="copyToFigma()">
+  <svg class="figma-icon" viewBox="0 0 38 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0z" fill="#1ABCFE"/>
+    <path d="M0 47.5a9.5 9.5 0 0 1 9.5-9.5H19v9.5a9.5 9.5 0 0 1-19 0z" fill="#0ACF83"/>
+    <path d="M19 0v19h9.5a9.5 9.5 0 0 0 0-19H19z" fill="#FF7262"/>
+    <path d="M0 9.5a9.5 9.5 0 0 0 9.5 9.5H19V0H9.5A9.5 9.5 0 0 0 0 9.5z" fill="#F24E1E"/>
+    <path d="M0 28.5a9.5 9.5 0 0 0 9.5 9.5H19V19H9.5A9.5 9.5 0 0 0 0 28.5z" fill="#A259FF"/>
+  </svg>
+  <span class="btn-label">Copy to Figma</span>
+</button>
+
+<div id="copyToast">
+  <div class="toast-title">✅ Copied to clipboard!</div>
+  <div class="toast-sub">Go to Figma → press <strong>⌘V</strong> to paste the screen</div>
+</div>
+</body>
+</html>

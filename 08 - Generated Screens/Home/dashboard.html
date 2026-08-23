@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Analytics</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #0f1117;
+    --surface:     #1a1d27;
+    --surface-2:   #22263a;
+    --border:      #2a2e42;
+    --accent:      #4ade80;
+    --accent-dim:  rgba(74,222,128,.12);
+    --text:        #e2e8f0;
+    --text-muted:  #64748b;
+    --text-dim:    #94a3b8;
+    --red:         #f87171;
+    --yellow:      #fbbf24;
+    --blue:        #60a5fa;
+    --sidebar-w:   240px;
+    --topbar-h:    60px;
+    --radius:      10px;
+    --font:        'Inter', system-ui, sans-serif;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; }
+
+  /* ── Layout shell ── */
+  .shell {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    grid-template-rows: var(--topbar-h) 1fr;
+    grid-template-areas:
+      "sidebar topbar"
+      "sidebar main";
+    height: 100vh;
+  }
+
+  /* ── Sidebar ── */
+  aside {
+    grid-area: sidebar;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .brand-mark {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #000; font-weight: 700; font-size: 16px;
+  }
+  .brand-name { font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
+
+  nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; }
+
+  .nav-section { font-size: 10px; font-weight: 600; color: var(--text-muted); letter-spacing: .08em; text-transform: uppercase; padding: 12px 8px 6px; }
+
+  .nav-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 7px;
+    color: var(--text-dim); text-decoration: none;
+    font-weight: 500; transition: background .15s, color .15s;
+    cursor: pointer;
+  }
+  .nav-link:hover { background: var(--surface-2); color: var(--text); }
+  .nav-link.active { background: var(--accent-dim); color: var(--accent); }
+  .nav-link svg { flex-shrink: 0; opacity: .8; }
+  .nav-link.active svg { opacity: 1; }
+
+  .nav-badge {
+    margin-left: auto;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-size: 10px; font-weight: 600;
+    padding: 1px 6px; border-radius: 20px;
+  }
+
+  .sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .avatar-sm {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #4ade80 0%, #06b6d4 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 12px; color: #000; flex-shrink: 0;
+  }
+  .sidebar-user-name { font-weight: 500; font-size: 13px; }
+  .sidebar-user-role { font-size: 11px; color: var(--text-muted); }
+
+  /* ── Top bar ── */
+  header {
+    grid-area: topbar;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px;
+    position: sticky; top: 0; z-index: 10;
+  }
+
+  .page-title { font-size: 16px; font-weight: 600; }
+  .page-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+
+  .search-wrap { position: relative; }
+  .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+  .search-input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 12px 7px 32px;
+    font-size: 13px; color: var(--text);
+    width: 220px; outline: none;
+    transition: border-color .15s;
+  }
+  .search-input::placeholder { color: var(--text-muted); }
+  .search-input:focus { border-color: var(--accent); }
+
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-dim); cursor: pointer;
+    position: relative;
+  }
+  .notif-dot {
+    position: absolute; top: 7px; right: 7px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); border: 1px solid var(--surface);
+  }
+
+  .avatar-topbar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #4ade80 0%, #06b6d4 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; color: #000; cursor: pointer;
+  }
+
+  /* ── Main ── */
+  main {
+    grid-area: main;
+    padding: 28px;
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 24px;
+  }
+
+  /* ── Section header ── */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-title { font-size: 13px; font-weight: 600; color: var(--text-dim); letter-spacing: .02em; text-transform: uppercase; }
+
+  .period-tabs { display: flex; gap: 4px; }
+  .period-tab {
+    padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;
+    color: var(--text-muted); cursor: pointer; border: 1px solid transparent;
+    transition: all .15s;
+  }
+  .period-tab.active { background: var(--surface-2); color: var(--text); border-color: var(--border); }
+
+  /* ── KPI cards ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex; flex-direction: column; gap: 10px;
+    transition: border-color .2s;
+  }
+  .kpi-card:hover { border-color: var(--accent); }
+
+  .kpi-top { display: flex; align-items: center; justify-content: space-between; }
+  .kpi-label { font-size: 12px; font-weight: 500; color: var(--text-muted); }
+  .kpi-icon { width: 30px; height: 30px; border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+
+  .kpi-value { font-size: 28px; font-weight: 700; letter-spacing: -1px; line-height: 1; }
+  .kpi-delta { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; }
+  .kpi-delta.up { color: var(--accent); }
+  .kpi-delta.down { color: var(--red); }
+  .kpi-period { font-size: 11px; color: var(--text-muted); margin-left: 4px; font-weight: 400; }
+
+  /* ── Charts ── */
+  .chart-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+
+  .chart-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+  .chart-title { font-size: 14px; font-weight: 600; }
+  .chart-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  .chart-legend { display: flex; gap: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-dim); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  svg.chart { width: 100%; overflow: visible; }
+
+  /* ── Table ── */
+  .table-wrap { overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left; font-size: 11px; font-weight: 600;
+    color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em;
+    padding: 0 0 12px; border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px; vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+
+  .user-cell { display: flex; align-items: center; gap: 10px; }
+  .avatar-xs {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 11px; color: #000; flex-shrink: 0;
+  }
+  .user-name { font-weight: 500; }
+  .user-email { font-size: 11px; color: var(--text-muted); }
+
+  .plan-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .plan-pro { background: rgba(74,222,128,.12); color: var(--accent); }
+  .plan-growth { background: rgba(96,165,250,.12); color: var(--blue); }
+  .plan-starter { background: var(--surface-2); color: var(--text-dim); }
+
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+  .status-active { background: var(--accent); }
+  .status-trial { background: var(--yellow); }
+
+  .mrr-val { font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── Sidebar ── -->
+  <aside data-od-id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">S</div>
+      <span class="brand-name">Sprout</span>
+    </div>
+
+    <nav>
+      <span class="nav-section">Overview</span>
+      <a class="nav-link active">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-link">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Analytics
+        <span class="nav-badge">Live</span>
+      </a>
+      <a class="nav-link">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Customers
+      </a>
+
+      <span class="nav-section">Revenue</span>
+      <a class="nav-link">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        MRR &amp; ARR
+      </a>
+      <a class="nav-link">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        Subscriptions
+      </a>
+      <a class="nav-link">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Upgrades
+      </a>
+
+      <span class="nav-section">Settings</span>
+      <a class="nav-link">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Integrations
+      </a>
+      <a class="nav-link">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="avatar-sm">AF</div>
+      <div>
+        <div class="sidebar-user-name">Ahmad Fauzan</div>
+        <div class="sidebar-user-role">Admin · Sprout</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Top bar ── -->
+  <header data-od-id="topbar">
+    <div>
+      <div class="page-title">Analytics Dashboard</div>
+      <div class="page-sub">May 2026 · All workspaces</div>
+    </div>
+    <div class="topbar-right">
+      <div class="search-wrap">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" type="text" placeholder="Search customers, events…">
+      </div>
+      <div class="icon-btn">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </div>
+      <div class="avatar-topbar">AF</div>
+    </div>
+  </header>
+
+  <!-- ── Main ── -->
+  <main data-od-id="main">
+
+    <!-- KPI Cards -->
+    <section data-od-id="kpi-grid">
+      <div class="section-header">
+        <span class="section-title">Key Metrics</span>
+        <div class="period-tabs">
+          <div class="period-tab">7d</div>
+          <div class="period-tab active">30d</div>
+          <div class="period-tab">90d</div>
+          <div class="period-tab">YTD</div>
+        </div>
+      </div>
+      <div class="kpi-grid">
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Monthly Revenue</span>
+            <div class="kpi-icon" style="background:rgba(74,222,128,.12)">
+              <svg width="16" height="16" fill="none" stroke="#4ade80" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value">$84,320</div>
+          <div class="kpi-delta up">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+            +12.4%
+            <span class="kpi-period">vs last month</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Active Users</span>
+            <div class="kpi-icon" style="background:rgba(96,165,250,.12)">
+              <svg width="16" height="16" fill="none" stroke="#60a5fa" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value">6,284</div>
+          <div class="kpi-delta up">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+            +8.1%
+            <span class="kpi-period">vs last month</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Trial → Paid Conv.</span>
+            <div class="kpi-icon" style="background:rgba(251,191,36,.1)">
+              <svg width="16" height="16" fill="none" stroke="#fbbf24" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value">34.7%</div>
+          <div class="kpi-delta up">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+            +3.2pp
+            <span class="kpi-period">vs last month</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Monthly Churn</span>
+            <div class="kpi-icon" style="background:rgba(248,113,113,.1)">
+              <svg width="16" height="16" fill="none" stroke="#f87171" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value">2.1%</div>
+          <div class="kpi-delta down">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="18 9 12 15 6 9"/></svg>
+            −0.4pp
+            <span class="kpi-period">vs last month</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Charts row -->
+    <section data-od-id="charts">
+      <div class="chart-row">
+
+        <!-- Line chart: Revenue trend -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Revenue Trend</div>
+              <div class="chart-subtitle">MRR vs. new revenue, last 8 months</div>
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item"><span class="legend-dot" style="background:#4ade80"></span>MRR</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#60a5fa"></span>New MRR</div>
+            </div>
+          </div>
+
+          <svg class="chart" viewBox="0 0 560 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="40" y1="10" x2="40" y2="150" stroke="#2a2e42" stroke-width="1"/>
+            <line x1="40" y1="10"  x2="555" y2="10"  stroke="#2a2e42" stroke-width="1" stroke-dasharray="4 4"/>
+            <line x1="40" y1="50"  x2="555" y2="50"  stroke="#2a2e42" stroke-width="1" stroke-dasharray="4 4"/>
+            <line x1="40" y1="90"  x2="555" y2="90"  stroke="#2a2e42" stroke-width="1" stroke-dasharray="4 4"/>
+            <line x1="40" y1="130" x2="555" y2="130" stroke="#2a2e42" stroke-width="1" stroke-dasharray="4 4"/>
+            <line x1="40" y1="150" x2="555" y2="150" stroke="#2a2e42" stroke-width="1"/>
+
+            <text x="32" y="13"  text-anchor="end" font-size="10" fill="#64748b">100k</text>
+            <text x="32" y="53"  text-anchor="end" font-size="10" fill="#64748b">80k</text>
+            <text x="32" y="93"  text-anchor="end" font-size="10" fill="#64748b">60k</text>
+            <text x="32" y="133" text-anchor="end" font-size="10" fill="#64748b">40k</text>
+            <text x="32" y="153" text-anchor="end" font-size="10" fill="#64748b">20k</text>
+
+            <text x="72"  y="168" text-anchor="middle" font-size="10" fill="#64748b">Oct</text>
+            <text x="140" y="168" text-anchor="middle" font-size="10" fill="#64748b">Nov</text>
+            <text x="208" y="168" text-anchor="middle" font-size="10" fill="#64748b">Dec</text>
+            <text x="276" y="168" text-anchor="middle" font-size="10" fill="#64748b">Jan</text>
+            <text x="344" y="168" text-anchor="middle" font-size="10" fill="#64748b">Feb</text>
+            <text x="412" y="168" text-anchor="middle" font-size="10" fill="#64748b">Mar</text>
+            <text x="480" y="168" text-anchor="middle" font-size="10" fill="#64748b">Apr</text>
+            <text x="545" y="168" text-anchor="middle" font-size="10" fill="#64748b">May</text>
+
+            <defs>
+              <linearGradient id="gMrr" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#4ade80" stop-opacity=".18"/>
+                <stop offset="100%" stop-color="#4ade80" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="gNew" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#60a5fa" stop-opacity=".15"/>
+                <stop offset="100%" stop-color="#60a5fa" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+
+            <polygon points="72,96 140,86 208,76 276,67 344,58 412,50 480,42 545,33 545,150 72,150" fill="url(#gMrr)"/>
+            <polyline points="72,96 140,86 208,76 276,67 344,58 412,50 480,42 545,33" stroke="#4ade80" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+
+            <circle cx="72"  cy="96" r="3.5" fill="#4ade80"/>
+            <circle cx="140" cy="86" r="3.5" fill="#4ade80"/>
+            <circle cx="208" cy="76" r="3.5" fill="#4ade80"/>
+            <circle cx="276" cy="67" r="3.5" fill="#4ade80"/>
+            <circle cx="344" cy="58" r="3.5" fill="#4ade80"/>
+            <circle cx="412" cy="50" r="3.5" fill="#4ade80"/>
+            <circle cx="480" cy="42" r="3.5" fill="#4ade80"/>
+            <circle cx="545" cy="33" r="5"   fill="#4ade80" stroke="#0f1117" stroke-width="2"/>
+
+            <polygon points="72,110 140,104 208,100 276,95 344,87 412,82 480,76 545,70 545,150 72,150" fill="url(#gNew)"/>
+            <polyline points="72,110 140,104 208,100 276,95 344,87 412,82 480,76 545,70" stroke="#60a5fa" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 3"/>
+          </svg>
+        </div>
+
+        <!-- Bar chart: New signups by week -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">New Signups</div>
+              <div class="chart-subtitle">Weekly, last 8 weeks</div>
+            </div>
+          </div>
+
+          <svg class="chart" viewBox="0 0 240 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="28" y1="10"  x2="28"  y2="130" stroke="#2a2e42" stroke-width="1"/>
+            <line x1="28" y1="130" x2="235" y2="130" stroke="#2a2e42" stroke-width="1"/>
+            <line x1="28" y1="10"  x2="235" y2="10"  stroke="#2a2e42" stroke-width="1" stroke-dasharray="4 4"/>
+            <line x1="28" y1="50"  x2="235" y2="50"  stroke="#2a2e42" stroke-width="1" stroke-dasharray="4 4"/>
+            <line x1="28" y1="90"  x2="235" y2="90"  stroke="#2a2e42" stroke-width="1" stroke-dasharray="4 4"/>
+
+            <text x="20" y="13"  text-anchor="end" font-size="9" fill="#64748b">300</text>
+            <text x="20" y="53"  text-anchor="end" font-size="9" fill="#64748b">200</text>
+            <text x="20" y="93"  text-anchor="end" font-size="9" fill="#64748b">100</text>
+
+            <rect x="36"  y="58"  width="18" height="72"  rx="3" fill="#22263a"/>
+            <rect x="62"  y="46"  width="18" height="84"  rx="3" fill="#22263a"/>
+            <rect x="88"  y="64"  width="18" height="66"  rx="3" fill="#22263a"/>
+            <rect x="114" y="34"  width="18" height="96"  rx="3" fill="#22263a"/>
+            <rect x="140" y="52"  width="18" height="78"  rx="3" fill="#22263a"/>
+            <rect x="166" y="42"  width="18" height="88"  rx="3" fill="#22263a"/>
+            <rect x="192" y="26"  width="18" height="104" rx="3" fill="#22263a"/>
+            <rect x="218" y="12"  width="18" height="118" rx="3" fill="#4ade80"/>
+
+            <text x="45"  y="145" text-anchor="middle" font-size="9" fill="#64748b">W1</text>
+            <text x="71"  y="145" text-anchor="middle" font-size="9" fill="#64748b">W2</text>
+            <text x="97"  y="145" text-anchor="middle" font-size="9" fill="#64748b">W3</text>
+            <text x="123" y="145" text-anchor="middle" font-size="9" fill="#64748b">W4</text>
+            <text x="149" y="145" text-anchor="middle" font-size="9" fill="#64748b">W5</text>
+            <text x="175" y="145" text-anchor="middle" font-size="9" fill="#64748b">W6</text>
+            <text x="201" y="145" text-anchor="middle" font-size="9" fill="#64748b">W7</text>
+            <text x="227" y="145" text-anchor="middle" font-size="9" fill="#64748b">W8</text>
+          </svg>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Recent signups table -->
+    <section data-od-id="recent-signups">
+      <div class="section-header">
+        <span class="section-title">Recent Signups</span>
+        <div style="font-size:12px;color:var(--accent);cursor:pointer;font-weight:500;">View all →</div>
+      </div>
+      <div class="chart-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Plan</th>
+                <th>Status</th>
+                <th>MRR</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="avatar-xs" style="background:linear-gradient(135deg,#4ade80,#06b6d4)">JL</div>
+                    <div><div class="user-name">Jamie Lee</div><div class="user-email">jamie@designco.io</div></div>
+                  </div>
+                </td>
+                <td><span class="plan-badge plan-pro">Pro</span></td>
+                <td><span class="status-dot status-active"></span><span style="color:var(--accent);font-weight:500">Active</span></td>
+                <td class="mrr-val">$149</td>
+                <td style="color:var(--text-muted)">May 4, 2026</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="avatar-xs" style="background:linear-gradient(135deg,#a78bfa,#f472b6)">MR</div>
+                    <div><div class="user-name">Marcus Reid</div><div class="user-email">marcus@fluxlabs.com</div></div>
+                  </div>
+                </td>
+                <td><span class="plan-badge plan-growth">Growth</span></td>
+                <td><span class="status-dot status-active"></span><span style="color:var(--accent);font-weight:500">Active</span></td>
+                <td class="mrr-val">$349</td>
+                <td style="color:var(--text-muted)">May 3, 2026</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="avatar-xs" style="background:linear-gradient(135deg,#fbbf24,#f97316)">SN</div>
+                    <div><div class="user-name">Sofia Nunes</div><div class="user-email">sofia@buildwith.xyz</div></div>
+                  </div>
+                </td>
+                <td><span class="plan-badge plan-starter">Starter</span></td>
+                <td><span class="status-dot status-trial"></span><span style="color:var(--yellow);font-weight:500">Trial</span></td>
+                <td class="mrr-val" style="color:var(--text-muted)">—</td>
+                <td style="color:var(--text-muted)">May 3, 2026</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="avatar-xs" style="background:linear-gradient(135deg,#60a5fa,#818cf8)">TK</div>
+                    <div><div class="user-name">Tariq Khan</div><div class="user-email">tariq@stacknodes.dev</div></div>
+                  </div>
+                </td>
+                <td><span class="plan-badge plan-pro">Pro</span></td>
+                <td><span class="status-dot status-active"></span><span style="color:var(--accent);font-weight:500">Active</span></td>
+                <td class="mrr-val">$149</td>
+                <td style="color:var(--text-muted)">May 2, 2026</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="avatar-xs" style="background:linear-gradient(135deg,#34d399,#10b981)">EW</div>
+                    <div><div class="user-name">Elena Wu</div><div class="user-email">elena@pineappledata.co</div></div>
+                  </div>
+                </td>
+                <td><span class="plan-badge plan-growth">Growth</span></td>
+                <td><span class="status-dot status-trial"></span><span style="color:var(--yellow);font-weight:500">Trial</span></td>
+                <td class="mrr-val" style="color:var(--text-muted)">—</td>
+                <td style="color:var(--text-muted)">May 2, 2026</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+</body>
+</html>

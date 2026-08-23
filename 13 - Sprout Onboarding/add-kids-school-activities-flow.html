@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Onboarding: Add Kids + School/Grade + Interests + Activities (full flow)</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brand-500: #186338;
+    --brand-600: #134f2d;
+    --brand-700: #1e3e2b;
+    --brand-200: #77b691;
+    --brand-50:  #e2e9e3;
+    --secondary-500: #f4f1ea;
+    --secondary-600: #eae6db;
+    --secondary-700: #dbd5c8;
+    --grey-300: #b3b8c1;
+    --grey-500: #818898;
+    --grey-700: #4d525b;
+    --grey-900: #1a1b1e;
+  }
+
+  body {
+    background: #cfc8b8;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 24px 64px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .variant-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .variant-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #5a5347; text-align: center; max-width: 393px; }
+
+  .phone {
+    width: 393px; height: 852px;
+    background: var(--secondary-500);
+    border-radius: 54px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04), 0 24px 80px rgba(0,0,0,0.24);
+  }
+  .dynamic-island { width: 120px; height: 36px; background: #000; border-radius: 20px; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 30; }
+
+  .screen { position: absolute; inset: 0; display: none; flex-direction: column; }
+  .screen.on { display: flex; }
+
+  .status-bar { height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 14px 28px 0; flex-shrink: 0; }
+  .status-time { font-size: 15px; font-weight: 600; color: var(--grey-900); }
+  .status-icons { display: flex; align-items: center; gap: 7px; }
+
+  .nav-row { display: flex; align-items: center; gap: 14px; padding: 8px 20px 0; flex-shrink: 0; }
+  .back-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--secondary-600); border: none; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .back-btn svg { width: 18px; height: 18px; stroke: var(--brand-700); }
+  .progress { flex: 1; display: flex; gap: 6px; }
+  .progress span { flex: 1; height: 4px; border-radius: 2px; background: var(--brand-50); }
+  .progress span.done { background: var(--brand-700); }
+
+  .scroll-area { flex: 1; overflow-y: auto; padding: 18px 24px 12px; }
+  .scroll-area::-webkit-scrollbar { display: none; }
+
+  h1 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 27px; color: var(--brand-700); line-height: 1.15; display: flex; align-items: center; gap: 8px; }
+  .desc { margin-top: 8px; font-size: 14px; line-height: 1.5; color: var(--grey-700); }
+
+  .footer { flex-shrink: 0; padding: 14px 24px 28px; }
+  .btn-primary { width: 100%; padding: 17px; border: none; border-radius: 99px; background: var(--brand-500); color: #fff; font-family: 'Inter'; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-primary svg { width: 16px; height: 16px; stroke: currentColor; }
+  .btn-primary:disabled { background: var(--secondary-700); color: var(--grey-500); cursor: not-allowed; }
+  .skip-link { display: block; text-align: center; margin-top: 12px; font-size: 14px; font-weight: 600; color: var(--grey-500); background: none; border: none; cursor: pointer; }
+
+  /* ── S1 Empty state ── */
+  .empty-icon { width: 88px; height: 88px; border-radius: 24px; background: var(--secondary-600); display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 28px auto 20px; }
+  .empty-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 19px; color: var(--brand-700); text-align: center; }
+  .empty-sub { margin-top: 8px; font-size: 13.5px; color: var(--grey-500); text-align: center; line-height: 1.5; max-width: 280px; margin-left: auto; margin-right: auto; }
+  .add-card { margin-top: 24px; display: flex; align-items: center; gap: 14px; background: var(--brand-700); border-radius: 18px; padding: 16px; cursor: pointer; }
+  .add-card-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .add-card-icon svg { width: 18px; height: 18px; stroke: #fff; }
+  .add-card-title { font-size: 15px; font-weight: 700; color: #fff; }
+  .add-card-sub { margin-top: 2px; font-size: 12.5px; color: rgba(255,255,255,0.72); }
+  .add-card-chevron { margin-left: auto; color: #fff; }
+  .note-banner { margin-top: 16px; display: flex; gap: 8px; padding: 12px 14px; border-radius: 14px; background: var(--brand-50); font-size: 12.5px; color: var(--brand-700); line-height: 1.45; }
+
+  /* ── S2 Add a Child form ── */
+  .form-hero { text-align: center; padding-top: 4px; }
+  .avatar-placeholder { width: 84px; height: 84px; border-radius: 50%; background: var(--secondary-600); display: flex; align-items: center; justify-content: center; font-size: 34px; margin: 0 auto; }
+  .form-title { margin-top: 14px; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 21px; color: var(--brand-700); }
+  .form-sub { margin-top: 6px; font-size: 13.5px; color: var(--grey-500); }
+  .field-label { margin-top: 20px; font-size: 13px; font-weight: 700; color: var(--brand-700); }
+  .text-input { margin-top: 8px; width: 100%; padding: 14px 16px; border-radius: 14px; background: var(--secondary-700); border: none; font-size: 15px; color: var(--grey-900); font-family: 'Inter'; }
+  .text-input::placeholder { color: var(--grey-500); }
+  .gender-row { margin-top: 8px; display: flex; gap: 10px; }
+  .gender-opt { flex: 1; padding: 14px 8px; border-radius: 14px; background: var(--secondary-700); border: 2px solid transparent; text-align: center; cursor: pointer; }
+  .gender-opt.active { border-color: var(--brand-500); background: var(--brand-50); }
+  .gender-opt .emo { font-size: 22px; }
+  .gender-opt .lbl { margin-top: 4px; font-size: 12.5px; font-weight: 600; color: var(--brand-700); }
+
+  /* ── S3 School + Grade (per-child) ── */
+  .zip-line { font-size: 12.5px; color: var(--grey-500); }
+  .school-row { margin-top: 14px; border: 1.5px solid var(--secondary-700); border-radius: 16px; overflow: hidden; }
+  .school-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; }
+  .school-icon { width: 38px; height: 38px; border-radius: 50%; background: var(--brand-50); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+  .school-name { font-size: 14.5px; font-weight: 700; color: var(--brand-700); }
+  .school-dist { font-size: 12px; color: var(--grey-500); }
+  .school-chevron { margin-left: auto; color: var(--grey-500); transition: transform 0.15s; }
+  .school-row.open .school-chevron { transform: rotate(180deg); }
+  .grade-panel { display: none; padding: 0 16px 12px; }
+  .school-row.open .grade-panel { display: block; }
+  .grade-opt { display: flex; align-items: center; gap: 12px; padding: 10px 4px; cursor: pointer; }
+  .grade-badge { width: 26px; height: 26px; border-radius: 50%; background: var(--secondary-600); color: var(--grey-700); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .grade-label { flex: 1; font-size: 13.5px; color: var(--grey-700); }
+  .radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--grey-300); flex-shrink: 0; position: relative; }
+  .grade-opt.picked .radio { border-color: var(--brand-500); }
+  .grade-opt.picked .radio::after { content:''; position: absolute; inset: 3px; border-radius: 50%; background: var(--brand-500); }
+  .grade-opt.picked .grade-label { color: var(--brand-700); font-weight: 700; }
+  .grade-opt.picked .grade-badge { background: var(--brand-500); color: #fff; }
+
+  /* ── S4 Interests (full picker, wired from kid-interests-select.html) ── */
+  .category { margin-top: 22px; }
+  .cat-header { font-size: 15px; font-weight: 700; color: var(--brand-700); margin-bottom: 12px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 9px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 10px 15px; border-radius: 99px; background: var(--secondary-700); font-size: 13.5px; font-weight: 600; color: var(--brand-700); cursor: pointer; border: 1.5px solid transparent; white-space: nowrap; }
+  .chip.active { background: var(--brand-50); border-color: var(--brand-200); }
+  .count-text { text-align: center; font-size: 12.5px; color: var(--grey-500); margin-bottom: 10px; }
+
+  /* ── S5/S6 Activities list + add (wired from kid-activities-manage.html) ── */
+  .activity-list { display: flex; flex-direction: column; gap: 10px; }
+  .activity-row { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border-radius: 14px; background: var(--secondary-600); }
+  .activity-icon { width: 40px; height: 40px; border-radius: 12px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; }
+  .activity-name { font-size: 14.5px; font-weight: 700; color: var(--brand-700); }
+  .activity-sub { margin-top: 1px; font-size: 12.5px; color: var(--grey-500); }
+  .row-actions { margin-left: auto; display: flex; gap: 6px; flex-shrink: 0; }
+  .icon-btn { width: 30px; height: 30px; border-radius: 50%; background: var(--secondary-700); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .icon-btn svg { width: 14px; height: 14px; stroke: var(--brand-700); }
+  .icon-btn.del { background: #f7dada; }
+  .icon-btn.del svg { stroke: #d64545; }
+  .empty-hint { text-align: center; padding: 30px 10px; color: var(--grey-500); font-size: 13.5px; }
+  .icon-picker { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; margin-bottom: 4px; }
+  .icon-opt { width: 52px; height: 52px; border-radius: 15px; background: var(--secondary-700); display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; border: 2px solid transparent; }
+  .icon-opt.active { border-color: var(--brand-500); background: var(--brand-50); }
+  .field-hint { margin-top: 6px; font-size: 12px; color: var(--grey-500); }
+
+  /* ── S7 Kids list (final) ── */
+  .kid-card { margin-top: 14px; display: flex; align-items: center; gap: 14px; background: var(--secondary-600); border-radius: 16px; padding: 14px; }
+  .kid-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--brand-200); color: #fff; font-family: 'Playfair Display'; font-weight: 700; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .kid-name-row { display: flex; align-items: center; gap: 8px; }
+  .kid-name { font-size: 15px; font-weight: 700; color: var(--brand-700); }
+  .kid-age-pill { font-size: 11px; font-weight: 700; color: var(--brand-600); background: var(--brand-50); padding: 2px 8px; border-radius: 99px; }
+  .kid-meta { margin-top: 3px; font-size: 12px; color: var(--grey-500); }
+  .kid-meta b { color: var(--brand-600); }
+  .del-btn { margin-left: auto; width: 34px; height: 34px; border-radius: 50%; background: #f7dada; border: none; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .del-btn svg { width: 15px; height: 15px; stroke: #d64545; }
+</style>
+</head>
+<body>
+
+  <div class="variant-wrap">
+    <div class="variant-label">Onboarding, full per-child sub-flow: Add Kids → Add a Child → School/Grade → Interests (full picker) → Sports &amp; Activities (add real team/league detail) → Kids list.</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+
+      <!-- ═══════ S1 — Add Kids, Empty State ═══════ -->
+      <div class="screen on" id="s1">
+        <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"></div></div>
+        <div class="nav-row"><button class="back-btn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="progress"><span class="done"></span><span class="done"></span><span></span><span></span><span></span></div>
+        </div>
+        <div class="scroll-area">
+          <h1>Add your little ones 🌱</h1>
+          <div class="desc">We'll personalize events, clubs, and activities to match each of your child's information.</div>
+          <div class="empty-icon">🧒</div>
+          <div class="empty-title">No kids added yet</div>
+          <div class="empty-sub">Add your children so Sprout can find age-perfect activities, playdates, and local events for your family.</div>
+          <div class="add-card" onclick="go('s2')">
+            <div class="add-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+            <div><div class="add-card-title">Add your child</div><div class="add-card-sub">Takes less than a minute</div></div>
+            <svg class="add-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+          <div class="note-banner">ℹ️ We use your kids' info just to make your Sprout experience more personal!</div>
+        </div>
+        <div class="footer"><button class="btn-primary" disabled>Continue</button></div>
+      </div>
+
+      <!-- ═══════ S2 — Add a Child ═══════ -->
+      <div class="screen" id="s2">
+        <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"></div></div>
+        <div class="nav-row"><button class="back-btn" onclick="go('s1')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="progress"><span class="done"></span><span class="done"></span><span></span><span></span><span></span></div>
+        </div>
+        <div class="scroll-area">
+          <div class="form-hero">
+            <div class="avatar-placeholder">🧒</div>
+            <div class="form-title">Add a Child</div>
+            <div class="form-sub">Tell us a little about your kid so we can find the right activities.</div>
+          </div>
+          <div class="field-label">Child's Name</div>
+          <input class="text-input" id="childName" placeholder="e.g. James, Lucas, Mia" oninput="onNameInput(this.value)">
+          <div class="field-label">Gender</div>
+          <div class="gender-row">
+            <div class="gender-opt active" onclick="pickGender(this)"><div class="emo">👦</div><div class="lbl">Boy</div></div>
+            <div class="gender-opt" onclick="pickGender(this)"><div class="emo">👧</div><div class="lbl">Girl</div></div>
+            <div class="gender-opt" onclick="pickGender(this)"><div class="emo">🧒</div><div class="lbl">Other</div></div>
+          </div>
+          <div class="field-label">Birth Date</div>
+          <input class="text-input" placeholder="dd/mm/yyyy">
+        </div>
+        <div class="footer">
+          <button class="btn-primary" onclick="go('s3')">Add Child</button>
+        </div>
+      </div>
+
+      <!-- ═══════ S3 — School + Grade (per-child) ═══════ -->
+      <div class="screen" id="s3">
+        <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"></div></div>
+        <div class="nav-row"><button class="back-btn" onclick="go('s2')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span></span><span></span></div>
+        </div>
+        <div class="scroll-area">
+          <div class="zip-line">Zip Code: 73301</div>
+          <h1 style="margin-top:6px;font-size:24px;">Which school is <span id="s3Name">Mia</span> in?</h1>
+          <div class="desc">This links <span id="s3Name2">Mia</span> to her class chat, calendar, and school-specific events — one school, one grade.</div>
+
+          <div class="school-row" onclick="toggleSchool(this)">
+            <div class="school-head"><div class="school-icon">🍀</div><div><div class="school-name">Lincoln Elementary School</div><div class="school-dist">0.8 miles away</div></div><svg class="school-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+            <div class="grade-panel">
+              <div class="grade-opt" onclick="pickGrade(event,this)"><div class="grade-badge">P</div><div class="grade-label">Pre-K</div><div class="radio"></div></div>
+              <div class="grade-opt" onclick="pickGrade(event,this)"><div class="grade-badge">K</div><div class="grade-label">Kinder</div><div class="radio"></div></div>
+              <div class="grade-opt" onclick="pickGrade(event,this)"><div class="grade-badge">1</div><div class="grade-label">1st Grade</div><div class="radio"></div></div>
+              <div class="grade-opt" onclick="pickGrade(event,this)"><div class="grade-badge">2</div><div class="grade-label">2nd Grade</div><div class="radio"></div></div>
+            </div>
+          </div>
+          <div class="school-row" onclick="toggleSchool(this)">
+            <div class="school-head"><div class="school-icon">🍀</div><div><div class="school-name">Washington Middle School</div><div class="school-dist">1.2 miles away</div></div><svg class="school-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+            <div class="grade-panel">
+              <div class="grade-opt" onclick="pickGrade(event,this)"><div class="grade-badge">6</div><div class="grade-label">6th Grade</div><div class="radio"></div></div>
+              <div class="grade-opt" onclick="pickGrade(event,this)"><div class="grade-badge">7</div><div class="grade-label">7th Grade</div><div class="radio"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><button class="btn-primary" id="s3Continue" disabled onclick="go('s4')">Select school + grade to continue</button></div>
+      </div>
+
+      <!-- ═══════ S4 — Interests (full picker) ═══════ -->
+      <div class="screen" id="s4">
+        <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"></div></div>
+        <div class="nav-row"><button class="back-btn" onclick="go('s3')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span></span></div>
+        </div>
+        <div class="scroll-area">
+          <h1 style="font-size:24px;">What does <span id="s4Name">Mia</span> like?</h1>
+          <div class="desc">Optional — this helps Sprout suggest the right playdates, camps, and events for her. Add as many as you'd like, or skip and add these later from her profile.</div>
+
+          <div class="category">
+            <div class="cat-header">⚽ Sports &amp; Movement</div>
+            <div class="chips">
+              <div class="chip" onclick="toggleChip(this)">⚽ Soccer</div>
+              <div class="chip" onclick="toggleChip(this)">🏀 Basketball</div>
+              <div class="chip" onclick="toggleChip(this)">⚾ Baseball</div>
+              <div class="chip" onclick="toggleChip(this)">🏊 Swimming</div>
+              <div class="chip" onclick="toggleChip(this)">🤸 Gymnastics</div>
+              <div class="chip" onclick="toggleChip(this)">💃 Dance</div>
+              <div class="chip" onclick="toggleChip(this)">🥋 Martial Arts</div>
+              <div class="chip" onclick="toggleChip(this)">🎾 Tennis</div>
+              <div class="chip" onclick="toggleChip(this)">🛹 Skateboarding</div>
+              <div class="chip" onclick="toggleChip(this)">🚲 Biking</div>
+            </div>
+          </div>
+
+          <div class="category">
+            <div class="cat-header">🎨 Creative &amp; Arts</div>
+            <div class="chips">
+              <div class="chip" onclick="toggleChip(this)">🎨 Drawing</div>
+              <div class="chip" onclick="toggleChip(this)">🖌️ Painting</div>
+              <div class="chip" onclick="toggleChip(this)">🎹 Music</div>
+              <div class="chip" onclick="toggleChip(this)">🎤 Singing</div>
+              <div class="chip" onclick="toggleChip(this)">🎭 Theater</div>
+              <div class="chip" onclick="toggleChip(this)">✂️ Crafts</div>
+            </div>
+          </div>
+
+          <div class="category">
+            <div class="cat-header">🧩 Games &amp; Play</div>
+            <div class="chips">
+              <div class="chip" onclick="toggleChip(this)">🧱 Legos</div>
+              <div class="chip" onclick="toggleChip(this)">🎮 Video Games</div>
+              <div class="chip" onclick="toggleChip(this)">🎲 Board Games</div>
+              <div class="chip" onclick="toggleChip(this)">🧩 Puzzles</div>
+              <div class="chip" onclick="toggleChip(this)">♟️ Chess</div>
+            </div>
+          </div>
+
+          <div class="category">
+            <div class="cat-header">🦕 Curiosity &amp; Nature</div>
+            <div class="chips">
+              <div class="chip" onclick="toggleChip(this)">🦕 Dinosaurs</div>
+              <div class="chip" onclick="toggleChip(this)">🚀 Space</div>
+              <div class="chip" onclick="toggleChip(this)">🐛 Bugs &amp; Animals</div>
+              <div class="chip" onclick="toggleChip(this)">🔬 Science Experiments</div>
+              <div class="chip" onclick="toggleChip(this)">🏕️ Camping</div>
+            </div>
+          </div>
+
+          <div class="category">
+            <div class="cat-header">📚 Reading &amp; Learning</div>
+            <div class="chips">
+              <div class="chip" onclick="toggleChip(this)">📚 Reading</div>
+              <div class="chip" onclick="toggleChip(this)">✍️ Writing Stories</div>
+              <div class="chip" onclick="toggleChip(this)">💻 Coding</div>
+            </div>
+          </div>
+
+          <div class="category">
+            <div class="cat-header">🎉 Just for Fun</div>
+            <div class="chips">
+              <div class="chip" onclick="toggleChip(this)">👗 Dress Up</div>
+              <div class="chip" onclick="toggleChip(this)">🪄 Magic Tricks</div>
+              <div class="chip" onclick="toggleChip(this)">🧁 Cooking &amp; Baking</div>
+              <div class="chip" onclick="toggleChip(this)">🃏 Collecting</div>
+            </div>
+          </div>
+        </div>
+        <div class="count-text" id="countText" style="padding:0 24px;">Tap the things Mia loves</div>
+        <div class="footer">
+          <button class="btn-primary" onclick="go('s5')">Continue</button>
+          <button class="skip-link" onclick="go('s5')">Skip for now</button>
+        </div>
+      </div>
+
+      <!-- ═══════ S5 — Sports & Activities list ═══════ -->
+      <div class="screen" id="s5">
+        <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"></div></div>
+        <div class="nav-row"><button class="back-btn" onclick="go('s4')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span></div>
+        </div>
+        <div class="scroll-area">
+          <h1 style="font-size:24px;"><span id="s5Header">Mia's Activities</span></h1>
+          <div class="desc">Optional — add her sports teams, leagues, or extracurriculars. This helps Sprout suggest similar activities and playdates.</div>
+          <div class="activity-list" id="activityListEditable"></div>
+          <div class="empty-hint" id="emptyHint">No activities added yet.</div>
+        </div>
+        <div class="footer">
+          <button class="btn-primary" onclick="go('s6')" style="background:var(--secondary-700);color:var(--brand-700);margin-bottom:10px;"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add Activity</button>
+          <button class="btn-primary" onclick="go('s7')">Continue</button>
+          <button class="skip-link" onclick="go('s7')">Skip for now</button>
+        </div>
+      </div>
+
+      <!-- ═══════ S6 — Add Activity form ═══════ -->
+      <div class="screen" id="s6">
+        <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"></div></div>
+        <div class="nav-row"><button class="back-btn" onclick="go('s5')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span></div>
+        </div>
+        <div class="scroll-area">
+          <h1 style="font-size:22px;">Add Activity</h1>
+          <div class="field-label" style="margin-top:16px;">Type</div>
+          <div class="icon-picker">
+            <div class="icon-opt active" data-emo="⚽" onclick="pickIcon(this)">⚽</div>
+            <div class="icon-opt" data-emo="🏀" onclick="pickIcon(this)">🏀</div>
+            <div class="icon-opt" data-emo="⚾" onclick="pickIcon(this)">⚾</div>
+            <div class="icon-opt" data-emo="🏊" onclick="pickIcon(this)">🏊</div>
+            <div class="icon-opt" data-emo="💃" onclick="pickIcon(this)">💃</div>
+            <div class="icon-opt" data-emo="🎹" onclick="pickIcon(this)">🎹</div>
+            <div class="icon-opt" data-emo="🎨" onclick="pickIcon(this)">🎨</div>
+            <div class="icon-opt" data-emo="🥋" onclick="pickIcon(this)">🥋</div>
+            <div class="icon-opt" data-emo="⭐" onclick="pickIcon(this)">⭐</div>
+          </div>
+          <div class="field-label">Activity or Team Name</div>
+          <input class="text-input" id="fName" placeholder="e.g. AYSO Soccer, Art Club">
+          <div class="field-label">League / Division <span style="font-weight:400;color:var(--grey-500);">(optional)</span></div>
+          <input class="text-input" id="fLeague" placeholder="e.g. U8 Division, Advanced">
+          <div class="field-label">Schedule <span style="font-weight:400;color:var(--grey-500);">(optional)</span></div>
+          <input class="text-input" id="fSchedule" placeholder="e.g. Fall league, Tuesdays 5pm">
+          <div class="field-hint">Add as much or as little detail as you'd like — you can always edit this later.</div>
+        </div>
+        <div class="footer"><button class="btn-primary" onclick="saveActivity()">Save Activity</button></div>
+      </div>
+
+      <!-- ═══════ S7 — Kids list (final) ═══════ -->
+      <div class="screen" id="s7">
+        <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"></div></div>
+        <div class="nav-row"><button class="back-btn" onclick="go('s5')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span></div>
+        </div>
+        <div class="scroll-area">
+          <h1>Add your little ones 🌱</h1>
+          <div class="desc">We'll personalize events, clubs, and activities to match each of your child's information.</div>
+
+          <div class="kid-card">
+            <div class="kid-avatar" id="s7Initial">M</div>
+            <div style="flex:1;">
+              <div class="kid-name-row"><span class="kid-name" id="s7Name">Mia</span><span class="kid-age-pill">6 yrs</span></div>
+              <div class="kid-meta"><b id="s7Grade">1st Grade</b> · Lincoln Elementary</div>
+              <div class="kid-meta" id="s7Summary">3 interests · 1 activity added</div>
+            </div>
+            <button class="del-btn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+          </div>
+
+          <div class="add-card" style="margin-top:16px;" onclick="go('s2')">
+            <div class="add-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+            <div><div class="add-card-title">Add another child</div><div class="add-card-sub">You can add up to 5 children</div></div>
+            <svg class="add-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+          <div class="note-banner">ℹ️ Sprout will suggest family-friendly events and clubs tailored to your children's ages, grades, and interests.</div>
+        </div>
+        <div class="footer"><button class="btn-primary">Continue</button></div>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+  document.querySelectorAll('.status-icons').forEach(el => {
+    el.innerHTML = `
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="#1a1b1e"><rect x="0" y="7" width="3" height="4" rx="0.6"/><rect x="4" y="5" width="3" height="6" rx="0.6"/><rect x="8" y="3" width="3" height="8" rx="0.6"/><rect x="12" y="0" width="3" height="11" rx="0.6"/></svg>
+      <svg width="15" height="11" viewBox="0 0 17 11" fill="#1a1b1e"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1zM3.5 7.6L5 9.1c1-0.9 2.2-1.4 3.5-1.4 1.3 0 2.5 0.5 3.5 1.4l1.5-1.5c-1.4-1.3-3.1-2-5-2-1.9 0-3.6 0.7-5 2zM6.5 10.6l2 2 2-2c-0.5-0.5-1.2-0.8-2-0.8s-1.5 0.3-2 0.8z"/></svg>
+      <svg width="25" height="11" viewBox="0 0 25 11"><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" fill="none" stroke="#1a1b1e" stroke-opacity="0.45"/><rect x="22" y="3.5" width="1.5" height="4" rx="0.4" fill="#1a1b1e" fill-opacity="0.45"/><rect x="2" y="2" width="18" height="7" rx="1.4" fill="#1a1b1e"/></svg>
+    `;
+  });
+
+  let activities = [];
+  let pickedIcon = '⚽';
+
+  function go(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+    document.getElementById(id).classList.add('on');
+    if (id === 's7') updateSummary();
+  }
+
+  function onNameInput(v) {
+    const name = v.trim() || 'Mia';
+    ['s3Name', 's3Name2', 's4Name', 's7Name'].forEach(id => document.getElementById(id).textContent = name);
+    document.getElementById('s5Header').textContent = name + "'s Activities";
+    document.getElementById('s7Initial').textContent = name[0].toUpperCase();
+  }
+  function pickGender(el) {
+    el.parentElement.querySelectorAll('.gender-opt').forEach(o => o.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function toggleSchool(el) {
+    document.querySelectorAll('.school-row').forEach(s => { if (s !== el) s.classList.remove('open'); });
+    el.classList.toggle('open');
+  }
+  function pickGrade(evt, el) {
+    evt.stopPropagation();
+    document.querySelectorAll('.grade-opt').forEach(g => g.classList.remove('picked'));
+    el.classList.add('picked');
+    document.getElementById('s7Grade').textContent = el.querySelector('.grade-label').textContent;
+    const btn = document.getElementById('s3Continue');
+    btn.disabled = false;
+    btn.textContent = 'Continue';
+  }
+
+  function toggleChip(el) {
+    el.classList.toggle('active');
+    const n = document.querySelectorAll('#s4 .chip.active').length;
+    document.getElementById('countText').textContent = n === 0 ? "Tap the things Mia loves" : `${n} interest${n === 1 ? '' : 's'} selected`;
+  }
+
+  function renderActivitiesList() {
+    const list = document.getElementById('activityListEditable');
+    document.getElementById('emptyHint').style.display = activities.length ? 'none' : 'block';
+    list.innerHTML = activities.map((a, i) => `
+      <div class="activity-row">
+        <div class="activity-icon">${a.emo}</div>
+        <div><div class="activity-name">${a.name}</div><div class="activity-sub">${a.sub || 'No details added'}</div></div>
+        <div class="row-actions"><button class="icon-btn del" onclick="removeActivity(${i})"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div>
+      </div>`).join('');
+  }
+  function removeActivity(i) { activities.splice(i, 1); renderActivitiesList(); }
+  function pickIcon(el) {
+    document.querySelectorAll('.icon-opt').forEach(o => o.classList.remove('active'));
+    el.classList.add('active');
+    pickedIcon = el.dataset.emo;
+  }
+  function saveActivity() {
+    const name = document.getElementById('fName').value.trim();
+    if (!name) { document.getElementById('fName').focus(); return; }
+    const league = document.getElementById('fLeague').value.trim();
+    const schedule = document.getElementById('fSchedule').value.trim();
+    const sub = [league, schedule].filter(Boolean).join(' · ');
+    activities.push({ emo: pickedIcon, name, sub });
+    document.getElementById('fName').value = '';
+    document.getElementById('fLeague').value = '';
+    document.getElementById('fSchedule').value = '';
+    renderActivitiesList();
+    go('s5');
+  }
+
+  function updateSummary() {
+    const nInterests = document.querySelectorAll('#s4 .chip.active').length;
+    const nActivities = activities.length;
+    const parts = [];
+    if (nInterests) parts.push(`${nInterests} interest${nInterests === 1 ? '' : 's'}`);
+    if (nActivities) parts.push(`${nActivities} activit${nActivities === 1 ? 'y' : 'ies'} added`);
+    document.getElementById('s7Summary').textContent = parts.length ? parts.join(' · ') : 'No interests or activities added yet';
+  }
+
+  renderActivitiesList();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprout – 19.8 & 19.9 Live Activities Add Moments</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand-500: #186338;
+      --bg: #f4f1ea;
+      --surf-1: #eae6db;
+      --surf-2: #dbd5c8;
+      --text-primary: #4d525b;
+      --text-secondary: #818898;
+    }
+
+    body {
+      background: #b5ad9e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 40px 80px;
+      font-family: 'Inter', sans-serif;
+      gap: 40px;
+    }
+
+    /* Page title */
+    .page-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .screens-row {
+      display: flex;
+      gap: 56px;
+      align-items: flex-start;
+    }
+
+    .screen-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .screen-label {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.65);
+      letter-spacing: 0.2px;
+    }
+
+    /* ── Phone shell ── */
+    .phone {
+      width: 393px;
+      height: 852px;
+      background: var(--bg);
+      border-radius: 54px;
+      overflow: hidden;
+      position: relative;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.08),
+        0 0 0 10px #1c1c1e,
+        0 0 0 12px #2c2c2e,
+        0 50px 100px rgba(0,0,0,.5);
+    }
+    /* Volume buttons */
+    .phone::before {
+      content: '';
+      position: absolute;
+      left: -13px; top: 120px;
+      width: 4px; height: 32px;
+      background: #2a2a2a;
+      border-radius: 2px 0 0 2px;
+      box-shadow: 0 44px 0 #2a2a2a, 0 88px 0 #2a2a2a;
+    }
+    /* Power button */
+    .phone::after {
+      content: '';
+      position: absolute;
+      right: -13px; top: 148px;
+      width: 4px; height: 66px;
+      background: #2a2a2a;
+      border-radius: 0 2px 2px 0;
+    }
+
+    /* Dynamic island */
+    .island {
+      position: absolute;
+      top: 14px; left: 50%;
+      transform: translateX(-50%);
+      width: 120px; height: 34px;
+      background: #0a0a0a;
+      border-radius: 18px;
+      z-index: 100;
+    }
+
+    /* ── Status bar ── */
+    .status-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 26px 0;
+      z-index: 30;
+    }
+    .s-time { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .s-icons { display: flex; align-items: center; gap: 5px; }
+
+    /* ── Close button ── */
+    .cam-close {
+      position: absolute;
+      top: 58px; left: 20px;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: rgba(234,230,219,0.92);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 30;
+      backdrop-filter: blur(4px);
+    }
+
+    /* ── Viewfinder ── */
+    .viewfinder {
+      position: absolute;
+      top: 108px; left: 0; right: 0;
+      height: 580px;
+      overflow: hidden;
+    }
+
+    /* Portrait photo simulation */
+    .photo-fill {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* Rule-of-thirds grid */
+    .grid {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .gl-h, .gl-v {
+      position: absolute;
+      background: rgba(255,255,255,0.38);
+    }
+    .gl-h { left: 0; right: 0; height: 1px; }
+    .gl-v { top: 0; bottom: 0; width: 1px; }
+
+    /* ── Bottom bar ── */
+    .cam-bottom {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 164px;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      padding: 0 36px;
+      z-index: 20;
+    }
+
+    /* Gallery thumbnail */
+    .gallery-thumb {
+      width: 52px; height: 52px;
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* Shutter */
+    .btn-shutter {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: var(--brand-500);
+      flex-shrink: 0;
+    }
+
+    /* Ghost circle button */
+    .btn-ghost {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: var(--surf-1);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Post pill */
+    .btn-post {
+      flex: 1;
+      height: 56px;
+      border-radius: 99px;
+      background: var(--brand-500);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.1px;
+    }
+
+    /* ── New badge annotation ── */
+    .badge-new {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(24,99,56,0.15);
+      border: 1px solid rgba(24,99,56,0.3);
+      color: #186338;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px 3px 7px;
+      border-radius: 99px;
+      letter-spacing: 0.2px;
+    }
+    .badge-new::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #186338;
+    }
+
+    /* Annotation callout */
+    .callout {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 14px;
+      padding: 14px 18px;
+      max-width: 393px;
+      backdrop-filter: blur(6px);
+    }
+    .callout-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: var(--surf-1);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .callout-text { font-size: 12.5px; color: rgba(255,255,255,0.85); line-height: 1.5; }
+    .callout-text strong { color: #fff; }
+  </style>
+</head>
+<body>
+
+  <div class="screens-row">
+
+    <!-- ════════════════════════════════ 19.8 — Camera ════════════════════════════════ -->
+    <div class="screen-wrap">
+      <div class="screen-label">19.8 — Camera (tap "Add Moments")</div>
+
+      <div class="phone">
+        <div class="island"></div>
+
+        <!-- Status bar -->
+        <div class="status-bar">
+          <span class="s-time">9:41</span>
+          <div class="s-icons">
+            <!-- Signal -->
+            <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+              <rect x="0" y="4" width="3" height="8" rx="1" fill="#4d525b" opacity=".35"/>
+              <rect x="4.5" y="2.5" width="3" height="9.5" rx="1" fill="#4d525b" opacity=".55"/>
+              <rect x="9" y="0" width="3" height="12" rx="1" fill="#4d525b"/>
+              <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#4d525b"/>
+            </svg>
+            <!-- Wi-Fi -->
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+              <path d="M8 9.5C8.8 9.5 9.5 10.2 9.5 11C9.5 11.8 8.8 12.5 8 12.5C7.2 12.5 6.5 11.8 6.5 11C6.5 10.2 7.2 9.5 8 9.5Z" fill="#4d525b"/>
+              <path d="M2.3 6.2C3.8 4.7 5.8 3.8 8 3.8C10.2 3.8 12.2 4.7 13.7 6.2L14.8 5.1C13 3.3 10.6 2.2 8 2.2C5.4 2.2 3 3.3 1.2 5.1L2.3 6.2Z" fill="#4d525b"/>
+              <path d="M4.6 8.3C5.5 7.4 6.7 6.9 8 6.9C9.3 6.9 10.5 7.4 11.4 8.3L12.5 7.2C11.3 6 9.7 5.3 8 5.3C6.3 5.3 4.7 6 3.5 7.2L4.6 8.3Z" fill="#4d525b"/>
+            </svg>
+            <!-- Battery -->
+            <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+              <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/>
+              <rect x="2" y="2" width="17" height="8" rx="2" fill="#4d525b"/>
+              <path d="M23 4.5V7.5C23.8 7.2 24.5 6.5 24.5 6C24.5 5.5 23.8 4.8 23 4.5Z" fill="#4d525b" opacity=".4"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Close button -->
+        <div class="cam-close">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1.5 1.5L12.5 12.5M12.5 1.5L1.5 12.5" stroke="#4d525b" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Viewfinder: warm portrait gradient -->
+        <div class="viewfinder">
+          <svg class="photo-fill" viewBox="0 0 393 580" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="bgGrad19_8" cx="50%" cy="30%" r="70%">
+                <stop offset="0%" stop-color="#c9c4b8"/>
+                <stop offset="100%" stop-color="#8a8880"/>
+              </radialGradient>
+              <radialGradient id="skinGrad" cx="50%" cy="45%" r="55%">
+                <stop offset="0%" stop-color="#d4a574"/>
+                <stop offset="60%" stop-color="#c49060"/>
+                <stop offset="100%" stop-color="#a87850"/>
+              </radialGradient>
+            </defs>
+            <!-- Background -->
+            <rect width="393" height="580" fill="url(#bgGrad19_8)"/>
+            <!-- Subtle wall texture -->
+            <rect width="393" height="580" fill="#bbb8b0" opacity="0.4"/>
+            <rect width="393" height="290" fill="#c8c5be" opacity="0.3"/>
+            <!-- Shirt/sweater — dark olive/charcoal -->
+            <ellipse cx="196" cy="620" rx="180" ry="160" fill="#3a3c35"/>
+            <!-- Neck -->
+            <rect x="166" y="380" width="62" height="80" rx="8" fill="#c8906a"/>
+            <!-- Head — face -->
+            <ellipse cx="196" cy="300" rx="105" ry="120" fill="url(#skinGrad)"/>
+            <!-- Hair — warm dark brown -->
+            <ellipse cx="196" cy="210" rx="108" ry="60" fill="#5c3b1e"/>
+            <ellipse cx="100" cy="265" rx="30" ry="70" fill="#5c3b1e"/>
+            <ellipse cx="292" cy="265" rx="30" ry="70" fill="#5c3b1e"/>
+            <!-- Eyes -->
+            <ellipse cx="158" cy="295" rx="14" ry="10" fill="#fff" opacity="0.9"/>
+            <ellipse cx="234" cy="295" rx="14" ry="10" fill="#fff" opacity="0.9"/>
+            <ellipse cx="160" cy="296" rx="9" ry="8" fill="#2e6b8a"/>
+            <ellipse cx="236" cy="296" rx="9" ry="8" fill="#2e6b8a"/>
+            <ellipse cx="162" cy="294" rx="4.5" ry="4" fill="#1a1a1a"/>
+            <ellipse cx="238" cy="294" rx="4.5" ry="4" fill="#1a1a1a"/>
+            <!-- Catchlight -->
+            <ellipse cx="165" cy="292" rx="2" ry="1.5" fill="#fff" opacity="0.9"/>
+            <ellipse cx="241" cy="292" rx="2" ry="1.5" fill="#fff" opacity="0.9"/>
+            <!-- Nose -->
+            <path d="M188 325 Q196 348 204 325" stroke="#b07850" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <!-- Mouth — smile -->
+            <path d="M174 355 Q196 372 218 355" stroke="#a06845" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <!-- Mustache -->
+            <path d="M176 348 Q196 358 216 348" stroke="#5c3b1e" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <!-- Ears -->
+            <ellipse cx="91" cy="300" rx="15" ry="22" fill="#c8906a"/>
+            <ellipse cx="301" cy="300" rx="15" ry="22" fill="#c8906a"/>
+            <!-- Shadow under chin -->
+            <ellipse cx="196" cy="395" rx="60" ry="18" fill="#a07045" opacity="0.35"/>
+          </svg>
+
+          <!-- Rule-of-thirds grid -->
+          <div class="grid">
+            <div class="gl-h" style="top:33.33%"></div>
+            <div class="gl-h" style="top:66.66%"></div>
+            <div class="gl-v" style="left:33.33%"></div>
+            <div class="gl-v" style="left:66.66%"></div>
+          </div>
+        </div>
+
+        <!-- Bottom bar: gallery + shutter + flip -->
+        <div class="cam-bottom" style="justify-content:space-between;">
+          <!-- Gallery thumbnail -->
+          <div class="gallery-thumb">
+            <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+              <rect width="52" height="52" fill="#8a8880"/>
+              <rect width="52" height="26" fill="#c9c4b8" opacity="0.5"/>
+              <!-- tiny person silhouette -->
+              <ellipse cx="26" cy="22" rx="8" ry="9" fill="#5c3b1e" opacity="0.7"/>
+              <ellipse cx="26" cy="46" rx="16" ry="14" fill="#3a3c35" opacity="0.7"/>
+            </svg>
+          </div>
+          <!-- Shutter -->
+          <div class="btn-shutter" style="display:flex;align-items:center;justify-content:center;">
+            <div style="width:60px;height:60px;border-radius:50%;border:3px solid rgba(255,255,255,0.4);"></div>
+          </div>
+          <!-- Flip camera -->
+          <div class="btn-ghost">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M18.5 6.5L15 3L11.5 6.5" stroke="#4d525b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M15 3V13C15 14.1 14.1 15 13 15H3" stroke="#4d525b" stroke-width="1.7" stroke-linecap="round"/>
+              <path d="M3.5 15.5L7 19L10.5 15.5" stroke="#4d525b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M7 19V9C7 7.9 7.9 7 9 7H19" stroke="#4d525b" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════ 19.9 — Captured + Retake ════════════════════════════════ -->
+    <div class="screen-wrap">
+      <div class="screen-label">19.9 — Photo Captured (proposed)</div>
+
+      <div class="phone">
+        <div class="island"></div>
+
+        <!-- Status bar -->
+        <div class="status-bar">
+          <span class="s-time">9:41</span>
+          <div class="s-icons">
+            <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+              <rect x="0" y="4" width="3" height="8" rx="1" fill="#4d525b" opacity=".35"/>
+              <rect x="4.5" y="2.5" width="3" height="9.5" rx="1" fill="#4d525b" opacity=".55"/>
+              <rect x="9" y="0" width="3" height="12" rx="1" fill="#4d525b"/>
+              <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#4d525b"/>
+            </svg>
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+              <path d="M8 9.5C8.8 9.5 9.5 10.2 9.5 11C9.5 11.8 8.8 12.5 8 12.5C7.2 12.5 6.5 11.8 6.5 11C6.5 10.2 7.2 9.5 8 9.5Z" fill="#4d525b"/>
+              <path d="M2.3 6.2C3.8 4.7 5.8 3.8 8 3.8C10.2 3.8 12.2 4.7 13.7 6.2L14.8 5.1C13 3.3 10.6 2.2 8 2.2C5.4 2.2 3 3.3 1.2 5.1L2.3 6.2Z" fill="#4d525b"/>
+              <path d="M4.6 8.3C5.5 7.4 6.7 6.9 8 6.9C9.3 6.9 10.5 7.4 11.4 8.3L12.5 7.2C11.3 6 9.7 5.3 8 5.3C6.3 5.3 4.7 6 3.5 7.2L4.6 8.3Z" fill="#4d525b"/>
+            </svg>
+            <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+              <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/>
+              <rect x="2" y="2" width="17" height="8" rx="2" fill="#4d525b"/>
+              <path d="M23 4.5V7.5C23.8 7.2 24.5 6.5 24.5 6C24.5 5.5 23.8 4.8 23 4.5Z" fill="#4d525b" opacity=".4"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Close button -->
+        <div class="cam-close">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1.5 1.5L12.5 12.5M12.5 1.5L1.5 12.5" stroke="#4d525b" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Viewfinder: same captured photo -->
+        <div class="viewfinder">
+          <svg class="photo-fill" viewBox="0 0 393 580" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="bgGrad19_9" cx="50%" cy="30%" r="70%">
+                <stop offset="0%" stop-color="#c9c4b8"/>
+                <stop offset="100%" stop-color="#8a8880"/>
+              </radialGradient>
+              <radialGradient id="skinGrad2" cx="50%" cy="45%" r="55%">
+                <stop offset="0%" stop-color="#d4a574"/>
+                <stop offset="60%" stop-color="#c49060"/>
+                <stop offset="100%" stop-color="#a87850"/>
+              </radialGradient>
+            </defs>
+            <rect width="393" height="580" fill="url(#bgGrad19_9)"/>
+            <rect width="393" height="580" fill="#bbb8b0" opacity="0.4"/>
+            <rect width="393" height="290" fill="#c8c5be" opacity="0.3"/>
+            <ellipse cx="196" cy="620" rx="180" ry="160" fill="#3a3c35"/>
+            <rect x="166" y="380" width="62" height="80" rx="8" fill="#c8906a"/>
+            <ellipse cx="196" cy="300" rx="105" ry="120" fill="url(#skinGrad2)"/>
+            <ellipse cx="196" cy="210" rx="108" ry="60" fill="#5c3b1e"/>
+            <ellipse cx="100" cy="265" rx="30" ry="70" fill="#5c3b1e"/>
+            <ellipse cx="292" cy="265" rx="30" ry="70" fill="#5c3b1e"/>
+            <ellipse cx="158" cy="295" rx="14" ry="10" fill="#fff" opacity="0.9"/>
+            <ellipse cx="234" cy="295" rx="14" ry="10" fill="#fff" opacity="0.9"/>
+            <ellipse cx="160" cy="296" rx="9" ry="8" fill="#2e6b8a"/>
+            <ellipse cx="236" cy="296" rx="9" ry="8" fill="#2e6b8a"/>
+            <ellipse cx="162" cy="294" rx="4.5" ry="4" fill="#1a1a1a"/>
+            <ellipse cx="238" cy="294" rx="4.5" ry="4" fill="#1a1a1a"/>
+            <ellipse cx="165" cy="292" rx="2" ry="1.5" fill="#fff" opacity="0.9"/>
+            <ellipse cx="241" cy="292" rx="2" ry="1.5" fill="#fff" opacity="0.9"/>
+            <path d="M188 325 Q196 348 204 325" stroke="#b07850" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <path d="M174 355 Q196 372 218 355" stroke="#a06845" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <path d="M176 348 Q196 358 216 348" stroke="#5c3b1e" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <ellipse cx="91" cy="300" rx="15" ry="22" fill="#c8906a"/>
+            <ellipse cx="301" cy="300" rx="15" ry="22" fill="#c8906a"/>
+            <ellipse cx="196" cy="395" rx="60" ry="18" fill="#a07045" opacity="0.35"/>
+          </svg>
+
+          <!-- Rule-of-thirds grid -->
+          <div class="grid">
+            <div class="gl-h" style="top:33.33%"></div>
+            <div class="gl-h" style="top:66.66%"></div>
+            <div class="gl-v" style="left:33.33%"></div>
+            <div class="gl-v" style="left:66.66%"></div>
+          </div>
+        </div>
+
+        <!-- Bottom bar: RETAKE + POST -->
+        <div class="cam-bottom" style="gap:16px;">
+          <!-- Retake button (replaces gallery in captured state) -->
+          <div class="btn-ghost" style="position:relative;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M3 12C3 7.03 7.03 3 12 3C14.52 3 16.8 4.02 18.47 5.69" stroke="#4d525b" stroke-width="2" stroke-linecap="round"/>
+              <path d="M21 12C21 16.97 16.97 21 12 21C9.48 21 7.2 19.98 5.53 18.31" stroke="#4d525b" stroke-width="2" stroke-linecap="round"/>
+              <path d="M16 3L19 6L16 9" stroke="#4d525b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 21L5 18L8 15" stroke="#4d525b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <!-- New indicator dot -->
+            <div style="
+              position:absolute; top:-2px; right:-2px;
+              width:10px; height:10px; border-radius:50%;
+              background:#186338;
+              border: 2px solid var(--bg);
+            "></div>
+          </div>
+          <!-- Post button -->
+          <div class="btn-post">Post</div>
+        </div>
+      </div>
+
+      <!-- Annotation -->
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start;width:393px;">
+        <div class="badge-new">New</div>
+        <div class="callout">
+          <div class="callout-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M3 12C3 7.03 7.03 3 12 3C14.52 3 16.8 4.02 18.47 5.69" stroke="#4d525b" stroke-width="2" stroke-linecap="round"/>
+              <path d="M21 12C21 16.97 16.97 21 12 21C9.48 21 7.2 19.98 5.53 18.31" stroke="#4d525b" stroke-width="2" stroke-linecap="round"/>
+              <path d="M16 3L19 6L16 9" stroke="#4d525b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 21L5 18L8 15" stroke="#4d525b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="callout-text">
+            <strong>Retake replaces the gallery thumbnail</strong> once a photo is captured — the gallery is no longer relevant at this point. Same visual weight as the flip-camera button on 19.8.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

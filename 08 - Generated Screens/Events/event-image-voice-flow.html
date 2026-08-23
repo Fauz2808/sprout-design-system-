@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Sprout – Event Image Voice Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --brand:    #186338;
+  --brand-d:  #145530;
+  --brand-dd: #1e3e2b;
+  --brand-l:  #e2e9e3;
+  --brand-ll: #f0f5f1;
+  --bg:       #f4f1ea;
+  --s1:       #eae6db;
+  --s2:       #dbd5c8;
+  --s3:       #ccc5b5;
+  --tp:       #4d525b;
+  --ts:       #818898;
+  --tt:       #b3b8c1;
+  --border:   rgba(0,0,0,.08);
+  --white:    #ffffff;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(140deg, #aca49a 0%, #c9c2b4 50%, #a9a296 100%);
+  display: flex; flex-direction: column;
+  align-items: center; padding: 52px 0 80px; gap: 18px;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+/* ── FLOW MAP ── */
+.flow-map {
+  display: flex; align-items: center;
+  background: rgba(255,255,255,.12); backdrop-filter: blur(12px);
+  border-radius: 14px; padding: 4px;
+}
+.flow-step {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 11px; border-radius: 10px;
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,.5);
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.flow-step.active { background: rgba(255,255,255,.18); color: #fff; }
+.flow-step .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.3); }
+.flow-step.active .dot { background: #fff; }
+.flow-arrow { color: rgba(255,255,255,.3); font-size: 11px; padding: 0 1px; }
+
+/* ── PHONE ── */
+.phone {
+  width: 393px; height: 852px;
+  background: var(--bg); border-radius: 54px;
+  overflow: hidden; position: relative;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.12),
+    0 0 0 10px #1c1c1e, 0 0 0 12px #2c2c2e,
+    0 60px 130px rgba(0,0,0,.55);
+}
+.phone::before {
+  content:''; position:absolute; left:-13px; top:120px;
+  width:4px; height:32px; background:#2a2a2a; border-radius:2px 0 0 2px;
+  box-shadow:0 44px 0 #2a2a2a,0 88px 0 #2a2a2a; z-index:200;
+}
+.phone::after {
+  content:''; position:absolute; right:-13px; top:148px;
+  width:4px; height:66px; background:#2a2a2a; border-radius:0 2px 2px 0; z-index:200;
+}
+.island {
+  position:absolute; top:14px; left:50%; transform:translateX(-50%);
+  width:120px; height:34px; background:#0a0a0a; border-radius:18px; z-index:150; pointer-events:none;
+}
+
+/* ── SCREEN STACK ── */
+.sc-wrap { position:absolute; inset:0; overflow:hidden; border-radius:54px; }
+.screen {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  background:var(--bg); will-change:transform; backface-visibility:hidden;
+}
+.screen.right { transform:translateX(100%); pointer-events:none; }
+.screen.left  { transform:translateX(-28%); filter:brightness(.88); pointer-events:none; }
+
+@keyframes pushIn  { from{transform:translateX(100%)} to{transform:translateX(0)} }
+@keyframes pushOut { from{transform:translateX(0);filter:brightness(1)} to{transform:translateX(-28%);filter:brightness(.88)} }
+@keyframes popIn   { from{transform:translateX(-28%);filter:brightness(.88)} to{transform:translateX(0);filter:brightness(1)} }
+@keyframes popOut  { from{transform:translateX(0)} to{transform:translateX(100%)} }
+.anim-push-in  { animation:pushIn  .36s cubic-bezier(.25,.46,.45,.94) forwards }
+.anim-push-out { animation:pushOut .36s cubic-bezier(.25,.46,.45,.94) forwards }
+.anim-pop-in   { animation:popIn   .34s cubic-bezier(.25,.46,.45,.94) forwards }
+.anim-pop-out  { animation:popOut  .34s cubic-bezier(.25,.46,.45,.94) forwards }
+
+/* ── STATUS BAR ── */
+.sb {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 26px 0; height:52px; flex-shrink:0;
+}
+.sb-time { font-size:15px; font-weight:600; color:var(--tp); }
+.sb-time.white { color: #fff; }
+.sb-icons { display:flex; align-items:center; gap:6px; }
+
+/* ── NAV BAR ── */
+.nav-bar {
+  background:rgba(244,241,234,.97); backdrop-filter:blur(20px);
+  border-bottom:.5px solid var(--border); flex-shrink:0;
+}
+.nav-row {
+  display:flex; align-items:center; padding:8px 14px; gap:8px; min-height:52px;
+}
+.back-btn {
+  display:flex; align-items:center; gap:3px;
+  color:var(--brand); font-size:15px; font-weight:500;
+  border:none; background:none; cursor:pointer; padding:6px 0;
+  transition:opacity .15s; flex-shrink:0;
+}
+.back-btn:active { opacity:.4; }
+.nav-title { font-size:15px; font-weight:600; color:var(--tp); flex:1; text-align:center; }
+.nav-step { font-size:12px; color:var(--ts); flex-shrink:0; min-width:52px; text-align:right; }
+.nav-action {
+  font-size:14.5px; font-weight:600; color:var(--brand);
+  border:none; background:none; cursor:pointer; padding:6px 0;
+}
+
+/* ─────────────────────────────────
+   S1 · REVIEW & EDIT
+───────────────────────────────── */
+
+/* Cover image area */
+.cover-wrap {
+  position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden;
+  background: linear-gradient(135deg, #2d5a3d 0%, #1a3d2b 40%, #0f2a1e 100%);
+}
+.cover-scene {
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 70%, rgba(24,99,56,.3) 0%, transparent 60%),
+    linear-gradient(135deg, #1e4d30 0%, #0f2820 60%, #162b1c 100%);
+}
+/* Golf course SVG sky + greens */
+.cover-scene::before {
+  content:''; position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 20%, rgba(135,180,100,.15) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 30% 60%, rgba(24,99,56,.25) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 30% at 70% 65%, rgba(20,85,48,.2) 0%, transparent 50%);
+}
+.cover-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to bottom, transparent 40%, rgba(0,0,0,.55) 100%);
+}
+.cover-tag {
+  position:absolute; top:14px; left:14px;
+  background:rgba(255,255,255,.18); backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.3); border-radius:99px;
+  padding:5px 11px; font-size:11px; font-weight:600; color:#fff;
+  display:flex; align-items:center; gap:5px;
+}
+.cover-bottom {
+  position:absolute; bottom:12px; left:14px; right:14px;
+  display:flex; align-items:flex-end; justify-content:space-between;
+}
+.cover-title {
+  font-family:'Playfair Display',serif;
+  font-size:20px; font-weight:600; color:#fff; line-height:1.2;
+  text-shadow:0 1px 8px rgba(0,0,0,.4);
+}
+/* Image action buttons */
+.cover-actions {
+  display:flex; gap:7px; flex-shrink:0;
+}
+.cover-action-btn {
+  display:flex; align-items:center; gap:5px;
+  background:rgba(255,255,255,.18); backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.3); border-radius:99px;
+  padding:6px 12px; font-size:11.5px; font-weight:600; color:#fff;
+  cursor:pointer; transition:all .15s; white-space:nowrap;
+}
+.cover-action-btn:active { opacity:.7; transform:scale(.96); }
+.cover-action-btn.primary {
+  background:rgba(24,99,56,.75); border-color:rgba(24,99,56,.6);
+}
+
+/* Review body */
+.review-body { flex:1; overflow-y:auto; scrollbar-width:none; }
+.review-body::-webkit-scrollbar { display:none; }
+.review-section { padding:16px 18px 0; }
+.review-section:last-of-type { padding-bottom:20px; }
+
+.field-label {
+  font-size:10px; font-weight:700; letter-spacing:.5px;
+  text-transform:uppercase; color:var(--ts); margin-bottom:6px;
+}
+.field-val {
+  background:var(--white); border:1.5px solid var(--border);
+  border-radius:12px; padding:11px 13px;
+  font-size:14px; color:var(--tp); line-height:1.45;
+}
+.field-val.title-f {
+  font-family:'Playfair Display',serif; font-size:16px; font-weight:600;
+}
+.field-row {
+  display:flex; align-items:center; gap:9px;
+  background:var(--white); border:1.5px solid var(--border);
+  border-radius:12px; padding:11px 13px;
+}
+.field-row-icon { font-size:16px; flex-shrink:0; }
+.field-row-text { flex:1; }
+.field-row-main { font-size:13.5px; color:var(--tp); font-weight:500; }
+.field-row-sub { font-size:11px; color:var(--ts); margin-top:1px; }
+.field-row-chev { color:var(--tt); }
+
+.ai-badge {
+  display:inline-flex; align-items:center; gap:4px;
+  background:var(--brand-l); border-radius:99px;
+  padding:3px 9px; font-size:10px; font-weight:700; color:var(--brand);
+  margin-bottom:6px;
+}
+
+/* Bottom CTA */
+.cta-bar {
+  background:rgba(244,241,234,.97); backdrop-filter:blur(20px);
+  border-top:.5px solid var(--border); padding:10px 18px 28px;
+  flex-shrink:0;
+}
+.btn-primary {
+  width:100%; height:50px; background:var(--brand); border:none; border-radius:15px;
+  color:#fff; font-size:15px; font-weight:600; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  transition:all .15s;
+}
+.btn-primary:active { background:var(--brand-d); transform:scale(.98); }
+
+/* ─────────────────────────────────
+   S2 · IMAGE PROMPT (voice + text)
+───────────────────────────────── */
+.prompt-screen { background:var(--bg); }
+
+.prompt-preview {
+  position:relative; width:100%; height:160px; flex-shrink:0;
+  overflow:hidden;
+  background:linear-gradient(135deg,#1e4d30 0%,#0f2820 60%,#162b1c 100%);
+}
+.prompt-preview-label {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:6px;
+}
+.prompt-preview-label span {
+  font-size:11px; font-weight:600; color:rgba(255,255,255,.6); letter-spacing:.3px;
+}
+
+.prompt-body { flex:1; overflow-y:auto; scrollbar-width:none; padding:20px 18px; display:flex; flex-direction:column; gap:20px; }
+.prompt-body::-webkit-scrollbar { display:none; }
+
+.prompt-heading {
+  font-family:'Playfair Display',serif;
+  font-size:21px; font-weight:700; color:var(--brand-dd);
+  line-height:1.3; text-align:center;
+}
+.prompt-sub {
+  font-size:13px; color:var(--ts); text-align:center; line-height:1.55; margin-top:-8px;
+}
+
+/* ── Voice orb ── */
+.voice-section { display:flex; flex-direction:column; align-items:center; gap:12px; }
+
+.voice-orb-wrap { position:relative; width:140px; height:140px; cursor:pointer; }
+
+/* Outer pulse rings */
+.orb-ring {
+  position:absolute; border-radius:50%;
+  border:2px solid rgba(24,99,56,.2);
+  animation:orbRing 2.4s ease-out infinite;
+  pointer-events:none;
+}
+.orb-ring-1 { inset:-16px; animation-delay:0s; }
+.orb-ring-2 { inset:-28px; animation-delay:.6s; }
+.orb-ring-3 { inset:-42px; animation-delay:1.2s; }
+
+@keyframes orbRing {
+  0%   { opacity:0; transform:scale(.85); }
+  30%  { opacity:.7; }
+  100% { opacity:0; transform:scale(1); }
+}
+
+.orb-btn {
+  position:absolute; inset:0; border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, rgba(42,120,72,.9), var(--brand));
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:
+    0 0 0 8px rgba(24,99,56,.12),
+    0 12px 40px rgba(24,99,56,.35),
+    inset 0 1px 0 rgba(255,255,255,.25);
+  border:none; cursor:pointer; transition:all .2s;
+}
+.orb-btn:active { transform:scale(.94); box-shadow:0 0 0 4px rgba(24,99,56,.2),0 6px 20px rgba(24,99,56,.3); }
+
+/* Active recording state */
+.voice-orb-wrap.recording .orb-ring { animation:orbRingActive 1s ease-out infinite; }
+.voice-orb-wrap.recording .orb-ring-1 { animation-delay:0s; }
+.voice-orb-wrap.recording .orb-ring-2 { animation-delay:.25s; }
+.voice-orb-wrap.recording .orb-ring-3 { animation-delay:.5s; }
+@keyframes orbRingActive {
+  0%   { opacity:0; transform:scale(.7); border-color:rgba(24,99,56,.6); }
+  40%  { opacity:1; }
+  100% { opacity:0; transform:scale(1.05); }
+}
+.voice-orb-wrap.recording .orb-btn {
+  background:radial-gradient(circle at 35% 35%, rgba(200,60,60,.9), #b91c1c);
+  box-shadow:0 0 0 8px rgba(185,28,28,.15),0 12px 40px rgba(185,28,28,.4),inset 0 1px 0 rgba(255,255,255,.25);
+}
+.voice-orb-wrap.recording .orb-ring { border-color:rgba(185,28,28,.35); }
+
+.voice-label {
+  font-size:13px; font-weight:600; color:var(--brand);
+  text-align:center; transition:color .2s;
+}
+.voice-hint {
+  font-size:11.5px; color:var(--tt); text-align:center; margin-top:-6px;
+  transition:all .3s;
+}
+
+/* Waveform (visible during recording) */
+.waveform {
+  display:flex; align-items:center; gap:3px; height:32px;
+  opacity:0; transition:opacity .3s;
+}
+.waveform.active { opacity:1; }
+.wave-bar {
+  width:4px; border-radius:99px; background:var(--brand);
+  animation:waveBar 1s ease-in-out infinite;
+}
+.wave-bar:nth-child(1) { height:8px;  animation-delay:0s; }
+.wave-bar:nth-child(2) { height:16px; animation-delay:.1s; }
+.wave-bar:nth-child(3) { height:24px; animation-delay:.2s; }
+.wave-bar:nth-child(4) { height:28px; animation-delay:.15s; }
+.wave-bar:nth-child(5) { height:32px; animation-delay:.05s; }
+.wave-bar:nth-child(6) { height:24px; animation-delay:.2s; }
+.wave-bar:nth-child(7) { height:20px; animation-delay:.1s; }
+.wave-bar:nth-child(8) { height:12px; animation-delay:.3s; }
+.wave-bar:nth-child(9) { height:20px; animation-delay:.08s; }
+.wave-bar:nth-child(10){ height:26px; animation-delay:.18s; }
+@keyframes waveBar {
+  0%,100% { transform:scaleY(1); opacity:.6; }
+  50%      { transform:scaleY(1.6); opacity:1; }
+}
+.waveform.recording .wave-bar { background:#b91c1c; }
+
+/* Divider with OR */
+.or-divider {
+  display:flex; align-items:center; gap:12px;
+}
+.or-line { flex:1; height:.5px; background:var(--border); }
+.or-text { font-size:11px; font-weight:600; color:var(--tt); }
+
+/* Text input area */
+.text-prompt-wrap { display:flex; flex-direction:column; gap:8px; }
+.text-prompt-input {
+  width:100%; background:var(--white); border:1.5px solid var(--border);
+  border-radius:14px; padding:13px 14px; padding-right:50px;
+  font-size:14px; color:var(--tp); font-family:'Inter',sans-serif;
+  resize:none; outline:none; transition:border-color .2s; min-height:80px; line-height:1.5;
+}
+.text-prompt-input:focus { border-color:var(--brand); }
+.text-prompt-input::placeholder { color:var(--tt); }
+.text-prompt-actions {
+  display:flex; gap:8px;
+}
+.prompt-generate-btn {
+  flex:1; height:46px; background:var(--brand); border:none; border-radius:13px;
+  color:#fff; font-size:14px; font-weight:600; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  transition:all .15s;
+}
+.prompt-generate-btn:active { background:var(--brand-d); transform:scale(.97); }
+.prompt-generate-btn.secondary {
+  background:var(--s1); color:var(--brand); flex:none; width:46px; padding:0;
+}
+
+/* ─────────────────────────────────
+   S3 · GENERATING (loading state)
+───────────────────────────────── */
+.generating-screen { background:var(--bg); }
+
+.gen-image-area {
+  position:relative; width:100%; height:260px; flex-shrink:0;
+  overflow:hidden;
+  background:linear-gradient(135deg, #1a2e20 0%, #0d1f15 100%);
+}
+
+/* Pulsing orb in center of image area */
+.gen-orb-wrap {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+}
+.gen-orb {
+  width:80px; height:80px; border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, rgba(42,120,72,.7), rgba(24,99,56,.4));
+  animation:genOrbPulse 2s ease-in-out infinite;
+  box-shadow:0 0 40px rgba(24,99,56,.4), 0 0 80px rgba(24,99,56,.2);
+}
+@keyframes genOrbPulse {
+  0%,100% { transform:scale(1);   box-shadow:0 0 40px rgba(24,99,56,.4),0 0 80px rgba(24,99,56,.2); }
+  50%      { transform:scale(1.2); box-shadow:0 0 60px rgba(24,99,56,.6),0 0 120px rgba(24,99,56,.3); }
+}
+.gen-orb-rings {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+}
+.gen-ring {
+  position:absolute; border-radius:50%; border:1px solid rgba(24,99,56,.3);
+  animation:genRing 3s ease-out infinite;
+}
+.gen-ring-1 { width:120px; height:120px; animation-delay:0s; }
+.gen-ring-2 { width:160px; height:160px; animation-delay:.7s; }
+.gen-ring-3 { width:210px; height:210px; animation-delay:1.4s; }
+@keyframes genRing {
+  0%   { opacity:0; transform:scale(.6); }
+  30%  { opacity:.8; }
+  100% { opacity:0; transform:scale(1.1); }
+}
+
+/* shimmer overlay on top of the dark bg */
+.gen-shimmer {
+  position:absolute; inset:0;
+  background:linear-gradient(
+    105deg,
+    transparent 25%,
+    rgba(24,99,56,.08) 50%,
+    transparent 75%
+  );
+  background-size:200% 100%;
+  animation:shimmerMove 2s linear infinite;
+}
+@keyframes shimmerMove {
+  0%   { background-position:200% 0; }
+  100% { background-position:-200% 0; }
+}
+
+.gen-body {
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  padding:28px 24px 0; gap:10px;
+}
+
+.gen-status {
+  display:flex; align-items:center; gap:6px;
+  background:var(--brand-ll); border-radius:99px;
+  padding:6px 14px;
+}
+.gen-status-dot {
+  width:7px; height:7px; border-radius:50%; background:var(--brand);
+  animation:statusDot 1.2s ease-in-out infinite;
+}
+@keyframes statusDot {
+  0%,100% { opacity:.4; transform:scale(.8); }
+  50%      { opacity:1; transform:scale(1.2); }
+}
+.gen-status-text {
+  font-size:12.5px; font-weight:600; color:var(--brand);
+}
+
+.gen-heading {
+  font-family:'Playfair Display',serif;
+  font-size:22px; font-weight:700; color:var(--brand-dd);
+  text-align:center; line-height:1.3;
+}
+.gen-sub {
+  font-size:13px; color:var(--ts); text-align:center; line-height:1.55;
+  max-width:280px;
+}
+
+/* Prompt recap pill */
+.gen-prompt-pill {
+  width:100%; background:var(--s1); border-radius:14px;
+  padding:12px 14px; display:flex; align-items:flex-start; gap:10px;
+  margin-top:4px;
+}
+.gen-prompt-icon { font-size:18px; flex-shrink:0; margin-top:1px; }
+.gen-prompt-text-wrap { flex:1; min-width:0; }
+.gen-prompt-label { font-size:10px; font-weight:700; color:var(--ts); text-transform:uppercase; letter-spacing:.4px; margin-bottom:3px; }
+.gen-prompt-text { font-size:13px; color:var(--tp); line-height:1.45; font-style:italic; }
+
+/* Progress dots */
+.gen-dots {
+  display:flex; gap:6px; margin-top:4px;
+}
+.gen-dot {
+  width:7px; height:7px; border-radius:50%; background:var(--brand-l);
+  animation:dotPop 1.4s ease-in-out infinite;
+}
+.gen-dot:nth-child(1) { animation-delay:0s; }
+.gen-dot:nth-child(2) { animation-delay:.2s; }
+.gen-dot:nth-child(3) { animation-delay:.4s; }
+@keyframes dotPop {
+  0%,80%,100% { background:var(--brand-l); transform:scale(1); }
+  40%          { background:var(--brand); transform:scale(1.4); }
+}
+
+.gen-cancel {
+  font-size:13px; color:var(--ts); cursor:pointer; margin-top:8px;
+  transition:color .15s; border:none; background:none; font-family:'Inter',sans-serif;
+}
+.gen-cancel:active { color:var(--tp); }
+
+/* ─────────────────────────────────
+   S4 · RESULT (image generated)
+───────────────────────────────── */
+.result-screen { background:var(--bg); }
+
+.result-image-wrap {
+  position:relative; width:100%; height:260px; flex-shrink:0; overflow:hidden;
+}
+.result-image-bg {
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 60%, rgba(40,100,60,.5) 0%, transparent 60%),
+    linear-gradient(155deg, #1d4f32 0%, #0f2e1c 40%, #0a1f13 70%, #1a3520 100%);
+}
+/* Some golf scenery shapes */
+.result-image-bg::before {
+  content:''; position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 60% 30% at 30% 80%, rgba(30,80,45,.6) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 25% at 70% 75%, rgba(20,60,35,.5) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 40% at 50% 30%, rgba(80,140,90,.12) 0%, transparent 60%);
+}
+.result-image-bg::after {
+  content:''; position:absolute;
+  bottom:0; left:0; right:0; height:100px;
+  background:linear-gradient(to top, rgba(10,30,18,.7) 0%, transparent 100%);
+}
+
+.result-success-badge {
+  position:absolute; top:14px; right:14px;
+  background:rgba(24,99,56,.85); backdrop-filter:blur(10px);
+  border:1px solid rgba(24,99,56,.5); border-radius:99px;
+  padding:5px 12px; font-size:11px; font-weight:700; color:#fff;
+  display:flex; align-items:center; gap:5px;
+}
+
+.result-body { flex:1; overflow-y:auto; scrollbar-width:none; padding:16px 18px; }
+.result-body::-webkit-scrollbar { display:none; }
+
+.result-heading {
+  font-family:'Playfair Display',serif;
+  font-size:20px; font-weight:700; color:var(--brand-dd); margin-bottom:4px;
+}
+.result-sub {
+  font-size:13px; color:var(--ts); line-height:1.5; margin-bottom:16px;
+}
+
+.result-actions { display:flex; gap:8px; margin-bottom:20px; }
+.result-use-btn {
+  flex:1; height:48px; background:var(--brand); border:none; border-radius:13px;
+  color:#fff; font-size:14px; font-weight:600; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  transition:all .15s;
+}
+.result-use-btn:active { background:var(--brand-d); transform:scale(.97); }
+.result-retry-btn {
+  height:48px; padding:0 16px; background:var(--s1); border:none; border-radius:13px;
+  color:var(--brand); font-size:14px; font-weight:600; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  transition:all .15s; white-space:nowrap;
+}
+.result-retry-btn:active { background:var(--s2); transform:scale(.97); }
+
+/* Prompt recap (in result) */
+.result-recap {
+  background:var(--s1); border-radius:14px; padding:12px 14px;
+  display:flex; align-items:flex-start; gap:10px;
+}
+.result-recap-icon { font-size:16px; flex-shrink:0; margin-top:1px; }
+.result-recap-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--ts); margin-bottom:3px; }
+.result-recap-text { font-size:13px; color:var(--tp); line-height:1.45; font-style:italic; }
+
+/* ── TOAST ── */
+.toast {
+  position:absolute; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:rgba(24,99,56,.95); backdrop-filter:blur(16px);
+  color:#fff; font-size:13px; font-weight:600;
+  padding:10px 20px; border-radius:99px; white-space:nowrap;
+  opacity:0; transition:all .3s; z-index:300; pointer-events:none;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ── HINT TAG (on screen) ── */
+.hint-tag {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:rgba(0,0,0,.55); backdrop-filter:blur(8px);
+  color:#fff; font-size:11px; font-weight:600; padding:6px 12px; border-radius:99px;
+  white-space:nowrap; pointer-events:none;
+  opacity:0; transition:opacity .3s;
+}
+.hint-tag.show { opacity:1; }
+
+</style>
+</head>
+<body>
+
+<!-- Flow map -->
+<div class="flow-map" id="flowMap">
+  <div class="flow-step active" data-screen="s-review" onclick="jumpTo('s-review')"><div class="dot"></div>Review & Edit</div>
+  <div class="flow-arrow">›</div>
+  <div class="flow-step" data-screen="s-prompt" onclick="jumpTo('s-prompt')"><div class="dot"></div>Image Prompt</div>
+  <div class="flow-arrow">›</div>
+  <div class="flow-step" data-screen="s-generating" onclick="jumpTo('s-generating')"><div class="dot"></div>Generating</div>
+  <div class="flow-arrow">›</div>
+  <div class="flow-step" data-screen="s-result" onclick="jumpTo('s-result')"><div class="dot"></div>Result</div>
+</div>
+
+<div class="phone">
+  <div class="island"></div>
+  <div class="sc-wrap">
+
+    <!-- ════════════════════════════
+         S1 · REVIEW & EDIT
+         ════════════════════════════ -->
+    <div class="screen" id="s-review">
+
+      <div class="sb">
+        <span class="sb-time white">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#fff"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#fff"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#fff"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#fff" opacity=".4"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#fff"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#fff" stroke-width="1.3" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#fff" stroke-width="1.3" fill="none"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity=".5"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#fff"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#fff" fill-opacity=".5"/></svg>
+        </div>
+      </div>
+
+      <!-- Cover image -->
+      <div class="cover-wrap">
+        <div class="cover-scene"></div>
+        <div class="cover-overlay"></div>
+        <div class="cover-tag">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="rgba(255,255,255,.7)" stroke-width="1.2"/><path d="M4 6.5l1.5 1.5 3-3" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          ⛳ Golf
+        </div>
+        <div class="cover-bottom">
+          <div class="cover-title">Golf at Greyrock<br>Golf Course</div>
+          <div class="cover-actions">
+            <div class="cover-action-btn" onclick="push('s-review','s-prompt')">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5C4 1.5 2 3.5 2 6s2 4.5 4.5 4.5S11 8.5 11 6s-2-4.5-4.5-4.5z" stroke="#fff" stroke-width="1.2"/><path d="M4 6h5M6.5 3.5v5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/></svg>
+              ✨ Change Image
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nav bar over content -->
+      <div class="nav-bar">
+        <div class="nav-row">
+          <button class="back-btn">
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8 2L2 8l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Back
+          </button>
+          <div class="nav-title">Your Event</div>
+          <div class="nav-step">Step 2/4</div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="review-body">
+
+        <div class="review-section" style="padding-top:14px">
+          <div class="ai-badge">✦ AI Generated</div>
+          <div class="field-label">Event Name</div>
+          <div class="field-val title-f">Golf at Greyrock Golf Course</div>
+        </div>
+
+        <div class="review-section" style="padding-top:12px">
+          <div class="field-label">Date & Time</div>
+          <div class="field-row">
+            <div class="field-row-icon">📅</div>
+            <div class="field-row-text">
+              <div class="field-row-main">Tomorrow, May 14</div>
+              <div class="field-row-sub">2:00 PM</div>
+            </div>
+            <div class="field-row-chev">›</div>
+          </div>
+        </div>
+
+        <div class="review-section" style="padding-top:12px">
+          <div class="field-label">Location</div>
+          <div class="field-row">
+            <div class="field-row-icon">📍</div>
+            <div class="field-row-text">
+              <div class="field-row-main">Greyrock Golf Course</div>
+              <div class="field-row-sub">Fort Collins, CO</div>
+            </div>
+            <div class="field-row-chev">›</div>
+          </div>
+        </div>
+
+        <div class="review-section" style="padding-top:12px">
+          <div class="field-label">Description</div>
+          <div class="field-val" style="font-size:13.5px;color:var(--ts);line-height:1.55">Join us for a round of golf at the beautiful Greyrock Golf Course. All skill levels welcome — just come ready to have fun!</div>
+        </div>
+
+        <div style="height:16px"></div>
+      </div>
+
+      <div class="cta-bar">
+        <button class="btn-primary">
+          Next — Invite Friends
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+    </div><!-- /s-review -->
+
+
+    <!-- ════════════════════════════
+         S2 · IMAGE PROMPT
+         ════════════════════════════ -->
+    <div class="screen right" id="s-prompt">
+
+      <div class="sb"><span class="sb-time">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".35"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/></svg>
+        </div>
+      </div>
+
+      <div class="nav-bar">
+        <div class="nav-row">
+          <button class="back-btn" onclick="pop('s-prompt','s-review')">
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8 2L2 8l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Edit Event
+          </button>
+          <div class="nav-title">Cover Image</div>
+          <div style="width:60px"></div>
+        </div>
+      </div>
+
+      <!-- Current image preview (small) -->
+      <div class="prompt-preview">
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1e4d30 0%,#0f2820 60%,#162b1c 100%);"></div>
+        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,.5) 100%)"></div>
+        <div class="prompt-preview-label">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="2" y="5" width="24" height="18" rx="4" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/><circle cx="9" cy="11" r="2.5" stroke="rgba(255,255,255,.4)" stroke-width="1.3"/><path d="M2 19l7-5 5 4 4-3 8 5" stroke="rgba(255,255,255,.4)" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          <span>Current cover image</span>
+        </div>
+      </div>
+
+      <div class="prompt-body">
+
+        <div>
+          <div class="prompt-heading">How should your cover look?</div>
+          <div class="prompt-sub">Use your voice or type — the AI will generate a perfect image for your event.</div>
+        </div>
+
+        <!-- Voice orb -->
+        <div class="voice-section">
+          <div class="voice-orb-wrap" id="voiceOrb" onclick="toggleVoice()">
+            <div class="orb-ring orb-ring-1"></div>
+            <div class="orb-ring orb-ring-2"></div>
+            <div class="orb-ring orb-ring-3"></div>
+            <button class="orb-btn" aria-label="Tap to use voice">
+              <!-- Mic icon (default) -->
+              <svg id="orbMicIcon" width="40" height="40" viewBox="0 0 40 40" fill="none">
+                <rect x="14" y="6" width="12" height="20" rx="6" fill="rgba(255,255,255,.95)"/>
+                <path d="M8 22c0 6.63 5.37 12 12 12s12-5.37 12-12" stroke="rgba(255,255,255,.95)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                <path d="M20 34v4" stroke="rgba(255,255,255,.95)" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+              <!-- Stop icon (recording) -->
+              <svg id="orbStopIcon" width="32" height="32" viewBox="0 0 32 32" fill="none" style="display:none">
+                <rect x="8" y="8" width="16" height="16" rx="3" fill="rgba(255,255,255,.95)"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="voice-label" id="voiceLabel">Tap to describe with your voice</div>
+          <div class="voice-hint" id="voiceHint">Speak naturally — "a sunny golf course at golden hour"</div>
+
+          <!-- Waveform (hidden until recording) -->
+          <div class="waveform" id="waveform">
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+          </div>
+        </div>
+
+        <!-- OR divider -->
+        <div class="or-divider">
+          <div class="or-line"></div>
+          <div class="or-text">OR TYPE IT OUT</div>
+          <div class="or-line"></div>
+        </div>
+
+        <!-- Text input -->
+        <div class="text-prompt-wrap">
+          <textarea class="text-prompt-input" id="promptInput" placeholder="e.g. A sunny golf course at golden hour, lush green fairways, warm sky…" rows="3"></textarea>
+          <div class="text-prompt-actions">
+            <button class="prompt-generate-btn" onclick="startGenerate()">
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1L9 6h5l-4 3 1.5 5-4-3-4 3L5 9 1 6h5L7.5 1z" fill="#fff"/></svg>
+              Generate Image
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /s-prompt -->
+
+
+    <!-- ════════════════════════════
+         S3 · GENERATING
+         ════════════════════════════ -->
+    <div class="screen right generating-screen" id="s-generating">
+
+      <div class="sb"><span class="sb-time">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".35"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/></svg>
+        </div>
+      </div>
+
+      <!-- Generating image area -->
+      <div class="gen-image-area">
+        <div class="gen-orb-rings">
+          <div class="gen-ring gen-ring-1"></div>
+          <div class="gen-ring gen-ring-2"></div>
+          <div class="gen-ring gen-ring-3"></div>
+        </div>
+        <div class="gen-orb-wrap">
+          <div class="gen-orb"></div>
+        </div>
+        <div class="gen-shimmer"></div>
+      </div>
+
+      <!-- Nav (floating) -->
+      <div class="nav-bar" style="border-bottom:none;background:rgba(244,241,234,.9)">
+        <div class="nav-row">
+          <button class="back-btn" onclick="pop('s-generating','s-prompt')">
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8 2L2 8l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Cancel
+          </button>
+          <div class="nav-title">Generating</div>
+          <div style="width:60px"></div>
+        </div>
+      </div>
+
+      <div class="gen-body">
+        <!-- Status pill -->
+        <div class="gen-status">
+          <div class="gen-status-dot"></div>
+          <span class="gen-status-text" id="genStatusText">Generating your image…</span>
+        </div>
+
+        <div class="gen-heading">Working on it</div>
+        <div class="gen-sub">This usually takes 10–15 seconds. Your prompt is being turned into a beautiful cover image.</div>
+
+        <!-- Prompt recap -->
+        <div class="gen-prompt-pill">
+          <div class="gen-prompt-icon">🎤</div>
+          <div class="gen-prompt-text-wrap">
+            <div class="gen-prompt-label">Your description</div>
+            <div class="gen-prompt-text" id="genPromptDisplay">"A sunny golf course at golden hour, lush green fairways, warm light"</div>
+          </div>
+        </div>
+
+        <!-- Progress dots -->
+        <div class="gen-dots">
+          <div class="gen-dot"></div>
+          <div class="gen-dot"></div>
+          <div class="gen-dot"></div>
+        </div>
+
+        <button class="gen-cancel" onclick="pop('s-generating','s-prompt')">Cancel and go back</button>
+      </div>
+
+    </div><!-- /s-generating -->
+
+
+    <!-- ════════════════════════════
+         S4 · RESULT
+         ════════════════════════════ -->
+    <div class="screen right result-screen" id="s-result">
+
+      <div class="sb"><span class="sb-time white">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#fff"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#fff"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#fff"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#fff" opacity=".4"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity=".5"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#fff"/></svg>
+        </div>
+      </div>
+
+      <!-- Generated image -->
+      <div class="result-image-wrap">
+        <div class="result-image-bg"></div>
+        <div class="result-success-badge">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Image Generated ✦
+        </div>
+      </div>
+
+      <!-- Nav -->
+      <div class="nav-bar">
+        <div class="nav-row">
+          <button class="back-btn" onclick="pop('s-result','s-prompt')">
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8 2L2 8l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Redo
+          </button>
+          <div class="nav-title">Your Cover Image</div>
+          <div style="width:50px"></div>
+        </div>
+      </div>
+
+      <div class="result-body">
+
+        <div class="result-heading">Here's your cover 🎉</div>
+        <div class="result-sub">Looks great! Use this image or go back and try a different description.</div>
+
+        <div class="result-actions">
+          <button class="result-use-btn" onclick="useImage()">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 7.5l4 4 7-7" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Use This Image
+          </button>
+          <button class="result-retry-btn" onclick="pop('s-result','s-prompt')">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 7.5A5.5 5.5 0 0 1 13 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M13 4v3.5H9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Try Again
+          </button>
+        </div>
+
+        <!-- Prompt used -->
+        <div class="result-recap">
+          <div class="result-recap-icon">🎤</div>
+          <div>
+            <div class="result-recap-label">Prompt used</div>
+            <div class="result-recap-text" id="resultPromptDisplay">"A sunny golf course at golden hour, lush green fairways, warm light"</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div><!-- /s-result -->
+
+    <!-- Toast -->
+    <div class="toast" id="toast">✓ Cover image updated</div>
+
+  </div><!-- /sc-wrap -->
+</div><!-- /phone -->
+
+
+<script>
+// ── NAV ───────────────────────────────────────────────────────
+let currentScreen = 's-review';
+
+function push(from, to) {
+  const f = document.getElementById(from);
+  const t = document.getElementById(to);
+  f.classList.remove('anim-pop-in','anim-push-out','left','right');
+  t.classList.remove('anim-push-in','anim-pop-out','left','right');
+  f.classList.add('anim-push-out');
+  t.classList.add('anim-push-in');
+  f.addEventListener('animationend', () => { f.classList.remove('anim-push-out'); f.classList.add('left'); }, { once:true });
+  t.addEventListener('animationend', () => { t.classList.remove('anim-push-in'); }, { once:true });
+  currentScreen = to;
+  updateFlowMap(to);
+}
+
+function pop(from, to) {
+  const f = document.getElementById(from);
+  const t = document.getElementById(to);
+  f.classList.remove('anim-push-in','anim-pop-in','anim-push-out','left','right');
+  t.classList.remove('anim-push-out','anim-pop-out','left','right');
+  f.classList.add('anim-pop-out');
+  t.classList.add('anim-pop-in');
+  f.addEventListener('animationend', () => { f.classList.remove('anim-pop-out'); f.classList.add('right'); }, { once:true });
+  t.addEventListener('animationend', () => { t.classList.remove('anim-pop-in'); }, { once:true });
+  currentScreen = to;
+  updateFlowMap(to);
+  // Reset voice if leaving prompt
+  if (from === 's-prompt') resetVoice();
+}
+
+function jumpTo(target) {
+  const screens = ['s-review','s-prompt','s-generating','s-result'];
+  const ci = screens.indexOf(currentScreen);
+  const ti = screens.indexOf(target);
+  if (ci === ti) return;
+  screens.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = 'screen' + (i < ti ? ' left' : i > ti ? ' right' : '');
+    if (id.includes('generating')) el.classList.add('generating-screen');
+    if (id.includes('result')) el.classList.add('result-screen');
+    if (id.includes('prompt')) el.classList.add('prompt-screen');
+  });
+  currentScreen = target;
+  updateFlowMap(target);
+  if (target !== 's-prompt') resetVoice();
+}
+
+function updateFlowMap(screen) {
+  document.querySelectorAll('.flow-step').forEach(el => {
+    el.classList.toggle('active', el.dataset.screen === screen);
+  });
+}
+
+// ── VOICE ─────────────────────────────────────────────────────
+let isRecording = false;
+let recordTimer = null;
+
+function toggleVoice() {
+  if (!isRecording) startVoice();
+  else stopVoice();
+}
+
+function startVoice() {
+  isRecording = true;
+  const orb = document.getElementById('voiceOrb');
+  const label = document.getElementById('voiceLabel');
+  const hint = document.getElementById('voiceHint');
+  const waveform = document.getElementById('waveform');
+  const micIcon = document.getElementById('orbMicIcon');
+  const stopIcon = document.getElementById('orbStopIcon');
+
+  orb.classList.add('recording');
+  waveform.classList.add('active','recording');
+  label.textContent = 'Listening… tap to stop';
+  label.style.color = '#b91c1c';
+  hint.textContent = '"A sunny golf course at golden hour…"';
+  hint.style.opacity = '.7';
+  micIcon.style.display = 'none';
+  stopIcon.style.display = '';
+
+  // Auto-stop after 3s to simulate recording done
+  recordTimer = setTimeout(() => {
+    stopVoice();
+    // Short delay then navigate to generating
+    setTimeout(() => {
+      setPromptText('A sunny golf course at golden hour, lush green fairways, warm light');
+      startGenerate();
+    }, 600);
+  }, 3000);
+}
+
+function stopVoice() {
+  isRecording = false;
+  clearTimeout(recordTimer);
+  const orb = document.getElementById('voiceOrb');
+  const label = document.getElementById('voiceLabel');
+  const hint = document.getElementById('voiceHint');
+  const waveform = document.getElementById('waveform');
+  const micIcon = document.getElementById('orbMicIcon');
+  const stopIcon = document.getElementById('orbStopIcon');
+
+  orb.classList.remove('recording');
+  waveform.classList.remove('active','recording');
+  label.textContent = 'Tap to describe with your voice';
+  label.style.color = '';
+  hint.textContent = 'Speak naturally — "a sunny golf course at golden hour"';
+  hint.style.opacity = '';
+  micIcon.style.display = '';
+  stopIcon.style.display = 'none';
+}
+
+function resetVoice() {
+  clearTimeout(recordTimer);
+  isRecording = false;
+  stopVoice();
+}
+
+function setPromptText(text) {
+  document.getElementById('promptInput').value = text;
+  document.getElementById('genPromptDisplay').textContent = `"${text}"`;
+  document.getElementById('resultPromptDisplay').textContent = `"${text}"`;
+}
+
+// ── GENERATE ──────────────────────────────────────────────────
+function startGenerate() {
+  const inputVal = document.getElementById('promptInput').value.trim();
+  if (inputVal) {
+    document.getElementById('genPromptDisplay').textContent = `"${inputVal}"`;
+    document.getElementById('resultPromptDisplay').textContent = `"${inputVal}"`;
+  }
+
+  push('s-prompt', 's-generating');
+
+  // Simulate stages
+  const stages = [
+    [1200, 'Analysing your description…'],
+    [2800, 'Generating image…'],
+    [4600, 'Adding finishing touches…'],
+    [6200, 'Almost there…'],
+  ];
+  stages.forEach(([delay, text]) => {
+    setTimeout(() => {
+      const el = document.getElementById('genStatusText');
+      if (el) el.textContent = text;
+    }, delay);
+  });
+
+  // Navigate to result after ~7s
+  setTimeout(() => {
+    if (currentScreen === 's-generating') {
+      push('s-generating', 's-result');
+    }
+  }, 7000);
+}
+
+function useImage() {
+  push('s-result', 's-review');
+  setTimeout(() => showToast('✓ Cover image updated'), 400);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// Init
+document.getElementById('s-review').classList.remove('right','left');
+['s-prompt','s-generating','s-result'].forEach(id => {
+  document.getElementById(id).classList.add('right');
+});
+</script>
+
+</body>
+</html>

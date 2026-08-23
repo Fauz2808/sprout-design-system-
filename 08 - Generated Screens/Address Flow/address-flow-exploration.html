@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Address flow — DoorDash structure, our brand</title>
+<style>
+  /* ---------- Tokens ---------- */
+  :root {
+    /* Brand (Sprout cream + sage palette — unchanged) */
+    --cream-bg:        #EFE9DC;
+    --cream-surface:   #F5F1E6;
+    --cream-field:     #E7E1D2;
+    --cream-divider:   #DAD3C1;
+
+    --sage-primary:    #8FB09F;
+    --sage-primary-h:  #7FA290;
+    --sage-deep:       #5E8775;
+
+    --ink:             #1A1A1A;
+    --ink-soft:        #6B6659;
+    --ink-faint:       #9A9482;
+
+    --callout-bg:      #F5E2CD;     /* warm peach — same visual weight as DoorDash's pink, in our palette */
+    --callout-text:    #5C3E25;
+
+    /* Page chrome */
+    --page-bg:         #1B1812;
+    --page-fg:         #E8E2D5;
+    --page-fg-soft:    #948D7E;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+    background: var(--page-bg);
+    color: var(--page-fg);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Page layout ---------- */
+  .page {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 56px 32px 96px;
+  }
+  .page-header { margin-bottom: 40px; }
+  .page-header .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 11px;
+    color: var(--page-fg-soft);
+    margin-bottom: 10px;
+  }
+  .page-header h1 {
+    font-size: 32px;
+    font-weight: 600;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+  .page-header p {
+    color: var(--page-fg-soft);
+    max-width: 720px;
+    line-height: 1.55;
+    margin: 0;
+    font-size: 15px;
+  }
+
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 56px;
+    align-items: start;
+    margin-bottom: 56px;
+  }
+  @media (max-width: 1000px) {
+    .stage { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Phone frame ---------- */
+  .phone-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  .phone {
+    width: 380px;
+    height: 800px;
+    border-radius: 56px;
+    background: #000;
+    padding: 12px;
+    position: relative;
+    box-shadow:
+      0 60px 120px -30px rgba(0,0,0,0.6),
+      0 0 0 2px #2A2620,
+      inset 0 0 0 1px rgba(255,255,255,0.05);
+  }
+  .screen {
+    width: 100%;
+    height: 100%;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    /* The backdrop behind the sheet — a slightly darker tone to suggest a previous screen */
+    background: #1F1B16;
+  }
+
+  /* iPhone dynamic island */
+  .dyn-island {
+    position: absolute;
+    top: 14px; left: 50%;
+    transform: translateX(-50%);
+    width: 110px; height: 30px;
+    background: #000;
+    border-radius: 16px;
+    z-index: 60;
+  }
+
+  /* status bar — sits on top of whatever sheet is showing */
+  .status-bar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 28px 0;
+    z-index: 50;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .status-bar .right { display: flex; gap: 6px; align-items: center; }
+  .status-bar svg { display: block; }
+
+  /* ---------- Bottom sheet (full-cover, DoorDash style) ---------- */
+  .sheet {
+    position: absolute;
+    left: 0; right: 0;
+    top: 30px;          /* tiny gap at top — shows we're a sheet over a stack */
+    bottom: 0;
+    background: var(--cream-surface);
+    border-radius: 18px 18px 0 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(110%);
+    transition: transform 0.45s cubic-bezier(.32,.72,.23,1);
+    box-shadow: 0 -16px 40px -8px rgba(0,0,0,0.18);
+  }
+  .sheet.show { transform: translateY(0); }
+  .sheet:not(.active) { display: none; }
+  .sheet.active { display: flex; transform: translateY(0); }
+
+  .sheet-handle {
+    width: 40px; height: 4px;
+    background: rgba(0,0,0,0.14);
+    border-radius: 4px;
+    margin: 8px auto 0;
+    flex-shrink: 0;
+  }
+  .sheet-header {
+    padding: 14px 16px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--cream-divider);
+  }
+  .sheet-header .sheet-back {
+    position: absolute;
+    left: 16px; top: 50%; transform: translateY(-50%);
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    color: var(--ink);
+  }
+  .sheet-header .sheet-back:hover { background: var(--cream-field); }
+  .sheet-header .sheet-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  .sheet-body {
+    padding: 18px 20px 8px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .sheet-footer {
+    padding: 14px 20px 28px;
+    flex-shrink: 0;
+    background: var(--cream-surface);
+  }
+
+  /* When keyboard is up, sheet sits above it */
+  .sheet.with-keyboard { bottom: 268px; }
+
+  /* ---------- Sheet content components ---------- */
+
+  /* Bold body heading — DoorDash pattern */
+  .body-heading {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 8px 0 14px;
+    letter-spacing: -0.01em;
+  }
+
+  /* Search field (Step 1) */
+  .search-field {
+    background: var(--cream-bg);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    border: 1px solid var(--cream-divider);
+  }
+  .search-field input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    outline: none;
+    color: var(--ink);
+    font-family: inherit;
+  }
+  .search-field input::placeholder { color: var(--ink-faint); }
+
+  /* Suggestion list */
+  .suggestion-list { display: flex; flex-direction: column; }
+  .suggestion {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 4px;
+    border-bottom: 1px solid var(--cream-divider);
+    cursor: pointer;
+    transition: background .12s ease;
+    border-radius: 8px;
+  }
+  .suggestion:hover { background: rgba(0,0,0,0.025); }
+  .suggestion:last-child { border-bottom: none; }
+  .suggestion .icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--cream-field);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--ink-soft);
+  }
+  .suggestion.location-row .icon {
+    background: var(--sage-primary);
+    color: white;
+  }
+  .suggestion .text { flex: 1; min-width: 0; }
+  .suggestion .primary {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .suggestion .secondary {
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  /* Form fields (Step 2 — Add details) */
+  .field {
+    background: var(--cream-bg);
+    border: 1px solid var(--cream-divider);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    transition: border-color .15s ease;
+  }
+  .field:focus-within { border-color: var(--sage-primary); }
+  .field .label {
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .field input, .field textarea {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-size: 15px;
+    color: var(--ink);
+    font-family: inherit;
+    outline: none;
+    resize: none;
+  }
+  .field input::placeholder, .field textarea::placeholder {
+    color: var(--ink-faint);
+  }
+
+  /* Address summary card (read-only context) */
+  .addr-summary {
+    background: var(--cream-bg);
+    border: 1px solid var(--cream-divider);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .addr-summary .pin-icon {
+    width: 22px; height: 22px;
+    color: var(--sage-deep);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .addr-summary .a-text { flex: 1; min-width: 0; }
+  .addr-summary .a1 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .addr-summary .a2 {
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  /* Large standalone text input (Set Label — DoorDash exact match) */
+  .text-input-large {
+    background: var(--cream-bg);
+    border: 1.5px solid var(--ink);
+    border-radius: 10px;
+    padding: 14px 14px;
+    margin-bottom: 16px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+  }
+  .text-input-large input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    color: var(--ink);
+    font-family: inherit;
+    outline: none;
+    caret-color: var(--ink);
+  }
+
+  /* Callout (warm peach — DoorDash pink, our palette) */
+  .callout {
+    background: var(--callout-bg);
+    color: var(--callout-text);
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 12px 0 4px;
+  }
+
+  /* Primary CTA */
+  .btn-primary {
+    width: 100%;
+    background: var(--sage-primary);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .15s ease, transform .08s ease;
+    letter-spacing: 0.01em;
+  }
+  .btn-primary:hover { background: var(--sage-primary-h); }
+  .btn-primary:active { transform: scale(0.99); }
+
+  /* Success state (Step 4) */
+  .success-icon {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: var(--sage-primary);
+    margin: 28px auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    box-shadow: 0 8px 24px -6px rgba(143, 176, 159, 0.6);
+  }
+  .success-text { text-align: center; }
+  .success-text h2 {
+    font-size: 22px; font-weight: 600;
+    margin: 0 0 8px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .success-text p {
+    color: var(--ink-soft);
+    font-size: 14px;
+    margin: 0 24px 24px;
+    line-height: 1.5;
+  }
+
+  /* ---------- iOS keyboard mockup ---------- */
+  .ios-keyboard {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: #D1D5DB;
+    padding: 6px 4px 4px;
+    z-index: 30;
+    transform: translateY(105%);
+    transition: transform 0.4s cubic-bezier(.32,.72,.23,1);
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    user-select: none;
+    height: 268px;
+  }
+  .ios-keyboard.show { transform: translateY(0); }
+  .kb-suggestions {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 14px;
+    color: var(--ink);
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .kb-suggestion {
+    flex: 1;
+    text-align: center;
+    border-right: 1px solid rgba(0,0,0,0.18);
+    padding: 0 6px;
+  }
+  .kb-suggestion:last-child { border-right: none; }
+  .kb-row {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin: 5px 3px;
+  }
+  .kb-key {
+    background: white;
+    height: 36px;
+    flex: 1;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    color: var(--ink);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.35);
+  }
+  .kb-key.dark {
+    background: #ABB2BC;
+    color: var(--ink);
+  }
+  .kb-key.space { flex: 5; }
+  .kb-bottom-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 14px 2px;
+    color: var(--ink);
+  }
+
+  /* ---------- Demo controls (right column) ---------- */
+  .controls-col {
+    background: #2A2620;
+    border: 1px solid #3A352D;
+    border-radius: 20px;
+    padding: 28px 24px;
+    color: var(--page-fg);
+    position: sticky;
+    top: 32px;
+  }
+  .controls-col h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--page-fg-soft);
+    font-weight: 600;
+    margin: 0 0 18px;
+  }
+  .step-list { list-style: none; padding: 0; margin: 0 0 24px; }
+  .step-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background .15s ease;
+    margin-bottom: 4px;
+    border: 1px solid transparent;
+  }
+  .step-list li:hover { background: #322D26; }
+  .step-list li.active {
+    background: #322D26;
+    border-color: var(--sage-primary);
+  }
+  .step-list .num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #3A352D;
+    color: var(--page-fg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-list li.active .num { background: var(--sage-primary); color: white; }
+  .step-list li.done .num { background: var(--sage-deep); color: white; }
+  .step-list .info { flex: 1; }
+  .step-list .info .name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--page-fg);
+    margin-bottom: 2px;
+  }
+  .step-list .info .desc {
+    font-size: 12px;
+    color: var(--page-fg-soft);
+    line-height: 1.4;
+  }
+
+  .nav-row { display: flex; gap: 8px; }
+  .nav-btn {
+    flex: 1;
+    background: #3A352D;
+    color: var(--page-fg);
+    border: 1px solid #4A453B;
+    padding: 12px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    transition: background .15s ease;
+  }
+  .nav-btn:hover { background: #4A453B; }
+  .nav-btn.primary {
+    background: var(--sage-primary);
+    color: white;
+    border-color: var(--sage-primary);
+  }
+  .nav-btn.primary:hover { background: var(--sage-primary-h); }
+  .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .nav-btn:disabled:hover { background: #3A352D; }
+
+  /* ---------- Notes ---------- */
+  .notes {
+    margin-top: 32px;
+    background: #2A2620;
+    border: 1px solid #3A352D;
+    border-radius: 20px;
+    padding: 32px;
+  }
+  .notes h2 {
+    font-size: 18px;
+    margin: 0 0 6px;
+    color: var(--page-fg);
+    letter-spacing: -0.01em;
+  }
+  .notes .sub {
+    color: var(--page-fg-soft);
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 760px) { .compare { grid-template-columns: 1fr; } }
+  .compare .col {
+    background: #1F1B16;
+    border-radius: 14px;
+    padding: 20px;
+    border: 1px solid #3A352D;
+  }
+  .compare .col h4 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--page-fg-soft);
+    margin: 0 0 14px;
+    font-weight: 600;
+  }
+  .compare .col ul { margin: 0; padding: 0; list-style: none; }
+  .compare .col li {
+    padding: 10px 0;
+    color: var(--page-fg);
+    font-size: 13.5px;
+    line-height: 1.5;
+    border-bottom: 1px solid #2A2620;
+  }
+  .compare .col li:last-child { border-bottom: none; }
+  .compare .col li::before {
+    content: '·';
+    margin-right: 8px;
+    color: var(--page-fg-soft);
+  }
+  .compare .col.before h4 { color: #C9876A; }
+  .compare .col.after h4 { color: var(--sage-primary); }
+
+  .footer-note {
+    text-align: center;
+    color: var(--page-fg-soft);
+    font-size: 12px;
+    margin-top: 40px;
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="page-header">
+      <div class="eyebrow">Address flow · Exploration v2</div>
+      <h1>DoorDash structure, our visual language</h1>
+      <p>No map. Each step is a full-cover sheet with the same template: drag handle → back arrow + centered title → bold body heading → focused input → warm callout → single sage CTA. Cream surface and sage primary stay; structure mirrors DoorDash exactly.</p>
+    </div>
+
+    <div class="stage">
+      <!-- Phone -->
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="screen">
+            <div class="dyn-island"></div>
+
+            <!-- Status bar -->
+            <div class="status-bar">
+              <span>9:22</span>
+              <div class="right">
+                <svg width="18" height="10" viewBox="0 0 18 10"><g fill="currentColor"><rect x="0" y="6" width="3" height="4" rx="0.5"/><rect x="4" y="4" width="3" height="6" rx="0.5"/><rect x="8" y="2" width="3" height="8" rx="0.5"/><rect x="12" y="0" width="3" height="10" rx="0.5"/></g></svg>
+                <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 2 2.5 0.5 4L1.5 5C2.7 3.8 5 2.5 7.5 2.5C10 2.5 12.3 3.8 13.5 5L14.5 4C13 2.5 10.5 1 7.5 1ZM7.5 4C5.7 4 4 4.8 3 6L4 7C4.8 6.2 6.1 5.5 7.5 5.5C8.9 5.5 10.2 6.2 11 7L12 6C11 4.8 9.3 4 7.5 4ZM7.5 7.5C6.7 7.5 6 8.2 6 9C6 9.8 6.7 10.5 7.5 10.5C8.3 10.5 9 9.8 9 9C9 8.2 8.3 7.5 7.5 7.5Z" fill="currentColor"/></svg>
+                <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none" opacity="0.5"/><rect x="2" y="2" width="13" height="8" rx="1.5" fill="#34C759"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="currentColor" opacity="0.5"/></svg>
+              </div>
+            </div>
+
+            <!-- ===== Sheet 1 — Search Address ===== -->
+            <div class="sheet active" data-step="1" id="sheet-1">
+              <div class="sheet-handle"></div>
+              <div class="sheet-header">
+                <button class="sheet-back" onclick="goBack()" aria-label="Back">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <span class="sheet-title">Add Address</span>
+              </div>
+              <div class="sheet-body">
+                <h3 class="body-heading">Find your address</h3>
+                <div class="search-field">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--ink-soft)"><circle cx="7" cy="7" r="5"/><path d="M14 14L11 11"/></svg>
+                  <input type="text" placeholder="Search for a street, city, or ZIP" id="searchField" />
+                </div>
+                <div class="suggestion-list">
+                  <div class="suggestion location-row" onclick="goToStep(2)">
+                    <div class="icon">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
+                    </div>
+                    <div class="text">
+                      <div class="primary">Use current location</div>
+                      <div class="secondary">10212 Banks Ct, Austin, TX</div>
+                    </div>
+                  </div>
+                  <div class="suggestion" onclick="goToStep(2)">
+                    <div class="icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <div class="text">
+                      <div class="primary">10212 Banks Ct</div>
+                      <div class="secondary">Austin, TX 78739, USA</div>
+                    </div>
+                  </div>
+                  <div class="suggestion" onclick="goToStep(2)">
+                    <div class="icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <div class="text">
+                      <div class="primary">10220 Banks Ct</div>
+                      <div class="secondary">Austin, TX 78739, USA</div>
+                    </div>
+                  </div>
+                  <div class="suggestion" onclick="goToStep(2)">
+                    <div class="icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <div class="text">
+                      <div class="primary">1021 Banks Park Way</div>
+                      <div class="secondary">Austin, TX 78739, USA</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== Sheet 2 — Add Details ===== -->
+            <div class="sheet" data-step="2" id="sheet-2">
+              <div class="sheet-handle"></div>
+              <div class="sheet-header">
+                <button class="sheet-back" onclick="goToStep(1)" aria-label="Back">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <span class="sheet-title">Add Address</span>
+              </div>
+              <div class="sheet-body">
+                <div class="addr-summary">
+                  <svg class="pin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <div class="a-text">
+                    <div class="a1">10212 Banks Ct</div>
+                    <div class="a2">Austin, TX 78739, USA</div>
+                  </div>
+                </div>
+                <h3 class="body-heading">Address details</h3>
+                <div class="field">
+                  <div class="label">Apt, suite, floor (optional)</div>
+                  <input type="text" placeholder="e.g. Apt 204" />
+                </div>
+                <div class="field">
+                  <div class="label">Drop-off instructions (optional)</div>
+                  <textarea rows="3" placeholder="e.g. Gate code 1234, leave at door"></textarea>
+                </div>
+                <div class="callout">
+                  These notes are sent to your courier so they can find you faster.
+                </div>
+              </div>
+              <div class="sheet-footer">
+                <button class="btn-primary" onclick="goToStep(3)">Continue</button>
+              </div>
+            </div>
+
+            <!-- ===== Sheet 3 — Set Label (DoorDash exact mirror) ===== -->
+            <div class="sheet" data-step="3" id="sheet-3">
+              <div class="sheet-handle"></div>
+              <div class="sheet-header">
+                <button class="sheet-back" onclick="goToStep(2)" aria-label="Back">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <span class="sheet-title">Set Label</span>
+              </div>
+              <div class="sheet-body">
+                <h3 class="body-heading">Address Label</h3>
+                <div class="text-input-large">
+                  <input type="text" placeholder="" value="" id="labelTextField" />
+                </div>
+                <div class="callout">
+                  Your labeled addresses are used to personalize your experience across Sprout. Only you can see the label and you can unset it at any time.
+                </div>
+              </div>
+              <div class="sheet-footer">
+                <button class="btn-primary" onclick="goToStep(4)">Continue</button>
+              </div>
+            </div>
+
+            <!-- ===== Sheet 4 — Saved ===== -->
+            <div class="sheet" data-step="4" id="sheet-4">
+              <div class="sheet-handle"></div>
+              <div class="sheet-body" style="padding-top: 16px;">
+                <div class="success-icon">
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12L10 17L19 7"/></svg>
+                </div>
+                <div class="success-text">
+                  <h2>Address saved</h2>
+                  <p>10212 Banks Ct, Austin, TX 78739 saved as <strong>Home</strong>.</p>
+                </div>
+              </div>
+              <div class="sheet-footer">
+                <button class="btn-primary" onclick="goToStep(1)">Done</button>
+              </div>
+            </div>
+
+            <!-- iOS keyboard (shown when input is focused — steps 1 & 3) -->
+            <div class="ios-keyboard" id="keyboard">
+              <div class="kb-suggestions">
+                <div class="kb-suggestion">I</div>
+                <div class="kb-suggestion">The</div>
+                <div class="kb-suggestion">I'm</div>
+              </div>
+              <div class="kb-row">
+                <div class="kb-key">Q</div><div class="kb-key">W</div><div class="kb-key">E</div><div class="kb-key">R</div><div class="kb-key">T</div><div class="kb-key">Y</div><div class="kb-key">U</div><div class="kb-key">I</div><div class="kb-key">O</div><div class="kb-key">P</div>
+              </div>
+              <div class="kb-row" style="padding: 0 16px;">
+                <div class="kb-key">A</div><div class="kb-key">S</div><div class="kb-key">D</div><div class="kb-key">F</div><div class="kb-key">G</div><div class="kb-key">H</div><div class="kb-key">J</div><div class="kb-key">K</div><div class="kb-key">L</div>
+              </div>
+              <div class="kb-row">
+                <div class="kb-key dark" style="flex:1.4;">⇧</div><div class="kb-key">Z</div><div class="kb-key">X</div><div class="kb-key">C</div><div class="kb-key">V</div><div class="kb-key">B</div><div class="kb-key">N</div><div class="kb-key">M</div><div class="kb-key dark" style="flex:1.4;">⌫</div>
+              </div>
+              <div class="kb-row">
+                <div class="kb-key dark" style="flex: 1.6">123</div><div class="kb-key space">space</div><div class="kb-key dark" style="flex: 1.6">return</div>
+              </div>
+              <div class="kb-bottom-bar">
+                <span style="font-size: 18px;">☺</span>
+                <span style="font-size: 16px;">⏺</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div style="color: var(--page-fg-soft); font-size: 12px; text-align:center;">
+          Tap suggestions or use the controls to walk through the flow. ← → arrow keys also work.
+        </div>
+      </div>
+
+      <!-- Right column: step navigation -->
+      <div class="controls-col">
+        <h3>Flow steps</h3>
+        <ul class="step-list" id="stepList">
+          <li data-step="1" class="active" onclick="goToStep(1)">
+            <div class="num">1</div>
+            <div class="info">
+              <div class="name">Search Address</div>
+              <div class="desc">Type or pick from suggestions / current location.</div>
+            </div>
+          </li>
+          <li data-step="2" onclick="goToStep(2)">
+            <div class="num">2</div>
+            <div class="info">
+              <div class="name">Add Details</div>
+              <div class="desc">Apt/suite + drop-off instructions (both optional).</div>
+            </div>
+          </li>
+          <li data-step="3" onclick="goToStep(3)">
+            <div class="num">3</div>
+            <div class="info">
+              <div class="name">Set Label</div>
+              <div class="desc">Free-text label · keyboard up · DoorDash exact mirror.</div>
+            </div>
+          </li>
+          <li data-step="4" onclick="goToStep(4)">
+            <div class="num">4</div>
+            <div class="info">
+              <div class="name">Saved</div>
+              <div class="desc">Confirmation with a clear next action.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="nav-row">
+          <button class="nav-btn" id="prevBtn" onclick="goBack()">← Back</button>
+          <button class="nav-btn primary" id="nextBtn" onclick="goNext()">Next step →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Structural notes -->
+    <div class="notes">
+      <h2>What changed</h2>
+      <div class="sub">Map removed. Flow simplified. Every screen now follows the DoorDash sheet template.</div>
+      <div class="compare">
+        <div class="col before">
+          <h4>Before — single screen with map</h4>
+          <ul>
+            <li>One screen does everything: map, name, address, tag.</li>
+            <li>Map takes ~25% of screen on every step — even when irrelevant.</li>
+            <li>Two competing CTAs split user attention (Set as Default + Save Address).</li>
+            <li>"Tag" is unlabeled in purpose — users don't know what it does.</li>
+            <li>No place for delivery details (apt, drop-off instructions).</li>
+          </ul>
+        </div>
+        <div class="col after">
+          <h4>After — DoorDash structure, our brand</h4>
+          <ul>
+            <li>No map. Removed entirely — autocomplete is enough to identify the address.</li>
+            <li>Four atomic steps, each a full-cover sheet with ONE primary action.</li>
+            <li>Same template every screen: drag handle → back + title → bold body heading → focused input → warm callout → single sage CTA.</li>
+            <li>Step 3 mirrors DoorDash's Set Label one-to-one: free-text input, "Address Label" heading, warm callout, Continue button.</li>
+            <li>Cream surface + sage primary preserved — only the architecture changed.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      Interactive prototype · click suggestions and the next/back controls to walk the full flow
+    </div>
+  </div>
+
+<script>
+  let currentStep = 1;
+  const totalSteps = 4;
+  // Steps where the keyboard should be up (input is the primary action)
+  const keyboardSteps = new Set([1, 3]);
+
+  function setStep(n) {
+    currentStep = n;
+
+    // Activate the right sheet
+    document.querySelectorAll('.sheet').forEach(s => {
+      s.classList.toggle('active', Number(s.dataset.step) === n);
+    });
+
+    // Step list state
+    document.querySelectorAll('#stepList li').forEach(li => {
+      const step = Number(li.dataset.step);
+      li.classList.toggle('active', step === n);
+      li.classList.toggle('done', step < n);
+    });
+
+    // Nav buttons
+    document.getElementById('prevBtn').disabled = n === 1;
+    document.getElementById('nextBtn').textContent = n === totalSteps ? 'Restart' : 'Next step →';
+
+    // Keyboard up/down + adjust active sheet bottom so CTA stays visible
+    const keyboard = document.getElementById('keyboard');
+    const activeSheet = document.querySelector('.sheet.active');
+    if (keyboardSteps.has(n)) {
+      keyboard.classList.add('show');
+      activeSheet.classList.add('with-keyboard');
+      // Focus the relevant input so caret blinks
+      const input = activeSheet.querySelector('input[type="text"], textarea');
+      if (input) setTimeout(() => input.focus(), 350);
+    } else {
+      keyboard.classList.remove('show');
+      activeSheet.classList.remove('with-keyboard');
+    }
+    // Always remove keyboard class from non-active sheets
+    document.querySelectorAll('.sheet').forEach(s => {
+      if (!s.classList.contains('active')) s.classList.remove('with-keyboard');
+    });
+  }
+
+  function goToStep(n) {
+    if (n < 1) n = 1;
+    if (n > totalSteps) n = totalSteps;
+    setStep(n);
+  }
+  function goNext() {
+    if (currentStep === totalSteps) { setStep(1); return; }
+    setStep(currentStep + 1);
+  }
+  function goBack() {
+    if (currentStep === 1) return;
+    setStep(currentStep - 1);
+  }
+
+  setStep(1);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') goNext();
+    if (e.key === 'ArrowLeft') goBack();
+  });
+</script>
+</body>
+</html>

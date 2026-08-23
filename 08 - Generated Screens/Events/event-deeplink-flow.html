@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Sprout – Deep Link Invite Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  --brand:   #186338;
+  --brand-d: #145530;
+  --brand-dd:#1e3e2b;
+  --brand-l: #e2e9e3;
+  --brand-ll:#f0f5f1;
+  --bg:      #f4f1ea;
+  --s1:      #eae6db;
+  --s2:      #dbd5c8;
+  --s3:      #ccc5b5;
+  --tp:      #4d525b;
+  --ts:      #818898;
+  --tt:      #b3b8c1;
+  --border:  rgba(0,0,0,.08);
+  --red:     #c0392b;
+  --red-l:   #fff0ef;
+  --orange:  #e67e22;
+}
+
+/* ── STAGE ── */
+body {
+  min-height: 100vh;
+  background: linear-gradient(140deg,#aca49a 0%,#c9c2b4 50%,#a9a296 100%);
+  display: flex; flex-direction: column;
+  align-items: center; padding: 40px 0 80px;
+  gap: 16px; font-family: 'Inter', -apple-system, sans-serif;
+}
+
+/* ── PATH LABEL ── */
+.path-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .9px;
+  text-transform: uppercase; color: rgba(255,255,255,.55);
+  margin-bottom: -4px;
+}
+
+/* ── FLOW MAP ── */
+.flow-map {
+  display: flex; align-items: center; gap: 0;
+  background: rgba(255,255,255,.12); backdrop-filter: blur(12px);
+  border-radius: 14px; padding: 4px; flex-wrap: wrap;
+  justify-content: center; max-width: 900px;
+}
+.flow-step {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 12px; border-radius: 10px;
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,.45);
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.flow-step.active { background: rgba(255,255,255,.18); color: #fff; }
+.flow-step .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.3); }
+.flow-step.active .dot { background: #fff; }
+.flow-arr { color: rgba(255,255,255,.3); font-size: 12px; padding: 0 1px; }
+.flow-divider {
+  width: 1px; height: 28px; background: rgba(255,255,255,.18); margin: 0 6px;
+}
+.path-tag {
+  font-size: 9px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 99px; margin: 0 4px;
+}
+.path-tag.has-app { background: rgba(24,99,56,.3); color: #7ddc9f; }
+.path-tag.no-app  { background: rgba(180,100,30,.3); color: #ffc97e; }
+
+/* ── PHONE ── */
+.phone {
+  width: 393px; height: 852px;
+  background: var(--bg); border-radius: 54px;
+  overflow: hidden; position: relative;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.12),
+    0 0 0 10px #1c1c1e,
+    0 0 0 12px #2c2c2e,
+    0 60px 130px rgba(0,0,0,.55);
+  flex-shrink: 0;
+}
+.phone::before {
+  content:''; position:absolute; left:-13px; top:120px;
+  width:4px; height:32px; background:#2a2a2a;
+  border-radius:2px 0 0 2px;
+  box-shadow:0 44px 0 #2a2a2a,0 88px 0 #2a2a2a; z-index:200;
+}
+.phone::after {
+  content:''; position:absolute; right:-13px; top:148px;
+  width:4px; height:66px; background:#2a2a2a;
+  border-radius:0 2px 2px 0; z-index:200;
+}
+.island {
+  position:absolute; top:14px; left:50%; transform:translateX(-50%);
+  width:120px; height:34px; background:#0a0a0a;
+  border-radius:18px; z-index:150; pointer-events:none;
+}
+
+/* ── SCREEN STACK ── */
+.sc-wrap { position:absolute; inset:0; overflow:hidden; border-radius:54px; }
+.screen {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  background:var(--bg);
+  will-change:transform; backface-visibility:hidden;
+}
+.screen.right { transform:translateX(100%); pointer-events:none; }
+.screen.left  { transform:translateX(-28%); filter:brightness(.88); pointer-events:none; }
+
+@keyframes pushIn  { from{transform:translateX(100%)} to{transform:translateX(0)} }
+@keyframes pushOut { from{transform:translateX(0);filter:brightness(1)} to{transform:translateX(-28%);filter:brightness(.88)} }
+@keyframes popIn   { from{transform:translateX(-28%);filter:brightness(.88)} to{transform:translateX(0);filter:brightness(1)} }
+@keyframes popOut  { from{transform:translateX(0)} to{transform:translateX(100%)} }
+
+.anim-push-in  { animation:pushIn  .36s cubic-bezier(.25,.46,.45,.94) forwards }
+.anim-push-out { animation:pushOut .36s cubic-bezier(.25,.46,.45,.94) forwards }
+.anim-pop-in   { animation:popIn   .34s cubic-bezier(.25,.46,.45,.94) forwards }
+.anim-pop-out  { animation:popOut  .34s cubic-bezier(.25,.46,.45,.94) forwards }
+
+/* ── STATUS BAR ── */
+.sb {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 26px 0; height:52px; flex-shrink:0;
+}
+.sb-time { font-size:15px; font-weight:600; color:var(--tp); }
+.sb-icons { display:flex; align-items:center; gap:6px; }
+
+/* ─────────────────────────────────────────────────
+   S1  SMART LINK LANDING (web browser)
+───────────────────────────────────────────────── */
+.smart-link-bg {
+  flex:1; display:flex; flex-direction:column;
+  background: linear-gradient(160deg, #e8f2ec 0%, #f4f1ea 60%);
+  overflow: hidden;
+}
+
+/* Top app banner */
+.app-banner {
+  background: rgba(255,255,255,.9); backdrop-filter: blur(16px);
+  border-bottom: .5px solid var(--border);
+  padding: 10px 14px; display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+}
+.app-banner-icon {
+  width: 40px; height: 40px; border-radius: 11px;
+  background: var(--brand); display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+}
+.app-banner-text { flex: 1; min-width: 0; }
+.app-banner-name { font-size: 13px; font-weight: 700; color: var(--tp); }
+.app-banner-sub  { font-size: 11px; color: var(--ts); margin-top: 1px; }
+.app-banner-btn {
+  background: var(--brand); color: #fff;
+  font-size: 13px; font-weight: 700;
+  padding: 7px 16px; border-radius: 99px; border: none;
+  cursor: pointer; transition: all .15s; flex-shrink: 0;
+  white-space: nowrap;
+}
+.app-banner-btn:active { transform: scale(.95); background: var(--brand-d); }
+
+/* Event hero card */
+.invite-hero {
+  margin: 22px 18px 0;
+  background: #fff; border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,.08);
+}
+.invite-cover {
+  height: 140px;
+  background: linear-gradient(135deg, #186338 0%, #2d8f5c 50%, #4aab7a 100%);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.invite-cover-emoji { font-size: 52px; filter: drop-shadow(0 4px 12px rgba(0,0,0,.25)); }
+.invite-cover-tag {
+  position: absolute; top: 12px; left: 12px;
+  background: rgba(255,255,255,.2); backdrop-filter: blur(8px);
+  color: #fff; font-size: 10px; font-weight: 700; letter-spacing: .4px;
+  text-transform: uppercase; padding: 4px 10px; border-radius: 99px;
+  border: 1px solid rgba(255,255,255,.3);
+}
+.invite-body { padding: 16px 16px 18px; }
+.invite-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 700; color: var(--brand-dd);
+  line-height: 1.25; margin-bottom: 6px;
+}
+.invite-meta { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+.invite-meta-row {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12.5px; color: var(--ts);
+}
+.invite-meta-icon { flex-shrink: 0; opacity: .7; }
+.invite-from {
+  display: flex; align-items: center; gap: 8px;
+  padding-top: 12px; border-top: .5px solid var(--border);
+}
+.invite-from-avi {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #5c8a6a; display: flex; align-items: center;
+  justify-content: center; font-size: 11px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.invite-from-text { flex: 1; }
+.invite-from-label { font-size: 10.5px; color: var(--tt); }
+.invite-from-name  { font-size: 13px; font-weight: 600; color: var(--tp); }
+
+/* CTA group on smart link page */
+.smart-cta {
+  margin: 16px 18px 0;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.btn-open-app {
+  width: 100%; height: 52px; border-radius: 16px;
+  background: var(--brand); border: none; cursor: pointer;
+  color: #fff; font-size: 15.5px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: all .15s;
+  box-shadow: 0 4px 20px rgba(24,99,56,.35);
+}
+.btn-open-app:active { transform: scale(.97); background: var(--brand-d); }
+
+.btn-web-fallback {
+  width: 100%; height: 44px; border-radius: 14px;
+  background: transparent; border: 1.5px solid var(--s2); cursor: pointer;
+  color: var(--ts); font-size: 14px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: all .15s;
+}
+.btn-web-fallback:active { background: var(--s1); }
+
+.smart-or {
+  display: flex; align-items: center; gap: 10px;
+}
+.smart-or-line { flex: 1; height: .5px; background: var(--border); }
+.smart-or-text { font-size: 11px; color: var(--tt); }
+
+/* ─────────────────────────────────────────────────
+   S2  IN-APP INVITE (deep linked into app)
+───────────────────────────────────────────────── */
+.app-nav {
+  background: rgba(244,241,234,.97); backdrop-filter: blur(20px);
+  border-bottom: .5px solid var(--border); flex-shrink: 0;
+}
+.app-nav-row {
+  display: flex; align-items: center; padding: 8px 10px;
+  gap: 6px; min-height: 52px;
+}
+.back-btn {
+  display: flex; align-items: center; gap: 2px;
+  color: var(--brand); font-size: 15px; font-weight: 500;
+  cursor: pointer; border: none; background: none; padding: 6px 4px;
+  transition: opacity .15s; flex-shrink: 0;
+}
+.back-btn:active { opacity: .4; }
+.app-nav-title {
+  font-size: 14.5px; font-weight: 700; color: var(--tp);
+  flex: 1; text-align: center;
+}
+.app-nav-actions { display: flex; gap: 4px; }
+
+.in-app-body {
+  flex: 1; overflow-y: auto; scrollbar-width: none;
+}
+.in-app-body::-webkit-scrollbar { display: none; }
+
+/* Invite card inside app */
+.app-invite-card {
+  margin: 16px 14px 0;
+  background: #fff; border-radius: 20px; overflow: hidden;
+  box-shadow: 0 2px 16px rgba(0,0,0,.06);
+}
+.app-invite-cover {
+  height: 130px;
+  background: linear-gradient(135deg, #186338 0%, #2d8f5c 50%, #4aab7a 100%);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.app-invite-cover-emoji { font-size: 48px; filter: drop-shadow(0 3px 8px rgba(0,0,0,.2)); }
+.invite-type-chip {
+  position: absolute; top: 10px; left: 12px;
+  background: rgba(255,255,255,.2); backdrop-filter: blur(8px);
+  color: #fff; font-size: 10px; font-weight: 700; letter-spacing: .4px;
+  text-transform: uppercase; padding: 3px 9px; border-radius: 99px;
+  border: 1px solid rgba(255,255,255,.3);
+}
+.app-invite-info { padding: 14px 14px 16px; }
+.app-invite-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px; font-weight: 700; color: var(--brand-dd);
+  line-height: 1.25; margin-bottom: 8px;
+}
+.app-invite-meta { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+.app-invite-meta-row {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12.5px; color: var(--ts);
+}
+.app-invite-from {
+  display: flex; align-items: center; gap: 8px;
+  padding-top: 10px; border-top: .5px solid var(--border);
+}
+.app-invite-from-avi {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #5c8a6a; display: flex; align-items: center;
+  justify-content: center; font-size: 10px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.app-invite-from-label { font-size: 10px; color: var(--tt); }
+.app-invite-from-name  { font-size: 12.5px; font-weight: 600; color: var(--tp); }
+
+/* RSVPs count */
+.rsvp-row {
+  margin: 10px 14px 0;
+  background: var(--s1); border-radius: 14px; padding: 10px 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.rsvp-avis { display: flex; }
+.rsvp-avi {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid var(--s1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: #fff; flex-shrink: 0;
+  margin-left: -6px;
+}
+.rsvp-avis .rsvp-avi:first-child { margin-left: 0; }
+.rsvp-text { flex: 1; font-size: 12.5px; color: var(--ts); }
+.rsvp-text strong { color: var(--tp); }
+
+/* Club context row */
+.club-row {
+  margin: 8px 14px 0;
+  background: var(--brand-l); border-radius: 14px; padding: 10px 14px;
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+}
+.club-row-icon {
+  width: 32px; height: 32px; border-radius: 9px;
+  background: var(--brand); display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+}
+.club-row-text { flex: 1; }
+.club-row-label { font-size: 10px; color: rgba(24,99,56,.6); font-weight: 600; text-transform: uppercase; letter-spacing: .3px; }
+.club-row-name  { font-size: 13px; font-weight: 700; color: var(--brand-dd); }
+.club-row-arr   { color: var(--brand); opacity: .5; font-size: 14px; }
+
+/* 3-action CTA bar */
+.action-bar {
+  background: rgba(244,241,234,.97); backdrop-filter: blur(20px);
+  border-top: .5px solid var(--border); padding: 12px 14px 28px;
+  flex-shrink: 0;
+}
+.action-bar-label {
+  font-size: 11px; font-weight: 600; color: var(--tt);
+  text-align: center; margin-bottom: 10px; text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.action-btn-group { display: flex; gap: 8px; }
+.btn-accept {
+  flex: 1; height: 50px; border-radius: 14px;
+  background: var(--brand); border: none; cursor: pointer;
+  color: #fff; font-size: 14.5px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: all .15s;
+  box-shadow: 0 3px 14px rgba(24,99,56,.3);
+}
+.btn-accept:active { transform: scale(.97); background: var(--brand-d); }
+.btn-decline {
+  flex: 1; height: 50px; border-radius: 14px;
+  background: var(--red-l); border: 1.5px solid rgba(192,57,43,.2); cursor: pointer;
+  color: var(--red); font-size: 14.5px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: all .15s;
+}
+.btn-decline:active { transform: scale(.97); background: #ffe0de; }
+.btn-ignore {
+  width: 50px; height: 50px; border-radius: 14px;
+  background: var(--s1); border: 1.5px solid var(--s2); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s; flex-shrink: 0;
+}
+.btn-ignore:active { transform: scale(.95); background: var(--s2); }
+.btn-ignore-label {
+  font-size: 9px; font-weight: 600; color: var(--ts);
+  text-align: center; margin-top: 4px; letter-spacing: .2px;
+}
+
+/* ignore button wrapper for label */
+.btn-ignore-wrap {
+  display: flex; flex-direction: column; align-items: center;
+}
+
+/* ─────────────────────────────────────────────────
+   S3  ACCEPTED CONFIRMATION
+───────────────────────────────────────────────── */
+.confirmed-body {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; padding: 20px 22px;
+}
+.confirmed-lottie {
+  width: 96px; height: 96px; border-radius: 50%;
+  background: var(--brand-l);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 44px; margin: 30px auto 16px;
+  animation: pop-in .4s cubic-bezier(.175,.885,.32,1.275) both;
+}
+@keyframes pop-in { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+.confirmed-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px; font-weight: 700; color: var(--brand-dd);
+  text-align: center; margin-bottom: 8px;
+}
+.confirmed-sub {
+  font-size: 14px; color: var(--ts); text-align: center; line-height: 1.55;
+  margin-bottom: 24px;
+}
+.confirmed-card {
+  width: 100%; background: #fff; border-radius: 18px; overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,.06); margin-bottom: 14px;
+}
+.confirmed-card-top {
+  height: 64px;
+  background: linear-gradient(135deg, #186338 0%, #4aab7a 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+}
+.confirmed-card-body { padding: 12px 14px; }
+.confirmed-card-title {
+  font-size: 15px; font-weight: 700; color: var(--tp); margin-bottom: 5px;
+}
+.confirmed-card-meta { font-size: 12.5px; color: var(--ts); }
+
+.add-to-cal-btn {
+  width: 100%; height: 48px; border-radius: 14px;
+  background: var(--s1); border: 1.5px solid var(--s2); cursor: pointer;
+  color: var(--tp); font-size: 14px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: all .15s; margin-bottom: 10px;
+}
+.add-to-cal-btn:active { transform: scale(.97); background: var(--s2); }
+.view-event-btn {
+  width: 100%; height: 50px; border-radius: 14px;
+  background: var(--brand); border: none; cursor: pointer;
+  color: #fff; font-size: 15px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: all .15s;
+  box-shadow: 0 3px 14px rgba(24,99,56,.3);
+}
+.view-event-btn:active { transform: scale(.97); background: var(--brand-d); }
+
+/* ─────────────────────────────────────────────────
+   S4  WEB FALLBACK (no app → phone login)
+───────────────────────────────────────────────── */
+.web-fallback-bg {
+  flex: 1; display: flex; flex-direction: column;
+  background: linear-gradient(160deg, #e8f2ec 0%, #f4f1ea 70%);
+  padding: 0 20px;
+  overflow-y: auto; scrollbar-width: none;
+}
+.web-fallback-bg::-webkit-scrollbar { display: none; }
+
+.web-header { padding: 32px 0 18px; }
+.web-back {
+  display: inline-flex; align-items: center; gap: 5px;
+  color: var(--brand); font-size: 14px; font-weight: 600;
+  cursor: pointer; margin-bottom: 18px;
+}
+.web-sprout-logo {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 20px;
+}
+.web-sprout-icon {
+  width: 32px; height: 32px; border-radius: 9px;
+  background: var(--brand); display: flex; align-items: center; justify-content: center;
+}
+.web-sprout-name { font-size: 17px; font-weight: 700; color: var(--brand-dd); }
+.web-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 700; color: var(--brand-dd);
+  line-height: 1.3; margin-bottom: 6px;
+}
+.web-sub { font-size: 13.5px; color: var(--ts); line-height: 1.55; margin-bottom: 22px; }
+
+.web-mini-event {
+  background: #fff; border-radius: 14px; padding: 11px 13px;
+  display: flex; align-items: center; gap: 11px;
+  margin-bottom: 22px; box-shadow: 0 1px 6px rgba(0,0,0,.06);
+}
+.web-mini-icon {
+  width: 38px; height: 38px; border-radius: 11px;
+  background: linear-gradient(135deg, #186338, #4aab7a);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.web-mini-title { font-size: 14px; font-weight: 700; color: var(--tp); }
+.web-mini-date  { font-size: 12px; color: var(--ts); margin-top: 2px; }
+
+.phone-field-label { font-size: 11px; font-weight: 700; color: var(--ts); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .4px; }
+.phone-field-wrap { display: flex; gap: 8px; margin-bottom: 14px; }
+.phone-flag {
+  width: 52px; height: 48px; border-radius: 13px;
+  background: var(--s1); border: 1.5px solid var(--s2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; cursor: pointer; flex-shrink: 0;
+}
+.phone-input {
+  flex: 1; height: 48px; border-radius: 13px;
+  background: #fff; border: 1.5px solid var(--brand);
+  padding: 0 14px; font-size: 16px; color: var(--tp);
+  font-family: 'Inter', sans-serif; outline: none;
+}
+.send-code-btn {
+  width: 100%; height: 50px; border-radius: 14px;
+  background: var(--brand); border: none; cursor: pointer;
+  color: #fff; font-size: 15px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: all .15s; margin-bottom: 12px;
+  box-shadow: 0 3px 14px rgba(24,99,56,.3);
+}
+.send-code-btn:active { transform: scale(.97); background: var(--brand-d); }
+
+.web-legal {
+  font-size: 11px; color: var(--tt); text-align: center; line-height: 1.6;
+  margin-bottom: 20px;
+}
+.web-legal a { color: var(--ts); }
+
+.get-app-strip {
+  background: var(--brand-l); border-radius: 14px; padding: 12px 14px;
+  display: flex; align-items: center; gap: 10px; margin-bottom: 24px;
+}
+.get-app-strip-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--brand); display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+}
+.get-app-strip-text { flex: 1; }
+.get-app-strip-title { font-size: 13px; font-weight: 700; color: var(--brand-dd); }
+.get-app-strip-sub   { font-size: 11px; color: rgba(24,99,56,.6); margin-top: 1px; }
+.get-app-strip-btn {
+  background: var(--brand); color: #fff; font-size: 12px; font-weight: 700;
+  padding: 6px 13px; border-radius: 99px; border: none; cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── TOAST ── */
+.toast {
+  position:absolute; bottom:108px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:rgba(24,99,56,.95); backdrop-filter:blur(16px);
+  color:#fff; font-size:13px; font-weight:600;
+  padding:10px 20px; border-radius:99px; white-space:nowrap;
+  opacity:0; transition:all .3s; z-index:300; pointer-events:none;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ── PHONES ROW ── */
+.phones-row {
+  display: flex; align-items: flex-start; gap: 28px;
+}
+.phone-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.phone-col-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .8px;
+  text-transform: uppercase;
+}
+.phone-col-label.has-app { color: #7ddc9f; }
+.phone-col-label.no-app  { color: #ffc97e; }
+
+/* ── SECTION LABEL ── */
+.section-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: -4px; max-width: 854px; width: 100%;
+}
+.section-line { flex: 1; height: 1px; background: rgba(255,255,255,.15); }
+.section-pill {
+  font-size: 9.5px; font-weight: 700; letter-spacing: .8px;
+  text-transform: uppercase; padding: 4px 12px; border-radius: 99px;
+  background: rgba(255,255,255,.12); color: rgba(255,255,255,.6);
+  white-space: nowrap;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     FLOW MAP
+════════════════════════════════════════════════ -->
+<div class="flow-map" id="flowMap">
+
+  <span class="path-tag has-app">📱 Has App</span>
+
+  <div class="flow-step active" data-phone="phone-a" data-screen="s-smart" onclick="setActive('phone-a','s-smart')">
+    <div class="dot"></div> Smart Link
+  </div>
+  <div class="flow-arr">›</div>
+  <div class="flow-step" data-phone="phone-a" data-screen="s-inapp" onclick="setActive('phone-a','s-inapp')">
+    <div class="dot"></div> In-App Invite
+  </div>
+  <div class="flow-arr">›</div>
+  <div class="flow-step" data-phone="phone-a" data-screen="s-confirmed" onclick="setActive('phone-a','s-confirmed')">
+    <div class="dot"></div> Accepted ✓
+  </div>
+
+  <div class="flow-divider"></div>
+
+  <span class="path-tag no-app">🌐 No App</span>
+
+  <div class="flow-step" data-phone="phone-b" data-screen="s-smart2" onclick="setActive('phone-b','s-smart2')">
+    <div class="dot"></div> Smart Link
+  </div>
+  <div class="flow-arr">›</div>
+  <div class="flow-step" data-phone="phone-b" data-screen="s-web" onclick="setActive('phone-b','s-web')">
+    <div class="dot"></div> Web Login
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     TWO PHONES SIDE BY SIDE
+════════════════════════════════════════════════ -->
+<div class="phones-row">
+
+  <!-- ─── PHONE A: Has App ─── -->
+  <div class="phone-col">
+    <div class="phone-col-label has-app">📱 Has App → Deep Link</div>
+    <div class="phone" id="phone-a">
+      <div class="island"></div>
+      <div class="sc-wrap">
+
+        <!-- ══════════════════════════
+             S1A · SMART LINK (has app)
+        ══════════════════════════ -->
+        <div class="screen" id="s-smart">
+          <div class="sb">
+            <span class="sb-time">9:41</span>
+            <div class="sb-icons">
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".35"/></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" fill="none"/></svg>
+              <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+            </div>
+          </div>
+
+          <div class="smart-link-bg">
+            <!-- iOS Smart App Banner -->
+            <div class="app-banner">
+              <div class="app-banner-icon">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="3.5" stroke="#fff" stroke-width="1.6"/><path d="M4 19c0-3.866 3.134-7 7-7h2c3.866 0 7 3.134 7 7" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </div>
+              <div class="app-banner-text">
+                <div class="app-banner-name">Sprout</div>
+                <div class="app-banner-sub">Open in the Sprout app</div>
+              </div>
+              <button class="app-banner-btn" onclick="pushA('s-smart','s-inapp')">Open</button>
+            </div>
+
+            <!-- Event card preview -->
+            <div class="invite-hero">
+              <div class="invite-cover">
+                <span class="invite-cover-tag">Event Invite</span>
+                <span class="invite-cover-emoji">🎭</span>
+              </div>
+              <div class="invite-body">
+                <div class="invite-title">1st Grade Talent Show</div>
+                <div class="invite-meta">
+                  <div class="invite-meta-row">
+                    <svg class="invite-meta-icon" width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="10" rx="2" stroke="#818898" stroke-width="1.2"/><path d="M1 5h11" stroke="#818898" stroke-width="1.2"/><path d="M4 1v2M9 1v2" stroke="#818898" stroke-width="1.2" stroke-linecap="round"/></svg>
+                    Thursday, May 29 · 9:00 AM
+                  </div>
+                  <div class="invite-meta-row">
+                    <svg class="invite-meta-icon" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5C4.567 1.5 3 3.067 3 5c0 2.667 3.5 6.5 3.5 6.5S10 7.667 10 5c0-1.933-1.567-3.5-3.5-3.5z" stroke="#818898" stroke-width="1.2"/><circle cx="6.5" cy="5" r="1.2" fill="#818898"/></svg>
+                    Lincoln Elementary · Multipurpose Room
+                  </div>
+                  <div class="invite-meta-row">
+                    <svg class="invite-meta-icon" width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="#818898" stroke-width="1.2"/><path d="M6.5 3.5V7l2 1.5" stroke="#818898" stroke-width="1.2" stroke-linecap="round"/></svg>
+                    Duration ~1.5 hrs
+                  </div>
+                </div>
+                <div class="invite-from">
+                  <div class="invite-from-avi">SR</div>
+                  <div class="invite-from-text">
+                    <div class="invite-from-label">Invited by</div>
+                    <div class="invite-from-name">Ms. Rivera · 1st Grade — Ms. Rivera</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CTAs -->
+            <div class="smart-cta">
+              <button class="btn-open-app" onclick="pushA('s-smart','s-inapp')">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="4" stroke="#fff" stroke-width="1.5"/><path d="M6 9l2.5 2.5L12 6" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Open in Sprout App
+              </button>
+              <div class="smart-or">
+                <div class="smart-or-line"></div>
+                <span class="smart-or-text">or</span>
+                <div class="smart-or-line"></div>
+              </div>
+              <button class="btn-web-fallback" style="cursor:default;opacity:.45">
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="#818898" stroke-width="1.3"/><path d="M7.5 1.5C5.5 3.5 4.5 5.4 4.5 7.5s1 4 3 6M7.5 1.5C9.5 3.5 10.5 5.4 10.5 7.5s-1 4-3 6M1.5 7.5h12" stroke="#818898" stroke-width="1.3" stroke-linecap="round"/></svg>
+                Continue in browser
+              </button>
+            </div>
+          </div>
+        </div><!-- /s-smart -->
+
+
+        <!-- ══════════════════════════
+             S2A · IN-APP INVITE
+        ══════════════════════════ -->
+        <div class="screen right" id="s-inapp">
+          <div class="sb">
+            <span class="sb-time">9:41</span>
+            <div class="sb-icons">
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".35"/></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" fill="none"/></svg>
+              <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+            </div>
+          </div>
+
+          <!-- Nav -->
+          <div class="app-nav">
+            <div class="app-nav-row">
+              <button class="back-btn" onclick="popA('s-inapp','s-smart')">
+                <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8 2L2 8l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="app-nav-title">Event Invite</div>
+              <div style="width:36px"></div>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="in-app-body">
+
+            <div class="app-invite-card">
+              <div class="app-invite-cover">
+                <span class="invite-type-chip">Event Invite</span>
+                <span class="app-invite-cover-emoji">🎭</span>
+              </div>
+              <div class="app-invite-info">
+                <div class="app-invite-title">1st Grade Talent Show</div>
+                <div class="app-invite-meta">
+                  <div class="app-invite-meta-row">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="10" rx="2" stroke="#818898" stroke-width="1.2"/><path d="M1 5h11" stroke="#818898" stroke-width="1.2"/><path d="M4 1v2M9 1v2" stroke="#818898" stroke-width="1.2" stroke-linecap="round"/></svg>
+                    Thursday, May 29 · 9:00 AM
+                  </div>
+                  <div class="app-invite-meta-row">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5C4.567 1.5 3 3.067 3 5c0 2.667 3.5 6.5 3.5 6.5S10 7.667 10 5c0-1.933-1.567-3.5-3.5-3.5z" stroke="#818898" stroke-width="1.2"/><circle cx="6.5" cy="5" r="1.2" fill="#818898"/></svg>
+                    Lincoln Elementary · Multipurpose Room
+                  </div>
+                </div>
+                <div class="app-invite-from">
+                  <div class="app-invite-from-avi">SR</div>
+                  <div>
+                    <div class="app-invite-from-label">Invited by</div>
+                    <div class="app-invite-from-name">Ms. Rivera</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RSVPs -->
+            <div class="rsvp-row">
+              <div class="rsvp-avis">
+                <div class="rsvp-avi" style="background:#5c8a6a">SR</div>
+                <div class="rsvp-avi" style="background:#7a6a9a">JL</div>
+                <div class="rsvp-avi" style="background:#6a7a9a">AM</div>
+                <div class="rsvp-avi" style="background:#9a6a6a">KP</div>
+              </div>
+              <div class="rsvp-text"><strong>14 going</strong> · 6 maybe</div>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="#b3b8c1" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </div>
+
+            <!-- Club context -->
+            <div class="club-row">
+              <div class="club-row-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="#fff" stroke-width="1.3"/><path d="M1.5 13.5c0-2.485 2.015-4.5 4.5-4.5s4.5 2.015 4.5 4.5" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/><circle cx="11.5" cy="5" r="2" stroke="#fff" stroke-width="1.3" opacity=".7"/><path d="M13.5 13c0-1.657-1.567-3-3.5-3" stroke="#fff" stroke-width="1.3" stroke-linecap="round" opacity=".7"/></svg>
+              </div>
+              <div class="club-row-text">
+                <div class="club-row-label">Via Club</div>
+                <div class="club-row-name">1st Grade — Ms. Rivera</div>
+              </div>
+              <span class="club-row-arr">›</span>
+            </div>
+
+            <div style="height:12px"></div>
+          </div>
+
+          <!-- 3-action bar -->
+          <div class="action-bar">
+            <div class="action-bar-label">Respond to this invite</div>
+            <div class="action-btn-group">
+              <button class="btn-accept" onclick="pushA('s-inapp','s-confirmed')">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 8l4 4 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Accept
+              </button>
+              <button class="btn-decline" onclick="showToastA('🚫 You declined this event')">
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 3l9 9M12 3l-9 9" stroke="#c0392b" stroke-width="1.8" stroke-linecap="round"/></svg>
+                Decline
+              </button>
+              <div class="btn-ignore-wrap">
+                <button class="btn-ignore" title="Ignore for now" onclick="popA('s-inapp','s-smart')">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 4v7M9 13.5v.5" stroke="#818898" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </button>
+                <span class="btn-ignore-label">Later</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="toast" id="toast-a"></div>
+        </div><!-- /s-inapp -->
+
+
+        <!-- ══════════════════════════
+             S3A · ACCEPTED
+        ══════════════════════════ -->
+        <div class="screen right" id="s-confirmed">
+          <div class="sb">
+            <span class="sb-time">9:41</span>
+            <div class="sb-icons">
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".35"/></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" fill="none"/></svg>
+              <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+            </div>
+          </div>
+
+          <div class="app-nav">
+            <div class="app-nav-row">
+              <button class="back-btn" onclick="popA('s-confirmed','s-inapp')">
+                <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8 2L2 8l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="app-nav-title">You're Going! 🎉</div>
+              <div style="width:36px"></div>
+            </div>
+          </div>
+
+          <div class="confirmed-body">
+            <div class="confirmed-lottie">✅</div>
+            <div class="confirmed-title">You're in!</div>
+            <div class="confirmed-sub">Your RSVP has been confirmed.<br>Ms. Rivera and 14 others are attending.</div>
+
+            <div class="confirmed-card">
+              <div class="confirmed-card-top">🎭</div>
+              <div class="confirmed-card-body">
+                <div class="confirmed-card-title">1st Grade Talent Show</div>
+                <div class="confirmed-card-meta">Thu, May 29 · 9:00 AM · Lincoln Elementary</div>
+              </div>
+            </div>
+
+            <button class="add-to-cal-btn">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2.5" width="13" height="12" rx="2.5" stroke="#4d525b" stroke-width="1.4"/><path d="M1.5 6.5h13" stroke="#4d525b" stroke-width="1.4"/><path d="M5 1.5V3.5M11 1.5V3.5" stroke="#4d525b" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Add to Calendar
+            </button>
+            <button class="view-event-btn" onclick="popA('s-confirmed','s-inapp')">
+              View Event Details
+            </button>
+          </div>
+
+        </div><!-- /s-confirmed -->
+
+      </div><!-- /sc-wrap -->
+    </div><!-- /phone-a -->
+  </div><!-- /phone-col -->
+
+
+  <!-- ─── PHONE B: No App ─── -->
+  <div class="phone-col">
+    <div class="phone-col-label no-app">🌐 No App → Web Fallback</div>
+    <div class="phone" id="phone-b">
+      <div class="island"></div>
+      <div class="sc-wrap">
+
+        <!-- ══════════════════════════
+             S1B · SMART LINK (no app)
+        ══════════════════════════ -->
+        <div class="screen" id="s-smart2">
+          <div class="sb">
+            <span class="sb-time">9:41</span>
+            <div class="sb-icons">
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".35"/></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" fill="none"/></svg>
+              <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+            </div>
+          </div>
+
+          <div class="smart-link-bg">
+            <!-- No app banner — greyed out / install prompt -->
+            <div class="app-banner">
+              <div class="app-banner-icon">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="3.5" stroke="#fff" stroke-width="1.6"/><path d="M4 19c0-3.866 3.134-7 7-7h2c3.866 0 7 3.134 7 7" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </div>
+              <div class="app-banner-text">
+                <div class="app-banner-name">Sprout</div>
+                <div class="app-banner-sub">Free · On the App Store</div>
+              </div>
+              <button class="app-banner-btn" style="background:#818898">GET</button>
+            </div>
+
+            <!-- Same event card -->
+            <div class="invite-hero">
+              <div class="invite-cover">
+                <span class="invite-cover-tag">Event Invite</span>
+                <span class="invite-cover-emoji">🎭</span>
+              </div>
+              <div class="invite-body">
+                <div class="invite-title">1st Grade Talent Show</div>
+                <div class="invite-meta">
+                  <div class="invite-meta-row">
+                    <svg class="invite-meta-icon" width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="10" rx="2" stroke="#818898" stroke-width="1.2"/><path d="M1 5h11" stroke="#818898" stroke-width="1.2"/><path d="M4 1v2M9 1v2" stroke="#818898" stroke-width="1.2" stroke-linecap="round"/></svg>
+                    Thursday, May 29 · 9:00 AM
+                  </div>
+                  <div class="invite-meta-row">
+                    <svg class="invite-meta-icon" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5C4.567 1.5 3 3.067 3 5c0 2.667 3.5 6.5 3.5 6.5S10 7.667 10 5c0-1.933-1.567-3.5-3.5-3.5z" stroke="#818898" stroke-width="1.2"/><circle cx="6.5" cy="5" r="1.2" fill="#818898"/></svg>
+                    Lincoln Elementary · Multipurpose Room
+                  </div>
+                </div>
+                <div class="invite-from">
+                  <div class="invite-from-avi">SR</div>
+                  <div class="invite-from-text">
+                    <div class="invite-from-label">Invited by</div>
+                    <div class="invite-from-name">Ms. Rivera · 1st Grade — Ms. Rivera</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CTAs — app unavailable, web is primary -->
+            <div class="smart-cta">
+              <button class="btn-open-app" style="background:#818898;box-shadow:none;cursor:default;opacity:.5">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="4" stroke="#fff" stroke-width="1.5"/><path d="M6 9l2.5 2.5L12 6" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                App not installed
+              </button>
+              <div class="smart-or">
+                <div class="smart-or-line"></div>
+                <span class="smart-or-text">continue on web</span>
+                <div class="smart-or-line"></div>
+              </div>
+              <button class="btn-web-fallback" style="background:var(--brand);color:#fff;border-color:var(--brand)" onclick="pushB('s-smart2','s-web')">
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="#fff" stroke-width="1.3"/><path d="M7.5 1.5C5.5 3.5 4.5 5.4 4.5 7.5s1 4 3 6M7.5 1.5C9.5 3.5 10.5 5.4 10.5 7.5s-1 4-3 6M1.5 7.5h12" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>
+                Continue in browser →
+              </button>
+            </div>
+          </div>
+        </div><!-- /s-smart2 -->
+
+
+        <!-- ══════════════════════════
+             S2B · WEB FALLBACK
+        ══════════════════════════ -->
+        <div class="screen right" id="s-web">
+          <div class="sb">
+            <span class="sb-time">9:41</span>
+            <div class="sb-icons">
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".35"/></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" fill="none"/></svg>
+              <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+            </div>
+          </div>
+
+          <div class="web-fallback-bg">
+            <div class="web-header">
+              <div class="web-back" onclick="popB('s-web','s-smart2')">
+                <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8 2L2 8l6 6" stroke="#186338" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Back
+              </div>
+
+              <div class="web-sprout-logo">
+                <div class="web-sprout-icon">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6.5" r="3" stroke="#fff" stroke-width="1.5"/><path d="M3.5 15.5c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </div>
+                <div class="web-sprout-name">Sprout</div>
+              </div>
+
+              <div class="web-headline">Verify your number to respond</div>
+              <div class="web-sub">Enter your phone number to accept or decline this event invite. No account needed.</div>
+            </div>
+
+            <!-- Mini event recap -->
+            <div class="web-mini-event">
+              <div class="web-mini-icon">🎭</div>
+              <div>
+                <div class="web-mini-title">1st Grade Talent Show</div>
+                <div class="web-mini-date">Thu, May 29 · 9:00 AM</div>
+              </div>
+            </div>
+
+            <!-- Phone input -->
+            <div class="phone-field-label">Your mobile number</div>
+            <div class="phone-field-wrap">
+              <div class="phone-flag">🇺🇸</div>
+              <input class="phone-input" type="tel" placeholder="(555) 000-0000" value="(555) 012-3456">
+            </div>
+
+            <button class="send-code-btn" onclick="showToastB('📲 Code sent to (555) 012-3456')">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4l6 5 6-5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><rect x="1.5" y="3" width="13" height="10" rx="2.5" stroke="#fff" stroke-width="1.5"/></svg>
+              Send verification code
+            </button>
+
+            <div class="web-legal">
+              By continuing you agree to Sprout's <a href="#">Terms</a> &amp; <a href="#">Privacy Policy</a>.<br>
+              Standard message rates may apply.
+            </div>
+
+            <!-- Get the app upsell -->
+            <div class="get-app-strip">
+              <div class="get-app-strip-icon">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6.5" r="3" stroke="#fff" stroke-width="1.4"/><path d="M3.5 15.5c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </div>
+              <div class="get-app-strip-text">
+                <div class="get-app-strip-title">Get the Sprout app</div>
+                <div class="get-app-strip-sub">Accept instantly next time — no web login</div>
+              </div>
+              <button class="get-app-strip-btn">Download</button>
+            </div>
+
+          </div>
+
+          <div class="toast" id="toast-b"></div>
+        </div><!-- /s-web -->
+
+      </div><!-- /sc-wrap -->
+    </div><!-- /phone-b -->
+  </div><!-- /phone-col -->
+
+</div><!-- /phones-row -->
+
+
+<script>
+// ── PHONE A NAVIGATION ─────────────────────────────────
+let screenA = 's-smart';
+
+function pushA(from, to) {
+  const fEl = document.getElementById(from);
+  const tEl = document.getElementById(to);
+  fEl.classList.remove('anim-pop-in','anim-push-out','left','right');
+  tEl.classList.remove('anim-push-in','anim-pop-out','left','right');
+  fEl.classList.add('anim-push-out');
+  tEl.classList.add('anim-push-in');
+  fEl.addEventListener('animationend', () => { fEl.classList.remove('anim-push-out'); fEl.classList.add('left'); }, { once:true });
+  tEl.addEventListener('animationend', () => { tEl.classList.remove('anim-push-in'); }, { once:true });
+  screenA = to;
+  updateFlow();
+  if (to === 's-confirmed') {
+    setTimeout(() => { document.querySelector('#s-confirmed .confirmed-lottie').style.animation = 'none'; void document.querySelector('#s-confirmed .confirmed-lottie').offsetWidth; document.querySelector('#s-confirmed .confirmed-lottie').style.animation = ''; }, 10);
+  }
+}
+
+function popA(from, to) {
+  const fEl = document.getElementById(from);
+  const tEl = document.getElementById(to);
+  fEl.classList.remove('anim-push-in','anim-pop-in','anim-push-out','left','right');
+  tEl.classList.remove('anim-push-out','anim-pop-out','left','right');
+  fEl.classList.add('anim-pop-out');
+  tEl.classList.add('anim-pop-in');
+  fEl.addEventListener('animationend', () => { fEl.classList.remove('anim-pop-out'); fEl.classList.add('right'); }, { once:true });
+  tEl.addEventListener('animationend', () => { tEl.classList.remove('anim-pop-in'); }, { once:true });
+  screenA = to;
+  updateFlow();
+}
+
+// ── PHONE B NAVIGATION ─────────────────────────────────
+let screenB = 's-smart2';
+
+function pushB(from, to) {
+  const fEl = document.getElementById(from);
+  const tEl = document.getElementById(to);
+  fEl.classList.remove('anim-pop-in','anim-push-out','left','right');
+  tEl.classList.remove('anim-push-in','anim-pop-out','left','right');
+  fEl.classList.add('anim-push-out');
+  tEl.classList.add('anim-push-in');
+  fEl.addEventListener('animationend', () => { fEl.classList.remove('anim-push-out'); fEl.classList.add('left'); }, { once:true });
+  tEl.addEventListener('animationend', () => { tEl.classList.remove('anim-push-in'); }, { once:true });
+  screenB = to;
+  updateFlow();
+}
+
+function popB(from, to) {
+  const fEl = document.getElementById(from);
+  const tEl = document.getElementById(to);
+  fEl.classList.remove('anim-push-in','anim-pop-in','anim-push-out','left','right');
+  tEl.classList.remove('anim-push-out','anim-pop-out','left','right');
+  fEl.classList.add('anim-pop-out');
+  tEl.classList.add('anim-pop-in');
+  fEl.addEventListener('animationend', () => { fEl.classList.remove('anim-pop-out'); fEl.classList.add('right'); }, { once:true });
+  tEl.addEventListener('animationend', () => { tEl.classList.remove('anim-pop-in'); }, { once:true });
+  screenB = to;
+  updateFlow();
+}
+
+// ── FLOW MAP ───────────────────────────────────────────
+function setActive(phone, screen) {
+  if (phone === 'phone-a') {
+    const screens = ['s-smart','s-inapp','s-confirmed'];
+    const ci = screens.indexOf(screenA);
+    const ti = screens.indexOf(screen);
+    if (ci === ti) return;
+    if (ti > ci) {
+      for (let i = ci; i < ti; i++) {
+        document.getElementById(screens[i]).className = 'screen left';
+        document.getElementById(screens[i+1]).className = 'screen';
+      }
+    } else {
+      for (let i = ci; i > ti; i--) {
+        document.getElementById(screens[i]).className = 'screen right';
+        document.getElementById(screens[i-1]).className = 'screen';
+      }
+    }
+    screenA = screen;
+  } else {
+    const screens = ['s-smart2','s-web'];
+    const ci = screens.indexOf(screenB);
+    const ti = screens.indexOf(screen);
+    if (ci === ti) return;
+    if (ti > ci) {
+      for (let i = ci; i < ti; i++) {
+        document.getElementById(screens[i]).className = 'screen left';
+        document.getElementById(screens[i+1]).className = 'screen';
+      }
+    } else {
+      for (let i = ci; i > ti; i--) {
+        document.getElementById(screens[i]).className = 'screen right';
+        document.getElementById(screens[i-1]).className = 'screen';
+      }
+    }
+    screenB = screen;
+  }
+  updateFlow();
+}
+
+function updateFlow() {
+  document.querySelectorAll('.flow-step').forEach(el => {
+    const active = el.dataset.screen === screenA || el.dataset.screen === screenB;
+    el.classList.toggle('active', active);
+  });
+}
+
+// ── TOASTS ────────────────────────────────────────────
+function showToastA(msg) {
+  const t = document.getElementById('toast-a');
+  t.textContent = msg; t.classList.add('show');
+  if (msg.includes('declined')) {
+    setTimeout(() => { t.classList.remove('show'); popA('s-inapp','s-smart'); }, 2000);
+  } else {
+    setTimeout(() => t.classList.remove('show'), 2400);
+  }
+}
+function showToastB(msg) {
+  const t = document.getElementById('toast-b');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ── INIT ─────────────────────────────────────────────
+document.getElementById('s-smart').classList.remove('right','left');
+document.getElementById('s-inapp').classList.add('right');
+document.getElementById('s-confirmed').classList.add('right');
+document.getElementById('s-smart2').classList.remove('right','left');
+document.getElementById('s-web').classList.add('right');
+</script>
+
+</body>
+</html>

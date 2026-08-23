@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Summer Camps — hero page + kid roster · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+    --green:#186338; --green-hover:#134f2d; --brand-200:#77b691;
+    --brand-light:#e2e9e3; --border-light:#d0dacf; --surface-l2:#dbd5c8; --border:#e6e7ea;
+    --shadow-m:1px 4px 25px rgba(13,13,18,.05); --shadow-l:1px 4px 25px rgba(13,13,18,.16);
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-direction:column;align-items:center;gap:16px;padding:44px 24px 70px;}
+  .ph{display:inline-block;vertical-align:middle;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+
+  .lede{max-width:600px;text-align:center;}
+  .lede h1{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);margin:0 0 6px;}
+  .lede p{font-size:12.5px;color:var(--muted);margin:0;line-height:1.55;}
+
+  .row{display:flex;gap:36px;align-items:flex-start;justify-content:center;flex-wrap:wrap;}
+
+  .device{position:relative;width:415px;height:874px;border-radius:56px;padding:11px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:60;}
+  .screen{position:relative;width:100%;height:100%;border-radius:43px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .tag{font:600 11px/14px var(--sans);color:var(--muted);text-align:center;margin-bottom:12px;letter-spacing:.04em;text-transform:uppercase;}
+  .tag b{color:var(--ink);}
+
+  .sb{position:absolute;top:0;left:0;right:0;padding:16px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:#fff;z-index:25;}
+  .sb.dark{color:var(--ink);}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;}
+  .sb svg{width:17px;height:11px;fill:#fff;} .sb.dark svg{fill:var(--ink);} .sb .bat{width:25px;}
+
+  /* ══════ Hero (Uber "Rent a car" pattern) ══════ */
+  .hero{position:relative;height:320px;flex-shrink:0;overflow:hidden;
+    background:linear-gradient(180deg,#a9d6d6 0%,#d9e8c9 55%,#eef1df 100%);}
+  .sun{position:absolute;top:34px;right:46px;width:64px;height:64px;border-radius:50%;
+    background:radial-gradient(circle,#ffe9a8 0%,#ffd873 60%,rgba(255,216,115,0) 72%);}
+  .mtn{position:absolute;left:0;right:0;bottom:70px;}
+  .mtn svg{display:block;width:100%;height:120px;}
+  .treeline{position:absolute;left:0;right:0;bottom:0;height:90px;}
+  .treeline svg{display:block;width:100%;height:100%;}
+  .tents{position:absolute;left:0;right:0;bottom:14px;display:flex;justify-content:center;gap:22px;}
+  .tent{font-size:26px;filter:drop-shadow(0 3px 3px rgba(0,0,0,.15));}
+
+  .hero-top{position:absolute;top:56px;left:0;right:0;display:flex;justify-content:space-between;padding:0 16px;z-index:20;}
+  .backbtn{width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:var(--shadow-m);flex-shrink:0;display:grid;place-items:center;}
+  .backbtn .ph{width:18px;height:18px;color:var(--ink);}
+  .campsbtn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 16px;border-radius:99px;background:#fff;box-shadow:var(--shadow-m);font-family:var(--sans);font-weight:700;font-size:13px;color:var(--ink);cursor:pointer;border:none;}
+  .campsbtn .ph{width:16px;height:16px;color:var(--ink);}
+
+  /* ══════ Sheet overlapping the hero ══════ */
+  .sheet{position:relative;margin-top:-26px;background:var(--card);border-radius:26px 26px 0 0;flex:1;display:flex;flex-direction:column;min-height:0;box-shadow:0 -8px 24px rgba(13,13,18,.08);z-index:10;}
+  .handle{width:36px;height:4px;border-radius:3px;background:var(--border-light);margin:10px auto 4px;}
+  .sheettitle{font-family:var(--serif);font-weight:700;font-size:20px;color:var(--ink);text-align:center;padding:8px 16px 14px;border-bottom:1px solid var(--border);}
+  .sheetscroll{flex:1;overflow-y:auto;padding-bottom:20px;}
+  .sheetscroll::-webkit-scrollbar{display:none;}
+
+  .field{display:flex;align-items:center;gap:12px;margin:14px 16px 0;padding:14px 14px;border-radius:14px;background:var(--brand-light);}
+  .field .fic{width:20px;height:20px;color:var(--ink);flex-shrink:0;}
+  .field .ftx{font-family:var(--sans);font-weight:500;font-size:14px;color:var(--ink);}
+  .agefield{display:inline-flex;align-items:center;gap:8px;margin:10px 0 4px 16px;padding:9px 13px;border-radius:99px;background:var(--card);border:1px solid var(--border-light);}
+  .agefield .fic{width:15px;height:15px;color:var(--ink);}
+  .agefield .ftx{font-size:12.5px;font-weight:600;color:var(--ink);}
+  .agefield .chev{width:12px;height:12px;color:var(--muted);}
+
+  .divider{height:8px;background:var(--bg);margin:18px 0 0;}
+
+  .sec2{padding:16px 16px 0;}
+  .sec2 h2{font-family:var(--sans);font-weight:700;font-size:15px;color:var(--ink);margin:0 0 12px;}
+  .whycards{display:flex;gap:11px;overflow-x:auto;padding:0 16px 4px;}
+  .whycards::-webkit-scrollbar{display:none;}
+  .whycard{flex:0 0 168px;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-m);}
+  .whycard .whimg{height:110px;display:flex;flex-direction:column;justify-content:flex-end;padding:10px;position:relative;background:#aecaa0;}
+  .whycard .whimg .bicon{position:absolute;right:8px;bottom:6px;font-size:34px;}
+  .whycard .whimg .blabel{font-family:var(--serif);font-weight:600;font-size:13px;color:var(--ink);max-width:65%;}
+  .whycard .whbody{background:var(--card);padding:9px 10px 12px;}
+  .whycard .whbody b{display:block;font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+  .whycard .whbody span{font-size:10.5px;color:var(--muted);line-height:1.35;}
+  .whycard.plain .whimg{background:var(--brand-light);align-items:center;justify-content:center;padding:0;}
+  .whycard.plain .whimg .picon{font-size:38px;}
+
+  .ctawrap{padding:14px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:var(--card);}
+  .cta{width:100%;padding:15px;border:none;border-radius:99px;background:var(--green);color:#fff;font-size:15.5px;font-weight:700;cursor:pointer;}
+
+  /* ══════ Screen 2: kid roster ══════ */
+  .rhead{flex:0 0 auto;display:flex;align-items:center;gap:12px;padding:60px 16px 4px;}
+  .rbackbtn{width:36px;height:36px;border-radius:50%;background:var(--brand-light);border:none;flex-shrink:0;display:grid;place-items:center;}
+  .rbackbtn .ph{width:18px;height:18px;color:var(--ink);}
+  .rtitle{font-family:var(--serif);font-weight:700;font-size:19px;color:var(--ink);}
+  .rsub{padding:6px 16px 16px;font-size:12.5px;color:var(--muted);line-height:1.5;}
+  .rscroll{flex:1;overflow-y:auto;padding:0 16px 30px;}
+  .rscroll::-webkit-scrollbar{display:none;}
+  .kidrow{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:13px 14px;margin-bottom:10px;box-shadow:var(--shadow-m);}
+  .kidav{width:46px;height:46px;border-radius:50%;background:var(--brand-200);color:#fff;font-family:var(--serif);font-weight:700;font-size:17px;display:grid;place-items:center;flex-shrink:0;}
+  .kidbody{flex:1;min-width:0;}
+  .kidname{font-family:var(--serif);font-weight:700;font-size:14.5px;color:var(--ink);}
+  .kidage{font-size:11px;color:var(--muted);margin-left:6px;font-weight:500;}
+  .campstatus{font-size:12px;margin-top:4px;line-height:1.4;}
+  .campstatus.registered{color:var(--green);font-weight:600;}
+  .campstatus.open{color:var(--muted);}
+  .campstatus.ineligible{color:var(--border-light);}
+  .rowaction{font-size:12px;font-weight:700;color:var(--green);flex-shrink:0;cursor:pointer;white-space:nowrap;}
+  .rowaction.muted{color:var(--muted);}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Summer Camps — hero header + "who's registered where"</h1>
+  <p>Tony sent Uber's "Rent a car" screen as reference (full-bleed hero illustration, floating back + Reservations pill, a sheet with search fields sliding up over it, "Why rent with Uber" cards, sticky CTA) and asked for the same treatment on Summer Camps — plus a place showing which kid is signed up for which camp. Screen 1 rebuilds that hero pattern in Sprout's own vector illustration and green CTA (not Uber's black); its "Why book with Sprout" card row weaves in the exact Summer Camp tile already built on the Discover page. The "My Camps" pill (top right, mirrors "Reservations") opens Screen 2 — the kid roster, reusing the Cooper/Ellie/Nora/Jack family from the club-binding prototype.</p>
+</div>
+
+<div class="row">
+
+  <div>
+    <div class="tag">Screen 1 · <b>Summer Camp hero</b></div>
+    <div class="device"><div class="island"></div>
+      <div class="screen" id="s1">
+
+        <div class="hero">
+          <div class="sun"></div>
+          <div class="mtn">
+            <svg viewBox="0 0 415 120" preserveAspectRatio="none">
+              <polygon points="0,120 0,60 70,10 140,55 210,20 280,60 340,30 415,70 415,120" fill="#7fa8c9" opacity=".55"/>
+              <polygon points="0,120 0,80 90,40 180,75 260,45 330,80 415,55 415,120" fill="#5a8fb5" opacity=".6"/>
+            </svg>
+          </div>
+          <div class="treeline">
+            <svg viewBox="0 0 415 90" preserveAspectRatio="none">
+              <polygon points="0,90 0,55 20,20 40,55 55,35 75,60 95,25 115,58 135,38 155,62 175,30 195,58 215,40 235,62 255,28 275,58 295,36 315,60 335,22 355,58 375,40 395,60 415,45 415,90" fill="#1e3e2b"/>
+              <polygon points="0,90 0,65 25,42 50,68 70,50 90,70 110,45 130,68 150,50 170,70 190,48 210,70 230,52 250,72 270,46 290,70 310,54 330,72 350,48 370,70 390,55 415,68 415,90" fill="#186338"/>
+            </svg>
+          </div>
+          <div class="tents"><span class="tent">🏕️</span><span class="tent">⛺</span><span class="tent">🏕️</span></div>
+
+          <div class="sb"><span>9:41</span><span class="r">
+            <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+            <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+            <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#fff"/><rect x="2.5" y="3.5" width="15" height="5" rx="1" fill="#fff"/><rect x="22" y="4.5" width="1.6" height="3" fill="#fff"/></svg>
+          </span></div>
+
+          <div class="hero-top">
+            <div class="backbtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span></div>
+            <button class="campsbtn">
+              <span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span>
+              My Camps
+            </button>
+          </div>
+        </div>
+
+        <div class="sheet">
+          <div class="handle"></div>
+          <div class="sheettitle">Summer Camps</div>
+          <div class="sheetscroll">
+            <div class="field"><span class="ph fic"><svg viewBox="0 0 256 256"><path d="M128 64a40 40 0 1 0 40 40 40 40 0 0 0-40-40m0 64a24 24 0 1 1 24-24 24 24 0 0 1-24 24m0-112a88.1 88.1 0 0 0-88 88c0 31.4 14.51 64.68 42 96.25a254.2 254.2 0 0 0 41.45 38.3 8 8 0 0 0 9.18 0 254.2 254.2 0 0 0 41.37-38.3c27.45-31.57 42-64.85 42-96.25a88.1 88.1 0 0 0-88-88m0 206c-16.53-13-72-60.75-72-118a72 72 0 0 1 144 0c0 57.23-55.47 105-72 118"/></svg></span><span class="ftx">Near Griffith Park, LA</span></div>
+            <div class="field"><span class="ph fic"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span><span class="ftx">Jun 1 – Aug 15 · This summer</span></div>
+            <div class="agefield"><span class="ph fic"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m37.66 130.34a8 8 0 0 1-11.32 11.32L128 139.31l-26.34 26.35a8 8 0 0 1-11.32-11.32L116.69 128 90.34 101.66a8 8 0 0 1 11.32-11.32L128 116.69l26.34-26.35a8 8 0 0 1 11.32 11.32L139.31 128Z" opacity="0"/><circle cx="128" cy="88" r="28"/><path d="M60 208c8-38 34-60 68-60s60 22 68 60"/></svg></span><span class="ftx">Camper's age: 6–8</span><span class="ph chev"><svg viewBox="0 0 256 256"><path d="M213.66 101.66l-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32"/></svg></span></div>
+
+            <div class="divider"></div>
+
+            <div class="sec2">
+              <h2>Why book with Sprout</h2>
+              <div class="whycards">
+                <div class="whycard">
+                  <div class="whimg"><span class="blabel">Summer Camp</span><span class="bicon">⛺</span></div>
+                  <div class="whbody"><b>Already on your Discover page</b><span>Same tile, one tap away from home</span></div>
+                </div>
+                <div class="whycard plain">
+                  <div class="whimg"><span class="picon">🛡️</span></div>
+                  <div class="whbody"><b>Sprout-vetted only</b><span>Listed by families already in your school community</span></div>
+                </div>
+                <div class="whycard plain">
+                  <div class="whimg"><span class="picon">👯</span></div>
+                  <div class="whbody"><b>See who else is going</b><span>Check which classmates are signed up before you book</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ctawrap"><button class="cta">Find Camps</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="tag">Screen 2 · <b>"My Camps" kid roster</b></div>
+    <div class="device"><div class="island"></div>
+      <div class="screen" id="s2">
+        <div class="sb dark"><span>9:41</span><span class="r">
+          <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+          <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+          <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+        </span></div>
+        <div class="rhead">
+          <button class="rbackbtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span></button>
+          <div class="rtitle">My Camps</div>
+        </div>
+        <div class="rsub">See which camp each of your kids is signed up for this summer.</div>
+        <div class="rscroll">
+
+          <div class="kidrow">
+            <div class="kidav">C</div>
+            <div class="kidbody">
+              <span class="kidname">Cooper<span class="kidage">6 yrs</span></span>
+              <div class="campstatus registered">⛺ Camp Kupugani · Jun 15–19</div>
+            </div>
+            <span class="rowaction">Change</span>
+          </div>
+
+          <div class="kidrow">
+            <div class="kidav">E</div>
+            <div class="kidbody">
+              <span class="kidname">Ellie<span class="kidage">4 yrs</span></span>
+              <div class="campstatus registered">⛺ Little Sprouts Day Camp · Jul 6–10</div>
+            </div>
+            <span class="rowaction">Change</span>
+          </div>
+
+          <div class="kidrow">
+            <div class="kidav">N</div>
+            <div class="kidbody">
+              <span class="kidname">Nora<span class="kidage">2 yrs</span></span>
+              <div class="campstatus open">Not registered yet</div>
+            </div>
+            <span class="rowaction">Browse →</span>
+          </div>
+
+          <div class="kidrow">
+            <div class="kidav">J</div>
+            <div class="kidbody">
+              <span class="kidname">Jack<span class="kidage">2 mo</span></span>
+              <div class="campstatus ineligible">Not eligible yet (infant)</div>
+            </div>
+            <span class="rowaction muted">—</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

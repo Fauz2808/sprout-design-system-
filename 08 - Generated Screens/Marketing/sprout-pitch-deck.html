@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sprout · Class Community Presentation</title>
+
+<!-- Fonts -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&display=swap');
+</style>
+
+<style>
+/* ============================================================
+   BASE.CSS — tokens + layout primitives
+   ============================================================ */
+:root {
+  --bg: #ffffff;
+  --bg-soft: #f7f7f8;
+  --surface: #ffffff;
+  --surface-2: #f2f2f4;
+  --border: rgba(0,0,0,.08);
+  --border-strong: rgba(0,0,0,.16);
+  --text-1: #111216;
+  --text-2: #55596a;
+  --text-3: #8a8f9e;
+  --accent: #186338;
+  --accent-2: #1e3e2b;
+  --accent-3: #77b691;
+  --good: #1aaf6c;
+  --warn: #f5a524;
+  --bad:  #e0445a;
+  --grad: linear-gradient(135deg,#186338,#2d7a54 55%,#1e3e2b);
+  --grad-soft: linear-gradient(135deg,#e2e9e3,#d0dacf 55%,#eae6db);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --radius-lg: 26px;
+  --shadow: 0 10px 30px rgba(18,24,40,.08), 0 2px 6px rgba(18,24,40,.04);
+  --shadow-lg: 0 24px 60px rgba(18,24,40,.14), 0 6px 16px rgba(18,24,40,.06);
+  --font-sans: 'Inter',-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+  --font-serif: 'Playfair Display',Georgia,serif;
+  --font-display: var(--font-sans);
+  --letter-tight: -.03em;
+  --letter-normal: -.01em;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text-1);
+  font-family:var(--font-sans);font-weight:400;line-height:1.6;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  letter-spacing:var(--letter-normal)}
+img,svg,video{max-width:100%;display:block}
+a{color:var(--accent);text-decoration:none}
+
+/* Slide System */
+.deck{position:relative;width:100vw;height:100vh;overflow:hidden;background:var(--bg)}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:72px 96px;
+  box-sizing:border-box;
+  opacity:0;pointer-events:none;
+  transition:opacity .5s var(--ease), transform .5s var(--ease);
+  transform:translateX(30px);
+  overflow:hidden;
+}
+.slide.is-active{opacity:1;pointer-events:auto;transform:translateX(0);z-index:2}
+.slide.is-prev{transform:translateX(-30px)}
+
+/* Typography */
+.eyebrow{font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3)}
+.kicker{font-size:14px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+h1.title,.h1{font-family:var(--font-serif);font-size:72px;line-height:1.05;font-weight:800;letter-spacing:var(--letter-tight);margin:0 0 18px;color:var(--text-1)}
+h2.title,.h2{font-family:var(--font-serif);font-size:54px;line-height:1.1;font-weight:700;letter-spacing:var(--letter-tight);margin:0 0 14px}
+h3,.h3{font-size:32px;line-height:1.2;font-weight:600;letter-spacing:var(--letter-normal);margin:0 0 10px}
+h4,.h4{font-size:20px;line-height:1.3;font-weight:600;margin:0 0 8px}
+.lede{font-size:22px;line-height:1.55;color:var(--text-2);font-weight:300;max-width:62ch}
+.dim{color:var(--text-2)}
+.dim2{color:var(--text-3)}
+.serif{font-family:var(--font-serif)}
+.gradient-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+
+/* Layout */
+.stack>*+*{margin-top:14px}
+.row{display:flex;gap:24px;align-items:center}
+.row.wrap{flex-wrap:wrap}
+.grid{display:grid;gap:24px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.center{display:flex;align-items:center;justify-content:center;text-align:center}
+.fill{flex:1}
+.mt-s{margin-top:8px}.mt-m{margin-top:18px}.mt-l{margin-top:32px}
+.mb-s{margin-bottom:8px}.mb-m{margin-bottom:18px}.mb-l{margin-bottom:32px}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:26px 28px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.card-soft{background:var(--surface-2);border:1px solid var(--border)}
+.card-accent{background:var(--surface);border-top:3px solid var(--accent)}
+.card-hover{transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.card-hover:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+
+.pill{display:inline-block;padding:5px 14px;border-radius:999px;font-size:13px;font-weight:500;
+  background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}
+.pill-accent{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 28%,transparent)}
+.pill-white{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.25)}
+
+/* Chrome */
+.deck-header{position:absolute;top:24px;left:40px;right:40px;display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;color:var(--text-3);letter-spacing:.12em;text-transform:uppercase;z-index:10;pointer-events:none}
+.deck-footer{position:absolute;bottom:24px;left:40px;right:40px;display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;color:var(--text-3);z-index:10;pointer-events:none}
+.slide-number::before{content:attr(data-current)}
+.slide-number::after{content:" / " attr(data-total)}
+.progress-bar{position:fixed;left:0;right:0;bottom:0;height:3px;background:transparent;z-index:20}
+.progress-bar > span{display:block;height:100%;width:0;background:var(--accent);transition:width .3s var(--ease)}
+
+/* Notes */
+.notes{display:none!important}
+.notes-overlay{position:fixed;inset:auto 0 0 0;max-height:42vh;background:rgba(20,22,30,.95);color:#e8ebf4;
+  padding:20px 32px;font-size:16px;line-height:1.6;border-top:1px solid rgba(255,255,255,.1);transform:translateY(100%);
+  transition:transform .3s var(--ease);z-index:40;overflow:auto;font-family:var(--font-sans)}
+.notes-overlay.open{transform:translateY(0)}
+.overview{position:fixed;inset:0;background:rgba(10,12,18,.92);backdrop-filter:blur(12px);z-index:50;
+  display:none;padding:40px;overflow:auto}
+.overview.open{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;align-content:start}
+.overview .thumb{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  aspect-ratio:16/9;overflow:hidden;cursor:pointer;position:relative;color:var(--text-1);padding:16px;
+  font-size:11px;transition:transform .2s var(--ease)}
+.overview .thumb:hover{transform:scale(1.04)}
+.overview .thumb .n{position:absolute;top:8px;left:10px;font-weight:700;font-size:14px;color:var(--text-3)}
+.overview .thumb .t{position:absolute;bottom:10px;left:14px;right:14px;font-weight:600;color:var(--text-1)}
+
+/* Utilities */
+.hidden{display:none!important}
+.nowrap{white-space:nowrap}
+.tr{text-align:right}.tc{text-align:center}.tl{text-align:left}
+.uppercase{text-transform:uppercase;letter-spacing:.12em}
+
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+:root{--anim-dur:.7s;--anim-ease:cubic-bezier(.4,0,.2,1)}
+
+@keyframes kf-fade-up{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:none}}
+@keyframes kf-fade-down{from{opacity:0;transform:translateY(-32px)}to{opacity:1;transform:none}}
+@keyframes kf-fade-left{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+@keyframes kf-fade-right{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+.anim-fade-up{animation:kf-fade-up var(--anim-dur) var(--anim-ease) both}
+.anim-fade-down{animation:kf-fade-down var(--anim-dur) var(--anim-ease) both}
+.anim-fade-left{animation:kf-fade-left var(--anim-dur) var(--anim-ease) both}
+.anim-fade-right{animation:kf-fade-right var(--anim-dur) var(--anim-ease) both}
+
+@keyframes kf-rise{from{opacity:0;transform:translateY(60px) scale(.97);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+@keyframes kf-zoom{0%{opacity:0;transform:scale(.6)}60%{transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}
+@keyframes kf-blur{from{opacity:0;filter:blur(18px)}to{opacity:1;filter:none}}
+.anim-rise-in{animation:kf-rise .9s var(--anim-ease) both}
+.anim-zoom-pop{animation:kf-zoom .7s cubic-bezier(.22,1.3,.36,1) both}
+.anim-blur-in{animation:kf-blur .8s var(--anim-ease) both}
+
+.anim-stagger-list > *{opacity:0;animation:kf-rise .65s var(--anim-ease) both}
+.anim-stagger-list > *:nth-child(1){animation-delay:.05s}
+.anim-stagger-list > *:nth-child(2){animation-delay:.15s}
+.anim-stagger-list > *:nth-child(3){animation-delay:.25s}
+.anim-stagger-list > *:nth-child(4){animation-delay:.35s}
+.anim-stagger-list > *:nth-child(5){animation-delay:.45s}
+.anim-stagger-list > *:nth-child(6){animation-delay:.55s}
+
+@keyframes kf-gradflow{to{background-position:300% 0}}
+.anim-gradient-flow{
+  background:linear-gradient(90deg,#186338,#2d7a54,#77b691,#186338);
+  background-size:300% 100%;-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  animation:kf-gradflow 5s linear infinite
+}
+
+@media (prefers-reduced-motion: reduce){
+  [class*="anim-"]{animation:none!important;transition:none!important}
+}
+
+
+/* ============================================================
+   SPROUT PITCH DECK THEME
+   ============================================================ */
+.tpl-pitch-deck {
+  --bg: #f4f1ea;
+  --bg-soft: #eae6db;
+  --surface: #ffffff;
+  --surface-2: #e2e9e3;
+  --border: rgba(30,62,43,.10);
+  --border-strong: rgba(30,62,43,.22);
+  --text-1: #1e3e2b;
+  --text-2: #4d5a51;
+  --text-3: #8a9e8f;
+  --accent: #186338;
+  --accent-2: #1e3e2b;
+  --accent-3: #77b691;
+  --grad: linear-gradient(135deg, #186338 0%, #2d7a54 55%, #1e3e2b 100%);
+  --grad-soft: linear-gradient(135deg, #e2e9e3 0%, #d0dacf 55%, #eae6db 100%);
+  --radius: 20px;
+  --radius-lg: 28px;
+  --shadow: 0 14px 40px rgba(30,62,43,.09), 0 2px 8px rgba(30,62,43,.04);
+  --shadow-lg: 0 28px 60px rgba(30,62,43,.16), 0 6px 16px rgba(30,62,43,.08);
+  font-family: 'Inter', sans-serif;
+}
+
+.tpl-pitch-deck .slide { padding: 80px 108px; }
+.tpl-pitch-deck .slide > * { position: relative; z-index: 1; }
+
+/* Cover */
+.tpl-pitch-deck .cover-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(145deg, #1e3e2b 0%, #186338 45%, #0f2218 100%);
+}
+.tpl-pitch-deck .cover-blob {
+  position: absolute; right: -120px; top: -120px;
+  width: 600px; height: 600px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(119,182,145,.35) 0%, transparent 70%);
+  z-index: 0; pointer-events: none;
+}
+.tpl-pitch-deck .cover-blob-2 {
+  position: absolute; left: -80px; bottom: -80px;
+  width: 400px; height: 400px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(208,218,207,.18) 0%, transparent 70%);
+  z-index: 0; pointer-events: none;
+}
+
+/* Brand mark */
+.tpl-pitch-deck .brand-wrap {
+  display: flex; align-items: center; gap: 10px;
+  position: absolute; top: 52px; left: 108px;
+}
+.tpl-pitch-deck .brand-leaf {
+  width: 32px; height: 32px; color: #fff;
+}
+.tpl-pitch-deck .brand-name {
+  font-weight: 800; font-size: 22px; letter-spacing: -.02em; color: #fff;
+  font-family: 'Playfair Display', Georgia, serif;
+}
+.tpl-pitch-deck .brand-name.dark { color: var(--text-1); }
+.tpl-pitch-deck .brand-leaf.dark { color: var(--text-1); }
+
+/* Typography for cover */
+.tpl-pitch-deck .cover-kicker {
+  font-size: 13px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+  color: rgba(119,182,145,.9); margin-bottom: 20px;
+}
+.tpl-pitch-deck .cover-h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 78px; line-height: 1.04; font-weight: 700;
+  letter-spacing: -.03em; color: #fff; margin: 0 0 20px;
+}
+.tpl-pitch-deck .cover-h1 em { font-style: italic; color: #77b691; }
+.tpl-pitch-deck .cover-lede {
+  font-size: 20px; line-height: 1.6; color: rgba(255,255,255,.72);
+  font-weight: 300; max-width: 52ch; margin-bottom: 36px;
+}
+.tpl-pitch-deck .cover-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,.12); color: #fff;
+  border: 1px solid rgba(255,255,255,.2); border-radius: 999px;
+  padding: 8px 18px; font-size: 13px; font-weight: 500;
+}
+.tpl-pitch-deck .cover-pill-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #77b691; animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .6; transform: scale(1.4); }
+}
+
+/* Section headers (non-cover) */
+.tpl-pitch-deck .section-eyebrow {
+  font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 10px;
+}
+.tpl-pitch-deck .section-eyebrow.white {
+  color: rgba(255,255,255,.6);
+}
+.tpl-pitch-deck .slide-h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 58px; line-height: 1.08; font-weight: 700; letter-spacing: -.025em;
+  color: var(--text-1); margin: 0 0 12px;
+}
+.tpl-pitch-deck .slide-h2 em { font-style: italic; color: var(--accent); }
+.tpl-pitch-deck .slide-h2.white { color: #fff; }
+.tpl-pitch-deck .slide-h2.white em { color: #77b691; }
+.tpl-pitch-deck .slide-lede {
+  font-size: 20px; line-height: 1.6; color: var(--text-2); font-weight: 300; max-width: 58ch;
+  margin-bottom: 36px;
+}
+.tpl-pitch-deck .slide-lede.white { color: rgba(255,255,255,.75); }
+
+/* Background variants */
+.tpl-pitch-deck .bg-dark {
+  background: linear-gradient(145deg, #1e3e2b 0%, #186338 45%, #0f2218 100%) !important;
+}
+.tpl-pitch-deck .bg-cream {
+  background: var(--bg) !important;
+}
+.tpl-pitch-deck .bg-sage {
+  background: linear-gradient(135deg, #e2e9e3 0%, #d0dacf 100%) !important;
+}
+.tpl-pitch-deck .bg-light {
+  background: #f0f4f1 !important;
+}
+
+/* Problem cards */
+.tpl-pitch-deck .prob-card {
+  background: #fff;
+  border: 1px solid rgba(30,62,43,.10);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.tpl-pitch-deck .prob-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: var(--grad);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.tpl-pitch-deck .prob-icon {
+  font-size: 36px; margin-bottom: 16px; display: block;
+}
+.tpl-pitch-deck .prob-title {
+  font-size: 20px; font-weight: 700; color: var(--text-1); margin-bottom: 8px;
+  font-family: 'Playfair Display', Georgia, serif;
+}
+.tpl-pitch-deck .prob-body {
+  font-size: 15px; line-height: 1.65; color: var(--text-2);
+}
+.tpl-pitch-deck .prob-stat {
+  margin-top: 16px; font-size: 32px; font-weight: 800; color: var(--accent);
+  font-family: 'Inter', sans-serif; letter-spacing: -.02em;
+}
+.tpl-pitch-deck .prob-stat-label {
+  font-size: 12px; color: var(--text-3); font-weight: 500;
+}
+
+/* How-it-works steps */
+.tpl-pitch-deck .step-card {
+  background: #fff;
+  border: 1px solid rgba(30,62,43,.10);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.tpl-pitch-deck .step-num {
+  font-size: 80px; font-weight: 900; line-height: 1;
+  color: var(--surface-2); position: absolute; right: 20px; bottom: 16px;
+  font-family: 'Inter', sans-serif; letter-spacing: -.04em; z-index: 0;
+  pointer-events: none;
+}
+.tpl-pitch-deck .step-icon {
+  width: 52px; height: 52px; border-radius: 16px;
+  background: var(--grad); display: flex; align-items: center; justify-content: center;
+  font-size: 24px; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(24,99,56,.25);
+  position: relative; z-index: 1;
+}
+.tpl-pitch-deck .step-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 22px; font-weight: 700; color: var(--text-1); margin-bottom: 10px;
+  position: relative; z-index: 1;
+}
+.tpl-pitch-deck .step-body {
+  font-size: 15px; line-height: 1.65; color: var(--text-2);
+  position: relative; z-index: 1;
+}
+
+/* Feature grid */
+.tpl-pitch-deck .feat-card {
+  background: #fff;
+  border: 1px solid rgba(30,62,43,.10);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column;
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+.tpl-pitch-deck .feat-card:hover {
+  transform: translateY(-3px); box-shadow: var(--shadow-lg);
+}
+.tpl-pitch-deck .feat-icon {
+  font-size: 30px; margin-bottom: 14px;
+}
+.tpl-pitch-deck .feat-title {
+  font-size: 17px; font-weight: 700; color: var(--text-1); margin-bottom: 6px;
+}
+.tpl-pitch-deck .feat-body {
+  font-size: 14px; line-height: 1.6; color: var(--text-2); flex: 1;
+}
+.tpl-pitch-deck .feat-tag {
+  display: inline-block; margin-top: 12px; padding: 3px 10px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent); border-radius: 999px; font-size: 11px; font-weight: 600;
+}
+
+/* Trust badges */
+.tpl-pitch-deck .trust-card {
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: var(--radius);
+  padding: 32px;
+  backdrop-filter: blur(10px);
+}
+.tpl-pitch-deck .trust-icon {
+  font-size: 40px; margin-bottom: 16px; display: block;
+}
+.tpl-pitch-deck .trust-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px;
+}
+.tpl-pitch-deck .trust-body {
+  font-size: 14px; line-height: 1.65; color: rgba(255,255,255,.65);
+}
+
+/* Social proof / testimonial */
+.tpl-pitch-deck .testi-big {
+  background: #fff;
+  border: 1px solid rgba(30,62,43,.10);
+  border-radius: var(--radius-lg);
+  padding: 44px 48px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+}
+.tpl-pitch-deck .testi-big::before {
+  content: '\201C';
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 120px; line-height: 1; color: #e2e9e3;
+  position: absolute; top: -10px; left: 36px; z-index: 0;
+}
+.tpl-pitch-deck .testi-quote {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 26px; line-height: 1.5; font-weight: 400; font-style: italic;
+  color: var(--text-1); position: relative; z-index: 1; margin-bottom: 24px;
+}
+.tpl-pitch-deck .testi-author {
+  display: flex; align-items: center; gap: 14px;
+  position: relative; z-index: 1;
+}
+.tpl-pitch-deck .testi-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--grad-soft); display: flex; align-items: center;
+  justify-content: center; font-size: 22px;
+  border: 2px solid rgba(30,62,43,.12);
+  flex-shrink: 0;
+}
+.tpl-pitch-deck .testi-name {
+  font-weight: 700; font-size: 16px; color: var(--text-1);
+}
+.tpl-pitch-deck .testi-role {
+  font-size: 13px; color: var(--text-3); margin-top: 2px;
+}
+.tpl-pitch-deck .testi-stars {
+  font-size: 18px; margin-bottom: 8px; letter-spacing: 2px;
+}
+
+/* Stats row */
+.tpl-pitch-deck .stat-item { text-align: center; }
+.tpl-pitch-deck .stat-num {
+  font-size: 54px; font-weight: 900; letter-spacing: -.035em;
+  background: var(--grad); -webkit-background-clip: text;
+  background-clip: text; -webkit-text-fill-color: transparent; line-height: 1;
+}
+.tpl-pitch-deck .stat-label {
+  font-size: 14px; color: var(--text-2); margin-top: 4px; font-weight: 500;
+}
+.tpl-pitch-deck .stat-divider {
+  width: 1px; height: 60px; background: var(--border); align-self: center;
+}
+
+/* Class community slide */
+.tpl-pitch-deck .class-feature {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 20px 24px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: var(--radius);
+}
+.tpl-pitch-deck .class-feature-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: rgba(255,255,255,.15); display: flex; align-items: center;
+  justify-content: center; font-size: 20px; flex-shrink: 0;
+}
+.tpl-pitch-deck .class-feature-title {
+  font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px;
+}
+.tpl-pitch-deck .class-feature-body {
+  font-size: 14px; color: rgba(255,255,255,.65); line-height: 1.55;
+}
+
+/* CTA slide */
+.tpl-pitch-deck .cta-app-btn {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: #fff; color: var(--text-1);
+  border-radius: 16px; padding: 14px 24px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.25);
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease);
+  text-decoration: none; cursor: pointer;
+}
+.tpl-pitch-deck .cta-app-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(0,0,0,.35);
+}
+.tpl-pitch-deck .cta-app-btn-icon { font-size: 28px; }
+.tpl-pitch-deck .cta-app-btn-text { display: flex; flex-direction: column; line-height: 1.2; }
+.tpl-pitch-deck .cta-app-btn-sub { font-size: 11px; color: #888; font-weight: 400; }
+.tpl-pitch-deck .cta-app-btn-main { font-size: 18px; font-weight: 700; }
+
+.tpl-pitch-deck .qr-placeholder {
+  width: 120px; height: 120px; border-radius: 16px;
+  background: #fff; padding: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  display: flex; align-items: center; justify-content: center;
+}
+.tpl-pitch-deck .qr-placeholder svg { width: 100%; height: 100%; }
+
+/* Deck footer */
+.tpl-pitch-deck .deck-footer { color: rgba(255,255,255,.35); }
+.tpl-pitch-deck .deck-footer.dark-footer { color: var(--text-3); }
+
+/* Big quote on CTA */
+.tpl-pitch-deck .mega-tagline {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 80px; line-height: 1.04; font-weight: 700; letter-spacing: -.03em;
+  color: #fff;
+}
+.tpl-pitch-deck .mega-tagline em { font-style: italic; color: #77b691; }
+
+/* Decorative ring */
+.tpl-pitch-deck .deco-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(119,182,145,.15);
+  pointer-events: none; z-index: 0;
+}
+
+/* Intro solution visual */
+.tpl-pitch-deck .solution-visual {
+  background: linear-gradient(135deg, rgba(24,99,56,.08) 0%, rgba(119,182,145,.12) 100%);
+  border: 1px solid rgba(30,62,43,.12);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.tpl-pitch-deck .solution-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(30,62,43,.06);
+}
+.tpl-pitch-deck .solution-row-icon {
+  font-size: 22px; flex-shrink: 0;
+}
+.tpl-pitch-deck .solution-row-title {
+  font-size: 15px; font-weight: 600; color: var(--text-1);
+}
+.tpl-pitch-deck .solution-row-sub {
+  font-size: 13px; color: var(--text-3);
+}
+
+/* Decorative leaf pattern */
+.tpl-pitch-deck .leaf-deco {
+  position: absolute;
+  opacity: .06; pointer-events: none; z-index: 0;
+}
+</style>
+
+</head>
+<body class="tpl-pitch-deck">
+<div class="deck">
+
+  <!-- ─── 1. COVER ─────────────────────────────────────── -->
+  <section class="slide" data-title="Cover">
+    <div class="cover-bg"></div>
+    <div class="cover-blob"></div>
+    <div class="cover-blob-2"></div>
+
+    <!-- Decorative rings -->
+    <div class="deco-ring" style="width:700px;height:700px;top:-200px;right:-200px;"></div>
+    <div class="deco-ring" style="width:500px;height:500px;top:-100px;right:-100px;"></div>
+
+    <!-- Brand mark -->
+    <div class="brand-wrap">
+      <svg class="brand-leaf" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 4C16 4 7 10 7 18C7 22.4183 11.1340 26 16 26C20.8660 26 25 22.4183 25 18C25 10 16 4 16 4Z" fill="currentColor" opacity="0.85"/>
+        <path d="M16 26V16" stroke="#0f2218" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M16 20C16 20 12 17 11 14" stroke="#0f2218" stroke-width="1.4" stroke-linecap="round" opacity="0.5"/>
+      </svg>
+      <span class="brand-name">Sprout</span>
+    </div>
+
+    <!-- Main content -->
+    <div style="max-width: 760px; margin-top: 40px;">
+      <p class="cover-kicker anim-fade-down" data-anim="fade-down" style="--anim-dur:.6s">For the families of [School Name]</p>
+
+      <h1 class="cover-h1 anim-fade-up" data-anim="fade-up" style="--anim-dur:.8s;animation-delay:.1s">
+        Where parents bond,<br><em>childhoods flourish.</em>
+      </h1>
+
+      <p class="cover-lede anim-fade-up" data-anim="fade-up" style="animation-delay:.25s">
+        A private community app that helps the parents in your neighbourhood — and your child's class — find each other, plan together, and build friendships that last.
+      </p>
+
+      <div class="row anim-fade-up" data-anim="fade-up" style="animation-delay:.4s;gap:16px;flex-wrap:wrap;">
+        <div class="cover-pill">
+          <span class="cover-pill-dot"></span>
+          Now on iOS
+        </div>
+        <div class="cover-pill">🌳 2,000+ Families</div>
+        <div class="cover-pill">📍 50+ Cities</div>
+      </div>
+    </div>
+
+    <!-- Right visual — floating cards -->
+    <div style="position:absolute;right:108px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:16px;z-index:2;">
+      <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:18px 22px;backdrop-filter:blur(20px);display:flex;align-items:center;gap:14px;min-width:280px;" class="anim-fade-left" data-anim="fade-left" style="animation-delay:.5s">
+        <span style="font-size:28px;">🌳</span>
+        <div>
+          <div style="font-weight:700;font-size:15px;color:#fff;">Friday Park Playdate</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.6);">8 families going · 3pm at Riverside</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:18px 22px;backdrop-filter:blur(20px);display:flex;align-items:center;gap:14px;min-width:280px;" class="anim-fade-left" data-anim="fade-left" style="animation-delay:.65s">
+        <span style="font-size:28px;">🍀</span>
+        <div>
+          <div style="font-weight:700;font-size:15px;color:#fff;">Sarah joined your club</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.6);">Grade 2 Parents · just now</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:18px 22px;backdrop-filter:blur(20px);display:flex;align-items:center;gap:14px;min-width:280px;" class="anim-fade-left" data-anim="fade-left" style="animation-delay:.8s">
+        <span style="font-size:28px;">💬</span>
+        <div>
+          <div style="font-weight:700;font-size:15px;color:#fff;">"Still on for Saturday? 🌿"</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.6);">Class Moms Group · 5m ago</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="deck-footer">
+      <span>Presented by the Sprout Team</span>
+      <span class="slide-number" data-current="1" data-total="9"></span>
+    </div>
+
+    <div class="notes">
+      Welcome everyone. Thank you for having us. What you're about to see is a community that's been quietly growing across 50+ cities — parents helping parents build the kinds of friendships they moved to a neighbourhood for.
+    </div>
+  </section>
+
+
+  <!-- ─── 2. THE PROBLEM ───────────────────────────────── -->
+  <section class="slide" data-title="The Problem">
+    <div class="bg-cream" style="position:absolute;inset:0;"></div>
+
+    <div class="brand-wrap">
+      <svg class="brand-leaf dark" viewBox="0 0 32 32" fill="none">
+        <path d="M16 4C16 4 7 10 7 18C7 22.4183 11.134 26 16 26C20.866 26 25 22.4183 25 18C25 10 16 4 16 4Z" fill="currentColor" opacity="0.85"/>
+        <path d="M16 26V16" stroke="#f4f1ea" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name dark">Sprout</span>
+    </div>
+
+    <p class="section-eyebrow anim-fade-down" data-anim="fade-down" style="--anim-dur:.5s;margin-top:48px;">01 · The Problem</p>
+    <h2 class="slide-h2 anim-fade-up" data-anim="fade-up" style="--anim-dur:.7s;animation-delay:.05s">
+      It shouldn't take luck<br>to find <em>your people.</em>
+    </h2>
+    <p class="slide-lede anim-fade-up" data-anim="fade-up" style="animation-delay:.15s;margin-bottom:36px;">
+      Once kids arrive, making real parent friends is harder than it looks — even when you're surrounded by families just like yours.
+    </p>
+
+    <div class="grid g3 anim-stagger-list" style="max-width:100%">
+      <div class="prob-card">
+        <span class="prob-icon">😮‍💨</span>
+        <p class="prob-title">Parenthood can be isolating</p>
+        <p class="prob-body">Packed schedules, school drop-offs, and exhausted evenings leave no room for the slow, awkward work of making new friends.</p>
+        <div class="prob-stat">68%</div>
+        <p class="prob-stat-label">of parents report feeling lonely since having kids</p>
+      </div>
+      <div class="prob-card">
+        <span class="prob-icon">⏳</span>
+        <p class="prob-title">No time for discovery</p>
+        <p class="prob-body">Even if you want to meet other parents, there's no easy way to find who's nearby, who has kids the same age, or what's happening this weekend.</p>
+        <div class="prob-stat">5hrs</div>
+        <p class="prob-stat-label">average time per week searching for family activities</p>
+      </div>
+      <div class="prob-card">
+        <span class="prob-icon">🍀</span>
+        <p class="prob-title">You're relying on luck</p>
+        <p class="prob-body">The families who become lifelong friends — you found them by accident. At the park, at school pickup. It shouldn't take a coincidence.</p>
+        <div class="prob-stat">1 in 10</div>
+        <p class="prob-stat-label">parents find a lasting community in their first year</p>
+      </div>
+    </div>
+
+    <div class="deck-footer dark-footer">
+      <span>Sprout · Class Community</span>
+      <span class="slide-number" data-current="2" data-total="9"></span>
+    </div>
+
+    <div class="notes">
+      We've all felt this. You move to a neighbourhood, you have a kid, and suddenly you realise: you don't actually *know* anyone here. The stats back this up — most parents describe the first years as genuinely lonely, even when surrounded by other parents.
+    </div>
+  </section>
+
+
+  <!-- ─── 3. INTRODUCING SPROUT ──────────────────────── -->
+  <section class="slide" data-title="Introducing Sprout">
+    <div style="position:absolute;inset:0;background:linear-gradient(160deg,#f4f1ea 0%,#e8f0eb 100%);"></div>
+
+    <div class="brand-wrap">
+      <svg class="brand-leaf dark" viewBox="0 0 32 32" fill="none">
+        <path d="M16 4C16 4 7 10 7 18C7 22.4183 11.134 26 16 26C20.866 26 25 22.4183 25 18C25 10 16 4 16 4Z" fill="currentColor" opacity="0.85"/>
+        <path d="M16 26V16" stroke="#f4f1ea" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name dark">Sprout</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-top:48px;">
+      <div>
+        <p class="section-eyebrow anim-fade-down" data-anim="fade-down" style="--anim-dur:.5s">02 · The Solution</p>
+        <h2 class="slide-h2 anim-fade-up" data-anim="fade-up" style="--anim-dur:.7s;animation-delay:.05s">
+          Meet Sprout — the app built <em>by parents, for parents.</em>
+        </h2>
+        <p class="slide-lede anim-fade-up" data-anim="fade-up" style="animation-delay:.15s;font-size:18px;margin-bottom:28px;">
+          A private community where families in your neighbourhood discover local events, join interest-based clubs, chat, and build the friendships their kids deserve.
+        </p>
+        <div class="row anim-fade-up" data-anim="fade-up" style="animation-delay:.28s;flex-wrap:wrap;gap:10px;">
+          <span class="pill pill-accent">🗓 Local Events</span>
+          <span class="pill pill-accent">🌿 Parent Clubs</span>
+          <span class="pill pill-accent">🤖 AI Matching</span>
+          <span class="pill pill-accent">💬 Group Chat</span>
+          <span class="pill pill-accent">📸 Memories</span>
+          <span class="pill pill-accent">🔒 Private & Safe</span>
+        </div>
+      </div>
+
+      <div class="solution-visual anim-fade-left" data-anim="fade-left" style="animation-delay:.2s">
+        <div style="font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">Live on Sprout right now</div>
+        <div class="solution-row">
+          <span class="solution-row-icon">🌳</span>
+          <div>
+            <div class="solution-row-title">Saturday Morning Trail Walk</div>
+            <div class="solution-row-sub">12 families · Riverside Park · 9am</div>
+          </div>
+          <span style="margin-left:auto;font-size:13px;font-weight:600;color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);padding:4px 10px;border-radius:8px;">RSVP</span>
+        </div>
+        <div class="solution-row">
+          <span class="solution-row-icon">⚽</span>
+          <div>
+            <div class="solution-row-title">Kids' Weekend Football League</div>
+            <div class="solution-row-sub">Ages 6-9 · Lincoln Field · Sundays</div>
+          </div>
+          <span style="margin-left:auto;font-size:13px;font-weight:600;color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);padding:4px 10px;border-radius:8px;">Join</span>
+        </div>
+        <div class="solution-row">
+          <span class="solution-row-icon">🎨</span>
+          <div>
+            <div class="solution-row-title">Arts & Crafts Mums Club</div>
+            <div class="solution-row-sub">23 members · New event this Friday</div>
+          </div>
+          <span style="margin-left:auto;font-size:13px;font-weight:600;color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);padding:4px 10px;border-radius:8px;">Join</span>
+        </div>
+        <div class="solution-row">
+          <span class="solution-row-icon">💬</span>
+          <div>
+            <div class="solution-row-title">Grade 2 Class Parents</div>
+            <div class="solution-row-sub">18 families · 3 new messages</div>
+          </div>
+          <span style="margin-left:auto;font-size:13px;font-weight:600;color:#fff;background:var(--accent);padding:4px 10px;border-radius:8px;">Open</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="deck-footer dark-footer">
+      <span>Sprout · Class Community</span>
+      <span class="slide-number" data-current="3" data-total="9"></span>
+    </div>
+
+    <div class="notes">
+      Sprout is not another social network. It's a focused, private community for parents in your area. Think of it like a neighbourhood noticeboard — but one that knows what you're interested in, who your kids are, and what's actually happening nearby.
+    </div>
+  </section>
+
+
+  <!-- ─── 4. HOW IT WORKS ──────────────────────────────── -->
+  <section class="slide" data-title="How It Works">
+    <div class="bg-light" style="position:absolute;inset:0;"></div>
+
+    <div class="brand-wrap">
+      <svg class="brand-leaf dark" viewBox="0 0 32 32" fill="none">
+        <path d="M16 4C16 4 7 10 7 18C7 22.4183 11.134 26 16 26C20.866 26 25 22.4183 25 18C25 10 16 4 16 4Z" fill="currentColor" opacity="0.85"/>
+        <path d="M16 26V16" stroke="#f4f1ea" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name dark">Sprout</span>
+    </div>
+
+    <p class="section-eyebrow anim-fade-down" data-anim="fade-down" style="--anim-dur:.5s;margin-top:48px;">03 · How It Works</p>
+    <h2 class="slide-h2 anim-fade-up" data-anim="fade-up" style="--anim-dur:.7s;animation-delay:.05s;margin-bottom:8px;">
+      From neighbour to <em>lifelong friend.</em>
+    </h2>
+    <p class="slide-lede anim-fade-up" data-anim="fade-up" style="animation-delay:.12s;font-size:18px;margin-bottom:36px;">
+      Three simple steps. No awkward icebreakers required.
+    </p>
+
+    <div class="grid g3 anim-stagger-list" style="max-width:100%">
+      <div class="step-card">
+        <span class="step-num">01</span>
+        <div class="step-icon">🗓</div>
+        <h3 class="step-title">Discover what's happening</h3>
+        <p class="step-body">Browse park meetups, sports clubs, arts workshops, movie nights, and playdates happening near you — all organised by parents like you.</p>
+        <div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:6px;">
+          <span style="font-size:12px;padding:4px 10px;border-radius:999px;background:#e2e9e3;color:var(--text-2);font-weight:500;">🌳 Parks</span>
+          <span style="font-size:12px;padding:4px 10px;border-radius:999px;background:#e2e9e3;color:var(--text-2);font-weight:500;">⚽ Sports</span>
+          <span style="font-size:12px;padding:4px 10px;border-radius:999px;background:#e2e9e3;color:var(--text-2);font-weight:500;">🎨 Arts</span>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <span class="step-num">02</span>
+        <div class="step-icon">🌿</div>
+        <h3 class="step-title">Join clubs that fit your life</h3>
+        <p class="step-body">Find interest-based parent clubs — from hiking with toddlers to weekend football leagues. Our AI matches you with the ones that fit your kids' ages and your interests.</p>
+        <div style="margin-top:20px;padding:12px 16px;background:#f0f4f1;border-radius:12px;font-size:13px;color:var(--text-2);">
+          <strong style="color:var(--accent);">93%</strong> of parents find a match in their first week
+        </div>
+      </div>
+
+      <div class="step-card">
+        <span class="step-num">03</span>
+        <div class="step-icon">💚</div>
+        <h3 class="step-title">Meet your people</h3>
+        <p class="step-body">Chat in group threads, DM directly, plan together, share photos from your outings. Show up. Build the kind of friendships that feel like you've known each other for years.</p>
+        <div style="margin-top:20px;background:#f0f4f1;border-radius:12px;padding:12px 16px;">
+          <div style="font-size:13px;color:var(--text-1);font-weight:500;">"Hey! Still on for Friday? 🌳"</div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Park Mums · Sarah</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="deck-footer dark-footer">
+      <span>Sprout · Class Community</span>
+      <span class="slide-number" data-current="4" data-total="9"></span>
+    </div>
+
+    <div class="notes">
+      It really is this simple. Download the app, tell it a little about your family, and it surfaces the things happening around you. You join what looks interesting, show up, and the rest happens naturally.
+    </div>
+  </section>
+
+
+  <!-- ─── 5. KEY FEATURES ──────────────────────────────── -->
+  <section class="slide" data-title="Key Features">
+    <div class="bg-cream" style="position:absolute;inset:0;"></div>
+
+    <div class="brand-wrap">
+      <svg class="brand-leaf dark" viewBox="0 0 32 32" fill="none">
+        <path d="M16 4C16 4 7 10 7 18C7 22.4183 11.134 26 16 26C20.866 26 25 22.4183 25 18C25 10 16 4 16 4Z" fill="currentColor" opacity="0.85"/>
+        <path d="M16 26V16" stroke="#f4f1ea" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name dark">Sprout</span>
+    </div>
+
+    <p class="section-eyebrow anim-fade-down" data-anim="fade-down" style="--anim-dur:.5s;margin-top:48px;">04 · Features</p>
+    <h2 class="slide-h2 anim-fade-up" data-anim="fade-up" style="--anim-dur:.7s;animation-delay:.05s;margin-bottom:32px;">
+      Everything your family <em>actually needs.</em>
+    </h2>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:100%" class="anim-stagger-list">
+      <div class="feat-card">
+        <span class="feat-icon">🗓</span>
+        <div class="feat-title">Local Events</div>
+        <p class="feat-body">Park meetups, playdates, sports leagues, arts workshops — nearby, parent-organised, and free to join.</p>
+        <span class="feat-tag">Browse & RSVP</span>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">🌿</span>
+        <div class="feat-title">Parent Clubs</div>
+        <p class="feat-body">Interest-based groups for parents whose kids are the same age. Your neighbourhood tribe, waiting for you.</p>
+        <span class="feat-tag">100+ Club Types</span>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">🤖</span>
+        <div class="feat-title">AI Matching</div>
+        <p class="feat-body">Smart recommendations based on your kids' ages, your location, and what your family loves doing together.</p>
+        <span class="feat-tag">93% Match Rate</span>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">💬</span>
+        <div class="feat-title">Group Chat & DMs</div>
+        <p class="feat-body">Event threads, club groups, and private messages — so no plan ever falls through the cracks again.</p>
+        <span class="feat-tag">Real-Time</span>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">📸</span>
+        <div class="feat-title">Memories</div>
+        <p class="feat-body">Post photos from your outings and build a shared family album with the people who were actually there.</p>
+        <span class="feat-tag">Private Gallery</span>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">📍</span>
+        <div class="feat-title">Neighbourhood Map</div>
+        <p class="feat-body">See what's happening around you, discover new parks and event spots, and find families in your area.</p>
+        <span class="feat-tag">Hyper-Local</span>
+      </div>
+    </div>
+
+    <div class="deck-footer dark-footer">
+      <span>Sprout · Class Community</span>
+      <span class="slide-number" data-current="5" data-total="9"></span>
+    </div>
+
+    <div class="notes">
+      These are the features parents tell us they use every single day. The app is designed so that every feature flows naturally into the next — you discover an event, you join, you chat, you share a memory. It's a full loop.
+    </div>
+  </section>
+
+
+  <!-- ─── 6. TRUST & SAFETY ────────────────────────────── -->
+  <section class="slide" data-title="Safe & Private">
+    <div class="bg-dark" style="position:absolute;inset:0;"></div>
+    <div class="deco-ring" style="width:700px;height:700px;bottom:-200px;left:-200px;"></div>
+    <div class="deco-ring" style="width:450px;height:450px;top:-100px;right:-100px;"></div>
+
+    <div class="brand-wrap">
+      <svg class="brand-leaf" viewBox="0 0 32 32" fill="none">
+        <path d="M16 4C16 4 7 10 7 18C7 22.4183 11.134 26 16 26C20.866 26 25 22.4183 25 18C25 10 16 4 16 4Z" fill="currentColor" opacity="0.85"/>
+        <path d="M16 26V16" stroke="#0f2218" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name">Sprout</span>
+    </div>
+
+    <p class="section-eyebrow white anim-fade-down" data-anim="fade-down" style="--anim-dur:.5s;margin-top:48px;">05 · Privacy & Safety</p>
+    <h2 class="slide-h2 white anim-fade-up" data-anim="fade-up" style="--anim-dur:.7s;animation-delay:.05s;margin-bottom:10px;">
+      A community, not a <em>social network.</em>
+    </h2>
+    <p class="slide-lede white anim-fade-up" data-anim="fade-up" style="animation-delay:.15s;font-size:18px;margin-bottom:36px;">
+      We built Sprout for families, which means privacy and safety come first — always.
+    </p>
+
+    <div class="grid g4 anim-stagger-list" style="max-width:100%">
+      <div class="trust-card">
+        <span class="trust-icon">🔒</span>
+        <h4 class="trust-title">Private Community</h4>
+        <p class="trust-body">Sprout is not a public platform. Your profile and activity are only visible to other verified members — never to strangers.</p>
+      </div>
+      <div class="trust-card">
+        <span class="trust-icon">✅</span>
+        <h4 class="trust-title">Verified Members</h4>
+        <p class="trust-body">Every account is verified before joining. We confirm identity so you always know who you're talking to.</p>
+      </div>
+      <div class="trust-card">
+        <span class="trust-icon">🚫</span>
+        <h4 class="trust-title">No Ads. Ever.</h4>
+        <p class="trust-body">We don't sell your data or show you ads. Sprout is funded by members, not advertisers. Your family's information stays yours.</p>
+      </div>
+      <div class="trust-card">
+        <span class="trust-icon">👨‍👩‍👧</span>
+        <h4 class="trust-title">Family-Safe Content</h4>
+        <p class="trust-body">Every community is moderated by real people. We remove anything that isn't appropriate for a family-first space.</p>
+      </div>
+    </div>
+
+    <div class="deck-footer" style="color:rgba(255,255,255,.3)">
+      <span>Sprout · Class Community</span>
+      <span class="slide-number" data-current="6" data-total="9"></span>
+    </div>
+
+    <div class="notes">
+      This is the question we get asked most often: "Is it safe?" Absolutely. We're not Facebook. We're not a public app. Sprout is a closed, moderated community where every member is verified. No ads, no data selling, no strangers.
+    </div>
+  </section>
+
+
+  <!-- ─── 7. SOCIAL PROOF ──────────────────────────────── -->
+  <section class="slide" data-title="What Parents Say">
+    <div style="position:absolute;inset:0;background:linear-gradient(160deg,#f4f1ea 0%,#eae6db 100%);"></div>
+
+    <!-- Decorative large quote mark -->
+    <div style="position:absolute;right:80px;top:60px;font-family:'Playfair Display',serif;font-size:320px;line-height:1;color:rgba(24,99,56,.06);z-index:0;pointer-events:none;user-select:none;">"</div>
+
+    <div class="brand-wrap">
+      <svg class="brand-leaf dark" viewBox="0 0 32 32" fill="none">
+        <path d="M16 4C16 4 7 10 7 18C7 22.4183 11.134 26 16 26C20.866 26 25 22.4183 25 18C25 10 16 4 16 4Z" fill="currentColor" opacity="0.85"/>
+        <path d="M16 26V16" stroke="#f4f1ea" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name dark">Sprout</span>
+    </div>
+
+    <p class="section-eyebrow anim-fade-down" data-anim="fade-down" style="--anim-dur:.5s;margin-top:48px;">06 · Real Parents, Real Stories</p>
+    <h2 class="slide-h2 anim-fade-up" data-anim="fade-up" style="--anim-dur:.7s;animation-delay:.05s;margin-bottom:28px;">
+      Parents who found <em>their people.</em>
+    </h2>
+
+    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:28px;align-items:start;" class="anim-fade-up" data-anim="fade-up" style="animation-delay:.2s">
+      <!-- Featured testimonial -->
+      <div class="testi-big">
+        <div class="testi-stars">⭐⭐⭐⭐⭐</div>
+        <p class="testi-quote">
+          "We moved to a new city when our daughter was 6 months old and knew absolutely no one. Within two weeks of joining Sprout, we had four families we genuinely liked. That doesn't happen by accident — the app is just really, really good at putting the right people together."
+        </p>
+        <div class="testi-author">
+          <div class="testi-avatar">👩</div>
+          <div>
+            <div class="testi-name">Priya M.</div>
+            <div class="testi-role">Mum of 1 · Joined 2024</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats + second quote -->
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <!-- Stats -->
+        <div style="background:#fff;border:1px solid rgba(30,62,43,.10);border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow);">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div class="stat-item">
+              <div class="stat-num">2k+</div>
+              <div class="stat-label">Families connected</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">50+</div>
+              <div class="stat-label">Cities across the US</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">10k+</div>
+              <div class="stat-label">Events created</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">93%</div>
+              <div class="stat-label">Find a match in week 1</div>
+            </div>
+          </div>
+        </div>
+        <!-- Second quote -->
+        <div style="background:#fff;border:1px solid rgba(30,62,43,.10);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);">
+          <div class="testi-stars" style="font-size:14px;margin-bottom:10px;">⭐⭐⭐⭐⭐</div>
+          <p style="font-family:'Playfair Display',serif;font-size:17px;line-height:1.55;color:var(--text-1);font-style:italic;margin-bottom:14px;">
+            "My kids look forward to Sprout events the way they used to look forward to birthday parties. The community here is something special."
+          </p>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="testi-avatar" style="width:36px;height:36px;font-size:17px;">👨</div>
+            <div>
+              <div style="font-weight:700;font-size:14px;color:var(--text-1);">James T.</div>
+              <div style="font-size:12px;color:var(--text-3);">Dad of 2 · Football Club</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="deck-footer dark-footer">
+      <span>Sprout · Class Community</span>
+      <span class="slide-number" data-current="7" data-total="9"></span>
+    </div>
+
+    <div class="notes">
+      These stories are why we do this. Priya's family found four close friends in two weeks. James's kids now have a social life they love. This happens over and over — because the app works.
+    </div>
+  </section>
+
+
+  <!-- ─── 8. YOUR CLASS COMMUNITY ───────────────────────── -->
+  <section class="slide" data-title="Your Class on Sprout">
+    <div class="bg-dark" style="position:absolute;inset:0;"></div>
+    <div class="deco-ring" style="width:900px;height:900px;top:-300px;right:-300px;"></div>
+    <div class="deco-ring" style="width:500px;height:500px;bottom:-150px;left:-100px;"></div>
+
+    <div class="brand-wrap">
+      <svg class="brand-leaf" viewBox="0 0 32 32" fill="none">
+        <path d="M16 4C16 4 7 10 7 18C7 22.4183 11.134 26 16 26C20.866 26 25 22.4183 25 18C25 10 16 4 16 4Z" fill="currentColor" opacity="0.85"/>
+        <path d="M16 26V16" stroke="#0f2218" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name">Sprout</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-top:48px;">
+      <div>
+        <p class="section-eyebrow white anim-fade-down" data-anim="fade-down" style="--anim-dur:.5s">07 · Just For Your Class</p>
+        <h2 class="slide-h2 white anim-fade-up" data-anim="fade-up" style="--anim-dur:.7s;animation-delay:.05s">
+          Your class already has a community.<br><em>Sprout makes it official.</em>
+        </h2>
+        <p class="slide-lede white anim-fade-up" data-anim="fade-up" style="animation-delay:.15s;font-size:18px;margin-bottom:28px;">
+          Create a private Sprout group just for the families in your child's class. Plan together, stay connected, and never miss a thing.
+        </p>
+        <div class="anim-fade-up" data-anim="fade-up" style="animation-delay:.25s">
+          <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(119,182,145,.2);border:1px solid rgba(119,182,145,.35);border-radius:999px;padding:8px 18px;color:#77b691;font-size:13px;font-weight:600;">
+            <span>🎁</span> Free for all class members
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px;" class="anim-stagger-list">
+        <div class="class-feature">
+          <div class="class-feature-icon">🏫</div>
+          <div>
+            <div class="class-feature-title">Private Class Group</div>
+            <div class="class-feature-body">A closed group just for your class families — separate from the public community.</div>
+          </div>
+        </div>
+        <div class="class-feature">
+          <div class="class-feature-icon">📅</div>
+          <div>
+            <div class="class-feature-title">Class Events & Playdates</div>
+            <div class="class-feature-body">Organise class outings, birthday playdates, and after-school activities in one place.</div>
+          </div>
+        </div>
+        <div class="class-feature">
+          <div class="class-feature-icon">💬</div>
+          <div>
+            <div class="class-feature-title">Class Chat</div>
+            <div class="class-feature-body">Replace the noisy WhatsApp group with a proper group chat — organised, searchable, no spam.</div>
+          </div>
+        </div>
+        <div class="class-feature">
+          <div class="class-feature-icon">🌍</div>
+          <div>
+            <div class="class-feature-title">Stay Part of the Neighbourhood</div>
+            <div class="class-feature-body">Your class group is nested inside the wider Sprout community — so you discover more as your kids grow.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="deck-footer" style="color:rgba(255,255,255,.3)">
+      <span>Sprout · Class Community</span>
+      <span class="slide-number" data-current="8" data-total="9"></span>
+    </div>
+
+    <div class="notes">
+      Here's the exciting part: you're all already in the same community. Your kids are in the same class. You see each other at pickup. Sprout just makes it official — a dedicated space for your class families to plan, connect, and build something real together.
+    </div>
+  </section>
+
+
+  <!-- ─── 9. CTA ────────────────────────────────────────── -->
+  <section class="slide center tc" data-title="Get Started">
+    <div class="bg-dark" style="position:absolute;inset:0;"></div>
+    <!-- Radial glow center -->
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%, rgba(119,182,145,.18) 0%, transparent 65%);z-index:0;pointer-events:none;"></div>
+    <div class="deco-ring" style="width:700px;height:700px;top:-180px;left:50%;transform:translateX(-50%);"></div>
+    <div class="deco-ring" style="width:950px;height:950px;top:-280px;left:50%;transform:translateX(-50%);"></div>
+
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:28px;">
+      <!-- Brand -->
+      <div style="display:flex;align-items:center;gap:10px;">
+        <svg style="width:40px;height:40px;color:#77b691;" viewBox="0 0 32 32" fill="none">
+          <path d="M16 4C16 4 7 10 7 18C7 22.4183 11.134 26 16 26C20.866 26 25 22.4183 25 18C25 10 16 4 16 4Z" fill="currentColor" opacity="0.85"/>
+          <path d="M16 26V16" stroke="#0f2218" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#fff;letter-spacing:-.02em;">Sprout</span>
+      </div>
+
+      <!-- Big tagline -->
+      <div class="anim-fade-up" data-anim="fade-up">
+        <div class="mega-tagline">
+          Start your family's<br><em>story today.</em>
+        </div>
+      </div>
+
+      <p class="anim-fade-up" data-anim="fade-up" style="animation-delay:.15s;font-size:20px;color:rgba(255,255,255,.65);font-weight:300;max-width:48ch;line-height:1.6;">
+        Download Sprout and join the [School Name] class community — free for every family.
+      </p>
+
+      <!-- CTA buttons -->
+      <div class="row anim-fade-up" data-anim="fade-up" style="animation-delay:.28s;gap:20px;justify-content:center;flex-wrap:wrap;">
+        <a class="cta-app-btn" href="#">
+          <span class="cta-app-btn-icon">🍎</span>
+          <span class="cta-app-btn-text">
+            <span class="cta-app-btn-sub">Download on the</span>
+            <span class="cta-app-btn-main">App Store</span>
+          </span>
+        </a>
+
+        <!-- QR Code -->
+        <div class="qr-placeholder">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="#186338">
+            <!-- QR code pattern (decorative) -->
+            <rect x="5" y="5" width="35" height="35" rx="4" fill="none" stroke="#186338" stroke-width="4"/>
+            <rect x="13" y="13" width="19" height="19" rx="2"/>
+            <rect x="60" y="5" width="35" height="35" rx="4" fill="none" stroke="#186338" stroke-width="4"/>
+            <rect x="68" y="13" width="19" height="19" rx="2"/>
+            <rect x="5" y="60" width="35" height="35" rx="4" fill="none" stroke="#186338" stroke-width="4"/>
+            <rect x="13" y="68" width="19" height="19" rx="2"/>
+            <rect x="60" y="60" width="8" height="8" rx="1"/>
+            <rect x="72" y="60" width="8" height="8" rx="1"/>
+            <rect x="84" y="60" width="8" height="8" rx="1"/>
+            <rect x="60" y="72" width="8" height="8" rx="1"/>
+            <rect x="76" y="76" width="16" height="8" rx="1"/>
+            <rect x="60" y="84" width="8" height="8" rx="1"/>
+            <rect x="72" y="84" width="8" height="8" rx="1"/>
+            <rect x="84" y="84" width="8" height="8" rx="1"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Social proof strip -->
+      <div class="row anim-fade-up" data-anim="fade-up" style="animation-delay:.4s;gap:24px;justify-content:center;flex-wrap:wrap;">
+        <div class="cover-pill">🌳 2,000+ Families</div>
+        <div class="cover-pill">⭐ 4.9 App Store</div>
+        <div class="cover-pill">📍 50+ Cities</div>
+        <div class="cover-pill">🔒 Free & Private</div>
+      </div>
+
+      <p style="font-size:14px;color:rgba(255,255,255,.35);">joinsprout.co · Available on iOS</p>
+    </div>
+
+    <div class="deck-footer" style="color:rgba(255,255,255,.3)">
+      <span>Thank you</span>
+      <span class="slide-number" data-current="9" data-total="9"></span>
+    </div>
+
+    <div class="notes">
+      That's Sprout. A private, safe, beautifully simple community for families like yours. Download the app, look up [School Name], and join your class group today. We'd love to welcome every family in this room. Any questions?
+    </div>
+  </section>
+
+</div>
+
+<!-- ============================================================
+     RUNTIME.JS — inlined for self-contained file
+     ============================================================ -->
+<script>
+(function () {
+  'use strict';
+
+  const ANIMS = ['fade-up','fade-down','fade-left','fade-right','rise-in','drop-in',
+    'zoom-pop','blur-in','glitch-in','typewriter','neon-glow','shimmer-sweep',
+    'gradient-flow','stagger-list','counter-up','path-draw','parallax-tilt',
+    'card-flip-3d','cube-rotate-3d','page-turn-3d','perspective-zoom',
+    'marquee-scroll','kenburns','confetti-burst','spotlight','morph-shape','ripple-reveal'];
+
+  function ready(fn){ if(document.readyState!='loading')fn(); else document.addEventListener('DOMContentLoaded',fn);}
+
+  function getPreviewIdx() {
+    const m = /[?&]preview=(\d+)/.exec(location.search || '');
+    return m ? parseInt(m[1], 10) - 1 : -1;
+  }
+
+  ready(function () {
+    const deck = document.querySelector('.deck');
+    if (!deck) return;
+    const slides = Array.from(deck.querySelectorAll('.slide'));
+    if (!slides.length) return;
+
+    const previewOnlyIdx = getPreviewIdx();
+    const isPreviewMode = previewOnlyIdx >= 0 && previewOnlyIdx < slides.length;
+
+    if (isPreviewMode) {
+      function showSlide(i) {
+        slides.forEach((s, j) => {
+          const active = (j === i);
+          s.classList.toggle('is-active', active);
+          s.style.display = active ? '' : 'none';
+          if (active) {
+            s.style.opacity = '1';
+            s.style.transform = 'none';
+            s.style.pointerEvents = 'auto';
+          }
+        });
+      }
+      showSlide(previewOnlyIdx);
+      const hideSel = '.progress-bar, .notes-overlay, .overview, .notes, aside.notes, .speaker-notes';
+      document.querySelectorAll(hideSel).forEach(el => { el.style.display = 'none'; });
+      document.documentElement.setAttribute('data-preview', '1');
+      document.body.setAttribute('data-preview', '1');
+      function getPreviewThemeBase() {
+        const base = document.documentElement.getAttribute('data-theme-base');
+        if (base) return base;
+        const tl = document.getElementById('theme-link');
+        if (tl) {
+          const raw = tl.getAttribute('href') || '';
+          const ls = raw.lastIndexOf('/');
+          if (ls >= 0) return raw.substring(0, ls + 1);
+        }
+        return 'assets/themes/';
+      }
+      const previewThemeBase = getPreviewThemeBase();
+      window.addEventListener('message', function(e) {
+        if (!e.data) return;
+        if (e.data.type === 'preview-goto') {
+          const n = parseInt(e.data.idx, 10);
+          if (n >= 0 && n < slides.length) showSlide(n);
+        } else if (e.data.type === 'preview-theme' && e.data.name) {
+          let link = document.getElementById('theme-link');
+          if (!link) {
+            link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.id = 'theme-link';
+            document.head.appendChild(link);
+          }
+          link.href = previewThemeBase + e.data.name + '.css';
+          document.documentElement.setAttribute('data-theme', e.data.name);
+        }
+      });
+      try { window.parent && window.parent.postMessage({ type: 'preview-ready' }, '*'); } catch(e) {}
+      return;
+    }
+
+    let idx = 0;
+    const total = slides.length;
+
+    const CHANNEL_NAME = 'html-ppt-presenter-' + location.pathname;
+    let bc;
+    try { bc = new BroadcastChannel(CHANNEL_NAME); } catch(e) { bc = null; }
+
+    let bar = document.querySelector('.progress-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.className = 'progress-bar';
+      bar.innerHTML = '<span></span>';
+      document.body.appendChild(bar);
+    }
+    const barFill = bar.querySelector('span');
+
+    let notes = document.querySelector('.notes-overlay');
+    if (!notes) {
+      notes = document.createElement('div');
+      notes.className = 'notes-overlay';
+      document.body.appendChild(notes);
+    }
+
+    let overview = document.querySelector('.overview');
+    if (!overview) {
+      overview = document.createElement('div');
+      overview.className = 'overview';
+      slides.forEach((s, i) => {
+        const t = document.createElement('div');
+        t.className = 'thumb';
+        t.style.padding = '0 0 56.25% 0';
+        t.style.height = '0';
+        t.style.position = 'relative';
+        t.style.overflow = 'hidden';
+        const title = s.getAttribute('data-title') ||
+          (s.querySelector('h1,h2,h3')||{}).textContent || ('Slide '+(i+1));
+        const mini = document.createElement('div');
+        mini.className = 'mini-slide';
+        mini.style.position = 'absolute';
+        mini.style.top = '0';
+        mini.style.left = '0';
+        mini.style.width = '1920px';
+        mini.style.height = '1080px';
+        mini.style.transformOrigin = 'top left';
+        mini.style.pointerEvents = 'none';
+        mini.style.background = 'var(--bg)';
+        const clone = s.cloneNode(true);
+        clone.className = 'slide is-active';
+        clone.style.position = 'absolute';
+        clone.style.inset = '0';
+        clone.style.transform = 'none';
+        clone.style.opacity = '1';
+        clone.style.padding = '72px 96px';
+        mini.appendChild(clone);
+        t.appendChild(mini);
+        const overlay = document.createElement('div');
+        overlay.style.position = 'absolute';
+        overlay.style.inset = '0';
+        overlay.style.background = 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.8) 100%)';
+        overlay.style.color = '#fff';
+        overlay.style.zIndex = '10';
+        overlay.style.pointerEvents = 'none';
+        const n = document.createElement('div');
+        n.className = 'n';
+        n.textContent = i + 1;
+        n.style.position = 'absolute';
+        n.style.top = '12px';
+        n.style.left = '16px';
+        n.style.fontWeight = '700';
+        n.style.fontSize = '16px';
+        n.style.color = '#fff';
+        n.style.textShadow = '0 1px 4px rgba(0,0,0,0.8)';
+        const text = document.createElement('div');
+        text.className = 't';
+        text.textContent = title.trim().slice(0,80);
+        text.style.position = 'absolute';
+        text.style.bottom = '12px';
+        text.style.left = '16px';
+        text.style.right = '16px';
+        text.style.fontWeight = '600';
+        text.style.fontSize = '14px';
+        text.style.color = '#fff';
+        text.style.textShadow = '0 1px 4px rgba(0,0,0,0.8)';
+        overlay.appendChild(n);
+        overlay.appendChild(text);
+        t.appendChild(overlay);
+        t.addEventListener('click', () => { go(i); toggleOverview(false); });
+        overview.appendChild(t);
+      });
+      document.body.appendChild(overview);
+    }
+
+    function go(n, fromRemote){
+      n = Math.max(0, Math.min(total-1, n));
+      slides.forEach((s,i) => {
+        s.classList.toggle('is-active', i===n);
+        s.classList.toggle('is-prev', i<n);
+      });
+      idx = n;
+      barFill.style.width = ((n+1)/total*100)+'%';
+      const numEl = document.querySelector('.slide-number');
+      if (numEl) { numEl.setAttribute('data-current', n+1); numEl.setAttribute('data-total', total); }
+      const note = slides[n].querySelector('.notes, aside.notes, .speaker-notes');
+      notes.innerHTML = note ? note.innerHTML : '';
+      const hashTarget = '#/'+(n+1);
+      if (location.hash !== hashTarget) history.replaceState(null,'', hashTarget);
+      slides[n].querySelectorAll('[data-anim]').forEach(el => {
+        const a = el.getAttribute('data-anim');
+        el.classList.remove('anim-'+a);
+        void el.offsetWidth;
+        el.classList.add('anim-'+a);
+      });
+      if (!fromRemote && bc) bc.postMessage({ type: 'go', idx: n });
+    }
+
+    if (bc) {
+      bc.onmessage = function(e) {
+        if (!e.data) return;
+        if (e.data.type === 'go' && typeof e.data.idx === 'number') go(e.data.idx, true);
+      };
+    }
+
+    function toggleNotes(force){ notes.classList.toggle('open', force!==undefined?force:!notes.classList.contains('open')); }
+    function toggleOverview(force){
+      const isOpen = force!==undefined ? force : !overview.classList.contains('open');
+      overview.classList.toggle('open', isOpen);
+      if (isOpen) {
+        requestAnimationFrame(() => {
+          const thumbs = overview.querySelectorAll('.thumb');
+          if (thumbs.length) {
+            const scale = thumbs[0].clientWidth / 1920;
+            overview.querySelectorAll('.mini-slide').forEach(m => {
+              m.style.transform = 'scale(' + scale + ')';
+            });
+          }
+        });
+      }
+    }
+
+    let presenterWin = null;
+    function openPresenterWindow() {
+      if (presenterWin && !presenterWin.closed) { presenterWin.focus(); return; }
+      const deckUrl = location.protocol + '//' + location.host + location.pathname;
+      const slideMeta = slides.map((s, i) => {
+        const note = s.querySelector('.notes, aside.notes, .speaker-notes');
+        return {
+          title: s.getAttribute('data-title') || (s.querySelector('h1,h2,h3')||{}).textContent || ('Slide '+(i+1)),
+          notes: note ? note.innerHTML : ''
+        };
+      });
+      const currentTheme = '';
+      const presenterHTML = buildPresenterHTML(deckUrl, slideMeta, total, idx, CHANNEL_NAME, currentTheme);
+      presenterWin = window.open('', 'html-ppt-presenter', 'width=1280,height=820,menubar=no,toolbar=no');
+      if (!presenterWin) { alert('Please allow popups to use presenter view'); return; }
+      presenterWin.document.open();
+      presenterWin.document.write(presenterHTML);
+      presenterWin.document.close();
+    }
+
+    function buildPresenterHTML(deckUrl, slideMeta, total, startIdx, channelName, currentTheme) {
+      const metaJSON = JSON.stringify(slideMeta);
+      const deckUrlJSON = JSON.stringify(deckUrl);
+      const channelJSON = JSON.stringify(channelName);
+      const themeJSON = JSON.stringify(currentTheme || '');
+      const storageKey = 'html-ppt-presenter:' + location.pathname;
+      return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Presenter View — Sprout</title><style>*{margin:0;padding:0;box-sizing:border-box}html,body{width:100%;height:100%;overflow:hidden;background:#1a1d24;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}#stage{position:absolute;inset:0;overflow:hidden}.pcard{position:absolute;background:#0d1117;border:1px solid rgba(255,255,255,.1);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.45);display:flex;flex-direction:column;overflow:hidden;min-width:180px;min-height:100px;transition:box-shadow .2s,border-color .2s}.pcard.dragging{box-shadow:0 16px 48px rgba(0,0,0,.6),0 0 0 2px rgba(88,166,255,.5);border-color:#58a6ff;transition:none;z-index:9999}.pcard-head{display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.06);cursor:move;user-select:none;flex-shrink:0}.pcard-dot{width:8px;height:8px;border-radius:50%;background:var(--dot-color,#58a6ff);flex-shrink:0}.pcard-title{font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;color:#8b949e;flex:1}.pcard-meta{font-size:11px;color:#6e7681}.pcard-body{flex:1;position:relative;overflow:hidden;min-height:0}.pcard-preview .pcard-body{background:#000}.pcard-preview iframe{position:absolute;top:0;left:0;width:1920px;height:1080px;border:none;transform-origin:top left;pointer-events:none}.pcard-notes .pcard-body{padding:14px 18px;overflow-y:auto;font-size:18px;line-height:1.75;color:#d0d7de}.pcard-notes .pcard-body p{margin:0 0 .7em 0}.pcard-notes .pcard-body strong{color:#f0883e}.pcard-notes .empty{color:#484f58;font-style:italic}.pcard-timer .pcard-body{display:flex;flex-direction:column;gap:14px;padding:18px 20px;justify-content:center}.timer-display{font-family:monospace;font-size:42px;font-weight:700;color:#3fb950;letter-spacing:.04em;line-height:1}.timer-row{display:flex;align-items:center;gap:12px;font-size:14px;color:#8b949e}.timer-row .label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#6e7681}.timer-row .val{color:#e6edf3;font-weight:600;font-family:monospace}.timer-controls{display:flex;gap:8px;flex-wrap:wrap}.timer-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#e6edf3;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit}.timer-btn:hover{background:rgba(88,166,255,.15);border-color:#58a6ff}.pcard-resize{position:absolute;right:0;bottom:0;width:18px;height:18px;cursor:nwse-resize;background:linear-gradient(135deg,transparent 50%,rgba(255,255,255,.25) 50%,rgba(255,255,255,.25) 60%,transparent 60%,transparent 70%,rgba(255,255,255,.25) 70%,rgba(255,255,255,.25) 80%,transparent 80%);z-index:5}.hint-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.08);padding:6px 16px;font-size:11px;color:#8b949e;display:flex;gap:18px;align-items:center;z-index:1000}.hint-bar kbd{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:3px;font-family:monospace;font-size:10px;border:1px solid rgba(255,255,255,.1);color:#e6edf3}.hint-bar .reset-layout{margin-left:auto;background:transparent;border:1px solid rgba(255,255,255,.15);color:#8b949e;padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;font-family:inherit}.hint-bar .reset-layout:hover{background:rgba(248,81,73,.15);border-color:#f85149;color:#f85149}body.is-dragging-card *{user-select:none!important}body.is-dragging-card iframe{pointer-events:none!important}</style></head><body><div id="stage"><div class="pcard pcard-preview" id="card-cur" style="--dot-color:#58a6ff"><div class="pcard-head" data-drag><span class="pcard-dot"></span><span class="pcard-title">CURRENT</span><span class="pcard-meta" id="cur-meta">—</span></div><div class="pcard-body"><iframe id="iframe-cur"></iframe></div><div class="pcard-resize" data-resize></div></div><div class="pcard pcard-preview" id="card-nxt" style="--dot-color:#bc8cff"><div class="pcard-head" data-drag><span class="pcard-dot"></span><span class="pcard-title">NEXT</span><span class="pcard-meta" id="nxt-meta">—</span></div><div class="pcard-body"><iframe id="iframe-nxt"></iframe></div><div class="pcard-resize" data-resize></div></div><div class="pcard pcard-notes" id="card-notes" style="--dot-color:#f0883e"><div class="pcard-head" data-drag><span class="pcard-dot"></span><span class="pcard-title">SPEAKER SCRIPT</span></div><div class="pcard-body" id="notes-body"></div><div class="pcard-resize" data-resize></div></div><div class="pcard pcard-timer" id="card-timer" style="--dot-color:#3fb950"><div class="pcard-head" data-drag><span class="pcard-dot"></span><span class="pcard-title">TIMER</span></div><div class="pcard-body"><div class="timer-display" id="timer-display">00:00</div><div class="timer-row"><span class="label">Slide</span><span class="val" id="timer-count">1 / ${total}</span></div><div class="timer-controls"><button class="timer-btn" id="btn-prev">← Prev</button><button class="timer-btn" id="btn-next">Next →</button><button class="timer-btn" id="btn-reset">⏱ Reset</button></div></div><div class="pcard-resize" data-resize></div></div></div><div class="hint-bar"><span><kbd>← →</kbd> Navigate</span><span><kbd>R</kbd> Reset timer</span><span><kbd>Esc</kbd> Close</span><button class="reset-layout" id="reset-layout">Reset layout</button></div><script>(function(){var slideMeta=${metaJSON};var total=${total};var idx=${startIdx};var deckUrl=${deckUrlJSON};var STORAGE_KEY=${JSON.stringify(storageKey)};var bc;try{bc=new BroadcastChannel(${channelJSON});}catch(e){}var iframeCur=document.getElementById('iframe-cur');var iframeNxt=document.getElementById('iframe-nxt');var notesBody=document.getElementById('notes-body');var curMeta=document.getElementById('cur-meta');var nxtMeta=document.getElementById('nxt-meta');var timerDisplay=document.getElementById('timer-display');var timerCount=document.getElementById('timer-count');function defaultLayout(){var w=window.innerWidth;var h=window.innerHeight-36;return{'card-cur':{x:16,y:16,w:Math.round(w*.55)-24,h:Math.round(h*.62)-16},'card-nxt':{x:Math.round(w*.55)+8,y:16,w:w-Math.round(w*.55)-24,h:Math.round(h*.42)-16},'card-notes':{x:Math.round(w*.55)+8,y:Math.round(h*.42)+8,w:w-Math.round(w*.55)-24,h:h-Math.round(h*.42)-16},'card-timer':{x:16,y:Math.round(h*.62)+8,w:Math.round(w*.55)-24,h:h-Math.round(h*.62)-16}};}function applyLayout(layout){Object.keys(layout).forEach(function(id){var el=document.getElementById(id);var l=layout[id];if(el&&l){el.style.left=l.x+'px';el.style.top=l.y+'px';el.style.width=l.w+'px';el.style.height=l.h+'px';}});rescaleAll();}function readLayout(){try{var saved=localStorage.getItem(STORAGE_KEY);if(saved)return JSON.parse(saved);}catch(e){}return defaultLayout();}function saveLayout(){var layout={};['card-cur','card-nxt','card-notes','card-timer'].forEach(function(id){var el=document.getElementById(id);if(el){layout[id]={x:parseInt(el.style.left,10)||0,y:parseInt(el.style.top,10)||0,w:parseInt(el.style.width,10)||300,h:parseInt(el.style.height,10)||200};}});try{localStorage.setItem(STORAGE_KEY,JSON.stringify(layout));}catch(e){}}function rescaleIframe(iframe){if(!iframe||iframe.style.display==='none')return;var body=iframe.parentElement;var cw=body.clientWidth,ch=body.clientHeight;if(!cw||!ch)return;var s=Math.min(cw/1920,ch/1080);iframe.style.transform='scale('+s+')';var sw=1920*s,sh=1080*s;iframe.style.left=Math.max(0,(cw-sw)/2)+'px';iframe.style.top=Math.max(0,(ch-sh)/2)+'px';}function rescaleAll(){rescaleIframe(iframeCur);rescaleIframe(iframeNxt);}window.addEventListener('resize',rescaleAll);document.querySelectorAll('[data-drag]').forEach(function(handle){handle.addEventListener('mousedown',function(e){if(e.button!==0)return;var card=handle.closest('.pcard');if(!card)return;e.preventDefault();card.classList.add('dragging');document.body.classList.add('is-dragging-card');var startX=e.clientX,startY=e.clientY;var startL=parseInt(card.style.left,10)||0;var startT=parseInt(card.style.top,10)||0;function onMove(ev){var nx=Math.max(0,Math.min(window.innerWidth-100,startL+ev.clientX-startX));var ny=Math.max(0,Math.min(window.innerHeight-50,startT+ev.clientY-startY));card.style.left=nx+'px';card.style.top=ny+'px';}function onUp(){card.classList.remove('dragging');document.body.classList.remove('is-dragging-card');document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);saveLayout();}document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);});});document.querySelectorAll('[data-resize]').forEach(function(handle){handle.addEventListener('mousedown',function(e){if(e.button!==0)return;var card=handle.closest('.pcard');if(!card)return;e.preventDefault();e.stopPropagation();card.classList.add('resizing');document.body.classList.add('is-dragging-card');var startX=e.clientX,startY=e.clientY;var startW=parseInt(card.style.width,10)||card.offsetWidth;var startH=parseInt(card.style.height,10)||card.offsetHeight;function onMove(ev){var nw=Math.max(180,startW+ev.clientX-startX);var nh=Math.max(100,startH+ev.clientY-startY);card.style.width=nw+'px';card.style.height=nh+'px';if(card.querySelector('iframe'))rescaleIframe(card.querySelector('iframe'));}function onUp(){card.classList.remove('resizing');document.body.classList.remove('is-dragging-card');document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);rescaleAll();saveLayout();}document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);});});var iframeReady={cur:false,nxt:false};var currentTheme=${themeJSON};window.addEventListener('message',function(e){if(!e.data||e.data.type!=='preview-ready')return;var iframe=null;if(e.source===iframeCur.contentWindow){iframeReady.cur=true;iframe=iframeCur;postPreviewGoto(iframeCur,idx);}else if(e.source===iframeNxt.contentWindow){iframeReady.nxt=true;iframe=iframeNxt;postPreviewGoto(iframeNxt,idx+1<total?idx+1:idx);}if(iframe)rescaleIframe(iframe);});function postPreviewGoto(iframe,n){try{iframe.contentWindow.postMessage({type:'preview-goto',idx:n},'*');}catch(e){}}function update(n){n=Math.max(0,Math.min(total-1,n));idx=n;if(iframeReady.cur)postPreviewGoto(iframeCur,n);curMeta.textContent=(n+1)+'/'+total;if(n+1<total){iframeNxt.style.display='';if(iframeReady.nxt)postPreviewGoto(iframeNxt,n+1);nxtMeta.textContent=(n+2)+'/'+total;}else{iframeNxt.style.display='none';nxtMeta.textContent='END';}var note=slideMeta[n].notes;notesBody.innerHTML=note||'<span class="empty">(No speaker notes for this slide)</span>';timerCount.textContent=(n+1)+' / '+total;}var tStart=Date.now();setInterval(function(){var s=Math.floor((Date.now()-tStart)/1000);var mm=String(Math.floor(s/60)).padStart(2,'0');var ss=String(s%60).padStart(2,'0');timerDisplay.textContent=mm+':'+ss;},1000);function resetTimer(){tStart=Date.now();timerDisplay.textContent='00:00';}if(bc){bc.onmessage=function(e){if(!e.data)return;if(e.data.type==='go')update(e.data.idx);};}function go(n){update(n);if(bc)bc.postMessage({type:'go',idx:idx});}document.getElementById('btn-prev').addEventListener('click',function(){go(idx-1);});document.getElementById('btn-next').addEventListener('click',function(){go(idx+1);});document.getElementById('btn-reset').addEventListener('click',resetTimer);document.getElementById('reset-layout').addEventListener('click',function(){if(confirm('Reset card layout?')){try{localStorage.removeItem(STORAGE_KEY);}catch(e){}applyLayout(defaultLayout());}});document.addEventListener('keydown',function(e){if(e.metaKey||e.ctrlKey||e.altKey)return;switch(e.key){case 'ArrowRight':case ' ':case 'PageDown':go(idx+1);e.preventDefault();break;case 'ArrowLeft':case 'PageUp':go(idx-1);e.preventDefault();break;case 'Home':go(0);break;case 'End':go(total-1);break;case 'r':case 'R':resetTimer();break;case 'Escape':window.close();break;}});iframeCur.addEventListener('load',function(){rescaleIframe(iframeCur);});iframeNxt.addEventListener('load',function(){rescaleIframe(iframeNxt);});applyLayout(readLayout());iframeCur.src=deckUrl+'?preview='+(idx+1);if(idx+1<total)iframeNxt.src=deckUrl+'?preview='+(idx+2);notesBody.innerHTML=slideMeta[idx].notes||'<span class="empty">(No speaker notes)</span>';curMeta.textContent=(idx+1)+'/'+total;nxtMeta.textContent=(idx+2)+'/'+total;timerCount.textContent=(idx+1)+' / '+total;})();<\/script></body></html>`;
+    }
+
+    function fullscreen(){
+      const el=document.documentElement;
+      if (!document.fullscreenElement) el.requestFullscreen&&el.requestFullscreen();
+      else document.exitFullscreen&&document.exitFullscreen();
+    }
+
+    const root = document.documentElement;
+    const themes = [];
+    let themeIdx = 0;
+    let themeBase = 'assets/themes/';
+
+    let animIdx = 0;
+    function cycleAnim(){
+      animIdx = (animIdx+1) % ANIMS.length;
+      const a = ANIMS[animIdx];
+      const target = slides[idx].querySelector('[data-anim-target]') || slides[idx];
+      ANIMS.forEach(x => target.classList.remove('anim-'+x));
+      void target.offsetWidth;
+      target.classList.add('anim-'+a);
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.metaKey||e.ctrlKey||e.altKey) return;
+      switch (e.key) {
+        case 'ArrowRight': case ' ': case 'PageDown': case 'Enter': go(idx+1); e.preventDefault(); break;
+        case 'ArrowLeft': case 'PageUp': case 'Backspace': go(idx-1); e.preventDefault(); break;
+        case 'Home': go(0); break;
+        case 'End': go(total-1); break;
+        case 'f': case 'F': fullscreen(); break;
+        case 's': case 'S': openPresenterWindow(); break;
+        case 'n': case 'N': toggleNotes(); break;
+        case 'o': case 'O': toggleOverview(); break;
+        case 'a': case 'A': cycleAnim(); break;
+        case 'Escape': toggleOverview(false); toggleNotes(false); break;
+      }
+    });
+
+    function fromHash(){
+      const m = /^#\/(\d+)/.exec(location.hash||'');
+      if (m) go(Math.max(0, parseInt(m[1],10)-1));
+    }
+    window.addEventListener('hashchange', fromHash);
+    fromHash();
+    go(idx);
+  });
+})();
+</script>
+
+</body>
+</html>

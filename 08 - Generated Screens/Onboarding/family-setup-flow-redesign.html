@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Family Setup — Redesign · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f1ea; --surface:#ffffff; --card:#ffffff; --field:#e8e2d6;
+  --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+  --brand:#186338; --brand-bold:#1e3e2b; --brand-mid:#4fa472;
+  --brand-light:#e2e9e3; --brand-border:#77b691; --border:#d0dacf;
+  --surface-l2:#dbd5c8; --border-brand-light:#d0dacf;
+  --bg-brand-disable:#a9c2af; --neg:#d64545; --neg-subtle:#f7dada;
+  --shadow-sm:1px 3px 9px rgba(13,13,18,.07); --shadow:1px 4px 16px rgba(13,13,18,.12);
+  --shadow-l:1px 4px 25px rgba(13,13,18,.2); --radius:16px;
+  --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;padding:48px 24px 80px;}
+.ph{display:inline-block;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+
+.lede{max-width:760px;margin:0 auto 40px;text-align:center;}
+.lede .k{font:600 11px/14px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--brand);margin-bottom:8px;}
+.lede h1{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--brand-bold);margin:0 0 8px;}
+.lede p{font-size:13.5px;color:var(--muted);margin:0;line-height:1.6;}
+
+.row{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-start;gap:40px;padding:0 8px;overflow-x:auto;}
+.col{flex:0 0 auto;}
+.tag{font:600 11px/14px var(--sans);color:var(--muted);text-align:center;margin-bottom:12px;letter-spacing:.04em;text-transform:uppercase;}
+.tag b{color:var(--brand-bold);}
+
+.device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;
+  background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+  box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+.island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:50;}
+.screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+
+.sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);z-index:20;}
+.sb .r{display:inline-flex;gap:6px;align-items:center;}
+.sb svg{width:17px;height:11px;fill:var(--ink);} .sb .bat{width:25px;}
+
+/* progress header — growth themed */
+.hdrp{flex:0 0 auto;padding:6px 20px 6px;display:flex;align-items:center;gap:14px;}
+.backc{width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--border);
+  display:grid;place-items:center;flex-shrink:0;box-shadow:var(--shadow-sm);}
+.backc .ph{width:18px;height:18px;color:var(--ink);}
+.ptrack{flex:1;display:flex;gap:6px;position:relative;}
+.pseg{flex:1;height:5px;border-radius:999px;background:var(--surface-l2);overflow:visible;position:relative;}
+.pseg.done{background:var(--brand);}
+.pseg.done.tip::after{content:"🌱";position:absolute;right:-9px;top:-11px;font-size:13px;}
+
+/* plain header (no progress) */
+.hdrx{flex:0 0 auto;display:flex;align-items:center;padding:14px 16px 4px;}
+.hdrx .ttl{flex:1;text-align:center;font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink);}
+.hdrx .sp{width:38px;flex-shrink:0;}
+
+.body{flex:1 1 auto;overflow-y:auto;padding:10px 20px 130px;}
+.body::-webkit-scrollbar{display:none;}
+
+.eyebrow{font:700 11px/14px var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--brand);margin:8px 0 6px;}
+.title{font-family:var(--serif);font-weight:600;font-size:23px;line-height:29px;color:var(--ink);margin:0 0 8px;}
+.title em{font-style:italic;color:var(--brand);font-weight:500;}
+.subcopy{font-size:13px;line-height:19px;color:var(--muted);margin:0 0 20px;}
+
+/* sticky CTA */
+.cta{position:absolute;left:0;right:0;bottom:0;padding:14px 20px 30px;
+  background:linear-gradient(to top,var(--bg) 68%,rgba(244,241,234,0));z-index:15;}
+.btn{width:100%;border:none;border-radius:var(--radius);padding:16px;font-family:var(--serif);font-size:15.5px;font-weight:600;
+  background:var(--brand);color:#fff;cursor:pointer;box-shadow:var(--shadow);letter-spacing:.01em;}
+.btn:disabled{background:var(--bg-brand-disable);color:rgba(255,255,255,.75);box-shadow:none;cursor:default;}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1.5px solid var(--border);box-shadow:none;}
+.btnrow{display:flex;gap:10px;}
+.btnrow .btn{flex:1;}
+
+/* avatar upload (profile) */
+.avwrap{display:flex;flex-direction:column;align-items:center;margin:6px 0 8px;}
+.avatarUp{width:102px;height:102px;border-radius:50%;position:relative;
+  background:linear-gradient(144deg,var(--brand) 8%,var(--brand-mid) 100%);
+  display:grid;place-items:center;box-shadow:0 0 0 7px var(--brand-light),var(--shadow);}
+.avatarUp .ph{width:38px;height:38px;color:#fff;opacity:.92;}
+.camBadge{position:absolute;right:-3px;bottom:-3px;width:32px;height:32px;border-radius:50%;
+  background:var(--surface);border:3px solid var(--bg);display:grid;place-items:center;box-shadow:var(--shadow-sm);}
+.camBadge .ph{width:15px;height:15px;color:var(--brand);}
+.reqlabel{color:var(--neg);font-size:11.5px;font-weight:600;margin-top:9px;}
+
+/* fields */
+.field{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:14px 15px;
+  font-size:14px;color:var(--body);box-shadow:var(--shadow-sm);width:100%;font-family:var(--sans);}
+.field::placeholder{color:var(--muted);}
+.field:focus{outline:none;border-color:var(--brand-border);box-shadow:0 0 0 3px var(--brand-light);}
+.fieldrow{display:flex;gap:10px;margin-bottom:10px;}
+.fieldrow .field{flex:1;}
+.fieldwrap{margin-bottom:16px;}
+.fieldwrap .fl{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;display:block;}
+.fielddate{display:flex;align-items:center;justify-content:space-between;}
+.fielddate .ph{width:18px;height:18px;color:var(--muted);}
+
+.sectionlbl{font-size:12.5px;font-weight:600;color:var(--body);margin:2px 0 10px;}
+
+/* role / gender picker */
+.rolegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px;}
+.rolecard{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:15px 8px;
+  text-align:center;box-shadow:var(--shadow-sm);cursor:pointer;transition:transform .1s,background .12s,border-color .12s;}
+.rolecard:active{transform:scale(.96);}
+.rolecard.on{background:var(--brand-light);border-color:var(--brand);}
+.rolecard .emo{font-size:23px;display:block;margin-bottom:7px;}
+.rolecard .lbl{font-size:13px;font-weight:600;color:var(--ink);}
+
+.gendergrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
+.gendercard{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:12px 4px;
+  text-align:center;box-shadow:var(--shadow-sm);cursor:pointer;}
+.gendercard.on{background:var(--brand-light);border-color:var(--brand);}
+.gendercard .emo{font-size:20px;display:block;margin-bottom:5px;}
+.gendercard .lbl{font-size:12px;font-weight:600;color:var(--ink);}
+
+/* empty state */
+.emptycard{background:var(--surface);border:1.5px dashed var(--border);border-radius:20px;padding:30px 22px;
+  text-align:center;box-shadow:var(--shadow-sm);margin:8px 0 16px;}
+.emptyicon{width:60px;height:60px;border-radius:50%;background:var(--brand-light);display:grid;place-items:center;
+  margin:0 auto 14px;font-size:26px;}
+.emptycard h3{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);margin:0 0 8px;}
+.emptycard p{font-size:12.5px;line-height:18px;color:var(--muted);margin:0;}
+
+/* add-row (big solid CTA trigger) */
+.addrow{display:flex;align-items:center;gap:13px;background:var(--brand);color:#fff;border-radius:18px;
+  padding:16px;box-shadow:var(--shadow);cursor:pointer;margin-bottom:14px;}
+.addrow .ic{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.16);display:grid;place-items:center;flex-shrink:0;}
+.addrow .ic .ph{width:19px;height:19px;color:#fff;}
+.addrow .tx{flex:1;}
+.addrow .tx .n{font-family:var(--serif);font-size:14.5px;font-weight:600;}
+.addrow .tx .s{font-size:12px;opacity:.85;margin-top:1px;}
+.addrow .chev{width:16px;height:16px;color:rgba(255,255,255,.8);flex-shrink:0;}
+
+.addrow.light{background:var(--brand-light);color:var(--ink);box-shadow:none;border:1px solid var(--border-brand-light);}
+.addrow.light .ic{background:var(--brand);}
+.addrow.light .tx .n{color:var(--ink);}
+.addrow.light .tx .s{color:var(--muted);opacity:1;}
+.addrow.light .chev{color:var(--muted);}
+
+/* info banner */
+.infobar{display:flex;gap:10px;align-items:flex-start;background:var(--brand-light);border-radius:14px;
+  padding:13px 14px;font-size:12px;line-height:17px;color:var(--body);margin:2px 0 6px;}
+.infobar .ic{width:18px;height:18px;color:var(--brand);flex-shrink:0;margin-top:1px;}
+
+/* kid card */
+.kidcard{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:18px;
+  padding:12px 14px;box-shadow:var(--shadow-sm);margin-bottom:10px;}
+.kidphoto{width:52px;height:52px;border-radius:14px;flex-shrink:0;display:grid;place-items:center;font-size:22px;
+  background:linear-gradient(135deg,#dcead0,#9dc08a);box-shadow:inset 0 0 0 1px rgba(0,0,0,.05);}
+.kidinfo{flex:1;min-width:0;}
+.kidinfo .n{font-family:var(--serif);font-size:14.5px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:7px;}
+.kidinfo .agebadge{background:var(--brand-light);color:var(--brand);font-size:10.5px;font-weight:700;
+  padding:2px 8px;border-radius:999px;}
+.kidinfo .d{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.trashbtn{width:34px;height:34px;border-radius:50%;background:var(--neg-subtle);display:grid;place-items:center;flex-shrink:0;}
+.trashbtn .ph{width:15px;height:15px;color:var(--neg);}
+
+/* family complete strip */
+.completestrip{display:flex;align-items:center;gap:11px;background:var(--brand-light);
+  border:1px solid var(--border-brand-light);border-radius:16px;padding:14px 15px;margin:4px 0 12px;}
+.completestrip .ic{width:36px;height:36px;border-radius:50%;background:var(--brand);display:grid;place-items:center;flex-shrink:0;}
+.completestrip .ic .ph{width:17px;height:17px;color:#fff;}
+.completestrip .n{font-family:var(--serif);font-size:13.5px;font-weight:600;color:var(--ink);}
+.completestrip .s{font-size:11.5px;color:var(--muted);margin-top:1px;}
+
+/* search + zip */
+.zipline{font-size:12px;color:var(--muted);margin-bottom:14px;}
+.searchfield{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--border);
+  border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-sm);margin-bottom:16px;}
+.searchfield .ph{width:17px;height:17px;color:var(--muted);flex-shrink:0;}
+.searchfield span{font-size:13.5px;color:var(--muted);}
+
+/* avatar monogram */
+.avatar{border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;
+  background:linear-gradient(144deg,var(--brand) 5%,var(--brand-mid) 100%);flex-shrink:0;}
+
+/* expandable school card */
+.xcard{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px 15px;
+  box-shadow:var(--shadow-sm);cursor:pointer;margin-bottom:11px;}
+.xhead{display:flex;align-items:center;gap:12px;}
+.xhead .avatar{width:42px;height:42px;font-size:15px;}
+.xhead .tx{flex:1;min-width:0;}
+.xhead .tx .n{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink);}
+.xhead .tx .s{font-size:11.5px;color:var(--muted);margin-top:1px;}
+.xhead .chev{width:16px;height:16px;color:var(--muted);flex-shrink:0;transition:transform .2s;}
+.xcard.open .chev{transform:rotate(180deg);}
+.xcard .detail{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.xcard.open .detail{max-height:900px;}
+.xcard .detail .inner{padding-top:12px;margin-top:12px;border-top:1px dashed var(--border);}
+
+.mrow{display:flex;align-items:center;gap:11px;padding:8px 2px;cursor:pointer;}
+.gradebadge{width:29px;height:29px;border-radius:50%;background:var(--brand-light);color:var(--brand);
+  font-family:var(--serif);font-weight:600;font-size:11.5px;display:grid;place-items:center;flex-shrink:0;}
+.mrow .gn{flex:1;font-size:13.5px;color:var(--body);font-weight:500;}
+.checkbox{width:23px;height:23px;border-radius:8px;border:2px solid #cfc7b5;display:grid;place-items:center;flex-shrink:0;}
+.mrow.sel .checkbox{background:var(--brand);border-color:var(--brand);}
+.mrow.sel .gn{color:var(--ink);font-weight:600;}
+.checkbox .ph{width:12px;height:12px;color:#fff;}
+
+/* photo screens */
+.cropwrap{position:relative;width:100%;aspect-ratio:1/1.05;border-radius:22px;overflow:hidden;margin:8px 0 16px;
+  box-shadow:var(--shadow-sm);background:linear-gradient(160deg,#d7cdb8,#8fae6a);display:grid;place-items:center;}
+.cropwrap .ph{width:64px;height:64px;color:rgba(255,255,255,.55);}
+.cropmask{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);width:76%;height:66%;border-radius:50%;
+  box-shadow:0 0 0 700px rgba(244,241,234,.6);}
+
+.thumbstrip{display:flex;gap:8px;margin-bottom:18px;}
+.thumb{flex:1;aspect-ratio:1;border-radius:12px;overflow:hidden;display:grid;place-items:center;position:relative;}
+.thumb.cam{background:var(--brand);}
+.thumb.cam .ph{width:20px;height:20px;color:#fff;}
+.thumb.grad1{background:linear-gradient(160deg,#e7c9a8,#8fae6a);}
+.thumb.grad2{background:linear-gradient(160deg,#3a4a8f,#7a5fc9,#3aa0c9);}
+.thumb.sel{box-shadow:0 0 0 2.5px var(--brand);}
+
+.photogrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.gcell{aspect-ratio:1;border-radius:11px;overflow:hidden;display:grid;place-items:center;}
+.gcell.cam{background:var(--brand);flex-direction:column;gap:3px;}
+.gcell.cam .ph{width:18px;height:18px;color:#fff;}
+.gcell.grad1{background:linear-gradient(160deg,#e7c9a8,#8fae6a);}
+.gcell.grad2{background:linear-gradient(160deg,#3a4a8f,#7a5fc9,#3aa0c9);}
+.gcell.grad3{background:linear-gradient(160deg,#2a2a3a,#5a2a2a,#c96a4a);}
+.gcell.grad4{background:linear-gradient(160deg,#c9c2b0,#e8e2d0);}
+.gcell.recent{background:linear-gradient(160deg,#cfd9c9,#9fb08a);display:grid;place-items:center;}
+.gcell.recent .ph{width:20px;height:20px;color:rgba(255,255,255,.7);}
+
+/* modal sheet (Add a Child) */
+.dimbg{position:absolute;inset:0;background:rgba(30,62,43,.42);z-index:30;}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--bg);border-radius:28px 28px 0 0;
+  padding:10px 20px 28px;z-index:35;box-shadow:0 -10px 40px rgba(0,0,0,.2);max-height:88%;overflow-y:auto;}
+.sheet::-webkit-scrollbar{display:none;}
+.sheethandle{width:36px;height:4px;border-radius:999px;background:var(--surface-l2);margin:0 auto 16px;}
+.sheet .stitle{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);text-align:center;margin-bottom:6px;}
+.sheet .ssub{font-size:12.5px;color:var(--muted);text-align:center;line-height:18px;margin-bottom:18px;}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <div class="k">Explore loop · redesign pass</div>
+  <h1>Family Setup flow — visual redesign</h1>
+  <p>Figma node 9029:133353 ("Ai Onboarding Flow") ported 1:1 for function — same fields, same steps, same states.
+  Only the surface changed: real elevation instead of flat fills, monogram avatars instead of repeated emoji,
+  a growth-themed progress bar, real Phosphor icons, and one small addition (a "family complete" moment on the
+  5-of-5 state — the original just showed nothing there).</p>
+</div>
+
+<div class="row">
+
+  <!-- SCREEN 1 — 4.1 Details Information -->
+  <div class="col">
+    <div class="tag">4.1 · <b>Profile Details</b></div>
+    <div class="device"><div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r">
+          <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+          <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+          <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+        </span></div>
+        <div class="hdrp">
+          <div class="backc"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+          <div class="ptrack">
+            <div class="pseg done tip"></div><div class="pseg"></div><div class="pseg"></div><div class="pseg"></div>
+          </div>
+        </div>
+        <div class="body">
+          <div class="eyebrow">Welcome</div>
+          <div class="title">Let's Set up <em>Your Profile!</em></div>
+          <p class="subcopy">Here's what you need to start. You can add more later.</p>
+
+          <div class="avwrap">
+            <div class="avatarUp">
+              <span class="ph"><svg viewBox="0 0 256 256"><path d="M208 56h-27.72l-13.63-20.44A8 8 0 0 0 160 32H96a8 8 0 0 0-6.65 3.56L75.71 56H48a24 24 0 0 0-24 24v112a24 24 0 0 0 24 24h160a24 24 0 0 0 24-24V80a24 24 0 0 0-24-24m8 136a8 8 0 0 1-8 8H48a8 8 0 0 1-8-8V80a8 8 0 0 1 8-8h32a8 8 0 0 0 6.66-3.56L100.28 48h55.43l13.63 20.44A8 8 0 0 0 176 72h32a8 8 0 0 1 8 8ZM128 88a44 44 0 1 0 44 44 44.05 44.05 0 0 0-44-44m0 72a28 28 0 1 1 28-28 28 28 0 0 1-28 28"/></svg></span>
+              <div class="camBadge"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 56h-27.72l-13.63-20.44A8 8 0 0 0 160 32H96a8 8 0 0 0-6.65 3.56L75.71 56H48a24 24 0 0 0-24 24v112a24 24 0 0 0 24 24h160a24 24 0 0 0 24-24V80a24 24 0 0 0-24-24m8 136a8 8 0 0 1-8 8H48a8 8 0 0 1-8-8V80a8 8 0 0 1 8-8h32a8 8 0 0 0 6.66-3.56L100.28 48h55.43l13.63 20.44A8 8 0 0 0 176 72h32a8 8 0 0 1 8 8ZM128 88a44 44 0 1 0 44 44 44.05 44.05 0 0 0-44-44m0 72a28 28 0 1 1 28-28 28 28 0 0 1-28 28"/></svg></span></div>
+            </div>
+            <div class="reqlabel">* Add photo profile</div>
+          </div>
+
+          <div class="fieldrow">
+            <input class="field" placeholder="First Name" value="">
+            <input class="field" placeholder="Last Name">
+          </div>
+          <div class="fieldwrap"><input class="field" placeholder="Zip Code"></div>
+
+          <div class="sectionlbl">I'm a..</div>
+          <div class="rolegrid">
+            <div class="rolecard on"><span class="emo">🤱</span><span class="lbl">Mom</span></div>
+            <div class="rolecard"><span class="emo">👨</span><span class="lbl">Dad</span></div>
+            <div class="rolecard"><span class="emo">🧑</span><span class="lbl">Guardian</span></div>
+            <div class="rolecard"><span class="emo">💛</span><span class="lbl">Step Parent</span></div>
+          </div>
+        </div>
+        <div class="cta"><button class="btn" disabled>Continue</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2 — 4.3 Add Kids Empty -->
+  <div class="col">
+    <div class="tag">4.3 · <b>Add Kids — Empty</b></div>
+    <div class="device"><div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r">
+          <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+          <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+          <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+        </span></div>
+        <div class="hdrp">
+          <div class="backc"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+          <div class="ptrack">
+            <div class="pseg done"></div><div class="pseg done tip"></div><div class="pseg"></div><div class="pseg"></div>
+          </div>
+        </div>
+        <div class="body">
+          <div class="eyebrow">Your Family</div>
+          <div class="title">Add your little <em>ones</em> 🌱</div>
+          <p class="subcopy">We'll personalize events, clubs, and activities to match each of your child's information.</p>
+
+          <div class="emptycard">
+            <div class="emptyicon">🧒</div>
+            <h3>No kids added yet</h3>
+            <p>Add your children so Sprout can find age-perfect activities, playdates, and local events for your family.</p>
+          </div>
+
+          <div class="addrow">
+            <div class="ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M256 136a8 8 0 0 1-8 8h-16v16a8 8 0 0 1-16 0v-16h-16a8 8 0 0 1 0-16h16v-16a8 8 0 0 1 16 0v16h16a8 8 0 0 1 8 8m-57.87 58.85a8 8 0 0 1-12.26 10.3C165.75 181.19 138.09 168 108 168s-57.75 13.19-77.87 37.15a8 8 0 0 1-12.25-10.3c14.94-17.78 33.52-30.41 54.17-37.17a68 68 0 1 1 71.9 0c20.65 6.76 39.23 19.39 54.18 37.17M108 152a52 52 0 1 0-52-52 52.06 52.06 0 0 0 52 52"/></svg></span></div>
+            <div class="tx"><div class="n">Add your child</div><div class="s">Take less than a minute</div></div>
+            <span class="chev ph"><svg viewBox="0 0 256 256"><path d="m181.66 133.66-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32Z"/></svg></span>
+          </div>
+
+          <div class="infobar">
+            <span class="ic ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m-8-64V88a8 8 0 0 1 16 0v64a8 8 0 0 1-16 0m20 32a12 12 0 1 1-12-12 12 12 0 0 1 12 12"/></svg></span>
+            <span>We use your kids' info just to make your Sprout experience more personal!</span>
+          </div>
+        </div>
+        <div class="cta"><button class="btn" disabled>Continue</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3 — Add a Child modal -->
+  <div class="col">
+    <div class="tag">4.4 · <b>Add a Child</b> (wizard step)</div>
+    <div class="device"><div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r">
+          <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+          <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+          <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+        </span></div>
+        <div class="hdrp">
+          <div class="backc"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+          <div class="ptrack">
+            <div class="pseg done"></div><div class="pseg done tip"></div><div class="pseg"></div><div class="pseg"></div>
+          </div>
+        </div>
+        <div class="body" style="filter:blur(1px);opacity:.5;">
+          <div class="eyebrow">Your Family</div>
+          <div class="title">Add your little <em>ones</em> 🌱</div>
+        </div>
+
+        <div class="dimbg"></div>
+        <div class="sheet">
+          <div class="sheethandle"></div>
+          <div class="stitle">Add a Child</div>
+          <div class="ssub">Tell us a little about your kid so we can find the right activities.</div>
+
+          <div class="avwrap" style="margin-bottom:18px;">
+            <div class="avatarUp" style="width:84px;height:84px;">
+              <span class="ph" style="width:30px;height:30px;"><svg viewBox="0 0 256 256"><path d="M230.92 212c-15.23-26.33-38.7-45.21-66.09-54.16a72 72 0 1 0-73.66 0c-27.39 8.95-50.86 27.83-66.09 54.16a8 8 0 1 0 13.85 8c18.84-32.56 52.14-52 89.07-52s70.23 19.44 89.07 52a8 8 0 1 0 13.85-8ZM72 96a56 56 0 1 1 56 56 56.06 56.06 0 0 1-56-56"/></svg></span>
+              <div class="camBadge" style="width:26px;height:26px;"><span class="ph" style="width:12px;height:12px;"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8h-80v80a8 8 0 0 1-16 0v-80H40a8 8 0 0 1 0-16h80V40a8 8 0 0 1 16 0v80h80a8 8 0 0 1 8 8"/></svg></span></div>
+            </div>
+          </div>
+
+          <div class="fieldwrap"><span class="fl">Child's Name</span><input class="field" placeholder="e.g. James"></div>
+
+          <div class="fieldwrap">
+            <span class="fl">Gender</span>
+            <div class="gendergrid">
+              <div class="gendercard on"><span class="emo">👦</span><span class="lbl">Boy</span></div>
+              <div class="gendercard"><span class="emo">👧</span><span class="lbl">Girl</span></div>
+              <div class="gendercard"><span class="emo">🧑</span><span class="lbl">Other</span></div>
+            </div>
+          </div>
+
+          <div class="fieldwrap">
+            <span class="fl">Birth Date</span>
+            <div class="field fielddate"><span>dd/mm/yyyy</span>
+              <span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span>
+            </div>
+          </div>
+
+          <div class="btnrow"><button class="btn ghost">Cancel</button><button class="btn">Add Child</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4 — 4.14 Add Kids Filled -->
+  <div class="col">
+    <div class="tag">4.14 · <b>Add Kids — Filled</b></div>
+    <div class="device"><div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r">
+          <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+          <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+          <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+        </span></div>
+        <div class="hdrp">
+          <div class="backc"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+          <div class="ptrack">
+            <div class="pseg done"></div><div class="pseg done tip"></div><div class="pseg"></div><div class="pseg"></div>
+          </div>
+        </div>
+        <div class="body">
+          <div class="eyebrow">Your Family</div>
+          <div class="title">Add your little <em>ones</em> 🌱</div>
+          <p class="subcopy">We'll personalize events, clubs, and activities to match each of your child's information.</p>
+
+          <div class="kidcard">
+            <div class="kidphoto">🌿</div>
+            <div class="kidinfo"><div class="n">Jesica <span class="agebadge">2 yrs</span></div><div class="d">Mar 04, 2024</div></div>
+            <div class="trashbtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Z"/></svg></span></div>
+          </div>
+
+          <div class="addrow light">
+            <div class="ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8h-80v80a8 8 0 0 1-16 0v-80H40a8 8 0 0 1 0-16h80V40a8 8 0 0 1 16 0v80h80a8 8 0 0 1 8 8"/></svg></span></div>
+            <div class="tx"><div class="n">Add another child</div><div class="s">You can add up to 5 children</div></div>
+            <span class="chev ph"><svg viewBox="0 0 256 256"><path d="m181.66 133.66-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32Z"/></svg></span>
+          </div>
+
+          <div class="infobar">
+            <span class="ic ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m-8-64V88a8 8 0 0 1 16 0v64a8 8 0 0 1-16 0m20 32a12 12 0 1 1-12-12 12 12 0 0 1 12 12"/></svg></span>
+            <span>Sprout will suggest family-friendly events and clubs tailored to your children's ages.</span>
+          </div>
+        </div>
+        <div class="cta"><button class="btn">Continue</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 5 — 4.15 Add Kids Full -->
+  <div class="col">
+    <div class="tag">4.15 · <b>Add Kids — Full (5/5)</b></div>
+    <div class="device"><div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r">
+          <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+          <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+          <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+        </span></div>
+        <div class="hdrp">
+          <div class="backc"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+          <div class="ptrack">
+            <div class="pseg done"></div><div class="pseg done tip"></div><div class="pseg"></div><div class="pseg"></div>
+          </div>
+        </div>
+        <div class="body" style="padding-bottom:150px;">
+          <div class="eyebrow">Your Family</div>
+          <div class="title">Add your little <em>ones</em> 🌱</div>
+          <p class="subcopy">We'll personalize events, clubs, and activities to match each of your child's information.</p>
+
+          <div class="kidcard"><div class="kidphoto">🌿</div><div class="kidinfo"><div class="n">Jesica <span class="agebadge">2 yrs</span></div><div class="d">Mar 03, 2024</div></div><div class="trashbtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Z"/></svg></span></div></div>
+          <div class="kidcard"><div class="kidphoto" style="background:linear-gradient(135deg,#f0dcb0,#c9975e);">🌻</div><div class="kidinfo"><div class="n">Marco <span class="agebadge">4 yrs</span></div><div class="d">Jan 18, 2022</div></div><div class="trashbtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Z"/></svg></span></div></div>
+          <div class="kidcard"><div class="kidphoto" style="background:linear-gradient(135deg,#cfe0e6,#7fa8b8);">🦋</div><div class="kidinfo"><div class="n">Ava <span class="agebadge">6 yrs</span></div><div class="d">Aug 02, 2020</div></div><div class="trashbtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Z"/></svg></span></div></div>
+          <div class="kidcard"><div class="kidphoto" style="background:linear-gradient(135deg,#e6cfe0,#a87fb8);">🌸</div><div class="kidinfo"><div class="n">Luca <span class="agebadge">8 yrs</span></div><div class="d">Feb 27, 2018</div></div><div class="trashbtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Z"/></svg></span></div></div>
+          <div class="kidcard"><div class="kidphoto" style="background:linear-gradient(135deg,#dce6cf,#a3c17f);">🍃</div><div class="kidinfo"><div class="n">Theo <span class="agebadge">10 yrs</span></div><div class="d">Nov 11, 2015</div></div><div class="trashbtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Z"/></svg></span></div></div>
+
+          <div class="completestrip">
+            <div class="ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88Z"/></svg></span></div>
+            <div><div class="n">Family all set</div><div class="s">You've added all 5 children this account allows.</div></div>
+          </div>
+        </div>
+        <div class="cta"><button class="btn">Continue</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 6 — 4.16 Select Kids Groups Default -->
+  <div class="col">
+    <div class="tag">4.16 · <b>School Groups</b></div>
+    <div class="device"><div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r">
+          <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+          <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+          <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+        </span></div>
+        <div class="hdrp">
+          <div class="backc"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+          <div class="ptrack">
+            <div class="pseg done"></div><div class="pseg done"></div><div class="pseg done tip"></div><div class="pseg"></div>
+          </div>
+        </div>
+        <div class="body">
+          <div class="eyebrow">Join Group</div>
+          <div class="title">Join your kids <em>school groups</em> 🏫</div>
+          <div class="zipline">Zip Code: 73301</div>
+
+          <div class="searchfield">
+            <span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 218.34-50.07-50.06a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.32-11.32M40 112a72 72 0 1 1 72 72 72.08 72.08 0 0 1-72-72"/></svg></span>
+            <span>Search</span>
+          </div>
+
+          <div class="xcard"><div class="xhead"><div class="avatar" style="width:42px;height:42px;font-size:15px;">L</div><div class="tx"><div class="n">Lincoln Elementary School</div><div class="s">0.8 miles away</div></div><span class="chev ph"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg></span></div></div>
+          <div class="xcard"><div class="xhead"><div class="avatar" style="width:42px;height:42px;font-size:15px;">W</div><div class="tx"><div class="n">Washington Middle School</div><div class="s">1.2 miles away</div></div><span class="chev ph"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg></span></div></div>
+          <div class="xcard"><div class="xhead"><div class="avatar" style="width:42px;height:42px;font-size:15px;">J</div><div class="tx"><div class="n">Jefferson High School</div><div class="s">1.5 miles away</div></div><span class="chev ph"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg></span></div></div>
+          <div class="xcard"><div class="xhead"><div class="avatar" style="width:42px;height:42px;font-size:15px;">R</div><div class="tx"><div class="n">Roosevelt Elementary</div><div class="s">2.1 miles away</div></div><span class="chev ph"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg></span></div></div>
+          <div class="xcard"><div class="xhead"><div class="avatar" style="width:42px;height:42px;font-size:15px;">K</div><div class="tx"><div class="n">Kennedy Preparatory</div><div class="s">2.6 miles away</div></div><span class="chev ph"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg></span></div></div>
+        </div>
+        <div class="cta"><button class="btn" disabled>Select your child's school + grade</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 7 — 4.17 Dropdown expanded -->
+  <div class="col">
+    <div class="tag">4.17 · <b>School Groups — Expanded</b></div>
+    <div class="device"><div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r">
+          <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+          <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+          <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+        </span></div>
+        <div class="hdrp">
+          <div class="backc"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+          <div class="ptrack">
+            <div class="pseg done"></div><div class="pseg done"></div><div class="pseg done tip"></div><div class="pseg"></div>
+          </div>
+        </div>
+        <div class="body">
+          <div class="eyebrow">Join Group</div>
+          <div class="title">Join your kids <em>school groups</em> 🏫</div>
+          <div class="zipline">Zip Code: 73301</div>
+
+          <div class="searchfield">
+            <span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 218.34-50.07-50.06a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.32-11.32M40 112a72 72 0 1 1 72 72 72.08 72.08 0 0 1-72-72"/></svg></span>
+            <span>Search</span>
+          </div>
+
+          <div class="xcard open">
+            <div class="xhead"><div class="avatar" style="width:42px;height:42px;font-size:15px;">L</div><div class="tx"><div class="n">Lincoln Elementary School</div><div class="s">0.8 miles away</div></div><span class="chev ph"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg></span></div>
+            <div class="detail"><div class="inner">
+              <div class="mrow"><div class="gradebadge">P</div><div class="gn">Pre-K</div><div class="checkbox"></div></div>
+              <div class="mrow"><div class="gradebadge">K</div><div class="gn">Kinder</div><div class="checkbox"></div></div>
+              <div class="mrow"><div class="gradebadge">1</div><div class="gn">1st grade</div><div class="checkbox"></div></div>
+              <div class="mrow"><div class="gradebadge">2</div><div class="gn">2nd grade</div><div class="checkbox"></div></div>
+              <div class="mrow"><div class="gradebadge">3</div><div class="gn">3rd grade</div><div class="checkbox"></div></div>
+            </div></div>
+          </div>
+          <div class="xcard"><div class="xhead"><div class="avatar" style="width:42px;height:42px;font-size:15px;">W</div><div class="tx"><div class="n">Washington Middle School</div><div class="s">1.2 miles away</div></div><span class="chev ph"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg></span></div></div>
+          <div class="xcard"><div class="xhead"><div class="avatar" style="width:42px;height:42px;font-size:15px;">J</div><div class="tx"><div class="n">Jefferson High School</div><div class="s">1.5 miles away</div></div><span class="chev ph"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg></span></div></div>
+        </div>
+        <div class="cta"><button class="btn" disabled>Select your child's school + grade</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 8 — 4.18 Selected -->
+  <div class="col">
+    <div class="tag">4.18 · <b>School Groups — Selected</b></div>
+    <div class="device"><div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r">
+          <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+          <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+          <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+        </span></div>
+        <div class="hdrp">
+          <div class="backc"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+          <div class="ptrack">
+            <div class="pseg done"></div><div class="pseg done"></div><div class="pseg done tip"></div><div class="pseg"></div>
+          </div>
+        </div>
+        <div class="body">
+          <div class="eyebrow">Join Group</div>
+          <div class="title">Join your kids <em>school groups</em> 🏫</div>
+          <div class="zipline">Zip Code: 73301</div>
+
+          <div class="searchfield">
+            <span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 218.34-50.07-50.06a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.32-11.32M40 112a72 72 0 1 1 72 72 72.08 72.08 0 0 1-72-72"/></svg></span>
+            <span>Search</span>
+          </div>
+
+          <div class="xcard open">
+            <div class="xhead"><div class="avatar" style="width:42px;height:42px;font-size:15px;">L</div><div class="tx"><div class="n">Lincoln Elementary School</div><div class="s">0.8 miles away</div></div><span class="chev ph"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg></span></div>
+            <div class="detail"><div class="inner">
+              <div class="mrow sel"><div class="gradebadge">P</div><div class="gn">Pre-K</div><div class="checkbox"><span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 77.66-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69 218.34 66.34a8 8 0 0 1 11.32 11.32Z"/></svg></span></div></div>
+              <div class="mrow sel"><div class="gradebadge">K</div><div class="gn">Kinder</div><div class="checkbox"><span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 77.66-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69 218.34 66.34a8 8 0 0 1 11.32 11.32Z"/></svg></span></div></div>
+              <div class="mrow"><div class="gradebadge">1</div><div class="gn">1st grade</div><div class="checkbox"></div></div>
+              <div class="mrow"><div class="gradebadge">2</div><div class="gn">2nd grade</div><div class="checkbox"></div></div>
+              <div class="mrow"><div class="gradebadge">3</div><div class="gn">3rd grade</div><div class="checkbox"></div></div>
+            </div></div>
+          </div>
+        </div>
+        <div class="cta"><button class="btn">Continue</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 9 — 6.4 Spouse Profile Upload -->
+  <div class="col">
+    <div class="tag">6.4 · <b>Spouse — Profile Image</b></div>
+    <div class="device"><div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r">
+          <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+          <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+          <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+        </span></div>
+        <div class="hdrx">
+          <div class="backc"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+          <div class="ttl">Profile Image</div>
+          <div class="sp"></div>
+        </div>
+        <div class="body" style="padding-top:14px;">
+          <div class="cropwrap">
+            <span class="ph"><svg viewBox="0 0 256 256"><path d="M230.92 212c-15.23-26.33-38.7-45.21-66.09-54.16a72 72 0 1 0-73.66 0c-27.39 8.95-50.86 27.83-66.09 54.16a8 8 0 1 0 13.85 8c18.84-32.56 52.14-52 89.07-52s70.23 19.44 89.07 52a8 8 0 1 0 13.85-8ZM72 96a56 56 0 1 1 56 56 56.06 56.06 0 0 1-56-56"/></svg></span>
+            <div class="cropmask"></div>
+          </div>
+          <div class="thumbstrip">
+            <div class="thumb cam"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 56h-27.72l-13.63-20.44A8 8 0 0 0 160 32H96a8 8 0 0 0-6.65 3.56L75.71 56H48a24 24 0 0 0-24 24v112a24 24 0 0 0 24 24h160a24 24 0 0 0 24-24V80a24 24 0 0 0-24-24"/></svg></span></div>
+            <div class="thumb grad1 sel"></div>
+            <div class="thumb grad2"></div>
+          </div>
+          <div class="btnrow"><button class="btn ghost">Cancel</button><button class="btn">Save</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 10 — 6.5 Spouse Gallery -->
+  <div class="col">
+    <div class="tag">6.5 · <b>Spouse — Gallery</b></div>
+    <div class="device"><div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r">
+          <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+          <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+          <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+        </span></div>
+        <div class="hdrx">
+          <div class="backc"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+          <div class="ttl">Profile Image</div>
+          <div class="sp"></div>
+        </div>
+        <div class="body" style="padding-top:14px;">
+          <div class="photogrid">
+            <div class="gcell cam"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 56h-27.72l-13.63-20.44A8 8 0 0 0 160 32H96a8 8 0 0 0-6.65 3.56L75.71 56H48a24 24 0 0 0-24 24v112a24 24 0 0 0 24 24h160a24 24 0 0 0 24-24V80a24 24 0 0 0-24-24"/></svg></span></div>
+            <div class="gcell recent"><span class="ph"><svg viewBox="0 0 256 256"><path d="M230.92 212c-15.23-26.33-38.7-45.21-66.09-54.16a72 72 0 1 0-73.66 0c-27.39 8.95-50.86 27.83-66.09 54.16a8 8 0 1 0 13.85 8c18.84-32.56 52.14-52 89.07-52s70.23 19.44 89.07 52a8 8 0 1 0 13.85-8ZM72 96a56 56 0 1 1 56 56 56.06 56.06 0 0 1-56-56"/></svg></span></div>
+            <div class="gcell grad2"></div>
+            <div class="gcell grad1"></div>
+            <div class="gcell grad3"></div>
+            <div class="gcell grad4"></div>
+            <div class="gcell grad1"></div>
+            <div class="gcell grad2"></div>
+            <div class="gcell grad4"></div>
+            <div class="gcell grad3"></div>
+            <div class="gcell grad1"></div>
+            <div class="gcell grad2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+document.querySelectorAll('.xcard').forEach(c=>{
+  c.querySelector('.xhead').addEventListener('click',()=>c.classList.toggle('open'));
+});
+document.querySelectorAll('.mrow').forEach(r=>{
+  r.addEventListener('click',()=>r.classList.toggle('sel'));
+});
+document.querySelectorAll('.rolecard, .gendercard').forEach(card=>{
+  card.addEventListener('click',()=>{
+    card.parentElement.querySelectorAll(':scope > *').forEach(s=>s.classList.remove('on'));
+    card.classList.add('on');
+  });
+});
+</script>
+</body>
+</html>

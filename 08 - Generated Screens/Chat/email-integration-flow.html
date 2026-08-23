@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Email Integration · Teacher Updates · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff; --field:#e8e2d6;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e; --green:#186338; --brand-mid:#4fa472;
+    --brand-light:#e2e9e3; --brand-border:#77b691; --border-light:#d0dacf; --border:#e6e7ea;
+    --shadow-m:1px 4px 25px rgba(13,13,18,.05); --shadow-l:1px 4px 25px rgba(13,13,18,.12);
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:22px 40px;padding:40px 22px 60px;}
+  .lede{flex:1 0 100%;text-align:center;max-width:760px;margin:0 auto 6px;}
+  .lede h1{font-family:var(--serif);font-weight:600;font-size:23px;color:#23271f;margin:0 0 5px;}
+  .lede p{font-size:12.5px;color:#6a665b;margin:0;line-height:1.5;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:11px;}
+  .cap{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:340px;line-height:1.5;}
+  .cap b{color:#3a3830;}
+  .ph{display:inline-block;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+
+  .device{position:relative;width:360px;height:760px;border-radius:50px;padding:10px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 2px #000 inset,0 22px 46px -14px rgba(0,0,0,.45);}
+  .island{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:110px;height:31px;background:#000;border-radius:999px;z-index:60;}
+  .screen{position:relative;width:100%;height:100%;border-radius:41px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .sb{flex:0 0 42px;padding:15px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:14px;font-weight:600;color:var(--ink);}
+  .sb .r{display:inline-flex;gap:5px;align-items:center;} .sb svg{width:16px;height:10px;fill:var(--ink);} .sb .bat{width:23px;}
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:2px 12px 6px;}
+  .top .ib{width:34px;height:34px;display:grid;place-items:center;color:var(--ink);flex-shrink:0;}
+  .top .ib .ph{width:22px;height:22px;}
+  .top .h{flex:1;text-align:center;font-family:var(--serif);font-weight:500;font-size:15px;color:var(--ink);}
+  .top .skip{font-size:13px;font-weight:600;color:var(--muted);}
+  .top .sp{width:34px;}
+  .body{flex:1;overflow-y:auto;padding:8px 20px 20px;}
+  .body::-webkit-scrollbar{display:none;}
+  .cta{flex:0 0 auto;padding:12px 20px 26px;}
+  .btn{width:100%;border:none;border-radius:15px;padding:15px;font-family:var(--sans);font-weight:600;font-size:15px;background:var(--green);color:#fff;cursor:pointer;box-shadow:var(--shadow-m);display:flex;align-items:center;justify-content:center;gap:8px;}
+  .btn .ph{width:18px;height:18px;}
+  .btn.ghost{background:transparent;color:var(--muted);box-shadow:none;margin-top:4px;}
+  .btn.google{background:#fff;color:#1a1a1a;border:1px solid var(--border-light);box-shadow:var(--shadow-m);}
+  .btn.google .g{width:18px;height:18px;color:#4285F4;}
+
+  .hero{width:82px;height:82px;border-radius:24px;background:var(--brand-light);display:grid;place-items:center;color:var(--green);margin:14px auto 0;position:relative;}
+  .hero .ph{width:42px;height:42px;}
+  .hero .spark{position:absolute;right:-6px;top:-6px;width:26px;height:26px;color:var(--brand-mid);}
+  h2.t{font-family:var(--serif);font-weight:600;font-size:22px;line-height:1.2;color:var(--ink);text-align:center;margin:18px 0 8px;}
+  p.sub{font-size:13.5px;color:var(--body);line-height:1.5;text-align:center;margin:0 auto;max-width:290px;}
+
+  .feat{display:flex;gap:12px;align-items:flex-start;margin-top:14px;}
+  .feat .fi{width:34px;height:34px;border-radius:10px;background:var(--brand-light);display:grid;place-items:center;color:var(--green);flex-shrink:0;}
+  .feat .fi .ph{width:19px;height:19px;}
+  .feat .ft{flex:1;} .feat .ft .h{font-family:var(--sans);font-weight:600;font-size:13.5px;color:var(--ink);}
+  .feat .ft .d{font-size:12px;color:var(--muted);line-height:1.4;margin-top:1px;}
+
+  .acct{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--border-light);border-radius:14px;padding:12px;box-shadow:var(--shadow-m);margin-top:16px;}
+  .acct .av{width:40px;height:40px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:15px;flex-shrink:0;}
+  .acct .ai{flex:1;min-width:0;} .acct .ai .n{font-weight:600;font-size:14px;color:var(--ink);} .acct .ai .e{font-size:12px;color:var(--muted);}
+  .acct .chk{width:22px;height:22px;color:var(--green);}
+
+  .note{display:flex;gap:10px;align-items:flex-start;background:var(--brand-light);border-radius:14px;padding:12px;margin-top:16px;}
+  .note .ph{width:20px;height:20px;color:var(--green);flex-shrink:0;margin-top:1px;}
+  .note .nt{font-size:12px;color:#2c3e30;line-height:1.45;} .note .nt b{font-weight:600;}
+
+  .flabel{font-family:var(--sans);font-weight:600;font-size:12px;color:var(--ink);margin:16px 0 6px;display:flex;align-items:center;gap:5px;}
+  .flabel .req{color:var(--muted);font-weight:400;}
+  .fin{display:flex;align-items:center;gap:9px;background:var(--field);border:none;border-radius:13px;padding:13px 12px;}
+  .fin .ph{width:19px;height:19px;color:var(--muted);flex-shrink:0;} .fin.filled .ph{color:var(--green);}
+  .fin .v{flex:1;font-size:13.5px;color:var(--ink);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fin .v.ph-txt{color:#9c9788;}
+  .fin .rm{width:18px;height:18px;color:#c3bdae;}
+  .addmore{display:flex;align-items:center;gap:7px;color:var(--green);font-weight:600;font-size:13px;margin-top:11px;cursor:pointer;}
+  .addmore .ph{width:18px;height:18px;}
+
+  /* success */
+  .succhero{width:74px;height:74px;border-radius:50%;background:var(--brand-light);display:grid;place-items:center;color:var(--green);margin:18px auto 0;}
+  .succhero .ph{width:44px;height:44px;}
+  .preview{background:var(--card);border-radius:16px;padding:14px;box-shadow:var(--shadow-m);margin-top:18px;}
+  .preview .ph-head{display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+  .preview .ph-head .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:13px;}
+  .preview .ph-head .t{font-family:var(--serif);font-weight:600;font-size:14px;color:var(--ink);}
+  .preview .ph-head .s{font-size:11px;color:var(--muted);margin-top:1px;}
+  .uprow{display:flex;gap:9px;padding:10px 0 0;}
+  .uprow .fav{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:10px;background:linear-gradient(145deg,#1e3e2b,#4fa472);}
+  .uprow .frm{font-size:11px;font-weight:600;color:var(--green);margin-bottom:1px;}
+  .uprow .badge{font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 7px;border-radius:7px;background:var(--brand-light);color:var(--green);height:fit-content;}
+  .uprow .badge.rem{background:#efe7cd;color:#836516;}
+  .uprow .ut{flex:1;} .uprow .ut .h{font-family:var(--serif);font-weight:600;font-size:13px;color:var(--ink);} .uprow .ut .d{font-size:11.5px;color:var(--muted);margin-top:1px;}
+</style>
+</head>
+<body>
+<div class="lede">
+  <h1>Email Integration — Teacher Updates</h1>
+  <p>Entry dari hub "Ms. Taylor's Updates" (belum connect) → intro → connect Gmail (kayak calendar) → input email guru + parent → auto-populate. Guru nggak perlu ngapa-ngapain.</p>
+</div>
+
+<!-- ===== 0. NOT CONNECTED (EMPTY) ===== -->
+<div class="panel">
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="top"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="h">Teacher Updates</div><div class="sp"></div></div>
+    <div class="body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px 60px">
+      <div class="hero" style="margin:0 auto"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span></div>
+      <h2 class="t">Nothing connected yet</h2>
+      <p class="sub">Connect your inbox and Sprout pulls your teacher's emails in here automatically — no new app for them.</p>
+    </div>
+    <div class="cta"><button class="btn">Connect email</button></div>
+  </div></div>
+  <div class="cap"><b>0 · Belum connect.</b> Empty state hub → CTA Connect email.</div>
+</div>
+
+<!-- ===== 1. INTRO ===== -->
+<div class="panel">
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="top"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="h"></div><div class="skip">Skip</div></div>
+    <div class="body">
+      <div class="hero">
+        <span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span>
+        <span class="ph spark"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88ZM137 164.22a8 8 0 0 0-4.74 4.74L112 223.85 91.78 169a8 8 0 0 0-4.78-4.78L32.15 144 87 123.78a8 8 0 0 0 4.78-4.78L112 64.15 132.22 119a8 8 0 0 0 4.74 4.74L191.85 144Z"/></svg></span>
+      </div>
+      <h2 class="t">Teacher updates,<br>automatically</h2>
+      <p class="sub">Teachers keep emailing like they always do. Sprout pulls their newsletters and reminders into one clean place.</p>
+      <div style="margin-top:8px">
+        <div class="feat"><div class="fi"><span class="ph"><svg viewBox="0 0 256 256"><path d="m251.76 88.94-120-64a8 8 0 0 0-7.52 0l-120 64a8 8 0 0 0 0 14.12L32 117.87v48.42a15.9 15.9 0 0 0 4.06 10.65C49.16 191.53 78.51 216 128 216a130 130 0 0 0 48-8.76V240a8 8 0 0 0 16 0v-40.49a115.6 115.6 0 0 0 27.94-22.57 15.9 15.9 0 0 0 4.06-10.65v-48.42l27.76-14.81a8 8 0 0 0 0-14.12M128 200c-43.27 0-68.72-21.14-80-33.71V126.4l76.24 40.66a8 8 0 0 0 7.52 0L176 143.47v46.34c-12.6 5.88-28.48 10.19-48 10.19"/></svg></span></div><div class="ft"><div class="h">No new app for teachers</div><div class="d">Works with how they already email you.</div></div></div>
+        <div class="feat"><div class="fi"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 40H48a16 16 0 0 0-16 16v56c0 52.72 25.52 84.67 46.93 102.19 23.06 18.86 46 25.26 47 25.53a8 8 0 0 0 4.2 0c1-.27 23.91-6.67 47-25.53C198.48 196.67 224 164.72 224 112V56a16 16 0 0 0-16-16m-34.34 69.66-56 56a8 8 0 0 1-11.32 0l-24-24a8 8 0 0 1 11.32-11.32L112 148.69l50.34-50.35a8 8 0 0 1 11.32 11.32"/></svg></span></div><div class="ft"><div class="h">Private by default</div><div class="d">Read-only, only the senders you choose.</div></div></div>
+        <div class="feat"><div class="fi"><span class="ph"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88ZM137 164.22a8 8 0 0 0-4.74 4.74L112 223.85 91.78 169a8 8 0 0 0-4.78-4.78L32.15 144 87 123.78a8 8 0 0 0 4.78-4.78L112 64.15 132.22 119a8 8 0 0 0 4.74 4.74L191.85 144Z"/></svg></span></div><div class="ft"><div class="h">Summarized for you</div><div class="d">Dates, action items, and a daily brief.</div></div></div>
+      </div>
+    </div>
+    <div class="cta"><button class="btn">Connect email</button><button class="btn ghost">Maybe later</button></div>
+  </div></div>
+  <div class="cap"><b>1 · Intro.</b> Nilai + privasi jelas sebelum connect.</div>
+</div>
+
+<!-- ===== 2. CONNECT GMAIL ===== -->
+<div class="panel">
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="top"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="h">Connect email</div><div class="sp"></div></div>
+    <div class="body">
+      <div class="hero"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span></div>
+      <h2 class="t">Connect your inbox</h2>
+      <p class="sub">Pick the Google email where you get school messages. It can be different from your calendar account.</p>
+      <div class="note">
+        <span class="ph"><svg viewBox="0 0 256 256"><path d="M208 40H48a16 16 0 0 0-16 16v56c0 52.72 25.52 84.67 46.93 102.19 23.06 18.86 46 25.26 47 25.53a8 8 0 0 0 4.2 0c1-.27 23.91-6.67 47-25.53C198.48 196.67 224 164.72 224 112V56a16 16 0 0 0-16-16m-34.34 69.66-56 56a8 8 0 0 1-11.32 0l-24-24a8 8 0 0 1 11.32-11.32L112 148.69l50.34-50.35a8 8 0 0 1 11.32 11.32"/></svg></span>
+        <div class="nt"><b>Read-only.</b> Sprout only scans messages from the senders you pick next — nothing else in your inbox. Disconnect anytime in Settings.</div>
+      </div>
+    </div>
+    <div class="cta">
+      <div style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:9px">Signed in with Google as <b style="color:var(--ink)">anthonyjohnmartin@gmail.com</b></div>
+      <button class="btn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span>Use this Google email</button>
+      <button class="btn google" style="margin-top:9px"><span class="g ph"><svg viewBox="0 0 256 256"><path d="M224 128a96 96 0 1 1-21.95-61.09 8 8 0 1 1-12.33 10.18A80 80 0 1 0 207.6 136H128a8 8 0 0 1 0-16h88a8 8 0 0 1 8 8"/></svg></span>Use a different Google email</button>
+    </div>
+  </div></div>
+  <div class="cap"><b>2 · Connect Gmail.</b> OAuth kayak calendar + jaminan read-only.</div>
+</div>
+
+<!-- ===== 3. ADD SENDERS ===== -->
+<div class="panel">
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="top"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="h">Emails to pull in</div><div class="sp"></div></div>
+    <div class="body">
+      <h2 class="t" style="text-align:left;font-size:20px;margin-top:8px">Whose emails should<br>we pull in?</h2>
+      <p class="sub" style="text-align:left;margin:0">We only scan messages from these addresses — nothing else in your inbox.</p>
+
+      <div class="flabel">Teacher's email</div>
+      <div class="fin filled">
+        <span class="ph"><svg viewBox="0 0 256 256"><path d="m251.76 88.94-120-64a8 8 0 0 0-7.52 0l-120 64a8 8 0 0 0 0 14.12L32 117.87v48.42a15.9 15.9 0 0 0 4.06 10.65C49.16 191.53 78.51 216 128 216a130 130 0 0 0 48-8.76V240a8 8 0 0 0 16 0v-40.49a115.6 115.6 0 0 0 27.94-22.57 15.9 15.9 0 0 0 4.06-10.65v-48.42l27.76-14.81a8 8 0 0 0 0-14.12M128 200c-43.27 0-68.72-21.14-80-33.71V126.4l76.24 40.66a8 8 0 0 0 7.52 0L176 143.47v46.34c-12.6 5.88-28.48 10.19-48 10.19"/></svg></span>
+        <span class="v">veronica.taylor@austinisd.org</span>
+        <span class="rm ph"><svg viewBox="0 0 256 256"><path d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128 50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg></span>
+      </div>
+
+      <div class="flabel">Class parent <span class="req">· optional</span></div>
+      <div class="fin filled">
+        <span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span>
+        <span class="v">amgessel@gmail.com</span>
+        <span class="rm ph"><svg viewBox="0 0 256 256"><path d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128 50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg></span>
+      </div>
+
+      <div class="addmore"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m48-88a8 8 0 0 1-8 8h-32v32a8 8 0 0 1-16 0v-32H88a8 8 0 0 1 0-16h32V88a8 8 0 0 1 16 0v32h32a8 8 0 0 1 8 8"/></svg></span>Add another email</div>
+
+      <div class="note"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 80h-32V56a48 48 0 0 0-96 0v24H48a16 16 0 0 0-16 16v112a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V96a16 16 0 0 0-16-16M96 56a32 32 0 0 1 64 0v24H96Zm112 152H48V96h160z"/></svg></span><div class="nt">You can add or remove senders anytime. We never read anything from other people.</div></div>
+    </div>
+    <div class="cta"><button class="btn">Start pulling updates</button></div>
+  </div></div>
+  <div class="cap"><b>3 · Pilih pengirim.</b> Email guru (wajib) + parent (opsional) + tambah lagi.</div>
+</div>
+
+<!-- ===== 4. SUCCESS / POPULATED ===== -->
+<div class="panel">
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="top"><div class="ib"></div><div class="h"></div><div class="sp"></div></div>
+    <div class="body" style="text-align:center">
+      <div class="succhero"><span class="ph"><svg viewBox="0 0 256 256"><path d="M173.66 98.34a8 8 0 0 1 0 11.32l-56 56a8 8 0 0 1-11.32 0l-24-24a8 8 0 0 1 11.32-11.32L112 148.69l50.34-50.35a8 8 0 0 1 11.32 0M232 128A104 104 0 1 1 128 24a104.11 104.11 0 0 1 104 104m-16 0a88 88 0 1 0-88 88 88.1 88.1 0 0 0 88-88"/></svg></span></div>
+      <h2 class="t">You're all set!</h2>
+      <p class="sub">We're pulling in updates from Ms. Taylor. New emails show up here automatically.</p>
+      <div class="preview" style="text-align:left">
+        <div class="ph-head">
+          <div class="av">VT</div>
+          <div><div class="t">Ms. Taylor's Updates</div><div class="s">from veronica.taylor@austinisd.org</div></div>
+        </div>
+        <div class="uprow"><span class="fav">VT</span><div class="ut"><div class="frm">Ms. Taylor · today</div><div class="h">Art Bags</div><div class="d">Send a labeled bag tomorrow</div></div></div>
+        <div class="uprow"><span class="fav">VT</span><div class="ut"><div class="frm">Ms. Taylor · 2d ago</div><div class="h">Week of May 18</div><div class="d">MAP results, summer reading</div></div></div>
+      </div>
+    </div>
+    <div class="cta"><button class="btn">View updates</button></div>
+  </div></div>
+  <div class="cap"><b>4 · Selesai.</b> Hub "Ms. Taylor's Updates" auto-keisi dari email guru.</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Daily Brief Intro — 3 Options · Sprout</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --field:#e8e4d9; --fg:#1a1a17; --ink:#1c2a1d; --muted:#807a6c; --border:#ddd9cf;
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-soft:#e7efe6; --sky:#5b8fb0; --gold:#c79a3a;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif; --serif:'Playfair Display',Georgia,serif; --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:30px 24px;padding:38px 22px 60px;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:13px;}
+  .caption{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:390px;line-height:1.5;} .caption strong{color:#3a3830;font-weight:700;} .caption em{color:var(--green);font-style:normal;font-weight:600;}
+  .lede{flex-basis:100%;width:100%;text-align:center;margin:0 0 10px;}
+  .lede h1{font-family:var(--serif);font-size:26px;font-weight:600;color:#23271f;margin:0 0 6px;}
+  .lede p{font-size:13.5px;color:#6a665b;margin:0 auto;max-width:660px;line-height:1.55;} .lede b{color:var(--green);}
+
+  .device{position:relative;width:390px;height:812px;border-radius:54px;padding:11px;background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 26px 56px -14px rgba(0,0,0,.45);}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:8;}
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:radial-gradient(125% 50% at 50% 2%, #eef3ea 0%, var(--bg) 46%);}
+  .sb{flex:0 0 42px;padding:15px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:14px;font-weight:600;color:var(--fg);}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:16px;height:11px;fill:var(--fg);} .sb .bat{width:24px;}
+  .top{flex:0 0 auto;display:flex;align-items:center;padding:4px 14px 0;}
+  .ibtn{width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;} .ibtn svg{width:18px;height:18px;stroke:var(--fg);fill:none;stroke-width:2;}
+
+  .scroll{flex:1 1 auto;overflow-y:auto;padding:6px 24px 12px;} .scroll::-webkit-scrollbar{display:none;}
+  .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--green-mid);margin-top:6px;}
+  .h1{font-family:var(--serif);font-size:27px;font-weight:600;color:var(--ink);line-height:1.15;letter-spacing:-.01em;margin:7px 0 7px;} .h1 em{font-style:italic;color:var(--green);}
+  .sub{font-size:13.5px;color:var(--muted);line-height:1.5;}
+
+  /* A · brief preview */
+  .brief{margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:15px;box-shadow:0 16px 34px -18px rgba(40,40,30,.5);}
+  .b-top{display:flex;align-items:center;gap:6px;font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:9px;} .b-top .dot{width:5px;height:5px;border-radius:50%;background:var(--green-mid);}
+  .b-greet{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--ink);} .b-date{font-size:12px;color:var(--muted);margin:1px 0 12px;padding-bottom:11px;border-bottom:1px solid var(--border);}
+  .b-wx{display:flex;align-items:center;gap:11px;background:linear-gradient(135deg,#e4f0e6,#d0e8d4);border:1px solid #b8d8be;border-radius:12px;padding:9px 12px;margin-bottom:11px;}
+  .b-wx .we{font-size:24px;} .b-wx .wt b{font-size:13px;color:#1a1a17;} .b-wx .wt span{display:block;font-size:11px;color:#3d7052;}
+  .b-sec{margin-bottom:10px;} .b-sec:last-child{margin-bottom:0;}
+  .b-h{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+  .b-li{font-size:12.5px;color:var(--fg);line-height:1.5;padding-left:2px;} .b-li b{color:var(--green);}
+
+  /* B · component rows */
+  .rows{margin-top:18px;display:flex;flex-direction:column;gap:11px;}
+  .row{display:flex;align-items:flex-start;gap:13px;}
+  .row .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:19px;flex-shrink:0;background:var(--green-soft);}
+  .row .ic.sky{background:#e2eef4;} .row .ic.gold{background:#f6edd8;} .row .ic.blue{background:#e1ecf7;}
+  .row .tx b{font-size:14px;color:var(--ink);} .row .tx p{margin:2px 0 0;font-size:12px;color:var(--muted);line-height:1.45;}
+
+  /* C · contrast */
+  .balbl{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:16px 2px 8px;} .balbl.after{color:var(--green-mid);}
+  .apps{display:flex;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:13px;}
+  .apptile{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;} .apptile .ai{width:42px;height:42px;border-radius:12px;background:var(--field);display:grid;place-items:center;font-size:21px;} .apptile .an{font-size:10px;color:var(--muted);font-weight:600;text-align:center;}
+  .oldnote{display:flex;align-items:center;gap:7px;margin-top:11px;font-size:11px;color:#9a5a2f;background:#fbeee0;border-radius:10px;padding:8px 10px;}
+  .arrow{display:grid;place-items:center;margin:9px 0;} .arrow svg{width:22px;height:22px;stroke:var(--green-mid);fill:none;stroke-width:2.4;}
+  .afterbrief{display:flex;align-items:center;gap:12px;background:linear-gradient(150deg,#2f6f48,#16412a);border-radius:15px;padding:14px;color:#fff;}
+  .afterbrief .ae{font-size:26px;} .afterbrief .at b{font-size:14px;display:block;} .afterbrief .at span{font-size:11.5px;opacity:.85;}
+
+  .dock{flex:0 0 auto;padding:12px 20px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(18px);}
+  .cta{width:100%;border-radius:14px;padding:15px;background:var(--green);border:none;color:#fff;font-size:15px;font-weight:700;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;box-shadow:0 12px 26px -10px rgba(45,92,46,.6);} .cta .sp{font-size:16px;}
+  .later{text-align:center;font-size:12.5px;color:var(--muted);margin-top:11px;text-decoration:underline;cursor:pointer;}
+  .home{position:absolute;left:50%;bottom:7px;transform:translateX(-50%);width:130px;height:5px;background:var(--fg);border-radius:999px;opacity:.18;z-index:9;}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Daily Brief explainer — 3 options</h1>
+  <p>New users won't know what a "daily brief" is — most apps have nothing like it. Goal: teach that Sprout hands them their family's whole day each morning, and get them to <b>turn it on</b>. Three ways: <b>show it, break it down, or contrast it.</b></p>
+</div>
+
+<!-- ══ A · SHOW IT ══ -->
+<div class="panel">
+  <div class="caption"><strong>A · Show it</strong> — <em>the brief itself is the hero</em></div>
+  <div class="device"><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 16 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg><svg class="bat" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="2" y="2" width="17" height="7" rx="1.4"/></svg></span></div>
+      <div class="top"><div class="ibtn"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></div></div>
+      <div class="scroll">
+        <div class="eyebrow">Your morning, sorted</div>
+        <div class="h1">Your family's day,<br>every <em>morning</em></div>
+        <div class="sub">Each day at 7 AM, Sprout hands you one brief with everything that matters — no digging.</div>
+        <div class="brief">
+          <div class="b-top"><span class="dot"></span>Sprout · Daily Brief · 7:00 AM</div>
+          <div class="b-greet">Good morning, Tony ☀️</div>
+          <div class="b-date">Here's your Thursday, June 12</div>
+          <div class="b-wx"><span class="we">⛅</span><div class="wt"><b>68° – 86° · Partly cloudy</b><span>🧥 Light jacket this morning, t-shirt by noon</span></div></div>
+          <div class="b-sec"><div class="b-h">🎂 Birthdays</div><div class="b-li">Kennedy turns <b>5</b> today 🎉</div></div>
+          <div class="b-sec"><div class="b-h">🗓️ Happening today</div><div class="b-li">3:30 · Soccer practice · Riverside Park<br>6:00 · Parent-teacher night</div></div>
+          <div class="b-sec"><div class="b-h">✅ Don't forget</div><div class="b-li">Bring towels for water day · sign Jake's slip</div></div>
+        </div>
+      </div>
+      <div class="dock"><button class="cta"><span class="sp">☀️</span> Turn on my morning brief</button><div class="later">Maybe later</div></div>
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ B · BREAK IT DOWN ══ -->
+<div class="panel">
+  <div class="caption"><strong>B · Break it down</strong> — <em>what's inside every brief</em></div>
+  <div class="device"><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 16 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg><svg class="bat" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="2" y="2" width="17" height="7" rx="1.4"/></svg></span></div>
+      <div class="top"><div class="ibtn"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></div></div>
+      <div class="scroll">
+        <div class="eyebrow">Everything about today</div>
+        <div class="h1">One brief,<br>your whole <em>day</em></div>
+        <div class="sub">Every morning Sprout pulls it all together for you:</div>
+        <div class="rows">
+          <div class="row"><div class="ic sky">☀️</div><div class="tx"><b>Today's weather</b><p>Highs, lows &amp; what to dress the kids in.</p></div></div>
+          <div class="row"><div class="ic">🎂</div><div class="tx"><b>Birthdays</b><p>Whose big day it is — never miss one again.</p></div></div>
+          <div class="row"><div class="ic gold">🗓️</div><div class="tx"><b>Today's plans</b><p>Practices, drop-offs, parties &amp; parent-teacher nights.</p></div></div>
+          <div class="row"><div class="ic blue">✅</div><div class="tx"><b>Reminders &amp; to-dos</b><p>Permission slips, snacks, water day — before you're out the door.</p></div></div>
+        </div>
+      </div>
+      <div class="dock"><button class="cta"><span class="sp">☀️</span> Turn on my morning brief</button><div class="later">Maybe later</div></div>
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ C · CONTRAST IT ══ -->
+<div class="panel">
+  <div class="caption"><strong>C · Contrast it</strong> — <em>4 apps before coffee vs one brief</em></div>
+  <div class="device"><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 16 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg><svg class="bat" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="2" y="2" width="17" height="7" rx="1.4"/></svg></span></div>
+      <div class="top"><div class="ibtn"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></div></div>
+      <div class="scroll">
+        <div class="eyebrow">Why the daily brief</div>
+        <div class="h1">Never get caught<br><em>off guard</em></div>
+        <div class="balbl">Every morning, without it</div>
+        <div class="apps">
+          <div class="apptile"><div class="ai">☀️</div><div class="an">Weather</div></div>
+          <div class="apptile"><div class="ai">🗓️</div><div class="an">Calendar</div></div>
+          <div class="apptile"><div class="ai">💬</div><div class="an">Class chat</div></div>
+          <div class="apptile"><div class="ai">✉️</div><div class="an">School email</div></div>
+        </div>
+        <div class="oldnote">😮‍💨 Four apps before coffee — and still missing the water-day towel</div>
+        <div class="arrow"><svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+        <div class="balbl after">With Sprout · 7:00 AM</div>
+        <div class="afterbrief"><span class="ae">☀️</span><div class="at"><b>Good morning, Tony</b><span>Weather, birthdays, today's plans &amp; reminders — in one brief</span></div></div>
+      </div>
+      <div class="dock"><button class="cta"><span class="sp">☀️</span> Turn on my morning brief</button><div class="later">Maybe later</div></div>
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

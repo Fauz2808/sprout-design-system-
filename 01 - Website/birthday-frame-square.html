@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Birthday Frame — Square (1:1) · Sprout</title>
+<style>
+  :root{
+    --pink:#ef7fb0; --pink-d:#d85f97; --purple:#b06fd0; --teal:#3fb0c4; --yellow:#f3c33f; --green:#5bbf6a; --orange:#f3923f; --red:#e8517a; --blue:#5b8fe0;
+    --rounded:'Arial Rounded MT Bold','SF Pro Rounded',system-ui,sans-serif;
+    --script:'Snell Roundhand','Brush Script MT',cursive;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#d8d4cc;font-family:system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:14px;padding:36px 20px;}
+  .cap{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#7a7568;text-align:center;line-height:1.7;}
+  .cap b{color:#3a3830;}
+  .toolbar{display:flex;gap:8px;}
+  .toolbar button{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;border:1px solid #b8b2a6;background:#fff;color:#4a463c;border-radius:8px;padding:7px 12px;cursor:pointer;}
+  .toolbar button.on{background:#3a3830;color:#fff;border-color:#3a3830;}
+
+  /* ── the square frame ── */
+  .frame{position:relative;width:540px;height:540px;border-radius:42px;overflow:hidden;
+    box-shadow:0 24px 60px -20px rgba(0,0,0,.4);}
+  /* transparency checkerboard (only visible where the frame is empty = the photo window) */
+  .frame.alpha{background:
+      conic-gradient(#e9e6df 90deg,#ffffff 90deg 180deg,#e9e6df 180deg 270deg,#ffffff 270deg) 0 0/26px 26px;}
+  /* sample photo behind (toggled) */
+  .photo{position:absolute;inset:0;display:none;background:radial-gradient(circle at 50% 38%,#bfe3ff,#7fb5d8 60%,#5a93bd);align-items:center;justify-content:center;}
+  .frame.withphoto .photo{display:flex;}
+  .frame.withphoto.alpha{background:none;}
+  .photo .kid{font-size:200px;filter:drop-shadow(0 8px 16px rgba(0,0,0,.25));}
+
+  /* decoration layer sits on top; center stays clear */
+  .deco{position:absolute;inset:0;pointer-events:none;}
+
+  /* soft white inner keyline like the reference */
+  .keyline{position:absolute;inset:18px;border:2.5px solid rgba(239,127,176,.55);border-radius:30px;}
+
+  /* ── title ── */
+  .title{position:absolute;top:20px;left:0;right:0;text-align:center;z-index:6;}
+  .title .ln{font-family:var(--rounded);font-weight:900;line-height:.92;letter-spacing:.5px;display:block;}
+  .title .happy{font-size:62px;transform:rotate(-3deg);}
+  .title .bday{font-size:54px;transform:rotate(-1deg);margin-top:-2px;}
+  .title span span{ -webkit-text-stroke:7px #fff;paint-order:stroke fill;text-shadow:0 4px 5px rgba(0,0,0,.18);display:inline-block;}
+  .title .happy span:nth-child(1){color:var(--red);transform:rotate(-6deg);}
+  .title .happy span:nth-child(2){color:var(--orange);transform:rotate(3deg);}
+  .title .happy span:nth-child(3){color:var(--yellow);transform:rotate(-2deg);}
+  .title .happy span:nth-child(4){color:var(--green);transform:rotate(4deg);}
+  .title .happy span:nth-child(5){color:var(--teal);transform:rotate(-3deg);}
+  .title .bday span:nth-child(1){color:var(--red);transform:rotate(-5deg);}
+  .title .bday span:nth-child(2){color:var(--purple);transform:rotate(3deg);}
+  .title .bday span:nth-child(3){color:var(--blue);transform:rotate(-2deg);}
+  .title .bday span:nth-child(4){color:var(--teal);transform:rotate(3deg);}
+  .title .bday span:nth-child(5){color:var(--green);transform:rotate(-3deg);}
+  .title .bday span:nth-child(6){color:var(--yellow);transform:rotate(2deg);}
+  .title .bday span:nth-child(7){color:var(--orange);transform:rotate(-3deg);}
+  .title .bday span:nth-child(8){color:var(--red);transform:rotate(4deg);}
+  .title .bday span:nth-child(9){color:var(--purple);transform:rotate(-4deg);}
+
+  /* ── balloons ── */
+  .bln{position:absolute;width:62px;height:76px;border-radius:50% 50% 48% 48%;
+    background:radial-gradient(circle at 34% 26%,rgba(255,255,255,.85),rgba(255,255,255,0) 42%),
+               radial-gradient(circle at 60% 62%,var(--c) 0%,var(--cd) 100%);
+    box-shadow:0 6px 12px -4px rgba(0,0,0,.22);}
+  .bln::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid var(--cd);}
+  .bln .str{position:absolute;top:99%;left:50%;width:2px;height:46px;background:rgba(120,120,120,.4);transform-origin:top center;}
+  .bln.pink{--c:#f4a9c8;--cd:#e87faa;} .bln.purple{--c:#c4a3e8;--cd:#a87fd4;}
+  .bln.teal{--c:#8fdcd0;--cd:#5cc2b4;} .bln.yellow{--c:#ffe08a;--cd:#f3c33f;}
+  .bln.mint{--c:#b8e6c0;--cd:#8fd49c;} .bln.blue{--c:#a9cdf0;--cd:#7fb0e0;}
+
+  /* ── stars / sparkles / confetti ── */
+  .star{position:absolute;font-size:22px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.15));}
+  .dot{position:absolute;width:9px;height:9px;border-radius:50%;}
+  .strk{position:absolute;width:26px;height:26px;border:3px solid var(--c,#ef7fb0);border-radius:50%;border-color:var(--c,#ef7fb0) transparent transparent transparent;transform:rotate(40deg);opacity:.8;}
+
+  /* ── cake (bottom-left) & gift (bottom-right) ── */
+  .cake{position:absolute;left:14px;bottom:64px;font-size:96px;line-height:1;filter:drop-shadow(0 6px 10px rgba(0,0,0,.22));z-index:5;}
+  .gift{position:absolute;right:18px;bottom:74px;font-size:82px;line-height:1;filter:drop-shadow(0 6px 10px rgba(0,0,0,.22));z-index:5;}
+
+  /* ── bottom ribbon banner ── */
+  .banner{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);background:linear-gradient(180deg,#f48bb6,#e96fa3);
+    color:#fff;font-family:var(--script);font-size:23px;line-height:1.05;text-align:center;padding:12px 30px;border-radius:14px;
+    box-shadow:0 8px 18px -8px rgba(216,95,151,.7);z-index:7;white-space:nowrap;}
+  .banner::before,.banner::after{content:'';position:absolute;bottom:-8px;border:9px solid transparent;border-top-color:#cf5c8e;}
+  .banner::before{left:14px;border-right-color:#cf5c8e;}
+  .banner::after{right:14px;border-left-color:#cf5c8e;}
+  .banner .heart{color:#ffe08a;}
+</style>
+</head>
+<body>
+  <div class="cap"><b>Birthday frame · square 1:1</b> — same design as Birthday .1, rebuilt true square · transparent center · nothing cut off<br>editable HTML — change colors/text directly, or export a 2× transparent PNG</div>
+  <div class="toolbar">
+    <button id="bAlpha" class="on" onclick="document.querySelector('.frame').classList.toggle('withphoto');this.classList.toggle('on')">Toggle sample photo</button>
+  </div>
+
+  <div class="frame alpha" id="frame">
+    <div class="photo"><div class="kid">🧒</div></div>
+
+    <div class="deco">
+      <div class="keyline"></div>
+
+      <!-- balloons: top-left cluster -->
+      <div class="bln purple" style="top:30px;left:18px;transform:rotate(-8deg)"><span class="str" style="transform:rotate(8deg)"></span></div>
+      <div class="bln pink"   style="top:64px;left:-6px;"><span class="str"></span></div>
+      <div class="bln teal"   style="top:96px;left:34px;transform:rotate(6deg)"><span class="str" style="transform:rotate(-6deg)"></span></div>
+      <!-- balloons: top-right cluster -->
+      <div class="bln yellow" style="top:26px;right:20px;transform:rotate(7deg)"><span class="str" style="transform:rotate(-7deg)"></span></div>
+      <div class="bln teal"   style="top:60px;right:-8px;"><span class="str"></span></div>
+      <div class="bln pink"   style="top:104px;right:30px;transform:rotate(-6deg)"><span class="str" style="transform:rotate(6deg)"></span></div>
+      <!-- a couple mid-side -->
+      <div class="bln mint"   style="top:188px;left:-10px;transform:rotate(-4deg)"><span class="str"></span></div>
+      <div class="bln purple" style="top:200px;right:-12px;transform:rotate(5deg)"><span class="str"></span></div>
+
+      <!-- title -->
+      <div class="title">
+        <span class="ln happy"><span>H</span><span>a</span><span>p</span><span>p</span><span>y</span></span>
+        <span class="ln bday"><span>B</span><span>i</span><span>r</span><span>t</span><span>h</span><span>d</span><span>a</span><span>y</span><span>!</span></span>
+      </div>
+
+      <!-- stars / sparkles / confetti scattered round the edges -->
+      <div class="star" style="top:150px;left:96px;color:#f3c33f;">★</div>
+      <div class="star" style="top:182px;left:60px;color:#b06fd0;font-size:16px;">★</div>
+      <div class="star" style="top:230px;left:30px;color:#ef7fb0;">✦</div>
+      <div class="star" style="top:300px;left:18px;color:#3fb0c4;font-size:18px;">★</div>
+      <div class="star" style="top:360px;left:34px;color:#f3c33f;font-size:16px;">✦</div>
+      <div class="star" style="top:158px;right:92px;color:#5bbf6a;">★</div>
+      <div class="star" style="top:196px;right:56px;color:#f3923f;font-size:16px;">✦</div>
+      <div class="star" style="top:258px;right:24px;color:#b06fd0;font-size:18px;">★</div>
+      <div class="star" style="top:330px;right:18px;color:#ef7fb0;font-size:16px;">✦</div>
+      <div class="dot" style="top:172px;left:130px;background:#3fb0c4;"></div>
+      <div class="dot" style="top:280px;left:24px;background:#f3c33f;"></div>
+      <div class="dot" style="top:222px;right:60px;background:#ef7fb0;"></div>
+      <div class="dot" style="top:380px;right:48px;background:#5bbf6a;"></div>
+      <div class="strk" style="top:250px;left:50px;--c:#3fb0c4;"></div>
+      <div class="strk" style="top:300px;right:42px;--c:#ef7fb0;transform:rotate(-50deg);"></div>
+
+      <!-- cake & gift -->
+      <div class="cake">🎂</div>
+      <div class="gift">🎁</div>
+
+      <!-- ribbon banner -->
+      <div class="banner">Wishing you a day<br>full of smiles and fun! <span class="heart">♥</span></div>
+    </div>
+  </div>
+</body>
+</html>

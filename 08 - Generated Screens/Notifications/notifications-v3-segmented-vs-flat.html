@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Notifications — flat tab vs segmented To-do · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --surface:#ffffff; --card:#ffffff; --field:#e8e2d6;
+    --ink:#1e3e2b; --ink-2:#23271f; --body:#4d525b; --muted:#7d715e;
+    --brand:#186338; --brand-bold:#1e3e2b; --brand-mid:#4fa472; --brand-light:#e2e9e3; --brand-border:#77b691;
+    --border:#e2dccf; --shadow-sm:1px 3px 9px rgba(13,13,18,.06); --radius:16px;
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace;
+    --t-event:#2d5c2e;   --t-event-bg:#e4f0e6;
+    --t-noschool:#c0533d;--t-noschool-bg:#fae3dd;
+    --t-special:#c08a2d; --t-special-bg:#fbf0d8;
+    --t-todo:#3b6ea5;    --t-todo-bg:#e1ecf7;
+    --danger:#c0533d;
+  }
+  .ph{display:inline-block;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;padding:40px 24px 70px;}
+
+  .lede{max-width:820px;margin:0 auto 26px;text-align:center;}
+  .lede h1{font-family:var(--serif);font-size:23px;font-weight:600;color:#23271f;margin:0 0 8px;}
+  .lede p{font-size:13px;color:#6a665b;margin:0;line-height:1.6;}
+
+  .row{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-start;justify-content:center;gap:52px;padding:0 40px;overflow-x:auto;}
+  .col{display:flex;flex-direction:column;align-items:center;gap:14px;flex-shrink:0;width:390px;}
+  .caption{width:100%;background:#fffdf8;border:1px solid #e4ddcb;border-radius:14px;padding:13px 16px;}
+  .caption .tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:999px;background:var(--brand-light);color:var(--brand-bold);margin-bottom:7px;}
+  .caption h3{font-family:var(--serif);font-size:15.5px;font-weight:600;color:#23271f;margin:0 0 5px;}
+  .caption p{font-size:12px;color:#4d4738;line-height:1.55;margin:0;}
+  .caption p b{color:#23271f;}
+
+  .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:50;}
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);z-index:20;}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;}
+  .sb svg{width:17px;height:11px;fill:var(--ink);} .sb .bat{width:25px;}
+
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:4px 16px 8px;}
+  .ibtn{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1px solid var(--border);
+    display:grid;place-items:center;cursor:pointer;flex-shrink:0;box-shadow:var(--shadow-sm);}
+  .ibtn svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .top .tt{flex:1;line-height:1.1;} .top .tt.center{text-align:center;}
+  .top .tt .t{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);}
+  .top .sp{width:40px;flex-shrink:0;}
+
+  .filters{flex:0 0 auto;display:flex;gap:7px;overflow-x:auto;padding:2px 16px 11px;}
+  .filters::-webkit-scrollbar{display:none;}
+  .fchip{flex:0 0 auto;font-family:var(--sans);font-size:12.5px;font-weight:500;background:var(--surface);border:1px solid var(--border);
+    color:var(--ink-2);border-radius:999px;padding:7px 13px;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow-sm);
+    transition:background .12s,color .12s,border-color .12s;}
+  .fchip .n{opacity:.6;margin-left:2px;}
+  .fchip.on{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .fchip.on .n{opacity:.8;}
+
+  .body{flex:1 1 auto;overflow-y:auto;padding:2px 12px 28px;}
+  .body::-webkit-scrollbar{display:none;}
+  .seclbl{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:14px 11px 6px;}
+  .seclbl:first-child{margin-top:4px;}
+
+  .nrow{display:flex;gap:11px;padding:12px 11px;border-radius:14px;cursor:pointer;}
+  .nrow.unread{background:var(--brand-light);}
+  .ico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;font-size:18px;color:#fff;}
+  .ico.club{background:linear-gradient(144deg,#dd7a37,#f0aa63);font-family:var(--serif);font-weight:600;font-size:18px;}
+  .ico.photo{background:linear-gradient(144deg,#1e3e2b,#4fa472);}
+  .ico.bday{background:linear-gradient(144deg,#b8446c,#e18aa8);}
+  .ico.camp{background:linear-gradient(144deg,#a37426,#d3a852);}
+  .avatar{border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;
+    background:linear-gradient(144deg,#1e3e2b 5%,#4fa472 100%);width:42px;height:42px;font-size:15px;flex-shrink:0;}
+  .ico.note{font-size:18px;}
+  .ico.note.t-event{background:var(--t-event-bg);color:var(--t-event);}
+  .ico.note.t-noschool{background:var(--t-noschool-bg);color:var(--t-noschool);}
+  .ico.note.t-special{background:var(--t-special-bg);color:var(--t-special);}
+
+  .todobox{width:42px;height:42px;border-radius:12px;flex-shrink:0;display:grid;place-items:center;background:var(--t-todo-bg);}
+  .cb{width:24px;height:24px;border-radius:7px;border:2px solid var(--t-todo);display:grid;place-items:center;background:transparent;transition:background .12s;}
+  .cb svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:3;opacity:0;transition:opacity .12s;}
+  .nrow.done .cb{background:var(--t-todo);}
+  .nrow.done .cb svg{opacity:1;}
+  .nrow.done .ti{color:var(--muted);text-decoration:line-through;}
+
+  .ntxt{flex:1;min-width:0;padding-top:1px;}
+  .ntxt .row1{display:flex;align-items:flex-start;gap:6px;}
+  .ntxt .ti{font-family:var(--sans);font-weight:700;font-size:13.5px;color:var(--ink-2);flex:1;min-width:0;}
+  .ntxt .tm{font-family:var(--sans);font-size:10.5px;color:var(--muted);flex-shrink:0;padding-top:1px;white-space:nowrap;}
+  .ntxt .de{font-family:var(--sans);font-size:12px;color:var(--body);line-height:1.42;margin-top:2px;}
+
+  .tag{flex-shrink:0;font-size:9.5px;font-weight:700;border-radius:6px;padding:2px 7px;white-space:nowrap;align-self:flex-start;margin-top:1px;}
+  .tag.bday{background:#f7e3ea;color:#b8446c;}
+  .tag.camp{background:#f3e6cd;color:#a37426;}
+  .tag.t-event{background:var(--t-event-bg);color:var(--t-event);}
+  .tag.t-noschool{background:var(--t-noschool-bg);color:var(--t-noschool);}
+  .tag.t-special{background:var(--t-special-bg);color:var(--t-special);}
+  .tag.t-todo{background:var(--t-todo-bg);color:var(--t-todo);}
+
+  .pinned{display:none;margin:4px 0 16px;border-radius:18px;overflow:hidden;border:1.5px solid var(--t-todo);background:var(--t-todo-bg);}
+  .pinned.show{display:block;}
+  .pinned-head{display:flex;align-items:center;justify-content:space-between;padding:11px 13px 8px;}
+  .pinned-head .lbl{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--t-todo);}
+  .pinned-head .lbl .ph{width:13px;height:13px;}
+  .pinned-head .cnt{font-size:10.5px;font-weight:700;color:var(--t-todo);background:#fff;padding:2px 9px;border-radius:999px;}
+  .pinned .nrow{background:var(--surface);margin:0 8px 8px;box-shadow:var(--shadow-sm);}
+  .pinned .nrow:last-child{margin-bottom:9px;}
+
+  .empty{display:none;flex-direction:column;align-items:center;text-align:center;padding:52px 30px 20px;}
+  .empty.on{display:flex;}
+  .empty .eic{width:56px;height:56px;border-radius:50%;background:var(--brand-light);display:grid;place-items:center;margin-bottom:14px;color:var(--brand);}
+  .empty .eic .ph{width:26px;height:26px;}
+  .empty h3{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin:0 0 6px;}
+  .empty p{font-size:12.5px;color:var(--muted);line-height:1.55;margin:0;max-width:240px;}
+
+  .fnote{display:flex;gap:7px;align-items:flex-start;justify-content:center;text-align:center;padding:18px 20px 6px;color:var(--muted);}
+  .fnote .ph{width:13px;height:13px;flex-shrink:0;margin-top:2px;}
+  .fnote span{font-size:11px;line-height:1.5;}
+
+  /* ═══ Screen 2 only — top-level segmented control (Notifications | To-do) ═══ */
+  .seg2wrap{flex:0 0 auto;padding:2px 16px 12px;}
+  .seg2{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:3px;position:relative;}
+  .seg2 button{flex:1;border:none;background:none;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--muted);
+    padding:9px 6px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:color .15s;position:relative;z-index:2;}
+  .seg2 button.on{color:#fff;}
+  .seg2 .thumb{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);background:var(--brand);border-radius:10px;transition:transform .22s cubic-bezier(.4,0,.2,1);z-index:1;}
+  .seg2 button.on.right ~ .thumb, .seg2.right .thumb{transform:translateX(100%);}
+  .seg2 .segbadge{background:rgba(255,255,255,.3);color:#fff;font-size:10px;font-weight:800;border-radius:999px;min-width:17px;height:17px;padding:0 4px;display:inline-flex;align-items:center;justify-content:center;}
+  .seg2 button:not(.on) .segbadge{background:var(--t-todo-bg);color:var(--t-todo);}
+
+  .todopane{display:none;}
+  .todopane.show{display:block;}
+  .notifpane.hide{display:none;}
+</style>
+</head>
+<body>
+
+  <div class="lede">
+    <h1>One notifications file, two structural takes on To-do</h1>
+    <p>Screen 1 is what we already shipped: To-do sits as one pill among the others (All / Events / Clubs / Calendar / To-do / Daily Brief), rescued from getting buried by a pinned "Needs your attention" strip. Screen 2 promotes To-do one level up — a 2-way segmented control (Notifications / To-do) right under the header, same idea as the existing Discover / My Events pattern on Home. Both stay inside this one screen — no bottom nav change, no Home change.</p>
+  </div>
+
+  <div class="row">
+
+    <!-- ═══════════════════ SCREEN 1 — flat tab (current) ═══════════════════ -->
+    <div class="col">
+      <div class="caption">
+        <span class="tag">Screen 1 — flat tab</span>
+        <h3>To-do as one pill among equals</h3>
+        <p><b>Goal:</b> minimal structural change — To-do is just another filter next to Events/Clubs/Calendar. The pinned strip does the work of keeping it from getting lost. <b>Trade-off:</b> a first-time user scanning the tab row sees 6 equal-weight pills — nothing tells them To-do is categorically different (actionable) until they notice the pinned strip.</p>
+      </div>
+
+      <div class="device">
+        <div class="island"></div>
+        <div class="screen">
+          <div class="sb"><span>9:41</span><span class="r">
+            <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+            <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+            <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+          </span></div>
+
+          <div class="top">
+            <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="tt center"><div class="t">Notifications</div></div>
+            <div class="sp"></div>
+          </div>
+
+          <div class="filters" id="filtersS1">
+            <span class="fchip on" data-tab="all">All<span class="n">· 15</span></span>
+            <span class="fchip" data-tab="events">Events<span class="n">· 7</span></span>
+            <span class="fchip" data-tab="clubs">Clubs<span class="n">· 3</span></span>
+            <span class="fchip" data-tab="calendar">Calendar<span class="n">· 3</span></span>
+            <span class="fchip" data-tab="todo">To-do<span class="n" id="s1TodoCount">· 2</span></span>
+            <span class="fchip" data-tab="daily">Daily Brief<span class="n">· 0</span></span>
+          </div>
+
+          <div class="body">
+            <div class="pinned" id="s1Pinned">
+              <div class="pinned-head">
+                <div class="lbl"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12"/></svg></span>Needs your attention</div>
+                <div class="cnt" id="s1PinnedCnt">2 open</div>
+              </div>
+              <div id="s1PinnedList">
+                <div class="nrow" data-todo="1"><div class="todobox"><div class="cb"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div></div><div class="ntxt"><div class="row1"><div class="ti">Bring towels for water day</div><span class="tag t-todo">To-do</span><div class="tm">Due tomorrow</div></div></div></div>
+                <div class="nrow" data-todo="1"><div class="todobox"><div class="cb"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div></div><div class="ntxt"><div class="row1"><div class="ti">Sign Jake's permission slip</div><span class="tag t-todo">To-do</span><div class="tm">Due Fri</div></div></div></div>
+              </div>
+            </div>
+
+            <div id="s1List">
+              <div class="nrow" data-cat="events"><div class="ico photo">⛳</div><div class="ntxt"><div class="row1"><div class="ti">New Event</div><div class="tm">1h</div></div><div class="de">"Come Join me for Golf" Nov 18, 8:00–9:00 AM (CST)</div></div></div>
+              <div class="nrow" data-cat="events"><div class="ico bday">🎂</div><div class="ntxt"><div class="row1"><div class="ti">Birthday Coming Up</div><span class="tag bday">Birthday</span><div class="tm">3h</div></div><div class="de">Alex turns 5 in 3 days — want to plan something?</div></div></div>
+              <div class="nrow" data-cat="events"><div class="ico camp">⛺</div><div class="ntxt"><div class="row1"><div class="ti">Camp Registration Confirmed</div><span class="tag camp">Camp</span><div class="tm">5h</div></div><div class="de">You're registered for Camp Wildwood — Week of July 14</div></div></div>
+              <div class="nrow unread" data-cat="clubs"><div class="ico club">Y</div><div class="ntxt"><div class="row1"><div class="ti">Removed from Club</div><div class="tm">1h</div></div><div class="de">"Guy Hawkins admin from Y Combinator has removed you from the club"</div></div></div>
+              <div class="nrow" data-cat="calendar"><div class="ico note t-event">🗓️</div><div class="ntxt"><div class="row1"><div class="ti">Field trip to the zoo</div><span class="tag t-event">Event</span><div class="tm">Today</div></div><div class="de">1st Grade Class · added by Ms. Rivera</div></div></div>
+              <div class="nrow" data-cat="clubs"><div class="avatar">NL</div><div class="ntxt"><div class="row1"><div class="ti">Join Request</div><div class="tm">1d</div></div><div class="de">Noah LaRonde requested to join "Y Combinator Social Club"</div></div></div>
+              <div class="nrow" data-cat="calendar"><div class="ico note t-noschool">🚫</div><div class="ntxt"><div class="row1"><div class="ti">Teacher in-service — no school</div><span class="tag t-noschool">No School</span><div class="tm">Tomorrow</div></div></div></div>
+              <div class="nrow" data-cat="events"><div class="ico photo">🥂</div><div class="ntxt"><div class="row1"><div class="ti">Almost Time!</div><div class="tm">2w</div></div><div class="de">"Y Combinator Happy hour" starts at 5:30 PM CDT.</div></div></div>
+              <div class="nrow" data-cat="clubs"><div class="ico club">Y</div><div class="ntxt"><div class="row1"><div class="ti">New Member</div><div class="tm">1mo</div></div><div class="de">Noah LaRonde joined "Y Combinator"</div></div></div>
+              <div class="nrow" data-cat="calendar"><div class="ico note t-special">✨</div><div class="ntxt"><div class="row1"><div class="ti">Pajama day! 🩳</div><span class="tag t-special">Special</span><div class="tm">Fri</div></div></div></div>
+              <div class="nrow" data-cat="events"><div class="ico photo">🎉</div><div class="ntxt"><div class="row1"><div class="ti">Event Completed!</div><div class="tm">2w</div></div><div class="de">"Y Combinator Happy hour" wrapped up! Share your best moments.</div></div></div>
+            </div>
+
+            <div class="empty" id="s1EmptyDaily"><div class="eic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12"/></svg></span></div><h3>Nothing here yet</h3><p>Your daily brief will show up here once it's live.</p></div>
+
+            <div class="fnote"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12"/></svg></span><span>Notifications that are over 30 days old will be removed.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ SCREEN 2 — segmented (Notifications | To-do) ═══════════════════ -->
+    <div class="col">
+      <div class="caption">
+        <span class="tag">Screen 2 — segmented</span>
+        <h3>To-do promoted to its own segment</h3>
+        <p><b>Goal:</b> a 2-way segmented control right under the header — "Notifications" and "To-do" are co-equal destinations, not one-pill-among-six. To-do gets the full screen to itself (Open/Completed), no squeezing into a pinned strip. <b>Trade-off:</b> one extra tap to get from a general notification to the to-do list (they're siblings now, not blended) — but the separation reads instantly, no strip needed to explain it.</p>
+      </div>
+
+      <div class="device">
+        <div class="island"></div>
+        <div class="screen">
+          <div class="sb"><span>9:41</span><span class="r">
+            <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+            <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+            <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+          </span></div>
+
+          <div class="top">
+            <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="tt center"><div class="t">Notifications</div></div>
+            <div class="sp"></div>
+          </div>
+
+          <div class="seg2wrap">
+            <div class="seg2" id="seg2">
+              <div class="thumb"></div>
+              <button class="on" data-pane="notif">Notifications</button>
+              <button data-pane="todo">To-do <span class="segbadge" id="segBadge">2</span></button>
+            </div>
+          </div>
+
+          <div class="body">
+
+            <div class="notifpane" id="notifPane">
+              <div class="filters" id="filtersS2">
+                <span class="fchip on" data-tab="all">All<span class="n">· 13</span></span>
+                <span class="fchip" data-tab="events">Events<span class="n">· 7</span></span>
+                <span class="fchip" data-tab="clubs">Clubs<span class="n">· 3</span></span>
+                <span class="fchip" data-tab="calendar">Calendar<span class="n">· 3</span></span>
+                <span class="fchip" data-tab="daily">Daily Brief<span class="n">· 0</span></span>
+              </div>
+
+              <div id="s2List">
+                <div class="nrow" data-cat="events"><div class="ico photo">⛳</div><div class="ntxt"><div class="row1"><div class="ti">New Event</div><div class="tm">1h</div></div><div class="de">"Come Join me for Golf" Nov 18, 8:00–9:00 AM (CST)</div></div></div>
+                <div class="nrow" data-cat="events"><div class="ico bday">🎂</div><div class="ntxt"><div class="row1"><div class="ti">Birthday Coming Up</div><span class="tag bday">Birthday</span><div class="tm">3h</div></div><div class="de">Alex turns 5 in 3 days — want to plan something?</div></div></div>
+                <div class="nrow" data-cat="events"><div class="ico camp">⛺</div><div class="ntxt"><div class="row1"><div class="ti">Camp Registration Confirmed</div><span class="tag camp">Camp</span><div class="tm">5h</div></div><div class="de">You're registered for Camp Wildwood — Week of July 14</div></div></div>
+                <div class="nrow unread" data-cat="clubs"><div class="ico club">Y</div><div class="ntxt"><div class="row1"><div class="ti">Removed from Club</div><div class="tm">1h</div></div><div class="de">"Guy Hawkins admin from Y Combinator has removed you from the club"</div></div></div>
+                <div class="nrow" data-cat="calendar"><div class="ico note t-event">🗓️</div><div class="ntxt"><div class="row1"><div class="ti">Field trip to the zoo</div><span class="tag t-event">Event</span><div class="tm">Today</div></div><div class="de">1st Grade Class · added by Ms. Rivera</div></div></div>
+                <div class="nrow" data-cat="clubs"><div class="avatar">NL</div><div class="ntxt"><div class="row1"><div class="ti">Join Request</div><div class="tm">1d</div></div><div class="de">Noah LaRonde requested to join "Y Combinator Social Club"</div></div></div>
+                <div class="nrow" data-cat="calendar"><div class="ico note t-noschool">🚫</div><div class="ntxt"><div class="row1"><div class="ti">Teacher in-service — no school</div><span class="tag t-noschool">No School</span><div class="tm">Tomorrow</div></div></div></div>
+                <div class="nrow" data-cat="events"><div class="ico photo">🥂</div><div class="ntxt"><div class="row1"><div class="ti">Almost Time!</div><div class="tm">2w</div></div><div class="de">"Y Combinator Happy hour" starts at 5:30 PM CDT.</div></div></div>
+                <div class="nrow" data-cat="clubs"><div class="ico club">Y</div><div class="ntxt"><div class="row1"><div class="ti">New Member</div><div class="tm">1mo</div></div><div class="de">Noah LaRonde joined "Y Combinator"</div></div></div>
+                <div class="nrow" data-cat="calendar"><div class="ico note t-special">✨</div><div class="ntxt"><div class="row1"><div class="ti">Pajama day! 🩳</div><span class="tag t-special">Special</span><div class="tm">Fri</div></div></div></div>
+                <div class="nrow" data-cat="events"><div class="ico photo">🎉</div><div class="ntxt"><div class="row1"><div class="ti">Event Completed!</div><div class="tm">2w</div></div><div class="de">"Y Combinator Happy hour" wrapped up! Share your best moments.</div></div></div>
+              </div>
+
+              <div class="empty" id="s2EmptyDaily"><div class="eic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12"/></svg></span></div><h3>Nothing here yet</h3><p>Your daily brief will show up here once it's live.</p></div>
+
+              <div class="fnote"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12"/></svg></span><span>Notifications that are over 30 days old will be removed.</span></div>
+            </div>
+
+            <div class="todopane" id="todoPane">
+              <div class="seclbl" style="margin-top:8px;">Open</div>
+              <div id="s2TodoOpen">
+                <div class="nrow" data-todo="1"><div class="todobox"><div class="cb"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div></div><div class="ntxt"><div class="row1"><div class="ti">Bring towels for water day</div><div class="tm">Due tomorrow</div></div><div class="de">1st Grade Class</div></div></div>
+                <div class="nrow" data-todo="1"><div class="todobox"><div class="cb"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div></div><div class="ntxt"><div class="row1"><div class="ti">Sign Jake's permission slip</div><div class="tm">Due Fri</div></div><div class="de">1st Grade Class</div></div></div>
+              </div>
+              <div class="seclbl">Completed</div>
+              <div id="s2TodoDone"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  /* ── Screen 1: flat tabs + pinned strip (same mechanic as notifications-v2-full-taxonomy.html) ── */
+  (function(){
+    var filters = document.getElementById('filtersS1');
+    var list = document.getElementById('s1List');
+    var pinned = document.getElementById('s1Pinned');
+    var pinnedList = document.getElementById('s1PinnedList');
+    var pinnedCnt = document.getElementById('s1PinnedCnt');
+    var todoCount = document.getElementById('s1TodoCount');
+    var allChip = filters.querySelector('[data-tab="all"] .n');
+    var emptyDaily = document.getElementById('s1EmptyDaily');
+    var rows = Array.prototype.slice.call(list.querySelectorAll('.nrow'));
+    var base = 13, currentTab = 'all';
+
+    function updateCounts(){
+      var open = pinnedList.querySelectorAll('.nrow').length;
+      todoCount.textContent = '· ' + open;
+      allChip.textContent = '· ' + (base + open);
+      pinnedCnt.textContent = open + ' open';
+    }
+    function render(){
+      var showPinned = (currentTab === 'all' || currentTab === 'todo');
+      pinned.classList.toggle('show', showPinned);
+      if(currentTab === 'todo'){ list.style.display = 'none'; emptyDaily.classList.remove('on'); }
+      else if(currentTab === 'daily'){ list.style.display = 'none'; emptyDaily.classList.add('on'); }
+      else{
+        list.style.display = 'block'; emptyDaily.classList.remove('on');
+        rows.forEach(function(r){ r.style.display = (currentTab === 'all' || r.dataset.cat === currentTab) ? 'flex' : 'none'; });
+      }
+    }
+    filters.addEventListener('click', function(e){
+      var chip = e.target.closest('.fchip'); if(!chip) return;
+      currentTab = chip.dataset.tab;
+      Array.prototype.forEach.call(filters.querySelectorAll('.fchip'), function(c){ c.classList.remove('on'); });
+      chip.classList.add('on');
+      render();
+    });
+    document.querySelector('.col:nth-child(1) .body').addEventListener('click', function(e){
+      var row = e.target.closest('.nrow[data-todo]'); if(!row) return;
+      row.classList.add('done');
+      pinnedList.removeChild(row);
+      updateCounts(); render();
+    });
+    updateCounts(); render();
+  })();
+
+  /* ── Screen 2: segmented Notifications | To-do ── */
+  (function(){
+    var seg = document.getElementById('seg2');
+    var notifPane = document.getElementById('notifPane');
+    var todoPane = document.getElementById('todoPane');
+    var filters = document.getElementById('filtersS2');
+    var list = document.getElementById('s2List');
+    var emptyDaily = document.getElementById('s2EmptyDaily');
+    var rows = Array.prototype.slice.call(list.querySelectorAll('.nrow'));
+    var openList = document.getElementById('s2TodoOpen');
+    var doneList = document.getElementById('s2TodoDone');
+    var segBadge = document.getElementById('segBadge');
+    var currentTab = 'all';
+
+    seg.addEventListener('click', function(e){
+      var btn = e.target.closest('button'); if(!btn) return;
+      Array.prototype.forEach.call(seg.querySelectorAll('button'), function(b){ b.classList.remove('on'); });
+      btn.classList.add('on');
+      seg.classList.toggle('right', btn.dataset.pane === 'todo');
+      notifPane.classList.toggle('hide', btn.dataset.pane !== 'notif');
+      todoPane.classList.toggle('show', btn.dataset.pane === 'todo');
+    });
+
+    filters.addEventListener('click', function(e){
+      var chip = e.target.closest('.fchip'); if(!chip) return;
+      currentTab = chip.dataset.tab;
+      Array.prototype.forEach.call(filters.querySelectorAll('.fchip'), function(c){ c.classList.remove('on'); });
+      chip.classList.add('on');
+      if(currentTab === 'daily'){ list.style.display = 'none'; emptyDaily.classList.add('on'); }
+      else{
+        list.style.display = 'block'; emptyDaily.classList.remove('on');
+        rows.forEach(function(r){ r.style.display = (currentTab === 'all' || r.dataset.cat === currentTab) ? 'flex' : 'none'; });
+      }
+    });
+
+    todoPane.addEventListener('click', function(e){
+      var row = e.target.closest('.nrow[data-todo]'); if(!row) return;
+      row.classList.add('done');
+      doneList.appendChild(row);
+      var open = openList.querySelectorAll('.nrow').length;
+      segBadge.textContent = open;
+      segBadge.style.display = open === 0 ? 'none' : 'inline-flex';
+    });
+  })();
+</script>
+</body>
+</html>

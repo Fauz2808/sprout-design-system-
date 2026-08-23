@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1E4A35; --forest-deep:#143626; --green-700:#2D6E4E; --green-500:#3A8A62;
+    --cream:#FAF9F6; --cream-2:#F0EDE6; --sage:#D6E8DC; --ink:#1C1C1A; --muted:#6B6860;
+    --display:'Playfair Display',Georgia,serif; --body:'Inter',-apple-system,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+  html,body{width:1024px;height:500px;}
+  .stage{
+    position:relative; width:1024px; height:500px; overflow:hidden;
+    background:
+      radial-gradient(120% 140% at 88% 18%, #2c6a4a 0%, #1E4A35 38%, #163a29 72%, #102a1e 100%);
+    font-family:var(--body);
+  }
+  /* decorative concentric arcs (brand motif) */
+  .arcs{position:absolute;inset:0;overflow:hidden;}
+  .arc{position:absolute;border-radius:50%;border:1.5px solid rgba(255,255,255,0.06);}
+  .arc.a1{width:760px;height:760px;right:-200px;top:-300px;}
+  .arc.a2{width:1040px;height:1040px;right:-360px;top:-430px;border-color:rgba(255,255,255,0.045);}
+  .arc.a3{width:520px;height:520px;right:-90px;top:-150px;border-color:rgba(255,255,255,0.07);}
+  .glow{position:absolute;width:680px;height:680px;right:-160px;top:-160px;border-radius:50%;
+        background:radial-gradient(circle,rgba(122,196,154,0.20) 0%,rgba(122,196,154,0) 62%);filter:blur(4px);}
+
+  .wrap{position:relative;height:100%;display:flex;align-items:center;}
+
+  /* ---------- LEFT: copy ---------- */
+  .copy{padding:0 0 0 64px;width:560px;}
+  .lockup{display:flex;align-items:center;gap:13px;margin-bottom:30px;}
+  .icon{width:54px;height:54px;border-radius:14px;background:linear-gradient(160deg,#FBFAF7,#EFEAE0);
+        box-shadow:0 6px 18px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.6);
+        display:flex;align-items:center;justify-content:center;}
+  .icon img{width:42px;height:42px;object-fit:contain;}
+  .wordmark{font-family:var(--display);font-weight:600;font-size:34px;color:#fff;letter-spacing:.3px;}
+
+  .eyebrow{font-family:var(--body);font-weight:600;font-size:12px;letter-spacing:.34em;
+           text-transform:uppercase;color:#9ecbb1;margin-bottom:16px;}
+  h1{font-family:var(--display);font-weight:700;font-size:55px;line-height:1.04;
+     color:#FCFBF8;letter-spacing:-1px;}
+  h1 em{font-style:italic;font-weight:600;color:#bfe6cf;}
+  .sub{font-family:var(--body);font-weight:400;font-size:18px;color:#cfe0d6;
+       margin-top:20px;line-height:1.5;max-width:430px;}
+
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px;max-width:450px;}
+  .pill{font-family:var(--body);font-weight:500;font-size:12.5px;color:#dcebe2;
+        background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
+        padding:6px 13px;border-radius:999px;backdrop-filter:blur(2px);}
+
+  /* ---------- RIGHT: phone ---------- */
+  .phone-area{position:absolute;right:0;top:0;width:430px;height:500px;}
+  .phone{
+    position:absolute;right:18px;top:50%;transform:translateY(-50%) rotate(-4deg);
+    width:262px;height:540px;border-radius:42px;
+    background:#0c0c0c;
+    padding:11px;
+    box-shadow:0 40px 80px rgba(0,0,0,0.45),0 8px 24px rgba(0,0,0,0.35),inset 0 0 0 2px rgba(255,255,255,0.06);
+  }
+  .screen{width:100%;height:100%;border-radius:33px;overflow:hidden;background:#F3F0E9;position:relative;}
+  .notch{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:84px;height:23px;background:#0c0c0c;border-radius:14px;z-index:5;}
+
+  .s-pad{padding:16px 15px 0;}
+  .s-top{display:flex;align-items:center;justify-content:space-between;font-family:var(--body);
+         font-size:11px;font-weight:600;color:#1C1C1A;margin-top:18px;}
+  .s-home{font-family:var(--display);font-weight:600;font-size:14px;color:#1C1C1A;}
+  .bell{width:22px;height:22px;border-radius:50%;background:#e8efe9;display:flex;align-items:center;justify-content:center;font-size:11px;}
+
+  .banner{margin-top:13px;background:linear-gradient(120deg,#1E4A35,#2c6a4a);border-radius:14px;
+          padding:11px 12px;display:flex;align-items:center;gap:10px;box-shadow:0 6px 14px rgba(30,74,53,0.3);}
+  .banner .temp{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,0.14);
+                display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;}
+  .banner .temp .ico{font-size:13px;line-height:1;}
+  .banner .temp .t{font-size:8px;font-weight:600;margin-top:1px;}
+  .banner .b-txt b{display:block;color:#fff;font-size:12px;font-weight:600;font-family:var(--body);}
+  .banner .b-txt span{display:block;color:rgba(255,255,255,0.8);font-size:9.5px;margin-top:1px;}
+
+  .tabs{display:flex;gap:18px;margin-top:15px;border-bottom:1px solid #e4ded3;padding-bottom:0;}
+  .tab{font-family:var(--body);font-size:12px;padding-bottom:8px;color:#9b978d;font-weight:500;}
+  .tab.on{color:#1E4A35;font-weight:600;border-bottom:2px solid #1E4A35;}
+
+  .sec{display:flex;align-items:center;justify-content:space-between;margin-top:13px;}
+  .sec h4{font-family:var(--display);font-weight:600;font-size:13px;color:#1C1C1A;}
+  .sec span{font-family:var(--body);font-size:9.5px;color:#6B6860;}
+
+  .ev{display:flex;align-items:center;gap:10px;margin-top:11px;}
+  .ev .thumb{width:46px;height:46px;border-radius:11px;flex-shrink:0;
+             background:linear-gradient(135deg,#6FA98A,#3A8A62);}
+  .ev .thumb.t2{background:linear-gradient(135deg,#8FA0B5,#5d6f86);}
+  .ev .info b{display:block;font-family:var(--body);font-weight:600;font-size:11px;color:#1C1C1A;}
+  .ev .info span{display:block;font-family:var(--body);font-size:9px;color:#6B6860;margin-top:2px;}
+  .ev .acts{margin-left:auto;display:flex;gap:6px;}
+  .ev .acts i{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+              font-style:normal;font-size:11px;}
+  .ev .acts .no{background:#e9efe9;color:#6B6860;}
+  .ev .acts .yes{background:#1E4A35;color:#fff;}
+
+  .navbar{position:absolute;bottom:0;left:0;right:0;height:54px;background:rgba(250,249,246,0.96);
+          border-top:1px solid #eae4d9;display:flex;align-items:center;justify-content:space-around;padding:0 8px 6px;}
+  .nv{display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--body);font-size:8px;color:#9b978d;}
+  .nv .d{width:17px;height:17px;border-radius:6px;background:#d9e4dc;}
+  .nv.on{color:#1E4A35;font-weight:600;}
+  .nv.on .d{background:#1E4A35;}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="glow"></div>
+    <div class="arcs">
+      <div class="arc a1"></div><div class="arc a2"></div><div class="arc a3"></div>
+    </div>
+
+    <div class="wrap">
+      <div class="copy">
+        <div class="lockup">
+          <div class="icon"><img src="__CLOVER__" alt="Sprout"></div>
+          <div class="wordmark">Sprout</div>
+        </div>
+        <div class="eyebrow">All&nbsp;·&nbsp;in&nbsp;·&nbsp;one</div>
+        <h1>Everything <em>families</em><br>need, in one place</h1>
+        <p class="sub">Connect with school parents, discover events, and stay briefed — from school days to special days.</p>
+        <div class="pills">
+          <div class="pill">Parent Chat</div>
+          <div class="pill">Discover Events</div>
+          <div class="pill">Class &amp; Grade Clubs</div>
+          <div class="pill">Memories</div>
+          <div class="pill">AI Daily Brief</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-area">
+      <div class="phone">
+        <div class="screen">
+          <div class="notch"></div>
+          <div class="s-pad">
+            <div class="s-top"><span>9:41</span><span>📶 🔋</span></div>
+            <div class="s-top" style="margin-top:14px;">
+              <div class="bell">👤</div>
+              <div class="s-home">Home ⌄</div>
+              <div class="bell">🔔</div>
+            </div>
+            <div class="banner">
+              <div class="temp"><span class="ico">☀️</span><span class="t">68–86°</span></div>
+              <div class="b-txt"><b>Good Morning, James</b><span>Tap to see your daily brief</span></div>
+            </div>
+            <div class="tabs">
+              <div class="tab on">Discover</div>
+              <div class="tab">My Events</div>
+            </div>
+            <div class="sec"><h4>Your Invitations</h4><span>2 Events</span></div>
+            <div class="ev">
+              <div class="thumb"></div>
+              <div class="info"><b>Family Fun Day at Zilker</b><span>Sat, Nov 9 · 6:30pm</span></div>
+              <div class="acts"><i class="no">✕</i><i class="yes">✓</i></div>
+            </div>
+            <div class="ev">
+              <div class="thumb t2"></div>
+              <div class="info"><b>Family Movie Night</b><span>Fri, Nov 15 · 1:30pm</span></div>
+              <div class="acts"><i class="no">✕</i><i class="yes">✓</i></div>
+            </div>
+            <div class="sec" style="margin-top:14px;"><h4>Activities this week</h4><span>See All</span></div>
+            <div class="ev">
+              <div class="thumb" style="background:linear-gradient(135deg,#E0A96D,#c97f3e);"></div>
+              <div class="info"><b>Kids Art &amp; Craft Day</b><span>Mon, Feb 25 · Griffith Park</span></div>
+            </div>
+          </div>
+          <div class="navbar">
+            <div class="nv on"><div class="d"></div>Events</div>
+            <div class="nv"><div class="d"></div>Memories</div>
+            <div class="nv"><div class="d"></div>AI</div>
+            <div class="nv"><div class="d"></div>Chat</div>
+            <div class="nv"><div class="d"></div>Clubs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

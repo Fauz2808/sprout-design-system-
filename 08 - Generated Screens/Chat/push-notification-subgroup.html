@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Subgroup Push Notification · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e; --green:#186338; --brand-mid:#4fa472;
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:26px 48px;padding:40px 24px 60px;}
+  .lede{flex:1 0 100%;text-align:center;max-width:720px;margin:0 auto 6px;}
+  .lede h1{font-family:var(--serif);font-weight:600;font-size:23px;color:#23271f;margin:0 0 5px;}
+  .lede p{font-size:12.5px;color:#6a665b;margin:0;line-height:1.5;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .cap{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:393px;line-height:1.5;}
+  .cap b{color:#3a3830;}
+
+  .device{position:relative;width:393px;height:852px;border-radius:54px;padding:11px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:60;}
+  .screen{position:relative;width:100%;height:100%;border-radius:43px;overflow:hidden;display:flex;flex-direction:column;
+    /* lock-screen wallpaper — soft Sprout-tinted dusk */
+    background:linear-gradient(165deg,#2e4636 0%,#1e3327 42%,#14231b 100%);color:#fff;}
+  .glow{position:absolute;inset:0;background:radial-gradient(120% 60% at 50% 8%,rgba(120,182,145,.28),transparent 60%);}
+
+  /* status bar (white) */
+  .sb{position:relative;z-index:5;flex:0 0 44px;padding:16px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:#fff;}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:#fff;} .sb .bat{width:25px;}
+
+  /* clock */
+  .clock{position:relative;z-index:5;text-align:center;margin-top:14px;}
+  .clock .lk{font-size:16px;opacity:.85;margin-bottom:2px;}
+  .clock .date{font-size:15px;font-weight:600;opacity:.92;letter-spacing:.2px;}
+  .clock .time{font-family:var(--sans);font-weight:600;font-size:78px;line-height:1;letter-spacing:-2px;margin-top:2px;text-shadow:0 2px 20px rgba(0,0,0,.2);}
+
+  /* notification stack */
+  .notifs{position:relative;z-index:5;margin-top:auto;padding:12px 10px 0;display:flex;flex-direction:column;gap:9px;}
+  .ntitle{font-size:12px;font-weight:600;opacity:.75;padding:0 8px 2px;text-transform:uppercase;letter-spacing:.06em;}
+  .note{display:flex;gap:11px;align-items:flex-start;background:rgba(248,246,241,.82);
+    -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-radius:20px;padding:11px 13px;
+    box-shadow:0 4px 16px rgba(0,0,0,.12);}
+  /* avatar + Sprout badge (the key: subgroup avatar is the MAIN icon, Sprout is the small corner badge) */
+  .ava{position:relative;flex-shrink:0;width:42px;height:42px;}
+  .ava .mono{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;
+    font-family:var(--serif);font-weight:600;font-size:16px;background:linear-gradient(145deg,#1e3e2b,#4fa472);overflow:hidden;}
+  .ava .mono img{width:100%;height:100%;object-fit:cover;}
+  .ava .badge{position:absolute;right:-3px;bottom:-3px;width:19px;height:19px;border-radius:7px;background:var(--green);
+    display:grid;place-items:center;box-shadow:0 0 0 2px rgba(248,246,241,.95);}
+  .ava .badge svg{width:12px;height:12px;}
+  .nbody{flex:1;min-width:0;color:#111;}
+  .nbody .r1{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .nbody .grp{font-family:var(--sans);font-weight:700;font-size:14px;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .nbody .t{font-size:12px;color:#3a3a3a;opacity:.6;flex-shrink:0;font-weight:500;}
+  .nbody .msg{font-size:13.5px;color:#2a2a2a;line-height:1.35;margin-top:1px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .nbody .msg b{font-weight:600;}
+  /* stacked look for older ones */
+  .stackhint{height:14px;margin:-4px 16px 0;border-radius:0 0 18px 18px;background:rgba(248,246,241,.42);
+    -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);}
+
+  .foot{position:relative;z-index:5;display:flex;justify-content:space-between;padding:16px 40px 14px;}
+  .foot .fb{width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.28);display:grid;place-items:center;}
+  .foot .fb svg{width:20px;height:20px;fill:#fff;}
+  .hi{position:relative;z-index:5;width:134px;height:5px;border-radius:3px;background:rgba(255,255,255,.75);margin:0 auto 9px;}
+
+  /* annotated detail card (right) */
+  .detail{width:360px;background:#fff;border-radius:20px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.08);}
+  .detail h3{font-family:var(--serif);font-weight:600;font-size:16px;color:#23271f;margin:0 0 14px;}
+  .anno{display:flex;gap:12px;margin-bottom:14px;}
+  .anno .num{width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;flex-shrink:0;}
+  .anno .tx{font-size:13px;color:#4a4a4a;line-height:1.45;}
+  .anno .tx b{color:#1a1a1a;}
+  .demo{display:flex;gap:11px;align-items:flex-start;background:#f4f1ea;border-radius:16px;padding:12px;margin-top:6px;}
+</style>
+</head>
+<body>
+<div class="lede">
+  <h1>Subgroup Push Notification (gaya WhatsApp)</h1>
+  <p>Avatar subgroup = icon utama, badge Sprout kecil di pojok. Judul = nama subgroup, preview = "pengirim: pesan". Bukan "pesan dari Sprout" — parents langsung tahu grup mana.</p>
+</div>
+
+<!-- ===== LOCK SCREEN ===== -->
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="glow"></div>
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#fff"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+      <div class="clock">
+        <div class="lk">🔒</div>
+        <div class="date">Monday, July 14</div>
+        <div class="time">9:41</div>
+      </div>
+
+      <div class="notifs">
+        <div class="ntitle">Notification Center</div>
+
+        <div class="note">
+          <div class="ava">
+            <div class="mono">MT</div>
+            <div class="badge"><svg viewBox="0 0 24 24" fill="#fff"><circle cx="8.5" cy="8.5" r="3.3"/><circle cx="15.5" cy="8.5" r="3.3"/><circle cx="8.5" cy="15" r="3.3"/><circle cx="15.5" cy="15" r="3.3"/><rect x="11.3" y="12" width="1.4" height="9" rx="0.7"/></svg></div>
+          </div>
+          <div class="nbody">
+            <div class="r1"><span class="grp">Miss Taylor's Class</span><span class="t">now</span></div>
+            <div class="msg"><b>Ms. Taylor:</b> 🎨 Art bags due tomorrow — send a labeled bag for artwork</div>
+          </div>
+        </div>
+
+        <div class="note">
+          <div class="ava">
+            <div class="mono" style="background:linear-gradient(145deg,#3a5f8a,#6aa0c9)">KD</div>
+            <div class="badge"><svg viewBox="0 0 24 24" fill="#fff"><circle cx="8.5" cy="8.5" r="3.3"/><circle cx="15.5" cy="8.5" r="3.3"/><circle cx="8.5" cy="15" r="3.3"/><circle cx="15.5" cy="15" r="3.3"/><rect x="11.3" y="12" width="1.4" height="9" rx="0.7"/></svg></div>
+          </div>
+          <div class="nbody">
+            <div class="r1"><span class="grp">Kiker Dads</span><span class="t">14m ago</span></div>
+            <div class="msg"><b>Marcus Reed:</b> Anyone up for golf this Saturday morning? ⛳</div>
+          </div>
+        </div>
+
+        <div class="note">
+          <div class="ava">
+            <div class="mono" style="background:linear-gradient(145deg,#8a4f6d,#c07fa0)">FM</div>
+            <div class="badge"><svg viewBox="0 0 24 24" fill="#fff"><circle cx="8.5" cy="8.5" r="3.3"/><circle cx="15.5" cy="8.5" r="3.3"/><circle cx="8.5" cy="15" r="3.3"/><circle cx="15.5" cy="15" r="3.3"/><rect x="11.3" y="12" width="1.4" height="9" rx="0.7"/></svg></div>
+          </div>
+          <div class="nbody">
+            <div class="r1"><span class="grp">First Grade Moms</span><span class="t">1h ago</span></div>
+            <div class="msg"><b>Jessica:</b> Hi moms, I'm new here — excited to meet everyone! 👋</div>
+          </div>
+        </div>
+        <div class="stackhint"></div>
+      </div>
+
+      <div class="foot">
+        <div class="fb"><svg viewBox="0 0 24 24"><path d="M9 3h6v2l-1 1v3l3 5v6a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-6l3-5V6L9 5z"/></svg></div>
+        <div class="fb"><svg viewBox="0 0 24 24"><path d="M4 7h3l1.5-2h7L18 7h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1zm8 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg></div>
+      </div>
+      <div class="hi"></div>
+    </div>
+  </div>
+  <div class="cap"><b>Lock screen</b> — 3 notif subgroup. Icon = avatar grup, badge Sprout di pojok, judul = nama grup.</div>
+</div>
+
+<!-- ===== ANATOMY / DETAIL ===== -->
+<div class="panel">
+  <div class="detail">
+    <h3>Anatomi notifikasi</h3>
+    <div class="anno"><div class="num">1</div><div class="tx"><b>Icon utama = avatar subgroup</b> (monogram/logo grup). Bukan icon Sprout — parents langsung kenal grupnya.</div></div>
+    <div class="anno"><div class="num">2</div><div class="tx"><b>Badge Sprout</b> (clover hijau) nempel di pojok kanan-bawah avatar, dengan ring putih — nunjukin ini dari Sprout, mirip WhatsApp.</div></div>
+    <div class="anno"><div class="num">3</div><div class="tx"><b>Judul = nama subgroup</b> (tebal), <b>preview = "pengirim: pesan"</b>, waktu di kanan.</div></div>
+    <div class="demo">
+      <div class="ava">
+        <div class="mono">MT</div>
+        <div class="badge"><svg viewBox="0 0 24 24" fill="#fff"><circle cx="8.5" cy="8.5" r="3.3"/><circle cx="15.5" cy="8.5" r="3.3"/><circle cx="8.5" cy="15" r="3.3"/><circle cx="15.5" cy="15" r="3.3"/><rect x="11.3" y="12" width="1.4" height="9" rx="0.7"/></svg></div>
+      </div>
+      <div class="nbody" style="color:#111">
+        <div class="r1"><span class="grp">Miss Taylor's Class</span><span class="t">now</span></div>
+        <div class="msg"><b>Ms. Taylor:</b> 🎨 Art bags due tomorrow</div>
+      </div>
+    </div>
+    <p style="font-size:11.5px;color:#8a8478;margin:16px 0 0;line-height:1.5">Catatan teknis buat Mohit: ini pakai iOS <b>Communication Notifications</b> (INSendMessageIntent) biar avatar grup + badge app muncul — sama seperti WhatsApp. Android pakai MessagingStyle + LargeIcon.</p>
+  </div>
+  <div class="cap"><b>Detail + catatan implementasi.</b></div>
+</div>
+</body>
+</html>

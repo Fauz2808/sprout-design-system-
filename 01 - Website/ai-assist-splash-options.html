@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AI Assist Splash — 3 More Options · Sprout</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --field:#e8e4d9; --fg:#1a1a17; --ink:#1c2a1d; --muted:#807a6c; --border:#ddd9cf;
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-soft:#e7efe6;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif; --serif:'Playfair Display',Georgia,serif; --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:30px 24px;padding:38px 22px 60px;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:13px;}
+  .caption{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:390px;line-height:1.5;} .caption strong{color:#3a3830;font-weight:700;} .caption em{color:var(--green);font-style:normal;font-weight:600;}
+  .lede{flex-basis:100%;width:100%;text-align:center;margin:0 0 10px;} .lede h1{font-family:var(--serif);font-size:26px;font-weight:600;color:#23271f;margin:0 0 6px;} .lede p{font-size:13.5px;color:#6a665b;margin:0 auto;max-width:660px;line-height:1.55;} .lede b{color:var(--green);}
+
+  .device{position:relative;width:390px;height:812px;border-radius:54px;padding:11px;background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 26px 56px -14px rgba(0,0,0,.45);}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:8;}
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:radial-gradient(120% 46% at 50% 3%, #e7f0e5 0%, var(--bg) 46%);}
+  .sb{flex:0 0 42px;padding:15px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:14px;font-weight:600;color:var(--fg);z-index:6;position:relative;}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:16px;height:11px;fill:var(--fg);} .sb .bat{width:24px;}
+  .sb.light,.sb.light svg{color:#fff;fill:#fff;}
+  .top{flex:0 0 auto;display:flex;justify-content:flex-end;padding:4px 22px 0;z-index:6;} .skip{font-size:13px;color:var(--muted);font-weight:600;cursor:pointer;} .skip.light{color:rgba(255,255,255,.9);}
+  .scroll{flex:1 1 auto;overflow-y:auto;padding:6px 26px 8px;display:flex;flex-direction:column;align-items:center;text-align:center;} .scroll::-webkit-scrollbar{display:none;}
+  .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--green-mid);margin-top:6px;}
+  .h1{font-family:var(--serif);font-size:27px;font-weight:600;color:var(--ink);line-height:1.15;letter-spacing:-.01em;margin:8px 0 8px;} .h1 em{font-style:italic;color:var(--green);}
+  .sub{font-size:13.5px;color:var(--muted);line-height:1.5;max-width:300px;}
+
+  .dock{flex:0 0 auto;padding:8px 24px calc(14px + env(safe-area-inset-bottom));text-align:center;z-index:6;}
+  .cta{width:100%;border:none;border-radius:16px;padding:16px;background:var(--green);color:#fff;font-size:15.5px;font-weight:700;font-family:var(--font);cursor:pointer;box-shadow:0 14px 30px -10px rgba(45,92,46,.6);}
+  .vhint{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--green-mid);font-weight:600;margin-bottom:12px;} .vhint .o{width:15px;height:15px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#a7e0a9,#5a8f5d 60%,#2d5c2e);}
+  .home{position:absolute;left:50%;bottom:7px;transform:translateX(-50%);width:130px;height:5px;background:var(--fg);border-radius:999px;opacity:.18;z-index:9;}
+
+  /* orb */
+  .orb{width:96px;height:96px;border-radius:50%;position:relative;flex-shrink:0;margin-top:14px;background:radial-gradient(circle at 38% 32%,#7cc47f,#3d7a40 44%,#2d5c2e 80%);box-shadow:0 16px 40px -12px rgba(45,92,46,.55),inset 0 2px 10px rgba(255,255,255,.25);animation:breathe 4s ease-in-out infinite;}
+  .orb::before{content:'';position:absolute;inset:6px;border-radius:50%;background-image:radial-gradient(rgba(255,255,255,.55) 1px,transparent 1.4px);background-size:10px 10px;opacity:.4;mix-blend-mode:screen;animation:spin 22s linear infinite;}
+  .orb .ring1,.orb .ring2{position:absolute;inset:-10px;border-radius:50%;border:2px solid rgba(45,92,46,.35);animation:ring 2.4s ease-out infinite;} .orb .ring2{animation-delay:1.2s;}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}} @keyframes spin{to{transform:rotate(360deg)}} @keyframes ring{0%{transform:scale(.85);opacity:.6}100%{transform:scale(1.7);opacity:0}}
+
+  /* D · voice prompt chips */
+  .vchips{display:flex;flex-direction:column;gap:9px;width:100%;margin-top:20px;}
+  .vchip{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:11px 13px;text-align:left;box-shadow:0 6px 16px -12px rgba(40,40,30,.4);}
+  .vchip .mic{width:26px;height:26px;border-radius:8px;background:var(--green-soft);display:grid;place-items:center;flex-shrink:0;font-size:13px;}
+  .vchip .q{font-size:13px;color:var(--ink);font-weight:600;} .vchip .q b{color:var(--green);font-weight:700;}
+
+  /* E · spoken → built */
+  .quote{width:100%;margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:14px 15px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 20px -14px rgba(40,40,30,.4);}
+  .quote .mo{width:38px;height:38px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#7cc47f,#2d5c2e);flex-shrink:0;display:grid;place-items:center;color:#fff;font-size:16px;}
+  .quote .qt{flex:1;text-align:left;font-size:13px;color:var(--ink);font-weight:600;line-height:1.35;}
+  .wave{display:flex;align-items:center;gap:3px;height:22px;margin-top:6px;} .wave i{width:3px;border-radius:2px;background:var(--green-mid);animation:wv 1s ease-in-out infinite;} .wave i:nth-child(2){animation-delay:.1s}.wave i:nth-child(3){animation-delay:.2s}.wave i:nth-child(4){animation-delay:.3s}.wave i:nth-child(5){animation-delay:.15s}.wave i:nth-child(6){animation-delay:.25s}.wave i:nth-child(7){animation-delay:.05s}
+  @keyframes wv{0%,100%{height:6px}50%{height:20px}}
+  .arrowdn{margin:12px 0;color:var(--green-mid);} .arrowdn svg{width:24px;height:24px;stroke:var(--green-mid);fill:none;stroke-width:2.4;}
+  .evcard{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:10px;box-shadow:0 14px 30px -16px rgba(40,40,30,.5);text-align:left;}
+  .evcard .ec{position:relative;aspect-ratio:16/9;border-radius:13px;overflow:hidden;background:linear-gradient(150deg,#2f6f48,#16412a);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:12px;}
+  .evcard .ec .num{font-family:var(--serif);font-size:44px;font-weight:800;line-height:.8;} .evcard .ec .nm{font-family:var(--serif);font-size:16px;font-weight:700;}
+  .evcard .eb{padding:9px 5px 3px;} .evcard .et{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--ink);} .evcard .em{font-size:11.5px;color:var(--muted);margin-top:2px;} .evcard .tagline{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--green);background:var(--green-soft);padding:4px 9px;border-radius:999px;margin-top:8px;}
+
+  /* F · immersive cover */
+  .imm{position:absolute;inset:0;z-index:1;background:linear-gradient(150deg,#2f6f48,#16412a);display:flex;flex-direction:column;justify-content:space-between;padding:64px 26px 30px;color:#fff;overflow:hidden;}
+  .imm .bignum{position:absolute;right:-10px;top:20%;font-family:var(--serif);font-size:300px;font-weight:800;line-height:.8;color:rgba(255,255,255,.08);}
+  .imm .face{position:absolute;left:50%;top:34%;transform:translateX(-50%);font-size:120px;filter:drop-shadow(0 10px 24px rgba(0,0,0,.4));}
+  .imm .scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,30,18,.88) 0%,rgba(10,30,18,.2) 46%,transparent 70%);}
+  .imm .body{position:relative;z-index:2;margin-top:auto;text-align:left;}
+  .imm .eyebrow{color:#a7e0a9;margin:0;} .imm h1{font-family:var(--serif);font-size:30px;font-weight:600;line-height:1.12;margin:8px 0 10px;} .imm h1 em{font-style:italic;color:#cfeccf;}
+  .imm .isub{font-size:13.5px;color:rgba(255,255,255,.82);line-height:1.5;}
+  .imm-dock{position:relative;z-index:2;margin-top:18px;} .imm-cta{width:100%;border:none;border-radius:16px;padding:16px;background:#fff;color:var(--green);font-size:15.5px;font-weight:700;font-family:var(--font);cursor:pointer;} .imm-vh{text-align:center;font-size:12px;color:rgba(255,255,255,.8);font-weight:600;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px;} .imm-vh .o{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#a7e0a9,#2d5c2e);}
+</style>
+</head>
+<body>
+<div class="lede">
+  <h1>AI Assist splash — 3 more options</h1>
+  <p>All sell the same thing (create events by <b>voice</b>, then Continue → the "What are we creating?" gate) — three different hooks: <b>voice-first, the transformation, or an immersive cover.</b></p>
+</div>
+
+<!-- ══ D · VOICE-FIRST ORB ══ -->
+<div class="panel">
+  <div class="caption"><strong>D · Voice-first</strong> — <em>the orb + example things you can say</em></div>
+  <div class="device"><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 16 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg><svg class="bat" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="2" y="2" width="17" height="7" rx="1.4"/></svg></span></div>
+      <div class="top"><div class="skip">Skip</div></div>
+      <div class="scroll">
+        <div class="orb"><span class="ring1"></span><span class="ring2"></span></div>
+        <div class="eyebrow" style="margin-top:18px">Meet Sprout AI</div>
+        <div class="h1">Just say it —<br>Sprout <em>builds it</em></div>
+        <div class="sub">No forms. Tap the mic and tell Sprout what you're planning:</div>
+        <div class="vchips">
+          <div class="vchip"><span class="mic">🎤</span><span class="q">"Throw <b>Kennedy</b> a 5th birthday Saturday 🎂"</span></div>
+          <div class="vchip"><span class="mic">🎤</span><span class="q">"Plan a <b>park playdate</b> Sunday morning 🧸"</span></div>
+          <div class="vchip"><span class="mic">🎤</span><span class="q">"Start a <b>soccer club</b> for first grade ⚽"</span></div>
+        </div>
+      </div>
+      <div class="dock"><div class="vhint"><span class="o"></span> Works by voice — just talk</div><button class="cta">Continue</button></div>
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ E · SPOKEN → BUILT ══ -->
+<div class="panel">
+  <div class="caption"><strong>E · The transformation</strong> — <em>your words become a finished event</em></div>
+  <div class="device"><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 16 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg><svg class="bat" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="2" y="2" width="17" height="7" rx="1.4"/></svg></span></div>
+      <div class="top"><div class="skip">Skip</div></div>
+      <div class="scroll">
+        <div class="eyebrow" style="margin-top:10px">Meet Sprout AI</div>
+        <div class="h1">Your words<br>become a <em>plan</em></div>
+        <div class="quote">
+          <div class="mo">🎤</div>
+          <div style="flex:1"><div class="qt">"Throw Kennedy a 5th birthday Saturday at 2 at Zilker 🎉"</div>
+            <div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+        </div>
+        <div class="arrowdn"><svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+        <div class="evcard">
+          <div class="ec"><div class="nm">Kennedy · Chapter 5</div><div class="num">5</div></div>
+          <div class="eb"><div class="et">Kennedy's 5th Birthday 🎉</div><div class="em">Sat, Jun 28 · 2:00 PM · Zilker Park</div><div class="tagline">✨ Cover + invites, done in seconds</div></div>
+        </div>
+      </div>
+      <div class="dock"><div class="vhint"><span class="o"></span> Speak once — Sprout does the rest</div><button class="cta">Continue</button></div>
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ F · IMMERSIVE COVER ══ -->
+<div class="panel">
+  <div class="caption"><strong>F · Immersive cover</strong> — <em>a gorgeous result fills the screen</em></div>
+  <div class="device"><span class="island"></span>
+    <div class="screen">
+      <div class="imm">
+        <div class="bignum">6</div>
+        <span class="face">🧒</span>
+        <div class="scrim"></div>
+        <div class="body">
+          <div class="eyebrow">Meet Sprout AI</div>
+          <h1>Plan it —<br><em>just by talking</em></h1>
+          <div class="isub">Say what you're celebrating and Sprout designs the cover, fills the details and lines up the invites.</div>
+        </div>
+        <div class="imm-dock">
+          <button class="imm-cta">Continue</button>
+          <div class="imm-vh"><span class="o"></span> Works by voice — no typing</div>
+        </div>
+      </div>
+      <div class="sb light"><span>9:41</span><span class="r"><svg viewBox="0 0 16 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg><svg class="bat" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="2" y="2" width="17" height="7" rx="1.4"/></svg></span></div>
+      <div class="home" style="background:#fff"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

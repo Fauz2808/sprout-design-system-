@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Calendar · Intro + Flow · Sprout</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --field:#e8e4d9; --fg:#1a1a17; --ink:#1c2a1d; --muted:#807a6c; --border:#ddd9cf;
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-soft:#e7efe6; --red:#c0392b; --red-soft:#fbe6e3;
+    --work:#5b6ee0; --work-soft:#eaecfb; --personal:#d98a3d; --personal-soft:#f7ecdd;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif; --serif:'Playfair Display',Georgia,serif; --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:34px 26px;padding:40px 24px 60px;}
+  .lede{flex-basis:100%;max-width:780px;text-align:center;margin:0 auto 6px;}
+  .lede h1{font-family:var(--serif);font-size:26px;font-weight:600;color:#23271f;margin:0 0 6px;}
+  .lede p{font-size:13.5px;color:#6a665b;margin:0;line-height:1.55;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .caption{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:390px;line-height:1.5;}
+  .caption strong{color:#3a3830;font-weight:600;}
+
+  .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:5;}
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--fg);}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--fg);} .sb .bat{width:25px;}
+
+  .view{flex:1 1 auto;display:none;flex-direction:column;min-height:0;} .view.on{display:flex;}
+
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:6px 14px 8px;}
+  .ibtn{width:36px;height:36px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;flex-shrink:0;} .ibtn svg{width:20px;height:20px;stroke:var(--fg);fill:none;stroke-width:2;}
+  .top .tt{flex:1;text-align:center;line-height:1.05;}
+  .top .tt .t{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);}
+  .top .tt .s{font-size:11px;color:var(--muted);margin-top:1px;}
+  .top .sp{width:36px;flex-shrink:0;}
+  .gear svg{stroke:var(--fg);}
+  .scroll{flex:1 1 auto;overflow-y:auto;padding:2px 18px 18px;} .scroll::-webkit-scrollbar{display:none;}
+  .home{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:134px;height:5px;background:var(--fg);border-radius:999px;opacity:.18;z-index:9;}
+
+  /* ── DAILY BRIEF (entry) ── */
+  .brief-h{font-family:var(--serif);font-size:25px;font-weight:600;color:var(--ink);margin:6px 4px 2px;}
+  .brief-d{font-size:12.5px;color:var(--muted);margin:0 4px 14px;}
+  .briefcard{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 15px;margin-bottom:10px;}
+  .briefcard .bt{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+  .blin{display:flex;gap:10px;align-items:center;padding:6px 0;}
+  .blin .be{width:30px;height:30px;border-radius:9px;background:var(--green-soft);display:grid;place-items:center;font-size:15px;flex-shrink:0;}
+  .blin .btx{font-size:13.5px;color:var(--ink);} .blin .btx span{display:block;font-size:11.5px;color:var(--muted);}
+  /* calendar entry banner */
+  .cal-entry{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#eef4ec,#e3efe1);border:1px solid #cfe0cc;border-radius:16px;padding:14px;cursor:pointer;margin-top:4px;}
+  .cal-entry .ce-ic{width:42px;height:42px;border-radius:12px;background:#fff;border:1px solid #d4e4d1;display:grid;place-items:center;font-size:21px;flex-shrink:0;}
+  .cal-entry .ce-tx b{display:block;font-size:14px;color:var(--ink);font-weight:700;}
+  .cal-entry .ce-tx span{font-size:11.5px;color:#5e7a5c;font-weight:600;}
+  .cal-entry .chev{margin-left:auto;color:var(--green);}
+
+  /* ── INTRO / MARKETING ── */
+  .intro{flex:1 1 auto;overflow-y:auto;padding:2px 22px 22px;} .intro::-webkit-scrollbar{display:none;}
+  .eyebrow{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--green-mid);text-align:center;margin:6px 0 8px;}
+  .intro-title{font-family:var(--serif);font-size:27px;font-weight:600;color:var(--ink);text-align:center;line-height:1.12;margin:0 0 8px;}
+  .intro-title em{font-style:italic;color:var(--green);}
+  .intro-sub{font-size:13.5px;color:var(--muted);text-align:center;line-height:1.5;margin:0 auto 16px;max-width:300px;}
+
+  /* mini demo preview of the calendar UI */
+  .demo{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:12px 12px 14px;box-shadow:0 16px 34px -18px rgba(40,40,30,.55);margin:0 2px 6px;}
+  .demo::after{content:'Preview';position:absolute;top:10px;right:11px;font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--field);padding:3px 7px;border-radius:999px;}
+  .demo-day{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink);margin:0 0 9px;}
+  .demo-grid{display:flex;gap:8px;}
+  .demo-gut{display:flex;flex-direction:column;gap:14px;padding-top:3px;}
+  .demo-gut span{font-size:8.5px;color:var(--muted);font-family:var(--mono);}
+  .demo-col{flex:1;display:flex;flex-direction:column;gap:6px;}
+  .ev{border-radius:9px;padding:6px 8px;border-left:3px solid;}
+  .ev .ev-t{font-size:11px;font-weight:700;line-height:1.15;}
+  .ev .ev-s{font-size:9px;margin-top:1px;opacity:.8;}
+  .ev.k{background:var(--green-soft);border-color:var(--green);color:var(--ink);}
+  .ev.w{background:var(--work-soft);border-color:var(--work);color:#2c3470;}
+  .ev.p{background:var(--personal-soft);border-color:var(--personal);color:#7a4a16;}
+  .demo-legend{display:flex;justify-content:center;gap:14px;margin-top:11px;}
+  .demo-legend span{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-weight:600;}
+  .demo-legend i{width:9px;height:9px;border-radius:3px;display:inline-block;}
+
+  .perks{margin:16px 2px 2px;display:flex;flex-direction:column;gap:11px;}
+  .perk{display:flex;gap:12px;align-items:flex-start;}
+  .perk .pic{width:34px;height:34px;border-radius:10px;background:var(--green-soft);display:grid;place-items:center;font-size:17px;flex-shrink:0;}
+  .perk b{font-size:13.5px;color:var(--ink);display:block;}
+  .perk p{font-size:11.5px;color:var(--muted);margin:1px 0 0;line-height:1.4;}
+  .secnote{display:flex;gap:9px;align-items:flex-start;background:var(--green-soft);border-radius:13px;padding:11px 13px;margin:16px 2px 2px;}
+  .secnote svg{width:17px;height:17px;flex-shrink:0;stroke:var(--green-mid);fill:none;stroke-width:2;margin-top:1px;}
+  .secnote span{font-size:11.5px;color:var(--green-mid);line-height:1.45;}
+
+  .intro-foot{flex:0 0 auto;padding:12px 22px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(18px);}
+  .gbtn{width:100%;border:none;border-radius:15px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;gap:11px;box-shadow:0 12px 26px -10px rgba(45,92,46,.6);}
+  .gbtn svg{width:20px;height:20px;}
+  .gbtn.white{background:#fff;color:#1f2937;border:1px solid var(--border);box-shadow:0 8px 20px -12px rgba(0,0,0,.25);}
+  .later{text-align:center;font-size:13px;font-weight:600;color:var(--muted);margin-top:11px;cursor:pointer;}
+  .micro{text-align:center;font-size:11px;color:var(--muted);margin-top:9px;}
+  .micro b{color:var(--green-mid);}
+
+  /* connecting */
+  .connecting{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:0 40px;text-align:center;}
+  .spin{width:46px;height:46px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--green);animation:sp 0.8s linear infinite;}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .connecting h3{font-family:var(--serif);font-size:19px;color:var(--ink);margin:4px 0 0;}
+  .connecting p{font-size:12.5px;color:var(--muted);margin:0;}
+
+  /* ── CALENDAR (real view) ── */
+  .cal-top{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:4px 18px 8px;}
+  .cal-month{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:5px;flex:1;}
+  .cal-month svg{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;}
+  .cal-gear{width:36px;height:36px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;}
+  .cal-gear svg{width:19px;height:19px;stroke:var(--fg);fill:none;stroke-width:1.8;}
+  .cal-prof{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#8fba92,#5a8f5d);color:#fff;font-weight:700;display:grid;place-items:center;font-size:15px;}
+  .daystrip{flex:0 0 auto;display:flex;gap:6px;padding:0 18px 8px;}
+  .dchip{flex:1;text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:7px 0;}
+  .dchip.on{background:var(--green);border-color:var(--green);}
+  .dchip .dw{font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
+  .dchip .dn{font-size:16px;font-weight:700;color:var(--ink);margin-top:1px;}
+  .dchip.on .dw,.dchip.on .dn{color:#fff;}
+  .cal-body{flex:1 1 auto;overflow-y:auto;padding:4px 16px 8px;display:flex;gap:9px;}
+  .cal-body::-webkit-scrollbar{display:none;}
+  .gut{display:flex;flex-direction:column;flex-shrink:0;width:34px;}
+  .gut span{height:58px;font-size:9.5px;color:var(--muted);font-family:var(--mono);text-align:right;padding-right:4px;}
+  .track{flex:1;position:relative;border-left:1px solid var(--border);}
+  .hline{position:absolute;left:0;right:0;height:1px;background:var(--border);opacity:.6;}
+  .nowline{position:absolute;left:-2px;right:0;height:2px;background:var(--red);z-index:3;}
+  .nowline::before{content:'';position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--red);}
+  .blk{position:absolute;left:6px;right:6px;border-radius:9px;padding:5px 8px;border-left:3px solid;overflow:hidden;}
+  .blk .bt2{font-size:11.5px;font-weight:700;line-height:1.15;}
+  .blk .bs2{font-size:9.5px;margin-top:1px;opacity:.85;}
+  .blk.k{background:var(--green-soft);border-color:var(--green);color:var(--ink);}
+  .blk.w{background:var(--work-soft);border-color:var(--work);color:#2c3470;}
+  .blk.p{background:var(--personal-soft);border-color:var(--personal);color:#7a4a16;}
+  .tabbar{flex:0 0 auto;display:flex;justify-content:space-around;align-items:center;padding:8px 6px calc(8px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(18px);}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;}
+  .tab svg{width:21px;height:21px;stroke:var(--muted);fill:none;stroke-width:1.8;}
+  .tab.active{color:var(--green);} .tab.active svg{stroke:var(--green);}
+
+  /* ── SETTINGS ── */
+  .group-h{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:20px 4px 9px;}
+  .group{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+  .acct{display:flex;align-items:center;gap:12px;padding:14px 15px;}
+  .acct .glogo{width:42px;height:42px;border-radius:50%;background:#fff;border:1px solid var(--border);display:grid;place-items:center;flex-shrink:0;} .acct .glogo svg{width:22px;height:22px;}
+  .acct .em{font-size:13.5px;font-weight:600;color:var(--ink);} .acct .st{font-size:11px;color:var(--green-mid);margin-top:2px;}
+  .acct .pill{margin-left:auto;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--green-soft);color:var(--green);}
+  .swrow{display:flex;align-items:center;gap:12px;padding:13px 15px;border-top:1px solid var(--border);}
+  .swrow:first-child{border-top:none;}
+  .swrow .dotc{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
+  .swrow .nm{font-size:13.5px;font-weight:600;color:var(--ink);} .swrow .sub{font-size:11px;color:var(--muted);margin-top:1px;}
+  .swrow>div:nth-child(2){flex:1;}
+  .sw{width:46px;height:28px;border-radius:999px;background:#cfcabc;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+  .sw.on{background:var(--green);}
+  .sw::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+  .sw.on::after{transform:translateX(18px);}
+  .note{font-size:11.5px;color:var(--muted);line-height:1.5;margin:14px 4px 0;}
+  .note b{color:var(--ink);}
+  .disconnect{width:100%;border:1.5px solid #e6c8c4;background:var(--surface);color:var(--red);border-radius:15px;padding:14px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer;margin-top:14px;}
+  /* the fix: prominent way back to the calendar — no dead end */
+  .settings-dock{flex:0 0 auto;padding:12px 18px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(18px);}
+  .btn{width:100%;border:none;border-radius:15px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);}
+  .btn.primary{background:var(--green);color:#fff;box-shadow:0 12px 26px -10px rgba(45,92,46,.6);display:flex;align-items:center;justify-content:center;gap:9px;}
+  .btn.primary svg{width:19px;height:19px;stroke:#fff;fill:none;stroke-width:2;}
+
+  /* sheet */
+  .scrim{position:absolute;inset:0;z-index:18;background:rgba(20,24,18,.45);opacity:0;pointer-events:none;transition:opacity .25s;border-radius:44px;}
+  .scrim.on{opacity:1;pointer-events:auto;}
+  .sheet{position:absolute;left:0;right:0;bottom:0;z-index:19;background:var(--surface);border-radius:26px 26px 0 0;padding:10px 22px calc(22px + env(safe-area-inset-bottom));transform:translateY(115%);visibility:hidden;transition:transform .32s cubic-bezier(.22,1,.36,1),visibility .32s;box-shadow:0 -16px 40px -16px rgba(0,0,0,.3);text-align:center;}
+  .sheet.on{transform:translateY(0);visibility:visible;}
+  .grab{width:38px;height:5px;border-radius:999px;background:var(--border);margin:8px auto 14px;}
+  .sheet .warn-ic{width:54px;height:54px;border-radius:50%;background:#f7e7e4;display:grid;place-items:center;font-size:26px;margin:0 auto 12px;}
+  .sheet h3{font-family:var(--serif);font-size:20px;color:var(--ink);margin:0 0 6px;}
+  .sheet p{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 18px;}
+  .sheet .acts{display:flex;gap:10px;}
+  .sheet .acts button{flex:1;border:none;border-radius:14px;padding:14px;font-size:14.5px;font-weight:700;font-family:var(--font);cursor:pointer;}
+  .sheet .cancel{background:var(--field);color:var(--ink);} .sheet .confirm{background:var(--red);color:#fff;}
+
+  .toast{position:absolute;left:50%;bottom:96px;transform:translateX(-50%) translateY(10px);background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:11px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:30;box-shadow:0 10px 24px -8px rgba(0,0,0,.5);max-width:300px;text-align:center;}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Calendar — Intro &amp; Fixed Flow</h1>
+  <p>Adds the missing intro/marketing page (now with a live preview of the calendar UI), gives you a real way <strong>into</strong> the calendar after connecting, and fixes <strong>Back</strong> to always return to the Daily Brief — whether or not you integrated.</p>
+</div>
+
+<div class="panel">
+  <div class="caption"><strong>One device</strong> — Daily Brief → Calendar intro → connect → Calendar → Settings → back to Brief</div>
+  <div class="device">
+    <span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg>
+        <svg viewBox="0 0 17 11"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1z"/></svg>
+        <svg class="bat" viewBox="0 0 25 11"><rect x=".5" y=".5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="22" y="3.5" width="1.5" height="4" rx=".4" fill="currentColor" fill-opacity=".45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+      </span></div>
+
+      <!-- ══ DAILY BRIEF (entry point) ══ -->
+      <section class="view on" id="v-brief">
+        <div class="scroll">
+          <div class="brief-h">Good morning, Tony</div>
+          <div class="brief-d">Monday, June 22 · here's your day</div>
+
+          <div class="briefcard">
+            <div class="bt">Today for Cooper</div>
+            <div class="blin"><div class="be">📋</div><div class="btx">School drop-off<span>8:30 AM · Lincoln Elementary</span></div></div>
+            <div class="blin"><div class="be">🍕</div><div class="btx">Pizza day<span>1:30 PM · First grade</span></div></div>
+            <div class="blin"><div class="be">⚽</div><div class="btx">Soccer practice<span>3:30 PM · Riverside Park</span></div></div>
+          </div>
+
+          <!-- tapping this opens the new intro page -->
+          <div class="cal-entry" onclick="go('v-intro')">
+            <div class="ce-ic">📅</div>
+            <div class="ce-tx"><b>See work &amp; kids in one view</b><span>Open your calendar →</span></div>
+            <div class="chev"><svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ INTRO / MARKETING (NEW) ══ -->
+      <section class="view" id="v-intro">
+        <div class="top">
+          <!-- Back always returns to the Daily Brief, integrated or not -->
+          <div class="ibtn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="tt"><div class="t">Calendar</div></div>
+          <div class="sp"></div>
+        </div>
+        <div class="intro">
+          <div class="eyebrow">One calendar for everything</div>
+          <div class="intro-title">Your whole week,<br><em>side by side</em></div>
+          <div class="intro-sub">See your kids' Sprout plans next to your work &amp; personal events — no more flipping between apps.</div>
+
+          <!-- live preview of the actual calendar UI -->
+          <div class="demo">
+            <div class="demo-day">Monday, Jun 22</div>
+            <div class="demo-grid">
+              <div class="demo-gut"><span>8</span><span>11</span><span>1</span><span>3</span></div>
+              <div class="demo-col">
+                <div class="ev k"><div class="ev-t">School drop-off</div><div class="ev-s">8:30 · Cooper</div></div>
+                <div class="ev w"><div class="ev-t">Pipeline review</div><div class="ev-s">11:00 · Work</div></div>
+                <div class="ev p"><div class="ev-t">Dentist</div><div class="ev-s">1:00 · Personal</div></div>
+                <div class="ev k"><div class="ev-t">Soccer practice</div><div class="ev-s">3:30 · Cooper</div></div>
+              </div>
+            </div>
+            <div class="demo-legend">
+              <span><i style="background:var(--green)"></i>Kids</span>
+              <span><i style="background:var(--work)"></i>Work</span>
+              <span><i style="background:var(--personal)"></i>Personal</span>
+            </div>
+          </div>
+
+          <div class="perks">
+            <div class="perk"><div class="pic">🗓️</div><div><b>Everything in one place</b><p>Drop-offs, practices, meetings &amp; deadlines on one timeline</p></div></div>
+            <div class="perk"><div class="pic">🔔</div><div><b>Never double-book</b><p>Sprout warns you when a kid event clashes with work</p></div></div>
+            <div class="perk"><div class="pic">🔄</div><div><b>Always in sync</b><p>Read-only — your Google Calendar stays the source of truth</p></div></div>
+          </div>
+
+          <div class="secnote">
+            <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+            <span>Private by default. Only you ever see your calendar — your work &amp; personal events are <b>never shared</b> with other families, and Sprout never edits them.</span>
+          </div>
+        </div>
+        <div class="intro-foot">
+          <button class="gbtn" onclick="connect()">
+            <svg viewBox="0 0 48 48"><path fill="#4285F4" d="M45 24c0-1.5-.1-3-.4-4.4H24v8.4h11.8c-.5 2.8-2 5.1-4.4 6.7v5.6h7.1C42.7 36.4 45 30.7 45 24z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-7.1-5.6c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.1 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.8 28.2c-.4-1.3-.7-2.7-.7-4.2s.2-2.9.7-4.2v-5.7H4.5C3 17.1 2 20.4 2 24s1 6.9 2.5 9.9l7.3-5.7z"/><path fill="#EA4335" d="M24 10.7c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4.1 29.9 2 24 2 15.4 2 8.1 6.9 4.5 14.1l7.3 5.7c1.7-5.2 6.5-9.1 12.2-9.1z"/></svg>
+            Connect Google Calendar
+          </button>
+          <!-- even without connecting, you can still see the Sprout-only calendar -->
+          <div class="later" onclick="go('v-cal')">See my kids' schedule only →</div>
+          <div class="micro">🔒 Read-only access · <b>you control what's shared</b></div>
+        </div>
+      </section>
+
+      <!-- ══ CONNECTING ══ -->
+      <section class="view" id="v-connecting">
+        <div class="connecting">
+          <div class="spin"></div>
+          <h3>Connecting…</h3>
+          <p>Securely linking your Google Calendar</p>
+        </div>
+      </section>
+
+      <!-- ══ CALENDAR (the real destination) ══ -->
+      <section class="view" id="v-cal">
+        <div class="cal-top">
+          <!-- back → Daily Brief -->
+          <div class="ibtn" onclick="goHome()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="cal-month">June <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div>
+          <div class="cal-gear" onclick="go('v-settings')" title="Calendar settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+          <div class="cal-prof">T</div>
+        </div>
+        <div class="daystrip">
+          <div class="dchip"><div class="dw">Sun</div><div class="dn">21</div></div>
+          <div class="dchip on"><div class="dw">Mon</div><div class="dn">22</div></div>
+          <div class="dchip"><div class="dw">Tue</div><div class="dn">23</div></div>
+          <div class="dchip"><div class="dw">Wed</div><div class="dn">24</div></div>
+          <div class="dchip"><div class="dw">Thu</div><div class="dn">25</div></div>
+        </div>
+        <div class="cal-body">
+          <div class="gut" id="gut"></div>
+          <div class="track" id="track"></div>
+        </div>
+        <nav class="tabbar">
+          <div class="tab" onclick="goHome()"><svg viewBox="0 0 24 24"><path d="M3 12 12 3l9 9"/><path d="M5 10v10h14V10"/></svg>Today</div>
+          <div class="tab active"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Schedule</div>
+          <div class="tab"><svg viewBox="0 0 24 24"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg>AI Assist</div>
+          <div class="tab"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</div>
+          <div class="tab"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clubs</div>
+        </nav>
+      </section>
+
+      <!-- ══ SETTINGS (reached via gear, no dead-end) ══ -->
+      <section class="view" id="v-settings">
+        <div class="top">
+          <!-- back → calendar (where you came from) -->
+          <div class="ibtn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="tt"><div class="t">Calendar settings</div></div>
+          <div class="sp"></div>
+        </div>
+        <div class="scroll">
+          <div class="group-h">Connected account</div>
+          <div class="group">
+            <div class="acct">
+              <div class="glogo"><svg viewBox="0 0 48 48"><path fill="#4285F4" d="M45 24c0-1.5-.1-3-.4-4.4H24v8.4h11.8c-.5 2.8-2 5.1-4.4 6.7v5.6h7.1C42.7 36.4 45 30.7 45 24z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-7.1-5.6c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.1 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.8 28.2c-.4-1.3-.7-2.7-.7-4.2s.2-2.9.7-4.2v-5.7H4.5C3 17.1 2 20.4 2 24s1 6.9 2.5 9.9l7.3-5.7z"/><path fill="#EA4335" d="M24 10.7c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4.1 29.9 2 24 2 15.4 2 8.1 6.9 4.5 14.1l7.3 5.7c1.7-5.2 6.5-9.1 12.2-9.1z"/></svg></div>
+              <div><div class="em">tony@joinsprout.co</div><div class="st">● Connected · synced 2 min ago</div></div>
+              <span class="pill">Google</span>
+            </div>
+          </div>
+
+          <div class="group-h">Show on my calendar</div>
+          <div class="group">
+            <div class="swrow"><span class="dotc" style="background:var(--green)"></span><div><div class="nm">Kids' Sprout schedule</div><div class="sub">Always on</div></div><div class="sw on" style="opacity:.5;pointer-events:none"></div></div>
+            <div class="swrow"><span class="dotc" style="background:var(--work)"></span><div><div class="nm">Work calendar</div><div class="sub">Meetings, calls &amp; deadlines</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="swrow"><span class="dotc" style="background:var(--personal)"></span><div><div class="nm">Personal calendar</div><div class="sub">Appointments &amp; errands</div></div><div class="sw on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="swrow"><span class="dotc" style="background:#7a7568"></span><div><div class="nm">Holidays</div><div class="sub">US public holidays</div></div><div class="sw" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+
+          <div class="note">🔒 Only you can see your calendar in Sprout — your work &amp; personal events are <b>never shared</b> with other families.</div>
+          <button class="disconnect" onclick="openConfirm()">Disconnect Google Calendar</button>
+        </div>
+        <!-- THE FIX: a clear way back to the calendar — no dead end -->
+        <div class="settings-dock">
+          <button class="btn primary" onclick="goBack()">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+            View calendar
+          </button>
+        </div>
+      </section>
+
+      <!-- disconnect confirm -->
+      <div class="scrim" id="scrim" onclick="closeConfirm()"></div>
+      <div class="sheet" id="sheet">
+        <div class="grab"></div>
+        <div class="warn-ic">🔌</div>
+        <h3>Disconnect Google Calendar?</h3>
+        <p>Your work &amp; personal events will be removed from your Sprout calendar. <b>Your kids' Sprout events stay.</b> You can reconnect anytime.</p>
+        <div class="acts">
+          <button class="cancel" onclick="closeConfirm()">Cancel</button>
+          <button class="confirm" onclick="doDisconnect()">Disconnect</button>
+        </div>
+      </div>
+
+      <div class="toast" id="toast">Done ✓</div>
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── nav stack so Back always returns to the real previous screen ── */
+let stack=['v-brief'];
+function current(){return stack[stack.length-1];}
+function render(){const id=current();document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));if(id==='v-cal')renderCal();}
+function go(id){ if(id===current())return; stack.push(id); render(); }
+function goBack(){ if(stack.length>1)stack.pop(); render(); }
+function goHome(){ stack=['v-brief']; render(); }   // tab/Today resets to brief
+
+/* connect → connecting → calendar (lands ON the calendar, not the toggle page) */
+let connected=false;
+function connect(){
+  stack.push('v-connecting'); render();
+  setTimeout(()=>{ connected=true; stack[stack.length-1]='v-cal'; render(); toast('Google Calendar connected ✓'); },1300);
+}
+
+/* ── render the day calendar ── */
+const START=7, END=19, PXH=58;   // 7am→7pm, 58px per hour
+const EVENTS=[
+  {s:8.5,e:9.25,cls:'k',t:'School drop-off',sub:'8:30 · Cooper'},
+  {s:11,e:12,cls:'w',t:'Pipeline review',sub:'11:00 · Work · Meet'},
+  {s:13,e:13.75,cls:'p',t:'Dentist',sub:'1:00 · Personal'},
+  {s:13.5,e:14.25,cls:'k',t:'Pizza day',sub:'1:30 · First grade',shift:true},
+  {s:15.5,e:16.5,cls:'k',t:'Soccer practice',sub:'3:30 · Riverside Park'},
+  {s:17,e:18,cls:'w',t:'Wrap-up sync',sub:'5:00 · Work'},
+];
+function renderCal(){
+  const gut=document.getElementById('gut'), track=document.getElementById('track');
+  let g='';
+  for(let h=START;h<=END;h++){const ampm=h<12?'AM':'PM';const hr=h%12===0?12:h%12;g+=`<span>${hr} ${ampm}</span>`;}
+  gut.innerHTML=g;
+  const nowH=9.75;   // ~9:45, sits just under the drop-off block
+  let full='';
+  for(let h=START;h<=END;h++){full+=`<div class="hline" style="top:${(h-START)*PXH}px"></div>`;}
+  full+=`<div class="nowline" style="top:${(nowH-START)*PXH}px"></div>`;
+  // when not connected, show kids-only (still useful, never a blank screen)
+  EVENTS.filter(e=> connected || e.cls==='k').forEach(e=>{
+    const top=(e.s-START)*PXH, h=Math.max((e.e-e.s)*PXH,30);
+    const style=e.shift?`top:${top}px;height:${h}px;left:52%;right:6px;`:`top:${top}px;height:${h}px;`;
+    full+=`<div class="blk ${e.cls}" style="${style}"><div class="bt2">${e.t}</div><div class="bs2">${e.sub}</div></div>`;
+  });
+  track.style.height=((END-START)*PXH+20)+'px';
+  track.innerHTML=full;
+}
+
+/* disconnect */
+function openConfirm(){document.getElementById('scrim').classList.add('on');document.getElementById('sheet').classList.add('on');}
+function closeConfirm(){document.getElementById('scrim').classList.remove('on');document.getElementById('sheet').classList.remove('on');}
+function doDisconnect(){connected=false;closeConfirm();toast('Google Calendar disconnected');goBack();}
+
+let tT;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('on'),2000);}
+
+render();
+</script>
+</body>
+</html>

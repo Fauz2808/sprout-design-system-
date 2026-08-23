@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Autofill Registration (section experiment)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#f4f1ea; --cream-mid:#eae6db; --cream-deep:#dbd5c8;
+  --green:#186338; --green-bold:#1e3e2b; --green-xbold:#0f2218;
+  --green-light:#e2e9e3; --green-mid:#77b691; --sage:#d0dacf;
+  --text:#2a2e25; --text-mid:#4d525b; --text-muted:#818898; --white:#fff;
+  --r-sm:6px; --r-md:12px; --r-lg:20px; --r-xl:32px; --r-full:9999px;
+  --font-display:'Playfair Display',Georgia,serif; --font-body:'Inter',-apple-system,sans-serif;
+  --ease-out:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-body);background:var(--cream);color:var(--text);line-height:1.6;overflow-x:hidden;}
+img{display:block;max-width:100%;}
+body::before{content:'';position:fixed;inset:0;z-index:0;opacity:.025;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:256px;}
+
+.section-eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:14px;}
+.section-title{font-family:var(--font-display);font-size:clamp(32px,4vw,52px);font-weight:700;line-height:1.15;letter-spacing:-1px;color:var(--text);margin-bottom:16px;}
+.section-title em{font-style:italic;color:var(--green);}
+.section-sub{font-size:16px;color:var(--text-mid);max-width:560px;line-height:1.7;}
+
+/* ── ONE-TAP / AUTOFILL SECTION ── */
+.oneclick{position:relative;z-index:1;padding:120px 48px;max-width:1200px;margin:0 auto;}
+.oc-head{max-width:660px;margin-bottom:60px;}
+.oc-head .badge{display:inline-flex;align-items:center;gap:7px;background:var(--green-light);color:var(--green);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:6px 12px;border-radius:var(--r-full);margin-bottom:18px;}
+.oc-head .badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green-mid);box-shadow:0 0 0 4px rgba(119,182,145,.25);}
+.compare{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch;}
+.cmp-card{background:var(--white);border:1px solid rgba(0,0,0,.06);border-radius:var(--r-xl);padding:30px;position:relative;overflow:hidden;}
+.cmp-label{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.old{box-shadow:0 20px 50px -30px rgba(0,0,0,.15);}
+.old .cmp-label{color:var(--text-muted);}
+.old .cmp-label .pill{margin-left:auto;background:#f3e8e3;color:#a8543a;padding:3px 9px;border-radius:var(--r-full);font-size:10px;letter-spacing:.04em;}
+.fakeform{display:flex;flex-direction:column;gap:13px;}
+.ff-row label{display:block;font-size:11px;color:var(--text-muted);margin-bottom:5px;font-weight:500;}
+.ff-input{height:36px;border:1px solid var(--cream-deep);border-radius:var(--r-sm);background:var(--cream);display:flex;align-items:center;padding:0 11px;font-size:12.5px;color:var(--text-mid);}
+.ff-input.empty{color:#bcb6a8;}
+.fakeform .fade{position:relative;}
+.fakeform .fade::after{content:'';position:absolute;left:0;right:0;bottom:-30px;height:90px;background:linear-gradient(180deg,transparent,var(--white));pointer-events:none;}
+.ff-foot{display:flex;align-items:center;gap:9px;margin-top:22px;color:var(--text-muted);font-size:12.5px;}
+.ff-foot .sigh{font-size:16px;}
+.cmp-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 26px;position:relative;}
+.cmp-mid .arrow{width:54px;height:54px;border-radius:50%;background:var(--green);display:grid;place-items:center;box-shadow:0 14px 30px -10px rgba(24,99,56,.5);}
+.cmp-mid .arrow svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.2;}
+.cmp-mid .line{position:absolute;top:50%;height:1px;width:100%;background:repeating-linear-gradient(90deg,var(--cream-deep) 0 6px,transparent 6px 12px);z-index:-1;}
+.sprout{background:linear-gradient(165deg,#1e3e2b,#0f2218);border-color:transparent;color:#fff;box-shadow:0 26px 60px -28px rgba(15,34,24,.7);}
+.sprout .cmp-label{color:var(--green-mid);}
+.sprout .cmp-label .pill{margin-left:auto;background:rgba(119,182,145,.2);color:var(--green-mid);padding:3px 9px;border-radius:var(--r-full);font-size:10px;letter-spacing:.04em;}
+
+/* external-form browser mock */
+.browser{border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 18px 40px -18px rgba(0,0,0,.5);}
+.bchrome{background:#e9e7e1;padding:9px 11px;display:flex;align-items:center;gap:6px;}
+.bdot{width:8px;height:8px;border-radius:50%;background:#c5c1b8;}
+.burl{margin-left:8px;background:#fff;border-radius:6px;padding:5px 11px;font-size:10.5px;color:#6b6f76;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.bbody{padding:15px 16px 16px;}
+.bform-title{font-family:var(--font-display);font-size:15px;font-weight:700;color:#2a2e25;margin-bottom:6px;}
+.frow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #efece5;}
+.frow:last-of-type{border-bottom:none;}
+.fl{font-size:11.5px;color:#9a9488;flex-shrink:0;transition:color .3s;}
+.fv{font-size:12px;font-weight:600;color:#ccc8bf;text-align:right;transition:color .3s;}
+.frow.filled .fv{color:#186338;}
+.frow.filled .fl::after{content:' ✓';color:#186338;font-weight:700;}
+.afbtn{margin-top:14px;width:100%;height:50px;border:none;border-radius:11px;background:var(--green-mid);color:#0f2218;font-family:var(--font-body);font-size:14.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 10px 24px -10px rgba(119,182,145,.6);position:relative;}
+.afbtn .af-clover{font-size:16px;}
+.afbtn .spin{width:17px;height:17px;border:2.4px solid rgba(15,34,24,.25);border-top-color:#0f2218;border-radius:50%;animation:ocsp .7s linear infinite;display:none;}
+@keyframes ocsp{to{transform:rotate(360deg);}}
+.afbtn.loading .lbl,.afbtn.loading .af-clover{display:none;} .afbtn.loading .spin{display:block;}
+.afbtn.done{background:#fff;color:var(--green-bold);box-shadow:0 10px 26px -12px rgba(0,0,0,.3);cursor:default;}
+.afbtn.done .lbl,.afbtn.done .af-clover,.afbtn.done .spin{display:none;} .afbtn .donelbl{display:none;} .afbtn.done .donelbl{display:inline;}
+.afnote{margin-top:13px;font-size:12px;color:rgba(255,255,255,.7);line-height:1.45;text-align:center;}
+.afnote b{color:#fff;}
+
+.remember{margin-top:64px;text-align:center;}
+.remember h3{font-family:var(--font-display);font-size:22px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.remember p{font-size:14px;color:var(--text-mid);margin-bottom:26px;}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:11px;max-width:780px;margin:0 auto;}
+.chip{display:inline-flex;align-items:center;gap:8px;background:var(--white);border:1px solid rgba(0,0,0,.06);border-radius:var(--r-full);padding:10px 17px;font-size:13.5px;font-weight:500;color:var(--text);box-shadow:0 6px 18px -14px rgba(0,0,0,.4);transition:transform .2s var(--ease-out),box-shadow .2s;}
+.chip:hover{transform:translateY(-2px);box-shadow:0 12px 24px -14px rgba(24,99,56,.4);}
+.chip .ic{font-size:15px;} .chip .ck{color:var(--green);font-weight:700;}
+.usecases{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:64px;}
+.uc{position:relative;border-radius:var(--r-xl);padding:34px;overflow:hidden;border:1px solid rgba(0,0,0,.06);min-height:200px;display:flex;flex-direction:column;justify-content:space-between;transition:transform .3s var(--ease-out),box-shadow .3s;}
+.uc:hover{transform:translateY(-4px);box-shadow:0 30px 60px -34px rgba(0,0,0,.3);}
+.uc.sports{background:linear-gradient(150deg,#e9f0ea,#dde9e0);}
+.uc.camps{background:linear-gradient(150deg,#f0ece0,#e6dfcd);}
+.uc .uc-ic{font-size:34px;width:62px;height:62px;border-radius:var(--r-lg);background:rgba(255,255,255,.7);display:grid;place-items:center;box-shadow:0 8px 20px -10px rgba(0,0,0,.2);}
+.uc h4{font-family:var(--font-display);font-size:24px;font-weight:600;color:var(--green-bold);margin-top:18px;}
+.uc p{font-size:14px;color:var(--text-mid);margin-top:7px;max-width:320px;line-height:1.65;}
+.uc .uc-foot{margin-top:20px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--green);}
+.uc .uc-foot svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;transition:transform .25s var(--ease-out);}
+.uc:hover .uc-foot svg{transform:translateX(4px);}
+.uc .watermark{position:absolute;right:-10px;bottom:-22px;font-size:120px;opacity:.06;line-height:1;pointer-events:none;}
+@media(max-width:860px){
+  .oneclick{padding:84px 24px;}
+  .compare{grid-template-columns:1fr;gap:20px;}
+  .cmp-mid{padding:4px 0;} .cmp-mid .line{display:none;} .cmp-mid .arrow{transform:rotate(90deg);}
+  .usecases{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ─── AUTOFILL REGISTRATION ─────────────────── -->
+<section class="oneclick" id="one-tap">
+  <div class="oc-head">
+    <span class="badge"><span class="dot"></span>New · Autofill any registration</span>
+    <h2 class="section-title">Save it once.<br><em>One-tap sign-up forever.</em></h2>
+    <p class="section-sub">Save your family's details to Sprout one time. When a league or summer camp opens registration, Sprout reads their form — even the clunky one on their own website — and fills it out for you, field by field, in a tap.</p>
+  </div>
+
+  <div class="compare">
+    <!-- OLD WAY -->
+    <div class="cmp-card old">
+      <div class="cmp-label">By hand, every site <span class="pill">Field 14 of 23</span></div>
+      <div class="fakeform">
+        <div class="ff-row"><label>Child's full name</label><div class="ff-input">Liam R. Carter</div></div>
+        <div class="ff-row"><label>Date of birth</label><div class="ff-input">04 / 12 / 2018</div></div>
+        <div class="ff-row"><label>Allergies & medical notes</label><div class="ff-input empty">Type here…</div></div>
+        <div class="ff-row fade"><label>Emergency contact</label><div class="ff-input empty">Type here…</div></div>
+      </div>
+      <div class="ff-foot"><span class="sigh">😮‍💨</span> …and nine more fields, on every single site.</div>
+    </div>
+
+    <!-- ARROW -->
+    <div class="cmp-mid">
+      <div class="line"></div>
+      <div class="arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+    </div>
+
+    <!-- SPROUT WAY — autofills the camp's own external form -->
+    <div class="cmp-card sprout">
+      <div class="cmp-label">The Sprout way <span class="pill">⚡ autofill</span></div>
+      <div class="browser">
+        <div class="bchrome"><span class="bdot"></span><span class="bdot"></span><span class="bdot"></span><div class="burl">🔒 sunnyvale-camp.com/register</div></div>
+        <div class="bbody">
+          <div class="bform-title">Summer Camp Registration</div>
+          <div class="frow" data-v="Liam R. Carter"><span class="fl">Child's name</span><span class="fv">—</span></div>
+          <div class="frow" data-v="Apr 12, 2018"><span class="fl">Date of birth</span><span class="fv">—</span></div>
+          <div class="frow" data-v="Peanuts, bee stings"><span class="fl">Allergies</span><span class="fv">—</span></div>
+          <div class="frow" data-v="Dana Carter · (512) 555-0148"><span class="fl">Emergency contact</span><span class="fv">—</span></div>
+          <div class="frow" data-v="Youth M"><span class="fl">T-shirt size</span><span class="fv">—</span></div>
+          <button class="afbtn" onclick="ocAutofill(this)">
+            <span class="af-clover">🍀</span><span class="lbl">Autofill with Sprout</span>
+            <span class="spin"></span><span class="donelbl">✓ Submitted to Sunnyvale Camp</span>
+          </button>
+        </div>
+      </div>
+      <div class="afnote">Sprout reads the camp's own form and fills every field from <b>Liam's saved profile</b>.</div>
+    </div>
+  </div>
+
+  <!-- WHAT SPROUT REMEMBERS -->
+  <div class="remember">
+    <h3>Saved once, used everywhere</h3>
+    <p>Sprout keeps your family's essentials ready — you stay in control of what's shared.</p>
+    <div class="chips">
+      <span class="chip"><span class="ic">🧒</span>Child info <span class="ck">✓</span></span>
+      <span class="chip"><span class="ic">🎂</span>Birthdate <span class="ck">✓</span></span>
+      <span class="chip"><span class="ic">🩹</span>Allergies & medical <span class="ck">✓</span></span>
+      <span class="chip"><span class="ic">📞</span>Emergency contacts <span class="ck">✓</span></span>
+      <span class="chip"><span class="ic">👕</span>Jersey & shirt size <span class="ck">✓</span></span>
+      <span class="chip"><span class="ic">📸</span>Photo & waiver consent <span class="ck">✓</span></span>
+    </div>
+  </div>
+
+</section>
+
+<script>
+  function ocAutofill(b){
+    if(b.classList.contains('done')||b.dataset.busy) return;
+    const rows=[...b.closest('.bbody').querySelectorAll('.frow')];
+    b.dataset.busy='1'; b.classList.add('loading');
+    rows.forEach((r,i)=>setTimeout(()=>{ r.querySelector('.fv').textContent=r.dataset.v; r.classList.add('filled'); }, 280*(i+1)));
+    setTimeout(()=>{ b.classList.remove('loading'); b.classList.add('done'); b.dataset.busy=''; }, 280*(rows.length+1)+250);
+  }
+</script>
+</body>
+</html>

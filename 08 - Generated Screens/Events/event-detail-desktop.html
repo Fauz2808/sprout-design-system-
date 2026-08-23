@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>San Antonio Spurs vs. Phoenix Suns — Sprout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:           #f4f1ea;
+      --surface:      #ffffff;
+      --surface-l1:   #eae6db;
+      --brand:        #186338;
+      --brand-bold:   #1e3e2b;
+      --brand-light:  #e2e9e3;
+      --secondary:    #7d715e;
+      --border:       #ddd9cf;
+
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body:    'Inter', -apple-system, system-ui, sans-serif;
+
+      --radius-card:  14px;
+      --radius-pill:  999px;
+      --shadow-up:    -2px 0 25px 5px rgba(0,0,0,0.03);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--brand-bold); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+
+    /* ─── top nav ──────────────────────────────────────────────────── */
+    .topnav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: color-mix(in oklch, var(--bg) 92%, transparent);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--surface-l1);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .topnav-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--brand);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 6px 4px;
+    }
+    .back-btn svg { width: 18px; height: 18px; stroke: var(--brand); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .topnav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(to bottom, #f2edea, #e7d8d2);
+      display: grid; place-items: center;
+      box-shadow: -1px -1px 0 rgba(14,14,16,0.02), 1px 1px 0 rgba(14,14,16,0.02);
+      overflow: hidden;
+    }
+    .logo-icon img { width: 22px; height: auto; }
+    .logo-name {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--brand-bold);
+    }
+    .topnav-right { display: flex; align-items: center; gap: 12px; }
+    .app-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: var(--surface);
+      border: 1px solid var(--surface-l1);
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      color: var(--secondary);
+    }
+    .app-badge strong { color: var(--brand-bold); font-weight: 500; }
+    .get-btn {
+      background: #007aff;
+      color: white;
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: 6px 16px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ─── hero ─────────────────────────────────────────────────────── */
+    .hero {
+      width: 100%;
+      height: clamp(280px, 42vw, 480px);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+      display: block;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(244,241,234,0.4) 0%, rgba(244,241,234,0) 30%),
+        linear-gradient(180deg, rgba(244,241,234,0) 65%, rgba(244,241,234,0.95) 100%);
+    }
+
+    /* ─── page layout ──────────────────────────────────────────────── */
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* event title bar */
+    .event-titlebar {
+      padding: 28px 0 24px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      border-bottom: 1px solid var(--surface-l1);
+      margin-bottom: 32px;
+    }
+    .event-title {
+      font-family: var(--font-display);
+      font-size: clamp(20px, 2.5vw, 28px);
+      font-weight: 500;
+      line-height: 1.3;
+      color: var(--brand-bold);
+      margin: 0 0 10px;
+    }
+    .distance-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--brand-light);
+      color: var(--brand-bold);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .distance-badge svg { width: 14px; height: 14px; stroke: var(--brand); fill: none; stroke-width: 1.8; }
+
+    /* register button (top-right on desktop) */
+    .register-btn-top {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--brand);
+      color: white;
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: 14px 32px;
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-shadow: 0 1px 1px rgba(13,13,18,0.06);
+      align-self: center;
+    }
+
+    /* ─── two-column content ───────────────────────────────────────── */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 40px;
+      align-items: start;
+    }
+
+    @media (max-width: 700px) {
+      .content-grid { grid-template-columns: 1fr; }
+      .event-titlebar { flex-direction: column; gap: 16px; }
+      .register-btn-top { width: 100%; }
+    }
+
+    /* ─── info rows ────────────────────────────────────────────────── */
+    .info-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .info-icon {
+      width: 40px; height: 40px;
+      background: var(--brand-light);
+      border-radius: 10px;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .info-icon svg { width: 20px; height: 20px; stroke: var(--brand); fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .info-text .label {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--brand-bold);
+      line-height: 1.5;
+    }
+    .info-text .sub {
+      font-size: 12px;
+      color: var(--secondary);
+      line-height: 1.55;
+      margin-top: 1px;
+    }
+
+    /* ─── sections ─────────────────────────────────────────────────── */
+    .section { margin-bottom: 28px; }
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--brand-bold);
+      letter-spacing: 0.02em;
+      margin: 0 0 10px;
+      text-transform: uppercase;
+    }
+    .section-body {
+      font-size: 13px;
+      color: var(--secondary);
+      line-height: 1.7;
+      margin: 0;
+    }
+    .ticket-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--brand);
+      font-size: 13px;
+      text-decoration: underline;
+      text-decoration-color: color-mix(in oklch, var(--brand) 40%, transparent);
+      font-weight: 500;
+    }
+    .ticket-link svg { width: 16px; height: 16px; stroke: var(--brand); fill: none; stroke-width: 1.8; flex-shrink: 0; }
+
+    /* ─── right column ─────────────────────────────────────────────── */
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: sticky;
+      top: 80px;
+    }
+    .map-card {
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      border: 1px solid var(--surface-l1);
+    }
+    .map-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+    }
+    .map-card-footer {
+      background: var(--surface);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .map-card-footer .info-icon { width: 32px; height: 32px; border-radius: 8px; }
+    .map-card-footer .info-icon svg { width: 16px; height: 16px; }
+    .map-card-footer .label {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--brand-bold);
+    }
+    .map-card-footer .sub {
+      font-size: 11px;
+      color: var(--secondary);
+    }
+
+    .register-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 52px;
+      background: var(--brand);
+      color: white;
+      border: none;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 1px 1px rgba(13,13,18,0.06);
+    }
+
+    /* share + save row */
+    .action-row {
+      display: flex;
+      gap: 10px;
+    }
+    .action-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      height: 42px;
+      background: var(--surface);
+      border: 1px solid var(--surface-l1);
+      border-radius: var(--radius-pill);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--brand-bold);
+      cursor: pointer;
+    }
+    .action-btn svg { width: 16px; height: 16px; stroke: var(--brand-bold); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* divider */
+    .divider { height: 1px; background: var(--surface-l1); margin: 0 0 28px; }
+
+    /* mobile register bar */
+    .mobile-register-bar {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: color-mix(in oklch, var(--bg) 96%, transparent);
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-up);
+      padding: 12px 20px 28px;
+    }
+    @media (max-width: 700px) {
+      .mobile-register-bar { display: block; }
+      .register-btn-top { display: none; }
+      .right-col .register-btn { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- top nav -->
+  <nav class="topnav">
+    <div class="topnav-left">
+      <button class="back-btn" aria-label="Back">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <div class="topnav-logo">
+        <div class="logo-icon">
+          <img src="https://www.figma.com/api/mcp/asset/240454a1-1627-4ef3-bf58-a8b363ce6e40" alt="Sprout" />
+        </div>
+        <span class="logo-name">Sprout</span>
+      </div>
+    </div>
+    <div class="topnav-right">
+      <span class="app-badge">Get the app — <strong>Build Stronger Bonds</strong></span>
+      <button class="get-btn">Get</button>
+    </div>
+  </nav>
+
+  <!-- hero image -->
+  <div class="hero">
+    <img src="https://www.figma.com/api/mcp/asset/1ecd310e-5fe5-4a97-b2c5-782e2cbbc56b" alt="San Antonio Spurs vs. Phoenix Suns" />
+  </div>
+
+  <!-- page content -->
+  <div class="page">
+
+    <!-- title bar -->
+    <div class="event-titlebar">
+      <div>
+        <h1 class="event-title">San Antonio Spurs vs. Phoenix Suns (NBA)</h1>
+        <span class="distance-badge">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="12" x2="15" y2="14"/></svg>
+          1 mi away
+        </span>
+      </div>
+      <button class="register-btn-top">Register</button>
+    </div>
+
+    <!-- two-column grid -->
+    <div class="content-grid">
+
+      <!-- left: details -->
+      <div>
+        <!-- date & location -->
+        <div class="info-stack">
+          <div class="info-row">
+            <div class="info-icon">
+              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="info-text">
+              <div class="label">Sunday, March 17</div>
+              <div class="sub">7PM – 10PM (EST) · Doors open at 6:00 PM</div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="info-text">
+              <div class="label">Frost Bank Center</div>
+              <div class="sub">San Antonio, Texas</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- tickets -->
+        <div class="section">
+          <p class="section-heading">Get Tickets Here</p>
+          <a href="https://nba.com/spurs" class="ticket-link" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            https://nba.com/spurs
+          </a>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- about -->
+        <div class="section">
+          <p class="section-heading">About</p>
+          <p class="section-body">
+            Get ready for an electrifying NBA showdown as the San Antonio Spurs take on the Phoenix Suns! Watch rising star Victor Wembanyama go head-to-head with Kevin Durant in what promises to be an unforgettable game. Doors open at 6:00 PM with pre-game entertainment and fan activities. Don't miss this epic matchup!
+          </p>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- directions (shown in left col on desktop, no sticky) -->
+        <div class="section">
+          <p class="section-heading">Directions</p>
+          <div class="map-card">
+            <img src="https://www.figma.com/api/mcp/asset/52817392-627f-4613-9503-54bbb666342e" alt="Map to Frost Bank Center" />
+            <div class="map-card-footer">
+              <div class="info-icon">
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <div class="label">Frost Bank Center</div>
+                <div class="sub">San Antonio, Texas</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- right: sticky card -->
+      <aside class="right-col">
+        <button class="register-btn">Register</button>
+
+        <div class="action-row">
+          <button class="action-btn">
+            <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            Share
+          </button>
+          <button class="action-btn">
+            <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            Save
+          </button>
+        </div>
+
+        <!-- quick info card -->
+        <div style="background: var(--surface); border: 1px solid var(--surface-l1); border-radius: var(--radius-card); padding: 16px; display: flex; flex-direction: column; gap: 14px;">
+          <div class="info-row">
+            <div class="info-icon">
+              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="info-text">
+              <div class="label">Sunday, March 17</div>
+              <div class="sub">7PM – 10PM (EST)</div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="info-text">
+              <div class="label">Frost Bank Center</div>
+              <div class="sub">San Antonio, Texas · 1 mi</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- mobile bottom register bar -->
+  <div class="mobile-register-bar">
+    <button class="register-btn">Register</button>
+  </div>
+
+</body>
+</html>

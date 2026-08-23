@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AI Assist Splash — Set 2 (G·H·I) · Sprout</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --field:#e8e4d9; --fg:#1a1a17; --ink:#1c2a1d; --muted:#807a6c; --border:#ddd9cf;
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-soft:#e7efe6;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif; --serif:'Playfair Display',Georgia,serif; --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:30px 24px;padding:38px 22px 60px;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:13px;}
+  .caption{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:390px;line-height:1.5;} .caption strong{color:#3a3830;font-weight:700;} .caption em{color:var(--green);font-style:normal;font-weight:600;}
+  .lede{flex-basis:100%;width:100%;text-align:center;margin:0 0 10px;} .lede h1{font-family:var(--serif);font-size:26px;font-weight:600;color:#23271f;margin:0 0 6px;} .lede p{font-size:13.5px;color:#6a665b;margin:0 auto;max-width:660px;line-height:1.55;} .lede b{color:var(--green);}
+
+  .device{position:relative;width:390px;height:812px;border-radius:54px;padding:11px;background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 26px 56px -14px rgba(0,0,0,.45);}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:8;}
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:radial-gradient(120% 46% at 50% 3%, #e7f0e5 0%, var(--bg) 46%);}
+  .sb{flex:0 0 42px;padding:15px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:14px;font-weight:600;color:var(--fg);} .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:16px;height:11px;fill:var(--fg);} .sb .bat{width:24px;}
+  .top{flex:0 0 auto;display:flex;justify-content:flex-end;padding:4px 22px 0;} .skip{font-size:13px;color:var(--muted);font-weight:600;cursor:pointer;}
+  .scroll{flex:1 1 auto;overflow-y:auto;padding:6px 26px 8px;display:flex;flex-direction:column;align-items:center;text-align:center;} .scroll::-webkit-scrollbar{display:none;}
+  .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--green-mid);margin-top:6px;}
+  .h1{font-family:var(--serif);font-size:27px;font-weight:600;color:var(--ink);line-height:1.15;letter-spacing:-.01em;margin:8px 0 8px;} .h1 em{font-style:italic;color:var(--green);}
+  .sub{font-size:13.5px;color:var(--muted);line-height:1.5;max-width:300px;}
+  .dock{flex:0 0 auto;padding:8px 24px calc(14px + env(safe-area-inset-bottom));text-align:center;}
+  .cta{width:100%;border:none;border-radius:16px;padding:16px;background:var(--green);color:#fff;font-size:15.5px;font-weight:700;font-family:var(--font);cursor:pointer;box-shadow:0 14px 30px -10px rgba(45,92,46,.6);}
+  .vhint{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--green-mid);font-weight:600;margin-bottom:12px;} .vhint .o{width:15px;height:15px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#a7e0a9,#5a8f5d 60%,#2d5c2e);}
+  .home{position:absolute;left:50%;bottom:7px;transform:translateX(-50%);width:130px;height:5px;background:var(--fg);border-radius:999px;opacity:.18;z-index:9;}
+
+  /* G · ask-bar hero */
+  .askbar{width:100%;display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:11px 11px 11px 15px;margin-top:20px;box-shadow:0 10px 26px -14px rgba(40,40,30,.4);}
+  .askbar .ph{flex:1;text-align:left;font-size:14px;color:#a8a496;} .askbar .ph .cur{display:inline-block;width:2px;height:15px;background:var(--green-mid);vertical-align:-2px;margin-left:1px;animation:bl 1s steps(1) infinite;} @keyframes bl{50%{opacity:0}}
+  .askbar .mic{width:42px;height:42px;border-radius:12px;background:var(--green);display:grid;place-items:center;flex-shrink:0;position:relative;} .askbar .mic svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;} .askbar .mic::after{content:'';position:absolute;inset:-5px;border-radius:14px;border:2px solid rgba(45,92,46,.35);animation:ring 1.8s ease-out infinite;} @keyframes ring{0%{transform:scale(.9);opacity:.6}100%{transform:scale(1.4);opacity:0}}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px;} .pill{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:8px 13px;font-size:12.5px;font-weight:600;color:var(--ink);}
+  .trylbl{font-size:11.5px;color:var(--muted);margin-top:20px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
+
+  /* H · range carousel (fanned covers) */
+  .fan{position:relative;width:100%;height:250px;margin-top:16px;}
+  .fcov{position:absolute;left:50%;top:10px;width:150px;height:194px;margin-left:-75px;border-radius:16px;box-shadow:0 16px 34px -16px rgba(0,0,0,.45);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:14px;border:3px solid #fff;}
+  .fcov .lb{font-family:var(--mono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;opacity:.85;} .fcov .em{font-size:34px;} .fcov .ti{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1;}
+  .fcov.l{transform:rotate(-11deg) translate(-64px,14px);background:linear-gradient(150deg,#3f86b0,#1f4f70);} .fcov.r{transform:rotate(11deg) translate(64px,14px);background:linear-gradient(150deg,#c07a3a,#7a4a1e);} .fcov.c{transform:rotate(0);z-index:2;background:linear-gradient(150deg,#2f6f48,#16412a);}
+  .dots{display:flex;gap:6px;justify-content:center;margin-top:8px;} .dots i{width:7px;height:7px;border-radius:50%;background:var(--border);} .dots i.on{background:var(--green);width:20px;border-radius:4px;}
+
+  /* I · time payoff */
+  .timewrap{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:22px;}
+  .t-old{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--muted);text-decoration:line-through;text-decoration-color:#c0392b;text-decoration-thickness:2px;} .t-old span{display:block;font-size:10px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-decoration:none;margin-top:2px;}
+  .t-arw svg{width:24px;height:24px;stroke:var(--green-mid);fill:none;stroke-width:2.4;}
+  .t-new{font-family:var(--serif);font-size:58px;font-weight:800;color:var(--green);line-height:.9;} .t-new span{display:block;font-size:11px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--green-mid);font-weight:700;margin-top:2px;}
+  .minicov{width:150px;aspect-ratio:16/10;border-radius:14px;margin-top:22px;background:linear-gradient(150deg,#2f6f48,#16412a);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:12px;box-shadow:0 12px 26px -14px rgba(0,0,0,.4);} .minicov .num{font-family:var(--serif);font-size:38px;font-weight:800;line-height:.8;} .minicov .nm{font-family:var(--serif);font-size:13px;font-weight:700;}
+</style>
+</head>
+<body>
+<div class="lede">
+  <h1>AI Assist splash — 3 more (set 2)</h1>
+  <p>Fresh angles: an <b>ask-bar</b> like a chat you talk to, a <b>range carousel</b> of what it makes, and a <b>time payoff</b>. All → Continue to the "What are we creating?" gate.</p>
+</div>
+
+<!-- ══ G · ASK-BAR ══ -->
+<div class="panel">
+  <div class="caption"><strong>G · Ask-bar</strong> — <em>a chat-style prompt you talk (or type) into</em></div>
+  <div class="device"><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 16 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg><svg class="bat" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="2" y="2" width="17" height="7" rx="1.4"/></svg></span></div>
+      <div class="top"><div class="skip">Skip</div></div>
+      <div class="scroll">
+        <div class="eyebrow" style="margin-top:16px">Meet Sprout AI</div>
+        <div class="h1">Ask Sprout to<br>plan <em>anything</em></div>
+        <div class="sub">Talk or type what you want — Sprout builds the whole event.</div>
+        <div class="askbar"><div class="ph">Plan Kennedy's 5th birthday<span class="cur"></span></div><div class="mic"><svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div></div>
+        <div class="trylbl">Try saying</div>
+        <div class="pills"><span class="pill">🎂 Birthday party</span><span class="pill">🧸 Playdate</span><span class="pill">⚽ Soccer club</span><span class="pill">🎉 Get-together</span></div>
+      </div>
+      <div class="dock"><button class="cta">Continue</button></div>
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ H · RANGE CAROUSEL ══ -->
+<div class="panel">
+  <div class="caption"><strong>H · Range carousel</strong> — <em>a fan of covers shows all it makes</em></div>
+  <div class="device"><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 16 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg><svg class="bat" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="2" y="2" width="17" height="7" rx="1.4"/></svg></span></div>
+      <div class="top"><div class="skip">Skip</div></div>
+      <div class="scroll">
+        <div class="fan">
+          <div class="fcov l"><div class="lb">Playdate</div><div class="em">🧸</div><div class="ti">Park meet-up</div></div>
+          <div class="fcov r"><div class="lb">Club</div><div class="em">⚽</div><div class="ti">Riverside Soccer</div></div>
+          <div class="fcov c"><div class="lb">Chapter Five</div><div class="em" style="font-size:44px">5</div><div class="ti">Kennedy's Birthday</div></div>
+        </div>
+        <div class="dots"><i class="on"></i><i></i><i></i></div>
+        <div class="eyebrow" style="margin-top:16px">Meet Sprout AI</div>
+        <div class="h1">One voice —<br><em>any plan</em></div>
+        <div class="sub">Birthdays, playdates, clubs and more — spoken out loud, built in seconds with a cover and invites.</div>
+      </div>
+      <div class="dock"><div class="vhint"><span class="o"></span> Works by voice — just talk</div><button class="cta">Continue</button></div>
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ I · TIME PAYOFF ══ -->
+<div class="panel">
+  <div class="caption"><strong>I · Time payoff</strong> — <em>an afternoon of forms → seconds</em></div>
+  <div class="device"><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 16 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg><svg class="bat" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="2" y="2" width="17" height="7" rx="1.4"/></svg></span></div>
+      <div class="top"><div class="skip">Skip</div></div>
+      <div class="scroll">
+        <div class="eyebrow" style="margin-top:18px">Meet Sprout AI</div>
+        <div class="h1">A whole party,<br>in <em>seconds</em></div>
+        <div class="sub">Skip the group texts and forms — just say it once.</div>
+        <div class="timewrap">
+          <div class="t-old">~10 min<span>the old way</span></div>
+          <div class="t-arw"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <div class="t-new">20s<span>with Sprout</span></div>
+        </div>
+        <div class="minicov"><div class="nm">Kennedy · Chapter 5</div><div class="num">5</div></div>
+      </div>
+      <div class="dock"><div class="vhint"><span class="o"></span> Just your voice — no typing</div><button class="cta">Continue</button></div>
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

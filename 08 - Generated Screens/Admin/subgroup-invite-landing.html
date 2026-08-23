@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Subgroup Invite Link — Landing Page · Sprout</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --field:#e8e4d9; --fg:#1a1a17; --ink:#1c2a1d; --muted:#807a6c; --border:#ddd9cf;
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-soft:#e7efe6; --red:#c0392b; --red-soft:#fbe6e3; --amber:#9a6b16; --amber-soft:#f6edd8;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif; --serif:'Playfair Display',Georgia,serif; --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:34px 28px;padding:40px 24px 60px;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .caption{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:390px;line-height:1.5;}
+  .caption strong{color:#3a3830;font-weight:600;}
+  .lede{max-width:760px;text-align:center;margin:0 auto 8px;}
+  .lede h1{font-family:var(--serif);font-size:26px;font-weight:600;color:#23271f;margin:0 0 6px;}
+  .lede p{font-size:13.5px;color:#6a665b;margin:0;line-height:1.55;}
+
+  .demo-toggle{display:flex;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:5px;}
+  .demo-toggle button{border:none;background:transparent;font-family:var(--font);font-size:12px;font-weight:700;color:var(--muted);padding:8px 14px;border-radius:9px;cursor:pointer;}
+  .demo-toggle button.on{background:var(--green-soft);color:var(--green);}
+
+  .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:5;}
+
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--fg);}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--fg);} .sb .bat{width:25px;}
+
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:6px 14px 4px;}
+  .wordmark{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--green);}
+  .wordmark .leaf{width:20px;height:20px;border-radius:6px;background:var(--green);display:grid;place-items:center;color:#fff;font-size:12px;}
+  .top .sp{flex:1;}
+  .ibtn{width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;flex-shrink:0;} .ibtn svg{width:16px;height:16px;stroke:var(--fg);fill:none;stroke-width:2.2;}
+
+  .scroll{flex:1 1 auto;overflow-y:auto;padding:8px 20px 18px;} .scroll::-webkit-scrollbar{display:none;}
+
+  /* hero */
+  .hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 6px 20px;}
+  .hero-ic{width:76px;height:76px;border-radius:22px;background:var(--green-soft);display:grid;place-items:center;font-size:38px;margin-bottom:14px;box-shadow:0 10px 22px -8px rgba(45,92,46,.28);}
+  .hero-name{font-family:var(--serif);font-size:23px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:7px;}
+  .hero-name .lock{font-size:11px;color:var(--amber);display:inline-flex;align-items:center;gap:3px;background:var(--amber-soft);padding:3px 8px 3px 6px;border-radius:999px;}
+  .hero-sub{font-size:13px;color:var(--muted);margin-top:4px;}
+  .hero-invited{font-size:12.5px;color:var(--green-mid);margin-top:10px;background:var(--green-soft);padding:7px 13px;border-radius:999px;font-weight:600;}
+
+  .facesrow{display:flex;align-items:center;gap:9px;justify-content:center;margin-top:16px;}
+  .facesrow .stack{display:inline-flex;}
+  .facesrow .stack span{width:28px;height:28px;border-radius:50%;border:2px solid var(--bg);margin-left:-9px;display:grid;place-items:center;color:#fff;font-size:10.5px;font-weight:700;}
+  .facesrow .stack span:first-child{margin-left:0;}
+  .facesrow .ct{font-size:13px;color:var(--muted);}
+  .facesrow .ct b{color:var(--ink);}
+
+  .seclbl{display:flex;align-items:center;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:22px 2px 10px;}
+  .seclbl .ct{color:var(--muted);font-weight:600;margin-left:5px;text-transform:none;letter-spacing:0;font-size:12px;}
+
+  .memlist{display:flex;flex-direction:column;gap:8px;}
+  .memrow{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:10px 13px;}
+  .av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0;}
+  .memrow .body{flex:1;min-width:0;}
+  .memrow .nm{font-size:13.5px;font-weight:600;color:var(--ink);}
+  .memrow .sub{font-size:11.5px;color:var(--muted);margin-top:1px;}
+  .memrow .adminchip{font-size:9.5px;font-weight:700;color:var(--green-mid);background:var(--green-soft);padding:3px 8px;border-radius:999px;flex-shrink:0;}
+  .morerow{text-align:center;font-size:12.5px;color:var(--green-mid);font-weight:600;padding:8px 0 2px;cursor:pointer;}
+
+  .about{font-size:13px;color:#5b5648;line-height:1.6;background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:13px 14px;margin-top:2px;}
+
+  .dock{flex:0 0 auto;padding:14px 18px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(18px);}
+  .btn{width:100%;border:none;border-radius:15px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);}
+  .btn.primary{background:var(--green);color:#fff;box-shadow:0 12px 26px -10px rgba(45,92,46,.6);}
+  .btn.requested{background:var(--amber-soft);color:var(--amber);box-shadow:none;cursor:default;}
+  .btn.joined{background:var(--green-soft);color:var(--green);box-shadow:none;}
+  .dock-note{font-size:11.5px;color:var(--muted);text-align:center;margin-top:9px;line-height:1.4;}
+
+  /* success / requested overlay states */
+  .view{flex:1 1 auto;display:none;flex-direction:column;min-height:0;} .view.on{display:flex;}
+  .success{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 40px;gap:6px;}
+  .success .ring{width:88px;height:88px;border-radius:50%;background:var(--green-soft);display:grid;place-items:center;margin-bottom:10px;}
+  .success .ring svg{width:42px;height:42px;stroke:var(--green);fill:none;stroke-width:2.4;}
+  .success.pending .ring{background:var(--amber-soft);}
+  .success.pending .ring svg{stroke:var(--amber);}
+  .success h2{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);margin:0;}
+  .success p{font-size:13.5px;color:var(--muted);line-height:1.5;margin:4px 0 0;max-width:280px;}
+
+  /* bottom sheet (join confirm) */
+  .overlay{position:absolute;inset:0;background:rgba(20,20,15,.45);opacity:0;pointer-events:none;transition:opacity .25s;z-index:20;border-radius:44px;}
+  .overlay.on{opacity:1;pointer-events:auto;}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:26px 26px 0 0;transform:translateY(115%);visibility:hidden;transition:transform .32s cubic-bezier(.32,.72,0,1),visibility .32s;z-index:21;box-shadow:0 -8px 34px rgba(0,0,0,.25);}
+  .sheet.on{transform:translateY(0);visibility:visible;}
+  .grab{width:38px;height:5px;border-radius:999px;background:rgba(0,0,0,.16);margin:10px auto 2px;}
+  .sh-pad{padding:8px 22px calc(24px + env(safe-area-inset-bottom));text-align:center;}
+  .sh-ic{width:60px;height:60px;border-radius:18px;background:var(--green-soft);display:grid;place-items:center;font-size:30px;margin:8px auto 12px;}
+  .sh-title{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);margin:0 0 6px;}
+  .sh-sub{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 18px;padding:0 6px;}
+  .btn.ghost2{background:var(--surface);border:1.5px solid var(--border);color:var(--ink);margin-top:9px;}
+
+  .home{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:134px;height:5px;background:var(--fg);border-radius:999px;opacity:.18;z-index:9;}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Subgroup Invite Link — Landing Page</h1>
+  <p>Opens directly when a parent taps a shared invite link (e.g. "Join Ms. Taylor's Class" sent via text). Shows the subgroup, who's already in it, and a single Join action — no navigating the app first. Handles both open groups and approval-required groups.</p>
+</div>
+
+<div class="panel">
+  <div class="demo-toggle">
+    <button class="on" id="toggleLocked" onclick="setScenario('locked')">Approval-required</button>
+    <button id="toggleOpen" onclick="setScenario('open')">Open group</button>
+  </div>
+  <div class="caption"><strong>Tap "Join" / "Request to join"</strong> to preview the confirm sheet and resulting state</div>
+  <div class="device">
+    <span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg>
+        <svg viewBox="0 0 17 11"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1z"/></svg>
+        <svg class="bat" viewBox="0 0 25 11"><rect x=".5" y=".5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="22" y="3.5" width="1.5" height="4" rx=".4" fill="currentColor" fill-opacity=".45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+      </span></div>
+
+      <!-- ── INVITE LANDING ── -->
+      <section class="view on" id="v-landing">
+        <div class="top">
+          <div class="wordmark"><span class="leaf">🌱</span> Sprout</div>
+          <div class="sp"></div>
+          <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+        </div>
+        <div class="scroll">
+          <div class="hero">
+            <div class="hero-ic" id="heroIc">🍀</div>
+            <div class="hero-name" id="heroName">Ms. Taylor's Class<span class="lock" id="heroLock"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Approval required</span></div>
+            <div class="hero-sub" id="heroSub">Class group · Lincoln Elementary</div>
+            <div class="hero-invited" id="heroInvited">Tony Martin invited you to join</div>
+            <div class="facesrow">
+              <span class="stack" id="heroFaces"></span>
+              <span class="ct"><b id="heroCount">24</b> families already here</span>
+            </div>
+          </div>
+
+          <div class="about" id="heroAbout">Where Ms. Taylor posts homework, field trip forms, and class updates for First Grade. Parents can chat and coordinate here too.</div>
+
+          <div class="seclbl">Members <span class="ct" id="memCount">· 24</span></div>
+          <div class="memlist" id="memlist"></div>
+          <div class="morerow" id="moreRow" onclick="showAllMembers()">Show all 24 members</div>
+        </div>
+        <div class="dock">
+          <button class="btn primary" id="joinBtn" onclick="openSheet()">Request to join</button>
+          <div class="dock-note" id="dockNote">An admin will approve your request before you can see the chat.</div>
+        </div>
+      </section>
+
+      <!-- ── SUCCESS / REQUESTED ── -->
+      <section class="view" id="v-result">
+        <div class="success" id="resultBody">
+          <div class="ring"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <h2 id="resultTitle">You're in!</h2>
+          <p id="resultBody2">You now have access to Ms. Taylor's Class chat, events, and files.</p>
+        </div>
+        <div class="dock">
+          <button class="btn primary" id="resultCta" onclick="setScenario(currentScenario)">Open group</button>
+        </div>
+      </section>
+
+      <!-- join confirm sheet -->
+      <div class="overlay" id="joinOverlay" onclick="closeSheet()"></div>
+      <div class="sheet" id="joinSheet">
+        <div class="grab"></div>
+        <div class="sh-pad">
+          <div class="sh-ic" id="shIc">🍀</div>
+          <div class="sh-title" id="shTitle">Request to join Ms. Taylor's Class?</div>
+          <div class="sh-sub" id="shSub">You'll see this class's chat and events once an admin approves you.</div>
+          <button class="btn primary" id="shConfirm" onclick="confirmJoin()">Request to join</button>
+          <button class="btn ghost2" onclick="closeSheet()">Cancel</button>
+        </div>
+      </div>
+
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLORS=['#c98aa8','#6fa8d0','#8fba92','#d8a86a','#b69be0','#7a5c52','#5a8f5d','#c0857a','#9a6f9a'];
+function ini(n){const p=n.split(' ');return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();}
+function colorFor(n){let s=0;for(const c of n)s+=c.charCodeAt(0);return COLORS[s%COLORS.length];}
+
+const SCENARIOS={
+  locked:{
+    icon:'🍀', name:"Ms. Taylor's Class", sub:'Class group · Lincoln Elementary',
+    invitedBy:'Tony Martin invited you to join', count:24, approval:true,
+    about:'Where Ms. Taylor posts homework, field trip forms, and class updates for First Grade. Parents can chat and coordinate here too.',
+    members:[
+      {name:'Tony Martin',kid:'Dad of Cooper',admin:true},
+      {name:'Sarah Jensen',kid:'Mom of Mia'},
+      {name:'Mike Johnson',kid:'Dad of Hawkins'},
+      {name:'Emily Centineo',kid:'Mom of Flora'},
+      {name:'Priya Patel',kid:'Mom of Aanya'},
+      {name:'Jake Thompson',kid:'Dad of Erick'},
+    ]
+  },
+  open:{
+    icon:'⚽️', name:'First Grade Dads', sub:'Parent group · Lincoln Elementary',
+    invitedBy:'Mike Johnson invited you to join', count:12, approval:false,
+    about:"A group for dads in First Grade — carpool coordination, weekend meetups, and the occasional game-day chat.",
+    members:[
+      {name:'Mike Johnson',kid:'Dad of Hawkins',admin:true},
+      {name:'Tony Martin',kid:'Dad of Cooper'},
+      {name:'Jake Thompson',kid:'Dad of Erick'},
+      {name:'David Lee',kid:'Dad of Sophie'},
+      {name:'Carlos Ruiz',kid:'Dad of Mateo'},
+    ]
+  }
+};
+let currentScenario='locked';
+
+function memRowHTML(m){
+  return `<div class="memrow">
+    <div class="av" style="background:${colorFor(m.name)}">${ini(m.name)}</div>
+    <div class="body"><div class="nm">${m.name}</div><div class="sub">${m.kid}</div></div>
+    ${m.admin?'<div class="adminchip">Admin</div>':''}
+  </div>`;
+}
+
+function setScenario(key){
+  currentScenario=key;
+  const s=SCENARIOS[key];
+  document.getElementById('toggleLocked').classList.toggle('on',key==='locked');
+  document.getElementById('toggleOpen').classList.toggle('on',key==='open');
+
+  document.getElementById('heroIc').textContent=s.icon;
+  document.getElementById('heroName').firstChild.textContent=s.name;
+  document.getElementById('heroLock').style.display=s.approval?'inline-flex':'none';
+  document.getElementById('heroSub').textContent=s.sub;
+  document.getElementById('heroInvited').textContent=s.invitedBy;
+  document.getElementById('heroCount').textContent=s.count;
+  document.getElementById('heroAbout').textContent=s.about;
+  document.getElementById('memCount').textContent='· '+s.count;
+
+  const faces=s.members.slice(0,4).map(m=>`<span style="background:${colorFor(m.name)}">${ini(m.name)}</span>`).join('');
+  document.getElementById('heroFaces').innerHTML=faces;
+
+  document.getElementById('memlist').innerHTML=s.members.map(memRowHTML).join('');
+  const remaining=s.count-s.members.length;
+  document.getElementById('moreRow').style.display=remaining>0?'block':'none';
+  document.getElementById('moreRow').textContent='Show all '+s.count+' members';
+
+  const joinBtn=document.getElementById('joinBtn');
+  joinBtn.className='btn primary'; joinBtn.disabled=false;
+  joinBtn.textContent=s.approval?'Request to join':'Join '+s.name;
+  document.getElementById('dockNote').textContent=s.approval
+    ? 'An admin will approve your request before you can see the chat.'
+    : "You'll get instant access to this group's chat and events.";
+
+  document.getElementById('shIc').textContent=s.icon;
+  document.getElementById('shTitle').textContent=(s.approval?'Request to join ':'Join ')+s.name+'?';
+  document.getElementById('shSub').textContent=s.approval
+    ? "You'll see this group's chat and events once an admin approves you."
+    : "You'll instantly see this group's chat and events.";
+  document.getElementById('shConfirm').textContent=s.approval?'Request to join':'Join now';
+
+  showView('v-landing');
+}
+
+function showAllMembers(){document.getElementById('moreRow').style.display='none';}
+
+function openSheet(){document.getElementById('joinOverlay').classList.add('on');document.getElementById('joinSheet').classList.add('on');}
+function closeSheet(){document.getElementById('joinOverlay').classList.remove('on');document.getElementById('joinSheet').classList.remove('on');}
+
+function confirmJoin(){
+  const s=SCENARIOS[currentScenario];
+  closeSheet();
+  const body=document.getElementById('resultBody');
+  if(s.approval){
+    body.classList.add('pending');
+    document.getElementById('resultTitle').textContent='Request sent';
+    document.getElementById('resultBody2').textContent="You'll get a notification when an admin approves your request to join "+s.name+'.';
+    document.getElementById('resultCta').textContent='Done';
+  }else{
+    body.classList.remove('pending');
+    document.getElementById('resultTitle').textContent="You're in!";
+    document.getElementById('resultBody2').textContent="You now have access to "+s.name+" — chat, events, and files.";
+    document.getElementById('resultCta').textContent='Open group';
+  }
+  showView('v-result');
+}
+
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));
+}
+
+setScenario('locked');
+</script>
+</body>
+</html>

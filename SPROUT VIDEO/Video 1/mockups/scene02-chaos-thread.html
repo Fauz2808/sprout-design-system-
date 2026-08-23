@@ -1,0 +1,120 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#c9c4b6; display:flex; justify-content:center; align-items:center; padding:60px; font-family:'Inter',sans-serif; }
+  .frame { width:393px; height:852px; background:#ffffff; border-radius:52px; overflow:hidden; position:relative; box-shadow:0 40px 80px rgba(0,0,0,0.35); }
+  .statusbar { height:47px; display:flex; align-items:center; justify-content:space-between; padding:0 28px 0 32px; font-weight:600; font-size:15px; color:#000; }
+  .statusicons { display:flex; align-items:center; gap:5px; }
+  .signal { display:flex; gap:2px; align-items:flex-end; }
+  .signal span { width:3px; background:#000; border-radius:1px; }
+  .signal span:nth-child(1){height:4px;} .signal span:nth-child(2){height:6px;} .signal span:nth-child(3){height:8px;} .signal span:nth-child(4){height:10px;}
+  .wifi { width:15px; height:11px; border:2px solid #000; border-radius:50% 50% 0 0 / 100% 100% 0 0; border-bottom:none; }
+  .battery { width:24px; height:12px; border:1.4px solid #000; border-radius:3px; position:relative; }
+  .battery::after { content:''; position:absolute; right:-3px; top:3px; width:2px; height:6px; background:#000; border-radius:0 1px 1px 0; }
+  .battery::before { content:''; position:absolute; top:1.5px; left:1.5px; bottom:1.5px; width:16px; background:#000; border-radius:1.5px; }
+
+  .chatheader { display:flex; align-items:center; gap:10px; padding:6px 18px 14px; border-bottom:1px solid #eee; }
+  .back { color:#186338; font-size:26px; font-weight:400; }
+  .grpicon { display:flex; }
+  .grpicon .c { width:34px; height:34px; border-radius:50%; background:#dfe2e6; margin-left:-12px; border:2px solid #fff; display:flex; align-items:center; justify-content:center; }
+  .grpicon .c:first-child { margin-left:0; }
+  .grpicon svg { width:18px; height:18px; fill:#a7adb6; }
+  .chattitle { flex:1; text-align:center; margin-right:36px; }
+  .chattitle .name { font-weight:600; font-size:14px; color:#0f0f0f; }
+  .chattitle .sub { font-size:12px; color:#a7adb6; }
+
+  .badge { position:absolute; top:52px; right:22px; background:#ff3b30; color:#fff; font-size:12px; font-weight:700; border-radius:10px; padding:2px 7px; box-shadow:0 2px 6px rgba(0,0,0,0.25); }
+
+  .thread { padding:16px 16px 0; }
+  .msgrow { display:flex; align-items:flex-end; gap:8px; margin-bottom:12px; }
+  .msgavatar { width:26px; height:26px; border-radius:50%; background:#dfe2e6; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .msgavatar svg { width:14px; height:14px; fill:#a7adb6; }
+  .bubblewrap { max-width:250px; }
+  .sender { font-size:11.5px; color:#a7adb6; margin-bottom:3px; margin-left:2px; }
+  .bubble { background:#eae6db; color:#1c1c1c; font-size:15.5px; line-height:1.35; padding:8px 13px; border-radius:18px 18px 18px 4px; }
+  .bubble.loud { background:#f6d9d9; font-weight:600; }
+  .time { font-size:10.5px; color:#c3c3c3; margin-top:3px; margin-left:2px; }
+
+  .typing { display:flex; gap:8px; align-items:flex-end; margin-top:4px; }
+  .typingbubble { background:#eae6db; border-radius:18px 18px 18px 4px; padding:11px 16px; display:flex; gap:4px; }
+  .typingbubble span { width:6px; height:6px; border-radius:50%; background:#b3b3b3; }
+
+  .inputbar { position:absolute; bottom:0; left:0; right:0; padding:10px 16px 26px; display:flex; align-items:center; gap:10px; border-top:1px solid #eee; }
+  .inputpill { flex:1; background:#f0f0f0; border-radius:20px; padding:10px 16px; color:#a7adb6; font-size:15px; }
+</style><link rel="stylesheet" href="scene-system.css"></head>
+<body class="motion-ready scene02">
+<div class="frame">
+  <div class="statusbar">
+    <span>8:00</span>
+    <div class="statusicons">
+      <div class="signal"><span></span><span></span><span></span><span></span></div>
+      <div class="wifi"></div>
+      <div class="battery"></div>
+    </div>
+  </div>
+
+  <div class="chatheader">
+    <span class="back">‹</span>
+    <div class="grpicon">
+      <div class="c"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg></div>
+      <div class="c"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg></div>
+    </div>
+    <div class="chattitle"><div class="name">512-304-7719, +3 more</div><div class="sub">Little Shots Parents</div></div>
+  </div>
+  <div class="badge">47</div>
+
+  <div class="thread">
+    <div class="msgrow">
+      <div class="msgavatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg></div>
+      <div class="bubblewrap">
+        <div class="sender">512-304-7719</div>
+        <div class="bubble loud">is today free dress or not?!</div>
+        <div class="time">7:58 AM</div>
+      </div>
+    </div>
+    <div class="msgrow">
+      <div class="msgavatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg></div>
+      <div class="bubblewrap">
+        <div class="sender">(737) 555-0182</div>
+        <div class="bubble">wait what??</div>
+        <div class="time">7:58 AM</div>
+      </div>
+    </div>
+    <div class="msgrow">
+      <div class="msgavatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg></div>
+      <div class="bubblewrap">
+        <div class="sender">Unknown Caller</div>
+        <div class="bubble loud">ANYONE?? ANYONE??</div>
+        <div class="time">7:59 AM</div>
+      </div>
+    </div>
+    <div class="msgrow">
+      <div class="msgavatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg></div>
+      <div class="bubblewrap">
+        <div class="sender">(210) 998-4432</div>
+        <div class="bubble">I don't think so...??</div>
+        <div class="time">7:59 AM</div>
+      </div>
+    </div>
+    <div class="msgrow">
+      <div class="msgavatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg></div>
+      <div class="bubblewrap">
+        <div class="sender">512-304-7719</div>
+        <div class="bubble">omg no one knows 😩</div>
+        <div class="time">8:00 AM</div>
+      </div>
+    </div>
+    <div class="msgrow">
+      <div class="msgavatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg></div>
+      <div class="typingbubble"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
+  <div class="inputbar">
+    <div class="inputpill">Text Message</div>
+  </div>
+</div>
+</body></html>

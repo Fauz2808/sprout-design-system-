@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Subgroup Switcher — 3 Ideas (interactive) · Sprout</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --field:#e8e4d9; --fg:#1a1a17; --ink:#1c2a1d; --muted:#807a6c; --border:#ddd9cf;
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-soft:#e7efe6; --red:#c0392b;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif; --serif:'Playfair Display',Georgia,serif; --mono:ui-monospace,'SF Mono',Menlo,monospace;
+    --chatbg:#efe9dd;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:30px 24px;padding:38px 22px 60px;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:13px;}
+  .caption{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:390px;line-height:1.5;}
+  .caption strong{color:#3a3830;font-weight:700;} .caption em{color:var(--green);font-style:normal;font-weight:600;}
+  .lede{flex-basis:100%;width:100%;max-width:100%;text-align:center;margin:0 0 10px;}
+  .lede h1{font-family:var(--serif);font-size:26px;font-weight:600;color:#23271f;margin:0 0 6px;}
+  .lede p{font-size:13.5px;color:#6a665b;margin:0 auto;max-width:660px;line-height:1.55;} .lede b{color:var(--green);}
+  .hint{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:#9a9384;margin-top:2px;}
+
+  .device{position:relative;width:390px;height:812px;border-radius:54px;padding:11px;background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 26px 56px -14px rgba(0,0,0,.45);}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:40;}
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;
+    background:var(--chatbg);
+    background-image:radial-gradient(circle at 20% 30%, rgba(45,92,46,.05) 0 1px, transparent 2px),radial-gradient(circle at 70% 60%, rgba(45,92,46,.05) 0 1px, transparent 2px);background-size:44px 44px;}
+  .sb{flex:0 0 44px;padding:16px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:14px;font-weight:600;color:var(--fg);position:relative;z-index:36;}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:16px;height:11px;fill:var(--fg);} .sb .bat{width:24px;}
+
+  .pane{flex:1 1 auto;display:none;flex-direction:column;min-height:0;} .pane.on{display:flex;}
+
+  /* header */
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:9px;padding:4px 12px 8px;position:relative;z-index:20;background:color-mix(in srgb,var(--surface) 55%,transparent);border-bottom:1px solid var(--border);}
+  .ibtn{width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;flex-shrink:0;} .ibtn svg{width:19px;height:19px;stroke:var(--fg);fill:none;stroke-width:2;}
+  .clover{width:32px;height:32px;border-radius:50%;background:var(--green-soft);display:grid;place-items:center;font-size:16px;flex-shrink:0;}
+  .htext{flex:1;min-width:0;line-height:1.12;}
+  .htext.tap{cursor:pointer;}
+  .htext .t{font-family:var(--serif);font-size:16.5px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:5px;}
+  .htext .t svg{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2.6;transition:transform .2s;}
+  .htext.open .t svg{transform:rotate(180deg);}
+  .htext .s{font-size:11px;color:var(--muted);margin-top:1px;}
+  .calbtn{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;color:var(--green);} .calbtn svg{width:22px;height:22px;stroke:var(--green);fill:none;stroke-width:1.9;} .calbtn span{font-size:8px;font-weight:600;}
+
+  /* chat body */
+  .chat{flex:1 1 auto;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;position:relative;z-index:1;} .chat::-webkit-scrollbar{display:none;}
+  .daydiv{align-self:center;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:rgba(0,0,0,.05);padding:4px 11px;border-radius:999px;}
+  .msg{display:flex;gap:8px;max-width:82%;} .msg.me{align-self:flex-end;flex-direction:row-reverse;}
+  .msg .mav{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:11px;flex-shrink:0;align-self:flex-end;}
+  .bub{background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:7px 11px;} .msg.me .bub{background:var(--green);border-color:var(--green);color:#fff;}
+  .bub .who{font-size:10.5px;font-weight:700;color:var(--green-mid);margin-bottom:1px;}
+  .bub .tx{font-size:13px;line-height:1.38;color:var(--ink);} .msg.me .bub .tx{color:#fff;}
+  .bub .tm{font-size:9.5px;color:var(--muted);margin-top:2px;text-align:right;} .msg.me .bub .tm{color:rgba(255,255,255,.7);}
+
+  .inputbar{flex:0 0 auto;display:flex;align-items:center;gap:9px;padding:9px 13px calc(11px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(18px);z-index:20;}
+  .inputbar .pill{flex:1;background:var(--field);border:1px solid var(--border);border-radius:999px;padding:10px 14px;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .inputbar .ib{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;}
+  .inputbar .ib.send{background:var(--green);} .inputbar .ib.send svg{width:16px;height:16px;fill:#fff;}
+  .inputbar .ib.cam svg{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.6;}
+
+  .scrim{position:absolute;inset:0;z-index:14;background:rgba(20,20,15,.34);border-radius:44px;opacity:0;pointer-events:none;transition:opacity .22s;}
+  .scrim.on{opacity:1;pointer-events:auto;} .scrim.s3{z-index:22;}
+  .home{position:absolute;left:50%;bottom:7px;transform:translateX(-50%);width:130px;height:5px;background:var(--fg);border-radius:999px;opacity:.18;z-index:38;}
+
+  .em{width:30px;height:30px;border-radius:9px;background:var(--green-soft);display:grid;place-items:center;font-size:15px;flex-shrink:0;}
+  .badge{background:var(--red);color:#fff;font-size:10px;font-weight:800;border-radius:999px;min-width:18px;height:18px;padding:0 5px;display:grid;place-items:center;}
+  .chk{width:16px;height:16px;}
+
+  /* Idea 1 · dropdown */
+  .ddwrap{position:absolute;top:52px;left:12px;right:12px;z-index:24;}
+  .dd{background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:0 20px 44px -14px rgba(0,0,0,.4);overflow:hidden;transform-origin:top center;transform:scaleY(.6) translateY(-10px);opacity:0;pointer-events:none;transition:transform .22s cubic-bezier(.32,.72,0,1),opacity .18s;}
+  .dd.on{transform:none;opacity:1;pointer-events:auto;}
+  .dd .ddh{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:11px 14px 5px;}
+  .dd .item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;} .dd .item:active{background:var(--field);}
+  .dd .item .nm{flex:1;font-size:13.5px;font-weight:600;color:var(--ink);} .dd .item .ct{font-size:11px;color:var(--muted);}
+  .dd .item.cur{background:var(--green-soft);}
+  .dd .sep{height:1px;background:var(--border);margin:4px 0;}
+  .dd .item.new .em{background:var(--green);color:#fff;} .dd .item.new .nm{color:var(--green);}
+
+  /* Idea 2 · community hub */
+  .hublist{flex:1 1 auto;overflow-y:auto;padding:8px 14px;} .hublist::-webkit-scrollbar{display:none;}
+  .hubseclbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:10px 4px 8px;}
+  .crow{display:flex;align-items:center;gap:11px;background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:transform .1s;}
+  .crow:active{transform:scale(.99);} .crow.cur{border-color:var(--green);background:var(--green-soft);}
+  .crow .cav{width:42px;height:42px;border-radius:12px;background:var(--green-soft);display:grid;place-items:center;font-size:20px;flex-shrink:0;} .crow.cur .cav{background:#fff;}
+  .crow .cb{flex:1;min-width:0;} .crow .cn{font-size:14px;font-weight:700;color:var(--ink);}
+  .crow .cp{font-size:11.5px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .crow .cr{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;} .crow .ctime{font-size:10px;color:var(--muted);} .crow .cmembers{font-size:10.5px;color:var(--muted);}
+  .createcard{display:flex;align-items:center;gap:11px;border:1.5px dashed #bcd3b9;border-radius:15px;padding:12px;cursor:pointer;}
+  .createcard .pic{width:36px;height:36px;border-radius:10px;background:var(--green-soft);display:grid;place-items:center;flex-shrink:0;} .createcard .pic svg{width:19px;height:19px;stroke:var(--green);fill:none;stroke-width:2.4;}
+  .createcard .ctx b{display:block;font-size:13.5px;font-weight:700;color:var(--green);} .createcard .ctx span{font-size:11px;color:var(--muted);}
+
+  /* Idea 3 · drawer */
+  .drawer{position:absolute;top:44px;bottom:0;left:0;width:82%;background:var(--surface);z-index:24;box-shadow:14px 0 40px -12px rgba(0,0,0,.4);border-radius:0 0 0 44px;display:flex;flex-direction:column;padding:14px 0 0;transform:translateX(-104%);transition:transform .3s cubic-bezier(.32,.72,0,1);}
+  .drawer.on{transform:none;}
+  .drawer .dwh{padding:6px 18px 12px;border-bottom:1px solid var(--border);} .drawer .dwh .t{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);} .drawer .dwh .s{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .drawer .dwlist{flex:1;overflow-y:auto;padding:10px 12px;} .drawer .dwlist::-webkit-scrollbar{display:none;}
+  .drawer .dwseclbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:6px 6px 8px;}
+  .dwrow{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;cursor:pointer;} .dwrow:active{background:var(--field);} .dwrow.cur{background:var(--green-soft);}
+  .dwrow .nm{flex:1;font-size:14px;font-weight:600;color:var(--ink);} .dwrow .ct{font-size:11px;color:var(--muted);}
+  .drawer .dwfoot{padding:12px;border-top:1px solid var(--border);}
+  .drawer .newbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--green);color:#fff;border:none;border-radius:13px;padding:12px;font-size:14px;font-weight:700;font-family:var(--font);cursor:pointer;} .drawer .newbtn svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2.6;}
+
+  .toast{position:absolute;left:50%;bottom:84px;transform:translateX(-50%) translateY(10px);background:var(--ink);color:#fff;font-size:12.5px;font-weight:600;padding:10px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:44;box-shadow:0 10px 24px -8px rgba(0,0,0,.5);text-align:center;max-width:280px;}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Subgroup selection — 3 clickable ideas</h1>
+  <p>Each kills the chip strip that <b>bled off-screen and floated over the chat</b>. All three are <b>live</b> — tap to switch groups, open chats, and create new ones.</p>
+</div>
+
+<!-- ══ IDEA 1 · HEADER DROPDOWN ══ -->
+<div class="panel">
+  <div class="caption"><strong>1 · Header dropdown</strong> — <em>tap the class name ▾ to switch</em></div>
+  <div class="device"><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 16 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg><svg class="bat" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="2" y="2" width="17" height="7" rx="1.4"/></svg></span></div>
+      <div class="top">
+        <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+        <div class="clover" id="cl1">🍀</div>
+        <div class="htext tap" id="tt1" onclick="dd1()"><div class="t"><span id="nm1">Ms. Taylor's Class</span> <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div><div class="s" id="mb1">6 members</div></div>
+        <div class="calbtn"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div>
+      </div>
+      <div class="ddwrap"><div class="dd" id="ddm1"></div></div>
+      <div class="scrim" id="sc1" onclick="dd1()"></div>
+      <div class="chat" id="chat1"></div>
+      <div class="inputbar"><div class="ib cam"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><circle cx="12" cy="12.5" r="3.4"/></svg></div><div class="pill" id="pl1">Message…</div><div class="ib send"><svg viewBox="0 0 18 18"><path d="M16 9L2 3l3 6-3 6 14-6Z"/></svg></div></div>
+      <div class="toast" id="ts1"></div><div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ IDEA 2 · COMMUNITY HUB ══ -->
+<div class="panel">
+  <div class="caption"><strong>2 · Community hub</strong> — <em>tap a group to open its chat</em></div>
+  <div class="device"><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 16 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg><svg class="bat" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="2" y="2" width="17" height="7" rx="1.4"/></svg></span></div>
+      <!-- hub pane -->
+      <section class="pane on" id="hubPane">
+        <div class="top" style="background:var(--bg)">
+          <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="htext"><div class="t">First Grade</div><div class="s">Lincoln Elementary · 10 members</div></div>
+          <div class="calbtn"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div>
+        </div>
+        <div class="hublist" id="hublist2"></div>
+      </section>
+      <!-- chat pane -->
+      <section class="pane" id="chatPane" style="background:var(--chatbg)">
+        <div class="top">
+          <div class="ibtn" onclick="back2()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="clover" id="cl2">🍀</div>
+          <div class="htext"><div class="t" id="nm2">Ms. Taylor's Class</div><div class="s" id="mb2">6 members</div></div>
+          <div class="calbtn"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div>
+        </div>
+        <div class="chat" id="chat2"></div>
+        <div class="inputbar"><div class="ib cam"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><circle cx="12" cy="12.5" r="3.4"/></svg></div><div class="pill" id="pl2">Message…</div><div class="ib send"><svg viewBox="0 0 18 18"><path d="M16 9L2 3l3 6-3 6 14-6Z"/></svg></div></div>
+      </section>
+      <div class="toast" id="ts2"></div><div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ IDEA 3 · SLIDE-OVER DRAWER ══ -->
+<div class="panel">
+  <div class="caption"><strong>3 · Slide-over drawer</strong> — <em>tap ☰ to open the group panel</em></div>
+  <div class="device"><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 16 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg><svg class="bat" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="2" y="2" width="17" height="7" rx="1.4"/></svg></span></div>
+      <div class="top">
+        <div class="ibtn" onclick="dw3()"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></div>
+        <div class="clover" id="cl3">🍀</div>
+        <div class="htext"><div class="t" id="nm3">Ms. Taylor's Class</div><div class="s" id="mb3">6 members</div></div>
+        <div class="calbtn"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div>
+      </div>
+      <div class="chat" id="chat3"></div>
+      <div class="inputbar"><div class="ib cam"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><circle cx="12" cy="12.5" r="3.4"/></svg></div><div class="pill" id="pl3">Message…</div><div class="ib send"><svg viewBox="0 0 18 18"><path d="M16 9L2 3l3 6-3 6 14-6Z"/></svg></div></div>
+      <div class="scrim s3" id="sc3" onclick="dw3()"></div>
+      <div class="drawer" id="drw3">
+        <div class="dwh"><div class="t">First Grade</div><div class="s">Lincoln Elementary · 10 members</div></div>
+        <div class="dwlist" id="dwlist3"></div>
+        <div class="dwfoot"><button class="newbtn" onclick="toast('ts3','Opens “Create subgroup”')"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New subgroup</button></div>
+      </div>
+      <div class="toast" id="ts3"></div><div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const GROUPS=[
+    {k:'taylor',em:'🍀',name:"Ms. Taylor's Class",members:6,unread:0,time:'10:00 PM'},
+    {k:'all',   em:'#', name:'All First Grade',   members:10,unread:0,time:'9:41 PM'},
+    {k:'sarah', em:'🌻',name:"Ms. Sarah's Class", members:8, unread:5,time:'8:20 PM'},
+    {k:'dads',  em:'⚽️',name:'First Grade Dads',  members:12,unread:0,time:'Yesterday'},
+  ];
+  const G=k=>GROUPS.find(g=>g.k===k);
+  const MSGS={
+    taylor:[{who:'Guy Hawkins',c:'#6fa8d0',t:"Yoow what's up everyone 🙌"},{who:'Robert Hugos',c:'#8fba92',t:"Hi guys, I'm good as well here"},{me:1,t:'Welcome to the club buddy!'}],
+    all:[{who:'Ms. Reed',c:'#c98aa8',t:'Picture day is next Tuesday 📸 wear your class colors!'},{who:'Albert Flores',c:'#d8a86a',t:'Yeah, never felt so great like this 😄'}],
+    sarah:[{who:'David Lee',c:'#6fa8d0',t:'Thanks for organizing the bake sale 🙏'},{who:'Nina Park',c:'#b69be0',t:'Count me in for cupcakes 🧁'}],
+    dads:[{who:'Carlos Romero',c:'#7a5c52',t:"Who's up for the World Cup Wednesday? ⚽"},{me:1,t:"I'm in 🍺 I'll bring the wings"}],
+  };
+  const ini=n=>{const p=n.split(' ');return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();};
+  function chatHTML(k){
+    return '<div class="daydiv">Today</div>'+MSGS[k].map(m=>m.me
+      ? `<div class="msg me"><div class="bub"><div class="tx">${m.t}</div><div class="tm">10:00 PM</div></div></div>`
+      : `<div class="msg"><div class="mav" style="background:${m.c}">${ini(m.who)}</div><div class="bub"><div class="who">${m.who}</div><div class="tx">${m.t}</div><div class="tm">10:00 PM</div></div></div>`).join('');
+  }
+  let tT={};
+  function toast(id,msg){const t=document.getElementById(id);t.textContent=msg;t.classList.add('on');clearTimeout(tT[id]);tT[id]=setTimeout(()=>t.classList.remove('on'),1700);}
+
+  /* ── IDEA 1 · dropdown ── */
+  let cur1='taylor', open1=false;
+  function renderDD1(){
+    document.getElementById('ddm1').innerHTML='<div class="ddh">First Grade · Lincoln Elementary</div>'+
+      GROUPS.map(g=>`<div class="item${g.k===cur1?' cur':''}" onclick="pick1('${g.k}')"><span class="em">${g.em}</span><span class="nm">${g.name}</span><span class="ct">${g.members}</span>${g.unread&&g.k!==cur1?`<span class="badge">${g.unread}</span>`:''}${g.k===cur1?'<svg class="chk" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>':''}</div>`).join('')+
+      '<div class="sep"></div><div class="item new" onclick="toast(\'ts1\',\'Opens “Create subgroup”\')"><span class="em">＋</span><span class="nm">New subgroup</span></div>';
+  }
+  function paint1(){const g=G(cur1);document.getElementById('nm1').textContent=g.name;document.getElementById('mb1').textContent=g.members+' members';document.getElementById('cl1').textContent=g.em;document.getElementById('pl1').textContent='Message '+g.name+'…';document.getElementById('chat1').innerHTML=chatHTML(cur1);renderDD1();}
+  function dd1(){open1=!open1;document.getElementById('ddm1').classList.toggle('on',open1);document.getElementById('sc1').classList.toggle('on',open1);document.getElementById('tt1').classList.toggle('open',open1);}
+  function pick1(k){cur1=k;paint1();dd1();}
+
+  /* ── IDEA 2 · hub ── */
+  function renderHub2(){
+    document.getElementById('hublist2').innerHTML='<div class="hubseclbl">Your classes & groups</div>'+
+      GROUPS.map(g=>{const last=MSGS[g.k][MSGS[g.k].length-1];const prev=(last.me?'You: ':last.who.split(' ')[0]+': ')+last.t;
+        return `<div class="crow" onclick="open2('${g.k}')"><div class="cav">${g.em}</div><div class="cb"><div class="cn">${g.name}</div><div class="cp">${prev}</div></div><div class="cr">${g.unread?`<span class="badge">${g.unread}</span>`:`<div class="ctime">${g.time}</div>`}<div class="cmembers">${g.members} members</div></div></div>`;}).join('')+
+      '<div class="createcard" onclick="toast(\'ts2\',\'Opens “Create subgroup”\')"><div class="pic"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div><div class="ctx"><b>New subgroup</b><span>A class, a moms/dads group, carpool…</span></div></div>';
+  }
+  function open2(k){const g=G(k);document.getElementById('nm2').textContent=g.name;document.getElementById('mb2').textContent=g.members+' members';document.getElementById('cl2').textContent=g.em;document.getElementById('pl2').textContent='Message '+g.name+'…';document.getElementById('chat2').innerHTML=chatHTML(k);document.getElementById('hubPane').classList.remove('on');document.getElementById('chatPane').classList.add('on');}
+  function back2(){document.getElementById('chatPane').classList.remove('on');document.getElementById('hubPane').classList.add('on');}
+
+  /* ── IDEA 3 · drawer ── */
+  let cur3='taylor', open3=false;
+  function renderDW3(){
+    document.getElementById('dwlist3').innerHTML='<div class="dwseclbl">Your groups</div>'+
+      GROUPS.map(g=>`<div class="dwrow${g.k===cur3?' cur':''}" onclick="pick3('${g.k}')"><span class="em">${g.em}</span><span class="nm">${g.name}</span>${g.unread&&g.k!==cur3?`<span class="badge">${g.unread}</span>`:`<span class="ct">${g.members}</span>`}</div>`).join('');
+  }
+  function paint3(){const g=G(cur3);document.getElementById('nm3').textContent=g.name;document.getElementById('mb3').textContent=g.members+' members';document.getElementById('cl3').textContent=g.em;document.getElementById('pl3').textContent='Message '+g.name+'…';document.getElementById('chat3').innerHTML=chatHTML(cur3);renderDW3();}
+  function dw3(){open3=!open3;document.getElementById('drw3').classList.toggle('on',open3);document.getElementById('sc3').classList.toggle('on',open3);}
+  function pick3(k){cur3=k;paint3();dw3();}
+
+  paint1();renderHub2();paint3();
+</script>
+</body>
+</html>

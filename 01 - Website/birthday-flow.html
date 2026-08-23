@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Birthday Flow · Sprout</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --field:#e8e4d9; --fg:#1a1a17; --ink:#1c2a1d; --muted:#807a6c; --border:#e3ded2;
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-soft:#e7efe6;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif; --serif:'Playfair Display',Georgia,serif; --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;height:100%;}
+  body{background:#ddd8ce;font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;padding:32px 24px;min-height:100vh;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .caption{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8478;text-align:center;}
+  .caption strong{color:#3a3830;font-weight:600;}
+
+  .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .device::before,.device::after{content:'';position:absolute;width:3px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.06) 8%,transparent 16%,transparent 84%,rgba(255,255,255,.04) 92%,transparent);top:100px;bottom:100px;}
+  .device::before{left:-1px;}.device::after{right:-1px;}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:5;}
+  .br{position:absolute;width:4px;background:#0a0a0c;border-radius:2px;}
+  .br.l1{left:-3px;top:174px;height:32px;}.br.l2{left:-3px;top:220px;height:60px;}.br.l3{left:-3px;top:290px;height:60px;}.br.r1{right:-3px;top:250px;height:100px;}
+
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;
+    background:radial-gradient(120% 60% at 50% 8%, #eef3ea 0%, var(--bg) 50%);}
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--fg);}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--fg);} .sb .bat{width:25px;}
+
+  .top{padding:6px 16px 6px;display:flex;align-items:center;gap:10px;flex:0 0 auto;}
+  .ibtn{width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;} .ibtn svg{width:18px;height:18px;stroke:var(--fg);fill:none;stroke-width:2;}
+  .top .t{flex:1;text-align:center;font-weight:700;font-size:15px;} .top .sp{width:34px;}
+  .prog{height:3px;background:var(--border);border-radius:2px;margin:0 18px;flex:0 0 auto;overflow:hidden;}
+  .prog i{display:block;height:100%;background:var(--green);border-radius:2px;transition:width .4s ease;}
+
+  .view{flex:1 1 auto;overflow-y:auto;display:none;flex-direction:column;}
+  .view.on{display:flex;} .view::-webkit-scrollbar{display:none;}
+  .pad{padding:14px 22px 22px;}
+
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--green-mid);}
+  .h1{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--ink);line-height:1.2;letter-spacing:-.01em;margin:6px 0 4px;}
+  .h1 em{font-style:italic;color:var(--green);}
+  .sub{font-size:13.5px;color:var(--muted);line-height:1.45;}
+
+  /* ── 1 · select kid ── */
+  .kids{display:flex;flex-direction:column;gap:11px;margin-top:18px;}
+  .kid{display:flex;align-items:center;gap:14px;background:var(--surface);border:1.5px solid var(--border);border-radius:18px;padding:13px 15px;cursor:pointer;transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease;box-shadow:0 6px 18px -12px rgba(40,40,30,.3);}
+  .kid:active{transform:scale(.99);}
+  .kid.sel{border-color:var(--green);box-shadow:0 10px 24px -12px rgba(45,92,46,.5);}
+  .kid .av{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:26px;color:#fff;flex-shrink:0;}
+  .kid .nm{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);}
+  .kid .meta{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .kid .turn{margin-left:auto;text-align:right;flex-shrink:0;}
+  .kid .turn b{display:block;font-family:var(--serif);font-size:22px;color:var(--green);line-height:1;}
+  .kid .turn span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+
+  /* ── 2 · voice ── */
+  .voice{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px 26px 0;}
+  .orb{width:120px;height:120px;border-radius:50%;position:relative;flex-shrink:0;
+    background:radial-gradient(circle at 38% 32%, #7cc47f 0%, #3d7a40 42%, #2d5c2e 78%);
+    box-shadow:0 16px 40px -12px rgba(45,92,46,.5), inset 0 2px 10px rgba(255,255,255,.25);animation:breathe 5s ease-in-out infinite;}
+  .orb::before{content:'';position:absolute;inset:6px;border-radius:50%;background-image:radial-gradient(rgba(255,255,255,.55) 1px,transparent 1.4px);background-size:11px 11px;opacity:.4;mix-blend-mode:screen;animation:spin 22s linear infinite;}
+  .orb.listening{animation:breathe 1.4s ease-in-out infinite;}
+  .orb.listening::after{content:'';position:absolute;inset:-10px;border-radius:50%;border:2px solid rgba(45,92,46,.4);animation:ring 1.2s ease-out infinite;}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes ring{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.55);opacity:0}}
+  .ailine{font-family:var(--serif);font-size:22px;line-height:1.32;color:var(--ink);margin:26px 0 0;max-width:300px;min-height:88px;}
+  .ailine b{color:var(--green);}
+  .said{margin-top:14px;font-size:13px;color:var(--muted);min-height:18px;} .said b{color:var(--fg);font-weight:600;}
+  .micbtn{margin-top:26px;width:64px;height:64px;border-radius:50%;border:none;background:var(--green);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 12px 28px -8px rgba(45,92,46,.6);}
+  .micbtn svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:2;}
+  .michint{margin-top:10px;font-size:11.5px;color:var(--muted);}
+  .recap{margin-top:18px;display:flex;flex-direction:column;gap:7px;width:100%;max-width:300px;}
+  .recap .row{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:9px 12px;font-size:13px;text-align:left;}
+  .recap .row .ic{width:18px;text-align:center;} .recap .row b{font-weight:600;color:var(--ink);}
+
+  /* ── 3 · cover style ── */
+  .seg-h{font-size:12px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.06em;margin:18px 0 10px;display:flex;align-items:center;gap:7px;}
+  .seg-h .tag{font-size:9px;font-weight:800;letter-spacing:.05em;padding:2px 7px;border-radius:999px;background:var(--green);color:#fff;}
+  .seg-h .reg{font-weight:500;color:var(--muted);text-transform:none;letter-spacing:0;font-size:11px;margin-left:auto;}
+  .seg-h .seeall{color:var(--green);font-weight:700;text-decoration:underline;text-underline-offset:2px;cursor:pointer;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+  .cov{position:relative;aspect-ratio:1/1;border-radius:16px;overflow:hidden;cursor:pointer;border:2.5px solid transparent;box-shadow:0 8px 20px -10px rgba(0,0,0,.3);transition:transform .12s ease;}
+  .cov:active{transform:scale(.98);}
+  .cov.sel{border-color:var(--green);box-shadow:0 12px 26px -8px rgba(45,92,46,.55);}
+  .cov.sel::after{content:'✓';position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;z-index:4;}
+  .cov .ph{position:absolute;left:8px;bottom:8px;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:rgba(255,255,255,.85);color:#444;padding:2px 7px;border-radius:6px;z-index:3;}
+  /* pencil — adjust how the photo sits in this frame (opens the square crop editor) */
+  .cov .editc{position:absolute;right:8px;bottom:8px;width:27px;height:27px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;z-index:6;cursor:pointer;box-shadow:0 2px 7px rgba(0,0,0,.22);}
+  .cov .editc:active{transform:scale(.92);}
+  .cov .editc svg{width:14px;height:14px;stroke:#3a3830;fill:none;stroke-width:2;}
+  /* stock balloon covers */
+  .stk{display:grid;place-items:center;}
+  .stk.blue{background:linear-gradient(160deg,#cfe4f5,#9cc3e8);} .stk.pink{background:linear-gradient(160deg,#f5d6e2,#e89cbf);}
+  .stk .emo{font-size:46px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.15));}
+  /* AI editorial poster covers */
+  .ai{display:flex;flex-direction:column;justify-content:space-between;padding:11px 11px 10px;color:#fff;}
+  .ai .num{font-family:var(--serif);font-size:62px;font-weight:800;line-height:.8;letter-spacing:-.03em;}
+  .ai .bot{display:flex;flex-direction:column;gap:2px;}
+  .ai .ch{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1;}
+  .ai .nm{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;opacity:.7;}
+  .ai .scene{position:absolute;right:8px;top:34%;font-size:30px;opacity:.92;filter:drop-shadow(0 3px 6px rgba(0,0,0,.25));}
+  .cov .ex{position:absolute;top:8px;left:8px;font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.82);color:#555;padding:2px 6px;border-radius:5px;z-index:3;}
+  .ai.wonder{background:linear-gradient(155deg,#2f6f48,#16412a);}
+  .ai.dusk{background:linear-gradient(155deg,#6a4a7a,#352042);}
+  .ai.sun{background:linear-gradient(155deg,#d98a3d,#9a4f1e);}
+  .ai.sky{background:linear-gradient(155deg,#3f86b0,#1f4f70);}
+  .ownrow{display:flex;gap:11px;margin-top:13px;}
+  .ghost{flex:1;border:1.5px dashed var(--border);background:transparent;border-radius:14px;padding:13px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--ink);display:flex;flex-direction:column;align-items:center;gap:5px;}
+  .ghost span{font-size:20px;} .ghost small{font-weight:500;color:var(--muted);font-size:10.5px;}
+
+  /* ── 4 · preview ── */
+  .preview-cover{position:relative;aspect-ratio:1/1;border-radius:20px;overflow:hidden;color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:20px;box-shadow:0 18px 40px -14px rgba(0,0,0,.45);}
+  .preview-cover .num{font-family:var(--serif);font-size:120px;font-weight:800;line-height:.78;letter-spacing:-.03em;}
+  .preview-cover .ch{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.85;}
+  .preview-cover .nm{font-family:var(--serif);font-size:30px;font-weight:700;line-height:1;margin-top:2px;}
+  .preview-cover .tag{font-size:12px;opacity:.85;margin-top:5px;font-style:italic;font-family:var(--serif);}
+  .preview-cover .face{position:absolute;right:18px;top:42%;width:74px;height:74px;border-radius:50%;border:3px solid rgba(255,255,255,.6);background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:38px;}
+  .preview-cover.plain{align-items:center;justify-content:center;}
+  .preview-cover.plain > *:not(.face):not(.pv-band){display:none;}
+  .preview-cover.plain .face{position:static;width:auto;height:auto;border:none;background:transparent;}
+  .pv-band{display:none;position:absolute;top:16px;left:50%;transform:translateX(-50%);align-items:center;background:rgba(255,255,255,.92);color:var(--green);font-family:var(--serif);font-weight:700;font-size:16px;padding:5px 16px;border-radius:999px;z-index:3;white-space:nowrap;}
+  .pv-actions{display:flex;gap:9px;margin-top:13px;}
+  .pv-actions button{flex:1;border-radius:13px;padding:11px;font-size:12.5px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--ink);display:flex;align-items:center;justify-content:center;gap:6px;}
+  .pv-actions button svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;}
+  .regen-box{margin-top:11px;background:var(--green-soft);border:1px solid #cfe0cf;border-radius:14px;padding:12px;display:none;}
+  .regen-box.on{display:block;}
+  .regen-box label{font-size:11.5px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.05em;}
+  .regen-box input{width:100%;margin-top:8px;border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:10px 12px;font-size:13px;font-family:var(--font);}
+  .regen-box .go{margin-top:9px;width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:10px;font-weight:700;font-size:12.5px;cursor:pointer;}
+  .details{margin-top:14px;background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+  .drow{display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--border);}
+  .drow:last-child{border-bottom:none;}
+  .drow .ic{font-size:17px;width:20px;text-align:center;}
+  .drow .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+  .drow .val{font-size:14px;font-weight:600;color:var(--ink);margin-top:1px;}
+  .drow .edit{margin-left:auto;font-size:12px;color:var(--green);font-weight:600;cursor:pointer;}
+
+  /* add-photo prompt (no photo on file) */
+  .addphoto{margin-top:13px;background:#fff6e8;border:1px solid #f0dcb8;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:12px;}
+  .addphoto .ic{font-size:22px;} .addphoto .tx{flex:1;} .addphoto .tx b{font-size:13px;color:var(--ink);} .addphoto .tx p{margin:2px 0 0;font-size:11.5px;color:var(--muted);}
+  .addphoto button{background:var(--ink);color:#fff;border:none;border-radius:10px;padding:8px 13px;font-size:12px;font-weight:700;cursor:pointer;}
+
+  /* ── 5 · invite ── */
+  .inv-group{margin-top:16px;} .inv-group h4{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 9px;}
+  .inv{display:flex;align-items:center;gap:13px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:9px;cursor:pointer;}
+  .inv .av{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;font-size:19px;background:var(--green-soft);flex-shrink:0;}
+  .inv .av.round{border-radius:50%;color:#fff;}
+  .inv .nm{font-weight:600;font-size:14px;color:var(--ink);} .inv .mt{font-size:11.5px;color:var(--muted);margin-top:1px;}
+  .chk{margin-left:auto;width:24px;height:24px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700;}
+  .inv.on .chk{background:var(--green);border-color:var(--green);}
+  .inv.on{border-color:var(--green);}
+
+  /* ── 6 · done ── */
+  .done{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px 26px;}
+  .done .burst{font-size:44px;}
+  .done .h{font-family:var(--serif);font-size:25px;font-weight:600;color:var(--ink);margin:8px 0 4px;}
+  .done .p{font-size:13px;color:var(--muted);max-width:260px;}
+  .done .mini{width:150px;aspect-ratio:1/1;border-radius:16px;overflow:hidden;margin:20px 0;box-shadow:0 14px 30px -12px rgba(0,0,0,.4);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:13px;}
+  .done .mini .num{font-family:var(--serif);font-size:52px;font-weight:800;line-height:.8;}
+  .done .mini .nm{font-family:var(--serif);font-size:15px;font-weight:700;}
+  .done .stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:13px 16px;font-size:13px;color:var(--muted);width:100%;max-width:280px;}
+  .done .stat b{color:var(--ink);}
+
+  /* dock */
+  .dock{flex:0 0 auto;padding:12px 18px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(18px);display:flex;gap:10px;}
+  .btn{flex:1;border:none;border-radius:15px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);}
+  .btn.primary{background:var(--green);color:#fff;box-shadow:0 12px 26px -10px rgba(45,92,46,.6);}
+  .btn.primary:disabled{opacity:.4;box-shadow:none;}
+  .btn.ghost2{background:var(--surface);border:1.5px solid var(--border);color:var(--ink);flex:1;}
+  .home{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:134px;height:5px;background:var(--fg);border-radius:999px;opacity:.18;z-index:9;}
+
+  /* ── photo framing (quick photos) ── */
+  /* choose-photo screen */
+  .photo-hero{display:flex;flex-direction:column;align-items:center;margin-top:26px;}
+  .ph-circle{width:170px;height:170px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff4e0,#e8c98a);display:grid;place-items:center;font-size:90px;box-shadow:0 18px 44px -16px rgba(0,0,0,.4);border:4px solid #fff;}
+  .ph-circle.empty{background:var(--field);border:3px dashed var(--border);font-size:48px;color:#b8b2a4;}
+  .ph-cap{margin-top:14px;font-size:12.5px;color:var(--muted);font-weight:600;}
+  .photo-actions{margin-top:26px;display:flex;flex-direction:column;gap:11px;}
+  .photo-actions .pa-primary{width:100%;border:none;border-radius:15px;padding:16px;background:var(--green);color:#fff;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer;box-shadow:0 12px 26px -10px rgba(45,92,46,.6);}
+  .photo-actions .pa-ghost{width:100%;border:1.5px solid var(--border);border-radius:15px;padding:15px;background:var(--surface);color:var(--ink);font-size:14.5px;font-weight:700;font-family:var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .photo-actions .pa-ghost svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;}
+  /* photo composited into quick-photo template card */
+  .stk .phslot{font-size:54px;border-radius:12px;}
+  .cov .fr-tag{position:absolute;top:8px;right:8px;font-size:18px;z-index:3;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2));}
+  /* template frame overlay on the framing stage */
+  .frame-overlay{position:absolute;inset:0;pointer-events:none;border:7px solid rgba(255,255,255,.92);border-radius:20px;box-shadow:inset 0 0 0 2px rgba(45,92,46,.25);z-index:4;}
+  .frame-overlay .fo-banner{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.92);color:var(--green);font-family:var(--serif);font-weight:700;font-size:14px;padding:4px 14px;border-radius:999px;white-space:nowrap;}
+  .frame-overlay.off{display:none;}
+  .frame-stage{aspect-ratio:1/1;border-radius:20px;overflow:hidden;position:relative;background:#1c1c1a;margin-top:14px;box-shadow:0 18px 40px -14px rgba(0,0,0,.45);touch-action:none;}
+  .frame-photo{position:absolute;top:50%;left:50%;width:120%;height:120%;transform:translate(-50%,-50%) scale(1);display:grid;place-items:center;font-size:130px;background:radial-gradient(circle at 50% 40%,#fef0cc,#e8c98a);transition:transform .05s linear;}
+  .frame-grid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.18) 1px,transparent 1px);background-size:33.33% 33.33%;}
+  .frame-hint{position:absolute;left:0;right:0;bottom:10px;text-align:center;color:#fff;font-size:11px;letter-spacing:.03em;text-shadow:0 1px 4px rgba(0,0,0,.6);}
+  .zoomrow{display:flex;align-items:center;gap:11px;margin-top:16px;color:var(--muted);}
+  .zoomrow svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;}
+  .zoomrow input[type=range]{flex:1;accent-color:var(--green);height:4px;}
+  .change-photo{margin-top:13px;width:100%;border:1.5px solid var(--border);background:var(--surface);border-radius:14px;padding:13px;font-size:13.5px;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-family:var(--font);}
+  .change-photo svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
+
+  /* ── generating state ── */
+  .gen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px;}
+  .gen-frame{width:200px;aspect-ratio:1/1;border-radius:20px;position:relative;overflow:hidden;background:linear-gradient(155deg,#2f6f48,#16412a);box-shadow:0 18px 44px -14px rgba(45,92,46,.55);display:grid;place-items:center;}
+  .gen-frame .shimmer{position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.28) 50%,transparent 70%);background-size:220% 100%;animation:shim 1.3s linear infinite;}
+  @keyframes shim{0%{background-position:160% 0}100%{background-position:-60% 0}}
+  .gen-frame .sparkle{font-size:48px;animation:pulse 1.4s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.12);opacity:1}}
+  .gen h2{font-family:var(--serif);font-size:23px;font-weight:600;color:var(--ink);margin:26px 0 6px;}
+  .gen p{font-size:13.5px;color:var(--muted);max-width:250px;}
+  .gen .dots{margin-top:16px;display:flex;gap:6px;}
+  .gen .dots i{width:8px;height:8px;border-radius:50%;background:var(--green-mid);animation:bd 1s ease-in-out infinite;}
+  .gen .dots i:nth-child(2){animation-delay:.15s}.gen .dots i:nth-child(3){animation-delay:.3s}
+  @keyframes bd{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-5px)}}
+
+  /* ── add reference photo (AI, no photo on file) ── */
+  .ref{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px;}
+  .ref .frameprev{width:190px;aspect-ratio:1/1;border-radius:20px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:16px;color:#fff;box-shadow:0 16px 36px -14px rgba(0,0,0,.4);}
+  .ref .frameprev .num{font-family:var(--serif);font-size:74px;font-weight:800;line-height:.8;}
+  .ref .frameprev .nm{font-family:var(--serif);font-size:18px;font-weight:700;}
+  .ref .frameprev .slot{position:absolute;right:14px;top:40%;width:58px;height:58px;border-radius:50%;border:2px dashed rgba(255,255,255,.7);display:grid;place-items:center;font-size:24px;}
+  .ref h2{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);margin:22px 0 6px;}
+  .ref p{font-size:13.5px;color:var(--muted);max-width:260px;line-height:1.5;}
+  .ref .upload{margin-top:20px;width:100%;max-width:280px;border:none;border-radius:15px;padding:15px;background:var(--green);color:#fff;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 12px 26px -10px rgba(45,92,46,.6);}
+  .ref .upload svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;}
+
+  /* ── event description on preview ── */
+  .descbox{margin-top:14px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 15px;}
+  .descbox .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:6px;}
+  .descbox .lab .edit{margin-left:auto;color:var(--green);font-weight:700;cursor:pointer;}
+  .descbox textarea{width:100%;margin-top:8px;border:none;background:transparent;resize:none;font-family:var(--font);font-size:13.5px;line-height:1.5;color:var(--ink);outline:none;min-height:54px;}
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="caption"><strong>Birthday Flow</strong> · kid → voice → cover style → preview → invite</div>
+  <div class="device">
+    <span class="br l1"></span><span class="br l2"></span><span class="br l3"></span><span class="br r1"></span><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg>
+        <svg viewBox="0 0 17 11"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1z"/></svg>
+        <svg class="bat" viewBox="0 0 25 11"><rect x=".5" y=".5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="22" y="3.5" width="1.5" height="4" rx=".4" fill="currentColor" fill-opacity=".45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+      </span></div>
+
+      <div class="top">
+        <div class="ibtn" id="backBtn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+        <div class="t" id="title">New Birthday</div>
+        <div class="sp"></div>
+      </div>
+      <div class="prog"><i id="bar" style="width:20%"></i></div>
+
+      <!-- 1 · SELECT KID -->
+      <section class="view on" id="v-kid">
+        <div class="pad">
+          <div class="eyebrow">Step 1 of 6</div>
+          <div class="h1">Whose <em>birthday</em> is it?</div>
+          <div class="sub">Pick a child — I already know their age from their birthday.</div>
+          <div class="kids" id="kidList"></div>
+        </div>
+      </section>
+
+      <!-- 2 · VOICE -->
+      <section class="view" id="v-voice">
+        <div class="voice">
+          <div class="orb" id="orb"></div>
+          <div class="ailine" id="ailine"></div>
+          <div class="said" id="said"></div>
+          <div class="recap" id="recap"></div>
+          <button class="micbtn" id="mic" onclick="micTap()"><svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+          <div class="michint" id="michint">Tap to answer</div>
+        </div>
+      </section>
+
+      <!-- 3 · COVER STYLE -->
+      <!-- 2b · CHOOSE PHOTO (before styling) -->
+      <section class="view" id="v-photo">
+        <div class="pad">
+          <div class="eyebrow">Step 3 of 6 · Photo</div>
+          <div class="h1">Which <em>photo</em>?</div>
+          <div class="sub">This is the photo we'll use for <span id="photoKid">your child</span>'s cover — pick the one you love, you can always change it.</div>
+
+          <div class="photo-hero" id="photoHero">
+            <div class="ph-circle" id="phCircle">🧒</div>
+            <div class="ph-cap" id="phCap">Profile photo on file</div>
+          </div>
+
+          <div class="photo-actions" id="photoActions"></div>
+        </div>
+      </section>
+
+      <section class="view" id="v-style">
+        <div class="pad">
+          <div class="eyebrow">Step 4 of 6 · Style</div>
+          <div class="h1">Style the <em>cover</em></div>
+          <div class="sub">Your photo's ready — pick a frame or an AI style, or <b>skip styling</b> to use the photo as-is.</div>
+
+          <div class="seg-h">Quick photos <span class="reg seeall" onclick="show('v-templates')">See all templates</span></div>
+          <div class="grid">
+            <div class="cov stk blue" onclick="pickCover(this,'stock')"><div class="emo phslot">🧒</div><div class="fr-tag">🎉</div><div class="ph">Classic blue</div><div class="editc" onclick="editCrop(event,this.parentElement,'stock')"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div></div>
+            <div class="cov stk pink" onclick="pickCover(this,'stock')"><div class="emo phslot">🧒</div><div class="fr-tag">🎀</div><div class="ph">Classic pink</div><div class="editc" onclick="editCrop(event,this.parentElement,'stock')"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div></div>
+          </div>
+
+          <div class="seg-h">AI styles <span class="tag">✨ Premium</span><span class="reg seeall" onclick="show('v-aistyles')">See all examples</span></div>
+          <div class="grid">
+            <div class="cov ai wonder" onclick="pickCover(this,'wonder')"><span class="ex">Example</span><div class="num">4</div><div class="scene">🦄</div><div class="bot"><div class="ch">Wonderland</div><div class="nm">Mia turns 4</div></div><div class="editc" onclick="editCrop(event,this.parentElement,'wonder')"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div></div>
+            <div class="cov ai dusk" onclick="pickCover(this,'dusk')"><span class="ex">Example</span><div class="num">6</div><div class="scene">🚀</div><div class="bot"><div class="ch">Galaxy</div><div class="nm">Theo turns 6</div></div><div class="editc" onclick="editCrop(event,this.parentElement,'dusk')"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div></div>
+            <div class="cov ai sun" onclick="pickCover(this,'sun')"><span class="ex">Example</span><div class="num">3</div><div class="scene">🦕</div><div class="bot"><div class="ch">Dino Days</div><div class="nm">Leo turns 3</div></div><div class="editc" onclick="editCrop(event,this.parentElement,'sun')"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div></div>
+            <div class="cov ai sky" onclick="pickCover(this,'sky')"><span class="ex">Example</span><div class="num">7</div><div class="scene">⚽</div><div class="bot"><div class="ch">All-Star</div><div class="nm">Sam turns 7</div></div><div class="editc" onclick="editCrop(event,this.parentElement,'sky')"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3a-i · SEE ALL TEMPLATES (quick photos) -->
+      <section class="view" id="v-templates">
+        <div class="pad">
+          <div class="eyebrow">Quick photos</div>
+          <div class="h1">Photo <em>templates</em></div>
+          <div class="sub">Pick a frame, then add your photo. We add more over time.</div>
+          <div class="grid" style="margin-top:16px">
+            <div class="cov stk blue" onclick="pickTemplate()"><div class="emo">🎈</div><div class="ph">Classic blue</div></div>
+            <div class="cov stk pink" onclick="pickTemplate()"><div class="emo">🎀</div><div class="ph">Classic pink</div></div>
+            <div class="cov stk" style="background:linear-gradient(160deg,#ffe1c2,#ffc78f)" onclick="pickTemplate()"><div class="emo">🌈</div><div class="ph">Rainbow</div></div>
+            <div class="cov stk" style="background:linear-gradient(160deg,#fff0b8,#ffd862)" onclick="pickTemplate()"><div class="emo">☀️</div><div class="ph">Sunshine</div></div>
+            <div class="cov stk" style="background:linear-gradient(160deg,#e6f0d8,#c2dca0)" onclick="pickTemplate()"><div class="emo">🌸</div><div class="ph">Floral</div></div>
+            <div class="cov stk" style="background:linear-gradient(160deg,#cfd6f0,#9aa8e0)" onclick="pickTemplate()"><div class="emo">✨</div><div class="ph">Starry night</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3a-ii · SEE ALL AI STYLES -->
+      <section class="view" id="v-aistyles">
+        <div class="pad">
+          <div class="eyebrow">AI styles ✨</div>
+          <div class="h1">All <em>AI styles</em></div>
+          <div class="sub">Examples, any kid — Sprout places your child into the look you pick.</div>
+          <div class="grid" style="margin-top:16px">
+            <div class="cov ai" style="background:linear-gradient(155deg,#2f6f48,#16412a)" onclick="pickStyle('wonder')"><span class="ex">Example</span><div class="num">4</div><div class="scene">🦄</div><div class="bot"><div class="ch">Wonderland</div><div class="nm">Mia turns 4</div></div></div>
+            <div class="cov ai" style="background:linear-gradient(155deg,#6a4a7a,#352042)" onclick="pickStyle('dusk')"><span class="ex">Example</span><div class="num">6</div><div class="scene">🚀</div><div class="bot"><div class="ch">Galaxy</div><div class="nm">Theo turns 6</div></div></div>
+            <div class="cov ai" style="background:linear-gradient(155deg,#d98a3d,#9a4f1e)" onclick="pickStyle('sun')"><span class="ex">Example</span><div class="num">3</div><div class="scene">🦕</div><div class="bot"><div class="ch">Dino Days</div><div class="nm">Leo turns 3</div></div></div>
+            <div class="cov ai" style="background:linear-gradient(155deg,#3f86b0,#1f4f70)" onclick="pickStyle('sky')"><span class="ex">Example</span><div class="num">7</div><div class="scene">⚽</div><div class="bot"><div class="ch">All-Star</div><div class="nm">Sam turns 7</div></div></div>
+            <div class="cov ai" style="background:linear-gradient(155deg,#d36fa6,#8a3f6e)" onclick="pickStyle('princess')"><span class="ex">Example</span><div class="num">5</div><div class="scene">👑</div><div class="bot"><div class="ch">Royal</div><div class="nm">Ava turns 5</div></div></div>
+            <div class="cov ai" style="background:linear-gradient(155deg,#c0473f,#7a241f)" onclick="pickStyle('hero')"><span class="ex">Example</span><div class="num">8</div><div class="scene">🦸</div><div class="bot"><div class="ch">Superhero</div><div class="nm">Max turns 8</div></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3b · FRAME PHOTO (quick photo / own photo — zoom & position) -->
+      <section class="view" id="v-frame">
+        <div class="pad">
+          <div class="eyebrow">Position the photo</div>
+          <div class="h1">Frame your <em>cover</em></div>
+          <div class="sub">Pinch and drag to fit — this is the photo that goes on the cover.</div>
+          <div class="frame-stage" id="frameStage">
+            <div class="frame-photo" id="framePhoto">🧒</div>
+            <div class="frame-grid"></div>
+            <div class="frame-overlay" id="frameOverlay"><span class="fo-banner">🎉 Happy Birthday!</span></div>
+            <div class="frame-hint">Drag to move · slider to zoom</div>
+          </div>
+          <div class="zoomrow">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11h6"/></svg>
+            <input type="range" min="100" max="220" value="120" id="zoom" oninput="setZoom(this.value)"/>
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>
+          </div>
+          <button class="change-photo" onclick="alert('Open camera roll / library')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>Change photo</button>
+        </div>
+      </section>
+
+      <!-- 3c · ADD REFERENCE PHOTO (AI style, no photo on file) -->
+      <section class="view" id="v-ref">
+        <div class="ref">
+          <div class="frameprev" id="refPrev">
+            <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;opacity:.85">Chapter <span id="refCh">Five</span></div><div class="nm" id="refNm">Kennedy</div></div>
+            <div class="num" id="refNum">5</div>
+            <div class="slot">＋</div>
+          </div>
+          <h2>Add a photo of <span id="refName">Kennedy</span></h2>
+          <p>The AI needs one clear photo of <span id="refName2">Kennedy</span> to place them into this style. No cropping needed — just a reference.</p>
+          <button class="upload" onclick="uploadRef()"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M5 16v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg>Add a photo</button>
+        </div>
+      </section>
+
+      <!-- 3d · GENERATING -->
+      <section class="view" id="v-generating">
+        <div class="gen">
+          <div class="gen-frame" id="genFrame"><div class="shimmer"></div><div class="sparkle">✨</div></div>
+          <h2>Generating your preview…</h2>
+          <p>Placing <span id="genName">Kennedy</span> into the style you picked. This takes a few seconds.</p>
+          <div class="dots"><i></i><i></i><i></i></div>
+        </div>
+      </section>
+
+      <!-- 4 · PREVIEW -->
+      <section class="view" id="v-preview">
+        <div class="pad">
+          <div class="eyebrow">Preview</div>
+          <div class="h1">Here's the <em>preview</em></div>
+          <div class="preview-cover" id="pvCover">
+            <div class="pv-band" id="pvBand">🎉 Happy Birthday!</div>
+            <div><div class="ch">Chapter <span id="pvChWord">Five</span></div><div class="nm" id="pvName">Kennedy</div></div>
+            <div class="num" id="pvNum">5</div>
+            <div><div class="tag" id="pvTag">five years of wonder</div></div>
+            <div class="face" id="pvFace">🧒</div>
+          </div>
+
+          <div class="pv-actions">
+            <button onclick="toggleRegen()"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Regenerate</button>
+            <button onclick="alert('Open camera roll / library')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>Change photo</button>
+          </div>
+          <div class="regen-box" id="regenBox">
+            <label>Tell me what to add or change</label>
+            <input id="regenInput" placeholder="e.g. add dump trucks and a construction theme"/>
+            <button class="go" onclick="doRegen()">✨ Regenerate cover</button>
+          </div>
+
+          <div class="details">
+            <div class="drow"><div class="ic">📅</div><div><div class="lab">Date</div><div class="val" id="dDate">Sat, Jun 28</div></div><div class="edit">Edit</div></div>
+            <div class="drow"><div class="ic">🕑</div><div><div class="lab">Time</div><div class="val" id="dTime">2:00 PM</div></div><div class="edit">Edit</div></div>
+            <div class="drow"><div class="ic">📍</div><div><div class="lab">Location</div><div class="val" id="dLoc">Zilker Park</div></div><div class="edit">Edit</div></div>
+          </div>
+
+          <div class="descbox">
+            <div class="lab">📝 Event description <span class="edit">Edit</span></div>
+            <textarea id="pvDesc">Come celebrate Kennedy's 5th birthday! 🎉 Cake, games and plenty of running around. Drinks & snacks provided — just bring the kids.</textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 · INVITE -->
+      <section class="view" id="v-invite">
+        <div class="pad">
+          <div class="eyebrow">Step 6 of 6</div>
+          <div class="h1">Who's <em>invited</em>?</div>
+          <div class="sub">Invite a whole club, or pick individual families.</div>
+          <div class="inv-group">
+            <h4>Your clubs</h4>
+            <div class="inv on" onclick="this.classList.toggle('on')"><div class="av">⚽</div><div><div class="nm">Riverside Soccer</div><div class="mt">14 families</div></div><div class="chk">✓</div></div>
+            <div class="inv" onclick="this.classList.toggle('on')"><div class="av">🎒</div><div><div class="nm">Oak Hill Kindergarten</div><div class="mt">22 families</div></div><div class="chk">✓</div></div>
+          </div>
+          <div class="inv-group">
+            <h4>Individual families</h4>
+            <div class="inv" onclick="this.classList.toggle('on')"><div class="av round" style="background:linear-gradient(135deg,#c98aa8,#9a5a78)">S</div><div><div class="nm">Sarah Jensen</div><div class="mt">Mom of Mia</div></div><div class="chk">✓</div></div>
+            <div class="inv" onclick="this.classList.toggle('on')"><div class="av round" style="background:linear-gradient(135deg,#8fba92,#5a8f5d)">M</div><div><div class="nm">Mohit Rai</div><div class="mt">Dad of Aanya</div></div><div class="chk">✓</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 · DONE -->
+      <section class="view" id="v-done">
+        <div class="done">
+          <div class="burst">🎉</div>
+          <div class="h" id="doneTitle">Kennedy's party is live!</div>
+          <div class="p">Invites are on their way. You'll see replies roll in on the event page.</div>
+          <div class="mini" id="doneMini"><div><div class="num">5</div></div><div class="nm" id="doneName">Kennedy</div></div>
+          <div class="stat"><b id="doneCount">14 families</b> invited · <b>0 replied</b> yet</div>
+        </div>
+      </section>
+
+      <div class="dock" id="dock">
+        <button class="btn ghost2" id="cta2" style="display:none" onclick="editDetails()">Edit event details</button>
+        <button class="btn primary" id="cta" disabled onclick="next()">Continue</button>
+      </div>
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── data ──
+  const KIDS = [
+    {name:'Kennedy', age:5, ord:'Five', emoji:'🧒', grad:'linear-gradient(135deg,#c98aa8,#9a5a78)', photo:true,  scene:'🦄', tag:'five years of wonder'},
+    {name:'Cooper',  age:3, ord:'Three',emoji:'👦', grad:'linear-gradient(135deg,#6fa8d0,#3f6f9a)', photo:true,  scene:'🦕', tag:'three & roaring'},
+    {name:'Rome',    age:1, ord:'One',  emoji:'👶', grad:'linear-gradient(135deg,#d8a86a,#a8763a)', photo:false, scene:'🎈', tag:'our first trip around the sun'},
+  ];
+  const STYLE_GRAD = {wonder:'linear-gradient(155deg,#2f6f48,#16412a)', dusk:'linear-gradient(155deg,#6a4a7a,#352042)', sun:'linear-gradient(155deg,#d98a3d,#9a4f1e)', sky:'linear-gradient(155deg,#3f86b0,#1f4f70)', princess:'linear-gradient(155deg,#d36fa6,#8a3f6e)', hero:'linear-gradient(155deg,#c0473f,#7a241f)', stock:null, own:null, skip:null};
+  const STEP = {'v-kid':1,'v-voice':2,'v-photo':3,'v-style':4,'v-templates':4,'v-aistyles':4,'v-frame':4,'v-ref':5,'v-generating':5,'v-preview':6,'v-invite':6,'v-done':6}, TOTAL=6;
+  const TITLES = {'v-kid':'New Birthday','v-voice':'New Birthday','v-photo':'Choose Photo','v-style':'Cover Style','v-templates':'Templates','v-aistyles':'AI Styles','v-frame':'Frame Photo','v-ref':'Add Photo','v-generating':'Generating','v-preview':'Preview','v-invite':'Event Details','v-done':'Done'};
+  let cur='v-kid', kid=null, chosen='wonder', regenOpen=false, coverChosen=false, cameFrom='v-style';
+
+  // ── view machinery ──
+  function show(id){
+    cur=id;
+    document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on', v.id===id));
+    document.getElementById('title').textContent=TITLES[id];
+    document.getElementById('bar').style.width=(STEP[id]/TOTAL*100)+'%';
+    document.getElementById('backBtn').style.visibility = (id==='v-kid'||id==='v-done'||id==='v-generating') ? 'hidden':'visible';
+    setCTA(id);
+    const on=document.querySelector('.view.on'); if(on) on.scrollTop=0;
+  }
+  function setCTA(id){
+    const cta=document.getElementById('cta'), cta2=document.getElementById('cta2'), dock=document.getElementById('dock');
+    dock.style.display = (id==='v-voice'||id==='v-photo'||id==='v-ref'||id==='v-generating'||id==='v-done'||id==='v-templates'||id==='v-aistyles') ? 'none':'flex';
+    cta2.style.display='none'; cta2.onclick=null;
+    if(id==='v-kid'){ cta.textContent='Continue'; cta.disabled=!kid; }
+    else if(id==='v-style'){ cta.textContent='Generate preview'; cta.disabled=!coverChosen; cta2.style.display='block'; cta2.textContent='Skip styling'; cta2.onclick=skipStyling; }
+    else if(id==='v-frame'){ cta.textContent='Use this photo'; cta.disabled=false; }
+    else if(id==='v-preview'){ cta.textContent='Continue'; cta.disabled=false; cta2.style.display='block'; cta2.textContent='Edit event details'; cta2.onclick=editDetails; }
+    else if(id==='v-invite'){ cta.textContent='Send invites 🎉'; cta.disabled=false; }
+  }
+  function goBack(){
+    if(cur==='v-voice'||cur==='v-photo') show('v-kid');
+    else if(cur==='v-style') show('v-photo');
+    else if(cur==='v-templates'||cur==='v-aistyles') show('v-style');
+    else if(cur==='v-frame'||cur==='v-ref') show('v-style');
+    else if(cur==='v-preview') show(cameFrom);
+    else if(cur==='v-invite') show('v-preview');
+  }
+  function next(){
+    if(cur==='v-kid')      startVoice();
+    else if(cur==='v-style')  routeFromStyle();
+    else if(cur==='v-frame')  show('v-style');   // crop editor is a sub-step of styling → back to the cards
+    else if(cur==='v-preview') show('v-invite');
+    else if(cur==='v-invite')  showDone();
+  }
+  function editDetails(){ show('v-invite'); }   // Edit button → same event-details page as Continue
+  function skipStyling(){ chosen='skip'; cameFrom='v-style'; buildPreview(); show('v-preview'); }
+  // Continue from the style screen — crop is no longer forced (it's optional via each card's pencil)
+  function routeFromStyle(){
+    if(chosen==='stock'||chosen==='own'){ cameFrom='v-style'; buildPreview(); show('v-preview'); }
+    else runGenerate();                        // AI style → generate (photo already chosen earlier)
+  }
+  // pencil on a card → select it, then open the square crop editor for THAT frame
+  function editCrop(ev, el, kind){ ev.stopPropagation(); pickCover(el, kind); openFrame(); }
+
+  // ── 2b · choose photo ──
+  function renderPhoto(){
+    document.getElementById('photoKid').textContent=kid.name;
+    const circle=document.getElementById('phCircle'), cap=document.getElementById('phCap'), acts=document.getElementById('photoActions');
+    if(kid.photo){
+      circle.className='ph-circle'; circle.textContent=kid.emoji;
+      cap.textContent=`${kid.name}'s profile photo`;
+      acts.innerHTML=`<button class="pa-primary" onclick="goStyle()">Use this photo</button>
+        <button class="pa-ghost" onclick="changePhoto()"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>Choose a different photo</button>`;
+    } else {
+      circle.className='ph-circle empty'; circle.textContent='＋';
+      cap.textContent=`No photo of ${kid.name} yet`;
+      acts.innerHTML=`<button class="pa-primary" onclick="uploadPhoto()">Upload a photo</button>`;
+    }
+  }
+  function changePhoto(){ /* opens gallery in real app */ document.getElementById('phCap').textContent='New photo selected ✓'; }
+  function uploadPhoto(){ kid.photo=true; renderPhoto(); }
+  function goStyle(){ renderStyle(); show('v-style'); }
+  function renderStyle(){
+    document.querySelectorAll('#v-style .phslot').forEach(s=>s.textContent=kid.emoji);  // show chosen photo in the frames
+  }
+
+  // ── 1 · kids ──
+  const kl=document.getElementById('kidList');
+  KIDS.forEach((k,i)=>{
+    const el=document.createElement('div'); el.className='kid';
+    el.innerHTML=`<div class="av" style="background:${k.grad}">${k.emoji}</div>
+      <div><div class="nm">${k.name}</div><div class="meta">${k.photo?'Photo on file':'No photo yet'}</div></div>
+      <div class="turn"><b>${k.age}</b><span>turning</span></div>`;
+    el.onclick=()=>{ document.querySelectorAll('.kid').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); kid=k; setCTA('v-kid'); applyKid(); };
+    kl.appendChild(el);
+  });
+  function applyKid(){
+    const e=document.getElementById('kidNameStyle'); if(e) e.textContent=kid.name;
+  }
+
+  // ── 2 · voice ──
+  let step=0, TURNS=[];
+  function startVoice(){
+    show('v-voice');
+    TURNS=[
+      {say:`Let's set up <b>${kid.name}'s</b> birthday 🎉 ${kid.name} is turning <b>${kid.age}</b>. What day is the party?`, hint:'Tap to answer', heard:'"Saturday, June 28th"', recap:{ic:'📅',label:'Date',val:'Sat, Jun 28'}},
+      {say:`Got it — <b>Saturday, June 28</b>. What time should it start?`, hint:'Tap to answer', heard:'"Around 2 in the afternoon"', recap:{ic:'🕑',label:'Time',val:'2:00 PM'}},
+      {say:`Perfect. And <b>where</b> is it happening?`, hint:'Tap to answer', heard:'"Zilker Park"', recap:{ic:'📍',label:'Location',val:'Zilker Park'}},
+      {say:`Love it. I've got the details for <b>${kid.name}'s</b> party — now let's set the photo.`, hint:'', heard:'', last:true},
+    ];
+    step=0; document.getElementById('recap').innerHTML=''; playTurn();
+  }
+  function playTurn(){
+    const t=TURNS[step], orb=document.getElementById('orb'), mic=document.getElementById('mic');
+    orb.classList.remove('listening');
+    document.getElementById('ailine').innerHTML=t.say;
+    document.getElementById('said').textContent='';
+    document.getElementById('michint').textContent=t.hint;
+    if(t.last){ mic.style.display='none'; document.getElementById('michint').innerHTML='<span style="color:var(--green);font-weight:700">Setting the photo…</span>'; setTimeout(()=>{ renderPhoto(); show('v-photo'); },1400); return; }
+    mic.style.display='grid';
+  }
+  function micTap(){
+    const t=TURNS[step], orb=document.getElementById('orb');
+    orb.classList.add('listening');
+    document.getElementById('michint').textContent='Listening…';
+    setTimeout(()=>{
+      orb.classList.remove('listening');
+      document.getElementById('said').innerHTML='You said <b>'+t.heard+'</b>';
+      const r=document.getElementById('recap');
+      r.innerHTML+=`<div class="row"><span class="ic">${t.recap.ic}</span><span><b>${t.recap.val}</b></span></div>`;
+      step++; setTimeout(playTurn,650);
+    },1100);
+  }
+
+  // ── 3 · cover style ──
+  function pickCover(el,kind){
+    document.querySelectorAll('.cov').forEach(c=>c.classList.remove('sel'));
+    el.classList.add('sel'); chosen=kind; coverChosen=true;
+    document.getElementById('cta').disabled=false;
+  }
+  // picked from a "See all" gallery → route straight on
+  function pickTemplate(){ chosen='stock'; coverChosen=true; openFrame(); }
+  function pickStyle(key){ chosen=key; coverChosen=true; kid.photo ? runGenerate() : showRef(); }
+  function useOwn(){ chosen='own'; document.querySelectorAll('.cov').forEach(c=>c.classList.remove('sel')); openFrame(); }
+  function skipCover(){ chosen='skip'; document.querySelectorAll('.cov').forEach(c=>c.classList.remove('sel')); cameFrom='v-style'; buildPreview(); show('v-preview'); }
+
+  // ── 3b · frame photo (quick / own) — drag + zoom ──
+  let panX=0,panY=0,zoom=1.2,fdrag=false,flx=0,fly=0;
+  function applyFrame(){ document.getElementById('framePhoto').style.transform=`translate(calc(-50% + ${panX}px), calc(-50% + ${panY}px)) scale(${zoom})`; }
+  function setZoom(v){ zoom=v/100; applyFrame(); }
+  function openFrame(){
+    document.getElementById('framePhoto').textContent=kid.emoji;
+    panX=0;panY=0;zoom=1.2; document.getElementById('zoom').value=120; applyFrame();
+    document.getElementById('frameOverlay').classList.toggle('off', chosen!=='stock');  // banner only for stock frames
+    show('v-frame');
+  }
+
+  // ── 3c · add reference photo (AI, no photo) ──
+  function showRef(){
+    document.getElementById('refName').textContent=kid.name;
+    document.getElementById('refName2').textContent=kid.name;
+    document.getElementById('refNm').textContent=kid.name;
+    document.getElementById('refNum').textContent=kid.age;
+    document.getElementById('refCh').textContent=kid.ord;
+    document.getElementById('refPrev').style.background=STYLE_GRAD[chosen]||'linear-gradient(155deg,#3d7a40,#2d5c2e)';
+    show('v-ref');
+  }
+  function uploadRef(){ kid.photo=true; runGenerate(); }   // got a reference → generate
+
+  // ── 3d · generating ──
+  function runGenerate(){
+    cameFrom='v-style';
+    document.getElementById('genName').textContent=kid.name;
+    document.getElementById('genFrame').style.background=STYLE_GRAD[chosen]||'linear-gradient(155deg,#3d7a40,#2d5c2e)';
+    show('v-generating');
+    setTimeout(()=>{ buildPreview(); show('v-preview'); }, 2000);
+  }
+
+  // ── 4 · preview ──
+  function buildPreview(){
+    const pv=document.getElementById('pvCover'), face=document.getElementById('pvFace'), band=document.getElementById('pvBand');
+    pv.classList.remove('plain'); band.style.display='none';
+    if(chosen==='skip'){                       // skip styling → plain photo, no styling
+      pv.classList.add('plain'); pv.style.background='linear-gradient(160deg,#efece4,#ddd7c9)';
+      face.textContent=kid.emoji; face.style.fontSize='96px';
+    } else if(chosen==='stock'){               // quick template → framed photo + banner
+      pv.classList.add('plain'); pv.style.background='linear-gradient(160deg,#bfe0f5,#8fc0e6)';
+      face.textContent=kid.emoji; face.style.fontSize='96px'; band.style.display='inline-flex';
+    } else {                                   // AI editorial poster
+      document.getElementById('pvName').textContent=kid.name;
+      document.getElementById('pvNum').textContent=kid.age;
+      document.getElementById('pvChWord').textContent=kid.ord;
+      document.getElementById('pvTag').textContent=kid.tag;
+      pv.style.background=STYLE_GRAD[chosen]||'linear-gradient(155deg,#3d7a40,#2d5c2e)';
+      face.textContent=kid.emoji; face.style.fontSize='38px';
+    }
+    regenOpen=false; document.getElementById('regenBox').classList.remove('on');
+  }
+  function toggleRegen(){ regenOpen=!regenOpen; document.getElementById('regenBox').classList.toggle('on',regenOpen); }
+  function doRegen(){
+    const v=document.getElementById('regenInput').value.trim();
+    const face=document.getElementById('pvFace');
+    face.textContent='✨'; setTimeout(()=>{ face.textContent=kid.photo?kid.emoji:'＋'; },700);
+    document.getElementById('regenBox').classList.remove('on'); regenOpen=false;
+    if(v) document.getElementById('pvTag').textContent=v.toLowerCase();
+  }
+
+  // ── 6 · done ──
+  function showDone(){
+    const mini=document.getElementById('doneMini');
+    mini.style.background=STYLE_GRAD[chosen]||'linear-gradient(155deg,#3d7a40,#2d5c2e)';
+    mini.querySelector('.num').textContent=kid.age;
+    document.getElementById('doneName').textContent=kid.name;
+    document.getElementById('doneTitle').textContent=`${kid.name}'s party is live!`;
+    // count selected invites
+    let fam=0; document.querySelectorAll('#v-invite .inv.on').forEach(i=>{ const m=i.querySelector('.mt').textContent.match(/(\d+)/); fam+= m?+m[1]:1; });
+    document.getElementById('doneCount').textContent=fam+' families';
+    show('v-done');
+  }
+
+  // drag-to-position on the framing stage
+  const fs=document.getElementById('frameStage');
+  fs.addEventListener('pointerdown',e=>{ fdrag=true; flx=e.clientX; fly=e.clientY; fs.setPointerCapture(e.pointerId); });
+  fs.addEventListener('pointermove',e=>{ if(!fdrag) return; panX+=e.clientX-flx; panY+=e.clientY-fly; flx=e.clientX; fly=e.clientY; applyFrame(); });
+  fs.addEventListener('pointerup',()=>fdrag=false);
+  fs.addEventListener('pointercancel',()=>fdrag=false);
+
+  show('v-kid');
+  if(location.hash){ const id=location.hash.slice(1); if(document.getElementById(id)){
+      kid=kid||KIDS[0]; applyKid();
+      if(id==='v-photo') renderPhoto();
+      if(id==='v-style'){ renderStyle(); }
+      if(id==='v-frame'){ openFrame(); }
+      if(id==='v-preview'){ chosen='stock'; buildPreview(); }
+      show(id);
+  } }
+</script>
+</body>
+</html>

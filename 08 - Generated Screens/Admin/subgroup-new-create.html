@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>New Sub Group · Create · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ece6da;          /* page */
+    --surface:#f4f1ea;     /* cards (background/primary) */
+    --field:#e8e2d6;       /* input fields */
+    --ink:#1e3e2b;         /* content/brand-bold */
+    --muted:#7d715e;       /* content/secondary */
+    --brand:#1e3e2b;
+    --brand-mid:#4fa472;
+    --brand-light:#e2e9e3; /* background/brand-light */
+    --brand-border:#77b691;/* background/brand-disable */
+    --border:#e0d9cb;
+    --white:#ffffff;
+    --shadow:1px 4px 12.5px rgba(13,13,18,.14);
+    --shadow-sm:1px 4px 12.5px rgba(13,13,18,.05);
+    --serif:'Playfair Display',Georgia,serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);font-size:15px;-webkit-font-smoothing:antialiased;padding:40px 0 60px;}
+
+  .lede{text-align:center;margin:0 auto 34px;max-width:820px;padding:0 24px;}
+  .lede h1{font-family:var(--serif);font-size:26px;font-weight:600;color:#23271f;margin:0 0 6px;}
+  .lede p{font-size:13.5px;color:#6a665b;margin:0;line-height:1.55;}
+
+  /* horizontal review row */
+  .row{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-start;gap:56px;
+    padding:0 56px;overflow-x:auto;}
+  .row::-webkit-scrollbar{height:10px;} .row::-webkit-scrollbar-thumb{background:#c3bdae;border-radius:6px;}
+
+  .panel{display:flex;flex-direction:column;align-items:center;gap:16px;flex:0 0 auto;}
+  .stepno{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);
+    background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:5px 16px;box-shadow:var(--shadow-sm);}
+  .caption{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:390px;line-height:1.55;}
+  .caption strong{color:#3a3830;font-weight:600;}
+
+  /* device */
+  .device{position:relative;width:390px;border-radius:56px;padding:12px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .device.fixed{height:844px;}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:50;}
+  .screen{position:relative;width:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .device.fixed .screen{height:100%;}
+
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);z-index:20;}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;}
+  .sb svg{width:17px;height:11px;fill:var(--ink);} .sb .bat{width:25px;}
+
+  .view{flex:1 1 auto;display:flex;flex-direction:column;min-height:0;}
+
+  /* top bar */
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:4px 16px 10px;}
+  .ibtn{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1px solid var(--border);
+    display:grid;place-items:center;cursor:pointer;flex-shrink:0;box-shadow:var(--shadow-sm);}
+  .ibtn svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .top .tt{flex:1;line-height:1.1;}
+  .top .tt.center{text-align:center;}
+  .top .tt .t{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);}
+  .top .tt .s{font-family:var(--sans);font-size:12px;color:var(--muted);margin-top:2px;}
+  .top .sp{width:40px;flex-shrink:0;}
+
+  .body{flex:1 1 auto;overflow-y:auto;padding:4px 16px 24px;}
+  .body::-webkit-scrollbar{display:none;}
+  .body.tall{overflow:visible;}
+
+  .sectlbl{font-family:var(--serif);font-size:14px;font-weight:500;color:var(--ink);margin:18px 2px 10px;display:flex;justify-content:space-between;align-items:center;}
+  .sectlbl .cnt{font-family:var(--sans);font-size:12px;color:var(--brand-mid);font-weight:600;}
+  .sectlbl .hint{font-family:var(--sans);font-size:12px;color:var(--muted);font-weight:400;}
+
+  /* identity block */
+  .idrow{display:flex;gap:14px;align-items:center;background:var(--surface);border-radius:16px;padding:16px;box-shadow:var(--shadow);}
+  .avatar{width:64px;height:64px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;
+    background:linear-gradient(144deg,#1e3e2b 5%,#4fa472 100%);color:#fff;font-family:var(--serif);font-weight:600;font-size:26px;
+    position:relative;overflow:hidden;}
+  .avatar .cam{position:absolute;right:-2px;bottom:-2px;width:24px;height:24px;border-radius:50%;background:var(--surface);
+    border:2px solid var(--surface);display:grid;place-items:center;box-shadow:0 1px 4px rgba(0,0,0,.15);}
+  .avatar .cam svg{width:13px;height:13px;stroke:var(--ink);fill:none;stroke-width:2;}
+  .idcol{flex:1;min-width:0;}
+  .nameinput{width:100%;border:none;background:transparent;font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);padding:0;}
+  .nameinput::placeholder{color:#b6ac97;font-weight:500;}
+  .nameinput:focus{outline:none;}
+  .idcol .sub{font-size:12px;color:var(--muted);margin-top:4px;}
+
+  /* icon options */
+  .emojis{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px;}
+  .emo{width:42px;height:42px;border-radius:12px;background:var(--field);display:grid;place-items:center;font-size:20px;cursor:pointer;border:2px solid transparent;transition:.12s;}
+  .emo.mono{background:linear-gradient(144deg,#1e3e2b 5%,#4fa472 100%);color:#fff;font-family:var(--serif);font-weight:600;font-size:15px;}
+  .emo.on{border-color:var(--brand);transform:scale(1.05);}
+
+  /* templates */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{padding:9px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--border);
+    font-size:13px;color:var(--ink);cursor:pointer;box-shadow:var(--shadow-sm);transition:.12s;}
+  .chip:active{transform:scale(.96);}
+  .chip.on{background:var(--brand-light);border-color:var(--brand-border);color:var(--brand);font-weight:600;}
+
+  /* search */
+  .search{display:flex;align-items:center;gap:9px;background:var(--field);border-radius:12px;padding:11px 14px;margin-bottom:10px;}
+  .search svg{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;flex-shrink:0;}
+  .search input{border:none;background:transparent;flex:1;font-family:var(--sans);font-size:14px;color:var(--ink);}
+  .search input:focus{outline:none;} .search input::placeholder{color:#9c9788;}
+
+  /* member list */
+  .mlist{display:flex;flex-direction:column;gap:8px;}
+  .mrow{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow-sm);cursor:pointer;transition:.12s;}
+  .mrow.sel{box-shadow:0 0 0 2px var(--brand-border) inset,var(--shadow-sm);}
+  .mav{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:15px;background:linear-gradient(144deg,#1e3e2b 5%,#4fa472 100%);}
+  .mtext{flex:1;min-width:0;}
+  .mtext .mn{font-family:var(--serif);font-size:14px;font-weight:500;color:var(--ink);}
+  .mtext .mk{font-size:12px;color:var(--muted);margin-top:1px;}
+  .check{width:24px;height:24px;border-radius:50%;border:2px solid #cfc7b5;flex-shrink:0;display:grid;place-items:center;transition:.12s;}
+  .mrow.sel .check{background:var(--brand);border-color:var(--brand);}
+  .check svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:3;opacity:0;transition:.12s;}
+  .mrow.sel .check svg{opacity:1;}
+
+  /* privacy */
+  .prow{display:flex;align-items:flex-start;gap:12px;background:var(--surface);border-radius:16px;padding:14px;box-shadow:var(--shadow-sm);cursor:pointer;margin-bottom:8px;transition:.12s;}
+  .prow.on{box-shadow:0 0 0 2px var(--brand-border) inset,var(--shadow-sm);background:var(--brand-light);}
+  .prow .pic{width:38px;height:38px;border-radius:11px;background:var(--field);display:grid;place-items:center;flex-shrink:0;}
+  .prow.on .pic{background:#fff;}
+  .prow .pic svg{width:20px;height:20px;stroke:var(--ink);fill:none;stroke-width:2;}
+  .prow .pt{flex:1;}
+  .prow .pt .h{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink);}
+  .prow .pt .d{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4;}
+  .radio{width:22px;height:22px;border-radius:50%;border:2px solid #cfc7b5;flex-shrink:0;margin-top:2px;position:relative;}
+  .prow.on .radio{border-color:var(--brand);}
+  .prow.on .radio::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--brand);}
+
+  /* CTA (static in review) */
+  .cta{padding:18px 16px 22px;}
+  .btn{width:100%;border:none;border-radius:16px;padding:16px;font-family:var(--sans);font-size:16px;font-weight:600;
+    background:var(--brand);color:#fff;cursor:pointer;box-shadow:var(--shadow);transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .btn:disabled{background:#c3bdae;color:#efeadf;box-shadow:none;cursor:not-allowed;}
+
+  /* ===== list view ===== */
+  .clublogo{width:40px;height:40px;border-radius:50%;background:#e9dcd7;display:grid;place-items:center;flex-shrink:0;}
+  .clublogo svg{width:24px;height:24px;}
+  .grp{font-family:var(--serif);font-size:14px;font-weight:500;color:var(--ink);margin:16px 2px 12px;}
+  .grp.tog{display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
+  .grp .car{width:20px;height:20px;stroke:var(--ink);fill:none;stroke-width:2;transition:transform .25s;}
+  .cell{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:16px;padding:12px 16px;box-shadow:var(--shadow);margin-bottom:8px;}
+  .cell .join{margin-left:auto;background:var(--brand-light);border:1px solid var(--brand-border);color:var(--brand);font-size:12px;font-weight:600;padding:6px 14px;border-radius:999px;cursor:pointer;}
+  .cell .badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--brand-light);color:var(--brand);font-size:10px;font-weight:600;display:grid;place-items:center;}
+  .newcell{border:1px dashed var(--brand-border);background:var(--brand-light);box-shadow:var(--shadow-sm);cursor:pointer;}
+  .newcell .plus{width:40px;height:40px;border-radius:50%;border:2px solid var(--brand);display:grid;place-items:center;}
+  .newcell .plus svg{width:20px;height:20px;stroke:var(--brand);fill:none;stroke-width:2;}
+  .collapsewrap{overflow:hidden;transition:max-height .28s ease;max-height:0;}
+  .collapsewrap.open{max-height:320px;}
+
+  /* ===== created / empty chat view ===== */
+  .chatempty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 40px;}
+  .chatempty .bigav{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;font-size:30px;
+    background:linear-gradient(144deg,#1e3e2b 5%,#4fa472 100%);color:#fff;font-family:var(--serif);font-weight:600;margin-bottom:20px;box-shadow:var(--shadow);}
+  .chatempty h2{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);margin:0 0 8px;}
+  .chatempty p{font-size:14px;color:var(--muted);margin:0;line-height:1.5;}
+  .chatempty .pill{margin-top:16px;background:var(--brand-light);color:var(--brand);font-size:12px;font-weight:600;padding:7px 14px;border-radius:999px;}
+  .composer{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:12px 16px 30px;}
+  .composer .field{flex:1;background:var(--field);border-radius:999px;padding:13px 18px;color:#9c9788;font-size:14px;}
+  .composer .send{width:44px;height:44px;border-radius:50%;background:var(--brand);display:grid;place-items:center;flex-shrink:0;}
+  .composer .send svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>New Sub Group — create flow</h1>
+  <p>The missing page behind the "New Sub Group" entry point, laid out left → right: where it starts, the create screen, and where it lands. Matches Sprout tokens (Playfair Display · Inter · #1e3e2b).</p>
+</div>
+
+<div class="row">
+
+  <!-- ============ STEP 1: LIST (entry point) ============ -->
+  <div class="panel">
+    <div class="stepno">1 · Entry point</div>
+    <div class="device fixed">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r">
+          <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+          <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+          <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+        </span></div>
+        <div class="view">
+          <div class="top">
+            <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="tt center"><div class="t">Lincoln School</div><div class="s">4 groups · 100 members</div></div>
+            <div class="ibtn"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div>
+          </div>
+          <div class="body">
+            <div class="grp">Groups you're in</div>
+            <div class="cell">
+              <div class="clublogo"><svg viewBox="0 0 24 24" fill="#2d5c2e"><path d="M12 11c0-2.2-1.8-4-4-4-2.2 0-4 1.8-4 4 0 2.2 1.8 4 4 4M12 11c0-2.2 1.8-4 4-4 2.2 0 4 1.8 4 4 0 2.2-1.8 4-4 4M12 11c2.2 0 4 1.8 4 4 0 2.2-1.8 4-4 4-2.2 0-4-1.8-4-4 0-2.2 1.8-4 4-4M12 11V22" stroke="#2d5c2e" stroke-width="1.6" fill="none"/></svg></div>
+              <div class="mtext"><div class="mn">All First Grade</div><div class="mk">You: Welcome to the club buddy!</div></div>
+            </div>
+            <div class="cell">
+              <div class="mav">MT</div><div class="mtext"><div class="mn">Miss Taylor's Class</div><div class="mk">Albert: Yeah, never felt so great 😄</div></div><span class="badge">5</span>
+            </div>
+            <div class="cell">
+              <div class="mav">MJ</div><div class="mtext"><div class="mn">Miss Jessica's Class</div><div class="mk">Albert: Yeah, never felt so great 😄</div></div><span class="badge">5</span>
+            </div>
+            <div class="grp tog" onclick="toggleJoin()">
+              <span>Groups you can join</span>
+              <svg class="car" id="joinCar" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+            <div class="collapsewrap" id="joinWrap">
+              <div class="cell"><div class="mav">MS</div><div class="mtext"><div class="mn">Miss Sarah's Class</div><div class="mk">Jennifer: Count me in for cupcakes 🧁</div></div><button class="join">Join</button></div>
+              <div class="cell"><div class="mav">AM</div><div class="mtext"><div class="mn">All First Grade Mom's</div><div class="mk">Jessica: Hi Mom's, I'm new here!</div></div><button class="join">Join</button></div>
+              <div class="cell"><div class="mav">AD</div><div class="mtext"><div class="mn">All First Grade Dad's</div><div class="mk">You: Who's up for the World Cup? ⚽</div></div><button class="join">Join</button></div>
+            </div>
+            <div class="cell newcell" style="margin-top:8px">
+              <div class="plus"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+              <div class="mtext"><div class="mn">New Sub Group</div><div class="mk">Hop on the current one or start your own!</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><strong>Tap "New Sub Group" →</strong><br>Caret points down when collapsed. "Taylor" spelling fixed.</div>
+  </div>
+
+  <!-- ============ STEP 2: CREATE PAGE ============ -->
+  <div class="panel">
+    <div class="stepno">2 · Create Sub Group</div>
+    <div class="device">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r">
+          <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+          <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+          <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+        </span></div>
+        <div class="view">
+          <div class="top">
+            <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="tt"><div class="t">New Sub Group</div><div class="s">in All First Grade</div></div>
+            <div class="sp"></div>
+          </div>
+          <div class="body tall">
+            <div class="idrow">
+              <div class="avatar" id="avPrev"><span id="avTxt">＋</span>
+                <div class="cam"><svg viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.2"/></svg></div>
+              </div>
+              <div class="idcol">
+                <input class="nameinput" id="sgName" placeholder="Name this group" oninput="onName()" autocomplete="off">
+                <div class="sub">e.g. Miss Taylor's Class, Soccer Dads</div>
+              </div>
+            </div>
+
+            <div class="sectlbl">Pick an icon <span class="hint">optional</span></div>
+            <div class="emojis" id="emojis">
+              <div class="emo mono on" data-emo="" onclick="pickEmo(this)"><span id="emoMono">AB</span></div>
+              <div class="emo" data-emo="🎒" onclick="pickEmo(this)">🎒</div>
+              <div class="emo" data-emo="⚽" onclick="pickEmo(this)">⚽</div>
+              <div class="emo" data-emo="🧁" onclick="pickEmo(this)">🧁</div>
+              <div class="emo" data-emo="🎨" onclick="pickEmo(this)">🎨</div>
+              <div class="emo" data-emo="📚" onclick="pickEmo(this)">📚</div>
+              <div class="emo" data-emo="👩‍👧" onclick="pickEmo(this)">👩‍👧</div>
+            </div>
+
+            <div class="sectlbl">Quick start <span class="hint">tap to name it</span></div>
+            <div class="chips" id="chips">
+              <div class="chip" onclick="tpl(this,&quot;Miss Taylor's Class&quot;,'')">Class</div>
+              <div class="chip" onclick="tpl(this,'Soccer Dads','⚽')">Dads</div>
+              <div class="chip" onclick="tpl(this,'First Grade Moms','👩‍👧')">Moms</div>
+              <div class="chip" onclick="tpl(this,'Weekend Playdates','🎒')">Playdate</div>
+              <div class="chip" onclick="tpl(this,'Birthday Crew','🧁')">Birthday</div>
+            </div>
+
+            <div class="sectlbl">Add members <span class="cnt" id="memCnt">0 selected</span></div>
+            <div class="search">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+              <input placeholder="Search club members" oninput="filterMems(this.value)">
+            </div>
+            <div class="mlist" id="mlist"></div>
+
+            <div class="sectlbl">Privacy</div>
+            <div class="prow on" data-priv="open" onclick="pickPriv(this)">
+              <div class="pic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18"/></svg></div>
+              <div class="pt"><div class="h">Open</div><div class="d">Anyone in All First Grade can find and join.</div></div>
+              <div class="radio"></div>
+            </div>
+            <div class="prow" data-priv="request" onclick="pickPriv(this)">
+              <div class="pic"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg></div>
+              <div class="pt"><div class="h">Request to join</div><div class="d">You approve who gets in. Group stays private.</div></div>
+              <div class="radio"></div>
+            </div>
+          </div>
+          <div class="cta"><button class="btn" id="createBtn" disabled>Create Sub Group</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><strong>Name → icon → members → privacy.</strong><br>Icon auto-generates from the name, so no repeated club logo.</div>
+  </div>
+
+  <!-- ============ STEP 3: CREATED / EMPTY CHAT ============ -->
+  <div class="panel">
+    <div class="stepno">3 · Created</div>
+    <div class="device fixed">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="sb"><span>9:41</span><span class="r">
+          <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+          <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+          <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+        </span></div>
+        <div class="view">
+          <div class="top">
+            <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="tt center"><div class="t">Miss Taylor's Class</div><div class="s">4 members · you</div></div>
+            <div class="ibtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="6" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="18" r="1.6"/></svg></div>
+          </div>
+          <div class="chatempty">
+            <div class="bigav">MT</div>
+            <h2>You created Miss Taylor's Class 🎉</h2>
+            <p>Say hello and get the conversation started. Members you added can jump in right away.</p>
+            <div class="pill">3 members added</div>
+          </div>
+          <div class="composer">
+            <div class="field">Message the group…</div>
+            <div class="send"><svg viewBox="0 0 24 24"><path d="M4 12l16-7-7 16-2-7z"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><strong>Lands in the new subgroup chat.</strong><br>Empty state prompts the first message.</div>
+  </div>
+
+</div>
+
+<script>
+  var MEMBERS=[
+    {n:"Jessica Nolan",k:"Mom of Albert · 1st"},
+    {n:"Marcus Reed",k:"Dad of Presley · 1st"},
+    {n:"Priya Shah",k:"Mom of Anaya · 1st"},
+    {n:"Daniel Cho",k:"Dad of Ellie · 1st"},
+    {n:"Sofia Ramirez",k:"Mom of Mateo · 1st"},
+    {n:"James Whitfield",k:"Dad of Nora · 1st"},
+    {n:"Aisha Bello",k:"Mom of Zayn · 1st"},
+    {n:"Tom Becker",k:"Dad of Lily · 1st"}
+  ];
+  var sel={}, curEmo="", filter="";
+
+  function ini(n){var p=n.trim().split(/\s+/);if(!p[0])return "AB";return (p[0][0]+(p[1]?p[1][0]:"")).toUpperCase();}
+
+  function renderMems(){
+    var box=document.getElementById('mlist');box.innerHTML="";
+    MEMBERS.forEach(function(m,i){
+      if(filter && (m.n+" "+m.k).toLowerCase().indexOf(filter)<0) return;
+      var d=document.createElement('div');
+      d.className='mrow'+(sel[i]?' sel':'');
+      d.onclick=function(){sel[i]=!sel[i];renderMems();updateBtn();};
+      d.innerHTML='<div class="mav">'+ini(m.n)+'</div>'+
+        '<div class="mtext"><div class="mn">'+m.n+'</div><div class="mk">'+m.k+'</div></div>'+
+        '<div class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>';
+      box.appendChild(d);
+    });
+    var c=Object.keys(sel).filter(function(k){return sel[k];}).length;
+    document.getElementById('memCnt').textContent=c+' selected';
+  }
+  function filterMems(v){filter=v.toLowerCase().trim();renderMems();}
+
+  function onName(){
+    var v=document.getElementById('sgName').value;
+    var mono=v.trim()?ini(v):'AB';
+    document.getElementById('emoMono').textContent=mono;
+    if(!curEmo){document.getElementById('avTxt').textContent=v.trim()?mono:'＋';document.getElementById('avPrev').style.fontSize=v.trim()?'26px':'30px';}
+    updateBtn();
+  }
+  function pickEmo(el){
+    document.querySelectorAll('.emo').forEach(function(e){e.classList.remove('on');});
+    el.classList.add('on');
+    curEmo=el.getAttribute('data-emo');
+    var v=document.getElementById('sgName').value;
+    if(curEmo){document.getElementById('avTxt').textContent=curEmo;document.getElementById('avPrev').style.fontSize='28px';}
+    else{document.getElementById('avTxt').textContent=v.trim()?ini(v):'＋';document.getElementById('avPrev').style.fontSize=v.trim()?'26px':'30px';}
+  }
+  function tpl(el,name,emo){
+    document.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});
+    el.classList.add('on');
+    document.getElementById('sgName').value=name;onName();
+    if(emo){var t=[].slice.call(document.querySelectorAll('.emo')).find(function(e){return e.getAttribute('data-emo')===emo;});if(t)pickEmo(t);}
+  }
+  function pickPriv(el){document.querySelectorAll('.prow').forEach(function(p){p.classList.remove('on');});el.classList.add('on');}
+  function updateBtn(){document.getElementById('createBtn').disabled=document.getElementById('sgName').value.trim().length===0;}
+
+  function toggleJoin(){
+    var w=document.getElementById('joinWrap');w.classList.toggle('open');
+    document.getElementById('joinCar').style.transform=w.classList.contains('open')?'rotate(180deg)':'rotate(0deg)';
+  }
+
+  /* pre-fill create step so it reviews as a realistic filled state */
+  (function(){
+    renderMems();
+    document.getElementById('sgName').value="Miss Taylor's Class";onName();
+    sel[0]=true;sel[1]=true;sel[3]=true;renderMems();updateBtn();
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Sprout – Generate Image v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --brand:    #186338;
+  --brand-d:  #145530;
+  --brand-dd: #1e3e2b;
+  --brand-l:  #e2e9e3;
+  --bg:       #f4f1ea;
+  --s1:       #eae6db;
+  --s2:       #dbd5c8;
+  --tp:       #4d525b;
+  --ts:       #818898;
+  --tt:       #b3b8c1;
+  --border:   rgba(0,0,0,.07);
+  --white:    #ffffff;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(140deg, #aca49a 0%, #c9c2b4 50%, #a9a296 100%);
+  display: flex; flex-direction: column;
+  align-items: center; padding: 52px 0 80px; gap: 20px;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+/* ── STATE SWITCHER ── */
+.state-bar {
+  display: flex; align-items: center; gap: 4px;
+  background: rgba(255,255,255,.12); backdrop-filter: blur(12px);
+  border-radius: 14px; padding: 4px;
+}
+.state-btn {
+  padding: 6px 14px; border-radius: 10px; border: none; cursor: pointer;
+  font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,.55);
+  background: transparent; transition: all .2s; white-space: nowrap;
+  font-family: 'Inter', sans-serif;
+}
+.state-btn.active { background: rgba(255,255,255,.18); color: #fff; }
+
+/* ── PHONE ── */
+.phone {
+  width: 393px; height: 852px;
+  border-radius: 54px; overflow: hidden; position: relative;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.12),
+    0 0 0 10px #1c1c1e, 0 0 0 12px #2c2c2e,
+    0 60px 130px rgba(0,0,0,.55);
+}
+.phone::before {
+  content:''; position:absolute; left:-13px; top:120px;
+  width:4px; height:32px; background:#2a2a2a; border-radius:2px 0 0 2px;
+  box-shadow:0 44px 0 #2a2a2a,0 88px 0 #2a2a2a; z-index:200;
+}
+.phone::after {
+  content:''; position:absolute; right:-13px; top:148px;
+  width:4px; height:66px; background:#2a2a2a; border-radius:0 2px 2px 0; z-index:200;
+}
+.island {
+  position:absolute; top:14px; left:50%; transform:translateX(-50%);
+  width:120px; height:34px; background:#0a0a0a; border-radius:18px; z-index:150; pointer-events:none;
+}
+
+/* ── FULL SCREEN LAYOUT ── */
+.screen-root {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  background: #a8c8a0; /* sky/park bg fallback */
+}
+
+/* ── IMAGE AREA ── */
+.img-area {
+  position: absolute; inset: 0;
+  overflow: hidden;
+  transition: filter .6s ease;
+}
+
+/* Default: park/city scene matching the screenshot */
+.img-area .img-scene {
+  position: absolute; inset: 0;
+  background:
+    /* sky */
+    linear-gradient(180deg, #87CEEB 0%, #B0D8F5 35%, #c8e6a0 55%, #4a8c3a 65%, #2d6b22 100%);
+  transition: opacity .5s;
+}
+/* Buildings silhouette */
+.img-area .img-scene::before {
+  content: '';
+  position: absolute;
+  bottom: 36%; left: 50%; transform: translateX(-50%);
+  width: 200px; height: 140px;
+  background:
+    /* center tall building */
+    linear-gradient(180deg, #c8d4e0 0%, #b0bece 100%) 80px 0 / 40px 140px no-repeat,
+    linear-gradient(180deg, #d0dae6 0%, #b8c6d4 100%) 110px 20px / 30px 120px no-repeat,
+    linear-gradient(180deg, #b8c8d6 0%, #a0b2c2 100%) 50px 10px / 35px 130px no-repeat;
+}
+/* Trees */
+.img-area .img-scene::after {
+  content: '';
+  position: absolute;
+  bottom: 34%; left: 0; right: 0; height: 80px;
+  background: linear-gradient(180deg, #3a7d30 0%, #2d6022 60%, #1e4a16 100%);
+  clip-path: polygon(
+    0% 100%, 0% 60%, 3% 40%, 6% 60%, 8% 30%, 12% 55%, 14% 20%, 18% 50%,
+    20% 25%, 24% 55%, 27% 15%, 31% 50%, 34% 30%, 38% 55%, 40% 20%,
+    44% 50%, 47% 10%, 51% 45%, 54% 25%, 58% 55%, 61% 20%, 65% 50%,
+    68% 30%, 72% 55%, 75% 15%, 79% 50%, 82% 25%, 86% 55%, 89% 35%,
+    93% 55%, 96% 40%, 100% 60%, 100% 100%
+  );
+}
+
+/* Ground / grass */
+.img-grass {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 35%;
+  background: linear-gradient(180deg, #5a9e48 0%, #3d7a2e 40%, #2d5e20 100%);
+}
+
+/* Generating state overlay */
+.img-gen-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, #0f2415 0%, #1a3520 50%, #0a1a0e 100%);
+  opacity: 0;
+  transition: opacity .5s ease;
+  display: flex; align-items: center; justify-content: center;
+}
+.img-gen-overlay.visible { opacity: 1; }
+
+/* Result image */
+.img-result-overlay {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 60%, rgba(40,100,60,.5) 0%, transparent 60%),
+    linear-gradient(155deg, #1d4f32 0%, #0f2e1c 40%, #0a1f13 70%, #1a3520 100%);
+  opacity: 0;
+  transition: opacity .6s ease;
+}
+.img-result-overlay.visible { opacity: 1; }
+.img-result-overlay::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 30% at 30% 80%, rgba(30,80,45,.6) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 25% at 70% 75%, rgba(20,60,35,.5) 0%, transparent 50%);
+}
+
+/* Status bar */
+.sb {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 26px 0; height: 52px;
+}
+.sb-time { font-size: 15px; font-weight: 600; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.3); }
+.sb-icons { display: flex; align-items: center; gap: 6px; }
+
+/* Back button */
+.back-chip {
+  position: absolute; top: 58px; left: 16px; z-index: 50;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,.22); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.3);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s;
+}
+.back-chip:active { background: rgba(255,255,255,.35); transform: scale(.92); }
+
+/* Result badge */
+.result-badge {
+  position: absolute; top: 58px; right: 16px; z-index: 50;
+  background: rgba(24,99,56,.85); backdrop-filter: blur(10px);
+  border: 1px solid rgba(24,99,56,.5); border-radius: 99px;
+  padding: 5px 12px; font-size: 11px; font-weight: 700; color: #fff;
+  display: flex; align-items: center; gap: 5px;
+  opacity: 0; transform: translateY(-4px);
+  transition: all .4s ease .2s;
+}
+.result-badge.show { opacity: 1; transform: translateY(0); }
+
+/* ── BOTTOM SHEET ── */
+.sheet {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: var(--bg);
+  border-radius: 28px 28px 0 0;
+  display: flex; flex-direction: column;
+  transition: height .4s cubic-bezier(.25,.46,.45,.94);
+  z-index: 10;
+  /* Default height */
+  height: 54%;
+}
+
+/* drag pill */
+.sheet-pill {
+  width: 36px; height: 4px; border-radius: 99px;
+  background: var(--s2); margin: 10px auto 0;
+  flex-shrink: 0;
+}
+
+/* Sheet title */
+.sheet-title {
+  font-size: 15px; font-weight: 600; color: var(--tp);
+  text-align: center; padding: 12px 0 0;
+  flex-shrink: 0; transition: all .3s;
+}
+
+/* ── CONTENT AREA (the big empty space) ── */
+.sheet-content {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 0 24px; gap: 16px; overflow: hidden;
+  position: relative;
+}
+
+/* ── DEFAULT STATE: ghost hint ── */
+.hint-idle {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  opacity: 1; transition: opacity .3s;
+}
+.hint-idle-icon {
+  width: 56px; height: 56px; border-radius: 18px;
+  background: var(--s1);
+  display: flex; align-items: center; justify-content: center;
+}
+.hint-idle-text {
+  font-size: 13.5px; color: var(--tt); text-align: center; line-height: 1.55;
+}
+.hint-idle-text strong { color: var(--ts); font-weight: 600; }
+
+/* ── VOICE STATE: waveform + transcript ── */
+.voice-vis {
+  display: none; flex-direction: column; align-items: center; gap: 18px; width: 100%;
+}
+.voice-vis.show { display: flex; }
+
+.voice-ring-wrap {
+  position: relative; width: 100px; height: 100px;
+  display: flex; align-items: center; justify-content: center;
+}
+.v-ring {
+  position: absolute; border-radius: 50%;
+  border: 1.5px solid rgba(24,99,56,.25);
+  animation: vRing 1.6s ease-out infinite;
+}
+.v-ring-1 { inset: 0;    animation-delay: 0s; }
+.v-ring-2 { inset: -14px; animation-delay: .4s; }
+.v-ring-3 { inset: -28px; animation-delay: .8s; }
+@keyframes vRing {
+  0%   { opacity: 0; transform: scale(.7); }
+  35%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+.v-orb {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(42,120,72,.9), var(--brand));
+  box-shadow: 0 0 0 10px rgba(24,99,56,.1), 0 16px 48px rgba(24,99,56,.35);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 2;
+  animation: orbBreath 1.4s ease-in-out infinite;
+}
+@keyframes orbBreath {
+  0%,100% { transform: scale(1); box-shadow: 0 0 0 10px rgba(24,99,56,.1), 0 16px 48px rgba(24,99,56,.3); }
+  50%      { transform: scale(1.06); box-shadow: 0 0 0 16px rgba(24,99,56,.15), 0 20px 60px rgba(24,99,56,.45); }
+}
+
+.waveform {
+  display: flex; align-items: center; gap: 3px; height: 36px;
+}
+.w-bar {
+  width: 4px; border-radius: 99px; background: var(--brand);
+  animation: wBar 1s ease-in-out infinite;
+}
+.w-bar:nth-child(1)  { height:8px;  animation-delay:.00s; }
+.w-bar:nth-child(2)  { height:18px; animation-delay:.08s; }
+.w-bar:nth-child(3)  { height:28px; animation-delay:.16s; }
+.w-bar:nth-child(4)  { height:36px; animation-delay:.12s; }
+.w-bar:nth-child(5)  { height:24px; animation-delay:.20s; }
+.w-bar:nth-child(6)  { height:32px; animation-delay:.06s; }
+.w-bar:nth-child(7)  { height:20px; animation-delay:.18s; }
+.w-bar:nth-child(8)  { height:14px; animation-delay:.10s; }
+.w-bar:nth-child(9)  { height:22px; animation-delay:.14s; }
+.w-bar:nth-child(10) { height:30px; animation-delay:.04s; }
+.w-bar:nth-child(11) { height:16px; animation-delay:.22s; }
+.w-bar:nth-child(12) { height:10px; animation-delay:.02s; }
+@keyframes wBar {
+  0%,100% { transform: scaleY(1);   opacity: .5; }
+  50%      { transform: scaleY(1.5); opacity: 1; }
+}
+
+.voice-transcript {
+  font-size: 14px; color: var(--ts); text-align: center;
+  line-height: 1.55; font-style: italic; min-height: 44px;
+  max-width: 280px;
+}
+.voice-tap-hint {
+  font-size: 12px; color: var(--tt);
+}
+
+/* ── GENERATING STATE ── */
+.gen-vis {
+  display: none; flex-direction: column; align-items: center; gap: 14px; width: 100%;
+}
+.gen-vis.show { display: flex; }
+
+.gen-status-pill {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--brand-l); border-radius: 99px; padding: 7px 16px;
+}
+.gen-pulse-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--brand);
+  animation: pulseDot 1.2s ease-in-out infinite;
+}
+@keyframes pulseDot {
+  0%,100% { opacity: .4; transform: scale(.8); }
+  50%      { opacity: 1;  transform: scale(1.3); }
+}
+.gen-status-text { font-size: 13px; font-weight: 600; color: var(--brand); }
+
+.gen-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 700; color: var(--brand-dd);
+  text-align: center;
+}
+.gen-sub {
+  font-size: 12.5px; color: var(--ts); text-align: center; line-height: 1.55; max-width: 260px;
+}
+.gen-dots {
+  display: flex; gap: 7px;
+}
+.gen-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--brand-l);
+  animation: dotPop 1.4s ease-in-out infinite;
+}
+.gen-dot:nth-child(1) { animation-delay: 0s; }
+.gen-dot:nth-child(2) { animation-delay: .2s; }
+.gen-dot:nth-child(3) { animation-delay: .4s; }
+@keyframes dotPop {
+  0%,80%,100% { background: var(--brand-l); transform: scale(1); }
+  40%          { background: var(--brand);   transform: scale(1.5); }
+}
+
+/* ── RESULT STATE ── */
+.result-vis {
+  display: none; flex-direction: column; align-items: center; gap: 14px; width: 100%;
+}
+.result-vis.show { display: flex; }
+
+.result-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 700; color: var(--brand-dd); text-align: center;
+}
+.result-sub {
+  font-size: 13px; color: var(--ts); text-align: center; line-height: 1.55; max-width: 270px;
+}
+.result-actions {
+  display: flex; gap: 8px; width: 100%;
+}
+.result-use-btn {
+  flex: 1; height: 48px; background: var(--brand); border: none; border-radius: 14px;
+  color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-family: 'Inter', sans-serif; transition: all .15s;
+}
+.result-use-btn:active { background: var(--brand-d); transform: scale(.97); }
+.result-retry-btn {
+  height: 48px; padding: 0 16px; background: var(--s1); border: none; border-radius: 14px;
+  color: var(--brand); font-size: 14px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-family: 'Inter', sans-serif; transition: all .15s; white-space: nowrap;
+}
+.result-retry-btn:active { background: var(--s2); transform: scale(.97); }
+
+/* ── INPUT BAR ── */
+.input-bar {
+  padding: 10px 16px 32px;
+  display: flex; align-items: flex-end; gap: 10px;
+  flex-shrink: 0;
+}
+.input-field-wrap {
+  flex: 1; background: var(--s1);
+  border-radius: 22px; padding: 11px 14px;
+  min-height: 46px; display: flex; align-items: center;
+  border: 1.5px solid transparent; transition: border-color .2s;
+}
+.input-field-wrap:focus-within { border-color: rgba(24,99,56,.3); background: var(--white); }
+.input-field {
+  flex: 1; background: transparent; border: none; outline: none;
+  font-size: 14px; color: var(--tp); font-family: 'Inter', sans-serif;
+  resize: none; line-height: 1.4;
+}
+.input-field::placeholder { color: var(--tt); }
+
+.mic-btn {
+  width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+  background: var(--brand-dd); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s; box-shadow: 0 2px 12px rgba(24,99,56,.25);
+}
+.mic-btn:active { transform: scale(.92); }
+.mic-btn.recording {
+  background: #b91c1c;
+  box-shadow: 0 2px 12px rgba(185,28,28,.4);
+  animation: micPulse .8s ease-in-out infinite;
+}
+@keyframes micPulse {
+  0%,100% { box-shadow: 0 2px 12px rgba(185,28,28,.4); }
+  50%      { box-shadow: 0 2px 24px rgba(185,28,28,.7), 0 0 0 6px rgba(185,28,28,.15); }
+}
+
+.send-btn {
+  width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+  background: var(--brand-dd); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s; box-shadow: 0 2px 12px rgba(24,99,56,.25);
+}
+.send-btn:active { transform: scale(.92); background: var(--brand-d); }
+.send-btn.dim { background: var(--s2); box-shadow: none; pointer-events: none; }
+
+/* ── TOAST ── */
+.toast {
+  position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%) translateY(16px);
+  background: rgba(24,99,56,.95); backdrop-filter: blur(12px);
+  color: #fff; font-size: 13px; font-weight: 600;
+  padding: 10px 20px; border-radius: 99px; white-space: nowrap;
+  opacity: 0; transition: all .3s; z-index: 300; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+</style>
+</head>
+<body>
+
+<!-- State switcher -->
+<div class="state-bar">
+  <button class="state-btn active" onclick="setState('idle')">Default</button>
+  <button class="state-btn" onclick="setState('voice')">🎤 Voice</button>
+  <button class="state-btn" onclick="setState('generating')">⏳ Generating</button>
+  <button class="state-btn" onclick="setState('result')">✓ Result</button>
+</div>
+
+<div class="phone">
+  <div class="island"></div>
+
+  <div class="screen-root">
+
+    <!-- Image area (full bleed) -->
+    <div class="img-area" id="imgArea">
+      <div class="img-scene" id="imgScene"></div>
+      <div class="img-grass"></div>
+      <!-- Generating overlay (dark pulsing) -->
+      <div class="img-gen-overlay" id="genOverlay">
+        <!-- Pulsing orb in image area -->
+        <div style="position:relative;display:flex;align-items:center;justify-content:center;width:120px;height:120px">
+          <div style="position:absolute;width:180px;height:180px;border-radius:50%;border:1px solid rgba(24,99,56,.25);animation:genRingBig 3s ease-out infinite"></div>
+          <div style="position:absolute;width:140px;height:140px;border-radius:50%;border:1px solid rgba(24,99,56,.3);animation:genRingBig 3s ease-out infinite .7s"></div>
+          <div style="width:80px;height:80px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(42,120,72,.7),rgba(24,99,56,.4));animation:genOrbPulse 2s ease-in-out infinite;box-shadow:0 0 40px rgba(24,99,56,.4),0 0 80px rgba(24,99,56,.2)"></div>
+        </div>
+      </div>
+      <!-- Result overlay -->
+      <div class="img-result-overlay" id="resultOverlay"></div>
+    </div>
+
+    <!-- Status bar -->
+    <div class="sb">
+      <span class="sb-time">9:41</span>
+      <div class="sb-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#fff"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#fff"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#fff"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#fff" opacity=".4"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#fff"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#fff" stroke-width="1.3" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#fff" stroke-width="1.3" fill="none"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity=".5"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#fff"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#fff" fill-opacity=".5"/></svg>
+      </div>
+    </div>
+
+    <!-- Back button -->
+    <div class="back-chip" onclick="showToast('Going back…')">
+      <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8 2L2 8l6 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <!-- Result badge -->
+    <div class="result-badge" id="resultBadge">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1.5 5.5l3 3 5-5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Generated ✦
+    </div>
+
+    <!-- Bottom Sheet -->
+    <div class="sheet" id="sheet">
+      <div class="sheet-pill"></div>
+      <div class="sheet-title" id="sheetTitle">Generate Image</div>
+
+      <!-- Content area -->
+      <div class="sheet-content">
+
+        <!-- IDLE: hint -->
+        <div class="hint-idle" id="hintIdle">
+          <div class="hint-idle-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <path d="M14 4C8.48 4 4 8.48 4 14s4.48 10 10 10 10-4.48 10-10S19.52 4 14 4z" stroke="#b3b8c1" stroke-width="1.4" fill="none"/>
+              <path d="M14 9v5l3 3" stroke="#b3b8c1" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="hint-idle-text">
+            Tap <strong>🎤</strong> to describe your image with voice,<br>or type a prompt below.
+          </div>
+        </div>
+
+        <!-- VOICE: orb + waveform -->
+        <div class="voice-vis" id="voiceVis">
+          <div class="voice-ring-wrap">
+            <div class="v-ring v-ring-1"></div>
+            <div class="v-ring v-ring-2"></div>
+            <div class="v-ring v-ring-3"></div>
+            <div class="v-orb">
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <rect x="12" y="4" width="12" height="20" rx="6" fill="rgba(255,255,255,.95)"/>
+                <path d="M6 20c0 6.63 5.37 12 12 12s12-5.37 12-12" stroke="rgba(255,255,255,.95)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+                <path d="M18 32v3" stroke="rgba(255,255,255,.95)" stroke-width="2.2" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="waveform">
+            <div class="w-bar"></div><div class="w-bar"></div><div class="w-bar"></div>
+            <div class="w-bar"></div><div class="w-bar"></div><div class="w-bar"></div>
+            <div class="w-bar"></div><div class="w-bar"></div><div class="w-bar"></div>
+            <div class="w-bar"></div><div class="w-bar"></div><div class="w-bar"></div>
+          </div>
+          <div class="voice-transcript" id="voiceTranscript">Listening…</div>
+          <div class="voice-tap-hint">Tap mic to stop</div>
+        </div>
+
+        <!-- GENERATING -->
+        <div class="gen-vis" id="genVis">
+          <div class="gen-status-pill">
+            <div class="gen-pulse-dot"></div>
+            <span class="gen-status-text" id="genStatusLabel">Generating your image…</span>
+          </div>
+          <div class="gen-heading">Working on it</div>
+          <div class="gen-sub">Turning your description into a beautiful event cover. Usually takes 10–15 seconds.</div>
+          <div class="gen-dots">
+            <div class="gen-dot"></div>
+            <div class="gen-dot"></div>
+            <div class="gen-dot"></div>
+          </div>
+        </div>
+
+        <!-- RESULT -->
+        <div class="result-vis" id="resultVis">
+          <div class="result-heading">Here's your cover 🎉</div>
+          <div class="result-sub">Looking good! Use this or describe something different to try again.</div>
+          <div class="result-actions">
+            <button class="result-use-btn" onclick="useImage()">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1.5 7l4 4 7-7" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Use This Image
+            </button>
+            <button class="result-retry-btn" onclick="setState('idle')">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7A5 5 0 0 1 12 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 4v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Retry
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Input bar -->
+      <div class="input-bar">
+        <button class="mic-btn" id="micBtn" onclick="toggleMic()">
+          <!-- Mic icon (default) -->
+          <svg id="micIcon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect x="7" y="2" width="6" height="11" rx="3" fill="#fff"/>
+            <path d="M3 10c0 3.86 3.13 7 7 7s7-3.14 7-7" stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+            <path d="M10 17v2" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <!-- Stop icon (recording) -->
+          <svg id="stopIcon" width="18" height="18" viewBox="0 0 18 18" fill="none" style="display:none">
+            <rect x="4" y="4" width="10" height="10" rx="2" fill="#fff"/>
+          </svg>
+        </button>
+
+        <div class="input-field-wrap">
+          <textarea class="input-field" id="promptField" rows="1"
+            placeholder="Generate a cool event cover"
+            oninput="onInput(this)"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendText()}"
+          ></textarea>
+        </div>
+
+        <button class="send-btn dim" id="sendBtn" onclick="sendText()">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M9 15V3M3 9l6-6 6 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+    </div><!-- /sheet -->
+
+    <div class="toast" id="toast"></div>
+
+  </div><!-- /screen-root -->
+</div><!-- /phone -->
+
+<style>
+@keyframes genRingBig {
+  0%   { opacity:0; transform:scale(.6); }
+  35%  { opacity:.8; }
+  100% { opacity:0; transform:scale(1.1); }
+}
+@keyframes genOrbPulse {
+  0%,100% { transform:scale(1);   box-shadow:0 0 40px rgba(24,99,56,.4),0 0 80px rgba(24,99,56,.2); }
+  50%      { transform:scale(1.2); box-shadow:0 0 60px rgba(24,99,56,.6),0 0 120px rgba(24,99,56,.3); }
+}
+</style>
+
+<script>
+// ── STATE MACHINE ──────────────────────────────────────────────
+let appState = 'idle';
+let micActive = false;
+let voiceTimer = null;
+let genTimer = null;
+
+const TRANSCRIPT_STEPS = [
+  'Listening…',
+  '"A sunny golf course…"',
+  '"A sunny golf course at golden hour…"',
+  '"A sunny golf course at golden hour, lush green fairways"',
+];
+const GEN_STAGES = [
+  'Analysing your prompt…',
+  'Generating your image…',
+  'Adding finishing touches…',
+  'Almost there…',
+];
+
+function setState(s) {
+  appState = s;
+
+  // Update state bar buttons
+  document.querySelectorAll('.state-btn').forEach(b => {
+    const map = { idle:'Default', voice:'🎤 Voice', generating:'⏳ Generating', result:'✓ Result' };
+    b.classList.toggle('active', b.textContent.trim() === (map[s] || s));
+  });
+
+  // Reset mic
+  clearTimeout(voiceTimer);
+  clearTimeout(genTimer);
+  micActive = false;
+  updateMicUI();
+
+  // Sheet title
+  const titles = { idle:'Generate Image', voice:'Listening…', generating:'Generating', result:'Your Cover' };
+  document.getElementById('sheetTitle').textContent = titles[s] || 'Generate Image';
+
+  // Show/hide content panels
+  document.getElementById('hintIdle').style.opacity   = s === 'idle' ? '1' : '0';
+  document.getElementById('hintIdle').style.pointerEvents = s === 'idle' ? '' : 'none';
+  document.getElementById('voiceVis').classList.toggle('show',      s === 'voice');
+  document.getElementById('genVis').classList.toggle('show',        s === 'generating');
+  document.getElementById('resultVis').classList.toggle('show',     s === 'result');
+
+  // Image area overlays
+  document.getElementById('genOverlay').classList.toggle('visible',    s === 'generating');
+  document.getElementById('resultOverlay').classList.toggle('visible', s === 'result');
+  document.getElementById('imgScene').style.opacity = (s === 'generating' || s === 'result') ? '0' : '1';
+  document.querySelector('.img-grass').style.opacity = (s === 'generating' || s === 'result') ? '0' : '1';
+
+  // Result badge
+  document.getElementById('resultBadge').classList.toggle('show', s === 'result');
+
+  // Input bar dimming
+  document.querySelector('.input-bar').style.opacity = s === 'generating' ? '.4' : '1';
+  document.querySelector('.input-bar').style.pointerEvents = s === 'generating' ? 'none' : '';
+
+  // Sheet height
+  const heights = { idle:'54%', voice:'58%', generating:'52%', result:'52%' };
+  document.getElementById('sheet').style.height = heights[s] || '54%';
+
+  // If generating, cycle labels then auto-advance to result
+  if (s === 'generating') {
+    let step = 0;
+    const el = document.getElementById('genStatusLabel');
+    el.textContent = GEN_STAGES[0];
+    genTimer = setInterval(() => {
+      step++;
+      if (step < GEN_STAGES.length) {
+        el.textContent = GEN_STAGES[step];
+      } else {
+        clearInterval(genTimer);
+        setState('result');
+      }
+    }, 1800);
+  }
+
+  // If voice, animate transcript then auto-go to generating
+  if (s === 'voice') {
+    let step = 0;
+    const el = document.getElementById('voiceTranscript');
+    el.textContent = TRANSCRIPT_STEPS[0];
+    voiceTimer = setInterval(() => {
+      step++;
+      if (step < TRANSCRIPT_STEPS.length) {
+        el.textContent = TRANSCRIPT_STEPS[step];
+      } else {
+        clearInterval(voiceTimer);
+        // Fill input with transcript
+        const field = document.getElementById('promptField');
+        field.value = 'A sunny golf course at golden hour, lush green fairways';
+        onInput(field);
+        setTimeout(() => setState('generating'), 500);
+      }
+    }, 1200);
+  }
+}
+
+// ── MIC BUTTON ──────────────────────────────────────────────────
+function toggleMic() {
+  if (appState === 'voice') {
+    // Stop → go to generating
+    setState('generating');
+  } else {
+    setState('voice');
+    micActive = true;
+    updateMicUI();
+  }
+}
+
+function updateMicUI() {
+  const btn = document.getElementById('micBtn');
+  const mic = document.getElementById('micIcon');
+  const stop = document.getElementById('stopIcon');
+  const isVoice = appState === 'voice';
+  btn.classList.toggle('recording', isVoice);
+  mic.style.display  = isVoice ? 'none' : '';
+  stop.style.display = isVoice ? '' : 'none';
+}
+
+// ── TEXT INPUT ───────────────────────────────────────────────────
+function onInput(el) {
+  // Auto-resize
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+  // Enable/dim send button
+  const hasText = el.value.trim().length > 0;
+  const sendBtn = document.getElementById('sendBtn');
+  sendBtn.classList.toggle('dim', !hasText);
+}
+
+function sendText() {
+  const val = document.getElementById('promptField').value.trim();
+  if (!val) return;
+  setState('generating');
+}
+
+// ── USE IMAGE ────────────────────────────────────────────────────
+function useImage() {
+  showToast('✓ Cover image updated');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// Init
+setState('idle');
+</script>
+</body>
+</html>

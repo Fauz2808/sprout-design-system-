@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Subgroup — Manage / Delete / Leave · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff; --field:#e8e2d6;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e; --green:#186338; --brand-mid:#4fa472;
+    --brand-light:#e2e9e3; --brand-border:#77b691; --border-light:#d0dacf; --border:#e6e7ea;
+    --neg:#cf4a4a; --neg-bold:#802929; --neg-subtle:#f7dada; --neg-light-bg:#f6dcdc; --neg-light-tx:#b3352f; --neg-light-bd:#eec7c7;
+    --shadow-m:1px 4px 25px rgba(13,13,18,.05); --shadow-l:1px 4px 25px rgba(13,13,18,.12);
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:22px 40px;padding:40px 22px 60px;}
+  .lede{flex:1 0 100%;text-align:center;max-width:760px;margin:0 auto 6px;}
+  .lede h1{font-family:var(--serif);font-weight:600;font-size:23px;color:#23271f;margin:0 0 5px;}
+  .lede p{font-size:12.5px;color:#6a665b;margin:0;line-height:1.5;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:11px;}
+  .cap{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:300px;line-height:1.5;}
+  .cap b{color:#3a3830;}
+  .ph{display:inline-block;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+
+  .device{position:relative;width:340px;height:718px;border-radius:48px;padding:9px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 2px #000 inset,0 22px 46px -14px rgba(0,0,0,.45);}
+  .island{position:absolute;top:17px;left:50%;transform:translateX(-50%);width:104px;height:29px;background:#000;border-radius:999px;z-index:60;}
+  .screen{position:relative;width:100%;height:100%;border-radius:39px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .sb{flex:0 0 40px;padding:14px 22px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:13px;font-weight:600;color:var(--ink);}
+  .sb .r{display:inline-flex;gap:5px;align-items:center;} .sb svg{width:15px;height:10px;fill:var(--ink);} .sb .bat{width:22px;}
+
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:2px 10px 8px;}
+  .top .ib{width:34px;height:34px;display:grid;place-items:center;color:var(--ink);flex-shrink:0;}
+  .top .ib .ph{width:22px;height:22px;}
+  .top .h{flex:1;text-align:center;font-family:var(--serif);font-weight:500;font-size:15px;color:var(--ink);}
+  .top .sp{width:34px;}
+
+  .body{flex:1;overflow-y:auto;padding:0 0 20px;}
+  .body::-webkit-scrollbar{display:none;}
+
+  /* identity */
+  .idb{display:flex;flex-direction:column;align-items:center;text-align:center;padding:6px 16px 16px;}
+  .idb .av{width:80px;height:80px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:30px;background:linear-gradient(145deg,#1e3e2b,#4fa472);box-shadow:var(--shadow-m);}
+  .idb .av.club{background:#e9dcd7;color:#2d5c2e;}
+  .idb .nm{font-family:var(--serif);font-weight:600;font-size:19px;color:var(--ink);margin-top:12px;}
+  .idb .mt{font-size:12px;color:var(--muted);margin-top:3px;}
+
+  .sect{margin:8px 12px 0;}
+  .sect .lbl{font-family:var(--sans);font-weight:600;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:0 6px 7px;}
+  .group{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-m);}
+  .row{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;border-bottom:1px solid var(--border);}
+  .row:last-child{border-bottom:none;}
+  .row .ic{width:22px;height:22px;color:var(--ink);flex-shrink:0;}
+  .row .tx{flex:1;font-family:var(--sans);font-weight:500;font-size:14px;color:var(--body);}
+  .row .val{font-size:13px;color:var(--muted);}
+  .row .cr{width:16px;height:16px;color:#c3bdae;}
+  .row.danger .ic,.row.danger .tx{color:var(--neg);}
+
+  /* member row */
+  .mrow{display:flex;align-items:center;gap:11px;padding:10px 14px;border-bottom:1px solid var(--border);}
+  .mrow:last-child{border-bottom:none;}
+  .mav{width:38px;height:38px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:13px;background:linear-gradient(145deg,#1e3e2b,#4fa472);}
+  .mrow .mn{flex:1;min-width:0;}
+  .mrow .mn .n{font-family:var(--sans);font-weight:500;font-size:14px;color:var(--ink);}
+  .mrow .mn .k{font-size:11.5px;color:var(--muted);margin-top:1px;}
+  .tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:3px;}
+  .tag.admin{background:var(--brand-light);color:var(--green);}
+  .tag .ph{width:11px;height:11px;}
+  .addrow .ic{color:var(--green);} .addrow .tx{color:var(--green);font-weight:600;}
+  .lockednote{display:flex;align-items:center;gap:8px;padding:11px 14px;font-size:12px;color:var(--muted);background:var(--card);border-radius:16px;box-shadow:var(--shadow-m);}
+  .lockednote .ph{width:16px;height:16px;color:var(--muted);flex-shrink:0;}
+
+  /* ===== confirm sheet ===== */
+  .dim{position:absolute;inset:0;background:rgba(20,20,18,.45);z-index:40;}
+  .sheet{position:absolute;left:10px;right:10px;bottom:10px;z-index:50;background:var(--card);border-radius:26px;padding:22px 20px 16px;box-shadow:0 -8px 30px rgba(0,0,0,.2);text-align:center;}
+  .sheet .badge{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;}
+  .sheet .badge.neg{background:var(--neg-subtle);color:var(--neg);}
+  .sheet .badge.warn{background:#f6ecd1;color:#7f600e;}
+  .sheet .badge .ph{width:28px;height:28px;}
+  .sheet h2{font-family:var(--serif);font-weight:600;font-size:19px;color:var(--ink);margin:0 0 8px;}
+  .sheet p{font-size:13px;color:var(--body);line-height:1.5;margin:0 0 18px;}
+  .sheet p b{color:var(--ink);}
+  .btn{width:100%;border:none;border-radius:14px;padding:14px;font-family:var(--sans);font-weight:600;font-size:15px;cursor:pointer;margin-bottom:9px;}
+  .btn.del{background:var(--neg-light-bg);color:var(--neg-light-tx);border:1px solid var(--neg-light-bd);box-shadow:none;}
+  .btn.leave{background:var(--ink);color:#fff;}
+  .btn.ghost{background:transparent;color:var(--muted);margin-bottom:0;}
+</style>
+</head>
+<body>
+<div class="lede">
+  <h1>Subgroup — Manage · Delete · Leave</h1>
+  <p>Aturan: <b>admin bisa delete subgroup</b> (mis. Miss Taylor's Class), tapi <b>tidak bisa delete club bawaan</b> (First Grade). Semua member bisa <b>leave</b>. Icon Phosphor + token asli.</p>
+</div>
+
+<!-- ===== 1. MANAGE (ADMIN, SUBGROUP) ===== -->
+<div class="panel">
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r">
+      <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+      <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+    </span></div>
+    <div class="top">
+      <div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+      <div class="h">Group Info</div>
+      <div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="m227.31 73.37-44.68-44.69a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63M92.69 208H48v-44.69l88-88L180.69 120ZM192 108.68 147.31 64l24-24L216 84.68Z"/></svg></span></div>
+    </div>
+    <div class="body">
+      <div class="idb">
+        <div class="av">MT</div>
+        <div class="nm">Miss Taylor's Class</div>
+        <div class="mt">Subgroup · All First Grade · 22 members</div>
+      </div>
+
+      <div class="sect">
+        <div class="group">
+          <div class="row"><span class="ic ph"><svg viewBox="0 0 256 256"><path d="M168 224a8 8 0 0 1-8 8H96a8 8 0 1 1 0-16h64a8 8 0 0 1 8 8m53.85-32a15.8 15.8 0 0 1-13.85 8H48a16 16 0 0 1-13.8-24.06C39.75 166.38 48 139.34 48 104a80 80 0 1 1 160 0c0 35.33 8.26 62.38 13.81 71.94a15.89 15.89 0 0 1 .03 16.06ZM208 184c-7.73-13.27-16-43.95-16-80a64 64 0 1 0-128 0c0 36.06-8.28 66.74-16 80Z"/></svg></span><span class="tx">Notifications</span><span class="val">On</span></div>
+          <div class="row"><span class="ic ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224h1.13a15.93 15.93 0 0 0 11.64-6.33c19.64-26.1 17.75-47.32 13.19-60L235.33 104a16 16 0 0 0-.01-22.63M224 92.69l-57.27 57.46a8 8 0 0 0-1.49 9.22c9.46 18.93-1.8 38.59-9.34 48.62L48 100.08c12.08-9.74 23.64-12.31 32.48-12.31A40.1 40.1 0 0 1 96.81 91a8 8 0 0 0 9.25-1.51L163.32 32 224 92.68Z"/></svg></span><span class="tx">Pinned messages</span><span class="cr ph"><svg viewBox="0 0 256 256"><path d="m181.66 133.66-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32"/></svg></span></div>
+        </div>
+      </div>
+
+      <div class="sect">
+        <div class="lbl">22 members</div>
+        <div class="group">
+          <div class="row addrow"><span class="ic ph"><svg viewBox="0 0 256 256"><path d="M256 136a8 8 0 0 1-8 8h-16v16a8 8 0 0 1-16 0v-16h-16a8 8 0 0 1 0-16h16v-16a8 8 0 0 1 16 0v16h16a8 8 0 0 1 8 8m-57.87 58.85a8 8 0 0 1-12.26 10.3C165.75 181.19 138.09 168 108 168s-57.75 13.19-77.87 37.15a8 8 0 0 1-12.25-10.3c14.94-17.78 33.52-30.41 54.17-37.17a68 68 0 1 1 71.9 0c20.65 6.76 39.23 19.39 54.18 37.17M108 152a52 52 0 1 0-52-52 52.06 52.06 0 0 0 52 52"/></svg></span><span class="tx">Add members</span></div>
+          <div class="mrow"><div class="mav">You</div><div class="mn"><div class="n">You (Tony)</div><div class="k">Dad of Cooper · 1st</div></div><span class="tag admin"><span class="ph"><svg viewBox="0 0 256 256"><path d="M248 80a28 28 0 1 0-51.12 15.77l-26.79 33L146 73.4a28 28 0 1 0-36.06 0l-24.03 55.34-26.79-33a28 28 0 1 0-26.6 12L47 194.63A16 16 0 0 0 62.78 208h130.44A16 16 0 0 0 209 194.63l14.47-86.85A28 28 0 0 0 248 80"/></svg></span>Admin</span></div>
+          <div class="mrow"><div class="mav">AM</div><div class="mn"><div class="n">Ana Michel</div><div class="k">Mom of Rory · 1st</div></div><span class="tag admin">Co-admin</span></div>
+          <div class="mrow"><div class="mav">MR</div><div class="mn"><div class="n">Marcus Reed</div><div class="k">Dad of Presley · 1st</div></div></div>
+          <div class="mrow"><div class="mav">PS</div><div class="mn"><div class="n">Priya Shah</div><div class="k">Mom of Anaya · 1st</div></div></div>
+          <div class="row"><span class="tx" style="color:var(--green);font-weight:600">Show all 22 members</span><span class="cr ph"><svg viewBox="0 0 256 256"><path d="m181.66 133.66-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32"/></svg></span></div>
+        </div>
+      </div>
+
+      <div class="sect">
+        <div class="group">
+          <div class="row danger"><span class="ic ph"><svg viewBox="0 0 256 256"><path d="M120 216a8 8 0 0 1-8 8H48a8 8 0 0 1-8-8V40a8 8 0 0 1 8-8h64a8 8 0 0 1 0 16H56v160h56a8 8 0 0 1 8 8m109.66-93.66-40-40a8 8 0 0 0-11.32 11.32L204.69 120H112a8 8 0 0 0 0 16h92.69l-26.35 26.34a8 8 0 0 0 11.32 11.32l40-40a8 8 0 0 0 0-11.32"/></svg></span><span class="tx">Leave group</span></div>
+          <div class="row danger"><span class="ic ph"><svg viewBox="0 0 256 256"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Zm-80-104v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0m48 0v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0"/></svg></span><span class="tx">Delete subgroup</span></div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+  <div class="cap"><b>1 · Manage (admin).</b> Ada Leave + Delete subgroup (merah).</div>
+</div>
+
+<!-- ===== 2. DELETE CONFIRM ===== -->
+<div class="panel">
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="top"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="h">Group Info</div><div class="sp"></div></div>
+    <div class="body"><div class="idb"><div class="av">MT</div><div class="nm">Miss Taylor's Class</div><div class="mt">Subgroup · All First Grade · 22 members</div></div></div>
+    <div class="dim"></div>
+    <div class="sheet">
+      <div class="badge neg"><span class="ph"><svg viewBox="0 0 256 256"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Zm-80-104v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0m48 0v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0"/></svg></span></div>
+      <h2>Delete Miss Taylor's Class?</h2>
+      <p>This permanently deletes the chat and <b>all its messages for 22 members</b>. This can't be undone.</p>
+      <button class="btn del">Delete subgroup</button>
+      <button class="btn ghost">Cancel</button>
+    </div>
+  </div></div>
+  <div class="cap"><b>2 · Delete confirm.</b> Destruktif, jelasin dampak ke 22 member.</div>
+</div>
+
+<!-- ===== 3. LEAVE CONFIRM ===== -->
+<div class="panel">
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="top"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="h">Group Info</div><div class="sp"></div></div>
+    <div class="body"><div class="idb"><div class="av">MT</div><div class="nm">Miss Taylor's Class</div><div class="mt">Subgroup · All First Grade · 22 members</div></div></div>
+    <div class="dim"></div>
+    <div class="sheet">
+      <div class="badge warn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M120 216a8 8 0 0 1-8 8H48a8 8 0 0 1-8-8V40a8 8 0 0 1 8-8h64a8 8 0 0 1 0 16H56v160h56a8 8 0 0 1 8 8m109.66-93.66-40-40a8 8 0 0 0-11.32 11.32L204.69 120H112a8 8 0 0 0 0 16h92.69l-26.35 26.34a8 8 0 0 0 11.32 11.32l40-40a8 8 0 0 0 0-11.32"/></svg></span></div>
+      <h2>Leave Miss Taylor's Class?</h2>
+      <p>You'll stop getting messages and updates from this group. You can rejoin later while it's open.</p>
+      <button class="btn leave">Leave group</button>
+      <button class="btn ghost">Cancel</button>
+    </div>
+  </div></div>
+  <div class="cap"><b>3 · Leave confirm.</b> Untuk semua member (bukan destruktif).</div>
+</div>
+
+<!-- ===== 4. CLUB (BUILT-IN) — LEAVE ONLY ===== -->
+<div class="panel">
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="top"><div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="h">Group Info</div><div class="sp"></div></div>
+    <div class="body">
+      <div class="idb">
+        <div class="av club"><svg viewBox="0 0 24 24" width="34" height="34" fill="#2d5c2e"><circle cx="8.5" cy="8.5" r="3.3"/><circle cx="15.5" cy="8.5" r="3.3"/><circle cx="8.5" cy="15" r="3.3"/><circle cx="15.5" cy="15" r="3.3"/><rect x="11.3" y="12" width="1.4" height="9" rx="0.7"/></svg></div>
+        <div class="nm">All First Grade</div>
+        <div class="mt">Club · Lincoln School · 100 members</div>
+      </div>
+      <div class="sect"><div class="lbl">Subgroups</div><div class="group">
+        <div class="row"><span class="tx">Miss Taylor's Class</span><span class="cr ph"><svg viewBox="0 0 256 256"><path d="m181.66 133.66-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32"/></svg></span></div>
+        <div class="row"><span class="tx">Kiker Dads</span><span class="cr ph"><svg viewBox="0 0 256 256"><path d="m181.66 133.66-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32"/></svg></span></div>
+      </div></div>
+      <div class="sect">
+        <div class="group"><div class="row danger"><span class="ic ph"><svg viewBox="0 0 256 256"><path d="M120 216a8 8 0 0 1-8 8H48a8 8 0 0 1-8-8V40a8 8 0 0 1 8-8h64a8 8 0 0 1 0 16H56v160h56a8 8 0 0 1 8 8m109.66-93.66-40-40a8 8 0 0 0-11.32 11.32L204.69 120H112a8 8 0 0 0 0 16h92.69l-26.35 26.34a8 8 0 0 0 11.32 11.32l40-40a8 8 0 0 0 0-11.32"/></svg></span><span class="tx">Leave club</span></div></div>
+        <div class="lockednote" style="margin-top:8px"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m88 104a87.56 87.56 0 0 1-20.41 56.28L71.72 60.4A88 88 0 0 1 216 128m-176 0a87.56 87.56 0 0 1 20.41-56.28L184.28 195.6A88 88 0 0 1 40 128"/></svg></span>Club bawaan sekolah — tidak bisa dihapus, hanya bisa di-leave.</div>
+      </div>
+    </div>
+  </div></div>
+  <div class="cap"><b>4 · Club bawaan.</b> Cuma "Leave" — <b>tanpa Delete</b>. Aturannya kelihatan.</div>
+</div>
+</body>
+</html>

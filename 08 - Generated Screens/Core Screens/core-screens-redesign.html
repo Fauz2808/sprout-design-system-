@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Interactive Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* ── Exact values from theme.ts (auto-generated from Figma) ── */
+  --cr-base:    #f4f1ea;  /* background.primary = secondary[500] */
+  --cr-light:   #eae6db;  /* surface.l1 = secondary[600] */
+  --cr-lighter: #eae6db;  /* surface.l1 — card backgrounds */
+  --cr-card:    #dbd5c8;  /* surface.l2 = secondary[700] */
+  --cr-input:   #dbd5c8;  /* surface.l2 */
+  --g900: #1e3e2b;        /* brand[700] */
+  --g800: #186338;        /* brand[500] — primary green */
+  --g700: #1e3e2b;        /* brand[700] */
+  --g600: #186338;        /* brand[500] */
+  --g500: #186338;        /* brand[500] */
+  --g400: #77b691;        /* brand[200] */
+  --g300: #77b691;        /* brand[200] */
+  --g200: #d0dacf;        /* brand[100] */
+  --g100: #e2e9e3;        /* brand[50] */
+  --g50:  #e2e9e3;        /* brand[50] */
+  --sage-bg:  #d0dacf;    /* brand[100] */
+  --sage-txt: #186338;    /* brand[500] */
+  --tx1: #4d525b;         /* grey[700] = content.primary */
+  --tx2: #818898;         /* grey[500] = content.secondary */
+  --tx3: #b3b8c1;         /* grey[300] = content.tertiary */
+  --bd-lt: #e6e7ea;       /* grey[100] = border */
+  --bd-md: #e6e7ea;       /* grey[100] */
+}
+
+/* ── Page ───────────────────────────────────────────────── */
+body {
+  background: #28241E;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 52px 24px 80px;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+.page-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.28);
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+/* ── Phone Shell ─────────────────────────────────────────── */
+.phone {
+  width: 393px;
+  height: 852px;
+  background: var(--cr-base);
+  border-radius: 54px;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.10),
+    0 0 0 10px #1c1c1e,
+    0 0 0 12px #2c2c2e,
+    0 60px 120px rgba(0,0,0,0.6),
+    0 24px 48px rgba(0,0,0,0.3);
+}
+.phone::before {
+  content: '';
+  position: absolute;
+  left: -13px; top: 120px;
+  width: 4px; height: 32px;
+  background: #2a2a2a;
+  border-radius: 2px 0 0 2px;
+  box-shadow: 0 44px 0 #2a2a2a, 0 88px 0 #2a2a2a;
+}
+.phone::after {
+  content: '';
+  position: absolute;
+  right: -13px; top: 148px;
+  width: 4px; height: 66px;
+  background: #2a2a2a;
+  border-radius: 0 2px 2px 0;
+}
+.island {
+  position: absolute;
+  top: 14px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 34px;
+  background: #0a0a0a;
+  border-radius: 18px;
+  z-index: 200;
+}
+
+/* ── Status Bar ─────────────────────────────────────────── */
+.sbar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 54px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 26px 0;
+  z-index: 100;
+  pointer-events: none;
+}
+.sbar-time { font-size: 15px; font-weight: 600; color: var(--tx1); letter-spacing: -0.01em; }
+.sbar-icons { display: flex; align-items: center; gap: 6px; }
+
+/* ── Screens container ──────────────────────────────────── */
+.screen {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+.screen.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── Scrollable body ─────────────────────────────────────── */
+.scr-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 96px;
+  padding-top: 54px;
+}
+.scr-body::-webkit-scrollbar { display: none; }
+
+/* Pinned header above scroll */
+.scr-header {
+  position: absolute;
+  top: 54px; left: 0; right: 0;
+  z-index: 10;
+  background: var(--cr-base);
+}
+
+/* ── Floating Nav ────────────────────────────────────────── */
+.float-nav {
+  position: absolute;
+  bottom: 18px; left: 16px; right: 16px;
+  height: 62px;
+  background: var(--cr-lighter);
+  border: 1px solid var(--bd-lt);
+  border-radius: 999px;
+  display: flex; align-items: center; justify-content: space-around;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.14), 0 1px 4px rgba(0,0,0,0.06);
+  z-index: 150;
+  padding: 0 6px;
+}
+.fn-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  cursor: pointer;
+  min-width: 52px; padding: 6px 4px;
+  border-radius: 999px;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.fn-item:active { transform: scale(0.94); }
+.fn-label { font-size: 8.5px; font-weight: 500; color: var(--tx3); letter-spacing: 0.02em; transition: color 0.15s; }
+.fn-item.active .fn-label { color: var(--g800); font-weight: 600; }
+
+/* SVG icon color swap via filter trick — simpler: just duplicate with color classes */
+.fn-icon-inactive { display: block; }
+.fn-icon-active   { display: none; }
+.fn-item.active .fn-icon-inactive { display: none; }
+.fn-item.active .fn-icon-active   { display: block; }
+
+/* ── Common Components ────────────────────────────────────── */
+.app-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 20px 10px;
+}
+.hdr-av {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--cr-card); border: 2.5px solid var(--g200);
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+}
+.hdr-loc { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.hdr-loc-lbl { font-size: 10.5px; font-weight: 500; color: var(--tx3); letter-spacing: 0.04em; }
+.hdr-loc-city {
+  display: flex; align-items: center; gap: 3px;
+  font-family: 'Playfair Display', serif;
+  font-size: 16px; font-weight: 600; color: var(--tx1); cursor: pointer;
+}
+.icon-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--cr-card); border: 1px solid var(--bd-lt);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative;
+}
+.icon-btn:active { background: var(--cr-input); }
+.notif-dot {
+  position: absolute; top: 8px; right: 8px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #d64545; border: 1.5px solid var(--cr-base);
+}
+
+/* Segment control */
+.seg-ctrl { display: flex; padding: 0 20px 12px; gap: 6px; }
+.seg-btn {
+  flex: 1; height: 36px; border-radius: 999px;
+  border: 1.5px solid var(--bd-md); background: transparent;
+  font-size: 13px; font-weight: 500; color: var(--tx2);
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  transition: all 0.15s;
+}
+.seg-btn:active { opacity: 0.7; }
+.seg-btn.active { background: var(--g800); border-color: var(--g800); color: #fff; font-weight: 600; }
+
+/* Section header */
+.sec-hd {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 0 20px; margin-bottom: 14px;
+}
+.sec-eyebrow { font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--tx3); margin-bottom: 3px; }
+.sec-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 600; color: var(--tx1); }
+.sec-see-all { font-size: 13px; font-weight: 500; color: var(--g700); cursor: pointer; border: none; background: none; font-family: 'Inter', sans-serif; padding-bottom: 2px; }
+.sec-see-all:active { opacity: 0.6; }
+
+/* Horizontal scroll */
+.h-scroll {
+  display: flex; gap: 12px;
+  overflow-x: auto; padding: 0 20px 4px;
+  scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+}
+.h-scroll::-webkit-scrollbar { display: none; }
+
+/* Activity card */
+.act-card {
+  width: 218px; flex-shrink: 0;
+  background: var(--cr-lighter); border: 1px solid var(--bd-lt);
+  border-radius: 20px; overflow: hidden; scroll-snap-align: start;
+  cursor: pointer; transition: transform 0.15s;
+}
+.act-card:active { transform: scale(0.97); }
+.act-img { width: 100%; height: 108px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.act-body { padding: 12px 14px 14px; }
+.act-tag { display: inline-flex; align-items: center; gap: 4px; background: var(--g50); border-radius: 999px; padding: 3px 9px 3px 7px; margin-bottom: 6px; }
+.act-tag-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--g600); flex-shrink: 0; }
+.act-tag-txt { font-size: 10.5px; font-weight: 600; color: var(--g700); }
+.act-title { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 600; color: var(--tx1); line-height: 1.35; margin-bottom: 7px; }
+.act-meta { display: flex; align-items: center; gap: 8px; }
+.act-meta-item { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--tx2); }
+
+/* Filter pills */
+.filter-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 20px 2px; -webkit-overflow-scrolling: touch; margin-bottom: 4px; }
+.filter-row::-webkit-scrollbar { display: none; }
+.f-pill {
+  display: flex; align-items: center; gap: 5px;
+  height: 30px; padding: 0 13px; border-radius: 999px;
+  font-size: 12.5px; font-weight: 500; color: var(--tx2);
+  background: var(--cr-card); border: none;
+  white-space: nowrap; cursor: pointer; flex-shrink: 0;
+  font-family: 'Inter', sans-serif; transition: all 0.15s;
+}
+.f-pill:active { opacity: 0.7; }
+.f-pill.active { background: var(--g800); color: #fff; font-weight: 600; }
+
+/* Event cards */
+.ev-list { display: flex; flex-direction: column; gap: 12px; padding: 0 20px; }
+.ev-card {
+  background: var(--cr-lighter); border: 1px solid var(--bd-lt);
+  border-radius: 20px; overflow: hidden; cursor: pointer;
+  transition: transform 0.15s;
+}
+.ev-card:active { transform: scale(0.98); }
+.ev-img { width: 100%; height: 136px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.ev-body { padding: 14px 16px 16px; }
+.ev-cat { font-size: 10.5px; font-weight: 600; color: var(--g700); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 5px; }
+.ev-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--tx1); line-height: 1.3; margin-bottom: 10px; }
+.ev-details { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+.ev-detail { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--tx2); }
+.ev-footer { display: flex; align-items: center; justify-content: space-between; }
+
+/* Date / Going badges */
+.date-badge {
+  position: absolute; top: 10px; left: 10px;
+  background: rgba(250,249,246,0.92); backdrop-filter: blur(8px);
+  border-radius: 10px; padding: 6px 10px; border: 1px solid rgba(0,0,0,0.06);
+}
+.date-day { font-size: 17px; font-weight: 700; color: var(--tx1); line-height: 1; }
+.date-mo  { font-size: 10px; font-weight: 600; color: var(--tx2); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.2; }
+.going-badge {
+  position: absolute; top: 10px; right: 10px;
+  height: 22px; padding: 0 9px; border-radius: 999px;
+  background: rgba(30,74,53,0.90); backdrop-filter: blur(6px);
+  display: flex; align-items: center; gap: 4px;
+  font-size: 10.5px; font-weight: 600; color: #fff;
+}
+.going-dot { width: 5px; height: 5px; border-radius: 50%; background: #79e3a3; flex-shrink: 0; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.8)} }
+.art-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.14) 100%); pointer-events: none; }
+
+/* Avatar stack */
+.av-stack { display: flex; }
+.av-stack .av {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid var(--cr-lighter); margin-left: -6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; font-weight: 600; color: #fff; flex-shrink: 0;
+}
+.av-stack .av:first-child { margin-left: 0; }
+.av-more { background: var(--cr-card); color: var(--tx2); }
+.attendee-count { font-size: 11.5px; font-weight: 500; color: var(--tx2); }
+
+/* Club tag on event */
+.ev-club-tag { display: flex; align-items: center; gap: 4px; background: var(--cr-card); border-radius: 999px; padding: 4px 10px 4px 6px; }
+.ev-club-av { width: 18px; height: 18px; border-radius: 50%; background: var(--g200); display: flex; align-items: center; justify-content: center; }
+.ev-club-name { font-size: 11.5px; font-weight: 500; color: var(--tx1); }
+
+/* Nearby banner */
+.nearby-banner {
+  margin: 8px 20px 0; border-radius: 20px;
+  background: linear-gradient(135deg, var(--g900) 0%, var(--g700) 100%);
+  padding: 18px 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  overflow: hidden; position: relative; cursor: pointer;
+}
+.nearby-banner::before { content:''; position:absolute; top:-20px; right:-20px; width:90px; height:90px; border-radius:50%; background:rgba(255,255,255,0.05); }
+.nearby-banner::after  { content:''; position:absolute; bottom:-30px; right:30px; width:70px; height:70px; border-radius:50%; background:rgba(255,255,255,0.04); }
+.nb-text { flex: 1; position: relative; z-index: 1; }
+.nb-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--g300); margin-bottom: 4px; }
+.nb-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: #fff; line-height: 1.3; margin-bottom: 10px; }
+.nb-cta { display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.25); font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; font-family: 'Inter', sans-serif; }
+.nb-img { width: 66px; height: 66px; border-radius: 14px; background: rgba(255,255,255,0.10); flex-shrink: 0; position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; }
+
+/* Art fills */
+.art-park   { background: linear-gradient(155deg, #c3e3cc, #80bc9e 55%, #4e9e72); }
+.art-craft  { background: linear-gradient(155deg, #f5d4be, #e8a97a 55%, #d0834e); }
+.art-movie  { background: linear-gradient(155deg, #1a1b2e, #2d3561 55%, #4c5aa3); }
+.art-garden { background: linear-gradient(155deg, #c8e8c0, #8bc486 55%, #4f9e48); }
+.art-swim   { background: linear-gradient(155deg, #b8dff6, #6db8ea 55%, #3a8fc5); }
+.art-story  { background: linear-gradient(155deg, #f8e9d0, #e9c97a 55%, #c59d3a); }
+.art-mem1   { background: linear-gradient(155deg, #f5d4be, #e8a97a 55%, #d0834e); }
+.art-mem2   { background: linear-gradient(155deg, #c3e3cc, #80bc9e 55%, #4e9e72); }
+.art-mem3   { background: linear-gradient(155deg, #1a1b2e, #2d3561 55%, #4c5aa3); }
+.art-mem4   { background: linear-gradient(155deg, #f8e9d0, #e9c97a 55%, #c59d3a); }
+
+/* ── Home — My Events view ──────────────────────────────── */
+.hero-next-up {
+  margin: 0 20px 16px;
+  background: linear-gradient(135deg, #1e3e2b 0%, #186338 100%);
+  border-radius: 20px; padding: 20px;
+  position: relative; overflow: hidden; cursor: pointer;
+}
+.hero-next-up::before { content:''; position:absolute; top:-10px; right:-10px; width:120px; height:120px; border-radius:50%; background:rgba(255,255,255,0.05); }
+.hnu-eye { font-size: 10.5px; font-weight: 600; color: var(--g300); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 6px; position: relative; z-index: 1; }
+.hnu-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: #fff; line-height: 1.25; margin-bottom: 12px; position: relative; z-index: 1; }
+.hnu-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; position: relative; z-index: 1; }
+.hnu-meta-item { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: rgba(255,255,255,0.7); }
+.hnu-footer { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 1; }
+.hnu-view-btn { display: flex; align-items: center; gap: 5px; height: 32px; padding: 0 14px; border-radius: 999px; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.24); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+
+/* Compact event row */
+.ev-compact { display: flex; align-items: stretch; background: var(--cr-lighter); border: 1px solid var(--bd-lt); border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform 0.15s; }
+.ev-compact:active { transform: scale(0.98); }
+.ev-compact-img { width: 80px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.ev-compact-body { flex: 1; padding: 12px 14px; display: flex; flex-direction: column; justify-content: center; }
+.ev-compact-cat { font-size: 10px; font-weight: 600; color: var(--g700); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+.ev-compact-title { font-family: 'Playfair Display', serif; font-size: 14.5px; font-weight: 600; color: var(--tx1); margin-bottom: 6px; line-height: 1.2; }
+.ev-compact-meta { display: flex; align-items: center; gap: 10px; }
+.ev-compact-meta-item { display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--tx2); }
+
+/* ── Memories ────────────────────────────────────────────── */
+.mem-hdr { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px 8px; }
+.mem-tabs { display: flex; gap: 20px; }
+.mem-tab { font-size: 15px; font-weight: 500; color: var(--tx3); padding-bottom: 6px; cursor: pointer; transition: color 0.15s; }
+.mem-tab.active { color: var(--g800); font-weight: 700; border-bottom: 2.5px solid var(--g800); }
+.mem-action { width: 34px; height: 34px; border-radius: 50%; background: var(--cr-card); border: 1px solid var(--bd-lt); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+/* Club story circles */
+.mem-stories { display: flex; gap: 14px; overflow-x: auto; padding: 4px 20px 12px; border-bottom: 1px solid var(--bd-lt); }
+.mem-stories::-webkit-scrollbar { display: none; }
+.mem-story { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.mem-story-ring { width: 54px; height: 54px; border-radius: 50%; border: 2px solid var(--bd-lt); display: flex; align-items: center; justify-content: center; background: var(--cr-card); transition: border-color 0.15s; }
+.mem-story.active .mem-story-ring { border-color: var(--g800); border-width: 2.5px; background: var(--g50); }
+.mem-story-av { font-size: 22px; line-height: 1; }
+.mem-story-lbl { font-size: 10px; font-weight: 500; color: var(--tx3); max-width: 62px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mem-story.active .mem-story-lbl { color: var(--g800); font-weight: 600; }
+
+/* Photo post */
+.mem-post { border-bottom: 1px solid var(--bd-lt); }
+.mem-post-hdr { display: flex; align-items: center; gap: 10px; padding: 12px 16px 8px; }
+.mem-post-av { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.mem-post-info { flex: 1; min-width: 0; }
+.mem-post-name { font-size: 13.5px; font-weight: 600; color: var(--tx1); display: block; margin-bottom: 1px; }
+.mem-post-meta { font-size: 11.5px; color: var(--tx2); }
+.mem-post-more { font-size: 16px; color: var(--tx3); padding: 4px 2px; cursor: pointer; letter-spacing: 0.04em; }
+.mem-post-img { width: 100%; height: 268px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.mem-post-caption {
+  position: absolute; bottom: 12px; left: 12px;
+  max-width: 164px;
+  background: rgba(28,29,32,0.50);
+  border: 0.5px solid rgba(43,44,49,0.7);
+  border-radius: 8px;
+  padding: 8px 12px;
+  backdrop-filter: blur(4px);
+}
+.mem-post-caption-title { font-size: 12.5px; font-weight: 600; color: #fff; line-height: 1.3; margin-bottom: 2px; }
+.mem-post-caption-sub { font-size: 10.5px; color: rgba(255,255,255,0.72); }
+.mem-post-actions { display: flex; align-items: center; padding: 8px 14px 10px; gap: 4px; }
+.mem-action-btn { display: flex; align-items: center; gap: 5px; padding: 5px 8px; border-radius: 8px; font-size: 12.5px; color: var(--tx2); cursor: pointer; border: none; background: none; font-family: 'Inter', sans-serif; transition: background 0.12s; }
+.mem-action-btn:active { background: var(--cr-card); }
+.mem-action-btn.liked { color: #DF1C41; }
+.mem-action-share { margin-left: auto; }
+
+/* Find Duo cards */
+.duo-card {
+  background: var(--cr-lighter); border: 1px solid var(--bd-lt);
+  border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 14px;
+  margin: 0 20px 10px; cursor: pointer; transition: transform 0.15s;
+}
+.duo-card:active { transform: scale(0.98); }
+.duo-av { width: 54px; height: 54px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.duo-info { flex: 1; }
+.duo-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--tx1); margin-bottom: 3px; }
+.duo-sub { font-size: 12.5px; color: var(--tx2); margin-bottom: 8px; line-height: 1.4; }
+.duo-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.duo-tag { background: var(--g50); color: var(--g700); font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 999px; }
+.duo-connect { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: var(--g800); flex-shrink: 0; }
+
+/* ── AI Assist ───────────────────────────────────────────── */
+.ai-hdr { padding: 14px 20px 4px; }
+/* AI Assist header */
+.ai-hdr { padding: 18px 20px 0; text-align: center; }
+.ai-greeting { font-size: 12px; color: var(--tx3); margin-bottom: 5px; font-style: italic; }
+.ai-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--tx1); line-height: 1.3; }
+
+/* Centred AI illustration (189×184 matching SVG) */
+.ai-illus {
+  width: 189px; height: 184px; margin: 22px auto 0;
+  position: relative; display: flex; align-items: center; justify-content: center;
+}
+.ai-orb-ring {
+  width: 164px; height: 164px; border-radius: 50%;
+  background: radial-gradient(circle at 38% 38%, #e2e9e3 0%, #d0dacf 35%, #77b691 70%, #186338 100%);
+  box-shadow: 0 0 0 12px rgba(24,99,56,0.07), 0 0 0 24px rgba(24,99,56,0.04), 0 12px 40px rgba(24,99,56,0.22);
+  display: flex; align-items: center; justify-content: center;
+  animation: aiPulse 3.5s ease-in-out infinite;
+  position: relative;
+}
+@keyframes aiPulse { 0%,100% { box-shadow: 0 0 0 12px rgba(24,99,56,0.07), 0 0 0 24px rgba(24,99,56,0.04), 0 12px 40px rgba(24,99,56,0.22); } 50% { box-shadow: 0 0 0 18px rgba(24,99,56,0.09), 0 0 0 34px rgba(24,99,56,0.05), 0 16px 50px rgba(24,99,56,0.28); } }
+.ai-orb-ring::before { content:''; position:absolute; top:18px; right:22px; width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.22); }
+.ai-orb-ring::after { content:''; position:absolute; bottom:24px; left:18px; width:16px; height:16px; border-radius:50%; background:rgba(255,255,255,0.14); }
+
+/* Floating sparkles around orb */
+.ai-spark { position:absolute; }
+.ai-spark-1 { top:4px; right:16px; }
+.ai-spark-2 { bottom:10px; left:6px; }
+.ai-spark-3 { top:50%; right:-4px; transform:translateY(-50%); }
+
+/* Sub-text below illustration */
+.ai-sub { text-align: center; padding: 20px 28px 0; }
+.ai-sub-title { font-family: 'Playfair Display', serif; font-size: 15px; font-style: italic; color: var(--tx2); line-height: 1.5; }
+
+/* Two tappable suggestion lines */
+.ai-suggests { display: flex; flex-direction: column; gap: 2px; padding: 18px 20px 0; }
+.ai-suggest-line {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-radius: 14px; cursor: pointer;
+  transition: background 0.12s; -webkit-tap-highlight-color: transparent;
+}
+.ai-suggest-line:active { background: var(--cr-card); }
+.ai-suggest-txt { font-size: 13.5px; color: var(--tx1); font-weight: 500; line-height: 1.3; flex: 1; }
+.ai-suggest-arrow { color: var(--tx3); flex-shrink: 0; margin-left: 10px; }
+
+/* Two-pill CTA row (matches SVG y=657–709, side by side) */
+.ai-pill-row {
+  position: absolute; bottom: 98px; left: 16px; right: 16px;
+  display: flex; gap: 12px; z-index: 50;
+}
+.ai-pill {
+  flex: 1; height: 51px; border-radius: 999px;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 600;
+  cursor: pointer; border: none; transition: opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.ai-pill:active { opacity: 0.82; }
+.ai-pill-secondary { background: #e2e9e3; color: var(--g800); border: 1px solid #d0dacf; }
+.ai-pill-primary { background: var(--g800); color: #fff; box-shadow: 0 2px 12px rgba(24,99,56,0.22); }
+
+/* ── Chat ────────────────────────────────────────────────── */
+.chat-hdr { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px 0; }
+.chat-pg-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--tx1); }
+.compose-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--cr-card); border: 1px solid var(--bd-lt); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.compose-btn:active { background: var(--cr-input); }
+.search-bar { margin: 10px 20px 0; height: 40px; border-radius: 999px; background: var(--cr-input); border: 1px solid var(--bd-lt); display: flex; align-items: center; gap: 8px; padding: 0 14px; }
+.search-bar span { font-size: 13.5px; color: var(--tx3); }
+.chat-sec-hd { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 6px; }
+.chat-sec-name { font-size: 12px; font-weight: 600; color: var(--tx2); letter-spacing: 0.05em; text-transform: uppercase; }
+.sec-divider { height: 1px; background: var(--bd-lt); margin: 0 20px; }
+.chat-conv { display: flex; align-items: center; gap: 12px; padding: 12px 20px; cursor: pointer; transition: background 0.1s; }
+.chat-conv:active { background: var(--cr-card); }
+.chat-av { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.chat-info { flex: 1; min-width: 0; }
+.chat-conv-name { font-size: 14px; font-weight: 600; color: var(--tx1); margin-bottom: 2px; }
+.chat-conv-prev { font-size: 12.5px; color: var(--tx2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+.chat-conv-time { font-size: 11px; color: var(--tx3); }
+.chat-unread { width: 19px; height: 19px; border-radius: 50%; background: var(--g800); color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+/* ── Clubs ───────────────────────────────────────────────── */
+.club-tabs-row { display: flex; gap: 16px; padding: 12px 20px 8px; overflow-x: auto; }
+.club-tabs-row::-webkit-scrollbar { display: none; }
+.c-tab { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; cursor: pointer; }
+.c-icon-wrap { position: relative; width: 52px; height: 52px; }
+.c-icon { width: 52px; height: 52px; border-radius: 50%; background: var(--cr-card); border: 2px solid transparent; display: flex; align-items: center; justify-content: center; font-size: 22px; transition: all 0.15s; }
+.c-tab.active .c-icon { border-color: var(--g800); background: var(--g50); }
+.c-badge { position: absolute; top: -1px; right: -1px; width: 17px; height: 17px; border-radius: 50%; background: var(--g800); color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid var(--cr-base); }
+.c-name { font-size: 9.5px; color: var(--tx2); text-align: center; max-width: 58px; line-height: 1.3; }
+.c-tab.active .c-name { color: var(--g800); font-weight: 600; }
+.clubs-sec-hd { padding: 6px 20px 12px; border-bottom: 1px solid var(--bd-lt); }
+.clubs-sec-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--g800); line-height: 1.3; margin-bottom: 2px; }
+.clubs-sec-sub { font-size: 12px; color: var(--tx2); }
+.clubs-filter-row { display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-bottom: 1px solid var(--bd-lt); }
+.fc-pill { display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 500; background: var(--cr-card); color: var(--tx2); border: none; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+.fc-pill.active { background: var(--g800); color: #fff; font-weight: 600; }
+.invite-pill { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 11px; border-radius: 999px; border: 1.5px solid var(--g800); background: transparent; color: var(--g800); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+.invite-pill:active { background: var(--g50); }
+.members-list { display: flex; flex-direction: column; gap: 8px; padding: 14px 20px; }
+.member-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--cr-lighter); border: 1px solid var(--bd-lt); border-radius: 14px; cursor: pointer; transition: transform 0.15s; }
+.member-row:active { transform: scale(0.98); }
+.member-av { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.member-info { flex: 1; }
+.member-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--tx1); }
+.member-role { font-size: 12px; color: var(--tx3); }
+.tag-new { background: var(--cr-card); border: 1px solid var(--bd-md); color: var(--tx2); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 999px; }
+.tag-met { background: var(--sage-bg); color: var(--sage-txt); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 999px; }
+.tag-admin { background: var(--g100); color: var(--g700); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 999px; }
+
+/* ── Animations ──────────────────────────────────────────── */
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.screen.active .scr-body { animation: fadeUp 0.28s ease both; }
+</style>
+</head>
+<body>
+
+<div class="page-label">Sprout · Interactive Prototype</div>
+
+<div class="phone">
+  <div class="island"></div>
+
+  <!-- Status bar (always on top) -->
+  <div class="sbar">
+    <span class="sbar-time">9:41</span>
+    <div class="sbar-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx=".6" fill="#4d525b"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="#4d525b"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="#4d525b"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="#4d525b" opacity=".25"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="10.5" r="1.3" fill="#4d525b"/><path d="M4.5 7C5.8 5.7 6.9 5 8 5s2.2.7 3.5 2" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round" fill="none"/><path d="M1.5 4C3.5 2 5.6.8 8 .8s4.5 1.2 6.5 3.2" stroke="#4d525b" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#4d525b" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#4d525b"/><path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#4d525b" fill-opacity=".4"/></svg>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════ HOME ════════════════════════════ -->
+  <div class="screen active" id="screen-home">
+    <!-- Pinned header -->
+    <div class="scr-header" id="home-header" style="padding-bottom:0;">
+      <div class="app-hdr">
+        <div class="hdr-av"><svg viewBox="0 0 24 24" fill="none" width="22" height="22"><circle cx="12" cy="9" r="4" fill="#b3b8c1"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="#b3b8c1"/></svg></div>
+        <div class="hdr-loc">
+          <span class="hdr-loc-lbl">Current location</span>
+          <div class="hdr-loc-city">Sydney, NSW <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M4 6l4 4 4-4" stroke="#186338" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+        <div class="hdr-actions">
+          <button class="icon-btn"><div class="notif-dot"></div><svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M6 10a6 6 0 1 1 12 0c0 3.5 1.5 5 2 6H4c.5-1 2-2.5 2-6z" stroke="#818898" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 20a2 2 0 0 0 4 0" stroke="#818898" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        </div>
+      </div>
+      <div class="seg-ctrl">
+        <button class="seg-btn active" id="seg-discover" onclick="homeTab('discover')">Discover</button>
+        <button class="seg-btn" id="seg-myevents" onclick="homeTab('myevents')">My Events</button>
+      </div>
+    </div>
+
+    <!-- Scrollable body -->
+    <div class="scr-body" style="padding-top:130px;">
+
+      <!-- DISCOVER view -->
+      <div id="home-discover">
+        <div style="padding: 4px 0 0;">
+          <div class="sec-hd">
+            <div><div class="sec-eyebrow">This Week</div><div class="sec-title">Activities</div></div>
+            <button class="sec-see-all">See all</button>
+          </div>
+          <div class="h-scroll">
+            <div class="act-card">
+              <div class="act-img art-craft"><svg width="60" height="60" viewBox="0 0 60 60" fill="none" style="opacity:.28;"><circle cx="30" cy="30" r="22" stroke="#fff" stroke-width="1.5"/><path d="M18 42 Q30 14 42 42" stroke="#fff" stroke-width="1.5" fill="none"/><circle cx="30" cy="28" r="6" fill="#fff" opacity=".5"/></svg><div class="art-overlay"></div></div>
+              <div class="act-body">
+                <div class="act-tag"><div class="act-tag-dot"></div><span class="act-tag-txt">Arts &amp; Crafts</span></div>
+                <div class="act-title">Kids Art &amp; Craft Day</div>
+                <div class="act-meta"><div class="act-meta-item"><svg viewBox="0 0 16 16" fill="none" width="11" height="11"><rect x="2" y="3" width="12" height="11" rx="2" stroke="#b3b8c1" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="#b3b8c1" stroke-width="1.4" stroke-linecap="round"/></svg>Nov 16, 10am</div><div class="act-meta-item"><svg viewBox="0 0 16 16" fill="none" width="11" height="11"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="#b3b8c1" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="#b3b8c1" stroke-width="1.4"/></svg>Griffith Park</div></div>
+              </div>
+            </div>
+            <div class="act-card">
+              <div class="act-img art-movie"><svg width="60" height="60" viewBox="0 0 60 60" fill="none" style="opacity:.4;"><circle cx="30" cy="30" r="22" stroke="#fff" stroke-width="1"/><path d="M23 18l18 12-18 12V18z" fill="#fff" opacity=".7"/></svg><div class="art-overlay"></div></div>
+              <div class="act-body">
+                <div class="act-tag"><div class="act-tag-dot"></div><span class="act-tag-txt">Movie Night</span></div>
+                <div class="act-title">Family Movie Night</div>
+                <div class="act-meta"><div class="act-meta-item"><svg viewBox="0 0 16 16" fill="none" width="11" height="11"><rect x="2" y="3" width="12" height="11" rx="2" stroke="#b3b8c1" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="#b3b8c1" stroke-width="1.4" stroke-linecap="round"/></svg>Nov 18, 7pm</div><div class="act-meta-item"><svg viewBox="0 0 16 16" fill="none" width="11" height="11"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="#b3b8c1" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="#b3b8c1" stroke-width="1.4"/></svg>Hyde Park</div></div>
+              </div>
+            </div>
+            <div class="act-card">
+              <div class="act-img art-swim"><svg width="60" height="60" viewBox="0 0 60 60" fill="none" style="opacity:.4;"><path d="M8 38c3-3 6-3 9 0s6 3 9 0 6-3 9 0 6 3 9 0" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><circle cx="30" cy="22" r="8" stroke="#fff" stroke-width="1.8"/></svg><div class="art-overlay"></div></div>
+              <div class="act-body">
+                <div class="act-tag"><div class="act-tag-dot"></div><span class="act-tag-txt">Swimming</span></div>
+                <div class="act-title">Kids Swim Lessons</div>
+                <div class="act-meta"><div class="act-meta-item"><svg viewBox="0 0 16 16" fill="none" width="11" height="11"><rect x="2" y="3" width="12" height="11" rx="2" stroke="#b3b8c1" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="#b3b8c1" stroke-width="1.4" stroke-linecap="round"/></svg>Nov 20, 8am</div><div class="act-meta-item"><svg viewBox="0 0 16 16" fill="none" width="11" height="11"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="#b3b8c1" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="#b3b8c1" stroke-width="1.4"/></svg>Bondi Pool</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="filter-row" style="margin-top:14px;">
+          <div class="f-pill active" onclick="setPill(this)">🌳 Parks</div>
+          <div class="f-pill" onclick="setPill(this)">🎨 Arts</div>
+          <div class="f-pill" onclick="setPill(this)">🏊 Swimming</div>
+          <div class="f-pill" onclick="setPill(this)">🎭 Classes</div>
+          <div class="f-pill" onclick="setPill(this)">🍕 Dining</div>
+        </div>
+        <div style="padding: 20px 0 0;">
+          <div class="sec-hd"><div><div class="sec-eyebrow">Near you</div><div class="sec-title">Parks &amp; Playgrounds</div></div><button class="sec-see-all">See all</button></div>
+          <div class="ev-list">
+            <div class="ev-card">
+              <div class="ev-img art-park"><svg width="100%" height="100%" viewBox="0 0 353 136" fill="none" style="position:absolute;top:0;left:0;" preserveAspectRatio="xMidYMid slice"><ellipse cx="176" cy="118" rx="150" ry="26" fill="rgba(255,255,255,0.06)"/><circle cx="80" cy="54" r="32" fill="rgba(255,255,255,0.07)"/><rect x="168" y="75" width="7" height="40" fill="rgba(255,255,255,0.14)"/><ellipse cx="171" cy="70" rx="16" ry="14" fill="rgba(255,255,255,0.14)"/></svg><div class="art-overlay"></div><div class="date-badge"><div class="date-day">23</div><div class="date-mo">Nov</div></div><div class="going-badge"><div class="going-dot"></div>Going</div></div>
+              <div class="ev-body"><div class="ev-cat">Parks &amp; Playgrounds</div><div class="ev-title">Picnic Playdate at Centennial Park</div><div class="ev-details"><div class="ev-detail"><svg viewBox="0 0 16 16" fill="none" width="13" height="13"><circle cx="8" cy="7" r="5.5" stroke="#b3b8c1" stroke-width="1.4"/><path d="M8 4.5v3l2 1.5" stroke="#b3b8c1" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Saturday, 23 Nov · 10:00 am</div><div class="ev-detail"><svg viewBox="0 0 16 16" fill="none" width="13" height="13"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="#b3b8c1" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="#b3b8c1" stroke-width="1.4"/></svg>Centennial Park, Eastern Suburbs</div></div><div class="ev-footer"><div style="display:flex;align-items:center;gap:7px;"><div class="av-stack"><div class="av" style="width:24px;height:24px;font-size:9px;background:#e8a97a;">J</div><div class="av" style="width:24px;height:24px;font-size:9px;background:#7dc49a;">K</div><div class="av" style="width:24px;height:24px;font-size:9px;background:#6db8ea;">P</div><div class="av av-more" style="width:24px;height:24px;font-size:8px;">+8</div></div><span class="attendee-count">12 going</span></div><div class="ev-club-tag"><div class="ev-club-av"><svg viewBox="0 0 16 16" fill="none" width="10" height="10"><circle cx="8" cy="6" r="3" fill="#7DC49A" opacity=".8"/><path d="M3 13c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="#7DC49A" stroke-width="1.3" stroke-linecap="round"/></svg></div><span class="ev-club-name">Eastern Mums</span></div></div></div>
+            </div>
+            <div class="ev-card">
+              <div class="ev-img art-garden"><svg width="100%" height="100%" viewBox="0 0 353 136" fill="none" style="position:absolute;top:0;left:0;" preserveAspectRatio="xMidYMid slice"><path d="M60 92 Q80 54 100 92" fill="rgba(255,255,255,0.09)"/><path d="M200 84 Q230 44 260 84" fill="rgba(255,255,255,0.07)"/><circle cx="295" cy="36" r="18" fill="rgba(255,255,255,0.07)"/></svg><div class="art-overlay"></div><div class="date-badge"><div class="date-day">30</div><div class="date-mo">Nov</div></div></div>
+              <div class="ev-body"><div class="ev-cat">Outdoor Activity</div><div class="ev-title">Royal Botanic Garden Playdate</div><div class="ev-details"><div class="ev-detail"><svg viewBox="0 0 16 16" fill="none" width="13" height="13"><circle cx="8" cy="7" r="5.5" stroke="#b3b8c1" stroke-width="1.4"/><path d="M8 4.5v3l2 1.5" stroke="#b3b8c1" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Sunday, 30 Nov · 9:30 am</div><div class="ev-detail"><svg viewBox="0 0 16 16" fill="none" width="13" height="13"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="#b3b8c1" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="#b3b8c1" stroke-width="1.4"/></svg>Royal Botanic Garden, CBD</div></div><div class="ev-footer"><div style="display:flex;align-items:center;gap:7px;"><div class="av-stack"><div class="av" style="width:24px;height:24px;font-size:9px;background:#4c5aa3;">A</div><div class="av" style="width:24px;height:24px;font-size:9px;background:#d64545;">B</div><div class="av av-more" style="width:24px;height:24px;font-size:8px;">+3</div></div><span class="attendee-count">5 going</span></div><div class="ev-club-tag"><div class="ev-club-av"><svg viewBox="0 0 16 16" fill="none" width="10" height="10"><circle cx="8" cy="6" r="3" fill="#7DC49A" opacity=".8"/><path d="M3 13c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="#7DC49A" stroke-width="1.3" stroke-linecap="round"/></svg></div><span class="ev-club-name">Inner City Parents</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="nearby-banner">
+          <div class="nb-text"><div class="nb-eyebrow">Near you</div><div class="nb-title">3 events happening<br>this weekend nearby</div><button class="nb-cta">Explore <svg viewBox="0 0 16 16" fill="none" width="13" height="13"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <div class="nb-img"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="17" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><path d="M20 8c-4.5 0-8 3.5-8 8 0 6 8 14 8 14s8-8 8-14c0-4.5-3.5-8-8-8z" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/><circle cx="20" cy="16" r="3" fill="rgba(255,255,255,0.6)"/></svg></div>
+        </div>
+        <div style="height:12px;"></div>
+      </div>
+
+      <!-- MY EVENTS view -->
+      <div id="home-myevents" style="display:none;">
+        <div class="hero-next-up">
+          <div class="hnu-eye">Next up · Tomorrow</div>
+          <div class="hnu-title">Picnic Playdate at<br>Centennial Park</div>
+          <div class="hnu-meta"><div class="hnu-meta-item"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="7" r="5.5" stroke="rgba(255,255,255,0.7)" stroke-width="1.4"/><path d="M8 4.5v3l2 1.5" stroke="rgba(255,255,255,0.7)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Sat 23 Nov · 10am</div><div class="hnu-meta-item"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="rgba(255,255,255,0.7)" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="rgba(255,255,255,0.7)" stroke-width="1.4"/></svg>Centennial Park</div></div>
+          <div class="hnu-footer"><div style="display:flex;align-items:center;gap:8px;"><div class="av-stack"><div class="av" style="width:26px;height:26px;font-size:9px;background:#e8a97a;border-color:rgba(255,255,255,0.3);">J</div><div class="av" style="width:26px;height:26px;font-size:9px;background:#7dc49a;border-color:rgba(255,255,255,0.3);">K</div><div class="av" style="width:26px;height:26px;font-size:9px;background:#6db8ea;border-color:rgba(255,255,255,0.3);">P</div></div><span style="font-size:12px;color:rgba(255,255,255,0.6);">12 going</span></div><button class="hnu-view-btn">View <svg viewBox="0 0 16 16" fill="none" width="13" height="13"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+        </div>
+        <div style="padding: 20px 0 0;">
+          <div class="sec-hd"><div><div class="sec-eyebrow">Coming up</div><div class="sec-title">Upcoming</div></div><button class="sec-see-all">Filter</button></div>
+          <div class="ev-list">
+            <div class="ev-compact"><div class="ev-compact-img art-swim"><svg width="28" height="28" viewBox="0 0 32 32" fill="none" style="opacity:.45;"><path d="M4 20c1.8-1.8 3.6-1.8 5.4 0s3.6 1.8 5.4 0 3.6-1.8 5.4 0 3.6 1.8 5.4 0" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><circle cx="16" cy="10" r="5" stroke="#fff" stroke-width="1.8"/></svg></div><div class="ev-compact-body"><div class="ev-compact-cat">Swimming</div><div class="ev-compact-title">Kids Swim Lessons</div><div class="ev-compact-meta"><div class="ev-compact-meta-item"><svg viewBox="0 0 16 16" fill="none" width="11" height="11"><rect x="2" y="3" width="12" height="11" rx="2" stroke="#b3b8c1" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="#b3b8c1" stroke-width="1.4" stroke-linecap="round"/></svg>Sat 23 Nov · 8am</div><div class="ev-compact-meta-item"><svg viewBox="0 0 16 16" fill="none" width="11" height="11"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="#b3b8c1" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="#b3b8c1" stroke-width="1.4"/></svg>Bondi Pool</div></div></div></div>
+            <div class="ev-compact"><div class="ev-compact-img art-story"><svg width="28" height="28" viewBox="0 0 32 32" fill="none" style="opacity:.35;"><rect x="6" y="4" width="20" height="24" rx="3" stroke="#fff" stroke-width="1.5"/><line x1="10" y1="12" x2="22" y2="12" stroke="#fff" stroke-width="1.5"/><line x1="10" y1="17" x2="22" y2="17" stroke="#fff" stroke-width="1.5"/><line x1="10" y1="22" x2="17" y2="22" stroke="#fff" stroke-width="1.5"/></svg></div><div class="ev-compact-body"><div class="ev-compact-cat">Storytime</div><div class="ev-compact-title">Morning Storytime Circle</div><div class="ev-compact-meta"><div class="ev-compact-meta-item"><svg viewBox="0 0 16 16" fill="none" width="11" height="11"><rect x="2" y="3" width="12" height="11" rx="2" stroke="#b3b8c1" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="#b3b8c1" stroke-width="1.4" stroke-linecap="round"/></svg>Wed 20 Nov · 9am</div><div class="ev-compact-meta-item"><svg viewBox="0 0 16 16" fill="none" width="11" height="11"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="#b3b8c1" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="#b3b8c1" stroke-width="1.4"/></svg>Surry Hills Library</div></div></div></div>
+            <div class="ev-compact"><div class="ev-compact-img art-craft"><svg width="28" height="28" viewBox="0 0 32 32" fill="none" style="opacity:.3;"><circle cx="16" cy="16" r="12" stroke="#fff" stroke-width="1.5"/><path d="M10 22 Q16 8 22 22" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div><div class="ev-compact-body"><div class="ev-compact-cat">Arts &amp; Crafts</div><div class="ev-compact-title">Kids Art &amp; Craft Day</div><div class="ev-compact-meta"><div class="ev-compact-meta-item"><svg viewBox="0 0 16 16" fill="none" width="11" height="11"><rect x="2" y="3" width="12" height="11" rx="2" stroke="#b3b8c1" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="#b3b8c1" stroke-width="1.4" stroke-linecap="round"/></svg>Sat 30 Nov · 10am</div><div class="ev-compact-meta-item"><svg viewBox="0 0 16 16" fill="none" width="11" height="11"><path d="M8 2a4.5 4.5 0 0 1 4.5 4.5C12.5 10 8 14 8 14S3.5 10 3.5 6.5A4.5 4.5 0 0 1 8 2z" stroke="#b3b8c1" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.5" stroke="#b3b8c1" stroke-width="1.4"/></svg>Griffith Park</div></div></div></div>
+          </div>
+        </div>
+        <div style="height:12px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════ MEMORIES ════════════════════════════ -->
+  <div class="screen" id="screen-memories">
+    <div class="scr-header" style="padding-bottom:0;">
+      <div class="mem-hdr">
+        <div class="mem-tabs">
+          <span class="mem-tab active" id="mem-tab-foryou" onclick="memTab('foryou')">For You</span>
+          <span class="mem-tab" id="mem-tab-findduo" onclick="memTab('findduo')">Find Duo</span>
+        </div>
+        <div class="mem-action">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="7" width="20" height="14" rx="3" stroke="#818898" stroke-width="1.6"/><circle cx="12" cy="14" r="3.5" stroke="#818898" stroke-width="1.5"/><path d="M9 7l1.5-3h3L15 7" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="18.5" cy="10.5" r="1" fill="#186338"/></svg>
+        </div>
+      </div>
+      <!-- Club story circles -->
+      <div class="mem-stories">
+        <div class="mem-story active" onclick="setStory(this)">
+          <div class="mem-story-ring"><span class="mem-story-av">✦</span></div>
+          <span class="mem-story-lbl">All</span>
+        </div>
+        <div class="mem-story" onclick="setStory(this)">
+          <div class="mem-story-ring"><span class="mem-story-av">🌿</span></div>
+          <span class="mem-story-lbl">Eastern Mums</span>
+        </div>
+        <div class="mem-story" onclick="setStory(this)">
+          <div class="mem-story-ring"><span class="mem-story-av">🏊</span></div>
+          <span class="mem-story-lbl">Bondi Swim</span>
+        </div>
+        <div class="mem-story" onclick="setStory(this)">
+          <div class="mem-story-ring"><span class="mem-story-av">🌱</span></div>
+          <span class="mem-story-lbl">Inner City</span>
+        </div>
+        <div class="mem-story" onclick="setStory(this)">
+          <div class="mem-story-ring"><span class="mem-story-av">🌳</span></div>
+          <span class="mem-story-lbl">North Shore</span>
+        </div>
+      </div>
+    </div>
+    <div class="scr-body" style="padding-top:138px;">
+
+      <!-- FOR YOU feed -->
+      <div id="mem-foryou">
+
+        <!-- POST 1 -->
+        <div class="mem-post">
+          <div class="mem-post-hdr">
+            <div class="mem-post-av" style="background:#186338;">JW</div>
+            <div class="mem-post-info">
+              <span class="mem-post-name">Jessica Williams</span>
+              <span class="mem-post-meta">Eastern Mums · 10 min ago</span>
+            </div>
+            <span class="mem-post-more">···</span>
+          </div>
+          <div class="mem-post-img art-park">
+            <svg width="100%" height="268" viewBox="0 0 393 268" fill="none" style="position:absolute;top:0;left:0;" preserveAspectRatio="xMidYMid slice"><circle cx="80" cy="70" r="52" fill="rgba(255,255,255,0.07)"/><circle cx="320" cy="50" r="38" fill="rgba(255,255,255,0.05)"/><rect x="188" y="120" width="9" height="68" fill="rgba(255,255,255,0.12)"/><ellipse cx="192" cy="114" rx="22" ry="18" fill="rgba(255,255,255,0.12)"/><ellipse cx="196" cy="248" rx="170" ry="28" fill="rgba(255,255,255,0.05)"/></svg>
+            <div class="art-overlay"></div>
+            <div class="mem-post-caption">
+              <div class="mem-post-caption-title">Centennial Park Picnic</div>
+              <div class="mem-post-caption-sub">Saturday, 23 Nov · 14 photos</div>
+            </div>
+          </div>
+          <div class="mem-post-actions">
+            <button class="mem-action-btn liked" onclick="this.classList.toggle('liked')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21C12 21 3 14.5 3 8.5a5 5 0 0 1 9-3 5 5 0 0 1 9 3C21 14.5 12 21 12 21z"/></svg>
+              <span class="mem-action-count">14</span>
+            </button>
+            <button class="mem-action-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 3.5h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H7.5l-5.5 4V5.5a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+              <span>3</span>
+            </button>
+            <button class="mem-action-btn mem-action-share">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Share</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- POST 2 -->
+        <div class="mem-post">
+          <div class="mem-post-hdr">
+            <div class="mem-post-av" style="background:#4c5aa3;">KM</div>
+            <div class="mem-post-info">
+              <span class="mem-post-name">Karen Mitchell</span>
+              <span class="mem-post-meta">Bondi Swim · Yesterday</span>
+            </div>
+            <span class="mem-post-more">···</span>
+          </div>
+          <div class="mem-post-img art-swim">
+            <svg width="100%" height="268" viewBox="0 0 393 268" fill="none" style="position:absolute;top:0;left:0;" preserveAspectRatio="xMidYMid slice"><path d="M0 160c40-30 80-30 120 0s80 30 120 0 80-30 120 0 80 30 120 0" stroke="rgba(255,255,255,0.15)" stroke-width="2"/><path d="M0 180c40-30 80-30 120 0s80 30 120 0 80-30 120 0 80 30 120 0" stroke="rgba(255,255,255,0.10)" stroke-width="2"/><circle cx="196" cy="90" r="38" stroke="rgba(255,255,255,0.18)" stroke-width="2" fill="none"/></svg>
+            <div class="art-overlay"></div>
+            <div class="mem-post-caption">
+              <div class="mem-post-caption-title">Thursday Morning Swim</div>
+              <div class="mem-post-caption-sub">Bondi Pool · 7 Nov · 6 photos</div>
+            </div>
+          </div>
+          <div class="mem-post-actions">
+            <button class="mem-action-btn" onclick="this.classList.toggle('liked')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21C12 21 3 14.5 3 8.5a5 5 0 0 1 9-3 5 5 0 0 1 9 3C21 14.5 12 21 12 21z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+              <span class="mem-action-count">8</span>
+            </button>
+            <button class="mem-action-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 3.5h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H7.5l-5.5 4V5.5a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+              <span>1</span>
+            </button>
+            <button class="mem-action-btn mem-action-share">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Share</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- POST 3 -->
+        <div class="mem-post">
+          <div class="mem-post-hdr">
+            <div class="mem-post-av" style="background:#d64545;">SK</div>
+            <div class="mem-post-info">
+              <span class="mem-post-name">Sarah Kim</span>
+              <span class="mem-post-meta">Inner City Parents · 3 days ago</span>
+            </div>
+            <span class="mem-post-more">···</span>
+          </div>
+          <div class="mem-post-img art-craft">
+            <svg width="100%" height="268" viewBox="0 0 393 268" fill="none" style="position:absolute;top:0;left:0;" preserveAspectRatio="xMidYMid slice"><circle cx="196" cy="110" r="60" stroke="rgba(255,255,255,0.18)" stroke-width="2" fill="none"/><path d="M80 220 Q196 50 312 220" stroke="rgba(255,255,255,0.15)" stroke-width="2" fill="none"/></svg>
+            <div class="art-overlay"></div>
+            <div class="mem-post-caption">
+              <div class="mem-post-caption-title">Kids Art &amp; Craft Day</div>
+              <div class="mem-post-caption-sub">Surry Hills · 16 Nov · 8 photos</div>
+            </div>
+          </div>
+          <div class="mem-post-actions">
+            <button class="mem-action-btn" onclick="this.classList.toggle('liked')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21C12 21 3 14.5 3 8.5a5 5 0 0 1 9-3 5 5 0 0 1 9 3C21 14.5 12 21 12 21z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+              <span class="mem-action-count">21</span>
+            </button>
+            <button class="mem-action-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 3.5h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H7.5l-5.5 4V5.5a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+              <span>5</span>
+            </button>
+            <button class="mem-action-btn mem-action-share">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Share</span>
+            </button>
+          </div>
+        </div>
+        <div style="height:12px;"></div>
+      </div>
+
+      <!-- FIND DUO -->
+      <div id="mem-findduo" style="display:none;">
+        <div style="padding: 4px 0 14px;">
+          <div class="sec-hd"><div><div class="sec-eyebrow">Parents nearby</div><div class="sec-title">Find Your Duo</div></div></div>
+        </div>
+        <div class="duo-card"><div class="duo-av" style="background:#c3e3cc;">👩</div><div class="duo-info"><div class="duo-name">Jessica Williams</div><div class="duo-sub">Mum to Oliver, 4 · Paddington · Eastern Mums member</div><div class="duo-tags"><span class="duo-tag">Parks</span><span class="duo-tag">Arts</span><span class="duo-tag">Storytime</span></div></div><div class="duo-connect"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></div></div>
+        <div class="duo-card"><div class="duo-av" style="background:#b8dff6;">👩‍🦱</div><div class="duo-info"><div class="duo-name">Karen Mitchell</div><div class="duo-sub">Mum to Lily, 3 & Tom, 6 · Bondi · Swim Club member</div><div class="duo-tags"><span class="duo-tag">Swimming</span><span class="duo-tag">Dining</span></div></div><div class="duo-connect"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></div></div>
+        <div class="duo-card"><div class="duo-av" style="background:#f5d4be;">👩‍🦰</div><div class="duo-info"><div class="duo-name">Sarah Kim</div><div class="duo-sub">Mum to Emma, 5 · Surry Hills · Inner City Parents</div><div class="duo-tags"><span class="duo-tag">Classes</span><span class="duo-tag">Parks</span><span class="duo-tag">Arts</span></div></div><div class="duo-connect"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></div></div>
+        <div style="height:12px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════ AI ASSIST ════════════════════════════ -->
+  <div class="screen" id="screen-ai">
+    <div class="scr-body" style="padding-top:54px; padding-bottom:180px;">
+
+      <!-- Header text (y=51–147 in SVG) -->
+      <div class="ai-hdr">
+        <div class="ai-greeting">Good morning, Sarah ✨</div>
+        <div class="ai-title">How can I help<br>your family today?</div>
+      </div>
+
+      <!-- AI Illustration (y=147–331 in SVG, 189×184) -->
+      <div class="ai-illus">
+        <!-- Sparkles -->
+        <div class="ai-spark ai-spark-1">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1v3M8 12v3M1 8h3M12 8h3M3.22 3.22l2.12 2.12M10.66 10.66l2.12 2.12M3.22 12.78l2.12-2.12M10.66 5.34l2.12-2.12" stroke="#77b691" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="ai-spark ai-spark-2">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="M5 0.5v2M5 7.5v2M0.5 5h2M7.5 5h2M1.96 1.96l1.41 1.41M6.63 6.63l1.41 1.41M1.96 8.04l1.41-1.41M6.63 3.37l1.41-1.41" stroke="#77b691" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="ai-spark ai-spark-3">
+          <svg width="8" height="8" viewBox="0 0 8 8" fill="#d0dacf" opacity="0.8">
+            <circle cx="4" cy="4" r="3"/>
+          </svg>
+        </div>
+
+        <!-- Main orb -->
+        <div class="ai-orb-ring">
+          <!-- Sprout leaf inside orb -->
+          <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+            <path d="M36 56 C36 44 42 36 52 34 C44 34 36 42 36 56Z" fill="rgba(255,255,255,0.35)"/>
+            <path d="M36 56 C36 44 30 36 20 34 C28 34 36 42 36 56Z" fill="rgba(255,255,255,0.25)"/>
+            <line x1="36" y1="34" x2="36" y2="56" stroke="rgba(255,255,255,0.5)" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M36 38 C36 30 40 26 46 26 C40 26 36 30 36 38Z" fill="rgba(255,255,255,0.22)"/>
+            <path d="M36 38 C36 30 32 26 26 26 C32 26 36 30 36 38Z" fill="rgba(255,255,255,0.16)"/>
+            <!-- Subtle stars -->
+            <circle cx="52" cy="42" r="2" fill="rgba(255,255,255,0.3)"/>
+            <circle cx="20" cy="44" r="1.5" fill="rgba(255,255,255,0.2)"/>
+            <circle cx="44" cy="24" r="1.5" fill="rgba(255,255,255,0.25)"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Subtitle (SVG y≈370) -->
+      <div class="ai-sub">
+        <div class="ai-sub-title">"What can I help you with today?"</div>
+      </div>
+
+      <!-- Two tappable suggestion lines (SVG y≈436 and y≈490) -->
+      <div class="ai-suggests">
+        <div class="ai-suggest-line">
+          <span class="ai-suggest-txt">What events are near me this weekend?</span>
+          <svg class="ai-suggest-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="ai-suggest-line">
+          <span class="ai-suggest-txt">What is Eastern Mums planning this month?</span>
+          <svg class="ai-suggest-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="ai-suggest-line">
+          <span class="ai-suggest-txt">Suggest activities for a 4-year-old on a rainy day</span>
+          <svg class="ai-suggest-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Two pill CTAs (SVG y=657–709, side-by-side) -->
+    <div class="ai-pill-row">
+      <button class="ai-pill ai-pill-secondary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
+        Find Activities
+      </button>
+      <button class="ai-pill ai-pill-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="rgba(255,255,255,0.9)" stroke-width="1.8"/><path d="M8 2v3M16 2v3M3 10h18M12 14v4M10 16h4" stroke="rgba(255,255,255,0.9)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Create an Event
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════ CHAT ════════════════════════════ -->
+  <div class="screen" id="screen-chat">
+    <div class="scr-header" style="padding-bottom:4px;">
+      <div class="chat-hdr">
+        <div class="chat-pg-title">Chat</div>
+        <div class="compose-btn"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 14l1.5-4.5L11 2l3 3-7.5 7.5L2 14Z" stroke="#818898" stroke-width="1.4" stroke-linejoin="round"/><path d="M9.5 3.5l3 3" stroke="#818898" stroke-width="1.4"/></svg></div>
+      </div>
+      <div class="search-bar"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.5" cy="6.5" r="4.5" stroke="#b3b8c1" stroke-width="1.4"/><path d="M10 10l3 3" stroke="#b3b8c1" stroke-width="1.4" stroke-linecap="round"/></svg><span>Search</span></div>
+    </div>
+    <div class="scr-body" style="padding-top:102px;">
+      <!-- Social Clubs -->
+      <div class="chat-sec-hd"><span class="chat-sec-name">Social Clubs</span></div>
+      <div class="sec-divider"></div>
+      <div class="chat-conv"><div class="chat-av" style="background:#e2e9e3;">🌿</div><div class="chat-info"><div class="chat-conv-name">Eastern Mums</div><div class="chat-conv-prev">Jessica: Anyone up for the park this Sunday? 🌳</div></div><div class="chat-conv-meta"><span class="chat-conv-time">10:24</span><div class="chat-unread">3</div></div></div>
+      <div class="sec-divider"></div>
+      <div class="chat-conv"><div class="chat-av" style="background:#e2e9e3;">🏊</div><div class="chat-info"><div class="chat-conv-name">Bondi Swim Club</div><div class="chat-conv-prev">Tomorrow's lesson is at 8 AM sharp!</div></div><div class="chat-conv-meta"><span class="chat-conv-time">Yesterday</span></div></div>
+      <div class="sec-divider"></div>
+      <div class="chat-conv"><div class="chat-av" style="background:#e2e9e3;">🌱</div><div class="chat-info"><div class="chat-conv-name">Inner City Parents</div><div class="chat-conv-prev">Welcome Sarah! So glad you joined us 👋</div></div><div class="chat-conv-meta"><span class="chat-conv-time">Mon</span><div class="chat-unread">1</div></div></div>
+      <!-- Events -->
+      <div class="chat-sec-hd" style="margin-top:4px;"><span class="chat-sec-name">Events</span></div>
+      <div class="sec-divider"></div>
+      <div class="chat-conv"><div class="chat-av" style="background:linear-gradient(135deg,#c3e3cc,#80bc9e);">🌳</div><div class="chat-info"><div class="chat-conv-name">Centennial Park Picnic</div><div class="chat-conv-prev">You: Bringing lemonade and a blanket! ☀️</div></div><div class="chat-conv-meta"><span class="chat-conv-time">Mon</span></div></div>
+      <div class="sec-divider"></div>
+      <div class="chat-conv"><div class="chat-av" style="background:linear-gradient(135deg,#c8e8c0,#8bc486);">🌿</div><div class="chat-info"><div class="chat-conv-name">Botanic Garden Playdate</div><div class="chat-conv-prev">Karen: Can't wait, it's going to be so fun! 🌺</div></div><div class="chat-conv-meta"><span class="chat-conv-time">Sun</span></div></div>
+      <!-- DMs -->
+      <div class="chat-sec-hd" style="margin-top:4px;"><span class="chat-sec-name">Direct Messages</span></div>
+      <div class="sec-divider"></div>
+      <div class="chat-conv"><div class="chat-av" style="background:#c3e3cc;color:#186338;font-size:15px;font-weight:700;">JW</div><div class="chat-info"><div class="chat-conv-name">Jessica Williams</div><div class="chat-conv-prev">See you Saturday! So excited 🎉</div></div><div class="chat-conv-meta"><span class="chat-conv-time">2h ago</span><div class="chat-unread">2</div></div></div>
+      <div class="sec-divider"></div>
+      <div class="chat-conv"><div class="chat-av" style="background:#b8dff6;color:#186338;font-size:15px;font-weight:700;">KM</div><div class="chat-info"><div class="chat-conv-name">Karen Mitchell</div><div class="chat-conv-prev">Thanks so much for the invite!</div></div><div class="chat-conv-meta"><span class="chat-conv-time">Yesterday</span></div></div>
+      <div class="sec-divider"></div>
+      <div class="chat-conv"><div class="chat-av" style="background:#f5d4be;color:#186338;font-size:15px;font-weight:700;">SK</div><div class="chat-info"><div class="chat-conv-name">Sarah Kim</div><div class="chat-conv-prev">How's the little one doing lately?</div></div><div class="chat-conv-meta"><span class="chat-conv-time">Wed</span></div></div>
+      <div style="height:12px;"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════ CLUBS ════════════════════════════ -->
+  <div class="screen" id="screen-clubs">
+    <div class="scr-header" style="padding-bottom:0;">
+      <div class="club-tabs-row">
+        <div class="c-tab active"><div class="c-icon-wrap"><div class="c-icon">🌿</div><div class="c-badge">3</div></div><span class="c-name">Eastern Mums</span></div>
+        <div class="c-tab"><div class="c-icon-wrap"><div class="c-icon">🏊</div></div><span class="c-name">Bondi Swim</span></div>
+        <div class="c-tab"><div class="c-icon-wrap"><div class="c-icon">🌱</div></div><span class="c-name">Inner City Parents</span></div>
+        <div class="c-tab"><div class="c-icon-wrap"><div class="c-icon">🌳</div></div><span class="c-name">North Shore Families</span></div>
+        <div class="c-tab"><div class="c-icon-wrap"><div class="c-icon" style="background:var(--cr-input);font-size:18px;color:var(--tx3);">+</div></div><span class="c-name">Join Club</span></div>
+      </div>
+      <div class="clubs-sec-hd"><div class="clubs-sec-title">Member Directory</div><div class="clubs-sec-sub">Eastern Mums · 18 members</div></div>
+      <div class="clubs-filter-row">
+        <div class="fc-pill active" onclick="setActivePill(this,'.clubs-filter-row .fc-pill')">All (18)</div>
+        <div class="fc-pill" onclick="setActivePill(this,'.clubs-filter-row .fc-pill')">Met (6)</div>
+        <div class="fc-pill" onclick="setActivePill(this,'.clubs-filter-row .fc-pill')">Admin (3)</div>
+        <button class="invite-pill"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v9M1 5.5h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Invite</button>
+      </div>
+    </div>
+    <div class="scr-body" style="padding-top:210px;">
+      <div class="members-list">
+        <div class="member-row"><div class="member-av" style="background:#186338;">JW</div><div class="member-info"><div class="member-name">Jessica Williams</div><div class="member-role">Admin · Mum to Oliver, 4</div></div><span class="tag-met">Met</span></div>
+        <div class="member-row"><div class="member-av" style="background:#4c5aa3;">MC</div><div class="member-info"><div class="member-name">Michael Chen</div><div class="member-role">Member · Dad to Mia, 6</div></div><span class="tag-new">New</span></div>
+        <div class="member-row"><div class="member-av" style="background:#77b691;">EW</div><div class="member-info"><div class="member-name">Emma Wilson</div><div class="member-role">Admin · Mum to Lily, 3</div></div><span class="tag-met">Met</span></div>
+        <div class="member-row"><div class="member-av" style="background:#e8a97a;">DP</div><div class="member-info"><div class="member-name">David Park</div><div class="member-role">Member · Dad to Sam, 5</div></div><span class="tag-new">New</span></div>
+        <div class="member-row"><div class="member-av" style="background:#d64545;">SK</div><div class="member-info"><div class="member-name">Sarah Kim</div><div class="member-role">Admin · Mum to Emma, 5</div></div><span class="tag-admin">Admin</span></div>
+        <div class="member-row"><div class="member-av" style="background:#c59d3a;">KM</div><div class="member-info"><div class="member-name">Karen Mitchell</div><div class="member-role">Member · Mum to Tom, 6 & Lily, 3</div></div><span class="tag-met">Met</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════ FLOATING NAV ════════════════════════════ -->
+  <div class="float-nav">
+    <!-- Events -->
+    <div class="fn-item active" data-nav="home" onclick="switchTo('home')">
+      <div class="fn-icon-inactive"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21H15v-5h-6v5H3V10.5z" stroke="#b3b8c1" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+      <div class="fn-icon-active"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21H15v-5h-6v5H3V10.5z" stroke="#186338" stroke-width="1.8" stroke-linejoin="round" fill="rgba(24,99,56,0.10)"/></svg></div>
+      <span class="fn-label">Events</span>
+    </div>
+    <!-- Memories -->
+    <div class="fn-item" data-nav="memories" onclick="switchTo('memories')">
+      <div class="fn-icon-inactive"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="4.5" width="19" height="15" rx="3" stroke="#b3b8c1" stroke-width="1.6"/><circle cx="8.5" cy="10.5" r="2.2" stroke="#b3b8c1" stroke-width="1.5"/><path d="M2.5 16.5l5.5-5 4 3.5 3.5-3 7 5.5" stroke="#b3b8c1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="fn-icon-active"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="4.5" width="19" height="15" rx="3" stroke="#186338" stroke-width="1.6" fill="rgba(24,99,56,0.08)"/><circle cx="8.5" cy="10.5" r="2.2" stroke="#186338" stroke-width="1.5"/><path d="M2.5 16.5l5.5-5 4 3.5 3.5-3 7 5.5" stroke="#186338" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="fn-label">Memories</span>
+    </div>
+    <!-- AI Assist -->
+    <div class="fn-item" data-nav="ai" onclick="switchTo('ai')">
+      <div class="fn-icon-inactive"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2L14 8.6H21L15.5 12.6L17.5 19.2L12 15.2L6.5 19.2L8.5 12.6L3 8.6H10Z" stroke="#b3b8c1" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+      <div class="fn-icon-active"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2L14 8.6H21L15.5 12.6L17.5 19.2L12 15.2L6.5 19.2L8.5 12.6L3 8.6H10Z" stroke="#186338" stroke-width="1.6" stroke-linejoin="round" fill="rgba(24,99,56,0.10)"/></svg></div>
+      <span class="fn-label">AI Assist</span>
+    </div>
+    <!-- Chat -->
+    <div class="fn-item" data-nav="chat" onclick="switchTo('chat')">
+      <div class="fn-icon-inactive"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 3.5h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H7.5l-5.5 4V5.5a2 2 0 0 1 2-2Z" stroke="#b3b8c1" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+      <div class="fn-icon-active"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 3.5h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H7.5l-5.5 4V5.5a2 2 0 0 1 2-2Z" stroke="#186338" stroke-width="1.6" stroke-linejoin="round" fill="rgba(24,99,56,0.10)"/></svg></div>
+      <span class="fn-label">Chat</span>
+    </div>
+    <!-- Clubs -->
+    <div class="fn-item" data-nav="clubs" onclick="switchTo('clubs')">
+      <div class="fn-icon-inactive"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="8.5" cy="8" r="4" stroke="#b3b8c1" stroke-width="1.6"/><circle cx="15.5" cy="8" r="4" stroke="#b3b8c1" stroke-width="1.6"/><path d="M2 20c0-3.59 2.91-6.5 6.5-6.5S15 16.41 15 20" stroke="#b3b8c1" stroke-width="1.6" stroke-linecap="round"/><path d="M9 20c0-3.59 2.91-6.5 6.5-6.5s6.5 2.91 6.5 6.5" stroke="#b3b8c1" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+      <div class="fn-icon-active"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="8.5" cy="8" r="4" stroke="#186338" stroke-width="1.6"/><circle cx="15.5" cy="8" r="4" stroke="#186338" stroke-width="1.6"/><path d="M2 20c0-3.59 2.91-6.5 6.5-6.5S15 16.41 15 20" stroke="#186338" stroke-width="1.6" stroke-linecap="round"/><path d="M9 20c0-3.59 2.91-6.5 6.5-6.5s6.5 2.91 6.5 6.5" stroke="#186338" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+      <span class="fn-label">Clubs</span>
+    </div>
+  </div>
+
+</div><!-- /phone -->
+
+<script>
+// ── Screen navigation ─────────────────────────────────────
+function switchTo(nav) {
+  // Hide all screens
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  // Show target
+  document.getElementById('screen-' + nav).classList.add('active');
+  // Update nav
+  document.querySelectorAll('.fn-item').forEach(i => i.classList.remove('active'));
+  document.querySelector('[data-nav="' + nav + '"]').classList.add('active');
+}
+
+// ── Home sub-tabs ─────────────────────────────────────────
+function homeTab(tab) {
+  document.getElementById('seg-discover').classList.toggle('active', tab === 'discover');
+  document.getElementById('seg-myevents').classList.toggle('active', tab === 'myevents');
+  document.getElementById('home-discover').style.display = tab === 'discover' ? '' : 'none';
+  document.getElementById('home-myevents').style.display = tab === 'myevents' ? '' : 'none';
+}
+
+// ── Memories sub-tabs ─────────────────────────────────────
+function memTab(tab) {
+  document.getElementById('mem-tab-foryou').classList.toggle('active', tab === 'foryou');
+  document.getElementById('mem-tab-findduo').classList.toggle('active', tab === 'findduo');
+  document.getElementById('mem-foryou').style.display = tab === 'foryou' ? '' : 'none';
+  document.getElementById('mem-findduo').style.display = tab === 'findduo' ? '' : 'none';
+}
+
+// ── Memory story circles ──────────────────────────────────
+function setStory(el) {
+  el.closest('.mem-stories').querySelectorAll('.mem-story').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── Generic pill / chip toggles ───────────────────────────
+function setPill(el) {
+  el.closest('.filter-row').querySelectorAll('.f-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+function setChip(el, selector) {
+  document.querySelectorAll(selector).forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+function setActivePill(el, selector) {
+  document.querySelectorAll(selector).forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>14.X – Chat – Kindergarten Class Toggle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+/* ── SPROUT TOKENS ── */
+:root {
+  --brand:    #186338;
+  --brand-d:  #134f2d;
+  --brand-dd: #1e3e2b;
+  --brand-l:  #e2e9e3;   /* Brand/50  — sent bubble */
+  --bg:       #f4f1ea;   /* Secondary/500 — app bg / nav bg */
+  --s1:       #eae6db;   /* Surface/L1 — recv bubble, search, input */
+  --s2:       #dbd5c8;   /* Surface/L2 */
+  --tp:       #4d525b;   /* Content/Primary */
+  --ts:       #818898;   /* Content/Secondary */
+  --tt:       #b3b8c1;   /* Content/Tertiary */
+  --border:   rgba(0,0,0,.07);
+  --online:   #30d158;
+}
+
+/* ── PAGE ── */
+body {
+  min-height: 100vh;
+  background: linear-gradient(140deg, #aca49a 0%, #c9c2b4 50%, #a9a296 100%);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 52px 0 80px;
+  font-family: 'Inter', -apple-system, sans-serif;
+  user-select: none;
+}
+
+/* ── PHONE FRAME ── */
+.phone {
+  width: 393px; height: 852px;
+  background: var(--bg);
+  border-radius: 54px; overflow: hidden; position: relative;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.12),
+    0 0 0 10px #1c1c1e,
+    0 0 0 12px #2c2c2e,
+    0 60px 130px rgba(0,0,0,.55);
+  display: flex; flex-direction: column;
+}
+.phone::before {
+  content: ''; position: absolute; left: -13px; top: 120px;
+  width: 4px; height: 32px; background: #2a2a2a;
+  border-radius: 2px 0 0 2px;
+  box-shadow: 0 44px 0 #2a2a2a, 0 88px 0 #2a2a2a; z-index: 200;
+}
+.phone::after {
+  content: ''; position: absolute; right: -13px; top: 148px;
+  width: 4px; height: 66px; background: #2a2a2a;
+  border-radius: 0 2px 2px 0; z-index: 200;
+}
+.island {
+  position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 34px; background: #0a0a0a;
+  border-radius: 18px; z-index: 150; pointer-events: none;
+}
+
+/* ── STATUS BAR ── */
+.sb {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 26px 0; height: 52px; flex-shrink: 0;
+  background: var(--bg);
+}
+.sb-time { font-size: 15px; font-weight: 600; color: var(--tp); letter-spacing: -.01em; }
+.sb-icons { display: flex; align-items: center; gap: 6px; }
+
+/* ── NAV BAR ── */
+.nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 14px 10px;
+  background: var(--bg);
+  border-bottom: .5px solid var(--border);
+  flex-shrink: 0; gap: 8px;
+}
+.nav-back {
+  background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 44px; flex-shrink: 0;
+  transition: opacity .15s;
+}
+.nav-back:active { opacity: .4; }
+
+.nav-center {
+  flex: 1; display: flex; align-items: center; gap: 10px;
+  justify-content: center; min-width: 0;
+}
+.nav-school-icon {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  background: #f2d9d9;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+}
+.nav-text { display: flex; flex-direction: column; }
+.nav-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; font-weight: 700;
+  color: var(--brand-dd); line-height: 1.2;
+  white-space: nowrap;
+}
+.nav-online {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; color: var(--ts); margin-top: 1px;
+}
+.dot-green {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--online); flex-shrink: 0;
+}
+
+/* Calendar button — right side */
+.nav-cal-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: none; border: none; cursor: pointer; flex-shrink: 0;
+  transition: opacity .15s;
+}
+.nav-cal-btn:active { opacity: .55; }
+.cal-icon {
+  width: 36px; height: 36px; border-radius: 9px;
+  background: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-cal-btn span {
+  font-size: 10px; font-weight: 500; color: var(--ts); letter-spacing: .01em;
+}
+
+/* ── SCOPE TOGGLE ── */
+.scope-bar {
+  padding: 10px 16px 8px;
+  background: var(--bg);
+  border-bottom: .5px solid var(--border);
+  flex-shrink: 0;
+}
+.scope-seg {
+  display: flex; background: var(--s1);
+  border-radius: 11px; padding: 3px; gap: 2px;
+}
+.seg-opt {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 8px 8px; border-radius: 9px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 500; color: var(--ts);
+  cursor: pointer; border: none; background: none;
+  transition: all .2s cubic-bezier(.25,.46,.45,.94);
+  white-space: nowrap;
+}
+.seg-opt.active {
+  background: var(--bg); color: var(--tp);
+  box-shadow: 0 1px 4px rgba(0,0,0,.10), 0 0 0 .5px rgba(0,0,0,.05);
+}
+.seg-chip {
+  font-size: 11px; font-weight: 600; padding: 2px 7px;
+  border-radius: 99px; background: transparent; color: var(--tt);
+  transition: all .2s;
+}
+.seg-opt.active .seg-chip { background: var(--brand-l); color: var(--brand); }
+.scope-meta {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  margin-top: 7px; font-size: 11.5px; color: var(--ts);
+}
+
+/* ── CHAT AREA ── */
+.chat-area {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  background-color: #f0ece1;
+  position: relative;
+}
+.chat-area::-webkit-scrollbar { display: none; }
+
+/* botanical watermark */
+.chat-area::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  opacity: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23186338' stroke-opacity='0.055' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 110 C20 82 44 68 64 75 C44 75 27 89 20 110Z'/%3E%3Cpath d='M20 110 L64 75'/%3E%3Cpath d='M90 32 C90 18 104 13 114 19 C104 19 93 25 90 32Z'/%3E%3Cpath d='M90 32 L114 19'/%3E%3Ccircle cx='130' cy='100' r='5'/%3E%3Ccircle cx='140' cy='100' r='5'/%3E%3Ccircle cx='135' cy='93' r='5'/%3E%3Ccircle cx='135' cy='107' r='5'/%3E%3Cline x1='135' y1='112' x2='135' y2='122'/%3E%3Cpath d='M42 26 C50 33 47 44 40 48'/%3E%3Cpath d='M46 34 C55 28 61 31 59 39'/%3E%3Cpath d='M108 65 C108 57 118 53 124 57 C118 57 111 61 108 65Z'/%3E%3Cpath d='M108 65 L124 57'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+.msg-feed {
+  position: relative; z-index: 1;
+  padding: 10px 0 18px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+
+/* date pill */
+.date-row { display: flex; justify-content: center; padding: 10px 0 8px; }
+.date-row span {
+  font-size: 12px; font-weight: 500; color: var(--ts);
+  background: rgba(218,212,198,.9); backdrop-filter: blur(8px);
+  padding: 5px 16px; border-radius: 99px;
+}
+
+/* message row */
+.mrow { display: flex; align-items: flex-end; gap: 10px; padding: 2px 14px; }
+.mrow.sent { flex-direction: row-reverse; }
+.mrow.gap  { margin-top: 10px; }
+
+/* avatar — large circles matching actual design */
+.mavi {
+  width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px;
+}
+.mavi.ghost { visibility: hidden; }
+
+/* bubble column */
+.bcol { display: flex; flex-direction: column; max-width: 70%; gap: 3px; }
+.mrow.recv .bcol { align-items: flex-start; }
+.mrow.sent .bcol { align-items: flex-end; }
+
+.sname {
+  font-size: 12px; font-weight: 500; color: var(--ts);
+  padding: 0 4px; margin-bottom: 1px;
+}
+
+/* bubble — clean rounded rect, NO tails */
+.bbl {
+  padding: 10px 13px 8px; border-radius: 18px;
+  max-width: 100%; cursor: pointer;
+  transition: transform .15s;
+}
+.bbl:active { transform: scale(.97); }
+
+.bbl.recv { background: var(--s1); color: var(--tp); }
+.bbl.sent { background: var(--brand-l); color: var(--brand-dd); }
+
+.bbl-txt { font-size: 15px; line-height: 1.44; word-break: break-word; }
+.bbl-foot {
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: 4px; margin-top: 4px;
+}
+.bbl-time { font-size: 10.5px; color: var(--tt); }
+.bbl.sent .bbl-time { color: rgba(30,62,43,.4); }
+
+/* double-tick */
+.tick svg { display: block; }
+
+/* ── INPUT BAR ── */
+.input-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px 30px;
+  background: var(--bg);
+  border-top: .5px solid var(--border);
+  flex-shrink: 0;
+}
+.input-photo-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: none; border: none; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.input-photo-btn:active { transform: scale(.88); background: var(--s1); }
+.input-pill {
+  flex: 1; background: var(--s1); border-radius: 22px;
+  padding: 10px 16px; min-height: 42px;
+  display: flex; align-items: center;
+}
+.input-pill span { font-size: 15px; color: var(--tt); }
+.send-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--brand); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all .15s;
+}
+.send-btn:active { transform: scale(.88); background: var(--brand-d); }
+
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <span class="island" aria-hidden></span>
+
+  <!-- Status bar -->
+  <div class="sb">
+    <span class="sb-time">9:41</span>
+    <span class="sb-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+        <rect x="0"   y="8"   width="3" height="4"   rx=".5" fill="#4d525b"/>
+        <rect x="4.5" y="5.5" width="3" height="6.5" rx=".5" fill="#4d525b"/>
+        <rect x="9"   y="3"   width="3" height="9"   rx=".5" fill="#4d525b"/>
+        <rect x="13.5" y="0"  width="3" height="12"  rx=".5" fill="#4d525b"/>
+      </svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <path d="M8 2.5C5.4 2.5 3.1 3.5 1.4 5.2l1.2 1.2C4 5.1 5.9 4.3 8 4.3s4 .8 5.4 2.1l1.2-1.2C12.9 3.5 10.6 2.5 8 2.5z" fill="#4d525b"/>
+        <path d="M4.2 7.5l1.2 1.2C6.1 8 7 7.6 8 7.6s1.9.4 2.6 1.1l1.2-1.2C10.6 6.3 9.4 5.8 8 5.8s-2.6.5-3.8 1.7z" fill="#4d525b"/>
+        <circle cx="8" cy="11" r="1.4" fill="#4d525b"/>
+      </svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+        <rect x=".5" y=".5" width="21" height="11" rx="2.5" stroke="#4d525b" stroke-opacity=".38"/>
+        <rect x="22" y="4"  width="2"  height="4"  rx=".8"  fill="#4d525b" fill-opacity=".38"/>
+        <rect x="2"  y="2"  width="18" height="8"  rx="1.5" fill="#4d525b"/>
+      </svg>
+    </span>
+  </div>
+
+  <!-- Nav bar -->
+  <div class="nav">
+    <!-- Back -->
+    <button class="nav-back" aria-label="Back">
+      <svg width="11" height="19" viewBox="0 0 11 19" fill="none">
+        <path d="M10 1L1.5 9.5 10 18" stroke="#1e3e2b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <!-- Center: icon + text -->
+    <div class="nav-center">
+      <div class="nav-school-icon" aria-hidden>🍀</div>
+      <div class="nav-text">
+        <div class="nav-title">Kindergarten</div>
+        <div class="nav-online">
+          <span class="dot-green"></span>
+          <span id="nav-online-txt">25 online</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar button -->
+    <button class="nav-cal-btn" aria-label="Calendar">
+      <div class="cal-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="2" y="4" width="16" height="14" rx="2.5" stroke="white" stroke-width="1.5"/>
+          <path d="M2 8h16" stroke="white" stroke-width="1.5"/>
+          <path d="M6 2v3M14 2v3" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="5.5" y="10.5" width="2.5" height="2.5" rx=".5" fill="white"/>
+          <rect x="9"   y="10.5" width="2.5" height="2.5" rx=".5" fill="white"/>
+          <rect x="12.5" y="10.5" width="2.5" height="2.5" rx=".5" fill="white"/>
+          <rect x="5.5" y="14" width="2.5" height="2.5" rx=".5" fill="white"/>
+          <rect x="9"   y="14" width="2.5" height="2.5" rx=".5" fill="white"/>
+        </svg>
+      </div>
+      <span>Calendar</span>
+    </button>
+  </div>
+
+  <!-- Scope toggle -->
+  <div class="scope-bar">
+    <div class="scope-seg">
+      <button class="seg-opt active" id="opt-class" onclick="switchScope('class')">
+        Miss Taylor's Class
+        <span class="seg-chip" id="chip-class">25</span>
+      </button>
+      <button class="seg-opt" id="opt-grade" onclick="switchScope('grade')">
+        All Kindergarten
+        <span class="seg-chip" id="chip-grade">147</span>
+      </button>
+    </div>
+    <div class="scope-meta">
+      <span class="dot-green" style="width:6px;height:6px;"></span>
+      <span id="scope-meta">8 parents active today</span>
+    </div>
+  </div>
+
+  <!-- ── CLASS VIEW ── -->
+  <div class="chat-area" id="view-class">
+    <div class="msg-feed">
+      <div class="date-row"><span>Today</span></div>
+
+      <div class="mrow recv gap">
+        <div class="mavi" style="background:linear-gradient(135deg,#77b691,#387f56)">SM</div>
+        <div class="bcol">
+          <div class="sname">Sarah M.</div>
+          <div class="bbl recv">
+            <div class="bbl-txt">Just a reminder — picture day is Thursday! 📸 Make sure the kiddos look their best 😊</div>
+            <div class="bbl-foot"><span class="bbl-time">9:14 PM</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mrow recv gap">
+        <div class="mavi" style="background:linear-gradient(135deg,#7ab0e8,#3a7ca5)">JK</div>
+        <div class="bcol">
+          <div class="sname">Jamie K.</div>
+          <div class="bbl recv">
+            <div class="bbl-txt">Are kids supposed to wear their class shirt for the photos?</div>
+            <div class="bbl-foot"><span class="bbl-time">9:22 PM</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mrow recv gap">
+        <div class="mavi" style="background:linear-gradient(135deg,#e8a87a,#c47a3a)">RP</div>
+        <div class="bcol">
+          <div class="sname">Ryan P.</div>
+          <div class="bbl recv" style="margin-bottom:4px">
+            <div class="bbl-txt">Ms. Taylor's note said yes — class shirt for picture day 🙌</div>
+          </div>
+          <div class="bbl recv">
+            <div class="bbl-txt">Also bring $15 cash or pay through the parent portal!</div>
+            <div class="bbl-foot"><span class="bbl-time">9:31 PM</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mrow recv gap">
+        <div class="mavi" style="background:linear-gradient(135deg,#d07ad0,#9a4a9a)">PS</div>
+        <div class="bcol">
+          <div class="sname">Priya S.</div>
+          <div class="bbl recv">
+            <div class="bbl-txt">Anyone helping with Jake's birthday book? His bday is Friday 🎂</div>
+            <div class="bbl-foot"><span class="bbl-time">9:45 PM</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mrow sent gap">
+        <div class="mavi ghost"></div>
+        <div class="bcol">
+          <div class="bbl sent">
+            <div class="bbl-txt">Happy to help with the birthday book! I can start a sign-up sheet 📋</div>
+            <div class="bbl-foot">
+              <span class="bbl-time">9:47 PM</span>
+              <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+                <path d="M1 5l2.5 3.5 4.5-8" stroke="rgba(30,62,43,.4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M6.5 5l2.5 3.5 4.5-8" stroke="rgba(30,62,43,.4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── GRADE VIEW ── -->
+  <div class="chat-area" id="view-grade" style="display:none">
+    <div class="msg-feed">
+      <div class="date-row"><span>Today</span></div>
+
+      <div class="mrow recv gap">
+        <div class="mavi" style="background:linear-gradient(135deg,#186338,#1e3e2b);border-radius:9px;font-size:17px">🌿</div>
+        <div class="bcol">
+          <div class="sname">Kiker PTA · Kindergarten</div>
+          <div class="bbl recv">
+            <div class="bbl-txt">📢 Field trip permission slips due Friday for ALL kinder classes. Sign in the parent portal or drop off at the front office.</div>
+            <div class="bbl-foot"><span class="bbl-time">8:02 AM</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mrow recv gap">
+        <div class="mavi" style="background:linear-gradient(135deg,#7ab0e8,#3a7ca5)">MT</div>
+        <div class="bcol">
+          <div class="sname">Marcus T. · Ms. Reed's class</div>
+          <div class="bbl recv">
+            <div class="bbl-txt">Is the field trip for all classes or just a few?</div>
+            <div class="bbl-foot"><span class="bbl-time">8:45 AM</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mrow recv gap">
+        <div class="mavi" style="background:linear-gradient(135deg,#77b691,#387f56)">DW</div>
+        <div class="bcol">
+          <div class="sname">Dana W. · Ms. Johnson's class</div>
+          <div class="bbl recv">
+            <div class="bbl-txt">All 6 classes going same day, same place. Different chaperones per class 👍</div>
+            <div class="bbl-foot"><span class="bbl-time">9:01 AM</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mrow recv gap">
+        <div class="mavi" style="background:linear-gradient(135deg,#e8a87a,#c47a3a)">LM</div>
+        <div class="bcol">
+          <div class="sname">Lena M. · Ms. Taylor's class</div>
+          <div class="bbl recv">
+            <div class="bbl-txt">We still need 2 more chaperones for Ms. Taylor's group if anyone's free! 🙋</div>
+            <div class="bbl-foot"><span class="bbl-time">9:18 AM</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mrow recv gap">
+        <div class="mavi" style="background:linear-gradient(135deg,#d07ad0,#9a4a9a)">CB</div>
+        <div class="bcol">
+          <div class="sname">Chris B. · Ms. Garcia's class</div>
+          <div class="bbl recv">
+            <div class="bbl-txt">Reminder: kindergarten spring concert May 14 at 6pm. All families welcome 🎵</div>
+            <div class="bbl-foot"><span class="bbl-time">9:39 AM</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mrow sent gap">
+        <div class="mavi ghost"></div>
+        <div class="bcol">
+          <div class="bbl sent">
+            <div class="bbl-txt">Happy to chaperone for Ms. Taylor's group! Signing up now 🙋‍♀️</div>
+            <div class="bbl-foot">
+              <span class="bbl-time">9:52 AM</span>
+              <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+                <path d="M1 5l2.5 3.5 4.5-8" stroke="rgba(30,62,43,.4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M6.5 5l2.5 3.5 4.5-8" stroke="rgba(30,62,43,.4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Input bar -->
+  <div class="input-bar">
+    <button class="input-photo-btn" aria-label="Photo">
+      <svg width="26" height="24" viewBox="0 0 26 24" fill="none">
+        <rect x="1" y="4" width="24" height="18" rx="3" stroke="#818898" stroke-width="1.5"/>
+        <circle cx="13" cy="13" r="4.5" stroke="#818898" stroke-width="1.5"/>
+        <path d="M9 4.5l2-3h4l2 3" stroke="#818898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="input-pill"><span>Type Message</span></div>
+    <button class="send-btn" aria-label="Send">
+      <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+        <path d="M14.5 2.5L7.5 9.5M14.5 2.5L10 15 7.5 9.5 2 7 14.5 2.5Z" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+</div><!-- /phone -->
+
+<script>
+function switchScope(scope) {
+  const oc = document.getElementById('opt-class');
+  const og = document.getElementById('opt-grade');
+  const vc = document.getElementById('view-class');
+  const vg = document.getElementById('view-grade');
+  const nt = document.getElementById('nav-online-txt');
+  const sm = document.getElementById('scope-meta');
+
+  if (scope === 'class') {
+    oc.className = 'seg-opt active'; og.className = 'seg-opt';
+    vc.style.display = '';           vg.style.display = 'none';
+    nt.textContent = '25 online';    sm.textContent = '8 parents active today';
+  } else {
+    oc.className = 'seg-opt';        og.className = 'seg-opt active';
+    vc.style.display = 'none';       vg.style.display = '';
+    nt.textContent = '147 online';   sm.textContent = '34 parents active today';
+  }
+}
+</script>
+</body>
+</html>

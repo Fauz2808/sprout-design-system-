@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lunch Menu — New Calendar Note Type · Sprout</title>
+  <style>
+    :root {
+      --bg:        #f0ede6;
+      --surface:   #ffffff;
+      --fg:        #1a1a17;
+      --muted:     #7a7568;
+      --border:    #ddd9cf;
+      --green:     #2d5c2e;
+      --green-mid: #3d7a40;
+      --green-soft:#e8f0e8;
+      --tag-bg:    #ece9e2;
+      --t-event:   #2d5c2e;   --t-event-bg:   #e4f0e6;
+      --t-special: #c08a2d;   --t-special-bg: #fbf0d8;
+      --t-noschool:#c0533d;   --t-noschool-bg:#fae3dd;
+      --t-todo:    #3b6ea5;   --t-todo-bg:    #e1ecf7;
+      --t-lunch:   #c9691f;   --t-lunch-bg:   #fbe6d3;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+      --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+      --radius: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {
+      background: #ddd8ce; font-family: var(--font); font-size: 15px; line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+      display: flex; align-items: flex-start; justify-content: center;
+      gap: 40px; padding: 32px 24px 90px; min-height: 100vh; flex-wrap: wrap;
+    }
+    .lede{width:100%;text-align:center;margin-bottom:6px;flex-basis:100%;}
+    .lede h1{font-size:24px;font-weight:700;color:#23271f;margin-bottom:8px;}
+    .lede p{font-size:13px;color:#7a7568;max-width:760px;margin:0 auto;line-height:1.6;}
+    .panel { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .caption {
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #8a8478; text-align: center; max-width: 340px; line-height:1.6;
+    }
+    .caption strong { color: #3a3830; font-weight: 600; }
+
+    .device {
+      position: relative; width: 390px; height: 844px; border-radius: 56px; padding: 12px;
+      background: linear-gradient(160deg, #2a2a2c 0%, #1a1a1c 50%, #0e0e10 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04) inset, 0 0 0 2px #000 inset,
+        0 28px 60px -12px rgba(0,0,0,0.45), 0 8px 20px -8px rgba(0,0,0,0.35);
+    }
+    .island { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); width: 124px; height: 36px; background: #000; border-radius: 999px; z-index: 5; }
+    .screen {
+      position: relative; width: 100%; height: 100%; background: var(--bg);
+      border-radius: 44px; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .statusbar {
+      flex: 0 0 47px; padding: 18px 26px 0; display: flex; align-items: flex-start;
+      justify-content: space-between; font-size: 15px; font-weight: 600; color: var(--fg);
+    }
+    .statusbar .right { display: inline-flex; align-items: center; gap: 6px; }
+    .statusbar svg { width: 17px; height: 11px; fill: var(--fg); } .statusbar .bat { width: 25px; }
+    .scroll { flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; }
+    .scroll::-webkit-scrollbar { display: none; }
+
+    .topbar { padding: 10px 16px 8px; display: flex; align-items: center; gap: 10px; }
+    .icon-btn {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--surface);
+      border: 1px solid var(--border); display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+    }
+    .icon-btn svg { width: 18px; height: 18px; stroke: var(--fg); fill: none; stroke-width: 2; }
+    .topbar-title .h { font-size: 18px; font-weight: 700; color: var(--fg); letter-spacing: -0.02em; margin: 0; }
+    .topbar-title .s { font-size: 12px; color: var(--muted); margin: 1px 0 0; }
+
+    .weekstrip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; padding: 4px 14px 14px; }
+    .daycell { text-align: center; padding: 7px 0 6px; border-radius: 12px; }
+    .daycell .dow { font-size: 10px; font-family: var(--font-mono); text-transform: uppercase; color: var(--muted); letter-spacing: 0.04em; }
+    .daycell .dnum { font-size: 15px; font-weight: 600; color: var(--fg); margin-top: 3px; }
+    .daycell .dotrow { display: flex; gap: 2px; justify-content: center; margin-top: 4px; height: 4px; }
+    .daycell .dotrow span { width: 4px; height: 4px; border-radius: 50%; }
+    .daycell.active { background: var(--green); }
+    .daycell.active .dow, .daycell.active .dnum { color: #fff; }
+
+    .agenda { padding: 0 16px 16px; }
+    .agenda-day { font-size: 13px; font-weight: 700; color: var(--fg); margin: 4px 2px 10px; }
+    .cal-item {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 13px;
+      padding: 11px 13px; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 11px;
+      position: relative; overflow: hidden; cursor:pointer;
+    }
+    .cal-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+    .cal-item.event::before    { background: var(--t-event); }
+    .cal-item.special::before  { background: var(--t-special); }
+    .cal-item.noschool::before { background: var(--t-noschool); }
+    .cal-item.todo::before     { background: var(--t-todo); }
+    .cal-item.lunch::before    { background: var(--t-lunch); }
+    .cal-ic { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; font-size: 16px; flex-shrink: 0; }
+    .cal-item.event .cal-ic    { background: var(--t-event-bg); }
+    .cal-item.special .cal-ic  { background: var(--t-special-bg); }
+    .cal-item.noschool .cal-ic { background: var(--t-noschool-bg); }
+    .cal-item.todo .cal-ic     { background: var(--t-todo-bg); }
+    .cal-item.lunch .cal-ic    { background: var(--t-lunch-bg); }
+    .cal-body { flex: 1; min-width: 0; }
+    .cal-title { font-size: 14px; font-weight: 600; color: var(--fg); }
+    .cal-meta { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .cal-type-pill {
+      font-size: 9.5px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 2px 7px; border-radius: 999px; font-weight: 700; flex-shrink: 0; align-self: center;
+    }
+    .cal-type-pill.lunch { background: var(--t-lunch-bg); color: var(--t-lunch); }
+
+    /* type picker */
+    .sheet-title { font-size: 16px; font-weight: 700; color: var(--fg); margin: 12px 16px 4px; }
+    .sheet-sub { font-size: 12.5px; color: var(--muted); margin: 0 16px 14px; }
+    .type-opt {
+      display: flex; align-items: center; gap: 13px; padding: 13px 12px; border-radius: 14px;
+      border: 1px solid var(--border); margin: 0 16px 9px; cursor: pointer; background: var(--surface);
+    }
+    .type-opt.feature { border-color: var(--t-lunch); background: var(--t-lunch-bg); }
+    .type-opt-ic { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; font-size: 19px; flex-shrink: 0; }
+    .type-opt .nm { font-size: 14.5px; font-weight: 600; color: var(--fg); }
+    .type-opt .ds { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .type-opt .new-badge { margin-left: auto; font-size: 9.5px; font-family: var(--font-mono); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #fff; background: var(--t-lunch); padding: 2px 8px; border-radius: 999px; }
+
+    /* lunch entry form */
+    .form { padding: 4px 16px 20px; }
+    .field { margin-bottom: 15px; }
+    .field label { display: block; font-size: 12px; font-weight: 700; color: var(--fg); margin-bottom: 6px; }
+    .field input { width:100%; border:1px solid var(--border); border-radius:12px; padding:11px 13px; font-family:var(--font); font-size:14px; color:var(--fg); background:var(--surface); }
+    .opt-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+    .opt-num{width:22px;height:22px;border-radius:50%;background:var(--t-lunch-bg);color:var(--t-lunch);font-size:11px;font-weight:700;display:grid;place-items:center;flex-shrink:0;}
+    .opt-row input{flex:1;}
+    .diet-tag{width:30px;height:30px;border-radius:9px;border:1px solid var(--border);display:grid;place-items:center;font-size:13px;flex-shrink:0;cursor:pointer;}
+    .diet-tag.on{background:var(--green-soft);border-color:var(--green-mid);}
+    .add-opt-btn{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--t-lunch);cursor:pointer;padding:4px 0;}
+    .save-btn{width:100%;height:48px;border-radius:14px;background:var(--t-lunch);color:#fff;border:none;font-size:14.5px;font-weight:700;font-family:var(--font);margin-top:8px;}
+
+    /* clean note-detail displays */
+    .nd-wrap{padding:6px 16px 16px;}
+    .nd-date{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:14px;}
+    .nd-section-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:18px 0 9px;}
+    .nd-section-lbl:first-of-type{margin-top:0;}
+    .nd-opt{display:flex;align-items:center;gap:11px;background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:12px 14px;margin-bottom:8px;}
+    .nd-opt .num{width:24px;height:24px;border-radius:50%;background:var(--t-lunch-bg);color:var(--t-lunch);font-size:11.5px;font-weight:700;display:grid;place-items:center;flex-shrink:0;}
+    .nd-opt .nm{flex:1;font-size:14.5px;font-weight:600;color:var(--fg);}
+    .nd-opt .icons{display:flex;gap:4px;flex-shrink:0;}
+    .nd-opt .icons span{font-size:13px;}
+    .nd-single{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:12px 14px;display:flex;align-items:center;gap:11px;margin-bottom:8px;}
+    .nd-single .ic{font-size:18px;}
+    .nd-single .nm{font-size:14.5px;font-weight:600;color:var(--fg);flex:1;}
+
+    /* daily brief snippet */
+    .brief-card{margin:0 16px 12px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:13px 15px;}
+    .brief-card-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+    .brief-card-head .ic{width:30px;height:30px;border-radius:9px;background:var(--t-lunch-bg);display:grid;place-items:center;font-size:15px;}
+    .brief-card-head .t{font-size:13.5px;font-weight:700;color:var(--fg);}
+    .brief-opt-row{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--fg);padding:5px 0;border-top:1px solid var(--border);}
+    .brief-opt-row:first-of-type{border-top:none;}
+    .brief-opt-row .icons span{font-size:11px;margin-left:2px;}
+  </style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Lunch Menu — New "Lunch" Note Type</h1>
+  <p>New note type alongside Event / Special / No School / To-do, per Tony's ask. Uses the real Aug 19 school menu as source data. The dense original (breakfast + 3 lunch mains + 4 side items + scattered diet icons) gets cut down to just the numbered mains with icons trailing at the end — sides are left out entirely, as Tony said they're "on the chopping block." Two display versions below to compare: lunch-only, and breakfast+lunch.</p>
+</div>
+
+<!-- ═══ 1. ADD NOTE — TYPE PICKER WITH NEW LUNCH TYPE ═══ -->
+<div class="panel">
+  <div class="device"><div class="island"></div>
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="right">🔋</span></div>
+      <div class="sheet-title">Add to Calendar</div>
+      <div class="sheet-sub">What kind of note is this?</div>
+      <div class="type-opt"><div class="type-opt-ic" style="background:var(--t-event-bg);">🎉</div><div><div class="nm">Event</div><div class="ds">Field trips, parties, activities</div></div></div>
+      <div class="type-opt"><div class="type-opt-ic" style="background:var(--t-noschool-bg);">🚫</div><div><div class="nm">No School</div><div class="ds">Holidays, teacher workdays</div></div></div>
+      <div class="type-opt"><div class="type-opt-ic" style="background:var(--t-special-bg);">⭐</div><div><div class="nm">Special</div><div class="ds">Spirit days, dress-up days</div></div></div>
+      <div class="type-opt"><div class="type-opt-ic" style="background:var(--t-todo-bg);">✅</div><div><div class="nm">To-do</div><div class="ds">Bring, sign, or send something</div></div></div>
+      <div class="type-opt feature"><div class="type-opt-ic" style="background:#fff;">🍽️</div><div><div class="nm">Lunch Menu</div><div class="ds">Today's breakfast &amp; lunch options</div></div><span class="new-badge">New</span></div>
+    </div>
+  </div>
+  <div class="caption"><strong>1 · Add Note</strong> — "Lunch Menu" added as a fifth type, same pattern as Event/Special/No School/To-do</div>
+</div>
+
+<!-- ═══ 2. LUNCH ENTRY FORM ═══ -->
+<div class="panel">
+  <div class="device"><div class="island"></div>
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="right">🔋</span></div>
+      <div class="sheet-title">Lunch Menu — Wed, Aug 19</div>
+      <div class="sheet-sub">Add breakfast and today's lunch options</div>
+      <div class="form">
+        <div class="field"><label>Breakfast</label><input value="Potato, Egg &amp; Cheese Taco (or Cereal)"></div>
+        <div class="field"><label>Lunch options</label>
+          <div class="opt-row"><div class="opt-num">1</div><input value="Hamburger"><div class="diet-tag">🌱</div></div>
+          <div class="opt-row"><div class="opt-num">2</div><input value="Rebellyous Burger"><div class="diet-tag on">🌱</div></div>
+          <div class="opt-row"><div class="opt-num">3</div><input value="SunButter &amp; Jelly Sandwich"><div class="diet-tag on">🌱</div></div>
+          <div class="add-opt-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>Add another option</div>
+        </div>
+        <button class="save-btn">Save Lunch Menu</button>
+      </div>
+    </div>
+  </div>
+  <div class="caption"><strong>2 · Entry form</strong> — tap the 🌱 tag to mark an option vegetarian; sides/extras are intentionally left off this form since Tony said to cut them</div>
+</div>
+
+<!-- ═══ 3. CALENDAR — day dot + agenda row ═══ -->
+<div class="panel">
+  <div class="device"><div class="island"></div>
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="right">🔋</span></div>
+      <div class="topbar"><div class="icon-btn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><div class="topbar-title"><div class="h">August 2026</div><div class="s">Ms. Taylor's Class</div></div></div>
+      <div class="weekstrip">
+        <div class="daycell"><div class="dow">Mo</div><div class="dnum">17</div><div class="dotrow"></div></div>
+        <div class="daycell"><div class="dow">Tu</div><div class="dnum">18</div><div class="dotrow"><span style="background:var(--t-lunch)"></span></div></div>
+        <div class="daycell active"><div class="dow">We</div><div class="dnum">19</div><div class="dotrow"><span style="background:#fff"></span><span style="background:#fff"></span></div></div>
+        <div class="daycell"><div class="dow">Th</div><div class="dnum">20</div><div class="dotrow"><span style="background:var(--t-lunch)"></span></div></div>
+        <div class="daycell"><div class="dow">Fr</div><div class="dnum">21</div><div class="dotrow"><span style="background:var(--t-lunch)"></span></div></div>
+        <div class="daycell"><div class="dow">Sa</div><div class="dnum">22</div><div class="dotrow"></div></div>
+        <div class="daycell"><div class="dow">Su</div><div class="dnum">23</div><div class="dotrow"></div></div>
+      </div>
+      <div class="agenda">
+        <div class="agenda-day">Wednesday, August 19</div>
+        <div class="cal-item event"><div class="cal-ic" style="background:var(--t-event-bg);">🎂</div><div class="cal-body"><div class="cal-title">Presley's Birthday</div><div class="cal-meta">All day</div></div></div>
+        <div class="cal-item lunch"><div class="cal-ic">🍽️</div><div class="cal-body"><div class="cal-title">Lunch Menu</div><div class="cal-meta">Hamburger, Rebellyous Burger + 1 more</div></div><span class="cal-type-pill lunch">LUNCH</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="caption"><strong>3 · Calendar</strong> — orange dot on days with a lunch menu entered; tapping the agenda row opens the note detail (next panels)</div>
+</div>
+
+<!-- ═══ 4a. NOTE DETAIL — LUNCH ONLY ═══ -->
+<div class="panel">
+  <div class="device"><div class="island"></div>
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="right">🔋</span></div>
+      <div class="topbar"><div class="icon-btn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><div class="topbar-title"><div class="h">🍽️ Lunch Menu</div></div></div>
+      <div class="scroll">
+        <div class="nd-wrap">
+          <div class="nd-date">Wednesday, August 19</div>
+          <div class="nd-opt"><div class="num">1</div><div class="nm">Hamburger</div></div>
+          <div class="nd-opt"><div class="num">2</div><div class="nm">Rebellyous Burger</div><div class="icons"><span>🌱</span></div></div>
+          <div class="nd-opt"><div class="num">3</div><div class="nm">SunButter &amp; Jelly Sandwich</div><div class="icons"><span>🌱</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="caption"><strong>4a · Version A — Lunch only</strong> — just the three mains, numbered, icon trailing at the end. No sides, no breakfast, no scattered icons.</div>
+</div>
+
+<!-- ═══ 4b. NOTE DETAIL — BREAKFAST + LUNCH ═══ -->
+<div class="panel">
+  <div class="device"><div class="island"></div>
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="right">🔋</span></div>
+      <div class="topbar"><div class="icon-btn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><div class="topbar-title"><div class="h">🍽️ Lunch Menu</div></div></div>
+      <div class="scroll">
+        <div class="nd-wrap">
+          <div class="nd-date">Wednesday, August 19</div>
+          <div class="nd-section-lbl">Breakfast</div>
+          <div class="nd-single"><span class="ic">🥞</span><span class="nm">Potato, Egg &amp; Cheese Taco</span></div>
+          <div class="nd-section-lbl">Lunch</div>
+          <div class="nd-opt"><div class="num">1</div><div class="nm">Hamburger</div></div>
+          <div class="nd-opt"><div class="num">2</div><div class="nm">Rebellyous Burger</div><div class="icons"><span>🌱</span></div></div>
+          <div class="nd-opt"><div class="num">3</div><div class="nm">SunButter &amp; Jelly Sandwich</div><div class="icons"><span>🌱</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="caption"><strong>4b · Version B — Breakfast + Lunch</strong> — same clean pattern, one more section up top. Still no sides.</div>
+</div>
+
+<!-- ═══ 5. DAILY BRIEF SNIPPET ═══ -->
+<div class="panel">
+  <div class="device"><div class="island"></div>
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="right">🔋</span></div>
+      <div class="topbar"><div class="topbar-title"><div class="h">Good morning, Tony</div><div class="s">Wednesday, August 19</div></div></div>
+      <div class="scroll">
+        <div style="padding:4px 16px 0;">
+          <div class="brief-card">
+            <div class="brief-card-head"><div class="ic">🎂</div><div class="t">Presley's Birthday</div></div>
+          </div>
+          <div class="brief-card">
+            <div class="brief-card-head"><div class="ic">🍽️</div><div class="t">Today's Lunch</div></div>
+            <div class="brief-opt-row"><span>1. Hamburger</span></div>
+            <div class="brief-opt-row"><span>2. Rebellyous Burger</span><span class="icons"><span>🌱</span></span></div>
+            <div class="brief-opt-row"><span>3. SunButter &amp; Jelly Sandwich</span><span class="icons"><span>🌱</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="caption"><strong>5 · Daily Brief</strong> — the calendar entry feeds straight into the brief automatically. No separate notification, per Tony ("they're already gonna use the daily brief to see all this stuff").</div>
+</div>
+
+</body>
+</html>

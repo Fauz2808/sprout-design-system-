@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprout — Search: Multi-Result Concepts (2, 3, 4+ matches)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --brand-500:#186338; --brand-600:#134f2d; --brand-700:#1e3e2b; --brand-50:#e2e9e3;
+    --bg:#f4f1ea; --surf-1:#eee9dc;
+    --grey-900:#1a1b1e; --grey-700:#4d525b; --grey-500:#818898; --grey-300:#b3b8c1; --grey-100:#e6e7ea;
+    --serif:'Playfair Display',serif; --sans:'Inter',sans-serif;
+  }
+  body{background:#cfc8b8;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:48px 32px 90px;font-family:var(--sans);gap:48px;flex-wrap:wrap;}
+  .lede{width:100%;text-align:center;margin-bottom:6px;flex-basis:100%;}
+  .lede h1{font-family:var(--serif);font-size:27px;font-weight:700;color:#3a332a;margin-bottom:8px;}
+  .lede p{font-size:13px;color:#7a7060;max-width:760px;margin:0 auto;line-height:1.6;}
+  .variant-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .variant-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5a5347;text-align:center;max-width:340px;line-height:1.6;}
+
+  .phone{width:393px;height:852px;background:var(--bg);border-radius:54px;overflow:hidden;position:relative;box-shadow:0 0 0 1px rgba(0,0,0,.07),0 24px 80px rgba(0,0,0,.22);display:flex;flex-direction:column;}
+  .island{width:120px;height:36px;background:#000;border-radius:20px;position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:20;}
+  .sb{height:54px;display:flex;align-items:center;justify-content:space-between;padding:14px 28px 0;flex-shrink:0;}
+  .sb span{font-size:15px;font-weight:600;color:var(--grey-900);}
+
+  .nav{display:flex;align-items:center;justify-content:center;position:relative;padding:8px 16px 14px;flex-shrink:0;}
+  .back-btn{position:absolute;left:16px;width:36px;height:36px;border-radius:50%;background:var(--brand-50);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .back-btn svg{width:16px;height:16px;color:var(--brand-700);}
+  .nav-title{display:flex;align-items:center;gap:5px;font-family:var(--serif);font-size:19px;font-weight:600;color:var(--brand-700);}
+  .nav-title svg{width:13px;height:13px;color:var(--brand-700);margin-top:2px;}
+
+  .search-wrap{padding:0 20px 10px;flex-shrink:0;}
+  .search{display:flex;align-items:center;gap:9px;background:#fff;border:1.5px solid var(--brand-500);border-radius:14px;padding:12px 15px;}
+  .search svg.ic{width:16px;height:16px;color:var(--grey-500);flex-shrink:0;}
+  .search input{border:none;background:transparent;outline:none;flex:1;font-family:var(--sans);font-size:14px;color:var(--grey-900);}
+  .search .clear{width:20px;height:20px;border-radius:50%;background:var(--grey-300);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .search .clear svg{width:9px;height:9px;color:#fff;}
+  .result-count{padding:0 20px 12px;font-size:12px;color:var(--grey-500);flex-shrink:0;}
+  .result-count b{color:var(--grey-900);}
+
+  .scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:8px;}
+  .scroll::-webkit-scrollbar{display:none;}
+
+  .ph1{background:linear-gradient(155deg,#9fc4e0 0%,#bcd8a8 42%,#5c8a4f 78%,#3a6b3e 100%);}
+  .ph2{background:linear-gradient(155deg,#a8c9e8 0%,#c7d9a0 40%,#6a8f52 75%,#2f5c38 100%);}
+  .ph3{background:linear-gradient(155deg,#f0d9a8 0%,#e0b978 45%,#8a6a45 80%,#5c4530 100%);}
+  .ph4{background:linear-gradient(155deg,#c9b8e0 0%,#a894c8 45%,#6b5590 80%,#453862 100%);}
+  .ph-ic{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:26px;opacity:.32;}
+
+  /* ═══ CONCEPT 1 — Compact list rows ═══ */
+  .cl-row{display:flex;align-items:center;gap:12px;margin:0 20px 9px;background:#fff;border-radius:16px;padding:9px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .cl-thumb{width:56px;height:56px;border-radius:12px;flex-shrink:0;position:relative;overflow:hidden;}
+  .cl-body{flex:1;min-width:0;}
+  .cl-name{font-family:var(--serif);font-size:14.5px;font-weight:700;color:var(--grey-900);}
+  .cl-dist{font-size:11.5px;color:var(--grey-500);margin-top:1px;}
+  .cl-rank{font-size:9.5px;font-weight:700;color:var(--brand-600);background:var(--brand-50);padding:2px 7px;border-radius:99px;margin-top:4px;display:inline-block;}
+  .cl-chev{width:8px;height:8px;color:var(--grey-300);flex-shrink:0;margin-right:4px;}
+
+  /* ═══ CONCEPT 2 — 2-column result grid ═══ */
+  .gr-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 20px;}
+  .gr-card{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,.06);}
+  .gr-photo{width:100%;aspect-ratio:1/1;position:relative;overflow:hidden;}
+  .gr-photo-shade{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 60%,rgba(0,0,0,.5) 100%);}
+  .gr-rank{position:absolute;left:8px;top:8px;background:rgba(255,255,255,.92);color:var(--brand-700);font-family:var(--serif);font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:99px;}
+  .gr-body{padding:9px 10px 11px;}
+  .gr-name{font-family:var(--serif);font-size:13.5px;font-weight:700;color:var(--grey-900);line-height:1.25;margin-bottom:3px;}
+  .gr-dist{font-size:11px;color:var(--grey-500);}
+
+  /* ═══ CONCEPT 3 — Best match hero + ranked list ═══ */
+  .bm-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--grey-500);padding:0 20px 8px;}
+  .bm-hero{margin:0 20px 16px;border-radius:22px;overflow:hidden;box-shadow:0 8px 22px rgba(0,0,0,.1);background:#fff;}
+  .bm-hero-photo{width:100%;height:150px;position:relative;overflow:hidden;}
+  .bm-hero-shade{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 55%,rgba(0,0,0,.55) 100%);}
+  .bm-hero-badge{position:absolute;left:12px;top:12px;background:rgba(255,255,255,.94);color:var(--brand-700);font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:99px;}
+  .bm-hero-name-on{position:absolute;left:14px;bottom:12px;font-family:var(--serif);font-size:18px;font-weight:700;color:#fff;}
+  .bm-hero-body{padding:10px 14px 13px;display:flex;align-items:center;justify-content:space-between;}
+  .bm-hero-dist{font-size:12px;color:var(--grey-500);}
+  .bm-hero-cta{font-size:12px;font-weight:700;color:var(--brand-500);}
+
+  .bm-rest-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--grey-500);padding:0 20px 8px;margin-top:2px;}
+  .bm-row{display:flex;align-items:center;gap:11px;margin:0 20px 8px;padding:6px 4px;}
+  .bm-thumb{width:44px;height:44px;border-radius:10px;flex-shrink:0;position:relative;overflow:hidden;}
+  .bm-name{font-size:13px;font-weight:600;color:var(--grey-900);}
+  .bm-dist{font-size:10.5px;color:var(--grey-500);margin-top:1px;}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Search Results — Handling 2, 3, 4+ Matches</h1>
+  <p>The single-result hero card stays as-is for an exact 1-match search (e.g. "Zilker Park"). But a query like "Park" will legitimately match several places — here are three ways to handle that case, all lighter than the full Nearby/Top 10 browsing UI, all using the square thumbnail format.</p>
+</div>
+
+<!-- ═══ CONCEPT 1 — COMPACT LIST ═══ -->
+<div class="variant-wrap">
+  <div class="phone">
+    <div class="island"></div>
+    <div class="sb"><span>9:41</span><span>🔋</span></div>
+    <div class="nav">
+      <button class="back-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="nav-title">Home <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="search-wrap"><div class="search"><svg class="ic" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input value="Park" readonly><div class="clear"><svg viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div></div></div>
+    <div class="result-count"><b>4 results</b> for "Park"</div>
+    <div class="scroll">
+      <div class="cl-row"><div class="cl-thumb ph1"><div class="ph-ic">🏞️</div></div><div class="cl-body"><div class="cl-name">Zilker Park</div><div class="cl-dist">2.1 mi</div><span class="cl-rank">🏆 Top 10 · #1</span></div><svg class="cl-chev" viewBox="0 0 8 14" fill="none"><path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="cl-row"><div class="cl-thumb ph2"><div class="ph-ic">🧗</div></div><div class="cl-body"><div class="cl-name">Mueller Park</div><div class="cl-dist">2.1 mi</div><span class="cl-rank">🏆 Top 10 · #2</span></div><svg class="cl-chev" viewBox="0 0 8 14" fill="none"><path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="cl-row"><div class="cl-thumb ph3"><div class="ph-ic">🛝</div></div><div class="cl-body"><div class="cl-name">Pease Park</div><div class="cl-dist">3.1 mi</div></div><svg class="cl-chev" viewBox="0 0 8 14" fill="none"><path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="cl-row"><div class="cl-thumb ph4"><div class="ph-ic">🌉</div></div><div class="cl-body"><div class="cl-name">Shipe Park</div><div class="cl-dist">3.3 mi</div></div><svg class="cl-chev" viewBox="0 0 8 14" fill="none"><path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+  </div>
+  <span class="variant-label">Concept 1 — Compact list: lightest option, scales to any number of results. Top 10 rank shown as a small badge when applicable, otherwise just name + distance.</span>
+</div>
+
+<!-- ═══ CONCEPT 2 — 2-COL GRID ═══ -->
+<div class="variant-wrap">
+  <div class="phone">
+    <div class="island"></div>
+    <div class="sb"><span>9:41</span><span>🔋</span></div>
+    <div class="nav">
+      <button class="back-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="nav-title">Home <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="search-wrap"><div class="search"><svg class="ic" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input value="Park" readonly><div class="clear"><svg viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div></div></div>
+    <div class="result-count"><b>4 results</b> for "Park"</div>
+    <div class="scroll">
+      <div class="gr-grid">
+        <div class="gr-card"><div class="gr-photo ph1"><div class="ph-ic">🏞️</div><div class="gr-photo-shade"></div><div class="gr-rank">🏆 #1</div></div><div class="gr-body"><div class="gr-name">Zilker Park</div><div class="gr-dist">2.1 mi</div></div></div>
+        <div class="gr-card"><div class="gr-photo ph2"><div class="ph-ic">🧗</div><div class="gr-photo-shade"></div><div class="gr-rank">🏆 #2</div></div><div class="gr-body"><div class="gr-name">Mueller Park</div><div class="gr-dist">2.1 mi</div></div></div>
+        <div class="gr-card"><div class="gr-photo ph3"><div class="ph-ic">🛝</div></div><div class="gr-body"><div class="gr-name">Pease Park</div><div class="gr-dist">3.1 mi</div></div></div>
+        <div class="gr-card"><div class="gr-photo ph4"><div class="ph-ic">🌉</div></div><div class="gr-body"><div class="gr-name">Shipe Park</div><div class="gr-dist">3.3 mi</div></div></div>
+      </div>
+    </div>
+  </div>
+  <span class="variant-label">Concept 2 — 2-column grid: same square-photo card as the single-result view, just smaller and repeated. Most visual of the three, good middle ground between list and hero.</span>
+</div>
+
+<!-- ═══ CONCEPT 3 — BEST MATCH + RANKED LIST ═══ -->
+<div class="variant-wrap">
+  <div class="phone">
+    <div class="island"></div>
+    <div class="sb"><span>9:41</span><span>🔋</span></div>
+    <div class="nav">
+      <button class="back-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="nav-title">Home <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="search-wrap"><div class="search"><svg class="ic" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input value="Park" readonly><div class="clear"><svg viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div></div></div>
+    <div class="result-count"><b>4 results</b> for "Park"</div>
+    <div class="scroll">
+      <div class="bm-label">Best match</div>
+      <div class="bm-hero">
+        <div class="bm-hero-photo ph1"><div class="ph-ic" style="font-size:34px;">🏞️</div><div class="bm-hero-shade"></div><div class="bm-hero-badge">🏆 Top 10 · #1</div><div class="bm-hero-name-on">Zilker Park</div></div>
+        <div class="bm-hero-body"><span class="bm-hero-dist">2.1 mi away</span><span class="bm-hero-cta">View Details →</span></div>
+      </div>
+
+      <div class="bm-rest-label">Other matches</div>
+      <div class="bm-row"><div class="bm-thumb ph2"><div class="ph-ic" style="font-size:18px;">🧗</div></div><div><div class="bm-name">Mueller Park</div><div class="bm-dist">2.1 mi · Top 10 #2</div></div></div>
+      <div class="bm-row"><div class="bm-thumb ph3"><div class="ph-ic" style="font-size:18px;">🛝</div></div><div><div class="bm-name">Pease Park</div><div class="bm-dist">3.1 mi</div></div></div>
+      <div class="bm-row"><div class="bm-thumb ph4"><div class="ph-ic" style="font-size:18px;">🌉</div></div><div><div class="bm-name">Shipe Park</div><div class="bm-dist">3.3 mi</div></div></div>
+      <div style="height:16px;"></div>
+    </div>
+  </div>
+  <span class="variant-label">Concept 3 — Best match + ranked list: top result gets the hero treatment (closest to the single-result design, so it feels consistent whether there's 1 match or several), rest fall in below as a quiet list.</span>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Admin · Manage Class · Sprout</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f0ede6; --surface:#fff; --field:#e8e4d9; --fg:#1a1a17; --ink:#1c2a1d; --muted:#807a6c; --border:#ddd9cf;
+    --green:#2d5c2e; --green-mid:#3d7a40; --green-soft:#e7efe6; --red:#c0392b; --red-soft:#fbe6e3;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif; --serif:'Playfair Display',Georgia,serif; --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;height:100%;}
+  body{background:#ddd8ce;font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;padding:32px 24px;min-height:100vh;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .caption{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8478;text-align:center;}
+  .caption strong{color:#3a3830;font-weight:600;}
+
+  .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .device::before,.device::after{content:'';position:absolute;width:3px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.06) 8%,transparent 16%,transparent 84%,rgba(255,255,255,.04) 92%,transparent);top:100px;bottom:100px;}
+  .device::before{left:-1px;}.device::after{right:-1px;}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:5;}
+  .br{position:absolute;width:4px;background:#0a0a0c;border-radius:2px;}
+  .br.l1{left:-3px;top:174px;height:32px;}.br.l2{left:-3px;top:220px;height:60px;}.br.l3{left:-3px;top:290px;height:60px;}.br.r1{right:-3px;top:250px;height:100px;}
+
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--fg);}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--fg);} .sb .bat{width:25px;}
+
+  .view{flex:1 1 auto;display:none;flex-direction:column;min-height:0;} .view.on{display:flex;}
+
+  /* top bar */
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:6px 14px 8px;}
+  .ibtn{width:36px;height:36px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;flex-shrink:0;} .ibtn svg{width:20px;height:20px;stroke:var(--fg);fill:none;stroke-width:2;}
+  .top .t{flex:1;text-align:center;font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);}
+  .top .sp{width:36px;flex-shrink:0;}
+
+  .scroll{flex:1 1 auto;overflow-y:auto;padding:4px 18px 18px;} .scroll::-webkit-scrollbar{display:none;}
+
+  /* class header */
+  .classcard{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:15px 16px;box-shadow:0 8px 20px -14px rgba(40,40,30,.4);}
+  .classcard .cc-ic{width:52px;height:52px;border-radius:15px;background:var(--green-soft);display:grid;place-items:center;font-size:26px;flex-shrink:0;}
+  .classcard .cc-nm{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);line-height:1.1;}
+  .classcard .cc-sub{font-size:12.5px;color:var(--muted);margin-top:3px;}
+  .classcard .cc-badge{margin-left:auto;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;background:var(--green);color:#fff;padding:4px 9px;border-radius:999px;flex-shrink:0;}
+
+  .seclbl{display:flex;align-items:center;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:22px 4px 9px;}
+  .seclbl .ct{color:var(--muted);font-weight:600;margin-left:5px;text-transform:none;letter-spacing:0;font-size:12px;}
+  .seclbl .add{margin-left:auto;color:var(--green);font-weight:700;text-transform:none;letter-spacing:0;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:3px;}
+
+  /* invite link */
+  .invite{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:12px 13px;cursor:pointer;}
+  .invite .inv-ic{width:38px;height:38px;border-radius:11px;background:#eef3ea;display:grid;place-items:center;font-size:18px;flex-shrink:0;}
+  .invite .inv-tx{flex:1;min-width:0;}
+  .invite .inv-url{font-size:13px;font-weight:600;color:var(--ink);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .invite .inv-mu{font-size:11px;color:var(--muted);margin-top:2px;}
+  .invite .inv-copy{flex-shrink:0;background:var(--green-soft);color:var(--green);border:none;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);}
+  .invite .inv-copy.done{background:var(--green);color:#fff;}
+
+  /* member / parent rows */
+  .mlist,.plist{display:flex;flex-direction:column;gap:8px;}
+  .mrow{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:11px 13px;}
+  .av{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;}
+  .mrow .nm{font-size:14.5px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:7px;}
+  .mrow .you{font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:var(--green);color:#fff;padding:2px 7px;border-radius:999px;}
+  .mrow .sub{font-size:12px;color:var(--muted);margin-top:2px;}
+  .mrow .body{flex:1;min-width:0;}
+  .mrow .rm{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--surface);display:grid;place-items:center;cursor:pointer;flex-shrink:0;}
+  .mrow .rm svg{width:17px;height:17px;stroke:var(--red);fill:none;stroke-width:2.2;}
+  .mrow .adminchip{font-size:10px;font-weight:700;color:var(--green-mid);background:var(--green-soft);padding:4px 9px;border-radius:999px;flex-shrink:0;}
+
+  /* search */
+  .searchwrap{flex:0 0 auto;padding:2px 18px 10px;}
+  .search{display:flex;align-items:center;gap:9px;background:var(--field);border:1px solid var(--border);border-radius:13px;padding:11px 13px;}
+  .search svg{width:17px;height:17px;stroke:var(--muted);fill:none;stroke-width:2;flex-shrink:0;}
+  .search input{flex:1;border:none;background:transparent;outline:none;font-family:var(--font);font-size:14.5px;color:var(--fg);}
+  .hint{font-size:12px;color:var(--muted);margin:2px 4px 10px;}
+
+  /* add-parent row with checkbox */
+  .prow{display:flex;align-items:center;gap:12px;background:var(--surface);border:1.5px solid var(--border);border-radius:15px;padding:11px 13px;cursor:pointer;transition:border-color .12s ease;}
+  .prow.sel{border-color:var(--green);}
+  .prow.added{opacity:.55;cursor:default;}
+  .prow .chk{width:25px;height:25px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700;}
+  .prow.sel .chk{background:var(--green);border-color:var(--green);}
+  .prow .inclass{font-size:11px;font-weight:700;color:var(--green-mid);flex-shrink:0;}
+  .notfound{text-align:center;font-size:12.5px;color:var(--muted);margin:18px 0 4px;}
+  .notfound b{color:var(--green);cursor:pointer;}
+
+  /* dock */
+  .dock{flex:0 0 auto;padding:12px 18px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(18px);}
+  .btn{width:100%;border:none;border-radius:15px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);}
+  .btn.primary{background:var(--green);color:#fff;box-shadow:0 12px 26px -10px rgba(45,92,46,.6);}
+  .btn.primary:disabled{opacity:.4;box-shadow:none;}
+  .btn.danger{background:var(--red);color:#fff;}
+  .btn.ghost2{background:var(--surface);border:1.5px solid var(--border);color:var(--ink);margin-top:9px;}
+
+  .home{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:134px;height:5px;background:var(--fg);border-radius:999px;opacity:.18;z-index:9;}
+
+  /* ── bottom sheets ── */
+  .overlay{position:absolute;inset:0;background:rgba(20,20,15,.45);opacity:0;pointer-events:none;transition:opacity .25s;z-index:20;border-radius:44px;}
+  .overlay.on{opacity:1;pointer-events:auto;}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:26px 26px 0 0;transform:translateY(115%);visibility:hidden;transition:transform .32s cubic-bezier(.32,.72,0,1),visibility .32s;z-index:21;box-shadow:0 -8px 34px rgba(0,0,0,.25);}
+  .sheet.on{transform:translateY(0);visibility:visible;}
+  .grab{width:38px;height:5px;border-radius:999px;background:rgba(0,0,0,.16);margin:10px auto 2px;}
+  .sh-pad{padding:8px 22px calc(24px + env(safe-area-inset-bottom));}
+  .sh-title{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);text-align:center;margin:6px 0 16px;}
+  .linkfield{display:flex;align-items:center;gap:10px;background:var(--field);border:1px solid var(--border);border-radius:13px;padding:13px 14px;}
+  .linkfield span{flex:1;font-family:var(--mono);font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .linkfield button{flex-shrink:0;background:var(--green);color:#fff;border:none;border-radius:10px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);}
+  .sharerow{display:flex;justify-content:space-between;gap:8px;margin:16px 0 6px;}
+  .share{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;color:var(--muted);font-weight:600;cursor:pointer;}
+  .share .sic{width:50px;height:50px;border-radius:16px;background:var(--field);display:grid;place-items:center;font-size:23px;}
+  .sh-note{text-align:center;font-size:11.5px;color:var(--muted);margin-top:14px;line-height:1.5;}
+  .rm-title{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--ink);text-align:center;margin:8px 0 8px;}
+  .rm-sub{text-align:center;font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:18px;padding:0 6px;}
+
+  .toast{position:absolute;left:50%;bottom:96px;transform:translateX(-50%) translateY(10px);background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:11px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:30;box-shadow:0 10px 24px -8px rgba(0,0,0,.5);}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="caption"><strong>Admin · Manage class</strong> — add from Sprout · remove · share invite link</div>
+  <div class="device">
+    <span class="br l1"></span><span class="br l2"></span><span class="br l3"></span><span class="br r1"></span><span class="island"></span>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg>
+        <svg viewBox="0 0 17 11"><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1z"/></svg>
+        <svg class="bat" viewBox="0 0 25 11"><rect x=".5" y=".5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="22" y="3.5" width="1.5" height="4" rx=".4" fill="currentColor" fill-opacity=".45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+      </span></div>
+
+      <!-- ── MANAGE CLASS ── -->
+      <section class="view on" id="v-manage">
+        <div class="top">
+          <div class="ibtn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="t">Manage class</div>
+          <div class="sp"></div>
+        </div>
+        <div class="scroll">
+          <div class="classcard">
+            <div class="cc-ic">🍀</div>
+            <div><div class="cc-nm">Miss Taylor's Class</div><div class="cc-sub">Lincoln Elementary · Kindergarten</div></div>
+            <div class="cc-badge">Admin</div>
+          </div>
+
+          <div class="seclbl">Invite link</div>
+          <div class="invite" onclick="openInvite()">
+            <div class="inv-ic">🔗</div>
+            <div class="inv-tx"><div class="inv-url">joinsprout.co/c/taylor-8fk3</div><div class="inv-mu">Anyone with the link can join</div></div>
+            <button class="inv-copy" onclick="copyLink(event,this)">Copy</button>
+          </div>
+
+          <div class="seclbl">Members <span class="ct" id="memCount">· 6 families</span> <span class="add" onclick="show('v-add')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg> Add</span></div>
+          <div class="mlist" id="mlist"></div>
+        </div>
+        <div class="dock"><button class="btn primary" onclick="show('v-add')">Add parents</button></div>
+      </section>
+
+      <!-- ── ADD PARENTS (from Sprout) ── -->
+      <section class="view" id="v-add">
+        <div class="top">
+          <div class="ibtn" onclick="show('v-manage')"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="t">Add parents</div>
+          <div class="sp"></div>
+        </div>
+        <div class="searchwrap">
+          <div class="search">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input id="search" placeholder="Search parents on Sprout" oninput="renderAdd(this.value)"/>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="hint">Parents at <b>Lincoln Elementary</b> already on Sprout</div>
+          <div class="plist" id="plist"></div>
+          <div class="notfound">Not on Sprout yet? <b onclick="openInvite()">Share the invite link →</b></div>
+        </div>
+        <div class="dock"><button class="btn primary" id="addBtn" disabled onclick="doAdd()">Select parents to add</button></div>
+      </section>
+
+      <!-- invite sheet -->
+      <div class="overlay" id="invOverlay" onclick="closeInvite()"></div>
+      <div class="sheet" id="invSheet">
+        <div class="grab"></div>
+        <div class="sh-pad">
+          <div class="sh-title">Invite to Miss Taylor's Class</div>
+          <div class="linkfield"><span>joinsprout.co/c/taylor-8fk3</span><button id="copyBtn2" onclick="copyLink2(this)">Copy</button></div>
+          <div class="sharerow">
+            <div class="share"><div class="sic">💬</div>Messages</div>
+            <div class="share"><div class="sic">🟢</div>WhatsApp</div>
+            <div class="share"><div class="sic">✉️</div>Email</div>
+            <div class="share"><div class="sic">•••</div>More</div>
+          </div>
+          <div class="sh-note">Anyone with the link can join this class's chat & events.</div>
+        </div>
+      </div>
+
+      <!-- remove confirm sheet -->
+      <div class="overlay" id="rmOverlay" onclick="closeRemove()"></div>
+      <div class="sheet" id="rmSheet">
+        <div class="grab"></div>
+        <div class="sh-pad">
+          <div class="rm-title">Remove <span id="rmName">Sarah Jensen</span>?</div>
+          <div class="rm-sub">They'll lose access to the class chat and events. You can always invite them back later.</div>
+          <button class="btn danger" onclick="confirmRemove()">Remove from class</button>
+          <button class="btn ghost2" onclick="closeRemove()">Cancel</button>
+        </div>
+      </div>
+
+      <div class="toast" id="toast">Link copied ✓</div>
+      <div class="home"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const COLORS=['#c98aa8','#6fa8d0','#8fba92','#d8a86a','#b69be0','#7a5c52','#5a8f5d','#c0857a','#9a6f9a'];
+  // current members (Tony = you/admin)
+  let MEMBERS=[
+    {name:'Tony Martin',  kid:'Dad of Cooper',  you:true},
+    {name:'Sarah Jensen', kid:'Mom of Mia'},
+    {name:'Emily Centineo',kid:'Mom of Flora'},
+    {name:'Mike Johnson', kid:'Dad of Hawkins'},
+    {name:'Priya Patel',  kid:'Mom of Aanya'},
+    {name:'Jake Thompson',kid:'Dad of Erick'},
+  ];
+  // parents on Sprout at the school, not yet in the class
+  const SPROUT=[
+    {name:'David Lee',     kid:'Dad of Ryan · Kindergarten'},
+    {name:'Maria Garcia',  kid:'Mom of Sofia · Kindergarten'},
+    {name:'Rachel Kim',    kid:'Mom of Ethan · Kindergarten'},
+    {name:'Tom Bennett',   kid:'Dad of Lily · Kindergarten'},
+    {name:'Aisha Khan',    kid:'Mom of Zayn · Kindergarten'},
+    {name:'Carlos Romero', kid:'Dad of Diego · 1st grade'},
+    {name:'Hannah White',  kid:'Mom of Grace · Kindergarten'},
+  ];
+  let selected=new Set();
+
+  function ini(n){ const p=n.split(' '); return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase(); }
+  function colorFor(n){ let s=0; for(const c of n) s+=c.charCodeAt(0); return COLORS[s%COLORS.length]; }
+
+  function show(id){ document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id)); if(id==='v-add'){ selected.clear(); document.getElementById('search').value=''; renderAdd(''); updateAddBtn(); } }
+
+  // ── members ──
+  function renderMembers(){
+    document.getElementById('memCount').textContent='· '+MEMBERS.length+' families';
+    document.getElementById('mlist').innerHTML=MEMBERS.map((m,i)=>`
+      <div class="mrow">
+        <div class="av" style="background:${colorFor(m.name)}">${ini(m.name)}</div>
+        <div class="body"><div class="nm">${m.name}${m.you?'<span class="you">You</span>':''}</div><div class="sub">${m.kid}</div></div>
+        ${m.you
+          ? '<div class="adminchip">Admin</div>'
+          : `<div class="rm" title="Remove" onclick="openRemove(${i})"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></div>`}
+      </div>`).join('');
+  }
+
+  // ── add parents ──
+  function renderAdd(q){
+    q=(q||'').toLowerCase();
+    const list=SPROUT.filter(p=>p.name.toLowerCase().includes(q));
+    document.getElementById('plist').innerHTML=list.map(p=>{
+      const idx=SPROUT.indexOf(p), sel=selected.has(idx);
+      return `<div class="prow${sel?' sel':''}" onclick="toggleSel(${idx})">
+        <div class="av" style="background:${colorFor(p.name)}">${ini(p.name)}</div>
+        <div class="body"><div class="nm">${p.name}</div><div class="sub">${p.kid}</div></div>
+        <div class="chk">${sel?'✓':''}</div>
+      </div>`;
+    }).join('') || '<div class="hint" style="text-align:center;margin-top:24px">No parents match "'+q+'"</div>';
+  }
+  function toggleSel(i){ selected.has(i)?selected.delete(i):selected.add(i); renderAdd(document.getElementById('search').value); updateAddBtn(); }
+  function updateAddBtn(){ const b=document.getElementById('addBtn'); b.disabled=selected.size===0; b.textContent=selected.size?`Add ${selected.size} ${selected.size===1?'parent':'parents'}`:'Select parents to add'; }
+  function doAdd(){
+    [...selected].sort((a,b)=>a-b).forEach(i=>MEMBERS.push({name:SPROUT[i].name, kid:SPROUT[i].kid.split(' · ')[0]}));
+    const n=selected.size; renderMembers(); show('v-manage'); toast(`${n} ${n===1?'parent':'parents'} added`);
+  }
+
+  // ── remove ──
+  let rmIdx=-1;
+  function openRemove(i){ rmIdx=i; document.getElementById('rmName').textContent=MEMBERS[i].name; document.getElementById('rmOverlay').classList.add('on'); document.getElementById('rmSheet').classList.add('on'); }
+  function closeRemove(){ document.getElementById('rmOverlay').classList.remove('on'); document.getElementById('rmSheet').classList.remove('on'); }
+  function confirmRemove(){ const n=MEMBERS[rmIdx].name; MEMBERS.splice(rmIdx,1); renderMembers(); closeRemove(); toast(`${n} removed`); }
+
+  // ── invite link ──
+  function openInvite(){ document.getElementById('invOverlay').classList.add('on'); document.getElementById('invSheet').classList.add('on'); }
+  function closeInvite(){ document.getElementById('invOverlay').classList.remove('on'); document.getElementById('invSheet').classList.remove('on'); }
+  function copyLink(e,btn){ e.stopPropagation(); btn.textContent='Copied ✓'; btn.classList.add('done'); toast('Link copied ✓'); setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('done');},1600); }
+  function copyLink2(btn){ btn.textContent='Copied ✓'; toast('Link copied ✓'); setTimeout(()=>btn.textContent='Copy',1600); }
+
+  let tT;
+  function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('on'),1700); }
+
+  renderMembers(); renderAdd('');
+  if(location.hash){ const id=location.hash.slice(1); if(document.getElementById(id)) show(id); }
+</script>
+</body>
+</html>
