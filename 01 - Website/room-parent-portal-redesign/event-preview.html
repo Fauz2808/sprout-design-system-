@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Event Preview · Mrs. Taylor's Class</title>
+<link rel="icon" type="image/svg+xml" href="assets/logo/room-parent-mark.svg"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --surface:#ffffff;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+    --green:#186338; --green-mid:#4fa472; --green-light:#e2e9e3; --green-border:#77b691;
+    --border:#e6e0d2; --amber:#c08a2d; --amber-bg:#fbf0d8; --red:#a83f34; --red-bg:#fbe4e0;
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);font-family:var(--sans);color:var(--body);-webkit-font-smoothing:antialiased;min-height:100vh;}
+
+  .wrap{max-width:560px;margin:0 auto;padding:40px 20px 80px;}
+  .brand{display:inline-flex;align-items:center;gap:9px;font-family:var(--sans);font-size:15px;font-weight:600;color:#245c43;margin-bottom:16px;letter-spacing:-.02em;}
+  .brand .mark{width:34px;height:34px;border-radius:10px;background:#fff;border:1px solid rgba(30,62,43,.1);padding:4px;display:grid;place-items:center;box-shadow:0 3px 12px rgba(30,62,43,.07);}
+  .brand .mark img{display:block;width:100%;height:100%;object-fit:contain;}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;box-shadow:0 2px 10px rgba(30,62,43,.05);margin-bottom:18px;}
+  .class-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--green);background:var(--green-light);padding:5px 11px;border-radius:99px;margin-bottom:14px;}
+  .mode-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--amber);background:var(--amber-bg);padding:5px 11px;border-radius:99px;margin-bottom:14px;margin-left:6px;}
+  h1{font-family:var(--serif);font-size:25px;font-weight:700;color:var(--ink);margin:0 0 10px;letter-spacing:-.01em;line-height:1.25;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .chip{font-size:12px;font-weight:600;color:var(--ink);background:#f3f0e6;padding:6px 11px;border-radius:99px;}
+  .desc{font-size:13.5px;line-height:1.65;margin:0;}
+
+  .going-row{display:flex;gap:8px;margin-bottom:6px;}
+  .going-chip{flex:1;text-align:center;padding:10px 8px;border-radius:12px;background:var(--green-light);}
+  .going-chip .v{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--green);}
+  .going-chip .k{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-top:2px;}
+  .spots-left{text-align:center;font-size:12px;color:var(--muted);margin-bottom:4px;}
+
+  .rsvp-title{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--ink);margin:0 0 12px;}
+  .yn-row{display:flex;gap:10px;margin-bottom:14px;}
+  .yn-opt{flex:1;text-align:center;padding:12px;border:1.5px solid var(--border);border-radius:11px;font-size:13.5px;font-weight:700;color:var(--body);cursor:pointer;transition:all .12s;user-select:none;}
+  .yn-opt:hover{border-color:var(--green-border);}
+  .yn-opt.on.yes{background:var(--green);border-color:var(--green);color:#fff;}
+  .yn-opt.on.no{background:var(--red);border-color:var(--red);color:#fff;}
+
+  .stepper-block{display:none;margin-bottom:14px;}
+  .stepper-block.on{display:block;}
+  .stepper-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0ece0;}
+  .stepper-row:last-child{border-bottom:none;}
+  .stepper-row .lbl{font-size:13.5px;font-weight:600;color:var(--ink);}
+  .stepper{display:flex;align-items:center;gap:12px;}
+  .stepper button{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border);background:#fff;font-size:16px;font-weight:700;color:var(--ink);cursor:pointer;display:grid;place-items:center;}
+  .stepper button:hover{border-color:var(--green-border);color:var(--green);}
+  .stepper .n{font-size:14.5px;font-weight:700;color:var(--ink);min-width:18px;text-align:center;}
+
+  .submit-btn{width:100%;background:var(--green);color:#fff;border:none;border-radius:11px;padding:13px 18px;font-family:var(--sans);font-weight:700;font-size:14px;cursor:pointer;transition:background .12s;}
+  .submit-btn:hover{background:var(--ink);}
+  .submit-btn:disabled{opacity:.5;cursor:default;}
+
+  .success{display:none;text-align:center;padding:8px 4px 4px;}
+  .success.on{display:block;}
+  .success .tick{width:52px;height:52px;border-radius:50%;background:var(--green-light);display:grid;place-items:center;margin:0 auto 14px;}
+  .success .tick svg{width:24px;height:24px;stroke:var(--green);fill:none;stroke-width:2.6;}
+  .success h2{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);margin:0 0 8px;}
+  .success p{font-size:13px;color:var(--muted);line-height:1.6;margin:0;}
+  #rsvpFormBlock.hidden{display:none;}
+
+  .fyi-note,.norsvp-note{font-size:12.5px;color:var(--muted);line-height:1.6;background:#f7f4ee;border-radius:12px;padding:12px 14px;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="brand"><span class="mark" aria-hidden="true"><img src="assets/logo/room-parent-mark.svg" alt=""></span><span>Room Parent</span></div>
+  <div class="card">
+    <span class="class-tag">Mrs. Taylor's Class · Kiker Elementary</span><span class="mode-tag" id="modeTag" style="display:none;"></span>
+    <h1 id="evTitle">Event</h1>
+    <div class="chips" id="evChips"></div>
+    <p class="desc" id="evDesc"></p>
+  </div>
+
+  <div class="card" id="goingCard" style="display:none;">
+    <div class="going-row">
+      <div class="going-chip"><div class="v" id="goingParents">0</div><div class="k">Parents</div></div>
+      <div class="going-chip"><div class="v" id="goingKids">0</div><div class="k">Kids</div></div>
+      <div class="going-chip"><div class="v" id="goingTotal">0</div><div class="k">Total Going</div></div>
+    </div>
+    <div class="spots-left" id="spotsLeft"></div>
+  </div>
+
+  <div class="card" id="rsvpCard" style="display:none;">
+    <div id="rsvpFormBlock">
+      <div class="rsvp-title">Will you be there?</div>
+      <div class="yn-row">
+        <div class="yn-opt" id="rsvpYes" onclick="setRsvp(true)">Yes, we'll be there</div>
+        <div class="yn-opt" id="rsvpNo" onclick="setRsvp(false)">Can't make it</div>
+      </div>
+      <div class="stepper-block" id="headcountBlock">
+        <div class="stepper-row"><span class="lbl">👪 Parents</span><div class="stepper"><button onclick="bump('parents',-1)">–</button><span class="n" id="nParents">1</span><button onclick="bump('parents',1)">+</button></div></div>
+        <div class="stepper-row"><span class="lbl">🧒 Kids</span><div class="stepper"><button onclick="bump('kids',-1)">–</button><span class="n" id="nKids">0</span><button onclick="bump('kids',1)">+</button></div></div>
+      </div>
+      <button class="submit-btn" id="rsvpSubmitBtn" disabled onclick="submitRsvp()">Send RSVP</button>
+    </div>
+    <div class="success" id="rsvpSuccess">
+      <div class="tick"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <h2 id="successTitle">You're in!</h2>
+      <p id="successBody">The room parent will see your response.</p>
+    </div>
+  </div>
+
+  <div class="card" id="noRsvpCard" style="display:none;"><div class="norsvp-note">No RSVP needed — just come!</div></div>
+  <div class="card" id="studentsOnlyCard" style="display:none;"><div class="fyi-note">This is for your awareness — no RSVP needed. Nothing to do here except plan around it.</div></div>
+</div>
+
+<script>
+const EVENTS = {
+  1:{title:'Back to School Picnic', date:'Sat, Sep 5, 2026', time:'5:30–7:00 PM', location:'Front Lawn', desc:'Meet-and-greet on the front lawn. Bring a folding chair!', mode:'invite', spots:40, parents:6, kids:5},
+  2:{title:"Spirit Night at Mandola's", date:'Sat, Sep 12, 2026', time:'', location:'', desc:"20% of proceeds go to our class fund — just mention Kiker 1st Grade.", mode:'invite', spots:null, parents:0, kids:0},
+  3:{title:"Mrs. Taylor's Class Photo Day", date:'Fri, Sep 18, 2026', time:'8:30 AM', location:'', desc:'Order forms go home the week before.', mode:'studentsOnly', spots:null, parents:0, kids:0},
+  4:{title:'Fall Fundraiser Kickoff', date:'Fri, Oct 2, 2026', time:'', location:'', desc:"Kicking off this year's fundraiser — details TBD.", mode:'invite', spots:null, parents:0, kids:0}
+};
+const params = new URLSearchParams(location.search);
+const ev = EVENTS[params.get('event')] || EVENTS[1];
+
+document.getElementById('evTitle').textContent = ev.title;
+document.getElementById('evDesc').textContent = ev.desc;
+document.title = `${ev.title} · Mrs. Taylor's Class`;
+const chipsEl = document.getElementById('evChips');
+let chipsHtml = `<span class="chip">📅 ${ev.date}${ev.time ? ' · '+ev.time : ''}</span>`;
+if(ev.location) chipsHtml += `<span class="chip">📍 ${ev.location}</span>`;
+chipsEl.innerHTML = chipsHtml;
+
+if(ev.mode === 'invite'){
+  document.getElementById('goingCard').style.display = 'block';
+  document.getElementById('rsvpCard').style.display = 'block';
+  const total = ev.parents + ev.kids;
+  document.getElementById('goingParents').textContent = ev.parents;
+  document.getElementById('goingKids').textContent = ev.kids;
+  document.getElementById('goingTotal').textContent = total;
+  const spotsEl = document.getElementById('spotsLeft');
+  if(ev.spots){
+    const left = Math.max(ev.spots - total, 0);
+    spotsEl.textContent = `${left} spot${left===1?'':'s'} left of ${ev.spots}`;
+  } else {
+    spotsEl.textContent = `${total} famil${total===1?'y':'ies'} going so far`;
+  }
+} else if(ev.mode === 'noRsvp'){
+  document.getElementById('noRsvpCard').style.display = 'block';
+} else if(ev.mode === 'studentsOnly'){
+  const tag = document.getElementById('modeTag');
+  tag.style.display = 'inline-flex';
+  tag.textContent = 'Students Only';
+  document.getElementById('studentsOnlyCard').style.display = 'block';
+}
+
+let rsvpChoice = null;
+let headcount = {parents:1, kids:0};
+function setRsvp(yes){
+  rsvpChoice = yes;
+  document.getElementById('rsvpYes').classList.toggle('on', yes === true);
+  document.getElementById('rsvpYes').classList.toggle('yes', true);
+  document.getElementById('rsvpNo').classList.toggle('on', yes === false);
+  document.getElementById('rsvpNo').classList.toggle('no', true);
+  document.getElementById('headcountBlock').classList.toggle('on', yes === true);
+  document.getElementById('rsvpSubmitBtn').disabled = false;
+}
+function bump(field, delta){
+  const next = headcount[field] + delta;
+  const min = field === 'parents' ? 1 : 0;
+  if(next < min) return;
+  headcount[field] = next;
+  document.getElementById(field === 'parents' ? 'nParents' : 'nKids').textContent = next;
+}
+function submitRsvp(){
+  document.getElementById('rsvpFormBlock').classList.add('hidden');
+  document.getElementById('rsvpSuccess').classList.add('on');
+  if(rsvpChoice){
+    document.getElementById('successTitle').textContent = "You're in!";
+    document.getElementById('successBody').textContent = `See you there — ${headcount.parents} parent${headcount.parents===1?'':'s'}${headcount.kids ? ` and ${headcount.kids} kid${headcount.kids===1?'':'s'}` : ''}.`;
+  } else {
+    document.getElementById('successTitle').textContent = 'Got it';
+    document.getElementById('successBody').textContent = "Thanks for letting us know — we'll miss you!";
+  }
+}
+</script>
+
+</body>
+</html>
