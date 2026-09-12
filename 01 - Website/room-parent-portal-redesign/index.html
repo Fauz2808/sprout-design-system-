@@ -711,22 +711,31 @@
      2026-09 review: "this should be in a hamburger menu vs a footer that you have to
      scroll to find the other things." Quick tabs stay 1-tap; everything else lives in
      the drawer, opened via the Menu tab. */
-  .mobile-tabbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:100;min-height:64px;padding:6px 4px calc(6px + env(safe-area-inset-bottom)) 4px;background:rgba(18,63,41,.96);backdrop-filter:blur(18px);align-items:stretch;justify-content:space-around;}
-  .mobile-tabbar .m-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;color:rgba(255,255,255,.55);font-size:9.5px;font-weight:600;border-radius:12px;min-width:0;}
-  .mobile-tabbar .m-tab.on{color:#fff;background:rgba(255,255,255,.1);}
-  .mobile-tabbar .m-tab svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-  .mobile-tabbar .m-tab span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
-  @media(max-width:760px){.mobile-tabbar{display:flex!important;}}
+  .mobile-tabbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:100;grid-template-columns:repeat(5,minmax(0,1fr));align-items:stretch;gap:4px;min-height:72px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:rgba(18,63,41,.96);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid rgba(255,255,255,.06);}
+  .mobile-tabbar .m-tab{appearance:none;width:100%;min-width:0;min-height:58px;margin:0;padding:6px 4px;border:0;border-radius:16px;background:transparent;color:rgba(255,255,255,.62);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font:600 11px/1.1 var(--sans,inherit);text-align:center;transition:color 160ms ease,background-color 160ms ease,transform 160ms ease;}
+  .mobile-tabbar .m-tab.on{color:#fff;background:rgba(255,255,255,.12);}
+  .mobile-tabbar .m-tab:active{transform:scale(.97);}
+  .mobile-tabbar .m-tab svg{width:22px;height:22px;flex:0 0 22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .mobile-tabbar .m-tab span{display:block;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  @media(max-width:760px){.mobile-tabbar{display:grid!important;}}
 
-  .nav-drawer-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(8,25,15,.55);align-items:flex-end;}
-  .nav-drawer-overlay.open{display:flex;}
-  .nav-drawer{width:100%;max-height:78vh;overflow-y:auto;background:var(--sidebar);border-radius:22px 22px 0 0;padding:10px 14px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -14px 40px rgba(0,0,0,.25);}
+  .nav-drawer-overlay{display:flex;position:fixed;inset:0;z-index:200;align-items:flex-end;background:rgba(8,25,15,.58);backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0);opacity:0;visibility:hidden;pointer-events:none;transition:opacity 180ms ease,visibility 0s linear 260ms,backdrop-filter 180ms ease;}
+  .nav-drawer-overlay.open{opacity:1;visibility:visible;pointer-events:auto;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);transition:opacity 240ms ease,visibility 0s linear 0s,backdrop-filter 240ms ease;}
+  .nav-drawer{width:100%;max-height:78vh;overflow-y:auto;overscroll-behavior:contain;background:var(--sidebar);border-radius:22px 22px 0 0;padding:10px 14px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -14px 40px rgba(0,0,0,0);transform:translate3d(0,calc(100% + env(safe-area-inset-bottom)),0);transition:transform 220ms cubic-bezier(.4,0,1,1),box-shadow 180ms ease;will-change:transform;}
+  .nav-drawer-overlay.open .nav-drawer{transform:translate3d(0,0,0);box-shadow:0 -14px 40px rgba(0,0,0,.25);transition-duration:320ms,240ms;transition-timing-function:cubic-bezier(.16,1,.3,1),ease;}
   .nav-drawer .drawer-grabber{width:36px;height:4px;background:rgba(255,255,255,.25);border-radius:99px;margin:2px auto 14px;}
-  .nav-drawer h4{font-family:var(--serif,inherit);font-size:14px;font-weight:600;color:#fff;margin:0 0 10px;padding:0 4px;}
-  .nav-drawer .nav-item{color:rgba(255,255,255,.72);padding:13px 12px;font-size:14px;}
+  .nav-drawer-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 2px 10px 8px;}
+  .nav-drawer h4{font-family:var(--serif,inherit);font-size:18px;font-weight:600;color:#fff;margin:0;padding:0;}
+  .drawer-close{appearance:none;width:40px;height:40px;padding:0;border:1px solid rgba(255,255,255,.12);border-radius:50%;background:rgba(255,255,255,.08);color:#fff;display:grid;place-items:center;transition:background-color 160ms ease,transform 160ms ease;}
+  .drawer-close:hover{background:rgba(255,255,255,.14);}
+  .drawer-close:active{transform:scale(.96);}
+  .drawer-close svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;}
+  .nav-drawer .nav-item{display:grid;grid-template-columns:22px minmax(0,1fr);align-items:center;gap:12px;width:100%;min-height:48px;margin:0 0 4px;padding:10px 12px;color:rgba(255,255,255,.72);font-size:14px;text-align:left;}
   .nav-drawer .nav-item:hover{background:rgba(255,255,255,.08);color:#fff;}
   .nav-drawer .nav-item.on{background:#fff!important;color:var(--sidebar)!important;}
   .nav-drawer .nav-item svg{width:19px;height:19px;flex-shrink:0;}
+  body.mobile-menu-open{overflow:hidden;}
+  @media(prefers-reduced-motion:reduce){.mobile-tabbar .m-tab,.drawer-close,.nav-drawer-overlay,.nav-drawer-overlay.open,.nav-drawer,.nav-drawer-overlay.open .nav-drawer{transition-duration:1ms!important;}}
   @media(max-width:440px){.quick-actions{grid-template-columns:1fr}.dash-hero h3{font-size:22px}.ctx-label .sb{max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
 
   /* ══ COMPLETE PORTAL REDESIGN ══ */
@@ -1080,10 +1089,15 @@
 
   <!-- mobile-only: quick tabs + hamburger, replaces the old scrolling footer -->
   <div class="mobile-tabbar" id="mobileTabbar"></div>
-  <div class="nav-drawer-overlay" id="navDrawerOverlay" onclick="if(event.target===this) closeNavDrawer()">
-    <div class="nav-drawer">
+  <div class="nav-drawer-overlay" id="navDrawerOverlay" aria-hidden="true" onclick="if(event.target===this) closeNavDrawer()">
+    <div class="nav-drawer" role="dialog" aria-modal="true" aria-labelledby="mobileMenuTitle">
       <div class="drawer-grabber"></div>
-      <h4>Menu</h4>
+      <div class="nav-drawer-head">
+        <h4 id="mobileMenuTitle">Menu</h4>
+        <button type="button" class="drawer-close" onclick="closeNavDrawer()" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
       <div id="navDrawerList"></div>
     </div>
   </div>
@@ -2747,18 +2761,43 @@ function renderMobileNav(activeSec){
   const restItems = items.filter(it => !quickSecs.includes(it.sec));
 
   let tabsHtml = quickItems.map(it =>
-    `<button type="button" class="m-tab nav-item ${it.sec===activeSec?'on':''}" data-sec="${it.sec}" onclick="goTo('${it.sec}')">${it.icon}<span>${MOBILE_TAB_SHORT_LABEL[it.sec] || it.label}</span></button>`
+    `<button type="button" class="m-tab ${it.sec===activeSec?'on':''}" data-sec="${it.sec}" onclick="goTo('${it.sec}')" aria-label="${it.label}"${it.sec===activeSec?' aria-current="page"':''}>${it.icon}<span>${MOBILE_TAB_SHORT_LABEL[it.sec] || it.label}</span></button>`
   ).join('');
   if (restItems.length){
-    tabsHtml += `<button type="button" class="m-tab" onclick="openNavDrawer()" aria-label="More"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>`;
+    const menuActive = restItems.some(it => it.sec === activeSec);
+    tabsHtml += `<button type="button" class="m-tab menu-trigger ${menuActive?'on':''}" onclick="openNavDrawer(this)" aria-label="Open menu" aria-controls="navDrawerOverlay" aria-expanded="false"${menuActive?' aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>`;
   }
   document.getElementById('mobileTabbar').innerHTML = tabsHtml;
   document.getElementById('navDrawerList').innerHTML = restItems.map(it =>
     `<button type="button" class="nav-item ${it.sec===activeSec?'on':''}" data-sec="${it.sec}" onclick="goTo('${it.sec}')">${it.icon}${it.label}</button>`
   ).join('');
 }
-function openNavDrawer(){ document.getElementById('navDrawerOverlay').classList.add('open'); }
-function closeNavDrawer(){ document.getElementById('navDrawerOverlay').classList.remove('open'); }
+let mobileMenuTrigger = null;
+function openNavDrawer(trigger){
+  const overlay = document.getElementById('navDrawerOverlay');
+  if(!overlay) return;
+  mobileMenuTrigger = trigger || document.querySelector('.mobile-tabbar .menu-trigger');
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden','false');
+  document.body.classList.add('mobile-menu-open');
+  if(mobileMenuTrigger) mobileMenuTrigger.setAttribute('aria-expanded','true');
+  requestAnimationFrame(() => {
+    const closeButton = overlay.querySelector('.drawer-close');
+    if(closeButton) closeButton.focus({preventScroll:true});
+  });
+}
+function closeNavDrawer(restoreFocus = true){
+  const overlay = document.getElementById('navDrawerOverlay');
+  if(!overlay || !overlay.classList.contains('open')) return;
+  overlay.classList.remove('open');
+  overlay.setAttribute('aria-hidden','true');
+  document.body.classList.remove('mobile-menu-open');
+  if(mobileMenuTrigger) mobileMenuTrigger.setAttribute('aria-expanded','false');
+  if(restoreFocus && mobileMenuTrigger) mobileMenuTrigger.focus({preventScroll:true});
+}
+document.addEventListener('keydown', event => {
+  if(event.key === 'Escape') closeNavDrawer();
+});
 
 function toggleCtxMenu(){
   document.getElementById('ctxMenu').classList.toggle('open');
@@ -2799,6 +2838,14 @@ document.addEventListener('click', (e)=>{
 function goTo(sec){
   closeNavDrawer();
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('on', n.dataset.sec === sec));
+  const directMobileTab = document.querySelector(`.mobile-tabbar .m-tab[data-sec="${sec}"]`);
+  const drawerHasDestination = !!document.querySelector(`#navDrawerList .nav-item[data-sec="${sec}"]`);
+  document.querySelectorAll('.mobile-tabbar .m-tab').forEach(tab => {
+    const isCurrent = tab === directMobileTab || (tab.classList.contains('menu-trigger') && !directMobileTab && drawerHasDestination);
+    tab.classList.toggle('on', isCurrent);
+    if(isCurrent) tab.setAttribute('aria-current','page');
+    else tab.removeAttribute('aria-current');
+  });
   document.querySelectorAll('.sec').forEach(s=>s.classList.toggle('on', s.id === 'sec-'+sec));
   if(sec === 'dashboard') renderDashboard();
   if(sec === 'email') renderEmailChecklists();
