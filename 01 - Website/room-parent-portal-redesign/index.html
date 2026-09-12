@@ -353,6 +353,21 @@
   /* reserve the same action width in both states so the task/assignee/due
      columns land in identical positions whether a row is saved or being typed */
   .todo-group-body .todo-row .ev-actions{min-width:130px;justify-content:flex-end;}
+  /* The wrappers collapse on desktop so its original task · assignee · due · link
+     column layout remains unchanged. Only mobile receives the compact three-column row. */
+  .todo-row-saved .todo-main,.todo-row-saved .todo-details{display:contents;}
+  @media(max-width:900px){
+    .todo-group-body .todo-row-saved{display:grid;grid-template-columns:22px minmax(0,1fr) auto;align-items:start;gap:12px;padding:14px 4px;}
+    .todo-group-body .todo-row-saved input[type=checkbox]{grid-column:1;margin-top:3px;}
+    .todo-row-saved .todo-main{display:block;grid-column:2;min-width:0;}
+    .todo-row-saved .todo-text{line-height:1.4;overflow-wrap:anywhere;}
+    .todo-row-saved .todo-details{display:flex;align-items:center;gap:5px 14px;flex-wrap:wrap;margin-top:5px;}
+    .todo-row-saved .todo-who,.todo-row-saved .todo-due{width:auto;}
+    .todo-row-saved .todo-link{flex:0 0 auto;}
+    .todo-group-body .todo-row-saved .ev-actions{grid-column:3;display:flex;align-items:center;gap:4px;flex-wrap:nowrap;width:auto;min-width:0;padding:0;margin-top:-7px;}
+    .todo-row-saved .ev-edit,.todo-row-saved .ev-trash{width:40px;height:40px;}
+    .todo-row-saved .ev-edit svg,.todo-row-saved .ev-trash svg{width:17px;height:17px;}
+  }
   .todo-row-edit .todo-edit-text{flex:1.6;min-width:0;padding:8px 10px;border:1.5px solid var(--green-border);border-radius:9px;font-size:13px;font-family:var(--sans);color:var(--ink);}
   .todo-row-edit .todo-edit-assignee{width:150px;flex-shrink:0;}
   .todo-row-edit .todo-edit-assignee .rich-select-btn{min-height:auto;padding:7px 9px;font-size:12.5px;border:1.5px solid var(--border);border-radius:9px;background:#fff;}
@@ -5393,12 +5408,16 @@ function todosForCurrentClass(){
 function renderTodoRow(t){
   const p = allParents.find(x=>x.name===t.assignee);
   const av = p ? {initials:p.initials, color:p.color} : avatarFor(t.assignee);
-  return `<div class="todo-row ${t.done?'done':''}">
-    <input type="checkbox" ${t.done?'checked':''} onchange="toggleTodoDone(${t.id})">
-    <div class="todo-text">${escapeHtml(t.text)}</div>
-    <div class="todo-who"><span class="avatar" style="background:${av.color};">${av.initials}</span><span>${escapeHtml(t.assignee)}</span></div>
-    <div class="todo-due${t.due ? '' : ' none'}">${t.due ? 'Due ' + fmtDate(t.due) : 'No due date'}</div>
-    <div class="todo-link">${t.link ? `<a href="${escapeHtml(t.link)}" target="_blank" rel="noopener">🔗 Link</a>` : ''}</div>
+  return `<div class="todo-row todo-row-saved ${t.done?'done':''}">
+    <input type="checkbox" ${t.done?'checked':''} onchange="toggleTodoDone(${t.id})" aria-label="${t.done?'Mark as incomplete: ':'Mark as complete: '}${escapeHtml(t.text)}">
+    <div class="todo-main">
+      <div class="todo-text">${escapeHtml(t.text)}</div>
+      <div class="todo-details">
+        <div class="todo-who"><span class="avatar" style="background:${av.color};">${av.initials}</span><span>${escapeHtml(t.assignee)}</span></div>
+        <div class="todo-due${t.due ? '' : ' none'}">${t.due ? 'Due ' + fmtDate(t.due) : 'No due date'}</div>
+        <div class="todo-link">${t.link ? `<a href="${escapeHtml(t.link)}" target="_blank" rel="noopener">🔗 Link</a>` : ''}</div>
+      </div>
+    </div>
     <div class="ev-actions">
       <div class="ev-edit" onclick="editTodoRow(${t.id})" title="Edit task"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M227.31 73.37 182.63 28.68a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69A15.86 15.86 0 0 0 104 219.31L227.31 96a16 16 0 0 0 0-22.63M92.69 208H48v-44.69l88-88L180.69 120ZM192 108.68 147.31 64l24-24L216 84.68Z"/></svg></div>
       <div class="ev-trash" onclick="deleteTodo(${t.id})" title="Delete task"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Zm-80-104v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0m48 0v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0"/></svg></div>
