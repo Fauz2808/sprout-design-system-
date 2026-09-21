@@ -1,0 +1,3210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Sprout · Room Parent Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --surface:#ffffff; --sidebar:#fbf9f4;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+    --green:#186338; --green-mid:#4fa472; --green-light:#e2e9e3; --green-border:#77b691;
+    --border:#e6e0d2; --amber:#c08a2d; --amber-bg:#fbf0d8;
+    --red:#a83f34; --red-bg:#fbe4e0; --blue:#2f6690; --blue-bg:#e3edf5;
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;height:100%;}
+  body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
+
+  /* ══ AUTH ══ */
+  .auth-layout{display:none;min-height:100vh;background:var(--bg);}
+  .auth-layout.active{display:flex;}
+  .auth-left{width:420px;flex-shrink:0;background:var(--green);display:flex;flex-direction:column;padding:48px 40px;}
+  .auth-left-logo{display:flex;align-items:center;gap:10px;margin-bottom:auto;}
+  .auth-left-logo .mark{width:40px;height:40px;background:rgba(255,255,255,.15);border-radius:12px;display:grid;place-items:center;font-family:var(--serif);font-weight:700;font-size:19px;color:#fff;flex-shrink:0;}
+  .auth-left-logo .name{font-family:var(--serif);font-size:19px;font-weight:600;color:#fff;line-height:1.25;}
+  .auth-left-logo .name small{display:block;font-family:var(--sans);font-size:10px;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.06em;margin-top:1px;}
+  .auth-left-body{margin-bottom:auto;}
+  .auth-left-body h2{font-family:var(--serif);font-size:29px;font-weight:600;color:#fff;line-height:1.28;margin:0 0 14px;letter-spacing:-.01em;}
+  .auth-left-body p{font-size:13.5px;color:rgba(255,255,255,.68);line-height:1.6;margin:0;}
+  .auth-left-features{display:flex;flex-direction:column;gap:13px;margin-top:30px;}
+  .auth-feature{display:flex;align-items:flex-start;gap:10px;}
+  .auth-feature .ic{width:18px;flex-shrink:0;font-size:14px;line-height:1.45;}
+  .auth-feature span{font-size:12.5px;color:rgba(255,255,255,.82);line-height:1.5;}
+  .auth-right{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 40px;}
+  .auth-box{width:100%;max-width:380px;}
+  .auth-progress{display:flex;gap:6px;margin-bottom:22px;}
+  .auth-progress span{flex:1;height:4px;border-radius:2px;background:var(--border);}
+  .auth-progress span.done{background:var(--green-border);}
+  .auth-progress span.on{background:var(--green);}
+  .auth-box h1{font-family:var(--serif);font-size:25px;font-weight:600;color:var(--ink);margin:0 0 6px;letter-spacing:-.01em;}
+  .auth-box .sub{font-size:13.5px;color:var(--muted);margin:0 0 28px;line-height:1.55;}
+  .switch-link{color:var(--green);font-weight:700;cursor:pointer;text-decoration:none;border:none;background:none;font-family:inherit;font-size:inherit;padding:0;}
+  .switch-link:hover{text-decoration:underline;}
+  .form-stack{display:flex;flex-direction:column;gap:16px;}
+  .code-row{display:flex;gap:9px;}
+  .code-box{width:100%;height:54px;text-align:center;font-family:var(--serif);font-size:21px;font-weight:700;color:var(--ink);border:1.5px solid var(--border);border-radius:12px;background:#fff;outline:none;}
+  .code-box:focus{border-color:var(--green-border);box-shadow:0 0 0 3px rgba(24,99,56,.1);}
+
+  /* ══ shared form/button primitives (auth + app) ══ */
+  select,input[type=text],input[type=tel],input[type=number],input[type=date],input[type=time],textarea{
+    font-family:var(--sans);font-size:13px;color:var(--ink);background:#fff;border:1px solid var(--border);
+    border-radius:9px;padding:11px 12px;width:100%;outline:none;
+  }
+  select:focus,input:focus,textarea:focus{border-color:var(--green-border);}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;}
+  .field .hint{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5;font-weight:400;text-transform:none;letter-spacing:0;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .btn{font-family:var(--sans);font-weight:700;border:none;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;justify-content:center;padding:10px 15px;font-size:12.5px;transition:background .12s,opacity .12s;}
+  .btn-primary{background:var(--green);color:#fff;}
+  .btn-primary:hover{background:var(--ink);}
+  .btn-primary:disabled{opacity:.5;cursor:default;}
+  .btn-primary-full{width:100%;justify-content:center;padding:13px 18px;font-size:14.5px;}
+  .btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--border);}
+  .btn-ghost:hover{background:var(--green-light);}
+  .btn-sm{padding:7px 12px;font-size:11.5px;}
+  .btn svg{width:14px;height:14px;flex-shrink:0;}
+  .regen-spin{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .radio-row{display:flex;flex-direction:column;gap:9px;}
+  .radio-row label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);font-weight:500;cursor:pointer;}
+  .radio-row input{accent-color:var(--green);width:15px;height:15px;flex-shrink:0;}
+
+  /* ══ APP SHELL ══ */
+  .app{display:flex;min-height:100vh;}
+  .sidebar{width:212px;flex-shrink:0;background:var(--sidebar);border-right:1px solid var(--border);padding:18px 14px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;}
+  .brand{display:flex;align-items:center;gap:9px;padding:4px 6px 20px;}
+  .brand .mark{width:30px;height:30px;border-radius:9px;background:var(--green);display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:700;font-size:15px;flex-shrink:0;}
+  .brand .txt{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink);line-height:1.25;}
+  .brand .txt small{display:block;font-family:var(--sans);font-size:9.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:10px;font-size:13px;font-weight:600;color:var(--body);cursor:pointer;margin-bottom:3px;transition:background .12s;}
+  .nav-item:hover{background:#f0ece0;}
+  .nav-item svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0;}
+  .nav-item.on{background:var(--green);color:#fff;}
+  .nav-item.on:hover{background:var(--green);}
+  .sidebar-foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--border);}
+  .sidebar-foot .who{display:flex;align-items:center;gap:9px;padding:6px;}
+  .sidebar-foot .who span{font-size:11.5px;}
+  .sidebar-foot .who .nm{font-weight:700;color:var(--ink);display:block;}
+  .sidebar-foot .who .role{color:var(--muted);}
+  .signout{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;margin-top:2px;}
+  .signout:hover{background:#f0ece0;color:var(--red);}
+  .signout svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0;}
+
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .topbar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:12px 26px;border-bottom:1px solid var(--border);background:var(--surface);position:relative;z-index:30;}
+  .topbar .me{display:flex;align-items:center;gap:8px;}
+  .topbar .me .avatar{width:28px;height:28px;font-size:11px;}
+  .topbar .me span{font-size:12px;font-weight:600;color:var(--body);}
+
+  /* context switcher */
+  .ctx-switcher{position:relative;}
+  .ctx-btn{display:flex;align-items:center;gap:10px;background:none;border:1px solid transparent;border-radius:12px;padding:6px 10px 6px 6px;cursor:pointer;font-family:inherit;text-align:left;}
+  .ctx-btn:hover{background:var(--green-light);}
+  .ctx-btn-mark{width:36px;height:36px;border-radius:10px;background:var(--green-light);display:grid;place-items:center;font-size:16px;flex-shrink:0;}
+  .ctx-label{display:flex;flex-direction:column;}
+  .ctx-label .nm{font-family:var(--serif);font-size:15.5px;font-weight:600;color:var(--ink);}
+  .ctx-label .sb{font-size:11px;font-weight:500;color:var(--muted);margin-top:1px;}
+  .ctx-chev{width:15px;height:15px;stroke:var(--muted);fill:none;stroke-width:2;flex-shrink:0;transition:transform .15s;}
+  .ctx-btn.open .ctx-chev{transform:rotate(180deg);}
+  .ctx-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;width:280px;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:0 14px 34px rgba(0,0,0,.14);padding:8px;z-index:40;}
+  .ctx-menu.open{display:block;}
+  .ctx-menu-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px 4px;}
+  .ctx-menu-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;}
+  .ctx-menu-item:hover{background:#f0ece0;}
+  .ctx-menu-item.on{background:var(--green-light);}
+  .ctx-menu-item .mk{width:30px;height:30px;border-radius:9px;background:var(--field,#e8e2d6);display:grid;place-items:center;font-size:14px;flex-shrink:0;}
+  .ctx-menu-item .tt{font-size:12.5px;font-weight:700;color:var(--ink);}
+  .ctx-menu-item .ss{font-size:10.5px;color:var(--muted);}
+
+  .content{flex:1;overflow-y:auto;padding:22px 28px 40px;background:var(--bg);}
+
+  .sec{display:none;}
+  .sec.on{display:block;animation:fadein .18s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  .sec-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:16px;}
+  .sec-head h2{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);margin:0 0 4px;}
+  .sec-head p{font-size:12.5px;color:var(--muted);margin:0;max-width:560px;line-height:1.5;}
+  .sec-head .actions{display:flex;gap:8px;flex-shrink:0;}
+
+  .stat-row{display:flex;gap:12px;margin-bottom:20px;}
+  .stat-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;}
+  .stat-card .k{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+  .stat-card .v{font-family:var(--serif);font-size:24px;font-weight:700;color:var(--ink);}
+  .stat-card.spent .v{color:var(--red);}
+  .stat-card.balance{background:var(--green-light);border-color:var(--green-border);}
+  .stat-card.balance .v{color:var(--green);}
+  .stat-card .sub{font-size:11px;color:var(--muted);margin-top:3px;}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:16px;}
+  .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .card-head h3{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);margin:0;}
+
+  .src-chip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--green-light);color:var(--green);white-space:nowrap;}
+  .avatar{border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;flex-shrink:0;}
+
+  .file-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--green);background:var(--green-light);padding:5px 10px;border-radius:99px;cursor:pointer;font-weight:600;}
+  .file-chip input{display:none;}
+  .receipt-thumb{width:34px;height:34px;border-radius:8px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);}
+  .receipt-empty{width:34px;height:34px;border-radius:8px;flex-shrink:0;border:1.5px dashed var(--border);display:grid;place-items:center;color:var(--muted);}
+  .receipt-empty svg{width:14px;height:14px;}
+
+  .inline-form{background:#fbf9f4;border:1px solid var(--green-border);border-radius:12px;padding:14px;margin-bottom:14px;display:none;}
+  .inline-form.on{display:block;}
+  .inline-form .form-grid{margin-bottom:10px;}
+  .inline-form-actions{display:flex;gap:8px;justify-content:flex-end;}
+
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);background:var(--ink);color:#fff;font-size:12.5px;font-weight:600;padding:11px 20px;border-radius:12px;opacity:0;transition:opacity .25s,transform .25s;z-index:999;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:420px;text-align:center;}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:12.5px;}
+  .table th{text-align:left;font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;background:#fbf9f4;padding:9px 12px;border-bottom:1px solid var(--border);}
+  .table td{padding:9px 12px;border-bottom:1px solid #f0ece0;color:var(--body);}
+  .table tr:last-child td{border-bottom:none;}
+  .table .who{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--ink);}
+  .table .who .avatar{width:24px;height:24px;font-size:9.5px;}
+  .table .empty{color:var(--muted);text-align:center;padding:18px;}
+
+  .dash-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:start;}
+  .quick-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .ev-row-mini{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #f0ece0;cursor:pointer;}
+  .ev-row-mini:last-child{border-bottom:none;}
+  .ev-row-mini:hover .ev-title{color:var(--green);}
+  .ev-date-badge{width:42px;height:42px;border-radius:10px;background:var(--green-light);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
+  .ev-date-badge .mo{font-size:8.5px;font-weight:700;color:var(--green);text-transform:uppercase;}
+  .ev-date-badge .dy{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--ink);line-height:1;}
+  .ev-title{font-size:12.5px;font-weight:600;color:var(--ink);}
+  .ev-status{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;flex-shrink:0;white-space:nowrap;}
+  .ev-status.draft{color:var(--amber);background:var(--amber-bg);}
+  .ev-status.published{color:var(--green);background:var(--green-light);}
+
+  .ev-row{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid #f0ece0;}
+  .ev-row:last-child{border-bottom:none;}
+  .ev-date-badge.lg{width:52px;height:52px;}
+  .ev-date-badge.lg .dy{font-size:18px;}
+  .ev-thumb{width:44px;height:44px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);}
+  .ev-body{flex:1;min-width:0;}
+  .ev-body .t{font-family:var(--serif);font-size:14.5px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+  .ev-body .t .tm{font-family:var(--sans);font-weight:500;color:var(--muted);font-size:11.5px;}
+  .ev-body .d{font-size:11.5px;color:var(--muted);line-height:1.4;}
+  .ev-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+  .ev-trash{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:var(--red);cursor:pointer;flex-shrink:0;}
+  .ev-trash svg{width:14px;height:14px;}
+  .ev-trash:hover{background:var(--red-bg);}
+
+  .lunch-row{display:grid;grid-template-columns:110px 1fr 1fr;gap:14px;align-items:center;padding:11px 0;border-bottom:1px solid #f0ece0;}
+  .lunch-row:last-child{border-bottom:none;}
+  .lunch-row .dayname{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink);}
+
+  .daypicker{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .daypill{padding:9px 18px;border-radius:99px;background:var(--surface);border:1px solid var(--border);font-size:13px;font-weight:700;color:var(--body);cursor:pointer;}
+  .daypill.on{background:var(--green);border-color:var(--green);color:#fff;}
+  .lunch-opt-row{background:#fbf9f4;border:1px solid var(--border);border-radius:12px;padding:12px 13px;margin-bottom:10px;}
+  .lunch-opt-row:last-child{margin-bottom:0;}
+  .opt-row-top{display:flex;align-items:center;gap:9px;margin-bottom:9px;}
+  .opt-num{width:22px;height:22px;border-radius:50%;background:var(--green-light);color:var(--green);font-size:11px;font-weight:700;display:grid;place-items:center;flex-shrink:0;}
+  .opt-row-top input{flex:1;}
+  .opt-del{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:var(--muted);font-size:16px;line-height:1;cursor:pointer;flex-shrink:0;}
+  .opt-del:hover{background:var(--red-bg);color:var(--red);}
+  .diet-chip-row{display:flex;gap:6px;flex-wrap:wrap;padding-left:31px;}
+  .diet-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 10px;border-radius:99px;background:#fff;border:1px solid var(--border);color:var(--muted);cursor:pointer;}
+  .diet-chip.on{background:var(--green-light);border-color:var(--green-border);color:var(--green);}
+  .add-opt-link{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--green);cursor:pointer;padding-top:4px;}
+  .add-opt-link svg{width:13px;height:13px;stroke:currentColor;}
+
+  .email-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+  .chk-row{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid #f0ece0;}
+  .chk-row:last-child{border-bottom:none;}
+  .chk-row input{margin-top:3px;accent-color:var(--green);width:15px;height:15px;flex-shrink:0;}
+  .chk-row .body{flex:1;min-width:0;}
+  .chk-row .t{font-size:12.5px;font-weight:600;color:var(--ink);}
+  .chk-row .d{font-size:11px;color:var(--muted);margin-top:1px;}
+  .chk-row-all .t{color:var(--green);}
+  .link-del{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:var(--muted);font-size:15px;line-height:1;flex-shrink:0;cursor:pointer;}
+  .link-del:hover{background:var(--red-bg);color:var(--red);}
+  .link-edit{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:var(--muted);flex-shrink:0;cursor:pointer;}
+  .link-edit svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;}
+  .link-edit:hover{background:var(--green-light);color:var(--green);}
+  .email-preview{background:#fdfcf9;border:1px solid var(--border);border-radius:12px;padding:16px 18px;font-size:12.5px;color:var(--body);line-height:1.75;font-family:var(--sans);}
+  .email-preview .subj{font-family:var(--serif);font-size:14.5px;font-weight:700;color:var(--ink);margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+  .email-preview a{color:var(--green);font-weight:600;text-decoration:none;}
+  .email-preview a:hover{text-decoration:underline;}
+
+
+  /* pie charts */
+  .pie-wrap{display:flex;justify-content:center;position:relative;margin-bottom:14px;}
+  .pie-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;}
+  .pie-center .v{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--ink);}
+  .pie-center .k{font-size:8.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+  .pie-wrap svg circle{transition:opacity .12s;cursor:pointer;}
+  .legend-row{display:flex;align-items:center;gap:8px;padding:6px 2px;font-size:12px;cursor:default;}
+  .legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+  .legend-lbl{flex:1;color:var(--ink);font-weight:600;}
+  .legend-val{color:var(--muted);font-variant-numeric:tabular-nums;}
+
+  /* invitation email review modal */
+  .modal-overlay{position:fixed;inset:0;background:rgba(20,20,15,.5);display:none;align-items:center;justify-content:center;z-index:200;padding:24px;}
+  .modal-overlay.on{display:flex;}
+  .modal-box{background:var(--surface);border-radius:20px;width:100%;max-width:460px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,.3);}
+  .modal-head{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);}
+  .modal-head h3{font-family:var(--serif);font-size:16.5px;font-weight:600;color:var(--ink);margin:0;}
+  .modal-close{width:30px;height:30px;border-radius:50%;background:var(--bg);border:none;display:grid;place-items:center;cursor:pointer;color:var(--muted);flex-shrink:0;}
+  .modal-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;}
+  .modal-body{flex:1;overflow-y:auto;padding:18px 22px;}
+  .modal-foot{flex-shrink:0;display:flex;gap:8px;padding:16px 22px;border-top:1px solid var(--border);}
+  .modal-foot .btn{flex:1;justify-content:center;padding:12px;font-size:13px;}
+  .modal-to{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);background:var(--green-light);padding:9px 12px;border-radius:10px;margin-bottom:14px;}
+  .modal-to b{color:var(--ink);}
+  .email-preview-card{background:#fdfcf9;border:1px solid var(--border);border-radius:14px;padding:12px;}
+  .email-preview-card .banner{width:100%;aspect-ratio:393/381;object-fit:cover;display:block;border-radius:12px;background:linear-gradient(135deg,#e2e9e3,#cfe0cc);}
+  /* card overlaps the bottom of the cover image, matching the real app's event/place detail screens */
+  .ep-overlap{position:relative;margin:-34px 8px 0;background:#fff;border-radius:16px;padding:14px 16px 12px;box-shadow:0 10px 22px rgba(30,51,35,.12);}
+  .ep-overlap.no-image{margin:0;padding:0;box-shadow:none;background:transparent;border-radius:0;}
+  .email-preview-card .inner{padding:14px 4px 4px;}
+  .email-preview-card .evtitle{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:8px;}
+  .ep-overlap.no-image .evtitle{margin-bottom:6px;}
+  .ep-chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .ep-chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--body);background:var(--bg);border:1px solid var(--border);padding:5px 10px;border-radius:9px;white-space:nowrap;}
+  .email-preview-card .evdesc{font-size:12.5px;color:var(--body);line-height:1.6;margin-bottom:14px;}
+  .email-preview-card .foot{font-size:11px;color:var(--muted);margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
+  .rsvp-row{display:flex;gap:8px;margin-top:2px;}
+  .rsvp-btn{flex:1;border:none;border-radius:9px;padding:10px;font-size:12px;font-weight:700;cursor:default;text-align:center;}
+  .rsvp-btn.yes{background:var(--green);color:#fff;}
+  .rsvp-btn.no{background:var(--field,#e8e2d6);color:var(--body);}
+
+  /* time picker */
+  .time-picker{display:flex;gap:5px;}
+  .time-picker select{padding:9px 2px;text-align:center;font-size:12.5px;}
+
+  /* image gallery */
+  .image-gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;}
+  .gallery-thumb{width:100%;aspect-ratio:1;border-radius:8px;object-fit:cover;cursor:pointer;border:2px solid transparent;display:block;}
+  .gallery-thumb.sel{border-color:var(--green);}
+  .gallery-thumb:hover{opacity:.85;}
+
+  /* rich parent select */
+  .rich-select{position:relative;}
+  .rich-select-btn{width:100%;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:9px;padding:8px 10px;cursor:pointer;font-family:var(--sans);font-size:13px;color:var(--ink);text-align:left;}
+  .rich-select-btn .ctx-chev{margin-left:auto;width:13px;height:13px;}
+  .rich-select-menu{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 10px 26px rgba(0,0,0,.12);padding:6px;z-index:50;max-height:220px;overflow-y:auto;}
+  .rich-select-menu.open{display:block;}
+  .rich-select-item{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:8px;cursor:pointer;font-size:12.5px;}
+  .rich-select-item:hover{background:var(--green-light);}
+
+  /* source tag picker */
+  .tag-select-row{display:flex;gap:6px;flex-wrap:wrap;}
+  .src-chip-btn{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;padding:7px 12px;border-radius:99px;background:#fff;border:1px solid var(--border);color:var(--muted);cursor:pointer;}
+  .src-chip-btn.on{background:var(--green-light);border-color:var(--green-border);color:var(--green);}
+
+  /* celebratory donation preview */
+  .celebrate-card{background:linear-gradient(155deg,#fff,#eef4ec);border:1.5px solid var(--green-border);border-radius:16px;padding:22px;text-align:center;}
+  .celebrate-avatar{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:700;font-size:22px;margin:0 auto 12px;}
+  .celebrate-amt{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--green);}
+  .celebrate-name{font-size:14px;font-weight:700;color:var(--ink);margin-top:4px;}
+  .celebrate-reason{font-size:12px;color:var(--muted);margin-top:2px;}
+  .celebrate-note{font-size:11px;color:var(--muted);margin-top:16px;padding-top:14px;border-top:1px solid var(--green-border);line-height:1.5;}
+
+  /* receipt dropzone */
+  .dropzone{background:#fbf9f4;border:1.5px dashed var(--green-border);border-radius:14px;padding:20px;text-align:center;cursor:pointer;transition:background .12s,border-color .12s;}
+  .dropzone:hover{background:var(--green-light);}
+  .dropzone.drag{background:var(--green-light);border-color:var(--green);}
+  .dropzone.has-file{padding:10px;}
+  .dropzone-inner{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .dropzone-icon{font-size:22px;}
+  .dropzone-text{font-size:12px;color:var(--muted);font-weight:600;}
+  .dropzone-preview{width:100%;max-height:140px;object-fit:contain;border-radius:10px;display:block;}
+
+  /* this week's menu widget (dashboard) — toggled between breakfast/lunch; every option for the
+     day is listed (a meal can have 1-3 options), numbered like the app's own Daily Briefing card */
+  .meal-toggle{display:flex;gap:6px;margin-bottom:12px;}
+  .meal-toggle-btn{font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:99px;background:var(--bg);color:var(--muted);cursor:pointer;border:1px solid var(--border);}
+  .meal-toggle-btn.on{background:var(--green);color:#fff;border-color:var(--green);}
+  .lw-day-block{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #f0ece0;align-items:flex-start;}
+  .lw-day-block:last-child{border-bottom:none;}
+  .lw-day-block.is-today{background:var(--green-light);margin:0 -8px;padding:9px 8px;border-radius:8px;border-bottom-color:transparent;}
+  .lw-day-label{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;width:38px;flex-shrink:0;padding-top:2px;}
+  .lw-day-block.is-today .lw-day-label{color:var(--green);}
+  .lw-day-opts{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;}
+  .lw-opt-row{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--body);}
+  .lw-opt-num{width:16px;height:16px;border-radius:50%;background:var(--green-light);color:var(--green);font-size:9.5px;font-weight:700;display:grid;place-items:center;flex-shrink:0;}
+  .lw-day-block.is-today .lw-opt-num{background:#fff;}
+  .lw-opt-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .lw-opt-tags{font-size:11.5px;flex-shrink:0;}
+
+  /* profile page */
+  .prof-head{display:flex;align-items:center;gap:18px;}
+  .prof-head .info{flex:1;min-width:0;}
+  .prof-head .nm{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);}
+  .prof-head .loc{font-size:12.5px;color:var(--muted);margin-top:3px;}
+  .kid-row-card{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0ece0;}
+  .kid-row-card:last-child{border-bottom:none;}
+  .kid-row-card .info{flex:1;}
+  .kid-row-card .nm{font-size:13.5px;font-weight:600;color:var(--ink);}
+  .kid-row-card .dob{font-size:11.5px;color:var(--muted);margin-top:1px;}
+  .kid-age-badge{font-size:10.5px;font-weight:700;color:var(--green);background:var(--green-light);padding:3px 9px;border-radius:99px;flex-shrink:0;}
+  .school-edit-block{margin-bottom:14px;}
+  .school-edit-block:last-child{margin-bottom:0;}
+  .school-edit-label{font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .school-edit-label .dist{font-weight:500;color:var(--muted);font-size:11.5px;}
+  .grade-chip-display{display:inline-flex;font-size:11px;font-weight:700;color:var(--green);background:var(--green-light);padding:4px 10px;border-radius:99px;margin:0 6px 6px 0;}
+  .grade-kid-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--border);}
+  .grade-kid-row:first-of-type{border-top:none;}
+  .grade-kid-name{flex:1;font-size:13px;font-weight:600;color:var(--ink);}
+  .grade-kid-row select{width:150px;padding:7px 9px;font-size:12.5px;}
+  .spouse-card{display:flex;align-items:center;gap:12px;padding:4px 0;}
+  .spouse-card .ic{width:40px;height:40px;border-radius:50%;background:var(--field,#e8e2d6);display:grid;place-items:center;font-size:18px;flex-shrink:0;}
+  .spouse-card .info{flex:1;}
+  .spouse-card .nm{font-size:13px;font-weight:600;color:var(--ink);}
+  .spouse-card .st{font-size:11.5px;color:var(--muted);margin-top:1px;}
+
+  /* sign-ups */
+  .su-view{display:none;}
+  .su-view.on{display:block;}
+  .signup-card{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:12px;}
+  .signup-card .thumb{width:52px;height:52px;border-radius:10px;object-fit:cover;flex-shrink:0;background:linear-gradient(135deg,#e2e9e3,#cfe0cc);}
+  .signup-card .info{flex:1;min-width:0;}
+  .signup-card .t{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);}
+  .signup-card .meta{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .signup-card .actions{display:flex;gap:6px;flex-shrink:0;}
+
+  .slot-date-block{background:#fbf9f4;border:1px solid var(--border);border-radius:12px;padding:12px 13px;margin-bottom:10px;}
+  .slot-date-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .slot-date-head input{flex:1;}
+  .slot-window-row{display:flex;align-items:flex-end;gap:8px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:9px 10px;margin-bottom:8px;flex-wrap:wrap;}
+  .slot-window-row:last-of-type{margin-bottom:0;}
+  .slot-window-row .tp-field{display:flex;flex-direction:column;gap:3px;}
+  .slot-window-row .tp-field label{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;}
+  .slot-window-row .cap-field{width:70px;}
+  .slot-window-row .cap-field input{padding:9px 6px;text-align:center;}
+  .slot-window-del{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:var(--muted);font-size:16px;cursor:pointer;flex-shrink:0;margin-left:auto;}
+  .slot-window-del:hover{background:var(--red-bg);color:var(--red);}
+  .add-window-link{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:var(--green);cursor:pointer;margin-top:2px;}
+  .remove-date-link{font-size:11px;font-weight:700;color:var(--red);cursor:pointer;flex-shrink:0;}
+
+  .signup-preview-card{background:#fdfcf9;border:1px solid var(--border);border-radius:14px;padding:14px;}
+  .signup-preview-card .banner{width:100%;aspect-ratio:393/381;object-fit:cover;border-radius:12px;margin-bottom:12px;display:block;background:linear-gradient(135deg,#e2e9e3,#cfe0cc);}
+  .signup-preview-card .t{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+  .signup-preview-card .d{font-size:12.5px;color:var(--body);line-height:1.6;margin-bottom:14px;}
+  .signup-slot-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:11px;padding:10px 12px;margin-bottom:8px;}
+  .signup-slot-row:last-child{margin-bottom:0;}
+  .signup-slot-row .info{flex:1;min-width:0;}
+  .signup-slot-row .dt{font-size:12.5px;font-weight:700;color:var(--ink);}
+  .signup-slot-row .tm{font-size:11.5px;color:var(--muted);margin-top:1px;}
+  .signup-slot-row .cap{font-size:10.5px;font-weight:700;color:var(--green);background:var(--green-light);padding:3px 9px;border-radius:99px;flex-shrink:0;}
+  .signup-slot-row .su-btn{background:var(--green);color:#fff;font-size:11.5px;font-weight:700;padding:7px 13px;border-radius:9px;flex-shrink:0;}
+
+  .link-copy-row{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:11px 13px;margin-bottom:14px;}
+  .link-copy-row .url{flex:1;font-family:var(--mono);font-size:12.5px;color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  .response-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #f0ece0;}
+  .response-row:last-child{border-bottom:none;}
+  .response-row .info{flex:1;}
+  .response-row .nm{font-size:13px;font-weight:600;color:var(--ink);}
+  .response-row .ct{font-size:11px;color:var(--muted);margin-top:1px;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     AUTH — this whole block is a UI-only prototype.
+     No real OTP send/verify: any phone + any 6 digits signs in.
+     Wire to a real auth/OTP backend before shipping.
+══════════════════════════════════════════ -->
+<div class="auth-layout active" id="auth-phone">
+  <div class="auth-left">
+    <div class="auth-left-logo"><div class="mark">S</div><div class="name">Sprout<small>Room Parent Portal</small></div></div>
+    <div class="auth-left-body">
+      <h2>Everything you need to run your class.</h2>
+      <p>One place for your class calendar, lunch menu, parent emails, and fundraising — no more spreadsheets and group texts.</p>
+      <div class="auth-left-features">
+        <div class="auth-feature"><span class="ic">📅</span><span>Preload your year's calendar, push events to Discover when it's time</span></div>
+        <div class="auth-feature"><span class="ic">🍎</span><span>Update the school-wide lunch menu in one place</span></div>
+        <div class="auth-feature"><span class="ic">✉️</span><span>AI-drafted class emails, pulled straight from your calendar</span></div>
+        <div class="auth-feature"><span class="ic">💛</span><span>Track fundraising — donations, spending, and receipts</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <h1>Sign in to your portal</h1>
+      <p class="sub">Enter the phone number on file for your class.</p>
+      <div class="form-stack">
+        <div class="field"><label>Phone Number</label><input type="tel" id="phoneInput" value="(512) 555-0147" placeholder="(512) 555-0147"></div>
+        <button class="btn btn-primary btn-primary-full" id="sendCodeBtn" onclick="sendCode()">Send Code</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="auth-layout" id="auth-code">
+  <div class="auth-left">
+    <div class="auth-left-logo"><div class="mark">S</div><div class="name">Sprout<small>Room Parent Portal</small></div></div>
+    <div class="auth-left-body">
+      <h2>Everything you need to run your class.</h2>
+      <p>One place for your class calendar, lunch menu, parent emails, and fundraising — no more spreadsheets and group texts.</p>
+      <div class="auth-left-features">
+        <div class="auth-feature"><span class="ic">📅</span><span>Preload your year's calendar, push events to Discover when it's time</span></div>
+        <div class="auth-feature"><span class="ic">🍎</span><span>Update the school-wide lunch menu in one place</span></div>
+        <div class="auth-feature"><span class="ic">✉️</span><span>AI-drafted class emails, pulled straight from your calendar</span></div>
+        <div class="auth-feature"><span class="ic">💛</span><span>Track fundraising — donations, spending, and receipts</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <h1>Enter your code</h1>
+      <p class="sub">We sent a 6-digit code to <b id="codePhoneEcho" style="color:var(--ink);">(512) 555-0147</b>. <button class="switch-link" onclick="showAuth('auth-phone')">Change number</button></p>
+      <div class="form-stack">
+        <div class="code-row">
+          <input class="code-box" maxlength="1" inputmode="numeric" data-i="0">
+          <input class="code-box" maxlength="1" inputmode="numeric" data-i="1">
+          <input class="code-box" maxlength="1" inputmode="numeric" data-i="2">
+          <input class="code-box" maxlength="1" inputmode="numeric" data-i="3">
+          <input class="code-box" maxlength="1" inputmode="numeric" data-i="4">
+          <input class="code-box" maxlength="1" inputmode="numeric" data-i="5">
+        </div>
+        <button class="btn btn-primary btn-primary-full" id="verifyBtn" onclick="verifyCode()" disabled>Verify &amp; Continue</button>
+        <p style="font-size:12.5px;color:var(--muted);text-align:center;margin:0;">Didn't get a code? <button class="switch-link" onclick="resendCode()">Resend</button></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     NEW-USER ONBOARDING — shown only when the phone number
+     doesn't match an existing Sprout parent. Room parents from
+     schools without Sprout land here instead of skipping straight in.
+══════════════════════════════════════════ -->
+<div class="auth-layout" id="auth-details">
+  <div class="auth-left">
+    <div class="auth-left-logo"><div class="mark">S</div><div class="name">Sprout<small>Room Parent Portal</small></div></div>
+    <div class="auth-left-body">
+      <h2>Everything you need to run your class.</h2>
+      <p>One place for your class calendar, lunch menu, parent emails, and fundraising — no more spreadsheets and group texts.</p>
+      <div class="auth-left-features">
+        <div class="auth-feature"><span class="ic">📅</span><span>Preload your year's calendar, push events to Discover when it's time</span></div>
+        <div class="auth-feature"><span class="ic">🍎</span><span>Update the school-wide lunch menu in one place</span></div>
+        <div class="auth-feature"><span class="ic">✉️</span><span>AI-drafted class emails, pulled straight from your calendar</span></div>
+        <div class="auth-feature"><span class="ic">💛</span><span>Track fundraising — donations, spending, and receipts</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <div class="auth-progress"><span class="on"></span><span></span><span></span></div>
+      <h1>Welcome — let's set you up 🌱</h1>
+      <p class="sub">We don't recognize this number yet. Just the basics to get your Sprout profile started.</p>
+      <div class="form-stack">
+        <div class="form-grid">
+          <div class="field"><label>First Name</label><input type="text" id="nudFirst" placeholder="Jamie"></div>
+          <div class="field"><label>Last Name</label><input type="text" id="nudLast" placeholder="Rivera"></div>
+        </div>
+        <button class="btn btn-primary btn-primary-full" onclick="saveUserDetails()">Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="auth-layout" id="auth-school">
+  <div class="auth-left">
+    <div class="auth-left-logo"><div class="mark">S</div><div class="name">Sprout<small>Room Parent Portal</small></div></div>
+    <div class="auth-left-body">
+      <h2>Everything you need to run your class.</h2>
+      <p>One place for your class calendar, lunch menu, parent emails, and fundraising — no more spreadsheets and group texts.</p>
+      <div class="auth-left-features">
+        <div class="auth-feature"><span class="ic">📅</span><span>Preload your year's calendar, push events to Discover when it's time</span></div>
+        <div class="auth-feature"><span class="ic">🍎</span><span>Update the school-wide lunch menu in one place</span></div>
+        <div class="auth-feature"><span class="ic">✉️</span><span>AI-drafted class emails, pulled straight from your calendar</span></div>
+        <div class="auth-feature"><span class="ic">💛</span><span>Track fundraising — donations, spending, and receipts</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <div class="auth-progress"><span class="done"></span><span class="on"></span><span></span></div>
+      <h1>Which school?</h1>
+      <p class="sub">So we can set up the right calendar and lunch menu for your class.</p>
+      <div class="form-stack">
+        <div class="field">
+          <label>School</label>
+          <select id="nudSchool">
+            <option value="">Select a school…</option>
+            <option>Kiker Elementary</option>
+            <option>Boone Elementary</option>
+            <option>Cowan Elementary</option>
+            <option>Baranoff Elementary</option>
+            <option>Mills Elementary</option>
+            <option value="__other__">My school isn't listed</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-primary-full" onclick="saveSchoolSelection()">Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="auth-layout" id="auth-kids">
+  <div class="auth-left">
+    <div class="auth-left-logo"><div class="mark">S</div><div class="name">Sprout<small>Room Parent Portal</small></div></div>
+    <div class="auth-left-body">
+      <h2>Everything you need to run your class.</h2>
+      <p>One place for your class calendar, lunch menu, parent emails, and fundraising — no more spreadsheets and group texts.</p>
+      <div class="auth-left-features">
+        <div class="auth-feature"><span class="ic">📅</span><span>Preload your year's calendar, push events to Discover when it's time</span></div>
+        <div class="auth-feature"><span class="ic">🍎</span><span>Update the school-wide lunch menu in one place</span></div>
+        <div class="auth-feature"><span class="ic">✉️</span><span>AI-drafted class emails, pulled straight from your calendar</span></div>
+        <div class="auth-feature"><span class="ic">💛</span><span>Track fundraising — donations, spending, and receipts</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <div class="auth-progress"><span class="done"></span><span class="done"></span><span class="on"></span></div>
+      <h1>Add your kids</h1>
+      <p class="sub">This helps us personalize your family's experience — and show you the right classes.</p>
+      <div class="form-stack">
+        <div id="kidRows"></div>
+        <button class="switch-link" style="text-align:left;" onclick="addAnotherKid()">+ Add another kid</button>
+        <button class="btn btn-primary btn-primary-full" onclick="finishNewUserOnboarding()">Finish Setup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     APP — hidden until login completes
+══════════════════════════════════════════ -->
+<div class="app" id="main-app" style="display:none;">
+  <div class="sidebar">
+    <div class="brand"><div class="mark">S</div><div class="txt">Room Parent<small>Portal</small></div></div>
+    <div id="sidebarNav"></div>
+    <div class="sidebar-foot">
+      <div class="who" style="cursor:pointer;" onclick="goTo('profile')"><div class="avatar" style="width:30px;height:30px;font-size:11px;background:linear-gradient(145deg,#1e3e2b,#4fa472);">TM</div><span><span class="nm">Tony M.</span><span class="role">Room Parent</span></span></div>
+      <div class="signout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>Sign Out</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="ctx-switcher">
+        <button class="ctx-btn" id="ctxBtn" onclick="toggleCtxMenu()">
+          <div class="ctx-btn-mark" id="ctxMark">🍀</div>
+          <div class="ctx-label"><span class="nm" id="ctxName">Mrs. Taylor's Class</span><span class="sb" id="ctxSub">1st Grade · Kiker Elementary</span></div>
+          <svg class="ctx-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="ctx-menu" id="ctxMenu"></div>
+      </div>
+      <div class="me"><div class="avatar" style="background:linear-gradient(145deg,#1e3e2b,#4fa472);">TM</div><span>Tony M.</span></div>
+    </div>
+
+    <div class="content">
+
+      <!-- ═══ DASHBOARD ═══ -->
+      <div class="sec on" id="sec-dashboard">
+        <div class="sec-head"><div><h2 id="dashGreeting">Welcome back, Tony 👋</h2><p id="dashSub">Here's what's happening in Mrs. Taylor's Class this week.</p></div></div>
+
+        <!-- class dashboard -->
+        <div id="dash-class-view">
+          <div class="quick-actions" style="margin-bottom:18px;">
+            <button class="btn btn-primary" onclick="goTo('calendar'); toggleForm('evForm');">+ Add Event</button>
+            <button class="btn btn-ghost" onclick="goTo('email')">✉️ Compose Email</button>
+            <button class="btn btn-ghost" onclick="openDonForm(true)">+ Log Donation</button>
+            <button class="btn btn-ghost" onclick="goTo('users'); toggleForm('parentForm');">+ Add Parent</button>
+          </div>
+
+          <div class="stat-row">
+            <div class="stat-card balance"><div class="k">Fund Balance</div><div class="v" id="dash-balance">$0</div><div class="sub" id="dash-raisedsub">$0 raised so far</div></div>
+            <div class="stat-card"><div class="k">Upcoming Events</div><div class="v" id="dash-eventcount">0</div><div class="sub" id="dash-eventsub">nothing scheduled</div></div>
+            <div class="stat-card"><div class="k">Class Size</div><div class="v" id="dash-classsize">24</div><div class="sub">parents</div></div>
+          </div>
+
+          <div class="dash-grid">
+            <div class="card">
+              <div class="card-head"><h3>Upcoming Events</h3><span class="btn btn-ghost btn-sm" onclick="goTo('calendar')">View Calendar</span></div>
+              <div id="dash-eventlist"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>This Week's Menu</h3><span style="font-size:10.5px;color:var(--muted);font-weight:600;">Set on Kiker Master</span></div>
+              <div class="meal-toggle">
+                <span class="meal-toggle-btn" data-meal="breakfast" onclick="setDashMealView('breakfast')">🍳 Breakfast</span>
+                <span class="meal-toggle-btn on" data-meal="lunch" onclick="setDashMealView('lunch')">🍽️ Lunch</span>
+              </div>
+              <div id="dash-lunch"></div>
+            </div>
+          </div>
+
+          <div class="dash-grid">
+            <div class="card">
+              <div class="card-head"><h3>Donations by Reason</h3></div>
+              <div class="pie-wrap"><svg id="pieDonations" viewBox="0 0 180 180" width="150" height="150"></svg><div class="pie-center"><div class="v" id="pieDonationsCenter">$0</div><div class="k">raised</div></div></div>
+              <div id="legendDonations"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Expenses by Event</h3></div>
+              <div class="pie-wrap"><svg id="pieExpenses" viewBox="0 0 180 180" width="150" height="150"></svg><div class="pie-center"><div class="v" id="pieExpensesCenter">$0</div><div class="k">spent</div></div></div>
+              <div id="legendExpenses"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- master dashboard -->
+        <div id="dash-master-view" style="display:none;">
+          <div class="stat-row">
+            <div class="stat-card"><div class="k">Room Parents</div><div class="v" id="dash-rpcount">0</div><div class="sub">with access to this page</div></div>
+            <div class="stat-card"><div class="k">School-wide Events</div><div class="v" id="dash-masterevcount">0</div><div class="sub">on the master calendar</div></div>
+            <div class="stat-card"><div class="k">Classes</div><div class="v">2</div><div class="sub">at Kiker Elementary</div></div>
+          </div>
+          <div class="dash-grid">
+            <div class="card">
+              <div class="card-head"><h3>Upcoming School-wide Events</h3><span class="btn btn-ghost btn-sm" onclick="goTo('calendar')">View Calendar</span></div>
+              <div id="dash-master-eventlist"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>This Week's Menu</h3><span class="btn btn-ghost btn-sm" onclick="goTo('lunch')">Edit</span></div>
+              <div class="meal-toggle">
+                <span class="meal-toggle-btn" data-meal="breakfast" onclick="setDashMealView('breakfast')">🍳 Breakfast</span>
+                <span class="meal-toggle-btn on" data-meal="lunch" onclick="setDashMealView('lunch')">🍽️ Lunch</span>
+              </div>
+              <div id="dash-master-lunch"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Room Parents with Access</h3><span class="btn btn-ghost btn-sm" onclick="goTo('roomparents')">See Activity Log</span></div>
+            <div id="dash-rp-preview"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ CALENDAR ═══ -->
+      <div class="sec" id="sec-calendar">
+        <div class="sec-head">
+          <div><h2 id="calTitle">Calendar</h2><p id="calSub">Preload events for the year — pick a send date and the platform sends the invitation for you.</p></div>
+          <div class="actions"><button class="btn btn-primary" onclick="toggleForm('evForm')">+ Add Event</button></div>
+        </div>
+
+        <div class="inline-form" id="evForm">
+          <div class="email-grid">
+            <div>
+              <div class="field" style="margin-bottom:10px;"><label>Title</label><input type="text" id="evTitle" placeholder="e.g. Fall Book Fair" oninput="renderEventFormPreview()"></div>
+              <div class="form-grid" style="margin-bottom:10px;">
+                <div class="field"><label>Date</label><input type="date" id="evDate" onchange="renderEventFormPreview()"></div>
+                <div class="field" id="evSendDateField">
+                  <label>Send Date</label>
+                  <input type="date" id="evSendDate">
+                </div>
+              </div>
+              <div class="hint" id="evSendDateHint" style="margin:-6px 0 10px;">Leave Send Date blank to send immediately, or pick a future date to queue it. Also emails parents who aren't on Sprout yet.</div>
+
+              <div class="form-grid" style="margin-bottom:10px;">
+                <div class="field"><label>Start Time</label>
+                  <div class="time-picker">
+                    <select id="evStartH" onchange="renderEventFormPreview()"></select>
+                    <select id="evStartM" onchange="renderEventFormPreview()"></select>
+                  </div>
+                </div>
+                <div class="field"><label>End Time</label>
+                  <div class="time-picker">
+                    <select id="evEndH" onchange="renderEventFormPreview()"></select>
+                    <select id="evEndM" onchange="renderEventFormPreview()"></select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field" style="margin-bottom:10px;"><label>Description</label><textarea id="evDesc" rows="4" placeholder="What parents need to know — feel free to use a few lines." oninput="renderEventFormPreview()"></textarea></div>
+
+              <div class="field" id="evImageField" style="margin-bottom:10px;">
+                <label>Event Image (optional)</label>
+                <div class="image-gallery" id="evImageGallery"></div>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                  <label class="file-chip">📎 Upload<input type="file" accept="image/*" id="evImageFile" onchange="handleEventImagePreview()"></label>
+                  <button type="button" class="btn btn-ghost btn-sm" id="evAiGenBtn" onclick="generateEventImageAI()">✨ Generate with AI</button>
+                </div>
+              </div>
+
+              <div class="field" style="margin-bottom:6px;">
+                <label>How Should This Go Out?</label>
+                <div class="radio-row">
+                  <label><input type="radio" name="evMode" value="invite" checked onchange="updateEvModeUI()"> 📨 Send as a formal Event Invitation<span style="color:var(--muted);font-weight:400;"> — also adds it to the calendar</span></label>
+                  <label><input type="radio" name="evMode" value="calendar" onchange="updateEvModeUI()"> 📅 Just add it to the calendar<span style="color:var(--muted);font-weight:400;"> — no invite, no RSVP</span></label>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="field"><label>Preview</label></div>
+              <div class="email-preview-card">
+                <img class="banner" id="evPrevBanner" style="display:none;">
+                <div class="ep-overlap no-image" id="evPrevOverlap">
+                  <div class="evtitle" id="evPrevTitle">Event Title</div>
+                  <div class="ep-chips"><span class="ep-chip" id="evPrevDateChip">📅 Pick a date</span></div>
+                </div>
+                <div class="inner">
+                  <div class="evdesc" id="evPrevDesc">Add a description to see it here.</div>
+                  <div class="rsvp-row" id="evPrevRsvpRow"><span class="rsvp-btn yes">✅ Yes, I'm Going</span><span class="rsvp-btn no">Can't Make It</span></div>
+                  <div class="foot" id="evPrevFoot">Sent from Mrs. Taylor's Class on Sprout.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="inline-form-actions"><button class="btn btn-ghost" onclick="closeEventForm()">Cancel</button><button class="btn btn-primary" onclick="addEvent()">Save Event</button></div>
+        </div>
+
+        <div class="card"><div id="ev-rows"></div></div>
+      </div>
+
+      <!-- ═══ LUNCH MENU (Master only) ═══ -->
+      <div class="sec" id="sec-lunch">
+        <div class="sec-head">
+          <div><h2>Weekly Lunch &amp; Breakfast Menu</h2><p>This is the master menu for the whole school — it flows down to every grade's calendar automatically. Matches the food-selection UI from the parent app: each meal can have multiple options, each taggable (Vegetarian, Vegan, Pre-K, Gluten Free, Local Ingredients).</p></div>
+          <div class="actions"><button class="btn btn-primary" onclick="saveLunch()"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>Save Menu</button></div>
+        </div>
+        <div class="daypicker" id="lunchDayPicker"></div>
+        <div class="card">
+          <div class="card-head"><h3>Breakfast Options — <span id="lunchDayLabelB">Monday</span></h3></div>
+          <div id="breakfastOptions"></div>
+          <div class="add-opt-link" onclick="addLunchOption('breakfast')"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Add another option</div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Lunch Options — <span id="lunchDayLabelL">Monday</span></h3></div>
+          <div id="lunchOptions"></div>
+          <div class="add-opt-link" onclick="addLunchOption('lunch')"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Add another option</div>
+        </div>
+      </div>
+
+      <!-- ═══ LINKS ═══ -->
+      <div class="sec" id="sec-links">
+        <div class="sec-head">
+          <div><h2>Links</h2><p>WhatsApp groups, photo albums, sign-up forms — everything you'd otherwise have to dig up in Compose Email lives here too.</p></div>
+          <div class="actions"><button class="btn btn-primary" onclick="toggleLinkFormPage()">+ Add Link</button></div>
+        </div>
+        <div class="inline-form" id="linkFormPage">
+          <div class="form-grid">
+            <div class="field"><label>Name</label><input type="text" id="linkNamePage" placeholder="e.g. Class WhatsApp"></div>
+            <div class="field"><label>Due Date (optional)</label><input type="date" id="linkDuePage"></div>
+            <div class="field" style="grid-column:1/-1;"><label>Description</label><input type="text" id="linkDescPage" placeholder="What is this link for?"></div>
+            <div class="field" style="grid-column:1/-1;"><label>Link URL</label><input type="text" id="linkUrlPage" placeholder="https://..."></div>
+          </div>
+          <div class="inline-form-actions"><button class="btn btn-ghost" onclick="closeLinkFormPage()">Cancel</button><button class="btn btn-primary" id="linkFormPageSaveBtn" onclick="addLinkPage()">Save Link</button></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Links</h3></div>
+          <div id="links-page-rows"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Sign-Up Links</h3><span class="btn btn-ghost btn-sm" onclick="goTo('signups')">Manage Sign-Ups</span></div>
+          <div id="links-page-signups"></div>
+        </div>
+      </div>
+
+      <!-- ═══ USERS ═══ -->
+      <div class="sec" id="sec-users">
+        <div class="sec-head">
+          <div><h2>Users</h2><p>Everyone connected to this class — on Sprout or not. Add parents who aren't on the app yet so you can still log their donations and email them.</p></div>
+          <div class="actions"><button class="btn btn-primary" onclick="toggleForm('parentForm')">+ Add Parent</button></div>
+        </div>
+        <div class="inline-form" id="parentForm">
+          <div class="form-grid">
+            <div class="field"><label>Name</label><input type="text" id="pName" placeholder="Full name"></div>
+            <div class="field"><label>Kid's Name</label><input type="text" id="pKid" placeholder="Child's name"></div>
+            <div class="field"><label>Email</label><input type="text" id="pEmail" placeholder="parent@email.com"></div>
+            <div class="field"><label>Phone</label><input type="tel" id="pPhone" placeholder="(512) 555-0100"></div>
+          </div>
+          <div class="field" style="margin-bottom:6px;">
+            <label>Role</label>
+            <div class="radio-row">
+              <label><input type="radio" name="pRole" value="parent" checked> Parent</label>
+              <label><input type="radio" name="pRole" value="roomparent"> Room Parent<span style="color:var(--muted);font-weight:400;"> — gets access to this portal</span></label>
+            </div>
+          </div>
+          <div class="inline-form-actions"><button class="btn btn-ghost" onclick="closeParentForm()">Cancel</button><button class="btn btn-primary" onclick="addParent()">Save Parent</button></div>
+        </div>
+        <div class="card"><table class="table"><thead><tr><th>Parent</th><th>Kid(s)</th><th>Phone</th><th>Email</th><th>Status</th><th>Access</th></tr></thead><tbody id="parent-rows"></tbody></table></div>
+      </div>
+
+      <!-- ═══ COMPOSE EMAIL ═══ -->
+      <div class="sec" id="sec-email">
+        <div class="sec-head">
+          <div><h2>Compose Class Email</h2><p>Pulls upcoming calendar events and your class links in automatically — uncheck anything you don't want included, then regenerate.</p></div>
+          <div class="actions"><button class="btn btn-ghost" id="regenBtn" onclick="regenerateEmail()">✨ Regenerate with AI</button><button class="btn btn-primary" onclick="sendEmail()">Send to Class</button></div>
+        </div>
+
+        <div class="card">
+          <div class="field" style="margin-bottom:14px;"><label>Subject</label><input type="text" id="emailSubject" value="September Updates from Mrs. Taylor's Class 🍎"></div>
+          <div class="field">
+            <label>Send To</label>
+            <div class="radio-row">
+              <label><input type="radio" name="emailRecipient" value="all" checked onchange="updateRecipientMode()"> All Families</label>
+              <label><input type="radio" name="emailRecipient" value="specific" onchange="updateRecipientMode()"> Select Specific People</label>
+              <label><input type="radio" name="emailRecipient" value="emailonly" onchange="updateRecipientMode()"> Email-Only Families</label>
+            </div>
+            <div id="recipientPicker" style="display:none;margin-top:10px;"></div>
+          </div>
+        </div>
+
+        <div class="email-grid">
+          <div>
+            <div class="card">
+              <div class="card-head"><h3>Your Message</h3></div>
+              <textarea id="emailIntro" rows="3" style="resize:vertical;min-height:320px;">Hi everyone! A few things coming up this month —</textarea>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Events to Include</h3></div>
+              <div id="email-events"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Links to Include</h3><button class="btn btn-primary btn-sm" onclick="toggleLinkForm()">+ Add Link</button></div>
+              <div class="inline-form" id="linkForm">
+                <div class="form-grid">
+                  <div class="field"><label>Name</label><input type="text" id="linkName" placeholder="e.g. Class WhatsApp"></div>
+                  <div class="field"><label>Due Date (optional)</label><input type="date" id="linkDue"></div>
+                  <div class="field" style="grid-column:1/-1;"><label>Description</label><input type="text" id="linkDesc" placeholder="What is this link for?"></div>
+                  <div class="field" style="grid-column:1/-1;"><label>Link URL</label><input type="text" id="linkUrl" placeholder="https://..."></div>
+                </div>
+                <div class="inline-form-actions"><button class="btn btn-ghost" onclick="closeLinkForm()">Cancel</button><button class="btn btn-primary" id="linkFormSaveBtn" onclick="addLink()">Save Link</button></div>
+              </div>
+              <div id="email-links"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Previously Sent</h3></div>
+              <div id="email-log"></div>
+            </div>
+          </div>
+          <div class="card" style="position:sticky;top:0;">
+            <div class="card-head"><h3>Preview</h3></div>
+            <div class="email-preview" id="email-preview"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ ROOM PARENTS & ACTIVITY (Master only) ═══ -->
+      <div class="sec" id="sec-roomparents">
+        <div class="sec-head"><div><h2>Room Parents &amp; Activity</h2><p>Everyone with access to the Kiker Master Page, and a log of who's updated the calendar or lunch menu.</p></div></div>
+        <div class="card">
+          <div class="card-head"><h3>Room Parents with Access</h3><button class="btn btn-primary btn-sm" onclick="toggleForm('addRpForm')">+ Add Room Parent</button></div>
+          <div class="inline-form" id="addRpForm">
+            <div class="form-grid">
+              <div class="field" style="grid-column:1/-1;">
+                <label>Name</label>
+                <select id="rpNameSelect" onchange="handleRpNameSelect()"></select>
+                <input type="text" id="rpNameCustom" placeholder="Full name" style="display:none;margin-top:8px;">
+              </div>
+              <div class="field"><label>Class</label>
+                <select id="rpClass"></select>
+              </div>
+              <div class="field"><label>Phone (optional)</label><input type="tel" id="rpPhone" placeholder="(512) 555-0100"></div>
+              <div class="field"><label>Email (optional)</label><input type="text" id="rpEmail" placeholder="parent@email.com"></div>
+            </div>
+            <div class="inline-form-actions"><button class="btn btn-ghost" onclick="closeAddRpForm()">Cancel</button><button class="btn btn-primary" onclick="addRoomParentAccess()">Grant Access</button></div>
+          </div>
+          <div id="rp-rows"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Activity Log</h3></div>
+          <div id="activity-rows"></div>
+        </div>
+      </div>
+
+      <!-- ═══ FUNDRAISING ═══ -->
+      <div class="sec" id="sec-fundraising">
+        <div class="sec-head">
+          <div><h2>Fundraising</h2><p>Track donations and how the class fund gets spent — replaces the spreadsheet.</p></div>
+          <div class="actions"><button class="btn btn-ghost" onclick="exportCSV()"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Export</button></div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-card"><div class="k">Total Raised</div><div class="v" id="fr-raised">$0</div></div>
+          <div class="stat-card spent"><div class="k">Total Spent</div><div class="v" id="fr-spent">$0</div></div>
+          <div class="stat-card balance"><div class="k">Balance</div><div class="v" id="fr-balance">$0</div></div>
+        </div>
+
+        <div class="dash-grid" style="margin-bottom:16px;">
+          <div class="card">
+            <div class="card-head"><h3>Donations by Reason</h3></div>
+            <div class="pie-wrap"><svg id="frPieDonations" viewBox="0 0 180 180" width="150" height="150"></svg><div class="pie-center"><div class="v" id="frPieDonationsCenter">$0</div><div class="k">raised</div></div></div>
+            <div id="frLegendDonations"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Expenses by Event</h3></div>
+            <div class="pie-wrap"><svg id="frPieExpenses" viewBox="0 0 180 180" width="150" height="150"></svg><div class="pie-center"><div class="v" id="frPieExpensesCenter">$0</div><div class="k">spent</div></div></div>
+            <div id="frLegendExpenses"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Donations</h3><button class="btn btn-primary btn-sm" onclick="openDonForm()">+ Log Donation</button></div>
+          <div class="inline-form" id="donForm">
+            <div class="email-grid">
+              <div>
+                <div class="field" style="margin-bottom:10px;"><label>Parent</label>
+                  <div class="rich-select">
+                    <button type="button" class="rich-select-btn" onclick="toggleParentPicker()">
+                      <span class="avatar" id="donParentAvatar" style="width:24px;height:24px;font-size:9px;"></span>
+                      <span id="donParentName">Select a parent</span>
+                      <svg class="ctx-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="rich-select-menu" id="donParentMenu"></div>
+                  </div>
+                  <input type="hidden" id="donParent">
+                </div>
+                <div class="field" style="margin-bottom:10px;"><label>Amount ($)</label><input type="number" id="donAmount" placeholder="0.00" step="0.01" min="0" oninput="renderDonationPreview()"></div>
+                <div class="field" style="margin-bottom:10px;"><label>Source</label>
+                  <div class="tag-select-row" id="donSourceRow">
+                    <span class="src-chip-btn on" data-val="Venmo" onclick="pickDonSource(this)">📱 Venmo</span>
+                    <span class="src-chip-btn" data-val="Apple Pay" onclick="pickDonSource(this)">📱 Apple Pay</span>
+                    <span class="src-chip-btn" data-val="Check" onclick="pickDonSource(this)">🧾 Check</span>
+                    <span class="src-chip-btn" data-val="Cash" onclick="pickDonSource(this)">💵 Cash</span>
+                    <span class="src-chip-btn" data-val="Other" onclick="pickDonSource(this)">❓ Other</span>
+                  </div>
+                  <input type="hidden" id="donSource" value="Venmo">
+                </div>
+                <div class="field" style="margin-bottom:10px;"><label>Date Received</label><input type="date" id="donDate"></div>
+                <div class="field" style="margin-bottom:10px;">
+                  <label>Donation Reason</label>
+                  <div class="tag-select-row" id="donReasonRow"></div>
+                  <input type="hidden" id="donReason" value="supplies">
+                </div>
+                <div class="field"><label>Note (optional)</label><input type="text" id="donNote" placeholder="Extra detail, e.g. which field trip" oninput="renderDonationPreview()"></div>
+              </div>
+              <div>
+                <div class="field"><label>Preview</label></div>
+                <div class="celebrate-card">
+                  <div class="celebrate-avatar" id="celebrateAvatar">?</div>
+                  <div class="celebrate-amt" id="celebrateAmt">$0.00</div>
+                  <div class="celebrate-name" id="celebrateName">Select a parent</div>
+                  <div class="celebrate-reason" id="celebrateReason">—</div>
+                  <div class="celebrate-note">🎉 This is what confirms to the parent that their donation was received.</div>
+                </div>
+              </div>
+            </div>
+            <div class="inline-form-actions"><button class="btn btn-ghost" onclick="toggleForm('donForm')">Cancel</button><button class="btn btn-primary" onclick="addDonation()">Save Donation</button></div>
+          </div>
+          <table class="table"><thead><tr><th>Parent</th><th>Amount</th><th>Source</th><th>Reason</th><th>Date</th></tr></thead><tbody id="don-rows"></tbody></table>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Expenses</h3><button class="btn btn-primary btn-sm" onclick="toggleForm('expForm')">+ Log Expense</button></div>
+          <div class="inline-form" id="expForm">
+            <div class="form-grid">
+              <div class="field" style="grid-column:1/-1;"><label>Tag To</label><select id="expTag"><option value="supplies">📦 Supplies</option></select></div>
+              <div class="field"><label>Amount Spent ($)</label><input type="number" id="expAmount" placeholder="0.00" step="0.01" min="0"></div>
+              <div class="field"><label>Date Spent</label><input type="date" id="expDate"></div>
+              <div class="field" style="grid-column:1/-1;"><label>What it was used for</label><input type="text" id="expDesc" placeholder="e.g. Spirit Night snacks"></div>
+            </div>
+            <div class="field" style="margin-bottom:10px;">
+              <label>Receipt (optional)</label>
+              <div class="dropzone" id="expDropzone" onclick="document.getElementById('expFile').click()" ondragover="event.preventDefault(); this.classList.add('drag');" ondragleave="this.classList.remove('drag');" ondrop="handleReceiptDrop(event)">
+                <input type="file" accept="image/*" id="expFile" onchange="handleReceiptPreview()" style="display:none;">
+                <div class="dropzone-inner" id="expDropzoneInner">
+                  <span class="dropzone-icon">📎</span>
+                  <span class="dropzone-text">Click to upload, or drag a photo of the receipt here</span>
+                </div>
+              </div>
+            </div>
+            <div class="inline-form-actions"><button class="btn btn-ghost" onclick="closeExpenseForm()">Cancel</button><button class="btn btn-primary" onclick="addExpense()">Save Expense</button></div>
+          </div>
+          <table class="table"><thead><tr><th>What for</th><th>Tagged To</th><th>Amount</th><th>Date</th><th>Receipt</th></tr></thead><tbody id="exp-rows"></tbody></table>
+        </div>
+      </div>
+
+      <!-- ═══ MY PROFILE — mirrors the parent-facing app profile 1:1 ═══ -->
+      <div class="sec" id="sec-profile">
+        <div class="sec-head"><div><h2>My Profile</h2><p>Same profile parents see across the app — kids, school groups, and interests, all in one place.</p></div></div>
+
+        <div class="card">
+          <div class="prof-head">
+            <div class="avatar" id="profAvatar" style="width:72px;height:72px;font-size:26px;background:linear-gradient(145deg,#1e3e2b,#4fa472);">TM</div>
+            <div class="info">
+              <div class="nm" id="profName">Tony Martin</div>
+              <div class="loc" id="profLoc">Austin, TX · 73301 · Parent</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="openProfNameForm()">Edit</button>
+          </div>
+          <div class="inline-form" id="profNameForm" style="margin-top:14px;">
+            <div class="form-grid">
+              <div class="field"><label>First Name</label><input type="text" id="profFirstName"></div>
+              <div class="field"><label>Last Name</label><input type="text" id="profLastName"></div>
+              <div class="field"><label>City</label><input type="text" id="profCity"></div>
+              <div class="field"><label>State</label><input type="text" id="profState" maxlength="2"></div>
+              <div class="field"><label>Zip Code</label><input type="text" id="profZip" maxlength="10"></div>
+              <div class="field"><label>Parenting Role</label><select id="profRole"><option>Parent</option><option>Guardian</option><option>Grandparent</option><option>Caregiver</option></select></div>
+            </div>
+            <div class="inline-form-actions"><button class="btn btn-ghost" onclick="toggleForm('profNameForm')">Cancel</button><button class="btn btn-primary" onclick="saveProfName()">Save</button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Bio</h3><button class="btn btn-ghost btn-sm" onclick="openProfBioForm()">Edit</button></div>
+          <p id="profBioText" style="font-size:13px;color:var(--body);line-height:1.65;margin:0;"></p>
+          <div class="inline-form" id="profBioForm" style="margin-top:12px;">
+            <textarea id="profBioInput" rows="4" maxlength="500" oninput="document.getElementById('profBioCount').textContent = this.value.length + ' / 500';" style="margin-bottom:4px;"></textarea>
+            <div class="hint" id="profBioCount" style="text-align:right;margin-bottom:10px;">0 / 500</div>
+            <div class="inline-form-actions"><button class="btn btn-ghost" onclick="toggleForm('profBioForm')">Cancel</button><button class="btn btn-primary" onclick="saveProfBio()">Save</button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>My Kids</h3><button class="btn btn-primary btn-sm" onclick="toggleForm('profKidForm')">+ Add Child</button></div>
+          <div class="inline-form" id="profKidForm">
+            <div class="form-grid">
+              <div class="field"><label>Child's Name</label><input type="text" id="profKidName" placeholder="e.g. Cooper"></div>
+              <div class="field"><label>Date of Birth</label><input type="date" id="profKidDob"></div>
+            </div>
+            <div class="inline-form-actions"><button class="btn btn-ghost" onclick="closeProfKidForm()">Cancel</button><button class="btn btn-primary" onclick="addProfKid()">Add Child</button></div>
+          </div>
+          <div id="profKidsList"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>School Groups</h3><button class="btn btn-ghost btn-sm" onclick="openProfGroupsForm()">Edit</button></div>
+          <div id="profGroupsDisplay"></div>
+          <div class="inline-form" id="profGroupsForm" style="margin-top:12px;">
+            <div id="profGroupsEdit"></div>
+            <div class="inline-form-actions"><button class="btn btn-ghost" onclick="toggleForm('profGroupsForm')">Cancel</button><button class="btn btn-primary" onclick="saveProfGroups()">Save</button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Interests</h3><button class="btn btn-ghost btn-sm" onclick="openProfIntForm()">Edit</button></div>
+          <div id="profIntDisplay" class="tag-select-row"></div>
+          <div class="inline-form" id="profIntForm" style="margin-top:12px;">
+            <div class="tag-select-row" id="profIntEdit" style="margin-bottom:10px;"></div>
+            <div class="inline-form-actions"><button class="btn btn-ghost" onclick="toggleForm('profIntForm')">Cancel</button><button class="btn btn-primary" onclick="saveProfInterests()">Save</button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Spouse / Partner</h3></div>
+          <div id="profSpouseDisplay"></div>
+          <div class="hint" style="margin-top:10px;">Spouse linking happens once, during onboarding sign-up — there's currently no way to add or change it afterward, so it's shown here for reference only.</div>
+        </div>
+      </div>
+
+      <!-- ═══ SIGN-UPS — volunteer slot booking, replaces SignUpGenius ═══ -->
+      <div class="sec" id="sec-signups">
+
+        <div class="su-view on" id="su-view-list">
+          <div class="sec-head">
+            <div><h2>Sign-Ups</h2><p>Get volunteers for field trips, book readings, or anything else — share a link or send straight from your dashboard.</p></div>
+            <div class="actions"><button class="btn btn-primary" onclick="newSignup()">+ New Sign-Up</button></div>
+          </div>
+          <div class="card"><div id="su-list-rows"></div></div>
+        </div>
+
+        <div class="su-view" id="su-view-create">
+          <div class="sec-head">
+            <div><h2 id="suFormHead">New Sign-Up</h2><p>Add dates and time windows — volunteers pick whichever works for them.</p></div>
+            <div class="actions"><button class="btn btn-ghost" onclick="showSignupView('list')">← Back to Sign-Ups</button></div>
+          </div>
+          <div class="card">
+            <div class="email-grid">
+              <div>
+                <div class="field" style="margin-bottom:10px;">
+                  <label>Link to an Event (optional)</label>
+                  <select id="suEventLink" onchange="applySignupEventLink()"></select>
+                  <div class="hint" style="margin-top:4px;">Pulls in that event's title, photo, and date so you're not typing it twice — everything stays editable below.</div>
+                </div>
+                <div class="field" style="margin-bottom:10px;"><label>Title</label><input type="text" id="suTitle" placeholder="e.g. Fall Field Trip Volunteers" oninput="renderSignupFormPreview()"></div>
+                <div class="field" style="margin-bottom:16px;"><label>Description (optional)</label><input type="text" id="suDesc" placeholder="What will volunteers be doing?" oninput="renderSignupFormPreview()"></div>
+
+                <div class="field" style="margin-bottom:18px;">
+                  <label>Photo (optional)</label>
+                  <div class="image-gallery" id="suImageGallery"></div>
+                  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                    <label class="file-chip">📎 Upload<input type="file" accept="image/*" id="suImageFile" onchange="handleSignupImagePreview()"></label>
+                    <button type="button" class="btn btn-ghost btn-sm" id="suAiGenBtn" onclick="generateSignupImageAI()">✨ Generate with AI</button>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Dates &amp; Time Windows</label>
+                  <div id="slotEditor"></div>
+                  <span class="add-window-link" onclick="addSlotDate()">+ Add Another Date</span>
+                </div>
+              </div>
+              <div>
+                <div class="field"><label>Preview</label></div>
+                <div class="signup-preview-card">
+                  <img class="banner" id="suPrevBanner" style="display:none;">
+                  <div class="t" id="suPrevTitle">Sign-Up Title</div>
+                  <div class="d" id="suPrevDesc">Add a description so parents know what to expect.</div>
+                  <div id="suPrevSlots"></div>
+                </div>
+              </div>
+            </div>
+            <div class="inline-form-actions"><button class="btn btn-ghost" onclick="showSignupView('list')">Cancel</button><button class="btn btn-primary" id="suSaveBtn" onclick="saveSignup()">Save &amp; Get Link</button></div>
+          </div>
+        </div>
+
+        <div class="su-view" id="su-view-share">
+          <div class="sec-head">
+            <div><h2>Share "<span id="suShareTitle"></span>"</h2><p>Copy the link to text or email yourself, or send it straight to parents from here.</p></div>
+            <div class="actions"><button class="btn btn-ghost" onclick="showSignupView('detail')">Skip for now</button></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Shareable Link</h3></div>
+            <div class="link-copy-row"><span class="url" id="suShareUrl"></span><button class="btn btn-primary btn-sm" onclick="copySignupShareLink()">Copy Link</button></div>
+            <div class="hint">Anyone who opens this link sees the sign-up details and can claim a spot — they'll be asked for their name and phone or email.</div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>What They'll See</h3></div>
+            <div class="hint" style="margin-bottom:12px;">Same layout whether they open the link or read the email — pick a time window, then give their name and phone or email.</div>
+            <div class="email-preview-card" style="max-width:420px;">
+              <img class="banner" id="suShareBanner" style="display:none;">
+              <div class="ep-overlap no-image" id="suShareOverlap">
+                <div class="evtitle" id="suShareEmailTitle">Sign-Up Title</div>
+              </div>
+              <div class="inner">
+                <div class="evdesc" id="suShareEmailDesc">—</div>
+                <div id="suShareSlots"></div>
+                <div class="foot" id="suShareEmailFoot">Sent from Mrs. Taylor's Class on Sprout.</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Or Send Directly From Your Dashboard</h3></div>
+            <div class="hint" style="margin-bottom:10px;">Everyone selected gets it by email — if they're on Sprout, it also shows up in their Invitations.</div>
+            <div id="suRecipientPicker" style="max-height:260px;overflow-y:auto;margin-bottom:12px;"></div>
+            <div class="inline-form-actions" style="border-top:none;padding-top:0;"><button class="btn btn-primary" onclick="sendSignupToSelected()">Send to Selected Parents</button></div>
+          </div>
+        </div>
+
+        <div class="su-view" id="su-view-detail">
+          <div class="sec-head">
+            <div><h2 id="suDetailTitle">Sign-Up</h2><p id="suDetailSentNote">Not sent yet.</p></div>
+            <div class="actions">
+              <button class="btn btn-ghost btn-sm" onclick="copySignupLink(pendingSignupId)">🔗 Copy Link</button>
+              <button class="btn btn-ghost btn-sm" onclick="showSignupView('share')">Send</button>
+              <button class="btn btn-ghost btn-sm" onclick="editSignup()">Edit</button>
+              <button class="btn btn-ghost" onclick="showSignupView('list')">← Back</button>
+            </div>
+          </div>
+          <div class="card">
+            <img class="banner" id="suDetailBanner" style="display:none;width:100%;max-width:360px;border-radius:12px;margin-bottom:12px;">
+            <div id="suDetailLinkedEvent" style="display:none;margin-bottom:10px;"></div>
+            <p id="suDetailDesc" style="font-size:13px;color:var(--body);line-height:1.6;margin-bottom:16px;"></p>
+            <div class="card-head"><h3>Time Windows &amp; Volunteers</h3></div>
+            <div id="suDetailSlots"></div>
+            <div class="inline-form-actions" style="border-top:none;justify-content:flex-start;padding-top:14px;">
+              <button class="btn btn-ghost" style="color:var(--red);" onclick="deleteSignup(pendingSignupId)">Delete Sign-Up</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Invitation email — reviewed before it goes out, whether sending now or scheduling -->
+<div class="modal-overlay" id="inviteModalOverlay" onclick="if(event.target===this) cancelInviteModal()">
+  <div class="modal-box">
+    <div class="modal-head"><h3>Invitation Email</h3><button class="modal-close" onclick="cancelInviteModal()"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="modal-to" id="inviteToLine"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m4 7 8 6 8-6"/></svg><span>To: <b id="inviteToCount">0 families</b> not yet on Sprout — everyone else sees this as an in-app invite</span></div>
+      <div class="field" style="margin-bottom:14px;"><label>Subject Line</label><input type="text" id="inviteSubject" oninput="renderInvitePreview()"></div>
+      <div class="field"><label>Preview</label></div>
+      <div class="email-preview-card">
+        <img class="banner" id="invPrevBanner" style="display:none;">
+        <div class="ep-overlap no-image" id="invPrevOverlap">
+          <div class="evtitle" id="invPrevTitle">Event Title</div>
+          <div class="ep-chips"><span class="ep-chip" id="invPrevDateChip">📅 Date</span></div>
+        </div>
+        <div class="inner">
+          <div class="evdesc" id="invPrevDesc">Description</div>
+          <div class="rsvp-row"><span class="rsvp-btn yes">✅ Yes, I'm Going</span><span class="rsvp-btn no">Can't Make It</span></div>
+          <div class="foot" id="invPrevFoot">Sent from Mrs. Taylor's Class on Sprout.</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="cancelInviteModal()">Cancel</button>
+      <button class="btn btn-primary" id="inviteSendBtn" onclick="confirmInviteSend()">Send Invitation Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- Room Parent info — quick lookup from Master dashboard / Room Parents & Activity -->
+<div class="modal-overlay" id="rpInfoModalOverlay" onclick="if(event.target===this) closeRoomParentModal()">
+  <div class="modal-box" style="max-width:380px;">
+    <div class="modal-head"><h3>Room Parent</h3><button class="modal-close" onclick="closeRoomParentModal()"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="prof-head" style="margin-bottom:0;">
+        <div class="avatar" id="rpInfoAvatar" style="width:56px;height:56px;font-size:19px;">?</div>
+        <div class="info">
+          <div class="nm" id="rpInfoName">—</div>
+          <div class="loc" id="rpInfoClasses">—</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">
+        <div class="ev-row-mini" style="cursor:default;padding:0;">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--green-light);display:grid;place-items:center;flex-shrink:0;">📞</div>
+          <div style="flex:1;"><div style="font-size:11px;color:var(--muted);">Phone</div><div class="ev-title" id="rpInfoPhone">—</div></div>
+        </div>
+        <div class="ev-row-mini" style="cursor:default;padding:0;">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--green-light);display:grid;place-items:center;flex-shrink:0;">✉️</div>
+          <div style="flex:1;"><div style="font-size:11px;color:var(--muted);">Email</div><div class="ev-title" id="rpInfoEmail">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" style="color:var(--red);" id="rpInfoRevokeBtn">Remove Access</button>
+    </div>
+  </div>
+</div>
+
+<!-- Event attendance — who said yes/no to a sent invitation -->
+<div class="modal-overlay" id="attendModalOverlay" onclick="if(event.target===this) closeAttendModal()">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-head"><h3 id="attendModalTitle">Attendance</h3><button class="modal-close" onclick="closeAttendModal()"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="modal-body">
+      <div id="attendYesList" style="margin-bottom:14px;"></div>
+      <div id="attendNoList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════ AUTH (prototype only — no backend) ═══════════════════════
+   sendCode() / verifyCode() are fully mocked: any phone number and any 6 digits
+   will sign in. Swap these for real OTP send/verify calls; completeLogin() is
+   the single hook that reveals the app once a real session exists. */
+function showAuth(id){
+  document.querySelectorAll('.auth-layout').forEach(a=>a.classList.remove('active'));
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById(id).classList.add('active');
+}
+function sendCode(){
+  const btn = document.getElementById('sendCodeBtn');
+  const phone = document.getElementById('phoneInput').value.trim() || '(512) 555-0147';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="regen-spin"></span> Sending…';
+  setTimeout(()=>{
+    btn.disabled = false;
+    btn.textContent = 'Send Code';
+    document.getElementById('codePhoneEcho').textContent = phone;
+    showAuth('auth-code');
+    const first = document.querySelector('.code-box[data-i="0"]');
+    if(first) first.focus();
+  }, 550);
+}
+function resendCode(){ showToast('Code resent ✓'); }
+function wireCodeBoxes(){
+  const boxes = [...document.querySelectorAll('.code-box')];
+  boxes.forEach((box,i)=>{
+    box.addEventListener('input', ()=>{
+      box.value = box.value.replace(/[^0-9]/g,'').slice(0,1);
+      if(box.value && boxes[i+1]) boxes[i+1].focus();
+      checkCodeComplete();
+    });
+    box.addEventListener('keydown', (e)=>{
+      if(e.key === 'Backspace' && !box.value && boxes[i-1]) boxes[i-1].focus();
+    });
+    box.addEventListener('paste', (e)=>{
+      e.preventDefault();
+      const digits = (e.clipboardData.getData('text') || '').replace(/[^0-9]/g,'').slice(0,6).split('');
+      digits.forEach((d,idx)=>{ if(boxes[idx]) boxes[idx].value = d; });
+      checkCodeComplete();
+      const last = boxes[Math.min(digits.length,6) - 1];
+      if(last) last.focus();
+    });
+  });
+}
+function checkCodeComplete(){
+  const boxes = [...document.querySelectorAll('.code-box')];
+  document.getElementById('verifyBtn').disabled = !boxes.every(b=>b.value.length === 1);
+}
+function isKnownPhone(phone){
+  const digits = (phone || '').replace(/\D/g,'');
+  if(!digits) return true;
+  return allParents.some(p => (p.phone || '').replace(/\D/g,'') === digits);
+}
+function verifyCode(){
+  const btn = document.getElementById('verifyBtn');
+  if(btn.disabled) return;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="regen-spin"></span> Verifying…';
+  const phone = document.getElementById('codePhoneEcho').textContent.trim();
+  setTimeout(()=>{
+    btn.textContent = 'Verify & Continue';
+    if(isKnownPhone(phone)){
+      completeLogin();
+    } else {
+      startNewUserOnboarding();
+    }
+  }, 550);
+}
+/* New-user onboarding — replicates Sprout's own app onboarding (name → kids)
+   with one addition: a school picker, since roomparent.com visitors may not
+   already be tied to a school the way an in-app-invited parent would be. */
+let newUserData = {firstName:'', lastName:'', school:'', kids:[]};
+function startNewUserOnboarding(){
+  newUserData = {firstName:'', lastName:'', school:'', kids:[{name:'', grade:'1st Grade'}]};
+  document.getElementById('nudFirst').value = '';
+  document.getElementById('nudLast').value = '';
+  document.getElementById('nudSchool').value = '';
+  showAuth('auth-details');
+}
+function saveUserDetails(){
+  const first = document.getElementById('nudFirst').value.trim();
+  const last = document.getElementById('nudLast').value.trim();
+  if(!first || !last){ alert('Please enter your first and last name.'); return; }
+  newUserData.firstName = first;
+  newUserData.lastName = last;
+  showAuth('auth-school');
+}
+function saveSchoolSelection(){
+  const school = document.getElementById('nudSchool').value;
+  if(!school){ alert('Please select a school.'); return; }
+  newUserData.school = school === '__other__' ? 'My school' : school;
+  renderKidRows();
+  showAuth('auth-kids');
+}
+function renderKidRows(){
+  document.getElementById('kidRows').innerHTML = newUserData.kids.map((k,i) => `
+    <div class="form-grid">
+      <div class="field"><label>Kid's Name</label><input type="text" value="${escapeHtml(k.name)}" placeholder="e.g. Mia" oninput="newUserData.kids[${i}].name=this.value"></div>
+      <div class="field"><label>Grade</label>
+        <select onchange="newUserData.kids[${i}].grade=this.value">
+          ${['Pre-K','Kindergarten','1st Grade','2nd Grade','3rd Grade','4th Grade','5th Grade'].map(g=>`<option ${g===k.grade?'selected':''}>${g}</option>`).join('')}
+        </select>
+      </div>
+    </div>`).join('');
+}
+function addAnotherKid(){
+  newUserData.kids.push({name:'', grade:'1st Grade'});
+  renderKidRows();
+}
+function finishNewUserOnboarding(){
+  const nameInputs = [...document.querySelectorAll('#kidRows input[type=text]')];
+  if(nameInputs.some(el => !el.value.trim())){ alert("Please add a name for each kid, or remove the extra row."); return; }
+  completeLogin();
+  showToast(`Welcome to Sprout, ${newUserData.firstName}! 🌱 (Demo continues as the sample Kiker Elementary room parent.)`);
+}
+function completeLogin(){
+  document.querySelectorAll('.auth-layout').forEach(a=>a.classList.remove('active'));
+  document.getElementById('main-app').style.display = 'flex';
+  goTo('dashboard');
+}
+function logout(){
+  document.querySelectorAll('.code-box').forEach(b=>b.value = '');
+  document.getElementById('verifyBtn').disabled = true;
+  showAuth('auth-phone');
+}
+
+/* ═══════════════════════ SHARED HELPERS ═══════════════════════ */
+function fmt(n){ return '$' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtDate(iso){
+  if(!iso) return '—';
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function fmtMonthDay(iso){
+  const d = new Date(iso + 'T00:00:00');
+  return {mo:d.toLocaleDateString('en-US',{month:'short'}), dy:d.getDate()};
+}
+function fmtTime(t){
+  if(!t) return '';
+  const [h,m] = t.split(':').map(Number);
+  const period = h>=12?'PM':'AM';
+  const h12 = h%12===0?12:h%12;
+  return `${h12}:${String(m).padStart(2,'0')}${period}`;
+}
+function fmtDateTime(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' at ' + d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+}
+function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function sourceEmoji(s){ return {Venmo:'📱','Apple Pay':'📱',Check:'🧾',Cash:'💵',Other:'❓'}[s] || '💵'; }
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(showToast._tm);
+  showToast._tm = setTimeout(()=>t.classList.remove('on'), 2600);
+}
+function toggleForm(id){ document.getElementById(id).classList.toggle('on'); }
+
+/* ═══ CONTEXTS — Room Parents can have multiple classes + the school-wide Master page ═══ */
+const CONTEXTS = [
+  {id:'master', name:'Kiker Master', sub:'Kiker Elementary · School-wide', type:'master', mark:'🏫'},
+  {id:'taylor', name:"Mrs. Taylor's Class", sub:'1st Grade · Kiker Elementary', type:'class', mark:'🍀'},
+  {id:'kruszone', name:"Mrs. Kruszone's Class", sub:'1st Grade · Kiker Elementary', type:'class', mark:'⭐'}
+];
+let currentContextId = 'taylor';
+function currentContext(){ return CONTEXTS.find(c=>c.id===currentContextId); }
+
+const ICON_GRID = '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>';
+const ICON_CAL = '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>';
+const ICON_LUNCH = '<svg viewBox="0 0 24 24"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 4v5h5"/></svg>';
+const ICON_MAIL = '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
+const ICON_FUND = '<svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
+const ICON_USERS = '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>';
+const ICON_RP = '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 19.5c0-3.4 2.9-6 6.5-6s6.5 2.6 6.5 6"/><circle cx="17" cy="9" r="2.6"/><path d="M15 12.3c2.6.4 4.5 2.3 4.5 4.7"/></svg>';
+const ICON_SIGNUP = '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 3v3M16 3v3M8 12l2.5 2.5L16 9"/></svg>';
+const ICON_LINK = '<svg viewBox="0 0 24 24"><path d="M9 17H7a5 5 0 0 1 0-10h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8"/></svg>';
+
+const CLASS_NAV = [
+  {sec:'dashboard', label:'Dashboard', icon:ICON_GRID},
+  {sec:'calendar', label:'Calendar', icon:ICON_CAL},
+  {sec:'signups', label:'Sign-Ups', icon:ICON_SIGNUP},
+  {sec:'links', label:'Links', icon:ICON_LINK},
+  {sec:'users', label:'Users', icon:ICON_USERS},
+  {sec:'email', label:'Compose Email', icon:ICON_MAIL},
+  {sec:'fundraising', label:'Fundraising', icon:ICON_FUND}
+];
+const MASTER_NAV = [
+  {sec:'dashboard', label:'Dashboard', icon:ICON_GRID},
+  {sec:'calendar', label:'Master Calendar', icon:ICON_CAL},
+  {sec:'lunch', label:'Lunch Menu', icon:ICON_LUNCH},
+  {sec:'roomparents', label:'Room Parents', icon:ICON_RP}
+];
+
+function renderSidebarNav(activeSec){
+  const ctx = currentContext();
+  const items = ctx.type === 'master' ? MASTER_NAV : CLASS_NAV;
+  document.getElementById('sidebarNav').innerHTML = items.map(it =>
+    `<div class="nav-item ${it.sec===activeSec?'on':''}" data-sec="${it.sec}" onclick="goTo('${it.sec}')">${it.icon}${it.label}</div>`
+  ).join('');
+}
+
+function toggleCtxMenu(){
+  document.getElementById('ctxMenu').classList.toggle('open');
+  document.getElementById('ctxBtn').classList.toggle('open');
+}
+function renderCtxMenu(){
+  const master = CONTEXTS.filter(c=>c.type==='master');
+  const classes = CONTEXTS.filter(c=>c.type==='class');
+  const row = c => `<div class="ctx-menu-item ${c.id===currentContextId?'on':''}" onclick="switchContext('${c.id}')"><div class="mk">${c.mark}</div><div><div class="tt">${c.name}</div><div class="ss">${c.sub}</div></div></div>`;
+  document.getElementById('ctxMenu').innerHTML =
+    `<div class="ctx-menu-label">Kiker Master</div>${master.map(row).join('')}` +
+    `<div class="ctx-menu-label">My Classes</div>${classes.map(row).join('')}`;
+}
+function switchContext(id){
+  currentContextId = id;
+  const ctx = currentContext();
+  document.getElementById('ctxMark').textContent = ctx.mark;
+  document.getElementById('ctxName').textContent = ctx.name;
+  document.getElementById('ctxSub').textContent = ctx.sub;
+  renderCtxMenu();
+  document.getElementById('ctxMenu').classList.remove('open');
+  document.getElementById('ctxBtn').classList.remove('open');
+  renderSidebarNav('dashboard');
+  populateExpTagOptions();
+  goTo('dashboard');
+}
+document.addEventListener('click', (e)=>{
+  const sw = document.querySelector('.ctx-switcher');
+  if(sw && !sw.contains(e.target)) { document.getElementById('ctxMenu').classList.remove('open'); document.getElementById('ctxBtn').classList.remove('open'); }
+  const rs = document.querySelector('.rich-select');
+  if(rs && !rs.contains(e.target)) { document.getElementById('donParentMenu').classList.remove('open'); }
+});
+
+/* ═══ NAVIGATION ═══ */
+function goTo(sec){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('on', n.dataset.sec === sec));
+  document.querySelectorAll('.sec').forEach(s=>s.classList.toggle('on', s.id === 'sec-'+sec));
+  if(sec === 'dashboard') renderDashboard();
+  if(sec === 'email') renderEmailChecklists();
+  if(sec === 'users') renderParents();
+  if(sec === 'roomparents') renderRoomParents();
+  if(sec === 'calendar'){
+    const ctx = currentContext();
+    document.getElementById('calTitle').textContent = ctx.type==='master' ? 'Master Calendar' : 'Calendar';
+    document.getElementById('calSub').textContent = ctx.type==='master'
+      ? 'School-wide events for all of Kiker Elementary.'
+      : `Events just for ${ctx.name}.`;
+    renderEvents();
+  }
+  if(sec === 'fundraising') populateExpTagOptions();
+  if(sec === 'profile') renderProfile();
+  if(sec === 'signups') showSignupView('list');
+  if(sec === 'links') renderLinksPage();
+}
+
+/* ═══ USERS / PARENTS ═══ */
+let allParents = [
+  {id:'lm', name:'Lydia Martin', phone:'(512) 555-0112', email:'lydia.martin@gmail.com', onSprout:true, initials:'LM', color:'linear-gradient(145deg,#1e3e2b,#4fa472)', kids:['Kennedy'], isRoomParent:false},
+  {id:'sj', name:'Sarah Jensen', phone:'(512) 555-0134', email:'sarahjensen@gmail.com', onSprout:true, initials:'SJ', color:'linear-gradient(145deg,#3a7ca5,#7ec8e3)', kids:['Mia'], isRoomParent:false},
+  {id:'mc', name:'Mike Cherches', phone:'(512) 555-0156', email:'', onSprout:true, initials:'MC', color:'linear-gradient(145deg,#7a3a8a,#ba7aca)', kids:['Hawkins'], isRoomParent:false},
+  {id:'ks', name:'Kate Skiff', phone:'(512) 555-0178', email:'kate.skiff@outlook.com', onSprout:true, initials:'KS', color:'linear-gradient(145deg,#c85e20,#f0a060)', kids:['Erick'], isRoomParent:false},
+  {id:'ar', name:'Amy Rangel', phone:'(512) 555-0190', email:'', onSprout:true, initials:'AR', color:'linear-gradient(145deg,#3a7ca5,#7ec8e3)', kids:['Flora'], isRoomParent:false},
+  {id:'tm', name:'Tony Martin', phone:'(512) 555-0147', email:'tony@joinsprout.co', onSprout:true, initials:'TM', color:'linear-gradient(145deg,#1e3e2b,#4fa472)', kids:['Cooper'], isRoomParent:true},
+  {id:'dr', name:'Diane Ruiz', phone:'(512) 555-0221', email:'', onSprout:false, initials:'DR', color:'linear-gradient(145deg,#c85e20,#f0a060)', kids:['Mateo'], isRoomParent:false},
+  {id:'fo', name:'Frank Osei', phone:'(512) 555-0245', email:'frank.osei@yahoo.com', onSprout:false, initials:'FO', color:'linear-gradient(145deg,#7a3a8a,#ba7aca)', kids:['Ama'], isRoomParent:false}
+];
+function parentById(id){ return allParents.find(p=>p.id===id) || allParents[0]; }
+function avatarFor(name){
+  const p = allParents.find(x=>x.name.toLowerCase()===String(name||'').toLowerCase());
+  if(p) return {initials:p.initials, color:p.color};
+  const colors = ['linear-gradient(145deg,#c85e20,#f0a060)','linear-gradient(145deg,#7a3a8a,#ba7aca)','linear-gradient(145deg,#3a7ca5,#7ec8e3)','linear-gradient(145deg,#1e3e2b,#4fa472)'];
+  const initials = String(name||'').split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase() || '?';
+  let hash = 0; for(let i=0;i<String(name||'').length;i++) hash = (hash*31 + String(name).charCodeAt(i)) >>> 0;
+  return {initials, color:colors[hash % colors.length]};
+}
+function renderParents(){
+  document.getElementById('parent-rows').innerHTML = allParents.map(p => `<tr>
+    <td><div class="who"><div class="avatar" style="background:${p.color};">${p.initials}</div>${p.name}</div></td>
+    <td>${(p.kids||[]).join(', ') || '—'}</td>
+    <td>${p.phone || '—'}</td>
+    <td>${p.email ? p.email : `<input type="text" placeholder="Add email" style="font-size:12px;padding:6px 9px;" onblur="setParentEmail('${p.id}', this.value)">`}</td>
+    <td>${p.onSprout ? '<span class="src-chip">📱 On Sprout</span>' : '<span class="src-chip" style="background:var(--amber-bg);color:var(--amber);">✉️ Email Only</span>'}</td>
+    <td>${p.isRoomParent
+      ? `<span class="src-chip" style="cursor:pointer;" onclick="toggleRoomParent('${p.id}', false)" title="Click to remove access">👑 Room Parent</span>`
+      : `<span class="btn btn-ghost btn-sm" onclick="toggleRoomParent('${p.id}', true)">+ Make Room Parent</span>`}</td>
+  </tr>`).join('') || `<tr><td colspan="6" class="table empty">No parents yet.</td></tr>`;
+}
+function toggleRoomParent(id, checked){
+  const p = allParents.find(x=>x.id===id); if(!p) return;
+  p.isRoomParent = checked;
+  const className = currentContext().name;
+  if(checked){
+    if(!roomParentsAccess.find(rp=>rp.name===p.name)) roomParentsAccess.push({name:p.name, initials:p.initials, color:p.color, classes:[className]});
+  } else {
+    roomParentsAccess = roomParentsAccess.filter(rp=>rp.name!==p.name);
+  }
+  renderParents();
+  showToast(checked ? `${p.name} now has Room Parent access ✓` : `${p.name} removed from Room Parent access`);
+}
+function setParentEmail(id, val){
+  const p = allParents.find(x=>x.id===id);
+  if(p && val.trim()){ p.email = val.trim(); renderParents(); showToast('Email added ✓'); }
+}
+function closeParentForm(){
+  document.getElementById('parentForm').classList.remove('on');
+  ['pName','pKid','pEmail','pPhone'].forEach(id=>document.getElementById(id).value='');
+  document.querySelector('input[name=pRole][value=parent]').checked = true;
+}
+function addParent(){
+  const name = document.getElementById('pName').value.trim();
+  if(!name){ alert('Enter a name.'); return; }
+  const kid = document.getElementById('pKid').value.trim();
+  const email = document.getElementById('pEmail').value.trim();
+  const phone = document.getElementById('pPhone').value.trim();
+  const initials = name.split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  const colors = ['linear-gradient(145deg,#c85e20,#f0a060)','linear-gradient(145deg,#7a3a8a,#ba7aca)','linear-gradient(145deg,#3a7ca5,#7ec8e3)','linear-gradient(145deg,#1e3e2b,#4fa472)'];
+  const color = colors[allParents.length % colors.length];
+  const isRoomParent = document.querySelector('input[name=pRole]:checked').value === 'roomparent';
+  allParents.push({id:'p'+allParents.length+'_'+Math.floor(Math.random()*10000), name, phone, email, onSprout:false, initials, color, kids: kid ? [kid] : [], isRoomParent});
+  if(isRoomParent) roomParentsAccess.push({name, initials, color, classes:[currentContext().name]});
+  closeParentForm();
+  renderParents();
+  renderDonParentMenu();
+  showToast(isRoomParent ? `${name} added with Room Parent access ✓` : 'Parent added — they will also get event invitations by email ✓');
+}
+
+/* ═══ EVENTS / CALENDAR ═══ */
+let events = [
+  {id:1, title:'Back to School Picnic', date:'2026-09-05', startTime:'17:30', endTime:'19:00', desc:'Meet-and-greet on the front lawn. Bring a folding chair!', image:null, mode:'invite', sendDate:null, sent:true, scope:'class',
+    rsvps:[{name:'Lydia Martin', response:'yes'},{name:'Sarah Jensen', response:'yes'},{name:'Mike Cherches', response:'yes'},{name:'Kate Skiff', response:'no'},{name:'Amy Rangel', response:'yes'}]},
+  {id:2, title:"Spirit Night at Mandola's", date:'2026-09-12', startTime:'', endTime:'', desc:'20% of proceeds go to our class fund — just mention Kiker 1st Grade.', image:null, mode:'invite', sendDate:'2026-09-01', sent:false, scope:'class'},
+  {id:3, title:"Mrs. Taylor's Class Photo Day", date:'2026-09-18', startTime:'08:30', endTime:'', desc:'Order forms go home the week before.', image:null, mode:'calendar', sendDate:null, sent:false, scope:'class'},
+  {id:4, title:'Fall Fundraiser Kickoff', date:'2026-10-02', startTime:'', endTime:'', desc:"Kicking off this year's fundraiser — details TBD.", image:null, mode:'invite', sendDate:null, sent:false, scope:'class'},
+  {id:5, title:'Kiker Movie Night (School-Wide)', date:'2026-09-25', startTime:'18:00', endTime:'20:00', desc:'Popcorn and a movie on the football field — all grades welcome!', image:null, mode:'invite', sendDate:null, sent:true, scope:'master',
+    rsvps:[{name:'Tony Martin', response:'yes'},{name:'Sarah Jensen', response:'yes'}]}
+];
+let nextEventId = 6;
+let pendingEventImage = null;
+
+/* ═══ time picker — 2 selects: Hour+AM/PM combined, then Minute (00/15/30/45) — stored internally as 24h "HH:MM" ═══ */
+function hourPeriodOpts(selectedH24){
+  return Array.from({length:24},(_,h)=>{
+    const period = h>=12 ? 'PM' : 'AM';
+    const h12 = h%12===0 ? 12 : h%12;
+    return `<option value="${h}" ${h===selectedH24?'selected':''}>${h12} ${period}</option>`;
+  }).join('');
+}
+function minOpts(sel){ return ['00','15','30','45'].map(m=>`<option value="${m}" ${m===sel?'selected':''}>${m}</option>`).join(''); }
+function populateTimeSelects(prefix, defaultH24, defaultM){
+  document.getElementById(prefix+'H').innerHTML = hourPeriodOpts(defaultH24);
+  document.getElementById(prefix+'M').innerHTML = minOpts(defaultM);
+}
+function timeFromPicker(prefix){
+  const h24 = parseInt(document.getElementById(prefix+'H').value, 10);
+  const m = document.getElementById(prefix+'M').value;
+  return String(h24).padStart(2,'0') + ':' + m;
+}
+/* element-based variants for dynamically-generated rows (Sign-Ups slot editor) that don't have fixed ids */
+function splitTime(t){ const [h,m] = t.split(':'); return {h:parseInt(h,10), m}; }
+function timeFromEls(hEl, mEl){ return String(parseInt(hEl.value,10)).padStart(2,'0') + ':' + mEl.value; }
+
+function updateEvModeUI(){
+  const mode = document.querySelector('input[name=evMode]:checked').value;
+  document.getElementById('evSendDateField').style.display = mode === 'invite' ? 'flex' : 'none';
+  document.getElementById('evSendDateField').style.flexDirection = 'column';
+  document.getElementById('evSendDateHint').style.display = mode === 'invite' ? 'block' : 'none';
+  document.getElementById('evImageField').style.display = mode === 'invite' ? 'block' : 'none';
+  if(mode !== 'invite'){
+    /* calendar-only events never send an invite, so a photo picked while briefly
+       in Invite mode shouldn't linger in the preview — Tony caught this live. */
+    pendingEventImage = null;
+    document.getElementById('evImageFile').value = '';
+    document.querySelectorAll('.gallery-thumb').forEach(t=>t.classList.remove('sel'));
+  }
+  renderEventFormPreview();
+}
+function handleEventImagePreview(){
+  const input = document.getElementById('evImageFile');
+  if(!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    pendingEventImage = e.target.result;
+    document.querySelectorAll('.gallery-thumb').forEach(t=>t.classList.remove('sel'));
+    renderEventFormPreview();
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function mockAIImage(seed){
+  const grads = [['#186338','#4fa472'],['#2a78d6','#86b6ef'],['#c08a2d','#eda100'],['#7a3a8a','#ba7aca'],['#2d5c2e','#77b691'],['#c2703f','#f0a060'],['#3a7ca5','#7ec8e3'],['#a83f34','#e8a99f']];
+  const g = grads[seed % grads.length];
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='${g[0]}'/><stop offset='1' stop-color='${g[1]}'/></linearGradient></defs><rect width='200' height='200' fill='url(#g)'/><text x='100' y='118' font-size='58' text-anchor='middle' fill='%23ffffffcc' font-family='Georgia,serif'>✨</text></svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+function renderImageGallery(){
+  document.getElementById('evImageGallery').innerHTML = Array.from({length:8},(_,i)=>
+    `<img src="${mockAIImage(i)}" class="gallery-thumb" data-i="${i}" onclick="selectGalleryImage(${i})" title="Suggested image">`
+  ).join('');
+}
+function selectGalleryImage(i){
+  pendingEventImage = mockAIImage(i);
+  document.querySelectorAll('.gallery-thumb').forEach(t=>t.classList.toggle('sel', Number(t.dataset.i)===i));
+  renderEventFormPreview();
+}
+function generateEventImageAI(){
+  const btn = document.getElementById('evAiGenBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="regen-spin" style="border-color:rgba(24,99,56,.25);border-top-color:var(--green);"></span> Generating…';
+  setTimeout(()=>{
+    pendingEventImage = mockAIImage(events.length + Math.floor(Math.random()*8));
+    document.querySelectorAll('.gallery-thumb').forEach(t=>t.classList.remove('sel'));
+    btn.disabled = false; btn.innerHTML = '✨ Generate with AI';
+    renderEventFormPreview();
+    showToast('Image generated ✓');
+  }, 900);
+}
+function renderEventFormPreview(){
+  const title = document.getElementById('evTitle').value.trim() || 'Event Title';
+  const date = document.getElementById('evDate').value;
+  const desc = document.getElementById('evDesc').value.trim() || 'Add a description to see it here.';
+  document.getElementById('evPrevTitle').textContent = title;
+  const startTime = timeFromPicker('evStart');
+  const endTime = timeFromPicker('evEnd');
+  document.getElementById('evPrevDateChip').textContent = date ? `📅 ${fmtDate(date)} · ${fmtTime(startTime)}–${fmtTime(endTime)}` : '📅 Pick a date';
+  document.getElementById('evPrevDesc').textContent = desc;
+  const banner = document.getElementById('evPrevBanner');
+  const hasImage = !!pendingEventImage;
+  banner.style.display = hasImage ? 'block' : 'none';
+  if(hasImage) banner.src = pendingEventImage;
+  document.getElementById('evPrevOverlap').classList.toggle('no-image', !hasImage);
+  const mode = document.querySelector('input[name=evMode]:checked').value;
+  document.getElementById('evPrevRsvpRow').style.display = mode === 'invite' ? 'flex' : 'none';
+  document.getElementById('evPrevFoot').textContent = `Sent from ${currentContext().name} on Sprout.`;
+}
+function closeEventForm(){
+  document.getElementById('evForm').classList.remove('on');
+  ['evTitle','evDate','evDesc','evSendDate'].forEach(id=>document.getElementById(id).value='');
+  populateTimeSelects('evStart', 9, '00');
+  populateTimeSelects('evEnd', 10, '00');
+  document.getElementById('evImageFile').value = '';
+  pendingEventImage = null;
+  document.querySelectorAll('.gallery-thumb').forEach(t=>t.classList.remove('sel'));
+  document.querySelector('input[name=evMode][value=invite]').checked = true;
+  updateEvModeUI();
+  renderEventFormPreview();
+}
+function eventStatusChip(ev){
+  if(ev.mode === 'calendar') return {cls:'draft', text:'📅 On Calendar'};
+  if(ev.sent) return {cls:'published', text:'✅ Invitation Sent'};
+  if(ev.sendDate) return {cls:'draft', text:'🕐 Scheduled — sends ' + fmtDate(ev.sendDate)};
+  return {cls:'draft', text:'Draft — ready to send'};
+}
+function eventRsvpCounts(ev){
+  const rsvps = ev.rsvps || [];
+  return { yes: rsvps.filter(r=>r.response==='yes').length, no: rsvps.filter(r=>r.response==='no').length };
+}
+function linkedSignupForEvent(eventId){ return signups.find(s=>s.eventId===eventId) || null; }
+function renderEvents(){
+  const scope = currentContext().type === 'master' ? 'master' : 'class';
+  const filtered = events.filter(e => e.scope === scope);
+  const sorted = [...filtered].sort((a,b)=> a.date.localeCompare(b.date));
+  const wrap = document.getElementById('ev-rows');
+  wrap.innerHTML = sorted.map(ev => {
+    const md = fmtMonthDay(ev.date);
+    const chip = eventStatusChip(ev);
+    const timeStr = ev.startTime ? `${fmtTime(ev.startTime)}${ev.endTime ? '–'+fmtTime(ev.endTime) : ''}` : '';
+    const thumb = ev.image ? `<img class="ev-thumb" src="${ev.image}">` : '';
+    const rsvpChip = ev.sent ? `<span class="src-chip" style="cursor:pointer;" onclick="openAttendModal(${ev.id})">✅ ${eventRsvpCounts(ev).yes} going</span>` : '';
+    const linkedSu = linkedSignupForEvent(ev.id);
+    let suChip = '';
+    if(linkedSu){
+      const cap = linkedSu.dates.reduce((s,d)=>s+d.windows.reduce((a,w)=>a+w.capacity,0),0);
+      const filled = linkedSu.dates.reduce((s,d)=>s+d.windows.reduce((a,w)=>a+w.signed.length,0),0);
+      suChip = `<span class="src-chip" style="cursor:pointer;background:var(--amber-bg);color:var(--amber);" onclick="goTo('signups'); showSignupView('detail', ${linkedSu.id});" title="View linked sign-up">🙋 ${filled}/${cap} volunteers</span>`;
+    }
+    return `<div class="ev-row">
+      <div class="ev-date-badge lg"><div class="mo">${md.mo}</div><div class="dy">${md.dy}</div></div>
+      ${thumb}
+      <div class="ev-body"><div class="t">${ev.title}${timeStr ? ` <span class="tm">· ${timeStr}</span>` : ''}</div><div class="d">${ev.desc}</div></div>
+      <div class="ev-actions">
+        <span class="ev-status ${chip.cls}">${chip.text}</span>
+        ${rsvpChip}
+        ${suChip}
+        ${(ev.mode==='invite' && !ev.sent) ? `<button class="btn btn-primary btn-sm" onclick="sendEventNow(${ev.id})">Send Now</button>` : ''}
+        ${(ev.mode==='invite' && ev.sent) ? `<button class="btn btn-ghost btn-sm" onclick="viewSentInvite(${ev.id})">View Email</button>` : ''}
+        <div class="ev-trash" onclick="deleteEvent(${ev.id})"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Zm-80-104v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0m48 0v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0"/></svg></div>
+      </div>
+    </div>`;
+  }).join('') || `<div class="table empty">No events yet — add your first one.</div>`;
+}
+function openAttendModal(id){
+  const ev = events.find(e=>e.id===id); if(!ev) return;
+  const rsvps = ev.rsvps || [];
+  const yes = rsvps.filter(r=>r.response==='yes');
+  const no = rsvps.filter(r=>r.response==='no');
+  document.getElementById('attendModalTitle').textContent = `${ev.title} — Attendance`;
+  document.getElementById('attendYesList').innerHTML = `<div class="hint" style="margin-bottom:8px;">✅ GOING (${yes.length})</div>` +
+    (yes.map(r => { const av = avatarFor(r.name); return `<div class="response-row"><div class="avatar" style="width:34px;height:34px;font-size:12px;background:${av.color};">${av.initials}</div><div class="info"><div class="nm">${escapeHtml(r.name)}</div></div></div>`; }).join('') || `<div class="table empty">No one yet.</div>`);
+  document.getElementById('attendNoList').innerHTML = `<div class="hint" style="margin-bottom:8px;">CAN'T MAKE IT (${no.length})</div>` +
+    (no.map(r => { const av = avatarFor(r.name); return `<div class="response-row"><div class="avatar" style="width:34px;height:34px;font-size:12px;background:${av.color};">${av.initials}</div><div class="info"><div class="nm">${escapeHtml(r.name)}</div></div></div>`; }).join('') || `<div class="table empty">No one yet.</div>`);
+  document.getElementById('attendModalOverlay').classList.add('on');
+}
+function closeAttendModal(){ document.getElementById('attendModalOverlay').classList.remove('on'); }
+function addEvent(){
+  const title = document.getElementById('evTitle').value.trim();
+  const date = document.getElementById('evDate').value;
+  const startTime = timeFromPicker('evStart');
+  const endTime = timeFromPicker('evEnd');
+  const desc = document.getElementById('evDesc').value.trim() || 'No description added yet.';
+  if(!title){ alert('Give the event a title.'); return; }
+  if(!date){ alert('Pick a date.'); return; }
+  const mode = document.querySelector('input[name=evMode]:checked').value;
+  const sendDate = mode==='invite' ? (document.getElementById('evSendDate').value || null) : null;
+  const scope = currentContext().type === 'master' ? 'master' : 'class';
+  const draft = { title, date, startTime, endTime, desc, image: pendingEventImage, mode, sendDate, scope };
+
+  if(mode === 'invite'){
+    openInviteEmailModal({ isNew:true, draft });
+    return;
+  }
+  events.push({ id: nextEventId++, ...draft, sent:false });
+  if(scope === 'master') logActivity('Updated Master Calendar', `Added "${title}"`);
+  closeEventForm();
+  renderEvents();
+  populateExpTagOptions();
+  showToast('Added to calendar ✓');
+}
+function sendEventNow(id){
+  const ev = events.find(e=>e.id===id); if(!ev) return;
+  openInviteEmailModal({ isNew:false, eventId:id });
+}
+
+/* ═══ INVITATION EMAIL — reviewed (subject + preview) before it actually sends ═══ */
+let pendingInvite = null;
+function suggestInviteSubject(title){ return `${currentContext().name} Event: ${title} 🎉`; }
+function openInviteEmailModal(payload){
+  pendingInvite = payload;
+  const ev = payload.isNew ? payload.draft : events.find(e=>e.id===payload.eventId);
+  document.getElementById('inviteSubject').value = ev.inviteSubject || suggestInviteSubject(ev.title);
+  document.getElementById('inviteSubject').disabled = !!payload.viewOnly;
+  const emailOnlyCount = allParents.filter(p=>!p.onSprout).length;
+  document.getElementById('inviteToCount').textContent = `${emailOnlyCount} famil${emailOnlyCount===1?'y':'ies'}`;
+  const sendDate = payload.isNew ? payload.draft.sendDate : null; // "Send Now" always overrides any existing schedule
+  const sendBtn = document.getElementById('inviteSendBtn');
+  if(payload.viewOnly){ sendBtn.style.display = 'none'; }
+  else { sendBtn.style.display = 'flex'; sendBtn.textContent = sendDate ? `Schedule for ${fmtDate(sendDate)}` : 'Send Invitation Now'; }
+  renderInvitePreview();
+  document.getElementById('inviteModalOverlay').classList.add('on');
+}
+function viewSentInvite(id){
+  openInviteEmailModal({ isNew:false, eventId:id, viewOnly:true });
+}
+function renderInvitePreview(){
+  if(!pendingInvite) return;
+  const ev = pendingInvite.isNew ? pendingInvite.draft : events.find(e=>e.id===pendingInvite.eventId);
+  document.getElementById('invPrevTitle').textContent = ev.title;
+  const timeStr = ev.startTime ? ` · ${fmtTime(ev.startTime)}${ev.endTime?'–'+fmtTime(ev.endTime):''}` : '';
+  document.getElementById('invPrevDateChip').textContent = `📅 ${fmtDate(ev.date)}${timeStr}`;
+  document.getElementById('invPrevDesc').textContent = ev.desc;
+  const banner = document.getElementById('invPrevBanner');
+  const hasImage = !!ev.image;
+  banner.style.display = hasImage ? 'block' : 'none';
+  if(hasImage) banner.src = ev.image;
+  document.getElementById('invPrevOverlap').classList.toggle('no-image', !hasImage);
+  document.getElementById('invPrevFoot').textContent = `Sent from ${currentContext().name} on Sprout.`;
+}
+function cancelInviteModal(){
+  document.getElementById('inviteModalOverlay').classList.remove('on');
+  document.getElementById('inviteSubject').disabled = false;
+  pendingInvite = null;
+}
+function confirmInviteSend(){
+  if(!pendingInvite || pendingInvite.viewOnly) return;
+  const subject = document.getElementById('inviteSubject').value.trim() || 'Class Update';
+  if(pendingInvite.isNew){
+    const d = pendingInvite.draft;
+    events.push({ id: nextEventId++, ...d, sent: !d.sendDate, inviteSubject: subject });
+    if(d.scope === 'master') logActivity('Updated Master Calendar', `Added "${d.title}"`);
+    closeEventForm();
+    renderEvents();
+    populateExpTagOptions();
+    showToast(d.sendDate ? 'Invitation scheduled ✓' : 'Invitation sent — also emailed to families not on Sprout ✓');
+  } else {
+    const ev = events.find(e=>e.id===pendingInvite.eventId);
+    ev.sent = true; ev.sendDate = null; ev.inviteSubject = subject;
+    renderEvents();
+    showToast(`"${ev.title}" invitation sent — also emailed to families not on Sprout ✓`);
+  }
+  document.getElementById('inviteModalOverlay').classList.remove('on');
+  pendingInvite = null;
+}
+function deleteEvent(id){
+  events = events.filter(e=>e.id!==id);
+  renderEvents();
+  populateExpTagOptions();
+}
+
+/* ═══ LUNCH MENU (Master only) — matches the parent-app food-selection UI:
+   multiple options per meal per day, each taggable (Vegetarian, Vegan, Pre-K, Gluten Free, Local) ═══ */
+const DIET_TAGS = [
+  {id:'veg', label:'Vegetarian', icon:'🥕'},
+  {id:'vegan', label:'Vegan', icon:'🌱'},
+  {id:'prek', label:'Pre-K', icon:'🧒'},
+  {id:'gf', label:'Gluten Free', icon:'🌾'},
+  {id:'local', label:'Local Ingredients', icon:'🍅'}
+];
+const DAY_NAMES = {Mon:'Monday', Tue:'Tuesday', Wed:'Wednesday', Thu:'Thursday', Fri:'Friday'};
+let lunchMenu = {
+  Mon:{breakfast:[{id:1, text:'Yogurt Parfait & Fruit', tags:['veg']}], lunch:[{id:1, text:'Chicken Tenders & Green Beans', tags:[]}]},
+  Tue:{breakfast:[{id:1, text:'Mini Pancakes', tags:['veg']}], lunch:[{id:1, text:'Cheese Quesadilla & Corn', tags:['veg']}]},
+  Wed:{breakfast:[{id:1, text:'Oatmeal Bar', tags:['veg','gf']}], lunch:[{id:1, text:'Turkey & Cheese Sandwich, Apple Slices', tags:[]}, {id:2, text:'Veggie Wrap', tags:['veg','gf']}, {id:3, text:'SunButter & Jelly Sandwich', tags:['veg']}]},
+  Thu:{breakfast:[{id:1, text:'Breakfast Burrito', tags:[]}], lunch:[{id:1, text:'Spaghetti & Marinara, Garlic Bread', tags:['veg']}]},
+  Fri:{breakfast:[{id:1, text:'Bagel & Cream Cheese', tags:['veg']}], lunch:[{id:1, text:'Pizza Day 🍕', tags:['veg']}, {id:2, text:'Gluten-Free Pizza', tags:['veg','gf']}]}
+};
+let lunchActiveDay = 'Mon';
+let lunchOptSeq = 100;
+
+function renderLunchDayPicker(){
+  document.getElementById('lunchDayPicker').innerHTML = Object.keys(lunchMenu).map(day =>
+    `<div class="daypill ${day===lunchActiveDay?'on':''}" onclick="switchLunchDay('${day}')">${day}</div>`
+  ).join('');
+}
+function switchLunchDay(day){ lunchActiveDay = day; renderLunch(); }
+function dietChipsHTML(meal, opt){
+  return DIET_TAGS.map(t =>
+    `<span class="diet-chip ${opt.tags.includes(t.id)?'on':''}" onclick="toggleLunchOptTag('${meal}',${opt.id},'${t.id}')">${t.icon} ${t.label}</span>`
+  ).join('');
+}
+function mealOptionsHTML(meal){
+  const opts = lunchMenu[lunchActiveDay][meal];
+  return opts.map((opt,i) => `
+    <div class="lunch-opt-row">
+      <div class="opt-row-top">
+        <div class="opt-num">${i+1}</div>
+        <input type="text" value="${opt.text.replace(/"/g,'&quot;')}" oninput="updateLunchOptText('${meal}',${opt.id},this.value)">
+        ${opts.length > 1 ? `<div class="opt-del" onclick="removeLunchOption('${meal}',${opt.id})" title="Remove option">×</div>` : ''}
+      </div>
+      <div class="diet-chip-row">${dietChipsHTML(meal, opt)}</div>
+    </div>`).join('');
+}
+function renderLunch(){
+  renderLunchDayPicker();
+  document.getElementById('lunchDayLabelB').textContent = DAY_NAMES[lunchActiveDay];
+  document.getElementById('lunchDayLabelL').textContent = DAY_NAMES[lunchActiveDay];
+  document.getElementById('breakfastOptions').innerHTML = mealOptionsHTML('breakfast');
+  document.getElementById('lunchOptions').innerHTML = mealOptionsHTML('lunch');
+}
+function updateLunchOptText(meal, id, val){
+  const opt = lunchMenu[lunchActiveDay][meal].find(o=>o.id===id);
+  if(opt) opt.text = val;
+}
+function toggleLunchOptTag(meal, id, tagId){
+  const opt = lunchMenu[lunchActiveDay][meal].find(o=>o.id===id);
+  if(!opt) return;
+  const idx = opt.tags.indexOf(tagId);
+  if(idx > -1) opt.tags.splice(idx,1); else opt.tags.push(tagId);
+  renderLunch();
+}
+function addLunchOption(meal){
+  lunchMenu[lunchActiveDay][meal].push({id: ++lunchOptSeq, text:'', tags:[]});
+  renderLunch();
+}
+function removeLunchOption(meal, id){
+  lunchMenu[lunchActiveDay][meal] = lunchMenu[lunchActiveDay][meal].filter(o=>o.id!==id);
+  renderLunch();
+}
+function todayLunchDay(){
+  const map = {1:'Mon', 2:'Tue', 3:'Wed', 4:'Thu', 5:'Fri'};
+  return map[new Date().getDay()] || 'Mon';
+}
+/* Still the full week, one compact row per day instead of a nested breakfast+lunch block per
+   day, so it doesn't out-stretch whatever sits next to it. Breakfast and lunch share the row
+   layout but only one meal shows at a time — toggled via the Breakfast/Lunch pills — so both
+   are reachable without doubling the card's height. Today's row is highlighted, same "what
+   matters right now" idea as the parent app's Daily Briefing. */
+let dashMealView = 'lunch';
+function setDashMealView(meal){
+  dashMealView = meal;
+  syncMealToggleUI();
+  document.getElementById('dash-lunch').innerHTML = lunchWidgetHTML();
+  document.getElementById('dash-master-lunch').innerHTML = lunchWidgetHTML();
+}
+function syncMealToggleUI(){
+  document.querySelectorAll('.meal-toggle-btn').forEach(b => b.classList.toggle('on', b.dataset.meal === dashMealView));
+}
+function lunchWidgetHTML(){
+  const today = todayLunchDay();
+  return Object.keys(lunchMenu).map(day => {
+    const opts = lunchMenu[day][dashMealView];
+    const optsHtml = opts.length
+      ? opts.map((opt,i) => {
+          const tags = (opt.tags||[]).map(id => DIET_TAGS.find(t=>t.id===id)?.icon || '').join(' ');
+          return `<div class="lw-opt-row"><span class="lw-opt-num">${i+1}</span><span class="lw-opt-text">${escapeHtml(opt.text || '—')}</span>${tags ? `<span class="lw-opt-tags">${tags}</span>` : ''}</div>`;
+        }).join('')
+      : `<div class="lw-opt-row"><span class="lw-opt-text" style="color:var(--muted);">Nothing set yet</span></div>`;
+    return `<div class="lw-day-block ${day===today?'is-today':''}">
+      <span class="lw-day-label">${day===today ? 'Today' : day}</span>
+      <div class="lw-day-opts">${optsHtml}</div>
+    </div>`;
+  }).join('');
+}
+function saveLunch(){
+  showToast('Lunch menu updated — synced to every grade ✓');
+  logActivity('Updated Lunch Menu', 'Made changes to the weekly menu');
+  renderDashboard();
+}
+
+/* ═══ ROOM PARENTS & ACTIVITY (Master only) ═══ */
+let roomParentsAccess = [
+  {name:'Tony Martin', initials:'TM', color:'linear-gradient(145deg,#1e3e2b,#4fa472)', classes:["Mrs. Taylor's Class"]},
+  {name:'Sarah Jensen', initials:'SJ', color:'linear-gradient(145deg,#3a7ca5,#7ec8e3)', classes:["Mrs. Kruszone's Class"]}
+];
+let activityLog = [
+  {who:'Tony Martin', action:'Updated Master Calendar', detail:'Added "Kiker Movie Night (School-Wide)"', when:'2026-08-24T14:20:00'},
+  {who:'Sarah Jensen', action:'Updated Lunch Menu', detail:'Changed Wednesday lunch', when:'2026-08-23T09:10:00'}
+];
+function logActivity(action, detail){
+  activityLog.unshift({who:'Tony Martin', action, detail, when:new Date().toISOString()});
+}
+function renderRoomParents(){
+  populateRpClassOptions();
+  populateRpNameOptions();
+  document.getElementById('rp-rows').innerHTML = roomParentsAccess.map(rp => `
+    <div class="ev-row-mini" onclick="openRoomParentModal('${rp.name.replace(/'/g,"\\'")}')">
+      <div class="avatar" style="width:36px;height:36px;font-size:12px;background:${rp.color};">${rp.initials}</div>
+      <div style="flex:1;"><div class="ev-title">${rp.name}</div><div style="font-size:11px;color:var(--muted);">${rp.classes.join(', ')}</div></div>
+      <div class="ev-trash" onclick="event.stopPropagation(); revokeRoomParentAccess('${rp.name.replace(/'/g,"\\'")}')" title="Remove access"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Zm-80-104v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0m48 0v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0"/></svg></div>
+    </div>`).join('') || `<div class="table empty">No one has access yet.</div>`;
+  const sorted = [...activityLog].sort((a,b)=> b.when.localeCompare(a.when));
+  document.getElementById('activity-rows').innerHTML = sorted.map(a => `
+    <div class="ev-row-mini" style="cursor:default;">
+      <div class="avatar" style="width:32px;height:32px;font-size:12px;background:var(--green-light);color:var(--green);">📝</div>
+      <div style="flex:1;"><div class="ev-title">${a.who} — ${a.action}</div><div style="font-size:11px;color:var(--muted);">${a.detail} · ${fmtDateTime(a.when)}</div></div>
+    </div>`).join('') || `<div class="table empty">No activity yet.</div>`;
+}
+function populateRpClassOptions(){
+  const sel = document.getElementById('rpClass');
+  if(!sel) return;
+  sel.innerHTML = CONTEXTS.filter(c=>c.type==='class').map(c=>`<option value="${c.name}">${c.name}</option>`).join('');
+}
+function populateRpNameOptions(){
+  const sel = document.getElementById('rpNameSelect');
+  if(!sel) return;
+  const available = allParents.filter(p => !roomParentsAccess.find(rp=>rp.name===p.name));
+  sel.innerHTML = `<option value="">— Select an existing parent —</option>` +
+    available.map(p=>`<option value="${p.id}">${p.name}</option>`).join('') +
+    `<option value="__custom__">✏️ Type a new name…</option>`;
+  document.getElementById('rpNameCustom').style.display = 'none';
+}
+function handleRpNameSelect(){
+  const val = document.getElementById('rpNameSelect').value;
+  const customInput = document.getElementById('rpNameCustom');
+  if(val === '__custom__'){
+    customInput.style.display = 'block';
+    customInput.value = '';
+    customInput.focus();
+    document.getElementById('rpPhone').value = '';
+    document.getElementById('rpEmail').value = '';
+  } else {
+    customInput.style.display = 'none';
+    const p = allParents.find(x=>x.id===val);
+    document.getElementById('rpPhone').value = p?.phone || '';
+    document.getElementById('rpEmail').value = p?.email || '';
+  }
+}
+function closeAddRpForm(){
+  document.getElementById('addRpForm').classList.remove('on');
+  document.getElementById('rpNameSelect').value = '';
+  document.getElementById('rpNameCustom').style.display = 'none';
+  ['rpNameCustom','rpPhone','rpEmail'].forEach(id=>document.getElementById(id).value='');
+}
+function addRoomParentAccess(){
+  const selVal = document.getElementById('rpNameSelect').value;
+  const existing = selVal && selVal !== '__custom__' ? allParents.find(p=>p.id===selVal) : null;
+  const name = existing ? existing.name : document.getElementById('rpNameCustom').value.trim();
+  if(!name){ alert('Select an existing parent or type a name.'); return; }
+  if(roomParentsAccess.find(rp=>rp.name===name)){ alert(`${name} already has access.`); return; }
+  const className = document.getElementById('rpClass').value;
+  const phone = document.getElementById('rpPhone').value.trim();
+  const email = document.getElementById('rpEmail').value.trim();
+  let initials, color;
+  if(existing){
+    initials = existing.initials; color = existing.color;
+    existing.isRoomParent = true;
+    if(phone) existing.phone = phone;
+    if(email) existing.email = email;
+  } else {
+    initials = name.split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const colors = ['linear-gradient(145deg,#c85e20,#f0a060)','linear-gradient(145deg,#7a3a8a,#ba7aca)','linear-gradient(145deg,#3a7ca5,#7ec8e3)','linear-gradient(145deg,#1e3e2b,#4fa472)'];
+    color = colors[roomParentsAccess.length % colors.length];
+  }
+  roomParentsAccess.push({name, initials, color, classes:[className]});
+  closeAddRpForm();
+  renderRoomParents();
+  showToast(`${name} granted Room Parent access to ${className} ✓`);
+}
+function revokeRoomParentAccess(name){
+  roomParentsAccess = roomParentsAccess.filter(rp=>rp.name!==name);
+  const p = allParents.find(x=>x.name===name);
+  if(p) p.isRoomParent = false;
+  renderRoomParents();
+  renderParents();
+  closeRoomParentModal();
+  showToast(`Removed ${name}'s Room Parent access`);
+}
+function openRoomParentModal(name){
+  const rp = roomParentsAccess.find(x=>x.name===name); if(!rp) return;
+  const p = allParents.find(x=>x.name===name);
+  document.getElementById('rpInfoAvatar').style.background = rp.color;
+  document.getElementById('rpInfoAvatar').textContent = rp.initials;
+  document.getElementById('rpInfoName').textContent = rp.name;
+  document.getElementById('rpInfoClasses').textContent = rp.classes.join(', ');
+  document.getElementById('rpInfoPhone').textContent = p?.phone || '—';
+  document.getElementById('rpInfoEmail').textContent = p?.email || '—';
+  document.getElementById('rpInfoRevokeBtn').setAttribute('onclick', `revokeRoomParentAccess('${name.replace(/'/g,"\\'")}')`);
+  document.getElementById('rpInfoModalOverlay').classList.add('on');
+}
+function closeRoomParentModal(){ document.getElementById('rpInfoModalOverlay').classList.remove('on'); }
+
+/* ═══ COMPOSE EMAIL ═══ */
+let classLinks = [
+  {id:2, label:'Class WhatsApp Group', description:'Chat with other parents in the class', dueDate:null, url:'sprout.link/kiker-1st-whatsapp', checked:true},
+  {id:3, label:'Shared Photo Album', description:'Photos from class events all year', dueDate:null, url:'sprout.link/kiker-1st-photos', checked:false}
+];
+let sentEmails = [
+  {subject:'Welcome Back to First Grade! 🍎', sentDate:'2026-08-18T09:00:00', summary:'All Families', count:24}
+];
+let selectedRecipientIds = new Set();
+
+function renderEmailChecklists(){
+  const evWrap = document.getElementById('email-events');
+  const upcoming = [...events].filter(e=>e.scope==='class').sort((a,b)=> a.date.localeCompare(b.date));
+  evWrap.innerHTML = upcoming.map(ev => `
+    <label class="chk-row"><input type="checkbox" data-evid="${ev.id}" ${ev.includeInEmail !== false ? 'checked' : ''} onchange="toggleEventInclude(${ev.id}, this.checked)">
+      <div class="body"><div class="t">${ev.title} — ${fmtDate(ev.date)}${ev.startTime ? ' ('+fmtTime(ev.startTime)+(ev.endTime?'–'+fmtTime(ev.endTime):'')+')' : ''}</div><div class="d">${ev.desc}</div></div>
+    </label>`).join('') || `<div class="table empty">No upcoming events.</div>`;
+
+  const scopedSignups = signups.filter(s=>s.scope===(currentContext().type==='master'?'master':'class'));
+  const linkRows = classLinks.map(l => `
+    <label class="chk-row"><input type="checkbox" data-linkid="${l.id}" ${l.checked ? 'checked' : ''} onchange="toggleLinkInclude(${l.id}, this.checked)">
+      <div class="body"><div class="t">${l.label}</div><div class="d">${l.description || l.url}${l.dueDate ? ' · Due '+fmtDate(l.dueDate) : ''}</div></div>
+      <div class="link-edit" onclick="event.preventDefault();event.stopPropagation();editLink(${l.id})" title="Edit link"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+      <div class="link-del" onclick="event.preventDefault();event.stopPropagation();deleteLink(${l.id})" title="Delete link">×</div>
+    </label>`).join('');
+  const signupRows = scopedSignups.map(s => `
+    <label class="chk-row"><input type="checkbox" ${s.includeInEmail !== false ? 'checked' : ''} onchange="toggleSignupInclude(${s.id}, this.checked)">
+      <div class="body"><div class="t">🙋 ${escapeHtml(s.title)} (Sign-Up)</div><div class="d">${signupLinkUrl(s)}</div></div>
+    </label>`).join('');
+  document.getElementById('email-links').innerHTML = (linkRows + signupRows) || `<div class="table empty">No links yet.</div>`;
+
+  renderEmailLog();
+  updateRecipientMode();
+  buildEmailPreview();
+}
+function toggleEventInclude(id, checked){
+  const ev = events.find(e=>e.id===id); if(ev) ev.includeInEmail = checked;
+}
+function toggleLinkInclude(id, checked){
+  const l = classLinks.find(l=>l.id===id); if(l) l.checked = checked;
+}
+function toggleSignupInclude(id, checked){
+  const s = signups.find(s=>s.id===id); if(s) s.includeInEmail = checked;
+}
+let editingLinkId = null;
+function toggleLinkForm(){
+  document.getElementById('linkForm').classList.contains('on') ? closeLinkForm() : openNewLinkForm();
+}
+function openNewLinkForm(){
+  editingLinkId = null;
+  ['linkName','linkDue','linkDesc','linkUrl'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('linkFormSaveBtn').textContent = 'Save Link';
+  document.getElementById('linkForm').classList.add('on');
+}
+function editLink(id){
+  const l = classLinks.find(x=>x.id===id); if(!l) return;
+  editingLinkId = id;
+  document.getElementById('linkName').value = l.label;
+  document.getElementById('linkDue').value = l.dueDate || '';
+  document.getElementById('linkDesc').value = l.description || '';
+  document.getElementById('linkUrl').value = l.url;
+  document.getElementById('linkFormSaveBtn').textContent = 'Save Changes';
+  document.getElementById('linkForm').classList.add('on');
+}
+function closeLinkForm(){
+  document.getElementById('linkForm').classList.remove('on');
+  editingLinkId = null;
+  document.getElementById('linkFormSaveBtn').textContent = 'Save Link';
+  ['linkName','linkDue','linkDesc','linkUrl'].forEach(id=>document.getElementById(id).value='');
+}
+function addLink(){
+  const label = document.getElementById('linkName').value.trim();
+  const url = document.getElementById('linkUrl').value.trim();
+  if(!label){ alert('Give the link a name.'); return; }
+  if(!url){ alert('Add the link URL.'); return; }
+  const description = document.getElementById('linkDesc').value.trim();
+  const dueDate = document.getElementById('linkDue').value || null;
+  if(editingLinkId){
+    const l = classLinks.find(x=>x.id===editingLinkId);
+    l.label = label; l.description = description; l.dueDate = dueDate; l.url = url;
+    showToast('Link updated ✓');
+  } else {
+    classLinks.push({id: classLinks.length + 1 + Math.floor(Math.random()*10000), label, description, dueDate, url, checked:true});
+    showToast('Link added ✓');
+  }
+  closeLinkForm();
+  renderEmailChecklists();
+  renderLinksPage();
+}
+function deleteLink(id){
+  classLinks = classLinks.filter(l=>l.id!==id);
+  renderEmailChecklists();
+  renderLinksPage();
+}
+function toggleLinkFormPage(){
+  document.getElementById('linkFormPage').classList.contains('on') ? closeLinkFormPage() : openNewLinkFormPage();
+}
+function openNewLinkFormPage(){
+  editingLinkId = null;
+  ['linkNamePage','linkDuePage','linkDescPage','linkUrlPage'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('linkFormPageSaveBtn').textContent = 'Save Link';
+  document.getElementById('linkFormPage').classList.add('on');
+}
+function editLinkPage(id){
+  const l = classLinks.find(x=>x.id===id); if(!l) return;
+  editingLinkId = id;
+  document.getElementById('linkNamePage').value = l.label;
+  document.getElementById('linkDuePage').value = l.dueDate || '';
+  document.getElementById('linkDescPage').value = l.description || '';
+  document.getElementById('linkUrlPage').value = l.url;
+  document.getElementById('linkFormPageSaveBtn').textContent = 'Save Changes';
+  document.getElementById('linkFormPage').classList.add('on');
+}
+function closeLinkFormPage(){
+  document.getElementById('linkFormPage').classList.remove('on');
+  editingLinkId = null;
+  document.getElementById('linkFormPageSaveBtn').textContent = 'Save Link';
+  ['linkNamePage','linkDuePage','linkDescPage','linkUrlPage'].forEach(id=>document.getElementById(id).value='');
+}
+function addLinkPage(){
+  const label = document.getElementById('linkNamePage').value.trim();
+  const url = document.getElementById('linkUrlPage').value.trim();
+  if(!label){ alert('Give the link a name.'); return; }
+  if(!url){ alert('Add the link URL.'); return; }
+  const description = document.getElementById('linkDescPage').value.trim();
+  const dueDate = document.getElementById('linkDuePage').value || null;
+  if(editingLinkId){
+    const l = classLinks.find(x=>x.id===editingLinkId);
+    l.label = label; l.description = description; l.dueDate = dueDate; l.url = url;
+    showToast('Link updated ✓');
+  } else {
+    classLinks.push({id: classLinks.length + 1 + Math.floor(Math.random()*10000), label, description, dueDate, url, checked:true});
+    showToast('Link added ✓');
+  }
+  closeLinkFormPage();
+  renderEmailChecklists();
+  renderLinksPage();
+}
+function renderLinksPage(){
+  document.getElementById('links-page-rows').innerHTML = classLinks.map(l => `
+    <div class="signup-card">
+      <div class="info">
+        <div class="t">${escapeHtml(l.label)}</div>
+        <div class="meta">${escapeHtml(l.description || l.url)}${l.dueDate ? ' · Due '+fmtDate(l.dueDate) : ''}</div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost btn-sm" onclick="copyPlainLink('${l.url.replace(/'/g,"\\'")}')">🔗 Copy Link</button>
+        <button class="btn btn-ghost btn-sm" onclick="editLinkPage(${l.id})">Edit</button>
+        <div class="ev-trash" onclick="deleteLink(${l.id})"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Zm-80-104v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0m48 0v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0"/></svg></div>
+      </div>
+    </div>`).join('') || `<div class="table empty">No links yet.</div>`;
+
+  const scopedSignups = signups.filter(s=>s.scope===(currentContext().type==='master'?'master':'class'));
+  document.getElementById('links-page-signups').innerHTML = scopedSignups.map(s => `
+    <div class="signup-card">
+      <img class="thumb" src="${s.image || mockAIImage(s.id)}">
+      <div class="info">
+        <div class="t">${escapeHtml(s.title)}</div>
+        <div class="meta">${signupLinkUrl(s)}</div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost btn-sm" onclick="copySignupLink(${s.id})">🔗 Copy Link</button>
+      </div>
+    </div>`).join('') || `<div class="table empty">No sign-ups yet.</div>`;
+}
+function copyPlainLink(url){
+  const full = url.startsWith('http') ? url : 'https://' + url;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(full).then(()=> showToast('Link copied ✓')).catch(()=> showToast('Link: ' + full));
+  } else {
+    showToast('Link: ' + full);
+  }
+}
+function updateRecipientMode(){
+  const checkedEl = document.querySelector('input[name=emailRecipient]:checked');
+  const mode = checkedEl ? checkedEl.value : 'all';
+  const picker = document.getElementById('recipientPicker');
+  if(mode === 'specific'){
+    picker.style.display = 'block';
+    picker.innerHTML = allParents.map(p => `
+      <label class="chk-row"><input type="checkbox" ${selectedRecipientIds.has(p.id)?'checked':''} onchange="toggleRecipient('${p.id}', this.checked)">
+        <div class="body"><div class="t">${p.name}</div><div class="d">${p.onSprout?'On Sprout':'Email only'}${p.email?' · '+p.email:''}</div></div>
+      </label>`).join('');
+  } else {
+    picker.style.display = 'none';
+  }
+}
+function toggleRecipient(id, checked){
+  if(checked) selectedRecipientIds.add(id); else selectedRecipientIds.delete(id);
+}
+function buildEmailPreview(){
+  const subject = document.getElementById('emailSubject').value.trim() || 'Class Update';
+  const intro = document.getElementById('emailIntro').value.trim();
+  const includedEvents = [...events].filter(e => e.scope==='class' && e.includeInEmail !== false).sort((a,b)=> a.date.localeCompare(b.date));
+  const includedLinks = classLinks.filter(l => l.checked);
+  const includedSignups = signups.filter(s => s.scope==='class' && s.includeInEmail !== false);
+
+  let body = intro ? escapeHtml(intro).replace(/\n/g,'<br>') + '<br><br>' : '';
+  if(includedEvents.length){
+    body += '📅 <b>Upcoming Events</b><br>';
+    includedEvents.forEach(ev => {
+      const timeStr = ev.startTime ? ` (${fmtTime(ev.startTime)}${ev.endTime?'–'+fmtTime(ev.endTime):''})` : '';
+      body += `• <b>${escapeHtml(ev.title)}</b> — ${fmtDate(ev.date)}${timeStr}<br>&nbsp;&nbsp;&nbsp;${escapeHtml(ev.desc)}<br>`;
+    });
+    body += '<br>';
+  }
+  if(includedLinks.length || includedSignups.length){
+    body += '🔗 <b>Helpful Links</b><br>';
+    includedLinks.forEach(l => { body += `• <a href="#" onclick="return false;">${escapeHtml(l.label)}</a><br>`; });
+    includedSignups.forEach(s => { body += `• <a href="#" onclick="return false;">🙋 ${escapeHtml(s.title)}</a><br>`; });
+    body += '<br>';
+  }
+  body += `Thanks!<br>Tony — Room Parent, Mrs. Taylor's Class`;
+
+  document.getElementById('email-preview').innerHTML = `<div class="subj">${escapeHtml(subject)}</div>` + body;
+}
+function regenerateEmail(){
+  const btn = document.getElementById('regenBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="regen-spin" style="border-color:rgba(24,99,56,.25);border-top-color:var(--green);"></span> Regenerating…';
+  setTimeout(()=>{
+    buildEmailPreview();
+    btn.disabled = false;
+    btn.innerHTML = '✨ Regenerate with AI';
+    showToast('Draft regenerated from your calendar & links ✓');
+  }, 650);
+}
+function renderEmailLog(){
+  const sorted = [...sentEmails].sort((a,b)=> b.sentDate.localeCompare(a.sentDate));
+  document.getElementById('email-log').innerHTML = sorted.map(e => `
+    <div class="ev-row-mini" style="cursor:default;">
+      <div class="avatar" style="width:32px;height:32px;font-size:12px;background:var(--green-light);color:var(--green);">✉️</div>
+      <div style="flex:1;min-width:0;"><div class="ev-title">${e.subject}</div><div style="font-size:11px;color:var(--muted);">${e.summary} · ${e.count} recipient${e.count===1?'':'s'} · ${fmtDateTime(e.sentDate)}</div></div>
+    </div>`).join('') || `<div class="table empty">No emails sent yet.</div>`;
+}
+function sendEmail(){
+  const subject = document.getElementById('emailSubject').value.trim() || 'Class Update';
+  const checkedEl = document.querySelector('input[name=emailRecipient]:checked');
+  const mode = checkedEl ? checkedEl.value : 'all';
+  let recipients, summary;
+  if(mode === 'all'){ recipients = allParents; summary = 'All Families'; }
+  else if(mode === 'emailonly'){ recipients = allParents.filter(p=>!p.onSprout); summary = 'Email-Only Families'; }
+  else { recipients = allParents.filter(p=>selectedRecipientIds.has(p.id)); summary = 'Selected People'; }
+  if(!recipients.length){ alert('Select at least one recipient.'); return; }
+  sentEmails.unshift({subject, sentDate:new Date().toISOString(), summary, count:recipients.length});
+  renderEmailLog();
+  showToast(`Sent to ${recipients.length} famil${recipients.length===1?'y':'ies'} (${summary}) ✓`);
+}
+
+/* ═══ SIGN-UPS — volunteer slot booking (replaces SignUpGenius) ═══ */
+let signups = [
+  { id:1, title:'Fall Field Trip Volunteers', desc:"We need parent chaperones for our trip to Sweet Berry Farm! Just needs someone available the full window — snacks and a wagon shift are the main jobs.", image:null, scope:'class', linkId:'su8k2p9q', eventId:null,
+    dates:[
+      { id:1, date:'2026-10-14', windows:[
+        { id:1, start:'08:30', end:'12:30', capacity:4, signed:[ {name:'Lydia Martin', contact:'lydia.martin@gmail.com', parentId:'lm'}, {name:'Sarah Jensen', contact:'sarahjensen@gmail.com', parentId:'sj'} ] },
+        { id:2, start:'12:30', end:'15:30', capacity:3, signed:[ {name:'Mike Cherches', contact:'(512) 555-0156', parentId:'mc'} ] }
+      ]},
+      { id:2, date:'2026-10-15', windows:[
+        { id:3, start:'08:30', end:'15:30', capacity:2, signed:[ {name:'Jen Alvarez', contact:'jen.alvarez88@gmail.com', parentId:null} ] }
+      ]}
+    ],
+    sentSummary:{ total:7, sprout:5, date:'2026-08-20T14:00:00.000Z' }
+  }
+];
+let nextSignupId = 2;
+let nextSlotDateId = 3;
+let nextSlotWinId = 4;
+let pendingSignupImage = null;
+let pendingSignupId = null;
+let editingSignupId = null;
+let linkedSignupEventId = null;
+let draftSignupDates = [];
+let selectedSignupRecipientIds = new Set();
+
+function signupLinkUrl(s){ return `https://joinsprout.co/s/${s.linkId}`; }
+function eventById(id){ return events.find(e=>e.id===id) || null; }
+function populateSignupEventLinkOptions(){
+  const scope = currentContext().type === 'master' ? 'master' : 'class';
+  const scopedEvents = [...events].filter(e=>e.scope===scope).sort((a,b)=>a.date.localeCompare(b.date));
+  document.getElementById('suEventLink').innerHTML = '<option value="">— No linked event —</option>' +
+    scopedEvents.map(e => `<option value="${e.id}">${escapeHtml(e.title)} · ${fmtDate(e.date)}</option>`).join('');
+  document.getElementById('suEventLink').value = linkedSignupEventId || '';
+}
+function applySignupEventLink(){
+  const id = parseInt(document.getElementById('suEventLink').value, 10) || null;
+  linkedSignupEventId = id;
+  if(!id) return;
+  const ev = eventById(id); if(!ev) return;
+  const titleEl = document.getElementById('suTitle');
+  if(!titleEl.value.trim()) titleEl.value = ev.title;
+  if(ev.image && !pendingSignupImage){ pendingSignupImage = ev.image; renderSignupImageGallery(); }
+  if(draftSignupDates.length && !draftSignupDates[0].date){
+    draftSignupDates[0].date = ev.date;
+    if(ev.startTime) draftSignupDates[0].windows[0].start = ev.startTime;
+    if(ev.endTime) draftSignupDates[0].windows[0].end = ev.endTime;
+    renderSlotEditor();
+  }
+  renderSignupFormPreview();
+  showToast(`Pulled in details from "${ev.title}" ✓`);
+}
+
+function renderSignupList(){
+  const scope = currentContext().type === 'master' ? 'master' : 'class';
+  const filtered = signups.filter(s=>s.scope===scope);
+  document.getElementById('su-list-rows').innerHTML = filtered.map(s => {
+    const totalCap = s.dates.reduce((sum,d)=>sum + d.windows.reduce((a,w)=>a+w.capacity,0), 0);
+    const totalFilled = s.dates.reduce((sum,d)=>sum + d.windows.reduce((a,w)=>a+w.signed.length,0), 0);
+    const linkedEv = s.eventId ? eventById(s.eventId) : null;
+    return `<div class="signup-card">
+      <img class="thumb" src="${s.image || mockAIImage(s.id)}">
+      <div class="info">
+        <div class="t">${escapeHtml(s.title)}</div>
+        <div class="meta">${s.dates.length} date${s.dates.length===1?'':'s'} · ${totalFilled}/${totalCap} spots filled${linkedEv ? ` · 🔗 ${escapeHtml(linkedEv.title)}` : ''}</div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost btn-sm" onclick="showSignupView('detail', ${s.id})">View</button>
+      </div>
+    </div>`;
+  }).join('') || `<div class="table empty">No sign-ups yet — create one to get volunteers for a field trip, book reading, or party.</div>`;
+}
+
+function newSignup(){
+  editingSignupId = null;
+  linkedSignupEventId = null;
+  document.getElementById('suTitle').value = '';
+  document.getElementById('suDesc').value = '';
+  pendingSignupImage = null;
+  document.getElementById('suImageFile').value = '';
+  draftSignupDates = [{id: nextSlotDateId++, date:'', windows:[{id: nextSlotWinId++, start:'09:00', end:'10:00', capacity:2}]}];
+  showSignupView('create');
+}
+function editSignup(){
+  const s = signups.find(x=>x.id===pendingSignupId); if(!s) return;
+  editingSignupId = s.id;
+  linkedSignupEventId = s.eventId || null;
+  document.getElementById('suTitle').value = s.title;
+  document.getElementById('suDesc').value = s.desc || '';
+  pendingSignupImage = s.image;
+  document.getElementById('suImageFile').value = '';
+  draftSignupDates = s.dates.map(d => ({id:d.id, date:d.date, windows: d.windows.map(w=>({id:w.id, start:w.start, end:w.end, capacity:w.capacity}))}));
+  showSignupView('create');
+}
+function deleteSignup(id){
+  signups = signups.filter(s=>s.id!==id);
+  showSignupView('list');
+  showToast('Sign-up deleted');
+}
+
+/* image gallery — same mocked AI/upload pattern as Add Event, own state so the two forms don't collide */
+function renderSignupImageGallery(){
+  document.getElementById('suImageGallery').innerHTML = Array.from({length:8},(_,i)=>
+    `<img src="${mockAIImage(i)}" class="gallery-thumb ${pendingSignupImage===mockAIImage(i)?'sel':''}" data-i="${i}" onclick="selectSignupGalleryImage(${i})" title="Suggested image">`
+  ).join('');
+}
+function selectSignupGalleryImage(i){
+  pendingSignupImage = mockAIImage(i);
+  document.querySelectorAll('#suImageGallery .gallery-thumb').forEach(t=>t.classList.toggle('sel', Number(t.dataset.i)===i));
+  renderSignupFormPreview();
+}
+function handleSignupImagePreview(){
+  const input = document.getElementById('suImageFile');
+  if(!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    pendingSignupImage = e.target.result;
+    document.querySelectorAll('#suImageGallery .gallery-thumb').forEach(t=>t.classList.remove('sel'));
+    renderSignupFormPreview();
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function generateSignupImageAI(){
+  const btn = document.getElementById('suAiGenBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="regen-spin" style="border-color:rgba(24,99,56,.25);border-top-color:var(--green);"></span> Generating…';
+  setTimeout(()=>{
+    pendingSignupImage = mockAIImage(signups.length + Math.floor(Math.random()*8));
+    document.querySelectorAll('#suImageGallery .gallery-thumb').forEach(t=>t.classList.remove('sel'));
+    btn.disabled = false; btn.innerHTML = '✨ Generate with AI';
+    renderSignupFormPreview();
+    showToast('Image generated ✓');
+  }, 900);
+}
+
+/* dates & time-windows editor — structural changes sync the DOM back into draftSignupDates, then re-render from state */
+function readSlotEditorDOM(){
+  return Array.from(document.querySelectorAll('#slotEditor .slot-date-block')).map(block => ({
+    date: block.querySelector('.slot-date-input').value,
+    windows: Array.from(block.querySelectorAll('.slot-window-row')).map(row => ({
+      start: timeFromEls(row.querySelector('.sw-start-h'), row.querySelector('.sw-start-m')),
+      end: timeFromEls(row.querySelector('.sw-end-h'), row.querySelector('.sw-end-m')),
+      capacity: parseInt(row.querySelector('.sw-cap').value, 10) || 1
+    }))
+  }));
+}
+function syncSlotEditorFromDOM(){
+  const read = readSlotEditorDOM();
+  read.forEach((r, di) => {
+    const d = draftSignupDates[di]; if(!d) return;
+    d.date = r.date;
+    r.windows.forEach((w, wi) => { if(d.windows[wi]) Object.assign(d.windows[wi], w); });
+  });
+}
+function renderSlotEditor(){
+  document.getElementById('slotEditor').innerHTML = draftSignupDates.map(d => {
+    const rows = d.windows.map(w => {
+      const s = splitTime(w.start), e = splitTime(w.end);
+      return `<div class="slot-window-row">
+        <div class="tp-field"><label>Start</label><div class="time-picker">
+          <select class="sw-start-h" onchange="renderSignupFormPreview()">${hourPeriodOpts(s.h)}</select><select class="sw-start-m" onchange="renderSignupFormPreview()">${minOpts(s.m)}</select>
+        </div></div>
+        <div class="tp-field"><label>End</label><div class="time-picker">
+          <select class="sw-end-h" onchange="renderSignupFormPreview()">${hourPeriodOpts(e.h)}</select><select class="sw-end-m" onchange="renderSignupFormPreview()">${minOpts(e.m)}</select>
+        </div></div>
+        <div class="tp-field cap-field"><label>Spots</label><input type="number" class="sw-cap" min="1" value="${w.capacity}" oninput="renderSignupFormPreview()"></div>
+        ${d.windows.length>1 ? `<div class="slot-window-del" onclick="removeSlotWindow(${d.id},${w.id})">×</div>` : ''}
+      </div>`;
+    }).join('');
+    return `<div class="slot-date-block">
+      <div class="slot-date-head">
+        <input type="date" class="slot-date-input" value="${d.date||''}" onchange="renderSignupFormPreview()">
+        ${draftSignupDates.length>1 ? `<span class="remove-date-link" onclick="removeSlotDate(${d.id})">Remove Date</span>` : ''}
+      </div>
+      ${rows}
+      <span class="add-window-link" onclick="addSlotWindow(${d.id})">+ Add another time window</span>
+    </div>`;
+  }).join('');
+  renderSignupFormPreview();
+}
+function addSlotDate(){
+  syncSlotEditorFromDOM();
+  draftSignupDates.push({id: nextSlotDateId++, date:'', windows:[{id: nextSlotWinId++, start:'09:00', end:'10:00', capacity:2}]});
+  renderSlotEditor();
+}
+function removeSlotDate(dateId){
+  syncSlotEditorFromDOM();
+  draftSignupDates = draftSignupDates.filter(d=>d.id!==dateId);
+  renderSlotEditor();
+}
+function addSlotWindow(dateId){
+  syncSlotEditorFromDOM();
+  const d = draftSignupDates.find(x=>x.id===dateId); if(!d) return;
+  d.windows.push({id: nextSlotWinId++, start:'12:00', end:'13:00', capacity:2});
+  renderSlotEditor();
+}
+function removeSlotWindow(dateId, winId){
+  syncSlotEditorFromDOM();
+  const d = draftSignupDates.find(x=>x.id===dateId); if(!d) return;
+  d.windows = d.windows.filter(w=>w.id!==winId);
+  renderSlotEditor();
+}
+
+function renderSignupFormPreview(){
+  const title = document.getElementById('suTitle').value.trim() || 'Sign-Up Title';
+  const desc = document.getElementById('suDesc').value.trim();
+  document.getElementById('suPrevTitle').textContent = title;
+  document.getElementById('suPrevDesc').textContent = desc || 'Add a description so parents know what to expect.';
+  const banner = document.getElementById('suPrevBanner');
+  if(pendingSignupImage){ banner.src = pendingSignupImage; banner.style.display = 'block'; } else { banner.style.display = 'none'; }
+  const dates = readSlotEditorDOM().filter(d=>d.date);
+  const slotsWrap = document.getElementById('suPrevSlots');
+  if(!dates.length){
+    slotsWrap.innerHTML = `<div class="hint">Add a date to see available time windows here.</div>`;
+  } else {
+    slotsWrap.innerHTML = dates.map(d => d.windows.map(w => `
+      <div class="signup-slot-row">
+        <div class="info"><div class="dt">${fmtDate(d.date)}</div><div class="tm">${fmtTime(w.start)}–${fmtTime(w.end)}</div></div>
+        <span class="cap">${w.capacity} spot${w.capacity===1?'':'s'} needed</span>
+        <span class="su-btn">Sign Up</span>
+      </div>`).join('')).join('');
+  }
+}
+
+function saveSignup(){
+  const title = document.getElementById('suTitle').value.trim();
+  if(!title){ alert('Give the sign-up a name.'); return; }
+  syncSlotEditorFromDOM();
+  const dates = draftSignupDates.filter(d=>d.date).map(d=>({
+    id: d.id, date: d.date,
+    windows: d.windows.map(w=>({id:w.id, start:w.start, end:w.end, capacity:w.capacity, signed:[]}))
+  }));
+  if(!dates.length){ alert('Add at least one date.'); return; }
+  const desc = document.getElementById('suDesc').value.trim();
+  const scope = currentContext().type === 'master' ? 'master' : 'class';
+
+  if(editingSignupId){
+    const s = signups.find(x=>x.id===editingSignupId);
+    const oldWindows = {};
+    s.dates.forEach(d=>d.windows.forEach(w=>{ oldWindows[w.id] = w.signed; }));
+    dates.forEach(d=>d.windows.forEach(w=>{ if(oldWindows[w.id]) w.signed = oldWindows[w.id]; }));
+    s.title = title; s.desc = desc; s.image = pendingSignupImage; s.dates = dates; s.eventId = linkedSignupEventId;
+    showToast('Sign-up updated ✓');
+    showSignupView('detail', s.id);
+    return;
+  }
+
+  const s = { id: nextSignupId++, title, desc, image: pendingSignupImage, dates, linkId: 'su' + Math.random().toString(36).slice(2,8), scope, sentSummary:null, eventId: linkedSignupEventId };
+  signups.push(s);
+  showSignupView('share', s.id);
+}
+
+function copySignupLink(id){
+  const s = signups.find(x=>x.id===id); if(!s) return;
+  const url = signupLinkUrl(s);
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(()=> showToast('Link copied ✓')).catch(()=> showToast('Link: ' + url));
+  } else {
+    showToast('Link: ' + url);
+  }
+}
+function copySignupShareLink(){ copySignupLink(pendingSignupId); }
+
+function renderSignupShare(){
+  const s = signups.find(x=>x.id===pendingSignupId); if(!s) return;
+  document.getElementById('suShareTitle').textContent = s.title;
+  document.getElementById('suShareUrl').textContent = signupLinkUrl(s);
+
+  document.getElementById('suShareEmailTitle').textContent = s.title;
+  document.getElementById('suShareEmailDesc').textContent = s.desc || 'Add a description so parents know what to expect.';
+  const banner = document.getElementById('suShareBanner');
+  const hasImage = !!s.image;
+  banner.style.display = hasImage ? 'block' : 'none';
+  if(hasImage) banner.src = s.image;
+  document.getElementById('suShareOverlap').classList.toggle('no-image', !hasImage);
+  document.getElementById('suShareSlots').innerHTML = s.dates.map(d => d.windows.map(w => {
+    const left = w.capacity - w.signed.length;
+    return `<div class="signup-slot-row">
+      <div class="info"><div class="dt">${fmtDate(d.date)}</div><div class="tm">${fmtTime(w.start)}–${fmtTime(w.end)}</div></div>
+      <span class="cap">${left > 0 ? `${left} spot${left===1?'':'s'} left` : 'Full'}</span>
+      <span class="su-btn">Sign Up</span>
+    </div>`;
+  }).join('')).join('');
+  document.getElementById('suShareEmailFoot').textContent = `Sent from ${currentContext().name} on Sprout.`;
+
+  selectedSignupRecipientIds = new Set();
+  renderSignupRecipientPicker();
+}
+function renderSignupRecipientPicker(){
+  const allSelected = allParents.length > 0 && allParents.every(p => selectedSignupRecipientIds.has(p.id));
+  const selectAllRow = `
+    <label class="chk-row chk-row-all"><input type="checkbox" ${allSelected?'checked':''} onchange="toggleSignupSelectAll(this.checked)">
+      <div class="body"><div class="t">Select All (${allParents.length})</div></div>
+    </label>`;
+  document.getElementById('suRecipientPicker').innerHTML = selectAllRow + allParents.map(p => `
+    <label class="chk-row"><input type="checkbox" ${selectedSignupRecipientIds.has(p.id)?'checked':''} onchange="toggleSignupRecipient('${p.id}', this.checked)">
+      <div class="body"><div class="t">${p.name}</div><div class="d">${p.onSprout?'On Sprout':'Email only'}${p.email?' · '+p.email:''}</div></div>
+    </label>`).join('');
+}
+function toggleSignupRecipient(id, checked){
+  if(checked) selectedSignupRecipientIds.add(id); else selectedSignupRecipientIds.delete(id);
+  renderSignupRecipientPicker();
+}
+function toggleSignupSelectAll(checked){
+  if(checked) allParents.forEach(p=>selectedSignupRecipientIds.add(p.id));
+  else selectedSignupRecipientIds.clear();
+  renderSignupRecipientPicker();
+}
+function sendSignupToSelected(){
+  const s = signups.find(x=>x.id===pendingSignupId); if(!s) return;
+  const recipients = allParents.filter(p=>selectedSignupRecipientIds.has(p.id));
+  if(!recipients.length){ alert('Select at least one parent.'); return; }
+  const sproutCount = recipients.filter(p=>p.onSprout).length;
+  s.sentSummary = { total: recipients.length, sprout: sproutCount, date: new Date().toISOString() };
+  const msg = sproutCount
+    ? `Emailed ${recipients.length} famil${recipients.length===1?'y':'ies'} — ${sproutCount} of them will also see it in their Sprout Invitations ✓`
+    : `Emailed ${recipients.length} famil${recipients.length===1?'y':'ies'} ✓`;
+  showToast(msg);
+  showSignupView('detail', s.id);
+}
+
+function renderSignupDetail(){
+  const s = signups.find(x=>x.id===pendingSignupId); if(!s) return;
+  document.getElementById('suDetailTitle').textContent = s.title;
+  document.getElementById('suDetailDesc').textContent = s.desc || 'No description added.';
+  const banner = document.getElementById('suDetailBanner');
+  if(s.image){ banner.src = s.image; banner.style.display = 'block'; } else { banner.style.display = 'none'; }
+  const linkedEv = s.eventId ? eventById(s.eventId) : null;
+  const linkedWrap = document.getElementById('suDetailLinkedEvent');
+  if(linkedEv){
+    linkedWrap.style.display = 'block';
+    linkedWrap.innerHTML = `<span class="src-chip" style="cursor:pointer;" onclick="goTo('calendar')">🔗 Linked to ${escapeHtml(linkedEv.title)} · ${fmtDate(linkedEv.date)}</span>`;
+  } else {
+    linkedWrap.style.display = 'none';
+  }
+
+  const rows = [];
+  s.dates.forEach(d => {
+    d.windows.forEach(w => {
+      rows.push(`<div class="signup-slot-row">
+        <div class="info"><div class="dt">${fmtDate(d.date)}</div><div class="tm">${fmtTime(w.start)}–${fmtTime(w.end)}</div></div>
+        <span class="cap">${w.signed.length}/${w.capacity} filled</span>
+      </div>`);
+      if(w.signed.length){
+        rows.push(`<div style="padding:0 0 10px 4px;">` + w.signed.map(r => `
+          <div class="response-row"><div class="info"><div class="nm">${escapeHtml(r.name)}</div><div class="ct">${escapeHtml(r.contact||'')}${r.parentId?' · On Sprout':''}</div></div></div>
+        `).join('') + `</div>`);
+      }
+    });
+  });
+  document.getElementById('suDetailSlots').innerHTML = rows.join('') || `<div class="table empty">No time windows yet.</div>`;
+
+  const sent = s.sentSummary;
+  document.getElementById('suDetailSentNote').textContent = sent
+    ? `Emailed ${sent.total} famil${sent.total===1?'y':'ies'}${sent.sprout ? ` (${sent.sprout} also see it in Sprout)` : ''} · ${fmtDateTime(sent.date)}`
+    : 'Not sent yet — copy the link or select parents to send.';
+}
+
+function showSignupView(view, id){
+  if(id != null) pendingSignupId = id;
+  document.querySelectorAll('#sec-signups .su-view').forEach(v=>v.classList.remove('on'));
+  document.getElementById('su-view-'+view).classList.add('on');
+  if(view === 'list') renderSignupList();
+  if(view === 'create'){
+    populateSignupEventLinkOptions();
+    renderSignupImageGallery();
+    renderSlotEditor();
+    document.getElementById('suFormHead').textContent = editingSignupId ? 'Edit Sign-Up' : 'New Sign-Up';
+    document.getElementById('suSaveBtn').textContent = editingSignupId ? 'Save Changes' : 'Save & Get Link';
+  }
+  if(view === 'share') renderSignupShare();
+  if(view === 'detail') renderSignupDetail();
+}
+
+/* ═══ FUNDRAISING ═══ */
+let donations = [
+  {parentId:'lm', amount:50, source:'Venmo', date:'2026-08-12', reason:'other', note:'General fund contribution'},
+  {parentId:'sj', amount:25, source:'Cash', date:'2026-08-14', reason:'other', note:'Field trip fund'},
+  {parentId:'mc', amount:100, source:'Check', date:'2026-08-15', reason:'2', note:''},
+  {parentId:'tm', amount:40, source:'Apple Pay', date:'2026-08-18', reason:'other', note:'General fund contribution'}
+];
+let expenses = [
+  {desc:'Spirit Night snacks & drinks', amount:62.50, date:'2026-08-20', receipt:null, tag:'2'}
+];
+
+function recalcFund(){
+  const raised = donations.reduce((sum,d)=>sum+Number(d.amount),0);
+  const spent = expenses.reduce((sum,e)=>sum+Number(e.amount),0);
+  const balance = raised - spent;
+  document.getElementById('fr-raised').textContent = fmt(raised);
+  document.getElementById('fr-spent').textContent = fmt(spent);
+  document.getElementById('fr-balance').textContent = fmt(balance);
+  return {raised, spent, balance};
+}
+function renderDonations(){
+  const sorted = [...donations].sort((a,b)=> b.date.localeCompare(a.date));
+  document.getElementById('don-rows').innerHTML = sorted.map(d => {
+    const p = parentById(d.parentId);
+    return `<tr><td><div class="who"><div class="avatar" style="background:${p.color};">${p.initials}</div>${p.name}</div></td><td>${fmt(d.amount)}</td><td><span class="src-chip">${sourceEmoji(d.source)} ${d.source}</span></td><td>${reasonTagLabel(d.reason)}${d.note ? `<div style="font-size:11px;color:var(--muted);">${escapeHtml(d.note)}</div>` : ''}</td><td>${fmtDate(d.date)}</td></tr>`;
+  }).join('') || `<tr><td colspan="5" class="table empty">No donations logged yet.</td></tr>`;
+}
+const FIXED_REASON_TAGS = [
+  {id:'supplies', label:'Supplies', icon:'📦'},
+  {id:'teachergift', label:'Teacher Gift', icon:'🎁'},
+  {id:'other', label:'Other', icon:'❓'}
+];
+function reasonTagOptions(){
+  const classEvents = events.filter(e=>e.scope==='class');
+  return [...FIXED_REASON_TAGS, ...classEvents.map(e=>({id:String(e.id), label:e.title, icon:'🎉'}))];
+}
+function reasonTagLabel(tagId){
+  const t = reasonTagOptions().find(x=>x.id===String(tagId));
+  return t ? `${t.icon} ${t.label}` : '📦 Supplies';
+}
+function expenseTagLabel(tag){ return reasonTagLabel(tag); }
+function renderExpenses(){
+  const sorted = [...expenses].sort((a,b)=> b.date.localeCompare(a.date));
+  const receiptCell = (e) => e.receipt
+    ? `<img class="receipt-thumb" src="${e.receipt}">`
+    : `<div class="receipt-empty" title="No receipt attached"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/></svg></div>`;
+  document.getElementById('exp-rows').innerHTML = sorted.map(e =>
+    `<tr><td>${e.desc}</td><td>${expenseTagLabel(e.tag)}</td><td style="color:var(--red);">-${fmt(e.amount)}</td><td>${fmtDate(e.date)}</td><td>${receiptCell(e)}</td></tr>`
+  ).join('') || `<tr><td colspan="5" class="table empty">No expenses logged yet.</td></tr>`;
+}
+function donationsByReason(){
+  const map = {};
+  donations.forEach(d => { const label = reasonTagLabel(d.reason).replace(/^[^ ]+ /,''); map[label] = (map[label]||0) + Number(d.amount); });
+  return map;
+}
+function expensesByTag(){
+  const map = {};
+  expenses.forEach(e => { const label = reasonTagLabel(e.tag).replace(/^[^ ]+ /,''); map[label] = (map[label]||0) + Number(e.amount); });
+  return map;
+}
+function populateExpTagOptions(){
+  const sel = document.getElementById('expTag');
+  if(!sel) return;
+  sel.innerHTML = reasonTagOptions().map(t=>`<option value="${t.id}">${t.icon} ${t.label}</option>`).join('');
+  populateDonReasonChips();
+}
+function populateDonReasonChips(){
+  const row = document.getElementById('donReasonRow');
+  if(!row) return;
+  const current = document.getElementById('donReason').value;
+  row.innerHTML = reasonTagOptions().map(t =>
+    `<span class="src-chip-btn ${t.id===current?'on':''}" data-val="${t.id}" onclick="pickDonReason(this)">${t.icon} ${t.label}</span>`
+  ).join('');
+}
+function renderFundraising(){
+  recalcFund(); renderDonations(); renderExpenses();
+  renderPieChart('frPieDonations', 'frLegendDonations', 'frPieDonationsCenter', toChartEntries(donationsByReason()));
+  renderPieChart('frPieExpenses', 'frLegendExpenses', 'frPieExpensesCenter', toChartEntries(expensesByTag()));
+}
+
+/* ═══ rich parent picker (avatar + name) for Log Donation ═══ */
+function renderDonParentMenu(){
+  document.getElementById('donParentMenu').innerHTML = allParents.map(p =>
+    `<div class="rich-select-item" onclick="pickDonParent('${p.id}')"><span class="avatar" style="width:24px;height:24px;font-size:9px;background:${p.color};">${p.initials}</span><span>${p.name}${p.onSprout?'':' (email only)'}</span></div>`
+  ).join('');
+}
+function toggleParentPicker(){
+  renderDonParentMenu();
+  document.getElementById('donParentMenu').classList.toggle('open');
+}
+function pickDonParent(id){
+  const p = parentById(id);
+  document.getElementById('donParent').value = id;
+  document.getElementById('donParentAvatar').style.background = p.color;
+  document.getElementById('donParentAvatar').textContent = p.initials;
+  document.getElementById('donParentName').textContent = p.name;
+  document.getElementById('donParentMenu').classList.remove('open');
+  renderDonationPreview();
+}
+function pickDonSource(el){
+  document.querySelectorAll('#donSourceRow .src-chip-btn').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('donSource').value = el.dataset.val;
+  renderDonationPreview();
+}
+function pickDonReason(el){
+  document.querySelectorAll('#donReasonRow .src-chip-btn').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('donReason').value = el.dataset.val;
+  renderDonationPreview();
+}
+function renderDonationPreview(){
+  const parentId = document.getElementById('donParent').value;
+  const p = parentId ? parentById(parentId) : null;
+  const amount = parseFloat(document.getElementById('donAmount').value) || 0;
+  const reason = reasonTagLabel(document.getElementById('donReason').value);
+  const note = document.getElementById('donNote').value.trim();
+  const avatarEl = document.getElementById('celebrateAvatar');
+  if(p){ avatarEl.style.background = p.color; avatarEl.textContent = p.initials; }
+  document.getElementById('celebrateAmt').textContent = fmt(amount);
+  document.getElementById('celebrateName').textContent = p ? p.name : 'Select a parent';
+  document.getElementById('celebrateReason').textContent = reason + (note ? ` — ${note}` : '');
+}
+function openDonForm(fromQuickAction){
+  if(fromQuickAction) goTo('fundraising');
+  document.getElementById('donForm').classList.add('on');
+  pickDonParent(allParents[0].id);
+  document.querySelector('#donSourceRow .src-chip-btn').click();
+  populateDonReasonChips();
+  document.querySelector('#donReasonRow .src-chip-btn').click();
+  renderDonationPreview();
+}
+
+function addDonation(){
+  const amount = parseFloat(document.getElementById('donAmount').value);
+  if(!amount || amount <= 0){ alert('Enter an amount greater than $0.'); return; }
+  const parentId = document.getElementById('donParent').value;
+  const source = document.getElementById('donSource').value;
+  const reason = document.getElementById('donReason').value;
+  const note = document.getElementById('donNote').value.trim();
+  const dateEl = document.getElementById('donDate');
+  const date = dateEl.value || new Date().toISOString().slice(0,10);
+  donations.push({parentId, amount, source, date, reason, note});
+  document.getElementById('donAmount').value = '';
+  document.getElementById('donNote').value = '';
+  dateEl.value = '';
+  toggleForm('donForm');
+  renderFundraising();
+  renderDashboard();
+  showToast('Donation logged ✓');
+}
+
+/* ═══ expense receipt dropzone ═══ */
+let pendingReceiptImage = null;
+function resetExpenseDropzone(){
+  pendingReceiptImage = null;
+  document.getElementById('expDropzoneInner').innerHTML = `<span class="dropzone-icon">📎</span><span class="dropzone-text">Click to upload, or drag a photo of the receipt here</span>`;
+  document.getElementById('expDropzone').classList.remove('has-file');
+  document.getElementById('expFile').value = '';
+}
+function showReceiptPreview(dataUrl){
+  pendingReceiptImage = dataUrl;
+  document.getElementById('expDropzoneInner').innerHTML = `<img class="dropzone-preview" src="${dataUrl}"><span class="dropzone-text">Click to change</span>`;
+  document.getElementById('expDropzone').classList.add('has-file');
+}
+function handleReceiptPreview(){
+  const input = document.getElementById('expFile');
+  if(!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = (e) => showReceiptPreview(e.target.result);
+  reader.readAsDataURL(input.files[0]);
+}
+function handleReceiptDrop(e){
+  e.preventDefault();
+  document.getElementById('expDropzone').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => showReceiptPreview(ev.target.result);
+  reader.readAsDataURL(file);
+}
+function closeExpenseForm(){
+  document.getElementById('expForm').classList.remove('on');
+  document.getElementById('expDesc').value = '';
+  document.getElementById('expAmount').value = '';
+  document.getElementById('expDate').value = '';
+  resetExpenseDropzone();
+}
+function addExpense(){
+  const amount = parseFloat(document.getElementById('expAmount').value);
+  const desc = document.getElementById('expDesc').value.trim();
+  if(!desc){ alert('Add a short description of what it was used for.'); return; }
+  if(!amount || amount <= 0){ alert('Enter an amount greater than $0.'); return; }
+  const tag = document.getElementById('expTag').value;
+  const dateEl = document.getElementById('expDate');
+  const date = dateEl.value || new Date().toISOString().slice(0,10);
+  expenses.push({desc, amount, date, receipt: pendingReceiptImage, tag});
+  closeExpenseForm();
+  renderFundraising();
+  renderDashboard();
+  showToast('Expense logged ✓');
+}
+function exportCSV(){
+  const rows = [['Type','Parent / Description','Amount','Source / Tagged To','Date','Reason']];
+  donations.forEach(d => rows.push(['Donation', parentById(d.parentId).name, d.amount.toFixed(2), d.source, d.date, reasonTagLabel(d.reason).replace(/^[^ ]+ /,'') + (d.note ? ' — '+d.note : '')]));
+  expenses.forEach(e => rows.push(['Expense', e.desc, '-'+e.amount.toFixed(2), reasonTagLabel(e.tag).replace(/^[^ ]+ /,''), e.date, '']));
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'kiker-1st-grade-fundraising.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('CSV downloaded ✓');
+}
+
+/* ═══ PIE CHARTS (dataviz skill: fixed-order categorical palette, validated) ═══
+   Colors are assigned per-label (first-seen), not per-rank — so the same event/
+   reason (e.g. "Spirit Night at Mandola's") always renders the same color across
+   the Donations and Expenses charts, regardless of where it ranks in each. */
+const CHART_COLORS = ['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4','#008300'];
+let chartColorMap = {};
+let chartColorNext = 0;
+function colorForLabel(label){
+  if(!chartColorMap[label]){
+    chartColorMap[label] = CHART_COLORS[chartColorNext % CHART_COLORS.length];
+    chartColorNext++;
+  }
+  return chartColorMap[label];
+}
+function toChartEntries(map){
+  const arr = Object.entries(map).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const top = arr.slice(0,6);
+  const rest = arr.slice(6);
+  const entries = top.map(([label,value])=>({label,value,color:colorForLabel(label)}));
+  if(rest.length){ entries.push({label:'Other', value: rest.reduce((s,[,v])=>s+v,0), color:'#c3c2b7'}); }
+  return entries;
+}
+function renderPieChart(svgId, legendId, centerId, entries){
+  const total = entries.reduce((s,e)=>s+e.value,0);
+  const r = 70, cx = 90, cy = 90, circumference = 2*Math.PI*r;
+  let offset = 0;
+  let circles = '';
+  entries.forEach(e => {
+    const frac = total>0 ? e.value/total : 0;
+    const slot = frac*circumference;
+    const dash = Math.max(slot - 2, 0);
+    circles += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${e.color}" stroke-width="26" stroke-dasharray="${dash} ${circumference-dash}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})"><title>${e.label}: ${fmt(e.value)}</title></circle>`;
+    offset += slot;
+  });
+  document.getElementById(svgId).innerHTML = circles || `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#e6e0d2" stroke-width="26"/>`;
+  document.getElementById(centerId).textContent = fmt(total);
+  document.getElementById(legendId).innerHTML = entries.map(e => {
+    const pct = total>0 ? Math.round(e.value/total*100) : 0;
+    return `<div class="legend-row"><span class="legend-dot" style="background:${e.color};"></span><span class="legend-lbl">${e.label}</span><span class="legend-val">${fmt(e.value)} · ${pct}%</span></div>`;
+  }).join('') || `<div class="table empty">Nothing to show yet.</div>`;
+}
+
+/* ═══ DASHBOARD ═══ */
+function renderDashboard(){
+  const ctx = currentContext();
+  const isMaster = ctx.type === 'master';
+  document.getElementById('dashGreeting').textContent = isMaster ? 'Kiker Master Page 👋' : 'Welcome back, Tony 👋';
+  document.getElementById('dashSub').textContent = isMaster ? "School-wide calendar, lunch menu, and who's got access." : `Here's what's happening in ${ctx.name} this week.`;
+  document.getElementById('dash-class-view').style.display = isMaster ? 'none' : 'block';
+  document.getElementById('dash-master-view').style.display = isMaster ? 'block' : 'none';
+
+  if(isMaster){
+    document.getElementById('dash-rpcount').textContent = roomParentsAccess.length;
+    const masterEvents = events.filter(e=>e.scope==='master');
+    document.getElementById('dash-masterevcount').textContent = masterEvents.length;
+    const upcoming = [...masterEvents].sort((a,b)=>a.date.localeCompare(b.date)).slice(0,4);
+    document.getElementById('dash-master-eventlist').innerHTML = upcoming.map(ev => {
+      const md = fmtMonthDay(ev.date);
+      const chip = eventStatusChip(ev);
+      return `<div class="ev-row-mini" onclick="goTo('calendar')">
+        <div class="ev-date-badge"><div class="mo">${md.mo}</div><div class="dy">${md.dy}</div></div>
+        <div style="flex:1;min-width:0;"><div class="ev-title">${ev.title}</div></div>
+        <span class="ev-status ${chip.cls}">${chip.text}</span>
+      </div>`;
+    }).join('') || `<div class="table empty">Nothing on the master calendar yet.</div>`;
+    document.getElementById('dash-master-lunch').innerHTML = lunchWidgetHTML();
+    document.getElementById('dash-rp-preview').innerHTML = roomParentsAccess.map(rp => `
+      <div class="ev-row-mini" onclick="openRoomParentModal('${rp.name.replace(/'/g,"\\'")}')">
+        <div class="avatar" style="width:32px;height:32px;font-size:11px;background:${rp.color};">${rp.initials}</div>
+        <div style="flex:1;"><div class="ev-title">${rp.name}</div><div style="font-size:11px;color:var(--muted);">${rp.classes.join(', ')}</div></div>
+      </div>`).join('');
+    return;
+  }
+
+  const {balance, raised} = recalcFund();
+  document.getElementById('dash-balance').textContent = fmt(balance);
+  document.getElementById('dash-raisedsub').textContent = `${fmt(raised)} raised so far`;
+  document.getElementById('dash-classsize').textContent = allParents.length;
+
+  const classEvents = events.filter(e=>e.scope==='class');
+  const upcoming = [...classEvents].sort((a,b)=> a.date.localeCompare(b.date)).slice(0,4);
+  document.getElementById('dash-eventcount').textContent = classEvents.length;
+  document.getElementById('dash-eventsub').textContent = classEvents.length === 1 ? '1 event on the calendar' : `${classEvents.length} events on the calendar`;
+  document.getElementById('dash-eventlist').innerHTML = upcoming.map(ev => {
+    const md = fmtMonthDay(ev.date);
+    const chip = eventStatusChip(ev);
+    return `<div class="ev-row-mini" onclick="goTo('calendar')">
+      <div class="ev-date-badge"><div class="mo">${md.mo}</div><div class="dy">${md.dy}</div></div>
+      <div style="flex:1;min-width:0;"><div class="ev-title">${ev.title}</div></div>
+      <span class="ev-status ${chip.cls}">${chip.text}</span>
+    </div>`;
+  }).join('') || `<div class="table empty">Nothing on the calendar yet.</div>`;
+
+  document.getElementById('dash-lunch').innerHTML = lunchWidgetHTML();
+
+  renderPieChart('pieDonations', 'legendDonations', 'pieDonationsCenter', toChartEntries(donationsByReason()));
+  renderPieChart('pieExpenses', 'legendExpenses', 'pieExpensesCenter', toChartEntries(expensesByTag()));
+}
+
+/* ═══ MY PROFILE — mirrors the parent-facing app's own profile 1:1 (see
+   13 - Sprout Onboarding/profile-preview.html + customize-profile-redesign.html
+   for the source data model). Spouse is shown read-only: per the 8/26 sync,
+   linking a spouse only happens once during onboarding sign-up — Tony/Mohit
+   explicitly decided not to add a post-onboarding way to do it. ═══ */
+const PROFILE = {
+  firstName:'Tony', lastName:'Martin', city:'Austin', state:'TX', zip:'73301', role:'Parent',
+  bio:"Dad of one at Kiker Elementary and the room parent for Mrs. Taylor's Class. Always up for a park meetup or helping plan the next class event.",
+  kids:[{name:'Cooper', dob:'2020-04-12'}],
+  schoolGroups:[
+    {school:'Kiker Elementary', distance:'0.6 miles away', allGrades:['Pre-K','Kindergarten','1st Grade','2nd Grade'], grades:[{grade:'1st Grade', kid:'Cooper'}]}
+  ],
+  interests:['Outdoor Activities','Sports','Community'],
+  spouse:{name:'Lydia Martin', phone:'(512) 555-0112', status:'accepted'}
+};
+const ALL_INTERESTS = ['Playdates','Outdoor Activities','Sports','Arts & Crafts','Music','Food & Dining','Education','Gaming','Outdoors','Community','Reading','Travel'];
+let tempProfGrades = {};
+let tempProfInterests = [];
+
+function profInitials(){ return (PROFILE.firstName[0]+PROFILE.lastName[0]).toUpperCase(); }
+function renderProfile(){
+  document.getElementById('profAvatar').textContent = profInitials();
+  document.getElementById('profName').textContent = `${PROFILE.firstName} ${PROFILE.lastName}`;
+  document.getElementById('profLoc').textContent = `${PROFILE.city}, ${PROFILE.state} · ${PROFILE.zip} · ${PROFILE.role}`;
+  document.getElementById('profBioText').textContent = PROFILE.bio || 'No bio added yet.';
+
+  document.getElementById('profKidsList').innerHTML = PROFILE.kids.map((k,i) => `
+    <div class="kid-row-card">
+      <div class="avatar" style="width:38px;height:38px;font-size:13px;background:var(--green-light);color:var(--green);">${k.name.slice(0,2).toUpperCase()}</div>
+      <div class="info"><div class="nm">${k.name}</div><div class="dob">${fmtDate(k.dob)}</div></div>
+      <div class="kid-age-badge">${kidAge(k.dob)} yrs</div>
+      <div class="ev-trash" onclick="deleteProfKid(${i})"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Zm-80-104v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0m48 0v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0"/></svg></div>
+    </div>`).join('') || `<div class="table empty">No kids added yet.</div>`;
+
+  document.getElementById('profGroupsDisplay').innerHTML = PROFILE.schoolGroups.map(sg => `
+    <div class="school-edit-block">
+      <div class="school-edit-label">🏫 ${sg.school} <span class="dist">${sg.distance}</span></div>
+      ${sg.grades.length ? sg.grades.map(g=>`<span class="grade-chip-display">${g.grade} — ${g.kid}</span>`).join('') : '<span style="font-size:12px;color:var(--muted);">No grades selected — add a kid\'s grade under Edit.</span>'}
+    </div>`).join('');
+
+  document.getElementById('profIntDisplay').innerHTML = PROFILE.interests.length
+    ? PROFILE.interests.map(t=>`<span class="src-chip-btn on">${t}</span>`).join('')
+    : `<div class="table empty">No interests selected yet.</div>`;
+
+  const sp = PROFILE.spouse;
+  document.getElementById('profSpouseDisplay').innerHTML = sp
+    ? `<div class="spouse-card"><div class="ic">💑</div><div class="info"><div class="nm">${sp.name}</div><div class="st">${sp.phone} · ${sp.status==='accepted' ? '✓ Linked' : 'Invite pending'}</div></div></div>`
+    : `<div class="spouse-card"><div class="ic">💑</div><div class="info"><div class="nm">No spouse linked</div><div class="st">Not added during onboarding</div></div></div>`;
+}
+function kidAge(dob){
+  const b = new Date(dob+'T00:00:00'), t = new Date();
+  let a = t.getFullYear() - b.getFullYear();
+  const m = t.getMonth() - b.getMonth();
+  if(m < 0 || (m === 0 && t.getDate() < b.getDate())) a--;
+  return a < 1 ? '<1' : a;
+}
+function openProfNameForm(){
+  document.getElementById('profFirstName').value = PROFILE.firstName;
+  document.getElementById('profLastName').value = PROFILE.lastName;
+  document.getElementById('profCity').value = PROFILE.city;
+  document.getElementById('profState').value = PROFILE.state;
+  document.getElementById('profZip').value = PROFILE.zip;
+  document.getElementById('profRole').value = PROFILE.role;
+  toggleForm('profNameForm');
+}
+function saveProfName(){
+  PROFILE.firstName = document.getElementById('profFirstName').value.trim() || PROFILE.firstName;
+  PROFILE.lastName = document.getElementById('profLastName').value.trim() || PROFILE.lastName;
+  PROFILE.city = document.getElementById('profCity').value.trim() || PROFILE.city;
+  PROFILE.state = document.getElementById('profState').value.trim() || PROFILE.state;
+  PROFILE.zip = document.getElementById('profZip').value.trim() || PROFILE.zip;
+  PROFILE.role = document.getElementById('profRole').value;
+  toggleForm('profNameForm');
+  renderProfile();
+  showToast('Profile updated ✓');
+}
+function openProfBioForm(){
+  document.getElementById('profBioInput').value = PROFILE.bio;
+  document.getElementById('profBioCount').textContent = PROFILE.bio.length + ' / 500';
+  toggleForm('profBioForm');
+}
+function saveProfBio(){
+  PROFILE.bio = document.getElementById('profBioInput').value.trim();
+  toggleForm('profBioForm');
+  renderProfile();
+  showToast('Bio saved ✓');
+}
+function closeProfKidForm(){
+  document.getElementById('profKidForm').classList.remove('on');
+  document.getElementById('profKidName').value = '';
+  document.getElementById('profKidDob').value = '';
+}
+function addProfKid(){
+  const name = document.getElementById('profKidName').value.trim();
+  if(!name){ alert("Enter the child's name."); return; }
+  const dob = document.getElementById('profKidDob').value || new Date().toISOString().slice(0,10);
+  PROFILE.kids.push({name, dob});
+  closeProfKidForm();
+  renderProfile();
+  showToast(`${name} added ✓`);
+}
+function deleteProfKid(i){
+  const removedName = PROFILE.kids[i].name;
+  PROFILE.kids.splice(i,1);
+  PROFILE.schoolGroups.forEach(sg => { sg.grades = sg.grades.filter(g => g.kid !== removedName); });
+  renderProfile();
+}
+function openProfGroupsForm(){
+  // tempProfGrades maps grade name -> kid name (or '' if not enrolled)
+  tempProfGrades = {};
+  PROFILE.schoolGroups.forEach(sg => sg.grades.forEach(g => tempProfGrades[g.grade] = g.kid));
+  const kidOptions = (selected) => PROFILE.kids.map(k=>`<option value="${k.name}" ${k.name===selected?'selected':''}>${k.name}</option>`).join('');
+  document.getElementById('profGroupsEdit').innerHTML = PROFILE.schoolGroups.map(sg => `
+    <div class="school-edit-block">
+      <div class="school-edit-label">🏫 ${sg.school} <span class="dist">${sg.distance}</span></div>
+      ${sg.allGrades.map(g => `
+        <div class="grade-kid-row">
+          <span class="grade-kid-name">${g}</span>
+          <select onchange="setProfGradeKid('${g}', this.value)">
+            <option value="">Not enrolled</option>
+            ${kidOptions(tempProfGrades[g])}
+          </select>
+        </div>`).join('')}
+    </div>`).join('');
+  toggleForm('profGroupsForm');
+}
+function setProfGradeKid(grade, kidName){
+  tempProfGrades[grade] = kidName;
+}
+function saveProfGroups(){
+  PROFILE.schoolGroups.forEach(sg => {
+    sg.grades = sg.allGrades.filter(g => tempProfGrades[g]).map(g => ({grade: g, kid: tempProfGrades[g]}));
+  });
+  toggleForm('profGroupsForm');
+  renderProfile();
+  showToast('School groups updated ✓');
+}
+function openProfIntForm(){
+  tempProfInterests = [...PROFILE.interests];
+  document.getElementById('profIntEdit').innerHTML = ALL_INTERESTS.map(t =>
+    `<span class="src-chip-btn ${tempProfInterests.includes(t)?'on':''}" onclick="toggleProfInterest(this,'${t}')">${t}</span>`
+  ).join('');
+  toggleForm('profIntForm');
+}
+function toggleProfInterest(el, t){
+  if(tempProfInterests.includes(t)){ tempProfInterests = tempProfInterests.filter(x=>x!==t); }
+  else { tempProfInterests.push(t); }
+  el.classList.toggle('on');
+}
+function saveProfInterests(){
+  PROFILE.interests = [...tempProfInterests];
+  toggleForm('profIntForm');
+  renderProfile();
+  showToast('Interests updated ✓');
+}
+
+/* ═══ INIT ═══ */
+renderCtxMenu();
+renderSidebarNav('dashboard');
+renderDonParentMenu();
+pickDonParent(allParents[0].id);
+renderEvents();
+renderLunch();
+renderFundraising();
+renderDashboard();
+populateExpTagOptions();
+populateTimeSelects('evStart', 9, '00', 'AM');
+populateTimeSelects('evEnd', 10, '00', 'AM');
+renderImageGallery();
+renderEventFormPreview();
+updateEvModeUI();
+wireCodeBoxes();
+</script>
+
+</body>
+</html>
