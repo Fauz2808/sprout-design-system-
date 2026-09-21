@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Sprout — App Store Screenshots (1–11)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#1a1a1a; font-family:-apple-system,BlinkMacSystemFont,sans-serif; padding:32px 24px 80px; }
+  h1 { font-family:'Playfair Display',serif; color:#fff; text-align:center; font-size:24px; font-weight:700; }
+  .sub { text-align:center; color:#999; font-size:13px; margin-top:8px; }
+  .toggle { display:flex; justify-content:center; gap:8px; margin-top:20px; }
+  .toggle button { background:#2a2a2a; border:1px solid #3a3a3a; color:#ccc; font-size:12px; padding:6px 16px; border-radius:20px; cursor:pointer; }
+  .toggle button.on { background:#186338; border-color:#186338; color:#fff; }
+  .grid { display:flex; flex-wrap:wrap; gap:28px; justify-content:center; margin-top:32px; max-width:1500px; margin-left:auto; margin-right:auto; }
+  figure { margin:0; text-align:center; width:210px; }
+  figure img { width:100%; border-radius:14px; box-shadow:0 12px 30px rgba(0,0,0,.5); display:block; }
+  figcaption { color:#bbb; font-size:12px; margin-top:10px; line-height:1.4; }
+  figcaption b { color:#fff; display:block; font-size:13px; margin-bottom:2px; }
+  .badge { display:inline-block; font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; border-radius:20px; padding:2px 8px; margin-top:4px; }
+  .badge.updated { background:#2a5236; color:#8fd6a8; }
+  .badge.new { background:#5a4a1a; color:#f0c96b; }
+</style>
+</head>
+<body>
+
+<h1>Sprout — App Store Screenshots</h1>
+<div class="sub">1–11 · 6.5″ shown below (1242×2688) · 6.9″ files live in the sibling folder</div>
+<div class="toggle">
+  <button class="on" onclick="setSize('6.5', this)">6.5″</button>
+  <button onclick="setSize('6.9', this)">6.9″</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+  const SLIDES = [
+    { n: 1,  title: 'Find your parenting tribe',      status: '' },
+    { n: 2,  title: 'See the names, faces & stories',  status: '' },
+    { n: 3,  title: 'Daily Brief — briefed by 7:30 AM', status: 'updated' },
+    { n: 4,  title: 'Chat with parents who get it',     status: 'updated' },
+    { n: 5,  title: 'Find events your kids will love',  status: 'updated' },
+    { n: 6,  title: 'Plan important moments',            status: '' },
+    { n: 7,  title: 'Invite the right families',         status: '' },
+    { n: 8,  title: 'AI Assist — just say it',           status: 'new' },
+    { n: 9,  title: 'Clubs — every group, organized',    status: 'new' },
+    { n: 10, title: 'Carpool — never miss a pickup',     status: 'new' },
+    { n: 11, title: 'AI Birthday Cover',                 status: 'new' },
+  ];
+
+  function setSize(tag, btn) {
+    document.querySelectorAll('.toggle button').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    render(tag);
+  }
+
+  function render(tag) {
+    document.getElementById('grid').innerHTML = SLIDES.map(s => `
+      <figure>
+        <img src="${tag}/${s.n} - ${tag}.jpg" alt="Slide ${s.n}">
+        <figcaption>
+          <b>${s.n}. ${s.title}</b>
+          ${s.status ? `<span class="badge ${s.status}">${s.status === 'new' ? 'New' : 'Updated'}</span>` : ''}
+        </figcaption>
+      </figure>
+    `).join('');
+  }
+
+  render('6.5');
+</script>
+
+</body>
+</html>

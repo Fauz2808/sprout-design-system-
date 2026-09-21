@@ -1,0 +1,33 @@
+# Sprout Bevel side-by-side hero
+
+This folder contains a side-by-side hero variation of the Connected Family System direction. The copy sits on the left and a nearly complete Sprout product screen sits on the right. The centered Bevel V2 hero and the earlier redesign directions remain unchanged in their own folders.
+
+## Preview
+
+Production: [https://sprout-bevel-side-by-side.vercel.app/](https://sprout-bevel-side-by-side.vercel.app/)
+
+Direct download section: [https://sprout-bevel-side-by-side.vercel.app/#download](https://sprout-bevel-side-by-side.vercel.app/#download)
+
+For local preview, run:
+
+```sh
+python3 -m http.server 8791 --bind 127.0.0.1
+```
+
+Then open [http://127.0.0.1:8791/](http://127.0.0.1:8791/). There is no build step or package installation.
+
+## Files
+
+- `index.html`: semantic structure, English product copy, local product imagery, store links, and legal links.
+- `styles.css`: Bevel-led visual system, side-by-side desktop hero, vertical mobile composition, interaction states, and reduced-motion support.
+- `script.js`: accessible mobile navigation, family-day tabs, profile preview, and entry motion.
+- `DESIGN.md`: visual reasoning and implementation handoff.
+- `CONTENT-CHANGES.md`: content sources, new editorial lines, and decisions required before production.
+- `QA.md`: checks completed for this prototype.
+- `assets/PROVENANCE.md`: origin of the imagery.
+
+## Scope
+
+This prototype is published as a standalone Vercel project. It does not change the live Sprout website, the Figma file, or any previous redesign option. The profile interaction is a local preview and sends no data.
+
+Instrument Sans is loaded from Google Fonts. The page falls back to system sans-serif fonts when the font request is unavailable.

@@ -1,0 +1,16 @@
+process.env.NODE_PATH='/Users/ahmadfauzanazhim/node_modules';
+const {createRequire}=await import('module');
+const require=createRequire('/Users/ahmadfauzanazhim/Sprout/04 - Design System & Storybook/x.js');
+const puppeteer=require('puppeteer-core');
+const file=process.argv[2], out=process.argv[3];
+const b=await puppeteer.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',args:['--font-render-hinting=none']});
+const p=await b.newPage();
+await p.setViewport({width:1780,height:1260,deviceScaleFactor:1.5});
+await p.goto('file://'+encodeURI(file),{waitUntil:'networkidle0'});
+await new Promise(r=>setTimeout(r,1400));
+const h=await p.evaluate(()=>document.body.scrollHeight);
+await p.setViewport({width:1780,height:Math.min(h+40,1400),deviceScaleFactor:1.5});
+await new Promise(r=>setTimeout(r,400));
+await p.screenshot({path:out});
+await b.close();
+console.log('shot',out);

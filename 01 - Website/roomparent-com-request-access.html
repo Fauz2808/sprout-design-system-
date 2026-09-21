@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f4f1ea">
+<meta name="description" content="Request access to the Room Parent portal — opening September 23. Sign up for a demo before it launches.">
+<link rel="icon" type="image/svg+xml" href="./roomparent-assets/logo/room-parent-mark.svg">
+<link rel="apple-touch-icon" href="./roomparent-assets/logo/apple-touch-icon.png">
+<title>Request Access — Room Parent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:       #f4f1ea;
+    --cream-mid:   #eae6db;
+    --green:       #186338;
+    --logo-green:  #245c43;
+    --green-bold:  #1e3e2b;
+    --green-xbold: #0f2218;
+    --green-light: #e2e9e3;
+    --green-mid:   #77b691;
+    --text:        #2a2e25;
+    --text-mid:    #4d525b;
+    --text-muted:  #818898;
+    --white:       #ffffff;
+    --amber:       #c08a2d;
+    --amber-light: #fbf0d8;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body:    'Manrope', -apple-system, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  a { text-decoration: none; color: inherit; }
+  body {
+    font-family: var(--font-body);
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 20px 60px;
+  }
+
+  .brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-body); font-size: 16px; font-weight: 600; letter-spacing: -.3px; color: var(--logo-green); margin-bottom: 40px; }
+  .brand .mark { width: 38px; height: 38px; border-radius: 11px; background: var(--white); border: 1px solid rgba(30,62,43,.1); box-shadow: 0 3px 12px rgba(30,62,43,.08); padding: 4px; display: grid; place-items: center; flex-shrink: 0; }
+  .brand .mark img { width: 100%; height: 100%; display: block; object-fit: contain; }
+
+  .wrap { width: 100%; max-width: 480px; }
+
+  .eyebrow { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--green); background: var(--green-light); padding: 6px 13px; border-radius: 99px; margin-bottom: 16px; }
+
+  .card { background: var(--white); border: 1px solid var(--cream-deep, #dbd5c8); border-radius: 24px; padding: 36px 32px; box-shadow: 0 4px 24px rgba(30,62,43,.07); }
+
+  h1 { font-family: var(--font-display); font-size: 30px; font-weight: 700; color: var(--green-bold); margin: 0 0 12px; letter-spacing: -.01em; line-height: 1.2; }
+  .intro { font-size: 14.5px; color: var(--text-mid); line-height: 1.65; margin: 0 0 28px; }
+  .intro strong { color: var(--green-bold); font-weight: 700; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+  .field label { font-size: 12.5px; font-weight: 700; color: var(--green-bold); }
+  .field input {
+    font-family: var(--font-body); font-size: 14.5px; color: var(--text); background: var(--cream);
+    border: 1.5px solid var(--cream-deep, #dbd5c8); border-radius: 11px; padding: 13px 14px; width: 100%; outline: none;
+    transition: border-color .12s, background .12s;
+  }
+  .field input:focus { border-color: var(--green-mid); background: #fff; box-shadow: 0 0 0 3px rgba(24,99,56,.08); }
+
+  .submit-btn {
+    width: 100%; background: var(--green); color: #fff; border: none; border-radius: 12px;
+    padding: 15px 18px; font-family: var(--font-body); font-weight: 700; font-size: 15px; cursor: pointer;
+    transition: background .12s, transform .12s; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .submit-btn:hover { background: var(--green-xbold); transform: translateY(-1px); }
+  .submit-btn:disabled { opacity: .55; cursor: default; transform: none; }
+
+  .fine-print { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 18px; line-height: 1.6; }
+
+  .have-access {
+    font-size: 13.5px; color: var(--text-mid); text-align: center;
+    margin: 18px 0 0; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.07);
+  }
+  .have-access a { color: var(--green); font-weight: 600; text-decoration: none; }
+  .have-access a:hover { text-decoration: underline; }
+
+  /* success state */
+  .success { display: none; text-align: center; }
+  .success.on { display: block; }
+  .success .tick { width: 60px; height: 60px; border-radius: 50%; background: var(--green-light); display: grid; place-items: center; margin: 0 auto 20px; }
+  .success .tick svg { width: 28px; height: 28px; stroke: var(--green); fill: none; stroke-width: 2.6; }
+  .success h2 { font-family: var(--font-display); font-size: 23px; font-weight: 600; color: var(--green-bold); margin: 0 0 12px; }
+  .success p { font-size: 14px; color: var(--text-mid); line-height: 1.65; margin: 0 auto 6px; max-width: 380px; }
+  .success .date-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--green); background: var(--green-light); padding: 6px 13px; border-radius: 99px; margin-top: 14px; }
+  #formCard.hidden { display: none; }
+
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); margin-top: 28px; }
+  .back-link:hover { color: var(--green); }
+</style>
+</head>
+<body>
+
+<a class="brand" href="./roomparent-com-landing-v2.html" aria-label="Room Parent home"><span class="mark" aria-hidden="true"><img src="./roomparent-assets/logo/room-parent-mark.svg" alt=""></span><span>Room Parent</span></a>
+
+<div class="wrap">
+  <div class="card" id="formCard">
+    <span class="eyebrow">Opening September 23</span>
+    <h1>Request Access</h1>
+    <p class="intro">The Room Parent portal opens to room parents on <strong>September 23</strong>. Sign up here and we'll set you up with a quick demo before it launches.</p>
+
+    <form id="raForm">
+      <div class="field">
+        <label>Full name</label>
+        <input type="text" id="fName" required placeholder="Your name">
+      </div>
+      <div class="field">
+        <label>Phone number</label>
+        <input type="tel" id="fPhone" required placeholder="(512) 555-0100">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="fEmail" required placeholder="you@email.com">
+      </div>
+      <button type="submit" class="submit-btn"><span>Request Access</span><span aria-hidden="true">→</span></button>
+    </form>
+    <p class="fine-print">No spam, just a heads-up before launch and a link to book your demo.</p>
+    <p class="have-access">Already have access? <a href="https://room-parent-portal.vercel.app">Log in to your portal</a></p>
+  </div>
+
+  <div class="card success" id="successCard">
+    <div class="tick"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+    <h2>You're on the list!</h2>
+    <p>We'll reach out to schedule your demo before launch.</p>
+    <div class="date-chip">🗓️ Portal opens September 23</div>
+    <p class="have-access">Already have access? <a href="https://room-parent-portal.vercel.app">Log in to your portal</a></p>
+  </div>
+
+  <div style="text-align:center;">
+    <a class="back-link" href="./roomparent-com-landing-v2.html">← Back to roomparent.com</a>
+  </div>
+</div>
+
+<script>
+// TODO(Mohit): prototype only — wire this to actually store the request (name/phone/email) and notify the team, e.g. via the parent database already used for consent-form.html submissions
+document.getElementById('raForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  document.getElementById('formCard').classList.add('hidden');
+  document.getElementById('successCard').classList.add('on');
+});
+</script>
+
+</body>
+</html>

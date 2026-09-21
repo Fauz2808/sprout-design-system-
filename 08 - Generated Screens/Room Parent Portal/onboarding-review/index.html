@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Sign in and onboarding — what already exists · Room Parent Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f4f1ea;--ink:#1e3e2b;--body:#4d525b;--muted:#7d715e;--green:#186338;
+    --brand-light:#e2e9e3;--brand-border:#77b691;--border:#d0dacf;
+    --amber:#b5872b;--amber-bg:#fbf1da;--amber-br:#e6cd96;
+    --serif:'Playfair Display',Georgia,serif;--sans:'Inter',-apple-system,system-ui,sans-serif}
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;padding:38px 0 70px}
+  .wrap{max-width:900px;margin:0 auto;padding:0 30px}
+  h1{font-family:var(--serif);font-size:29px;font-weight:600;color:var(--ink);margin:0 0 10px}
+  .p{font-size:14px;color:#5b5648;line-height:1.68;margin:0 0 14px}
+  .live{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--brand-border);
+    border-radius:14px;padding:14px 17px;margin-bottom:16px;flex-wrap:wrap}
+  .live b{color:var(--ink)}
+  .live a{color:var(--green);font-weight:700;text-decoration:none}
+  .live a:hover{text-decoration:underline}
+  .live .tag{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--brand-light);color:var(--green);border-radius:99px;padding:5px 11px}
+  .warn{background:var(--amber-bg);border:1px solid var(--amber-br);border-radius:14px;padding:14px 17px;
+    font-size:13.5px;line-height:1.65;color:#7a5a12;margin-bottom:26px}
+  .warn b{color:#5f4a12}
+  .warn code{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+
+  .row{display:flex;gap:34px;align-items:flex-start;overflow-x:auto;padding:14px 30px 26px}
+  .panel{flex:0 0 auto;width:440px;display:flex;flex-direction:column;gap:13px}
+  .shot{width:440px;border-radius:18px;overflow:hidden;background:#efece3;
+    box-shadow:0 0 0 1px rgba(0,0,0,.06),0 16px 40px rgba(30,62,43,.13)}
+  .shot img{display:block;width:100%}
+  .shot.wide{width:100%}
+  .cap{font-size:12.5px;line-height:1.58;color:#655f52}
+  .cap .n{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--green);background:var(--brand-light);border-radius:99px;padding:4px 10px;margin-bottom:7px}
+  .cap b{display:block;font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin-bottom:3px}
+  .cap code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#8a8375}
+  .gate{display:block;margin-top:6px;color:var(--amber);font-size:12px}
+  .band{max-width:900px;margin:30px auto 0;padding:0 30px}
+  .band h2{font-family:var(--serif);font-size:21px;color:var(--ink);margin:0 0 5px}
+  .band p{font-size:13px;color:var(--muted);margin:0;line-height:1.55;max-width:720px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>Sign in and onboarding already exist</h1>
+  <p class="p">Seven screens, all built, all in the prototype today. These are screenshots of the live
+  build, not mockups. Nothing here needs designing, only porting.</p>
+
+  <div class="live">
+    <span class="tag">Live now</span>
+    <span><b>Walk it yourself:</b>
+      <a href="https://room-parent-portal.vercel.app/">room-parent-portal.vercel.app</a></span>
+    <span style="font-size:13px;color:var(--muted)">Type any 10 digits that are not
+      <code style="font-family:ui-monospace,Menlo,monospace">(512) 555-0147</code>, then any 6 digits
+      as the code. An unknown number is what opens onboarding.</span>
+  </div>
+
+  <div class="warn">
+    <b>What the real portal does today instead.</b> On <code>cms.roomparent.com</code> the sign-in
+    screen is built, from this design, word for word. The five onboarding screens are not. After a
+    correct code, an account that is not finished gets this:
+    <i>&ldquo;Your account setup isn't complete &mdash; finish your profile in the Sprout app, then
+    sign in again.&rdquo;</i> A room parent with no Sprout app has nowhere to go from there, which is
+    the gap Tony raised on 15 Sep.
+  </div>
+</div>
+
+<div class="band">
+  <h2>The whole thing, left to right</h2>
+  <p>The green panel is identical on every screen, so it is shown once in full and cropped away after
+  that. Ids are the <code>.auth-layout</code> ids in <code>index.html</code>.</p>
+</div>
+
+<div class="row">
+  <div class="panel" style="width:880px">
+    <div class="shot wide"><img src="img/full-1.png" alt="Sign in, full screen"></div>
+    <div class="cap"><span class="n">1 &middot; auth-phone</span><b>Sign in</b>
+      The whole layout, once. Phone number only, no password anywhere in the flow. An unknown number
+      is what routes into onboarding instead of the dashboard.
+      <span class="gate">Blocks on: not exactly 10 digits.</span></div>
+  </div>
+
+  <div class="panel">
+    <div class="shot"><img src="img/card-2.png" alt="Enter your code"></div>
+    <div class="cap"><span class="n">2 &middot; auth-code</span><b>Enter your code</b>
+      Six boxes, paste-aware, backspace walks back a box. Verify stays disabled until all six are filled.
+      <span class="gate">Blocks on: fewer than 6 digits.</span></div>
+  </div>
+
+  <div class="panel">
+    <div class="shot"><img src="img/card-3.png" alt="Set up your profile"></div>
+    <div class="cap"><span class="n">3 &middot; auth-profile</span><b>Your profile</b>
+      Photo, first and last name, zip, and a Mom or Dad tile. Onboarding starts here, the moment the
+      number is not on the roster.
+      <span class="gate">Blocks on: missing name, missing zip, or no role picked.</span></div>
+  </div>
+
+  <div class="panel">
+    <div class="shot"><img src="img/card-4.png" alt="Pick activities"></div>
+    <div class="cap"><span class="n">4 &middot; auth-interests</span><b>Activities</b>
+      The real activity list from the app's own Select Activities screen, not placeholders. Capped at 10.
+      <span class="gate">Blocks on: none picked.</span></div>
+  </div>
+
+  <div class="panel">
+    <div class="shot"><img src="img/card-5.png" alt="Add your kids"></div>
+    <div class="cap"><span class="n">5 &middot; auth-kids</span><b>Your children</b>
+      Name, grade, gender, photo per child. Adding a row is not a saved thing yet, so removing one
+      asks nothing.
+      <span class="gate">Blocks on: no children added.</span></div>
+  </div>
+
+  <div class="panel">
+    <div class="shot"><img src="img/card-6.png" alt="Find your school"></div>
+    <div class="cap"><span class="n">6 &middot; auth-schools</span><b>School and grades</b>
+      Schools collapsed by default, sorted by distance from the zip given two screens ago. Grades are
+      multi-select, because one parent can have children in three of them.
+      <span class="gate">Blocks on: no school, or a school with no grade.</span></div>
+  </div>
+
+  <div class="panel">
+    <div class="shot"><img src="img/card-7.png" alt="Create your class group"></div>
+    <div class="cap"><span class="n">7 &middot; auth-classgroup</span><b>The class group</b>
+      The only screen with real logic. It checks whether a class already exists for that school and
+      grade, and if so offers to join it, with how many room parents it already has, instead of
+      letting you create a duplicate. Picking one disables the name field.
+      <span class="gate">Blocks on: no grade, or a new class with no name. This check must also exist
+      on the server.</span></div>
+  </div>
+</div>
+
+</body>
+</html>

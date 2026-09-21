@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Daily Briefing + Calendar — Figma Comment Revisions · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff; --field:#e8e2d6;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e; --green:#186338; --brand-mid:#4fa472;
+    --brand-light:#e2e9e3; --brand-border:#77b691; --border-light:#d0dacf; --border:#e6e7ea;
+    --amber:#c08a2d; --amber-light:#fbf0d8;
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:32px 40px;padding:36px 24px 60px;}
+
+  .page-title{flex:1 0 100%;text-align:center;font-family:var(--serif);font-size:15px;font-weight:600;color:#5a5347;letter-spacing:.02em;margin:0 0 4px;}
+
+  .panel{display:flex;flex-direction:column;align-items:center;gap:14px;width:393px;}
+  .panel-head{text-align:left;width:100%;}
+  .panel-head .tag{display:inline-flex;font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);background:var(--amber-light);padding:3px 9px;border-radius:99px;margin-bottom:7px;}
+  .panel-head h2{font-family:var(--serif);font-size:16px;font-weight:600;color:#23271f;margin:0 0 4px;}
+  .panel-head p{font-size:12px;color:#6a665b;margin:0;line-height:1.5;}
+
+  .device{position:relative;width:393px;height:852px;border-radius:54px;overflow:hidden;background:var(--bg);box-shadow:0 0 0 1px rgba(0,0,0,.07),0 24px 80px rgba(0,0,0,.22);display:flex;flex-direction:column;}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:20px;z-index:10;}
+  .sb{height:44px;flex-shrink:0;padding:14px 26px 0;display:flex;justify-content:space-between;font-size:15px;font-weight:600;color:var(--ink);}
+  .scroll{flex:1;overflow-y:auto;padding:0 18px 20px;}
+  .scroll::-webkit-scrollbar{display:none;}
+
+  /* ═══ DAILY BRIEFING ═══ */
+  .db-top{display:flex;align-items:center;gap:10px;padding:2px 0 12px;}
+  .db-back{width:34px;height:34px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:grid;place-items:center;flex-shrink:0;color:var(--ink);font-size:16px;}
+  .db-titlewrap{flex:1;text-align:center;}
+  .db-title{font-family:var(--serif);font-size:16.5px;font-weight:600;color:var(--ink);}
+  .db-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+  .db-sub .school{color:var(--green);font-weight:700;}
+  .db-cal-ic{width:34px;height:34px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:grid;place-items:center;flex-shrink:0;font-size:15px;}
+
+  .db-tabs{display:flex;gap:6px;background:var(--field);border-radius:12px;padding:4px;margin-bottom:18px;}
+  .db-tab{flex:1;text-align:center;padding:8px 0;border-radius:9px;font-size:12.5px;font-weight:600;color:var(--muted);}
+  .db-tab.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+
+  .db-greet{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+  .db-greet-sub{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--body);margin-bottom:16px;}
+
+  .db-weather{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--brand-border);border-radius:14px;padding:13px 15px;margin-bottom:20px;}
+  .db-weather .ic{font-size:26px;}
+  .db-weather .loc{font-size:13.5px;font-weight:700;color:var(--ink);}
+  .db-weather .desc{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.4;}
+  .db-weather .temp{margin-left:auto;font-size:12px;color:var(--muted);text-align:right;flex-shrink:0;}
+
+  .db-section{margin-bottom:18px;}
+  .db-section-t{font-size:11.5px;font-weight:700;color:var(--ink);margin-bottom:9px;display:flex;align-items:center;gap:6px;}
+  .db-bday-card{background:var(--amber-light);border:1px solid #e8d2a0;border-radius:14px;padding:12px 14px;display:flex;gap:11px;align-items:center;margin-bottom:8px;}
+  .db-bday-card .ic{font-size:22px;}
+  .db-bday-card .t{font-size:13px;font-weight:700;color:#8a6a1f;}
+  .db-bday-card .s{font-size:11.5px;color:#a08543;margin-top:1px;}
+  .db-bday-row{font-size:12.5px;color:var(--body);padding:3px 0;}
+  .db-bday-row b{color:var(--ink);}
+
+  .db-line{font-size:12.5px;color:var(--body);padding:4px 0;line-height:1.5;}
+  .db-line b{color:var(--ink);}
+  .db-line a{color:var(--green);text-decoration:underline;font-weight:600;}
+  .db-lunch-hdr{font-size:11.5px;font-weight:700;color:var(--ink);margin-bottom:9px;}
+  .db-lunch-hdr .school{color:var(--green);}
+
+  /* ═══ CALENDAR ═══ */
+  .cal-top{display:flex;align-items:center;gap:10px;padding:2px 0 10px;}
+  .cal-month{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink);flex:1;}
+  .cal-nav{display:flex;gap:8px;}
+  .cal-nav div{width:32px;height:32px;border-radius:50%;background:var(--field);display:grid;place-items:center;color:var(--ink);font-size:13px;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;margin-bottom:10px;}
+  .cal-grid .dow{font-size:11px;font-weight:700;color:var(--muted);padding-bottom:6px;}
+  .cal-grid .day{font-size:13px;color:var(--ink);padding:8px 0;border-radius:10px;position:relative;}
+  .cal-grid .day.today{background:var(--ink);color:#fff;font-weight:700;}
+  .cal-grid .day.dim{color:#c7c0af;}
+  .cal-legend{display:flex;gap:14px;font-size:10.5px;color:var(--muted);padding:6px 0 14px;border-bottom:1px solid var(--border-light);margin-bottom:14px;flex-wrap:wrap;}
+  .cal-legend span{display:inline-flex;align-items:center;gap:4px;}
+  .cal-date-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .cal-date-hdr .d{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);}
+  .cal-addnote{display:inline-flex;align-items:center;gap:5px;background:var(--green);color:#fff;font-size:12px;font-weight:700;padding:8px 14px;border-radius:99px;}
+
+  .note-card{background:var(--card);border-left:3px solid var(--green);border-radius:10px;padding:11px 13px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+  .note-card.type-special{border-left-color:var(--amber);}
+  .note-card.type-noschool{border-left-color:#b23b3b;}
+  .note-card.type-todo{border-left-color:#3d7a40;}
+  .note-card.type-lunch{border-left-color:#c9691f;}
+  .note-t{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+  .note-b{font-size:12px;color:var(--body);line-height:1.5;}
+  .note-b b{color:var(--ink);}
+  .note-list{margin:4px 0 0;padding-left:0;list-style:none;font-size:12px;color:var(--body);}
+  .note-list li{padding:1px 0;}
+  .note-by{font-size:10.5px;color:var(--muted);text-align:right;margin-top:6px;}
+
+  .callout{background:var(--brand-light);border:1px dashed var(--brand-border);border-radius:10px;padding:9px 11px;font-size:11px;color:var(--green);margin-top:10px;line-height:1.5;}
+
+  /* ═══ CALENDAR — chronological upcoming list (Panel 4) ═══ */
+  .day.has-note{position:relative;}
+  .day.has-note::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#8a6a4a;}
+  .cal-list-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .cal-list-hdr .d{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);}
+  .cal-day-group{margin-bottom:14px;}
+  .cal-day-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px;}
+  .up-row{background:var(--card);border-left:3px solid var(--border-light);border-radius:9px;padding:9px 12px;margin-bottom:6px;box-shadow:0 1px 3px rgba(0,0,0,.03);}
+  .up-row.type-special{border-left-color:var(--amber);}
+  .up-row.type-noschool{border-left-color:#b23b3b;}
+  .up-row.type-todo{border-left-color:#3d7a40;}
+  .up-row.type-lunch{border-left-color:#c9691f;}
+  .up-row.type-event{border-left-color:var(--green);}
+  .up-t{font-size:12.5px;font-weight:700;color:var(--ink);}
+  .up-s{font-size:11px;color:var(--muted);margin-top:2px;}
+</style>
+</head>
+<body>
+
+<div class="page-title">Daily Briefing + Calendar — Figma Comment Revisions</div>
+
+<!-- ═══ PANEL 1 — DAILY BRIEFING ═══ -->
+<div class="panel">
+  <div class="panel-head">
+    <span class="tag">Daily Briefing</span>
+    <h2>School name added to the header</h2>
+    <p>Tony's Figma comment: "Maybe put the school name here." The Lunch section already said "(Kiker Elementary)" — the header up top had no school context at all, so it's added there now, next to the timestamp.</p>
+  </div>
+  <div class="device">
+    <div class="island"></div>
+    <div class="sb"><span>9:41</span><span>🔋</span></div>
+    <div class="scroll">
+      <div class="db-top">
+        <div class="db-back">‹</div>
+        <div class="db-titlewrap">
+          <div class="db-title">Sprout AI</div>
+          <div class="db-sub"><span class="school">Kiker Elementary</span> · 7:31 AM</div>
+        </div>
+        <div class="db-cal-ic">📅</div>
+      </div>
+      <div class="db-tabs">
+        <div class="db-tab on">Today · Wed</div>
+        <div class="db-tab">Tomorrow · Thu</div>
+      </div>
+      <div class="db-greet">Good morning, James.</div>
+      <div class="db-greet-sub">Here's your Wednesday:</div>
+
+      <div class="db-weather">
+        <div class="ic">☀️</div>
+        <div>
+          <div class="loc">Austin, TX · Sunny</div>
+          <div class="desc">T-shirt by afternoon — light jacket this morning</div>
+        </div>
+        <div class="temp">68-86°</div>
+      </div>
+
+      <div class="db-section">
+        <div class="db-section-t">🎂 Birthdays</div>
+        <div class="db-bday-card">
+          <div class="ic">🎈</div>
+          <div><div class="t">Kennedy turns 4 today!</div><div class="s">Say happy birthday at drop-off 👏</div></div>
+        </div>
+        <div class="db-bday-row"><b>Presley (6)</b> — June 6th</div>
+        <div class="db-bday-row"><b>Rome (1)</b> — June 7th</div>
+      </div>
+
+      <div class="db-section">
+        <div class="db-section-t">🎪 Happening today</div>
+        <div class="db-line"><b>8:30 am</b> Talent Show · Kindergarten</div>
+        <div class="db-line"><b>3:30 pm</b> Soccer practice · Little Shots</div>
+        <div class="db-line"><b>6:00 pm</b> Parent-teacher night · 1st Grade</div>
+      </div>
+
+      <div class="db-section">
+        <div class="db-lunch-hdr">🍔 Today's Lunch – (<span class="school">Kiker Elementary</span>)</div>
+        <div class="db-line">1. Hamburger 🍔🍟</div>
+        <div class="db-line">2. Rebellyous Burger 🍔</div>
+        <div class="db-line">3. SunButter & Jelly Sandwich 🥪🍇</div>
+      </div>
+
+      <div class="db-section">
+        <div class="db-section-t">📌 Reminders</div>
+        <div class="db-line"><b>Little Shots:</b> 🥅 Jake has soccer at field 2 today</div>
+        <div class="db-line"><b>Kindergarten:</b> 🚫 No School</div>
+        <div class="db-line"><b>First Grade:</b> 🍕 Pizza day</div>
+      </div>
+
+      <div class="db-section">
+        <div class="db-section-t">✅ To Do</div>
+        <div class="db-line"><b>1st Grade:</b> Sign Jake's permission <a href="#">slip here</a></div>
+        <div class="db-line"><b>Kindergarten:</b> Confirm snacks for parent-teacher night</div>
+        <div class="db-line"><a href="#">RSVP surfing at second point</a> (expires today)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PANEL 2 — CALENDAR ═══ -->
+<div class="panel">
+  <div class="panel-head">
+    <span class="tag">Calendar</span>
+    <h2>Every note type now carries a leading emoji</h2>
+    <p>Tony's comment: "I would put the emojis in this as well" — pinned on the whole Calendar frame. The two note types visible that day (Special, Lunch) already had one; this extends the same treatment to No School and To-Do so all 5 note types are consistent. Flagging: the exact target wasn't pinpointable from the comment alone since visible cards already had emoji — confirm this is what you meant.</p>
+  </div>
+  <div class="device">
+    <div class="island"></div>
+    <div class="sb"><span>9:41</span><span>🔋</span></div>
+    <div class="scroll">
+      <div class="cal-top">
+        <div class="cal-month">May 2026</div>
+        <div class="cal-nav"><div>‹</div><div>›</div></div>
+      </div>
+      <div class="cal-grid">
+        <div class="dow">S</div><div class="dow">M</div><div class="dow">T</div><div class="dow">W</div><div class="dow">T</div><div class="dow">F</div><div class="dow">S</div>
+        <div class="day dim">10</div><div class="day dim">11</div><div class="day dim">12</div><div class="day today">13</div><div class="day">14</div><div class="day">15</div><div class="day">16</div>
+      </div>
+      <div class="cal-legend">
+        <span>🟢 Today</span><span>🚫 No school</span><span>🟤 Has notes</span>
+      </div>
+      <div class="cal-date-hdr"><div class="d">Wednesday, May 13</div><div class="cal-addnote">+ Add Note</div></div>
+
+      <div class="note-card type-special">
+        <div class="note-t">📝 Art Exhibition</div>
+        <div class="note-b">Explore stunning artworks from local artists! Open from 11 AM to 6 PM.</div>
+        <div class="note-by">By: James Martin</div>
+      </div>
+      <div class="note-card type-lunch">
+        <div class="note-t">🍔 Today's Lunch:</div>
+        <div class="note-b"><b>Breakfast:</b></div>
+        <ul class="note-list"><li>Potato, Egg 🥔 & Cheese Taco 🧀</li></ul>
+        <div class="note-b" style="margin-top:6px;"><b>Lunch:</b></div>
+        <ul class="note-list">
+          <li>Hamburger 🍔🍟</li>
+          <li>Rebellyous Burger 🍔</li>
+          <li>SunButter & Jelly Sandwich 🥪🍇</li>
+        </ul>
+        <div class="note-by">By: Mohit Rai</div>
+      </div>
+      <div class="note-card type-noschool">
+        <div class="note-t">🚫 No School — Staff Development Day</div>
+        <div class="note-b">Kindergarten campus closed. Regular classes resume Thursday.</div>
+        <div class="note-by">By: Veronica Taylor</div>
+      </div>
+      <div class="note-card type-todo">
+        <div class="note-t">✅ Field Trip Permission Slip</div>
+        <div class="note-b">Due back by Friday — sign and return with your child.</div>
+        <div class="note-by">By: Veronica Taylor</div>
+      </div>
+
+      <div class="callout">Added: 🚫 for No School and ✅ for To-Do — the two types that didn't have a leading emoji yet. Event/Special (📝) and Lunch (🍔) were already consistent.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PANEL 3 — DAILY BRIEFING, UPCOMING EVENTS ═══ -->
+<div class="panel">
+  <div class="panel-head">
+    <span class="tag">Daily Briefing</span>
+    <h2>New section: Upcoming Events (next 7 days)</h2>
+    <p>Tony's request (2026-09-02 Room Parent planning call, not a Figma comment): "I want to add 'Upcoming Events' in the daily brief that shows any events or things in your calendar that are coming up in the next 7 days." Added as its own section between "Happening today" and "Today's Lunch" — "Happening today" stays scoped to just today, this new section is the forward-looking window.</p>
+  </div>
+  <div class="device">
+    <div class="island"></div>
+    <div class="sb"><span>9:41</span><span>🔋</span></div>
+    <div class="scroll">
+      <div class="db-top">
+        <div class="db-back">‹</div>
+        <div class="db-titlewrap">
+          <div class="db-title">Sprout AI</div>
+          <div class="db-sub"><span class="school">Kiker Elementary</span> · 7:31 AM</div>
+        </div>
+        <div class="db-cal-ic">📅</div>
+      </div>
+      <div class="db-tabs">
+        <div class="db-tab on">Today · Wed</div>
+        <div class="db-tab">Tomorrow · Thu</div>
+      </div>
+      <div class="db-greet">Good morning, James.</div>
+      <div class="db-greet-sub">Here's your Wednesday:</div>
+
+      <div class="db-weather">
+        <div class="ic">☀️</div>
+        <div>
+          <div class="loc">Austin, TX · Sunny</div>
+          <div class="desc">T-shirt by afternoon — light jacket this morning</div>
+        </div>
+        <div class="temp">68-86°</div>
+      </div>
+
+      <div class="db-section">
+        <div class="db-section-t">🎂 Birthdays</div>
+        <div class="db-bday-card">
+          <div class="ic">🎈</div>
+          <div><div class="t">Kennedy turns 4 today!</div><div class="s">Say happy birthday at drop-off 👏</div></div>
+        </div>
+        <div class="db-bday-row"><b>Presley (6)</b> — June 6th</div>
+        <div class="db-bday-row"><b>Rome (1)</b> — June 7th</div>
+      </div>
+
+      <div class="db-section">
+        <div class="db-section-t">🎪 Happening today</div>
+        <div class="db-line"><b>8:30 am</b> Talent Show · Kindergarten</div>
+        <div class="db-line"><b>3:30 pm</b> Soccer practice · Little Shots</div>
+        <div class="db-line"><b>6:00 pm</b> Parent-teacher night · 1st Grade</div>
+      </div>
+
+      <div class="db-section">
+        <div class="db-section-t">📅 Upcoming this week</div>
+        <div class="db-line"><b>Fri, May 15</b> Field Day · 3rd Grade</div>
+        <div class="db-line"><b>Mon, May 18</b> Book Fair begins · All Grades</div>
+        <div class="db-line"><b>Tue, May 19</b> Spring Concert · Kindergarten</div>
+        <div class="db-line"><b>Wed, May 20</b> Last day to order yearbooks</div>
+      </div>
+
+      <div class="db-section">
+        <div class="db-lunch-hdr">🍔 Today's Lunch – (<span class="school">Kiker Elementary</span>)</div>
+        <div class="db-line">1. Hamburger 🍔🍟</div>
+        <div class="db-line">2. Rebellyous Burger 🍔</div>
+        <div class="db-line">3. SunButter & Jelly Sandwich 🥪🍇</div>
+      </div>
+
+      <div class="db-section">
+        <div class="db-section-t">📌 Reminders</div>
+        <div class="db-line"><b>Little Shots:</b> 🥅 Jake has soccer at field 2 today</div>
+        <div class="db-line"><b>Kindergarten:</b> 🚫 No School</div>
+        <div class="db-line"><b>First Grade:</b> 🍕 Pizza day</div>
+      </div>
+
+      <div class="db-section">
+        <div class="db-section-t">✅ To Do</div>
+        <div class="db-line"><b>1st Grade:</b> Sign Jake's permission <a href="#">slip here</a></div>
+        <div class="db-line"><b>Kindergarten:</b> Confirm snacks for parent-teacher night</div>
+        <div class="db-line"><a href="#">RSVP surfing at second point</a> (expires today)</div>
+      </div>
+
+      <div class="callout">Added: "Upcoming this week" — pulled from the same linked calendar as the Calendar tab, windowed to the next 7 days from today. Placed right after "Happening today" so the two read as today → this week, then the day's lunch/reminders/to-dos follow below as before.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PANEL 4 — CALENDAR, CHRONOLOGICAL UPCOMING LIST (not one day) ═══ -->
+<div class="panel">
+  <div class="panel-head">
+    <span class="tag">Calendar</span>
+    <h2>Tapping the 📅 icon now opens an Upcoming list, not one day</h2>
+    <p>Ahmad's request (2026-09-02, on behalf of Tony): "I want to adjust this calendar UI to list out all the upcoming events I have for Ms. Taylor's class instead of just showing what's happening today. That way when I click the calendar icon, I'll know all the upcoming things in chronological order. I still need the calendar UI in case I want to add a note, but I don't want to just display things that are happening for one day anymore." The month grid and "+ Add Note" stay — tap any date to add a note there. What changes is what shows below: instead of Panel 2's single selected day, every upcoming note and event across every date is listed here, grouped by day, in order.</p>
+  </div>
+  <div class="device">
+    <div class="island"></div>
+    <div class="sb"><span>9:41</span><span>🔋</span></div>
+    <div class="scroll">
+      <div class="cal-top">
+        <div class="cal-month">May 2026</div>
+        <div class="cal-nav"><div>‹</div><div>›</div></div>
+      </div>
+      <div class="cal-grid">
+        <div class="dow">S</div><div class="dow">M</div><div class="dow">T</div><div class="dow">W</div><div class="dow">T</div><div class="dow">F</div><div class="dow">S</div>
+        <div class="day dim">10</div><div class="day dim">11</div><div class="day dim">12</div><div class="day today has-note">13</div><div class="day">14</div><div class="day has-note">15</div><div class="day">16</div>
+      </div>
+      <div class="cal-legend">
+        <span>🟢 Today</span><span>🚫 No school</span><span>🟤 Has notes</span>
+      </div>
+
+      <div class="cal-list-hdr">
+        <div class="d">Upcoming</div>
+        <div class="cal-addnote">+ Add Note</div>
+      </div>
+
+      <div class="cal-day-group">
+        <div class="cal-day-label">Today · Wed, May 13</div>
+        <div class="up-row type-special"><div class="up-t">📝 Art Exhibition</div><div class="up-s">11 AM – 6 PM</div></div>
+        <div class="up-row type-lunch"><div class="up-t">🍔 Today's Lunch posted</div><div class="up-s">Hamburger, Rebellyous Burger, SunButter &amp; Jelly</div></div>
+        <div class="up-row type-noschool"><div class="up-t">🚫 No School — Staff Development Day</div><div class="up-s">Kindergarten campus closed</div></div>
+        <div class="up-row type-todo"><div class="up-t">✅ Field Trip Permission Slip</div><div class="up-s">Due back Friday</div></div>
+      </div>
+
+      <div class="cal-day-group">
+        <div class="cal-day-label">Fri, May 15</div>
+        <div class="up-row type-event"><div class="up-t">🎪 Field Day</div><div class="up-s">3rd Grade</div></div>
+      </div>
+
+      <div class="cal-day-group">
+        <div class="cal-day-label">Mon, May 18</div>
+        <div class="up-row type-event"><div class="up-t">📚 Book Fair begins</div><div class="up-s">All Grades · runs through Friday</div></div>
+      </div>
+
+      <div class="cal-day-group">
+        <div class="cal-day-label">Tue, May 19</div>
+        <div class="up-row type-event"><div class="up-t">🎵 Spring Concert</div><div class="up-s">Kindergarten · 6:00 PM</div></div>
+      </div>
+
+      <div class="cal-day-group">
+        <div class="cal-day-label">Wed, May 20</div>
+        <div class="up-row type-todo"><div class="up-t">✅ Last day to order yearbooks</div><div class="up-s">No specific time</div></div>
+      </div>
+
+      <div class="callout">Changed: the calendar icon and Calendar tab now land here by default — every upcoming note and event, in chronological order, grouped by day, same color-by-type system as Panel 2 (📝 Special, 🍔 Lunch, 🚫 No School, ✅ To-Do, plus a new 🎪 Event type for calendar items that aren't a note). The month grid is unchanged and still exists purely to add a note on a specific date — it no longer also gates what the list below shows.</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

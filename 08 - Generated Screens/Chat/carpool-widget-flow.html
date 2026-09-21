@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Carpool Widget — Full Flow · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff; --field:#e8e2d6;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e; --green:#186338; --brand-mid:#4fa472;
+    --brand-light:#e2e9e3; --brand-border:#77b691; --border-light:#d0dacf; --border:#e6e7ea;
+    --amber:#c08a2d; --amber-light:#fbf0d8;
+    --chat-bg:#f0ece1; --ts:#818898; --tt:#b3b8c1;
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:32px 40px;padding:36px 24px 80px;}
+
+  .page-title{flex:1 0 100%;text-align:center;font-family:var(--serif);font-size:15px;font-weight:600;color:#5a5347;letter-spacing:.02em;margin:0 0 4px;}
+
+  .row-label{flex:1 0 100%;text-align:left;max-width:1400px;margin:28px auto 0;padding:0 4px;}
+  .row-label .n{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;font-family:var(--serif);font-weight:700;font-size:12px;margin-right:8px;}
+  .row-label span.t{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);}
+  .row-label p{font-size:12.5px;color:var(--muted);margin:4px 0 0 30px;line-height:1.55;max-width:900px;}
+  .row-wrap{flex:1 0 100%;display:flex;gap:28px;overflow-x:auto;padding:6px 4px 10px;}
+
+  .panel{display:flex;flex-direction:column;align-items:center;gap:12px;width:340px;flex-shrink:0;}
+  .panel-head{text-align:left;width:100%;}
+  .panel-head .tag{display:inline-flex;font-family:ui-monospace,Menlo,monospace;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);background:var(--amber-light);padding:3px 9px;border-radius:99px;margin-bottom:6px;}
+  .panel-head h3{font-family:var(--serif);font-size:14px;font-weight:600;color:#23271f;margin:0;}
+
+  .device{position:relative;width:340px;height:736px;border-radius:46px;overflow:hidden;background:var(--bg);box-shadow:0 0 0 1px rgba(0,0,0,.07),0 20px 60px rgba(0,0,0,.22);display:flex;flex-direction:column;}
+  .island{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:104px;height:28px;background:#000;border-radius:16px;z-index:30;}
+  .sb{height:38px;flex-shrink:0;padding:12px 22px 0;display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:var(--ink);z-index:20;}
+
+  /* ═══ shared chat chrome (matches 14 - Chat - iOS Prototype.html) ═══ */
+  .chat-nav{background:rgba(244,241,234,.97);border-bottom:.5px solid rgba(0,0,0,.08);flex-shrink:0;}
+  .chat-nav-row{display:flex;align-items:center;padding:5px 10px;gap:6px;min-height:46px;}
+  .back-btn{display:flex;align-items:center;gap:2px;color:var(--green);font-size:14px;font-weight:500;border:none;background:none;padding:6px 4px;flex-shrink:0;}
+  .chat-nav-center{flex:1;display:flex;align-items:center;gap:8px;min-width:0;}
+  .nav-avi{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;overflow:hidden;}
+  .nav-avi.circle{border-radius:50%;}
+  .nav-text{flex:1;min-width:0;}
+  .nav-name{font-size:13.5px;font-weight:600;color:var(--body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .nav-sub{font-size:10.5px;color:var(--ts);}
+  .nav-sub.online{color:#30d158;font-weight:500;}
+
+  .msg-area{flex:1;overflow-y:auto;background:var(--chat-bg);}
+  .msg-inner{padding:10px 0 14px;display:flex;flex-direction:column;gap:1px;}
+  .date-div{display:flex;align-items:center;justify-content:center;padding:8px 0 4px;}
+  .date-div span{font-size:10.5px;font-weight:500;color:var(--ts);background:rgba(228,222,206,.9);padding:4px 12px;border-radius:99px;}
+  .mw{display:flex;align-items:flex-end;gap:5px;padding:1px 10px;flex-shrink:0;}
+  .mw.sent{flex-direction:row-reverse;}
+  .msg-avi{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-bottom:1px;}
+  .bc{display:flex;flex-direction:column;max-width:80%;}
+  .mw.sent .bc{align-items:flex-end;} .mw.recv .bc{align-items:flex-start;}
+  .sender-name{font-size:10px;font-weight:600;color:#1a7040;margin-bottom:2px;padding-left:3px;}
+  .bbl{position:relative;border-radius:16px;padding:8px 11px 6px;max-width:100%;}
+  .bbl.sent{background:var(--green);color:#fff;border-bottom-right-radius:5px;}
+  .bbl.recv{background:#eae6db;color:var(--body);border-bottom-left-radius:5px;}
+  .bbl-txt{font-size:13.5px;line-height:1.42;}
+  .bbl-meta{display:flex;align-items:center;justify-content:flex-end;gap:3px;margin-top:3px;}
+  .bbl-time{font-size:9.5px;}
+  .bbl.sent .bbl-time{color:rgba(255,255,255,.65);} .bbl.recv .bbl-time{color:var(--tt);}
+  .sys-msg{display:flex;justify-content:center;padding:10px 20px;}
+  .sys-msg span{font-size:11.5px;font-weight:600;color:var(--green);background:var(--brand-light);padding:7px 14px;border-radius:99px;text-align:center;line-height:1.4;}
+  .input-bar{background:rgba(244,241,234,.97);border-top:.5px solid rgba(0,0,0,.08);padding:7px 10px;display:flex;align-items:center;gap:7px;flex-shrink:0;}
+  .input-wrap{flex:1;background:#eae6db;border-radius:20px;padding:9px 14px;font-size:13px;color:var(--tt);}
+  .send-btn{width:32px;height:32px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+  /* ═══ carpool request card (rich message) ═══ */
+  .cp-card{background:var(--card);border-radius:18px;padding:13px;box-shadow:0 2px 10px rgba(0,0,0,.08);width:100%;}
+  .cp-card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .cp-card-hdr .avi{width:30px;height:30px;border-radius:50%;background:linear-gradient(144deg,#1e3e2b,#579a74);display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:12px;flex-shrink:0;}
+  .cp-card-hdr .who{flex:1;min-width:0;}
+  .cp-card-hdr .who .n{font-size:12.5px;font-weight:700;color:var(--ink);}
+  .cp-card-hdr .who .s{font-size:10.5px;color:var(--muted);}
+  .cp-tag{font-size:9.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--green);background:var(--brand-light);padding:3px 8px;border-radius:99px;flex-shrink:0;}
+  .cp-badges{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+  .cp-badge{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--body);background:var(--field);padding:6px 10px;border-radius:10px;}
+  .cp-area{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);margin-bottom:10px;}
+  .cp-area svg{width:13px;height:13px;stroke:var(--muted);fill:none;stroke-width:2;flex-shrink:0;}
+  .cp-offered{font-size:11px;color:var(--muted);margin:8px 0 10px;}
+  .cp-cta{width:100%;border:none;border-radius:12px;padding:12px;font-family:var(--sans);font-size:13.5px;font-weight:700;background:var(--green);color:#fff;}
+
+  /* aerial map illustration */
+  .aerial-map{position:relative;width:100%;aspect-ratio:16/10;border-radius:12px;overflow:hidden;
+    background:linear-gradient(135deg,#9db894 0%,#b9cba9 45%,#cdd9b8 100%);}
+  .aerial-map .block{position:absolute;background:rgba(255,255,255,.22);border-radius:3px;}
+  .aerial-map .road{position:absolute;background:rgba(255,250,240,.65);}
+  .aerial-map .rd1{top:36%;left:-10%;right:-10%;height:6px;transform:rotate(-6deg);}
+  .aerial-map .rd2{left:28%;top:-10%;bottom:-10%;width:6px;transform:rotate(4deg);}
+  .aerial-map .rd3{top:68%;left:-10%;right:-10%;height:4px;transform:rotate(2deg);}
+  .aerial-map .b1{width:20%;height:16%;top:8%;left:8%;}
+  .aerial-map .b2{width:16%;height:20%;top:14%;right:14%;}
+  .aerial-map .b3{width:22%;height:14%;bottom:10%;left:14%;}
+  .aerial-map .b4{width:18%;height:18%;bottom:14%;right:10%;}
+  .aerial-map .circle{position:absolute;width:46%;height:46%;top:50%;left:50%;transform:translate(-50%,-50%);
+    border:3px solid rgba(24,99,56,.9);border-radius:50%;background:rgba(24,99,56,.14);
+    box-shadow:0 0 0 8px rgba(24,99,56,.08);}
+  .aerial-map .pin{position:absolute;width:14px;height:14px;top:50%;left:50%;transform:translate(-50%,-90%);
+    background:var(--green);border-radius:50% 50% 50% 0;transform-origin:bottom right;box-shadow:0 2px 4px rgba(0,0,0,.3);}
+
+  /* ═══ live activity ═══ */
+  .la-top{padding:14px 18px 8px;}
+  .la-title{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);}
+  .la-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+  .la-map{position:relative;margin:0 18px;border-radius:16px;overflow:hidden;height:340px;
+    background:linear-gradient(135deg,#9db894 0%,#b9cba9 45%,#cdd9b8 100%);}
+  .la-map .road-h{position:absolute;left:-10%;right:-10%;height:8px;background:rgba(255,250,240,.7);}
+  .la-map .road-v{position:absolute;top:-10%;bottom:-10%;width:8px;background:rgba(255,250,240,.7);}
+  .la-route{position:absolute;border-top:3px dashed rgba(30,62,43,.55);}
+  .la-car{position:absolute;width:34px;height:34px;border-radius:50%;background:var(--green);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 14px rgba(0,0,0,.3);border:3px solid #fff;}
+  .la-pin{position:absolute;width:16px;height:16px;background:var(--ink);border-radius:50% 50% 50% 0;
+    transform:rotate(-45deg);box-shadow:0 2px 4px rgba(0,0,0,.3);}
+  .la-card{margin:-40px 16px 0;position:relative;z-index:5;background:var(--card);border-radius:18px;
+    padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.12);}
+  .la-eta{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .la-eta .num{font-family:var(--serif);font-size:32px;font-weight:700;color:var(--ink);line-height:1;}
+  .la-eta .unit{font-size:12px;color:var(--muted);font-weight:600;}
+  .la-eta .status{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--green);background:var(--brand-light);padding:6px 11px;border-radius:99px;}
+  .la-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.4s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+  .la-who{display:flex;align-items:center;gap:10px;padding-top:12px;border-top:1px solid var(--border-light);}
+  .la-who .avi{width:38px;height:38px;border-radius:50%;background:linear-gradient(144deg,#1e3e2b,#579a74);display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:14px;}
+  .la-who .n{font-size:13.5px;font-weight:700;color:var(--ink);}
+  .la-who .s{font-size:11px;color:var(--muted);margin-top:1px;}
+
+  .la-driver-card{margin:16px;background:var(--card);border-radius:20px;padding:18px;box-shadow:0 4px 20px rgba(0,0,0,.08);}
+  .la-driver-card .kid{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .la-driver-card .kid .avi{width:42px;height:42px;border-radius:50%;background:linear-gradient(144deg,#3a7ca5,#7ec8e3);display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:15px;}
+  .la-driver-card .kid .n{font-size:14px;font-weight:700;color:var(--ink);}
+  .la-driver-card .kid .s{font-size:11.5px;color:var(--muted);margin-top:1px;}
+  .la-detail-row{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border-light);font-size:12.5px;color:var(--body);}
+  .la-detail-row:last-of-type{border-bottom:none;}
+  .la-detail-row svg{width:16px;height:16px;stroke:var(--green);fill:none;stroke-width:2;flex-shrink:0;}
+  .bus-btn{width:100%;border:none;border-radius:14px;padding:16px;margin-top:16px;font-family:var(--sans);font-size:15px;font-weight:700;background:var(--green);color:#fff;box-shadow:0 6px 20px rgba(24,99,56,.3);display:flex;align-items:center;justify-content:center;gap:8px;}
+
+  .maps-overlay{position:absolute;inset:0;background:rgba(20,26,20,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:40;}
+  .maps-overlay .spin{width:34px;height:34px;border-radius:50%;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .maps-overlay .t{font-family:var(--serif);font-size:15px;font-weight:600;color:#fff;}
+
+  .live-banner{position:absolute;top:52px;left:12px;right:12px;background:#111;color:#fff;border-radius:20px;padding:10px 14px;display:flex;align-items:center;gap:10px;z-index:45;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+  .live-banner .ic{width:30px;height:30px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+  .live-banner .t{flex:1;}
+  .live-banner .t .a{font-size:12px;font-weight:700;}
+  .live-banner .t .b{font-size:10.5px;color:rgba(255,255,255,.6);margin-top:1px;}
+  .live-banner .time{font-family:var(--serif);font-size:15px;font-weight:700;}
+
+  /* ═══ AI voice assist ═══ */
+  .va-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 28px;background:#1e3e2b;height:100%;}
+  .va-eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,241,234,.55);margin-bottom:10px;}
+  .va-q{font-family:var(--serif);font-size:22px;font-weight:600;color:#f4f1ea;text-align:center;line-height:1.3;margin-bottom:30px;}
+  .va-orb{width:96px;height:96px;border-radius:50%;background:radial-gradient(circle,rgba(87,154,116,.5) 0%,rgba(87,154,116,.08) 70%);display:flex;align-items:center;justify-content:center;margin-bottom:26px;position:relative;}
+  .va-orb::before{content:'';position:absolute;inset:14px;border-radius:50%;border:1.5px solid rgba(244,241,234,.25);}
+  .va-orb .mic{width:44px;height:44px;border-radius:50%;background:#f4f1ea;display:flex;align-items:center;justify-content:center;}
+  .va-transcript{background:rgba(255,255,255,.08);border-radius:16px;padding:14px 16px;width:100%;}
+  .va-transcript .lbl{font-size:10px;font-weight:700;color:rgba(244,241,234,.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+  .va-transcript .txt{font-family:var(--serif);font-style:italic;font-size:15px;color:#f4f1ea;line-height:1.45;}
+  .va-wave{display:flex;align-items:center;gap:3px;height:22px;margin-bottom:24px;}
+  .va-wave span{width:3px;background:rgba(244,241,234,.6);border-radius:2px;animation:wv 1.1s ease-in-out infinite;}
+  @keyframes wv{0%,100%{height:5px;}50%{height:20px;}}
+
+  /* ═══ daily brief (matches calendar-daily-briefing-revisions.html) ═══ */
+  .scroll{flex:1;overflow-y:auto;padding:0 16px 20px;}
+  .db-top{display:flex;align-items:center;gap:10px;padding:2px 0 12px;}
+  .db-back{width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:grid;place-items:center;flex-shrink:0;color:var(--ink);font-size:14px;}
+  .db-titlewrap{flex:1;text-align:center;}
+  .db-title{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);}
+  .db-sub{font-size:10.5px;color:var(--muted);margin-top:1px;}
+  .db-sub .school{color:var(--green);font-weight:700;}
+  .db-cal-ic{width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:grid;place-items:center;flex-shrink:0;font-size:13px;}
+  .db-tabs{display:flex;gap:6px;background:var(--field);border-radius:12px;padding:4px;margin-bottom:16px;}
+  .db-tab{flex:1;text-align:center;padding:7px 0;border-radius:9px;font-size:11.5px;font-weight:600;color:var(--muted);}
+  .db-tab.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+  .db-greet{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+  .db-greet-sub{font-family:var(--serif);font-style:italic;font-size:12.5px;color:var(--body);margin-bottom:14px;}
+  .db-weather{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--brand-border);border-radius:14px;padding:12px 14px;margin-bottom:16px;}
+  .db-weather .ic{font-size:23px;}
+  .db-weather .loc{font-size:12.5px;font-weight:700;color:var(--ink);}
+  .db-weather .desc{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.4;}
+  .db-weather .temp{margin-left:auto;font-size:11px;color:var(--muted);text-align:right;flex-shrink:0;}
+  .db-section{margin-bottom:16px;}
+  .db-section-t{font-size:11px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .db-line{font-size:11.5px;color:var(--body);padding:3px 0;line-height:1.5;}
+  .db-line b{color:var(--ink);}
+  .db-carpool-card{background:var(--brand-light);border:1px solid var(--brand-border);border-radius:14px;padding:12px 14px;display:flex;gap:11px;align-items:center;}
+  .db-carpool-card .ic{width:36px;height:36px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+  .db-carpool-card .t{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.4;}
+  .db-carpool-card .s{font-size:11px;color:var(--green);margin-top:2px;font-weight:600;}
+</style>
+</head>
+<body>
+
+<div class="page-title">Carpool Widget — Full Flow (Tony's feedback, 08/29)</div>
+
+<!-- ═══ 1. REQUEST POSTED IN CHAT ═══ -->
+<div class="row-label"><span class="n">1</span><span class="t">Request posted in class chat</span>
+  <p>Sarah posts a carpool request into Mrs. Taylor's Class chat. It shows the day, whether it's drop-off/pick-up/both, and — for privacy — only the general area she lives in, never her exact address. The aerial map has a soft circle over the general pickup zone, not a precise pin. "Yes, I can help!" is the one action needed to respond.</p>
+</div>
+<div class="row-wrap">
+  <div class="panel">
+    <div class="panel-head"><span class="tag">Chat</span><h3>Carpool request card</h3></div>
+    <div class="device">
+      <div class="island"></div>
+      <div class="sb"><span>9:41</span><span>🔋</span></div>
+      <div class="chat-nav"><div class="chat-nav-row">
+        <button class="back-btn">‹ Chat</button>
+        <div class="chat-nav-center">
+          <div class="nav-avi" style="background:#e2e9e3;">🍀</div>
+          <div class="nav-text"><div class="nav-name">Mrs. Taylor's Class</div><div class="nav-sub">18 members · 4 online</div></div>
+        </div>
+      </div></div>
+      <div class="msg-area"><div class="msg-inner">
+        <div class="date-div"><span>Today</span></div>
+        <div class="mw recv">
+          <div class="msg-avi" style="background:#3a7ca5">SJ</div>
+          <div class="bc"><div class="sender-name">Sarah Jensen</div>
+            <div class="bbl recv"><div class="bbl-txt">Hi everyone! Anyone able to help with a carpool this week? 🙏</div><div class="bbl-meta"><span class="bbl-time">2:14 PM</span></div></div>
+          </div>
+        </div>
+        <div class="mw recv" style="padding-top:6px;align-items:flex-start;">
+          <div class="msg-avi" style="background:#3a7ca5">SJ</div>
+          <div class="bc">
+            <div class="cp-card">
+              <div class="cp-card-hdr">
+                <div class="avi">SJ</div>
+                <div class="who"><div class="n">Sarah Jensen</div><div class="s">Mia's mom</div></div>
+                <span class="cp-tag">🚗 Carpool</span>
+              </div>
+              <div class="cp-badges">
+                <span class="cp-badge">📅 Friday</span>
+                <span class="cp-badge">🔁 Drop-off &amp; Pick-up</span>
+              </div>
+              <div class="aerial-map">
+                <div class="block b1"></div><div class="block b2"></div><div class="block b3"></div><div class="block b4"></div>
+                <div class="road rd1"></div><div class="road rd2"></div><div class="road rd3"></div>
+                <div class="circle"></div>
+              </div>
+              <div class="cp-area" style="margin-top:10px;">
+                <svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                General area: Near Zilker Park
+              </div>
+              <div class="cp-offered">🙋 1 parent already offered to help</div>
+              <button class="cp-cta">✅ Yes, I can help!</button>
+            </div>
+          </div>
+        </div>
+      </div></div>
+      <div class="input-bar"><div class="input-wrap">Message</div><div class="send-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 12h16M14 6l6 6-6 6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    </div>
+  </div>
+
+  <!-- ═══ 2. CARPOOL CHAT OPENS ═══ -->
+  <div class="panel">
+    <div class="panel-head"><span class="tag">Chat</span><h3>Carpool chat opens on accept</h3></div>
+    <div class="device">
+      <div class="island"></div>
+      <div class="sb"><span>9:41</span><span>🔋</span></div>
+      <div class="chat-nav"><div class="chat-nav-row">
+        <button class="back-btn">‹ Chat</button>
+        <div class="chat-nav-center">
+          <div class="nav-avi circle" style="background:#3a7ca5;color:#fff;font-weight:700;font-size:12px;">SJ</div>
+          <div class="nav-text"><div class="nav-name">Sarah Jensen</div><div class="nav-sub online">🚗 Friday carpool</div></div>
+        </div>
+      </div></div>
+      <div class="msg-area"><div class="msg-inner">
+        <div class="sys-msg"><span>🎉 You're matched for Friday's carpool!<br>Drop-off &amp; Pick-up · Mia</span></div>
+        <div class="mw recv">
+          <div class="msg-avi" style="background:#3a7ca5">SJ</div>
+          <div class="bc"><div class="bbl recv"><div class="bbl-txt">Thank you SO much for this — you're a lifesaver 🙏</div><div class="bbl-meta"><span class="bbl-time">2:20 PM</span></div></div></div>
+        </div>
+        <div class="mw sent">
+          <div class="bc"><div class="bbl sent"><div class="bbl-txt">Of course! Happy to help. What time works for drop-off?</div><div class="bbl-meta"><span class="bbl-time">2:22 PM</span></div></div></div>
+        </div>
+        <div class="mw recv">
+          <div class="msg-avi" style="background:#3a7ca5">SJ</div>
+          <div class="bc"><div class="bbl recv"><div class="bbl-txt">8:15am would be perfect, and pick-up around 3pm 💛</div><div class="bbl-meta"><span class="bbl-time">2:23 PM</span></div></div></div>
+        </div>
+      </div></div>
+      <div class="input-bar"><div class="input-wrap">Message</div><div class="send-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 12h16M14 6l6 6-6 6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 3. LIVE ACTIVITY ═══ -->
+<div class="row-label"><span class="n">2</span><span class="t">Live activity — like Uber's "driver is close by"</span>
+  <p>Once the driver taps "On my way!", the requesting parent (Sarah) sees a live tracker: map, moving position, ETA countdown. On the driver's side, before starting there's one clear "On my way! 🚌" button — tapping it hands off to their phone's native Maps app for turn-by-turn, and flips their own live activity to "en route", shown as a compact banner.</p>
+</div>
+<div class="row-wrap">
+  <div class="panel">
+    <div class="panel-head"><span class="tag">Live Activity · Parent</span><h3>Sarah watches you arrive</h3></div>
+    <div class="device">
+      <div class="island"></div>
+      <div class="sb"><span>9:41</span><span>🔋</span></div>
+      <div class="la-top"><div class="la-title">Pickup Tracker</div><div class="la-sub">Friday · Drop-off for Mia</div></div>
+      <div class="la-map">
+        <div class="road-h" style="top:60%;left:-10%;right:-10%;transform:rotate(-5deg);"></div>
+        <div class="road-v" style="left:35%;top:-10%;bottom:-10%;transform:rotate(4deg);"></div>
+        <div class="la-route" style="top:32%;left:18%;width:150px;transform:rotate(18deg);"></div>
+        <div class="la-car" style="top:26%;left:16%;">🚗</div>
+        <div class="la-pin" style="top:58%;left:62%;"></div>
+      </div>
+      <div class="la-card">
+        <div class="la-eta">
+          <div><div class="num">8</div></div>
+          <div class="unit">min<br>away</div>
+          <span class="status"><span class="la-dot"></span> On the way</span>
+        </div>
+        <div class="la-who">
+          <div class="avi">TM</div>
+          <div><div class="n">Tony Martin</div><div class="s">Heading to your place for drop-off</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span class="tag">Live Activity · Driver</span><h3>Before you start the trip</h3></div>
+    <div class="device">
+      <div class="island"></div>
+      <div class="sb"><span>9:41</span><span>🔋</span></div>
+      <div class="la-top"><div class="la-title">Time to head out</div><div class="la-sub">Friday drop-off · 8:15 AM</div></div>
+      <div class="la-driver-card">
+        <div class="kid">
+          <div class="avi">M</div>
+          <div><div class="n">Mia Jensen</div><div class="s">Drop-off at Kiker Elementary</div></div>
+        </div>
+        <div class="la-detail-row"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Pickup: 214 Bluebonnet Ln</div>
+        <div class="la-detail-row"><svg viewBox="0 0 24 24"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg> ~12 min drive from you</div>
+        <button class="bus-btn">On my way! 🚌</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span class="tag">Live Activity · Driver</span><h3>Tap → hands off to Maps</h3></div>
+    <div class="device">
+      <div class="island"></div>
+      <div class="sb" style="color:#fff;"><span>9:41</span><span>🔋</span></div>
+      <div class="maps-overlay">
+        <div class="spin"></div>
+        <div class="t">Opening Maps…</div>
+      </div>
+      <div class="live-banner">
+        <div class="ic">🚌</div>
+        <div class="t"><div class="a">En route to Mia's pickup</div><div class="b">Started 0:12 ago</div></div>
+        <div class="time">12 min</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 4. AI VOICE ASSIST ═══ -->
+<div class="row-label"><span class="n">3</span><span class="t">Creating the request with AI Assist voice flow</span>
+  <p>Same voice-first pattern as event creation: tap the mic, say what you need, AI Assist parses it into the structured request (day + type), pulls the map from your saved home area, and hands you a ready-to-post preview.</p>
+</div>
+<div class="row-wrap">
+  <div class="panel">
+    <div class="panel-head"><span class="tag">AI Assist</span><h3>Say what you need</h3></div>
+    <div class="device" style="background:#1e3e2b;">
+      <div class="island"></div>
+      <div class="sb" style="color:#f4f1ea;"><span>9:41</span><span>🔋</span></div>
+      <div class="va-wrap">
+        <div class="va-eyebrow">AI Assist</div>
+        <div class="va-q">What do you need<br>help with today?</div>
+        <div class="va-orb"><div class="mic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="9" y="2" width="6" height="12" rx="3" fill="#1e3e2b"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="#1e3e2b" stroke-width="2" stroke-linecap="round"/></svg></div></div>
+        <div class="va-wave"><span style="height:8px"></span><span style="height:18px;animation-delay:.1s"></span><span style="height:12px;animation-delay:.2s"></span><span style="height:20px;animation-delay:.3s"></span><span style="height:9px;animation-delay:.4s"></span><span style="height:15px;animation-delay:.5s"></span></div>
+        <div class="va-transcript"><div class="lbl">Listening</div><div class="txt">"I need someone to drop off and pick up Mia this Friday…"</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span class="tag">AI Assist</span><h3>Generated &amp; ready to post</h3></div>
+    <div class="device">
+      <div class="island"></div>
+      <div class="sb"><span>9:41</span><span>🔋</span></div>
+      <div class="chat-nav"><div class="chat-nav-row">
+        <button class="back-btn">‹</button>
+        <div class="chat-nav-center"><div class="nav-text" style="text-align:center;"><div class="nav-name">Review your carpool request</div></div></div>
+      </div></div>
+      <div class="scroll" style="padding-top:16px;">
+        <div class="cp-card" style="box-shadow:0 2px 14px rgba(0,0,0,.06);border:1px solid var(--border-light);">
+          <div class="cp-card-hdr">
+            <div class="avi">SJ</div>
+            <div class="who"><div class="n">Sarah Jensen</div><div class="s">Mia's mom</div></div>
+            <span class="cp-tag">🚗 Carpool</span>
+          </div>
+          <div class="cp-badges">
+            <span class="cp-badge">📅 Friday</span>
+            <span class="cp-badge">🔁 Drop-off &amp; Pick-up</span>
+          </div>
+          <div class="aerial-map">
+            <div class="block b1"></div><div class="block b2"></div><div class="block b3"></div><div class="block b4"></div>
+            <div class="road rd1"></div><div class="road rd2"></div><div class="road rd3"></div>
+            <div class="circle"></div>
+          </div>
+          <div class="cp-area" style="margin-top:10px;">
+            <svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            General area: Near Zilker Park
+          </div>
+          <div class="cp-offered" style="color:var(--green);font-weight:600;">✨ Generated from your voice request — edit anything before posting.</div>
+        </div>
+      </div>
+      <div class="input-bar" style="justify-content:center;"><button class="cp-cta" style="width:auto;padding:12px 28px;">Post to Mrs. Taylor's Class</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 5. DAILY BRIEF ═══ -->
+<div class="row-label"><span class="n">4</span><span class="t">Shows up in the Daily Brief</span>
+  <p>Same "Good morning" AI daily brief James already sees — a new Carpool section slots in right after "Happening today" so it reads as part of the day's logistics, not a separate feature to remember to check.</p>
+</div>
+<div class="row-wrap">
+  <div class="panel">
+    <div class="panel-head"><span class="tag">Daily Briefing</span><h3>New Carpool section</h3></div>
+    <div class="device">
+      <div class="island"></div>
+      <div class="sb"><span>9:41</span><span>🔋</span></div>
+      <div class="scroll">
+        <div class="db-top">
+          <div class="db-back">‹</div>
+          <div class="db-titlewrap"><div class="db-title">Sprout AI</div><div class="db-sub"><span class="school">Kiker Elementary</span> · 7:31 AM</div></div>
+          <div class="db-cal-ic">📅</div>
+        </div>
+        <div class="db-tabs"><div class="db-tab on">Today · Fri</div><div class="db-tab">Tomorrow · Sat</div></div>
+        <div class="db-greet">Good morning, Tony.</div>
+        <div class="db-greet-sub">Here's your Friday:</div>
+        <div class="db-weather">
+          <div class="ic">☀️</div>
+          <div><div class="loc">Austin, TX · Sunny</div><div class="desc">T-shirt weather all day</div></div>
+          <div class="temp">70-88°</div>
+        </div>
+        <div class="db-section">
+          <div class="db-section-t">🎪 Happening today</div>
+          <div class="db-line"><b>8:15 am</b> Carpool drop-off · Mia (Sarah's kid)</div>
+          <div class="db-line"><b>3:00 pm</b> Carpool pick-up · Mia (Sarah's kid)</div>
+        </div>
+        <div class="db-section">
+          <div class="db-section-t">🚗 Carpool</div>
+          <div class="db-carpool-card">
+            <div class="ic">🚌</div>
+            <div><div class="t">You're covering drop-off &amp; pick-up for Mia today</div><div class="s">Tap for pickup details →</div></div>
+          </div>
+        </div>
+        <div class="db-section">
+          <div class="db-section-t">🍔 Today's Lunch – (<span class="school">Kiker Elementary</span>)</div>
+          <div class="db-line">1. Pizza Day 🍕</div>
+          <div class="db-line">2. Gluten-Free Pizza</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

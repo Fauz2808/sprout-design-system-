@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Compose Email — mobile (Direction B, full)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f1ea; --surface:#ffffff; --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+  --green:#186338; --green-mid:#4fa472; --green-light:#e2e9e3; --green-border:#77b691;
+  --border:#e6e0d2; --amber:#c08a2d; --amber-bg:#fbf0d8;
+  --red:#a83f34; --red-bg:#fbe4e0; --blue:#2f6690; --blue-bg:#e3edf5;
+  --serif:'Playfair Display',Georgia,serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--bg);font-family:var(--sans);color:var(--body);
+  -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;overflow:hidden;position:relative}
+
+.topbar{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:10px 14px;
+  background:var(--bg);border-bottom:1px solid var(--border)}
+.ctx{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:7px 12px 7px 8px;flex:1;min-width:0}
+.ctx-mark{width:30px;height:30px;border-radius:9px;background:var(--green-light);display:grid;place-items:center;flex-shrink:0}
+.ctx-mark svg{width:17px;height:17px;stroke:var(--green);fill:none;stroke-width:1.8}
+.ctx .nm{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink);display:block;line-height:1.2}
+.ctx .sb{font-size:10.5px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  font-size:11px;font-weight:700;color:#fff;flex-shrink:0;background:linear-gradient(145deg,#1e3e2b,#4fa472)}
+.avatar.sm{width:22px;height:22px;font-size:8.5px}
+
+.scroll{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;padding:18px 14px;scroll-behavior:smooth}
+h1.screen{font-family:var(--serif);font-size:24px;font-weight:700;color:var(--ink);margin:0 0 5px}
+p.screen-sub{font-size:13px;line-height:1.5;margin:0 0 16px}
+
+.tabbar{flex:0 0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;
+  padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:rgba(18,63,41,.96)}
+.tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:6px 4px;
+  border-radius:14px;color:rgba(255,255,255,.62);font-size:10.5px;font-weight:600;min-height:52px}
+.tab.on{color:#fff;background:rgba(255,255,255,.12)}
+.tab svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.blocks{display:flex;flex-direction:column;gap:10px}
+.block{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:visible}
+.block.open{border-color:var(--green-border)}
+.bhead{display:flex;align-items:center;gap:12px;padding:15px 16px;cursor:pointer;user-select:none}
+.bicon{width:34px;height:34px;border-radius:11px;background:var(--green-light);display:grid;place-items:center;flex-shrink:0}
+.bicon svg{width:17px;height:17px;stroke:var(--green);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.btext{flex:1;min-width:0}
+.btext b{display:block;font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.3}
+.btext span{display:block;font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chev{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0;transition:transform .18s}
+.block.open .chev{transform:rotate(90deg)}
+.bbody{padding:4px 16px 16px;border-top:1px solid #f2efe6}
+
+.chip{display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;padding:4px 9px;
+  border-radius:999px;background:var(--green-light);color:var(--green);white-space:nowrap}
+.chip.warn{background:var(--amber-bg);color:var(--amber)}
+.chip.grey{background:#f0ece2;color:var(--muted)}
+.chip.blue{background:var(--blue-bg);color:var(--blue)}
+
+/* ── fields ──
+   Required is stated once, quietly, on the label. The red only appears after
+   someone has actually left a required field empty, never before. */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;scroll-margin-top:12px}
+.field:last-child{margin-bottom:0}
+.field .lab{display:flex;align-items:baseline;gap:7px}
+.field label{font-size:11px;font-weight:700;color:#626d65;text-transform:uppercase;letter-spacing:.06em}
+.req{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--amber)}
+.opt{font-size:9.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#a79c88}
+.why{font-size:11px;line-height:1.45;color:var(--muted)}
+input[type=text],input[type=date],textarea{font-family:var(--sans);font-size:14px;color:var(--ink);
+  background:var(--surface);border:1.5px solid #ddd8cc;border-radius:11px;padding:11px 13px;min-height:44px;width:100%}
+input:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 4px rgba(24,99,56,.09)}
+textarea{line-height:1.6;resize:vertical;min-height:230px;font-size:13.5px}
+.field.bad input{border-color:#d98b7c;background:#fffaf9}
+.err{display:none;font-size:11.5px;font-weight:600;color:var(--red);line-height:1.4}
+.field.bad .err{display:block}
+@keyframes flash{0%,100%{box-shadow:0 0 0 0 rgba(168,63,52,0)}30%{box-shadow:0 0 0 5px rgba(168,63,52,.22)}}
+.field.flash input{animation:flash .9s ease}
+
+.picker{position:relative}
+.picker>button{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--surface);
+  border:1.5px solid #ddd8cc;border-radius:11px;padding:10px 13px;min-height:44px;cursor:pointer;text-align:left}
+.picker>button svg{width:15px;height:15px;stroke:var(--muted);fill:none;stroke-width:2;flex-shrink:0}
+.pmenu{position:absolute;z-index:20;top:calc(100% + 5px);left:0;right:0;background:#fff;
+  border:1px solid var(--border);border-radius:13px;box-shadow:0 14px 34px rgba(30,62,43,.16);
+  max-height:250px;overflow:auto;padding:5px}
+.pmenu div{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;font-size:13.5px;color:var(--ink)}
+.pmenu div:active,.pmenu div:hover{background:var(--green-light)}
+
+.pick{display:flex;align-items:flex-start;gap:11px;padding:12px 0;border-bottom:1px solid #f0ece0;cursor:pointer}
+.pick:last-child{border-bottom:none}
+.box{width:21px;height:21px;border-radius:6px;border:1.6px solid var(--border);background:#fff;flex-shrink:0;
+  display:grid;place-items:center;margin-top:1px}
+.box.round{border-radius:50%}
+.box svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:3.2;opacity:0}
+.pick.on .box{background:var(--green);border-color:var(--green)}
+.pick.on .box svg{opacity:1}
+.pick.on .box.round{background:#fff;border-color:var(--green);box-shadow:inset 0 0 0 4.5px var(--green)}
+.pick .grow{flex:1;min-width:0}
+.pick .t{font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.35;display:block}
+.pick .m{font-size:11.5px;color:var(--muted);margin-top:2px;display:block}
+
+.btn{font-family:var(--sans);font-weight:700;border:none;border-radius:11px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 16px;
+  font-size:12.5px;min-height:42px;transition:background .12s,opacity .12s}
+.btn-primary{background:var(--green);color:#fff;box-shadow:0 7px 16px rgba(24,99,56,.14)}
+.btn-primary:disabled{opacity:.42;cursor:default;box-shadow:none}
+.btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--border)}
+.btn-full{width:100%}
+
+.dock{flex:0 0 auto;display:flex;gap:10px;align-items:center;padding:11px 14px;
+  background:rgba(244,241,234,.95);border-top:1px solid var(--border);backdrop-filter:blur(12px)}
+.dock .sum{flex:1;min-width:0;font-size:11px;color:var(--muted);line-height:1.35}
+.dock .sum b{color:var(--ink);display:block;font-size:12.5px}
+.dock .sum b.warn{color:var(--amber);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+
+.mail{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;font-size:13.5px;line-height:1.65}
+.mail h4{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0 0 4px;line-height:1.3}
+.mail .meta{font-size:11px;color:var(--muted);margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #f0ece0}
+.mail p{margin:0 0 11px;white-space:pre-wrap}
+.mail .blk{margin:14px 0;padding:12px 14px;background:#f8f6f0;border-radius:11px}
+.mail .blk b{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:7px}
+.mail .blk div{font-size:12.5px;color:var(--ink);padding:3px 0}
+.gap{color:var(--red);background:var(--red-bg);border-radius:4px;padding:1px 5px;font-weight:600;font-size:12.5px}
+
+.sheet-wrap{position:absolute;inset:0;z-index:60;display:flex;align-items:flex-end;
+  background:rgba(8,25,15,.5);opacity:0;visibility:hidden;transition:opacity .18s}
+.sheet-wrap.open{opacity:1;visibility:visible}
+.sheet{width:100%;max-height:90%;display:flex;flex-direction:column;background:var(--bg);
+  border-radius:20px 20px 0 0;transform:translateY(100%);transition:transform .24s cubic-bezier(.2,.8,.25,1)}
+.sheet-wrap.open .sheet{transform:none}
+.sheet-head{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:14px 16px 11px;border-bottom:1px solid var(--border)}
+.sheet-head h3{font-family:var(--serif);font-size:18px;color:var(--ink);margin:0}
+.sheet-body{flex:1 1 auto;overflow-y:auto;padding:15px 16px}
+.sheet-foot{flex:0 0 auto;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--border);display:flex;gap:9px}
+.sheet-foot .btn{flex:1}
+.x{appearance:none;border:1px solid var(--border);background:var(--surface);width:34px;height:34px;
+  border-radius:50%;display:grid;place-items:center;cursor:pointer;flex-shrink:0}
+.x svg{width:15px;height:15px;stroke:var(--ink);fill:none;stroke-width:2;stroke-linecap:round}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px 16px;margin-top:13px}
+.card h3{font-family:var(--serif);font-size:16px;color:var(--ink);margin:0 0 10px}
+.note{font-size:11.5px;line-height:1.55;color:var(--muted);background:#f8f6f0;
+  border:1px dashed var(--border);border-radius:11px;padding:10px 12px;margin-bottom:13px}
+.note.warn{background:var(--amber-bg);border-color:#ecd9ae;border-style:solid;color:#7a5712}
+.note b{color:inherit}
+
+.toast{position:absolute;left:50%;bottom:86px;transform:translate(-50%,14px);z-index:90;
+  background:var(--ink);color:#fff;font-size:12.5px;font-weight:600;padding:11px 17px;border-radius:12px;
+  box-shadow:0 12px 28px rgba(0,0,0,.2);opacity:0;visibility:hidden;transition:opacity .2s,transform .2s;
+  max-width:88%;text-align:center;line-height:1.4}
+.toast.on{opacity:1;visibility:visible;transform:translate(-50%,0)}
+
+.done{text-align:center;padding:26px 6px 10px}
+.done .ring{width:66px;height:66px;border-radius:50%;background:var(--green-light);margin:0 auto 16px;display:grid;place-items:center}
+.done .ring svg{width:31px;height:31px;stroke:var(--green);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.done h3{font-family:var(--serif);font-size:21px;color:var(--ink);margin:0 0 7px}
+.done p{font-size:13px;line-height:1.55;margin:0}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   Direction B — Compose Email on mobile.
+
+   Three things changed after Ahmad tested the first build:
+
+   1. Moving between inputs no longer rebuilds the DOM. Field edits call
+      refreshStatus(), which rewrites four small nodes. The full render()
+      is reserved for structural change and now restores scroll position
+      and focus, so even that no longer throws you back to the top.
+
+   2. The red "N still needed" block is gone. Required is stated once per
+      field, in the label, with a line saying why. Red appears only after
+      someone leaves a required field empty, not before they start.
+
+   3. Required is derived, not declared. A template field is required
+      because its [token] is still in the message. Delete the line and the
+      field stops being required. The teacher's email is required only when
+      the chosen recipients include the teacher, because it is never
+      printed in the email at all — it is only an address.
+   ═══════════════════════════════════════════════════════════════════ */
+
+const PARENTS = [
+  {id:'lm', name:'Lydia Martin',  email:'lydia.martin@gmail.com', initials:'LM', onSprout:true,  roomParent:true},
+  {id:'tm', name:'Tony Martin',   email:'tony.martin@gmail.com',  initials:'TM', onSprout:true,  roomParent:true},
+  {id:'sj', name:'Sarah Jensen',  email:'sarahjensen@gmail.com',  initials:'SJ', onSprout:true,  roomParent:false},
+  {id:'mc', name:'Mike Cherches', email:'',                       initials:'MC', onSprout:true,  roomParent:false},
+  {id:'ks', name:'Kate Skiff',    email:'kate.skiff@outlook.com', initials:'KS', onSprout:true,  roomParent:false},
+  {id:'ar', name:'Amy Rangel',    email:'',                       initials:'AR', onSprout:true,  roomParent:false},
+  {id:'dr', name:'Diane Ruiz',    email:'',                       initials:'DR', onSprout:false, roomParent:false},
+  {id:'fo', name:'Frank Osei',    email:'frank.osei@yahoo.com',   initials:'FO', onSprout:false, roomParent:false},
+];
+
+const TPL_TOKENS = {
+  teacherName: ['[Enter Teachers Name here]', '[Enter Teacher Name Here]'],
+  rp1Name:     ['[Room Parent 1]', '[Room Parent 1 Name]'],
+  rp2Name:     ['[Room Parent 2]', '[Room Parent 2 Name]'],
+  rp1Email:    ['[Room Parent 1 Email]'],
+  rp2Email:    ['[Room Parent 2 Email]'],
+  deadline:    ['[Enter Deadline Date Here]'],
+};
+const TPL_FIELDS = ['rp1Name','rp1Email','rp2Name','rp2Email','teacherName','teacherEmail','deadline'];
+const TPL_BLOCK_FIELDS = TPL_FIELDS.filter(k => k !== 'teacherEmail');   // teacherEmail sits with the recipients
+const TPL_LABELS = {
+  rp1Name:'Room Parent 1 — Name', rp1Email:'Room Parent 1 — Email',
+  rp2Name:'Room Parent 2 — Name', rp2Email:'Room Parent 2 — Email',
+  teacherName:"Teacher's Name", teacherEmail:"Teacher's Email", deadline:'Form Deadline',
+};
+const SHORT = {rp1Name:'Room Parent 1 name', rp1Email:'Room Parent 1 email', rp2Name:'Room Parent 2 name',
+  rp2Email:'Room Parent 2 email', teacherName:"Teacher's name", teacherEmail:"Teacher's email", deadline:'Deadline'};
+const PLACEHOLDER = {rp1Name:'e.g. Tony Martin', rp1Email:'tony.martin@gmail.com', rp2Name:'e.g. Lydia Martin',
+  rp2Email:'lydia.martin@gmail.com', teacherName:'e.g. Mrs. Taylor', teacherEmail:'mstaylorclass@kiker.edu', deadline:''};
+
+const INTRO_SUBJECT = 'Introducing your room parents for the year';
+const INTRO_BODY =
+`Hello Parents,
+
+We hope your school year is off to a great start! We wanted to introduce ourselves as [Enter Teachers Name here] room parents for the year, [Room Parent 1] and [Room Parent 2]
+
+Together we will be working to support our wonderful teacher by planning and collecting funds for AISD Appreciation Days, class activities, gifts and, of course, being a point of contact for you should you need it. Thank you in advance for your time and contributions!
+
+We look forward to meeting all of you. We will be meeting with [Enter Teachers Name here] soon to make a plan for the semester regarding ways we can all help the class.
+
+For now, please fill out the attached form so that we may gather your contact information as well as have permission to contact you directly if you so choose. This form is optional. If you do not fill this form out by [Enter Deadline Date Here], we will assume you do not give us permission to contact you.
+
+Thank you so much, everyone!
+
+— The [Enter Teacher Name Here] Class Room Parents
+
+[Room Parent 1 Name]: [Room Parent 1 Email]
+[Room Parent 2 Name]: [Room Parent 2 Email]`;
+
+const EVENTS = [
+  {id:1, t:'Back to School Picnic',         d:'Sep 5 · 5:30 PM',  chip:'Invitation sent', cls:''},
+  {id:2, t:"Spirit Night at Mandola's",     d:'Sep 12',           chip:'Not sent yet',    cls:'grey'},
+  {id:3, t:"Mrs. Taylor's Class Photo Day", d:'Sep 18 · 8:30 AM', chip:'Students only',   cls:'blue'},
+  {id:4, t:'Fall Fundraiser Kickoff',       d:'Oct 2',            chip:'Not sent yet',    cls:'grey'},
+];
+
+const RECIPIENTS = [
+  {v:'all_teacher',       l:'All Families + Teacher',        m:'8 families and the teacher', teacher:true},
+  {v:'all',               l:'All Families',                  m:'8 families, no teacher'},
+  {v:'specific',          l:'Select Specific People',        m:'Choose from the roster'},
+  {v:'emailonly_teacher', l:'Email-only Families + Teacher', m:'Skips anyone already on Sprout', teacher:true},
+  {v:'teacher',           l:'Send to Teacher only',          m:'Just the teacher', teacher:true},
+];
+
+const state = {
+  template:'blank',          // a blank email is the default; the template is an option
+  tpl:{rp1Name:'', rp1Email:'', rp2Name:'', rp2Email:'', teacherName:'', teacherEmail:'', deadline:''},
+  subject:'',
+  body:'',
+  events:{1:false, 2:true, 3:false, 4:true},
+  links:[
+    {id:1, t:'Contact + Consent Form', u:'roomparent.com/kiker-1st-consent', on:true},
+    {id:2, t:'Shared Photo Album',     u:'roomparent.com/kiker-1st-photos',  on:false},
+  ],
+  recipient:'all_teacher',
+  specific:{},
+  sent:false,
+};
+
+let openBlock = null;
+let sheet = null;
+let menu = null;
+let addingLink = false;
+const touched = new Set();      // a field only turns red after you have left it
+
+/* ── derived ── */
+const usingTpl    = () => state.template === 'intro';
+const chosenEv    = () => EVENTS.filter(e => state.events[e.id]);
+const chosenLk    = () => state.links.filter(l => l.on);
+const recipient   = () => RECIPIENTS.find(r => r.v === state.recipient);
+const specificIds = () => Object.keys(state.specific).filter(id => state.specific[id]);
+const prettyDate  = v => v ? new Date(v+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric'}) : '';
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+/* A field is required because something actually needs it, not because a list
+   says so. Two sources, and both are live: the message text, and who you send to. */
+function isRequired(k){
+  if (k === 'teacherEmail') return !!recipient().teacher;
+  return (TPL_TOKENS[k] || []).some(tok => state.body.includes(tok));
+}
+function whyRequired(k){
+  if (k === 'teacherEmail') return recipient().teacher
+    ? 'Needed because the teacher is one of the recipients.'
+    : 'Only needed when you send to the teacher.';
+  if (!isRequired(k)) return 'Not used anywhere in the message right now.';
+  if (k === 'deadline')    return 'Printed in the paragraph about the form.';
+  if (k.endsWith('Email')) return 'Printed in the sign-off, so families can reply to you.';
+  return 'Printed in the body of the email.';
+}
+const requiredFields = () => TPL_FIELDS.filter(isRequired);
+const missing = () => requiredFields().filter(k => !state.tpl[k].trim());
+
+function blockers(){
+  const out = missing().map(k => ({field:k, text:`${SHORT[k]} is empty`}));
+  if (!state.subject.trim()) out.push({field:'subject', text:'Subject is empty'});
+  if (!state.body.trim()) out.push({field:'body', text:'Message is empty'});
+  if (state.recipient === 'specific' && !specificIds().length)
+    out.push({field:null, text:'No recipients selected'});
+  return out;
+}
+
+/* Seven bullet points reads like a rejection letter, and they were all in the
+   same block anyway. Say it in one sentence: how many blanks, and where. */
+function blockerSummary(){
+  const bl = blockers();
+  if (!bl.length) return null;
+  // Opening a blank email is not a mistake, so do not greet it as one.
+  if (!state.subject.trim() && !state.body.trim())
+    return {line:'Write a subject and a message, or load the Room Parent Intro template.',
+            action:'Start writing'};
+  const where = f => (f === 'subject' || f === 'body') ? 'Subject and message'
+                   : f === 'teacherEmail' ? 'Who gets this'
+                   : f ? 'Template details' : null;
+  const counts = {};
+  let needPeople = false;
+  bl.forEach(b => {
+    const w = where(b.field);
+    if (!w) { needPeople = true; return; }
+    counts[w] = (counts[w] || 0) + 1;
+  });
+  const places = Object.keys(counts);
+  const blanks = places.reduce((n, p) => n + counts[p], 0);
+
+  if (!blanks) return {line:'Pick who gets this before you send.', action:'Choose recipients'};
+
+  let line;
+  if (places.length === 1) {
+    line = blanks === 1
+      ? `One blank left to fill in, in ${places[0]}.`
+      : `${blanks} blanks left to fill in. They are all in ${places[0]}.`;
+  } else {
+    line = `${blanks} blanks left to fill in: ` +
+      places.map(p => `${counts[p]} in ${p}`).join(', ') + '.';
+  }
+  if (needPeople) line += ' You also need to pick who gets this.';
+  return {line, action: blanks === 1 ? 'Fill it in' : 'Fill them in'};
+}
+
+/* Short version for the bar at the bottom. */
+function dockLine(){
+  const bl = blockers();
+  if (!bl.length) return 'Ready to send';
+  if (!state.subject.trim() && !state.body.trim()) return 'Write your email';
+  const blanks = bl.filter(b => b.field).length;
+  if (!blanks) return 'Pick who gets this';
+  return blanks === 1 ? '1 blank left' : `${blanks} blanks left`;
+}
+
+const blockMissing = () => TPL_BLOCK_FIELDS.filter(k => isRequired(k) && !state.tpl[k].trim());
+const blockRequired = () => TPL_BLOCK_FIELDS.filter(isRequired);
+
+function tplSummary(){
+  if (!usingTpl()) return 'Optional · you are writing from scratch';
+  const m = blockMissing().length;
+  return m ? `Room Parent Intro · ${m} of ${blockRequired().length} still needed`
+           : 'Room Parent Intro · all filled in';
+}
+
+function recipientSummary(){
+  const r = recipient();
+  if (r.v === 'specific') {
+    const n = specificIds().length;
+    return n ? `${n} ${n===1?'person':'people'} selected` : 'Nobody selected yet';
+  }
+  return r.l;
+}
+
+function renderedBody(){
+  let out = esc(state.body);
+  Object.entries(TPL_TOKENS).forEach(([key, tokens]) => {
+    const raw = key === 'deadline' ? prettyDate(state.tpl[key]) : state.tpl[key];
+    tokens.forEach(tok => {
+      const re = new RegExp(tok.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+      out = out.replace(re, raw ? esc(raw) : `<span class="gap">${TPL_LABELS[key]}</span>`);
+    });
+  });
+  return out.split(/\n{2,}/).map(p => `<p>${p}</p>`).join('');
+}
+
+function mailExtras(){
+  const ev = chosenEv(), lk = chosenLk();
+  return (ev.length ? `<div class="blk"><b>Coming up</b>${ev.map(e=>`<div>${esc(e.t)} · ${e.d}</div>`).join('')}</div>` : '')
+       + (lk.length ? `<div class="blk"><b>Links</b>${lk.map(l=>`<div>${esc(l.t)} — ${esc(l.u)}</div>`).join('')}</div>` : '');
+}
+
+function mailHtml(){
+  return `<div class="mail">
+    <h4>${esc(state.subject) || '<span class="gap">No subject</span>'}</h4>
+    <div class="meta">To <span id="mailTo">${esc(recipientSummary())}</span> · from Tony Martin</div>
+    ${renderedBody()}
+    <div id="mailExtras">${mailExtras()}</div>
+  </div>`;
+}
+
+/* ═══ the fix for the jumping ═══
+   Typing and tabbing between fields must never rebuild the DOM. These four
+   nodes are the only things a field edit can change, so update just them. */
+function refreshStatus(){
+  const miss = missing(), bl = blockers(), ev = chosenEv(), lk = chosenLk();
+
+  const sum = document.getElementById('sum-tpl');
+  if (sum) sum.textContent = tplSummary();
+
+  const chip = document.getElementById('chip-tpl');
+  if (chip) {
+    const bm = blockMissing().length;
+    chip.className = 'chip' + (bm ? ' warn' : '');
+    chip.textContent = bm ? String(bm) : 'Done';
+    chip.style.display = usingTpl() ? '' : 'none';
+  }
+
+  const sw = document.getElementById('sum-write');
+  if (sw) sw.textContent = state.subject.trim() || 'No subject yet';
+
+  const se = document.getElementById('sum-events');
+  if (se) se.textContent = ev.length ? ev.map(e => e.t).join(' · ') : 'None selected';
+  const sl = document.getElementById('sum-links');
+  if (sl) sl.textContent = lk.length ? lk.map(l => l.t).join(' · ') : 'None selected';
+  const ce = document.getElementById('chip-events'); if (ce) ce.textContent = ev.length;
+  const cl = document.getElementById('chip-links');  if (cl) cl.textContent = lk.length;
+
+  // the email in the open sheet, updated in place so the sheet does not scroll
+  const to = document.getElementById('mailTo');
+  if (to) to.textContent = recipientSummary();
+  const extras = document.getElementById('mailExtras');
+  if (extras) extras.innerHTML = mailExtras();
+
+  const warn = document.getElementById('teacherWarn');
+  if (warn) warn.hidden = !recipient().teacher;
+
+  const note = document.getElementById('blockNote');
+  if (note) {
+    const sum = blockerSummary();
+    note.hidden = !sum;
+    if (sum) note.innerHTML = `${sum.line} <b style="cursor:pointer;text-decoration:underline;white-space:nowrap" onclick="jumpToFirstMissing()">${sum.action}</b>`;
+  }
+  const sendBtn = document.getElementById('sendBtn');
+  if (sendBtn) { sendBtn.disabled = bl.length > 0; sendBtn.textContent = bl.length ? 'Send' : 'Send now'; }
+
+  const main = document.getElementById('dock-main'), sub = document.getElementById('dock-sub');
+  if (main) {
+    main.className = bl.length ? 'warn' : '';
+    main.textContent = dockLine();
+    main.onclick = bl.length ? jumpToFirstMissing : null;
+  }
+  if (sub) sub.textContent =
+    `${ev.length} event${ev.length===1?'':'s'} · ${lk.length} link${lk.length===1?'':'s'} · ${recipientSummary()}`;
+
+  // per-field red, only for fields the person has already left
+  TPL_FIELDS.forEach(k => {
+    const wrap = document.getElementById('fw-' + k);
+    if (!wrap) return;
+    const bad = touched.has(k) && isRequired(k) && !state.tpl[k].trim();
+    wrap.classList.toggle('bad', bad);
+  });
+  const subj = document.getElementById('fw-subject');
+  if (subj) subj.classList.toggle('bad', touched.has('subject') && !state.subject.trim());
+  const bodyWrap = document.getElementById('fw-body');
+  if (bodyWrap) bodyWrap.classList.toggle('bad', touched.has('body') && !state.body.trim());
+}
+
+function onFieldInput(k, v){ state.tpl[k] = v; refreshStatus(); }
+function onFieldBlur(k){ touched.add(k); refreshStatus(); }
+
+/* Takes you to the first thing standing between you and Send, opens the right
+   block, scrolls it into view and flashes it. This is the reaction that
+   replaces the permanent red warning panel. */
+function jumpToFirstMissing(){
+  const bl = blockers();
+  if (!bl.length) return;
+  const first = bl.find(b => b.field) || bl[0];
+  sheet = null;
+  if (!first.field) { openBlock = null; render(); toast('Open Preview and choose who gets this'); return; }
+  // starting from nothing: just open the writing block, do not paint it red
+  if (!state.subject.trim() && !state.body.trim()) touched.delete('subject'), touched.delete('body');
+  if (first.field === 'teacherEmail') {
+    sheet = 'preview'; render();
+    requestAnimationFrame(() => {
+      const w = document.getElementById('fw-teacherEmail');
+      if (!w) return;
+      w.scrollIntoView({block:'center', behavior:'smooth'});
+      w.classList.add('flash');
+      const i = w.querySelector('input'); if (i) i.focus({preventScroll:true});
+      setTimeout(() => w.classList.remove('flash'), 950);
+    });
+    return;
+  }
+  openBlock = (first.field === 'subject' || first.field === 'body') ? 'write' : 'tpl';
+  touched.add(first.field);
+  render();
+  requestAnimationFrame(() => {
+    const wrap = document.getElementById('fw-' + first.field);
+    if (!wrap) return;
+    wrap.scrollIntoView({block:'center', behavior:'smooth'});
+    wrap.classList.add('flash');
+    const input = wrap.querySelector('input, textarea');
+    if (input) input.focus({preventScroll:true});
+    setTimeout(() => wrap.classList.remove('flash'), 950);
+  });
+}
+
+/* ── actions ── */
+function useTemplate(){
+  state.template = 'intro';
+  state.body = INTRO_BODY;
+  if (!state.subject.trim()) state.subject = INTRO_SUBJECT;
+  render();
+  toast('Template loaded. Fill in the details below.');
+}
+function clearTemplate(){
+  state.template = 'blank';
+  state.body = '';
+  render();
+}
+
+function toggleBlock(id){ openBlock = openBlock === id ? null : id; menu = null; render(); }
+
+/* ═══ nothing below rebuilds the page ═══
+   Tapping a checkbox or a radio used to run render(), which replaced every node
+   and sent both the page and the open sheet back to the top. A selection only
+   ever changes: the row you tapped, a couple of summary lines, the email
+   preview, and whether Send is live. So change exactly those. */
+function markRow(el, on){ if (el) el.classList.toggle('on', on); }
+
+function toggleEvent(id, el){
+  state.events[id] = !state.events[id];
+  markRow(el, state.events[id]);
+  refreshStatus();
+}
+function toggleLink(i, el){
+  state.links[i].on = !state.links[i].on;
+  markRow(el, state.links[i].on);
+  refreshStatus();
+}
+function setRecipient(v){
+  state.recipient = v;
+  document.querySelectorAll('.rcp').forEach(r => r.classList.toggle('on', r.dataset.v === v));
+  const sp = document.getElementById('specificWrap');
+  if (sp) sp.hidden = v !== 'specific';
+  refreshStatus();
+}
+function toggleSpecific(id, el){
+  state.specific[id] = !state.specific[id];
+  markRow(el, state.specific[id]);
+  refreshStatus();
+}
+function pickParent(slot, id){
+  const p = PARENTS.find(x => x.id === id);
+  state.tpl[slot+'Name'] = p.name;
+  state.tpl[slot+'Email'] = p.email;
+  touched.add(slot+'Name');
+  if (p.email) touched.add(slot+'Email');
+  menu = null; render();
+  toast(p.email ? `${p.name} filled in` : `${p.name} has no email on file. Type one in below.`);
+}
+function addLink(){
+  const t = document.getElementById('newLinkTitle').value.trim();
+  const u = document.getElementById('newLinkUrl').value.trim();
+  if (!t || !u) { toast('Give the link a name and a URL'); return; }
+  state.links.push({id:Date.now(), t, u, on:true});
+  addingLink = false; render(); toast('Link added');
+}
+function send(){ if (blockers().length) return; state.sent = true; sheet = 'sent'; render(); }
+
+let toastTimer;
+function toast(msg){
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg; el.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('on'), 2600);
+}
+
+/* ── markup ── */
+const CHECK = '<svg viewBox="0 0 24 24"><path d="m5 13 4 4 10-10"/></svg>';
+const ICONS = {
+  tpl:'<path d="M5 4h14v16H5z"/><path d="M9 9h6M9 13h4"/>',
+  write:'<path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3Z"/><path d="M14 6l4 4"/>',
+  cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  link:'<path d="M9 17H7a5 5 0 0 1 0-10h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8"/>',
+};
+
+function block(id, icon, title, summaryId, summary, flag, bodyFn){
+  const on = openBlock === id;
+  return `<div class="block ${on?'open':''}">
+    <div class="bhead" onclick="toggleBlock('${id}')">
+      <span class="bicon"><svg viewBox="0 0 24 24">${ICONS[icon]}</svg></span>
+      <span class="btext"><b>${title}</b><span id="${summaryId}">${summary}</span></span>
+      ${flag||''}
+      <svg class="chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+    </div>
+    ${on ? `<div class="bbody">${bodyFn()}</div>` : ''}
+  </div>`;
+}
+
+function tplField(k){
+  const req = isRequired(k);
+  const bad = touched.has(k) && req && !state.tpl[k].trim();
+  const type = k === 'deadline' ? 'date' : 'text';
+  return `<div class="field ${bad?'bad':''}" id="fw-${k}">
+    <span class="lab"><label for="f-${k}">${TPL_LABELS[k]}</label>
+      ${req ? '<span class="req">Required</span>' : '<span class="opt">Optional</span>'}</span>
+    <span class="why">${whyRequired(k)}</span>
+    <input id="f-${k}" type="${type}" value="${esc(state.tpl[k])}" placeholder="${PLACEHOLDER[k]||''}"
+      oninput="onFieldInput('${k}', this.value)" onblur="onFieldBlur('${k}')">
+    <span class="err">${SHORT[k]} is still empty.</span>
+  </div>`;
+}
+
+function parentPicker(slot){
+  const cur = state.tpl[slot+'Name'];
+  return `<div class="field"><span class="lab">
+      <label>${slot==='rp1'?'Room Parent 1':'Room Parent 2'}</label><span class="opt">Shortcut</span></span>
+    <span class="why">Picks a parent from the roster and fills the two fields below.</span>
+    <div class="picker">
+      <button type="button" onclick="event.stopPropagation(); menu = menu==='${slot}' ? null : '${slot}'; render()">
+        <span style="${cur?'':'color:var(--muted)'}">${cur ? esc(cur) : '— Pick from the roster —'}</span>
+        <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      ${menu === slot ? `<div class="pmenu">${PARENTS.map(p => `
+        <div onclick="event.stopPropagation(); pickParent('${slot}','${p.id}')">
+          <span class="avatar sm">${p.initials}</span>
+          <span style="flex:1;min-width:0">${p.name}</span>
+          ${p.email ? '' : '<span class="chip grey">no email</span>'}
+        </div>`).join('')}</div>` : ''}
+    </div></div>`;
+}
+
+function templateBody(){
+  if (!usingTpl()) return `
+    <div class="note">Blank email. Nothing is required except a subject and a message.</div>
+    <button class="btn btn-ghost btn-full" onclick="useTemplate()">Use the Room Parent Intro template</button>`;
+  return `
+    <div class="note">A field is required only while its [bracket] is still in the message.
+      Remove a line from the message and the field below stops being required.</div>
+    ${parentPicker('rp1')}${tplField('rp1Name')}${tplField('rp1Email')}
+    ${parentPicker('rp2')}${tplField('rp2Name')}${tplField('rp2Email')}
+    ${tplField('teacherName')}${tplField('deadline')}
+    <button class="btn btn-ghost btn-full" style="margin-top:14px"
+      onclick="clearTemplate()">Switch to a blank email</button>`;
+}
+
+function writeBody(){
+  const bad = touched.has('subject') && !state.subject.trim();
+  return `
+    <div class="field ${bad?'bad':''}" id="fw-subject">
+      <span class="lab"><label for="f-subject">Subject</label><span class="req">Required</span></span>
+      <input id="f-subject" type="text" value="${esc(state.subject)}"
+        oninput="state.subject=this.value; refreshStatus()" onblur="touched.add('subject'); refreshStatus()">
+      <span class="err">Subject is still empty.</span>
+    </div>
+    <div class="field ${touched.has('body') && !state.body.trim() ? 'bad' : ''}" id="fw-body">
+      <span class="lab"><label for="f-body">Message</label><span class="req">Required</span></span>
+      <span class="why">${usingTpl()
+        ? 'Anything in [brackets] fills in from the block above. Delete a line you do not need.'
+        : 'Write whatever you need. You can load the template from the block above instead.'}</span>
+      <textarea id="f-body" placeholder="Hello parents..." oninput="state.body=this.value; refreshStatus()"
+        onblur="touched.add('body'); refreshStatus()">${esc(state.body)}</textarea>
+      <span class="err">Message is still empty.</span>
+    </div>`;
+}
+
+function eventsBody(){
+  return EVENTS.map(e => `
+    <div class="pick ${state.events[e.id]?'on':''}" onclick="toggleEvent(${e.id}, this)">
+      <span class="box">${CHECK}</span>
+      <span class="grow"><span class="t">${esc(e.t)}</span><span class="m">${e.d}</span></span>
+      <span class="chip ${e.cls}">${e.chip}</span>
+    </div>`).join('');
+}
+
+function linksBody(){
+  return state.links.map((l,i) => `
+    <div class="pick ${l.on?'on':''}" onclick="toggleLink(${i}, this)">
+      <span class="box">${CHECK}</span>
+      <span class="grow"><span class="t">${esc(l.t)}</span><span class="m">${esc(l.u)}</span></span>
+    </div>`).join('')
+    + (addingLink ? `
+      <div style="padding-top:13px;border-top:1px solid #f0ece0;margin-top:4px">
+        <div class="field"><span class="lab"><label>Link name</label></span>
+          <input type="text" id="newLinkTitle" placeholder="e.g. Sign-up sheet"></div>
+        <div class="field"><span class="lab"><label>URL</label></span>
+          <input type="text" id="newLinkUrl" placeholder="roomparent.com/..."></div>
+        <div style="display:flex;gap:9px">
+          <button class="btn btn-ghost" style="flex:1" onclick="addingLink=false;render()">Cancel</button>
+          <button class="btn btn-primary" style="flex:1" onclick="addLink()">Add link</button>
+        </div>
+      </div>`
+    : `<button class="btn btn-ghost btn-full" style="margin-top:13px" onclick="addingLink=true;render()">+ Add a link</button>`);
+}
+
+function recipientsCard(){
+  const needsTeacher = recipient().teacher && !state.tpl.teacherEmail.trim();
+  return `<div class="card"><h3>Who gets this</h3>
+    ${RECIPIENTS.map(r => `
+      <div class="pick rcp ${state.recipient===r.v?'on':''}" data-v="${r.v}" onclick="setRecipient('${r.v}')">
+        <span class="box round"></span>
+        <span class="grow"><span class="t">${r.l}</span><span class="m">${r.m}</span></span>
+      </div>`).join('')}
+    <div id="specificWrap" ${state.recipient==='specific' ? '' : 'hidden'}
+         style="margin-top:12px;padding-top:12px;border-top:1px solid #f0ece0">
+      ${PARENTS.map(p => `
+        <div class="pick ${state.specific[p.id]?'on':''}" onclick="toggleSpecific('${p.id}', this)">
+          <span class="box">${CHECK}</span>
+          <span class="avatar sm">${p.initials}</span>
+          <span class="grow"><span class="t">${p.name}</span>
+            <span class="m">${p.email || 'No email on file'}${p.onSprout?'':' · not on Sprout'}</span></span>
+        </div>`).join('')}
+    </div>
+    <div id="teacherWarn" style="margin:14px 0 0;padding-top:14px;border-top:1px solid #f0ece0"
+         ${recipient().teacher ? '' : 'hidden'}>${tplField('teacherEmail')}</div>
+  </div>`;
+}
+
+function previewSheet(){
+  const bl = blockers();
+  return `
+    <div class="sheet-head"><h3>Preview</h3>
+      <button class="x" onclick="sheet=null;render()"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="sheet-body">
+      <div class="note warn" id="blockNote" ${bl.length ? '' : 'hidden'}></div>
+      ${mailHtml()}
+      ${recipientsCard()}
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-ghost" onclick="sheet=null;render()">Keep editing</button>
+      <button class="btn btn-primary" id="sendBtn" ${bl.length?'disabled':''} onclick="send()">Send${bl.length?'':' now'}</button>
+    </div>`;
+}
+
+function sentSheet(){
+  const n = state.recipient === 'specific' ? specificIds().length : 8;
+  return `
+    <div class="sheet-head"><h3>Sent</h3>
+      <button class="x" onclick="sheet=null;render()"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="sheet-body"><div class="done">
+      <div class="ring"><svg viewBox="0 0 24 24"><path d="m4 13 5 5L20 7"/></svg></div>
+      <h3>Your email is on its way</h3>
+      <p>Sent to ${esc(recipientSummary())}${state.recipient==='specific'?'':` · ${n} recipients`}.<br>
+         Nothing left the portal until you pressed Send.</p>
+    </div></div>
+    <div class="sheet-foot"><button class="btn btn-primary btn-full" onclick="sheet=null;render()">Done</button></div>`;
+}
+
+/* Full rebuild, used only for structural change. Remembers where you were so it
+   never throws you back to the top of the page. */
+function render(){
+  // Both the page and an open sheet scroll independently. Remember both, or a
+  // structural change inside the sheet throws the sheet back to its top.
+  const keep = {};
+  document.querySelectorAll('.scroll, .sheet-body').forEach(el => {
+    keep[el.classList.contains('scroll') ? 'page' : 'sheet'] = el.scrollTop;
+  });
+  const act = document.activeElement;
+  const focusId = act && act.id ? act.id : null;
+  const selStart = act && act.selectionStart != null ? act.selectionStart : null;
+  const selEnd   = act && act.selectionEnd   != null ? act.selectionEnd   : null;
+
+  const miss = missing(), ev = chosenEv(), lk = chosenLk(), bl = blockers();
+
+  const blocks = [
+    block('tpl','tpl', usingTpl() ? 'Template details' : 'Start from a template', 'sum-tpl',
+      tplSummary(),
+      `<span class="chip ${blockMissing().length?'warn':''}" id="chip-tpl" style="${usingTpl()?'':'display:none'}">${blockMissing().length || 'Done'}</span>`,
+      templateBody),
+    block('write','write','Subject and message','sum-write',
+      state.subject.trim() ? esc(state.subject) : 'No subject yet', '', writeBody),
+    block('events','cal','Events to include','sum-events',
+      ev.length ? ev.map(e=>esc(e.t)).join(' · ') : 'None selected',
+      `<span class="chip grey" id="chip-events">${ev.length}</span>`, eventsBody),
+    block('links','link','Links to include','sum-links',
+      lk.length ? lk.map(l=>esc(l.t)).join(' · ') : 'None selected',
+      `<span class="chip grey" id="chip-links">${lk.length}</span>`, linksBody),
+  ].join('');
+
+  document.getElementById('app').outerHTML = `<div id="app" style="display:contents">
+    <div class="topbar">
+      <div class="ctx">
+        <span class="ctx-mark"><svg viewBox="0 0 24 24"><path d="M4 21V9l8-6 8 6v12"/><circle cx="12" cy="12" r="2.2"/></svg></span>
+        <span style="min-width:0"><span class="nm">Mrs. Taylor's Class</span><span class="sb">1st Grade · Kiker Elementary</span></span>
+      </div>
+      <span class="avatar">TM</span>
+    </div>
+
+    <div class="scroll" onclick="if(menu){menu=null;render()}">
+      <h1 class="screen">Compose Class Email</h1>
+      <p class="screen-sub">Events and links are pulled in for you. Open a block to change it. Nothing sends until you press Send.</p>
+      <div class="blocks">${blocks}</div>
+      ${state.sent ? `<div class="note" style="margin-top:14px">Last sent just now to ${esc(recipientSummary())}.</div>` : ''}
+    </div>
+
+    <div class="dock">
+      <span class="sum">
+        <b id="dock-main" class="${bl.length?'warn':''}" ${bl.length?'onclick="jumpToFirstMissing()"':''}>${dockLine()}</b>
+        <span id="dock-sub">${ev.length} event${ev.length===1?'':'s'} · ${lk.length} link${lk.length===1?'':'s'} · ${esc(recipientSummary())}</span></span>
+      <button class="btn btn-primary" onclick="sheet='preview';render()">Preview</button>
+    </div>
+
+    <div class="tabbar">
+      ${[['dash','Dashboard'],['mail','Email'],['cal','Calendar'],['fund','Funds'],['more','More']]
+        .map(([k,l]) => `<span class="tab ${k==='mail'?'on':''}"><svg viewBox="0 0 24 24">${{
+          dash:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+          mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+          cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+          fund:'<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+          more:'<path d="M4 7h16M4 12h16M4 17h16"/>'}[k]}</svg>${l}</span>`).join('')}
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <div class="sheet-wrap ${sheet?'open':''}" onclick="if(event.target===this){sheet=null;render()}">
+      <div class="sheet">${sheet === 'sent' ? sentSheet() : previewSheet()}</div>
+    </div>
+  </div>`;
+
+  // blockNote and the Send label are owned by refreshStatus, so fill them once
+  // the fresh DOM exists.
+  refreshStatus();
+
+  document.querySelectorAll('.scroll, .sheet-body').forEach(el => {
+    const v = keep[el.classList.contains('scroll') ? 'page' : 'sheet'];
+    if (v == null) return;
+    const prior = el.style.scrollBehavior;
+    el.style.scrollBehavior = 'auto';
+    el.scrollTop = v;
+    el.style.scrollBehavior = prior;
+  });
+  if (focusId) {
+    const el = document.getElementById(focusId);
+    if (el) {
+      el.focus({preventScroll:true});
+      if (selStart != null && el.setSelectionRange) {
+        try { el.setSelectionRange(selStart, selEnd); } catch(e) {}
+      }
+    }
+  }
+}
+render();
+</script>
+</body>
+</html>

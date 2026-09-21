@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Events — AI Discovery Redesign · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff; --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+    --green:#186338; --brand-light:#e2e9e3; --brand-border:#77b691; --border:#d0dacf;
+    --warning-subtle:#f6ecd1; --shadow-m:1px 4px 25px 2px rgba(13,13,18,.05);
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:30px 48px;padding:40px 24px 60px;}
+
+  .lede{flex:1 0 100%;text-align:center;max-width:820px;margin:0 auto 8px;}
+  .lede h1{font-family:var(--serif);font-size:25px;font-weight:600;color:var(--ink);margin:0 0 6px;}
+  .lede p{font-size:13px;color:var(--muted);margin:0;line-height:1.55;}
+  .lede .flag{display:inline-block;margin-top:10px;font-size:11.5px;color:#8a6a1c;background:#f6ecd1;border:1px solid #e9d9ad;border-radius:999px;padding:5px 12px;}
+
+  .row{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-start;gap:48px;padding:0 24px;overflow-x:auto;width:100%;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0;}
+  .cap{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.03em;text-align:center;max-width:415px;line-height:1.5;color:#6a665b;}
+  .cap b{color:#23271f;font-size:12.5px;}
+
+  .ph{display:inline-block;vertical-align:middle;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+
+  .device{position:relative;width:415px;height:874px;border-radius:56px;padding:11px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:60;}
+  .screen{position:relative;width:100%;height:100%;border-radius:43px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+
+  .sb{flex:0 0 44px;padding:16px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);z-index:20;}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--ink);} .sb .bat{width:25px;}
+
+  .top{flex:0 0 auto;padding:10px 20px 6px;}
+  .top .t{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);}
+  .top .loc{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--muted);margin-top:2px;}
+  .top .loc .ph{width:14px;height:14px;}
+
+  .body{flex:1 1 auto;overflow-y:auto;padding:4px 0 24px;}
+  .bx{padding:0 20px;}
+
+  /* day-toggle strip */
+  .daystrip{display:flex;gap:8px;overflow-x:auto;padding:10px 20px 16px;}
+  .daystrip::-webkit-scrollbar{display:none;}
+  .daychip{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;background:#fff;border:1.5px solid var(--border);
+    border-radius:14px;padding:9px 14px;box-shadow:var(--shadow-m);cursor:pointer;min-width:56px;}
+  .daychip .d1{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;}
+  .daychip .d2{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);}
+  .daychip.on{background:var(--green);border-color:var(--green);}
+  .daychip.on .d1,.daychip.on .d2{color:#fff;}
+
+  .sh{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px;}
+  .sh .t{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);}
+  .sh .a{font-size:12.5px;color:var(--green);font-weight:600;}
+
+  /* friend invite card — sits above AI discovery */
+  .invite{display:flex;gap:12px;align-items:center;background:var(--warning-subtle);border-radius:16px;padding:12px;box-shadow:var(--shadow-m);margin-bottom:8px;}
+  .invite .av{width:52px;height:52px;border-radius:12px;background:linear-gradient(145deg,#c9944f,#e8bb7a);display:grid;place-items:center;font-size:24px;flex-shrink:0;}
+  .invite .tx{flex:1;min-width:0;}
+  .invite .tx .n{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);}
+  .invite .tx .m{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.4;}
+  .invite .tx .h{font-size:11.5px;color:#8a6a1c;font-weight:600;margin-top:2px;}
+  .invite .ph{width:18px;height:18px;color:var(--muted);flex-shrink:0;}
+
+  /* category pills */
+  .catrow{display:flex;gap:8px;overflow-x:auto;padding-bottom:14px;}
+  .catrow::-webkit-scrollbar{display:none;}
+  .catchip{flex:0 0 auto;font-size:13px;font-weight:500;background:#fff;border:1px solid var(--border);border-radius:999px;
+    padding:8px 14px;box-shadow:var(--shadow-m);cursor:pointer;white-space:nowrap;}
+  .catchip.on{background:var(--green);border-color:var(--green);color:#fff;}
+
+  /* AI discovery event card — full-width image on top, info below (per Tony's Figma comment).
+     2:1 landscape ratio, confirmed live 2026-09-10 — Mohit is changing the AI image generator to
+     match this ratio for this section only (event cards + event detail hero), nothing else. */
+  .ecard{display:flex;flex-direction:column;background:#fff;border-radius:16px;box-shadow:var(--shadow-m);overflow:hidden;margin-bottom:12px;}
+  .ecard .img{width:100%;aspect-ratio:2/1;flex-shrink:0;display:grid;place-items:center;font-size:40px;position:relative;overflow:hidden;}
+  .ecard .aitag{position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:3px;background:rgba(30,62,43,.85);color:#fff;
+    border-radius:999px;padding:3px 8px 3px 6px;font-size:9.5px;font-weight:700;}
+  .ecard .aitag .ph{width:10px;height:10px;}
+  .ecard .tx{padding:12px 14px 14px;}
+  .ecard .cat{font-size:11px;color:var(--green);font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+  .ecard .n{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin-top:3px;}
+  .ecard .m{font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.4;}
+
+  /* event detail page — per Tony 2026-09-10: "we'll have to see how this image translates into
+     the event page... this image will live up here just slightly smaller because it won't be as
+     tall... let's build out that page too" */
+  .detail-hero{position:relative;width:100%;height:200px;flex-shrink:0;overflow:hidden;}
+  .detail-back,.detail-share{position:absolute;top:16px;width:36px;height:36px;border-radius:50%;
+    background:rgba(255,255,255,.92);display:grid;place-items:center;box-shadow:var(--shadow-m);z-index:5;color:var(--ink);}
+  .detail-back{left:16px;} .detail-back .ph{width:18px;height:18px;}
+  .detail-share{right:16px;} .detail-share .ph{width:16px;height:16px;}
+  .detail-aitag{position:absolute;bottom:14px;left:16px;display:flex;align-items:center;gap:4px;background:rgba(30,62,43,.85);color:#fff;
+    border-radius:999px;padding:4px 10px 4px 8px;font-size:10px;font-weight:700;z-index:5;}
+  .detail-aitag .ph{width:11px;height:11px;}
+  .detail-body{padding:18px 20px 0;}
+  .detail-cat{font-size:11.5px;color:var(--green);font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+  .detail-title{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);margin-top:4px;line-height:1.25;}
+  .detail-facts{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+  .detail-fact{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--body);}
+  .detail-fact .ph{width:18px;height:18px;color:var(--muted);flex-shrink:0;}
+  .detail-fact b{color:var(--ink);}
+  .detail-price{display:inline-block;margin-top:14px;background:var(--brand-light);color:var(--green);font-size:12.5px;font-weight:700;
+    border-radius:999px;padding:5px 12px;}
+  .detail-divider{height:1px;background:var(--border);margin:18px 0;}
+  .detail-desc{font-size:13.5px;color:var(--body);line-height:1.6;}
+  .detail-cta-fade{position:absolute;left:0;right:0;bottom:0;height:100px;background:linear-gradient(to top,var(--bg) 55%,rgba(244,241,234,0));z-index:25;pointer-events:none;}
+  .detail-cta{position:absolute;left:16px;right:16px;bottom:18px;display:flex;gap:10px;z-index:30;}
+  .detail-cta .btn-primary{flex:1;background:var(--green);color:#fff;border-radius:999px;padding:15px;text-align:center;
+    font-family:var(--serif);font-size:15px;font-weight:600;box-shadow:0 6px 18px rgba(24,99,56,.28);}
+  .detail-cta .btn-secondary{width:52px;flex-shrink:0;background:#fff;border:1.5px solid var(--border);border-radius:999px;display:grid;place-items:center;box-shadow:var(--shadow-m);}
+  .detail-cta .btn-secondary .ph{width:20px;height:20px;color:var(--ink);}
+
+  /* pill bottom nav (reused verbatim from create-reminder-flow.html) */
+  .navfade{position:absolute;left:0;right:0;bottom:0;height:110px;background:linear-gradient(to top,var(--bg) 46%,rgba(244,241,234,0));z-index:25;pointer-events:none;}
+  .pillnav{position:absolute;left:16px;right:16px;bottom:18px;border-radius:9999px;background:var(--bg);border-top:1px solid #fff;
+    box-shadow:2px 5px 10px rgba(14,14,16,.05),4px 5px 25px 3px rgba(14,14,16,.15);display:flex;justify-content:space-around;padding:12px 8px;z-index:30;}
+  .pn{display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;color:#818898;}
+  .pn .ph{width:24px;height:24px;}
+  .pn .l{font-size:11px;}
+  .pn.on{color:var(--green);}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Events — AI Discovery Redesign</h1>
+  <p>Sesuai ruling meeting: fokus total ke AI-generated local kid-events discovery, base struktur dari "summer camp discovery" prototype lama (day-toggle browsing + card list) tapi dibangun ulang pakai sistem desain Sprout saat ini (Playfair, tokens.css, Phosphor).</p>
+  <div class="flag">Day-toggle pakai date-strip (per hari) — interpretasi literal dari "toggle the day I wanna look at". Gampang diganti ke Today/Tomorrow/Weekend kalau kamu lebih suka itu.</div>
+  <div class="flag" style="background:#e2e9e3;border-color:#b9d0bf;color:#1e3e2b;">2026-09-08 Figma comments applied: day-toggle now sits directly above "Discover for [day]" with nothing in between (Invited to you moved below the AI feed instead) · discovery cards now full-width image on top, info below · header removed, notification bell moved to Daily Brief (both already true in this build). Open: "Put the calendar thing here" — not clear enough to act on, need Ahmad's read on what that means.</div>
+</div>
+
+<div class="row">
+
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+
+      <div class="top">
+        <div class="t">Events</div>
+        <div class="loc"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 64a40 40 0 1 0 40 40 40 40 0 0 0-40-40m0 64a24 24 0 1 1 24-24 24 24 0 0 1-24 24m0-112a88.1 88.1 0 0 0-88 88c0 31.4 14.51 64.68 42 96.25a254.2 254.2 0 0 0 41.45 38.3 8 8 0 0 0 9.18 0 254.2 254.2 0 0 0 41.37-38.3c27.45-31.57 42-64.85 42-96.25a88.1 88.1 0 0 0-88-88m0 206c-16.53-13-72-60.75-72-118a72 72 0 0 1 144 0c0 57.23-55.47 105-72 118"/></svg></span>Near Austin, TX</div>
+      </div>
+
+      <div class="body">
+        <div class="daystrip">
+          <div class="daychip on"><div class="d1">Today</div><div class="d2">Wed 17</div></div>
+          <div class="daychip"><div class="d1">Thu</div><div class="d2">18</div></div>
+          <div class="daychip"><div class="d1">Fri</div><div class="d2">19</div></div>
+          <div class="daychip"><div class="d1">Sat</div><div class="d2">20</div></div>
+          <div class="daychip"><div class="d1">Sun</div><div class="d2">21</div></div>
+          <div class="daychip"><div class="d1">Mon</div><div class="d2">22</div></div>
+          <div class="daychip"><div class="d1">Tue</div><div class="d2">23</div></div>
+        </div>
+
+        <div class="bx">
+          <div class="sh"><div class="t">✨ Discover for Wed 17</div></div>
+          <div class="catrow">
+            <span class="catchip on">All</span>
+            <span class="catchip">🌳 Parks</span>
+            <span class="catchip">🎨 Arts</span>
+            <span class="catchip">🏊 Swimming</span>
+            <span class="catchip">🎭 Classes</span>
+            <span class="catchip">⛺ Camps</span>
+          </div>
+
+          <div class="ecard">
+            <div class="img" style="background:linear-gradient(135deg,#e8bb7a,#c9944f);">📖<div class="aitag"><span class="ph"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88Z"/></svg></span>AI-found</div></div>
+            <div class="tx"><div class="cat">Arts &amp; Reading</div><div class="n">Storytime at BookPeople</div><div class="m">10:00 AM · Free · Downtown Austin</div></div>
+          </div>
+          <div class="ecard">
+            <div class="img" style="background:linear-gradient(135deg,#7ab8e8,#4f8fc9);">🏊<div class="aitag"><span class="ph"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88Z"/></svg></span>AI-found</div></div>
+            <div class="tx"><div class="cat">Swimming</div><div class="n">Toddler Splash Hour</div><div class="m">11:30 AM · Deep Eddy Pool</div></div>
+          </div>
+          <div class="ecard">
+            <div class="img" style="background:linear-gradient(135deg,#7ac97a,#4f9a4f);">🌳<div class="aitag"><span class="ph"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88Z"/></svg></span>AI-found</div></div>
+            <div class="tx"><div class="cat">Parks</div><div class="n">Nature Scavenger Hunt</div><div class="m">4:00 PM · Zilker Park</div></div>
+          </div>
+
+          <div class="sh" style="margin-top:20px;"><div class="t">🎉 Invited to you</div></div>
+          <div class="invite">
+            <div class="av">🎂</div>
+            <div class="tx"><div class="n">Kennedy's 4th Birthday Party</div><div class="m">Sat, Sep 20 · 2:00 PM · Mueller Lake Park</div><div class="h">Hosted by Sarah Chen</div></div>
+            <span class="ph"><svg viewBox="0 0 256 256"><path d="m181.66 133.66-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32"/></svg></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="navfade"></div>
+      <div class="pillnav">
+        <div class="pn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M240 152h-40.45a74 74 0 0 0 .45-8 72 72 0 0 0-144 0 74 74 0 0 0 .45 8H16a8 8 0 0 0 0 16h224a8 8 0 0 0 0-16m-168-8a56 56 0 1 1 111.41 8H72.59a56 56 0 0 1-.59-8m144 56a8 8 0 0 1-8 8H48a8 8 0 0 1 0-16h160a8 8 0 0 1 8 8M72.84 43.58a8 8 0 0 1 14.32-7.16l8 16a8 8 0 0 1-14.32 7.16Zm-56 48.84a8 8 0 0 1 10.74-3.57l16 8a8 8 0 0 1-7.16 14.31l-16-8a8 8 0 0 1-3.58-10.74m192 15.16a8 8 0 0 1 3.58-10.73l16-8a8 8 0 1 1 7.16 14.31l-16 8a8 8 0 0 1-10.74-3.58m-48-55.16 8-16a8 8 0 0 1 14.32 7.16l-8 16a8 8 0 1 1-14.32-7.16"/></svg></span><span class="l">Daily Brief</span></div>
+        <div class="pn on"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m51.58 57.79-32 64a4.08 4.08 0 0 1-1.79 1.79l-64 32a4 4 0 0 1-5.37-5.37l32-64a4.08 4.08 0 0 1 1.79-1.79l64-32a4 4 0 0 1 5.37 5.37"/></svg></span><span class="l">Events</span></div>
+        <div class="pn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88ZM137 164.22a8 8 0 0 0-4.74 4.74L112 223.85 91.78 169a8 8 0 0 0-4.78-4.78L32.15 144 87 123.78a8 8 0 0 0 4.78-4.78L112 64.15 132.22 119a8 8 0 0 0 4.74 4.74L191.85 144ZM144 40a8 8 0 0 1 8-8h16V16a8 8 0 0 1 16 0v16h16a8 8 0 0 1 0 16h-16v16a8 8 0 0 1-16 0V48h-16a8 8 0 0 1-8-8m104 48a8 8 0 0 1-8 8h-8v8a8 8 0 0 1-16 0v-8h-8a8 8 0 0 1 0-16h8v-8a8 8 0 0 1 16 0v8h8a8 8 0 0 1 8 8"/></svg></span><span class="l">AI Assist</span></div>
+        <div class="pn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24m0 192a87.87 87.87 0 0 1-44.06-11.81 8 8 0 0 0-6.54-.67L40 216l12.47-37.4a8 8 0 0 0-.66-6.54A88 88 0 1 1 128 216"/></svg></span><span class="l">Chat</span></div>
+        <div class="pn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M244.8 150.4a8 8 0 0 1-11.2-1.6A51.6 51.6 0 0 0 192 128a8 8 0 0 1-7.37-4.89 8 8 0 0 1 0-6.22A8 8 0 0 1 192 112a24 24 0 1 0-23.24-30 8 8 0 1 1-15.5-4A40 40 0 1 1 219 117.51a67.94 67.94 0 0 1 27.43 21.68 8 8 0 0 1-1.63 11.21M190.92 212a8 8 0 1 1-13.84 8 57 57 0 0 0-98.16 0 8 8 0 1 1-13.84-8 72.06 72.06 0 0 1 33.74-29.92 48 48 0 1 1 58.36 0A72.06 72.06 0 0 1 190.92 212M128 176a32 32 0 1 0-32-32 32 32 0 0 0 32 32m-56-56a8 8 0 0 0-8-8 24 24 0 1 1 23.24-30 8 8 0 1 0 15.5-4A40 40 0 1 0 37 117.51a67.94 67.94 0 0 0-27.4 21.68 8 8 0 1 0 12.8 9.61A51.6 51.6 0 0 1 64 128a8 8 0 0 0 8-8"/></svg></span><span class="l">Clubs</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="cap"><b>Events — AI Discovery.</b> Day-toggle strip langsung nempel ke "Discover for [day]", ga ada yang motong di antaranya (per Tony's comment). "Invited to you" sekarang di bawah feed AI, bukan di atas. Tiap card discovery full-width image + badge "✨ AI-found" biar jelas ini scraped/generated, bukan manual curation. Kategori pill bisa filter lebih jauh.</div>
+</div>
+
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="detail-hero" style="background:linear-gradient(135deg,#e8bb7a,#c9944f);display:grid;place-items:center;font-size:56px;">
+        📖
+        <div class="detail-back"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span></div>
+        <div class="detail-share"><span class="ph"><svg viewBox="0 0 256 256"><path d="M214.75 211.71l-33.66-56.61A15.87 15.87 0 0 0 176 152h-38.34l32.55-91.87a8 8 0 0 0-15.08-5.34l-33.9 95.64a8 8 0 0 0 .78 7.11l38.4 57.6a16 16 0 0 0 13.32 7.13h13.3a15.87 15.87 0 0 0 15.16-11.14M40 152a16 16 0 0 0 16 16h13.3a16 16 0 0 0 13.6-7.63L118.79 96H176a8 8 0 0 0 0-16h-63.6a15.87 15.87 0 0 0-13.6 7.63L64 152Z"/></svg></span></div>
+        <div class="detail-aitag"><span class="ph"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88Z"/></svg></span>AI-found</div>
+      </div>
+      <div class="body" style="position:relative;">
+        <div class="detail-body">
+          <div class="detail-cat">Arts &amp; Reading</div>
+          <div class="detail-title">Storytime at BookPeople</div>
+          <div class="detail-facts">
+            <div class="detail-fact"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span><b>Wed, Sep 17 · 10:00 AM</b></div>
+            <div class="detail-fact"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 64a40 40 0 1 0 40 40 40 40 0 0 0-40-40m0 64a24 24 0 1 1 24-24 24 24 0 0 1-24 24m0-112a88.1 88.1 0 0 0-88 88c0 31.4 14.51 64.68 42 96.25a254.2 254.2 0 0 0 41.45 38.3 8 8 0 0 0 9.18 0 254.2 254.2 0 0 0 41.37-38.3c27.45-31.57 42-64.85 42-96.25a88.1 88.1 0 0 0-88-88m0 206c-16.53-13-72-60.75-72-118a72 72 0 0 1 144 0c0 57.23-55.47 105-72 118"/></svg></span>BookPeople, Downtown Austin</div>
+          </div>
+          <span class="detail-price">Free</span>
+          <div class="detail-divider"></div>
+          <div class="detail-desc">Join us for a cozy morning of stories, songs, and rhymes for little ones. This week's theme is animal friends — bring a stuffed animal to share! Best for ages 2–6, but all kids are welcome.</div>
+        </div>
+      </div>
+      <div class="detail-cta-fade"></div>
+      <div class="detail-cta">
+        <div class="btn-primary">I'm Interested</div>
+        <div class="btn-secondary"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span></div>
+      </div>
+    </div>
+  </div>
+  <div class="cap"><b>Event Detail — AI Discovery.</b> Sama hero image, sama rasio 2:1, tapi lebih pendek (200px vs card yang bisa berapa aja tergantung lebar layar) karena kontennya lebih banyak di bawah — persis kayak yang diminta Tony: "this image will live up here just slightly smaller because it won't be as tall." Back &amp; share overlay di atas gambar, "AI-found" tag tetap ada biar konsisten sama card di feed. CTA "I'm Interested" + calendar-add jadi sticky di bawah.</div>
+</div>
+
+</div>
+</body>
+</html>

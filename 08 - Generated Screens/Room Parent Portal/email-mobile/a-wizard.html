@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Direction A — Wizard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_shared.css">
+<style>
+  .steps{flex:0 0 auto;display:flex;gap:5px;padding:12px 14px 0}
+  .steps i{flex:1;height:3px;border-radius:2px;background:var(--border)}
+  .steps i.done{background:var(--green-mid)}
+  .steps i.now{background:var(--green)}
+  .stepno{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+    color:var(--muted);padding:12px 14px 0}
+  .done-mark{display:grid;place-items:center;padding:34px 0 22px}
+  .done-mark span{width:62px;height:62px;border-radius:50%;background:var(--green-light);
+    display:grid;place-items:center}
+  .done-mark svg{width:30px;height:30px;stroke:var(--green);fill:none;stroke-width:2.4;stroke-linecap:round}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="_data.js"></script>
+<script>
+const STEPS = ['Start','Details','Write','Attach','Review'];
+let step = 0;
+let useTpl = true;
+
+function stepBody(){
+  if (step === 0) return `
+    <h1 class="screen">Start your email</h1>
+    <p class="screen-sub">Begin from a template or write from scratch.</p>
+    <div class="card" style="cursor:pointer;border-color:${useTpl?'var(--green-border)':'var(--border)'};background:${useTpl?'var(--green-light)':'#fff'}"
+         onclick="useTpl=true;render()">
+      <h3 style="margin-bottom:6px">Room Parent Intro Template</h3>
+      <div style="font-size:12.5px;line-height:1.5">Introduce yourselves, explain what you do, and ask families to fill in the contact form.</div>
+    </div>
+    <div class="card" style="cursor:pointer;border-color:${!useTpl?'var(--green-border)':'var(--border)'};background:${!useTpl?'var(--green-light)':'#fff'}"
+         onclick="useTpl=false;render()">
+      <h3 style="margin-bottom:6px">Blank email</h3>
+      <div style="font-size:12.5px;line-height:1.5">Start with an empty subject and message.</div>
+    </div>`;
+
+  if (step === 1) {
+    const miss = missingFields().length;
+    return `
+    <h1 class="screen">Fill in your details</h1>
+    <p class="screen-sub">Type these once. Every red placeholder in the email fills in as you go.</p>
+    ${miss ? `<div class="note"><b style="color:var(--amber)">${miss} still needed.</b> The email cannot be sent until all of them are filled.</div>` : ''}
+    <div class="card">${TPL_FIELDS.map(fieldRow).join('')}</div>`;
+  }
+
+  if (step === 2) return `
+    <h1 class="screen">Write your email</h1>
+    <p class="screen-sub">Red placeholders come from the previous step.</p>
+    <div class="card">
+      <div class="field"><label>Subject</label>
+        <input type="text" value="${state.subject}" oninput="state.subject=this.value">
+      </div>
+      <div class="field" style="margin-bottom:0"><label>Message</label>
+        <div style="border:1.5px solid #ddd8cc;border-radius:11px;padding:12px 13px;background:#fff;
+                    font-size:13.5px;line-height:1.6;min-height:210px">${bodyHtml()}</div>
+      </div>
+    </div>`;
+
+  if (step === 3) return `
+    <h1 class="screen">Anything to attach?</h1>
+    <p class="screen-sub">Pulled from your calendar and links. Skip if you do not need them.</p>
+    <div class="card"><h3>Events to include</h3>
+      ${EVENTS.map(e => pickRow(state.events[e.id], e.t, e.d, `state.events[${e.id}]=!state.events[${e.id}];render()`)).join('')}
+    </div>
+    <div class="card"><h3>Links to include</h3>
+      ${LINKS.map(l => pickRow(state.links[l.id], l.t, l.u, `state.links[${l.id}]=!state.links[${l.id}];render()`)).join('')}
+    </div>`;
+
+  const miss = missingFields();
+  return `
+    <h1 class="screen">Review and send</h1>
+    <p class="screen-sub">This is exactly what families receive.</p>
+    ${miss.length ? `<div class="note"><b style="color:var(--red)">${miss.length} placeholder${miss.length>1?'s':''} still empty.</b> Go back to Details to fill them.</div>` : ''}
+    ${mailHtml()}
+    <div class="card" style="margin-top:14px"><h3>Who gets this</h3>
+      ${RECIPIENTS.map(r => pickRow(state.recipient===r.v, r.l, r.m, `state.recipient='${r.v}';render()`, true)).join('')}
+    </div>`;
+}
+
+function dock(){
+  const last = step === STEPS.length - 1;
+  const back = step > 0
+    ? `<button class="btn btn-ghost" onclick="step--;render()">Back</button>` : '';
+  if (last) {
+    const blocked = missingFields().length > 0;
+    return `<div class="dock">${back}
+      <button class="btn btn-primary grow" ${blocked?'disabled':''}
+        onclick="alert('Sent to ' + recipientLabel() + '.\\n\\nNothing left the portal until this tap.')">
+        Send to ${recipientLabel().toLowerCase()}</button></div>`;
+  }
+  const skippable = step === 3;
+  return `<div class="dock">${back}
+    ${skippable ? `<button class="btn btn-ghost" onclick="step++;render()">Skip</button>` : ''}
+    <button class="btn btn-primary grow" onclick="step++;render()">Next</button></div>`;
+}
+
+function render(){
+  document.getElementById('app').outerHTML = `<div id="app" style="display:contents">
+    ${chrome()}
+    <div class="steps">${STEPS.map((_,i)=>`<i class="${i<step?'done':i===step?'now':''}"></i>`).join('')}</div>
+    <div class="stepno">Step ${step+1} of ${STEPS.length} · ${STEPS[step]}</div>
+    <div class="scroll" style="padding-top:10px">${stepBody()}</div>
+    ${dock()}
+    ${tabbar()}
+  </div>`;
+}
+render();
+</script>
+</body>
+</html>

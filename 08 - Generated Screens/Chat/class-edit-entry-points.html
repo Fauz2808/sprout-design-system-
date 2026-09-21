@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Editing a class — the missing way in · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#fff; --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+    --green:#186338; --brand-light:#e2e9e3; --brand-border:#77b691; --border:#d0dacf;
+    --amber:#b5872b; --amber-bg:#fbf1da; --amber-br:#e6cd96; --red:#b3402f;
+    --shadow-m:1px 4px 25px 2px rgba(13,13,18,.05); --shadow-l:1px 4px 25px 2px rgba(13,13,18,.2);
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;padding:38px 0 70px}
+
+  .lede{max-width:900px;margin:0 auto;padding:0 30px}
+  .lede h1{font-family:var(--serif);font-size:29px;font-weight:600;color:var(--ink);margin:0 0 8px}
+  .lede .p{font-size:14px;color:#5b5648;line-height:1.65;margin:0 0 14px;max-width:770px}
+  .quote{background:#fff;border-left:3px solid var(--green);border-radius:12px;padding:14px 17px;
+    font-size:13.5px;line-height:1.65;color:var(--body);margin-bottom:14px;max-width:790px}
+  .quote b{color:var(--ink)} .quote i{color:#5b5648}
+
+  .paths{max-width:900px;margin:0 auto;padding:4px 30px 0;display:flex;gap:14px;flex-wrap:wrap}
+  .path{flex:1 1 330px;background:#fff;border:1px solid #cfc8ba;border-radius:16px;padding:15px 17px}
+  .path.good{border-color:var(--brand-border);background:var(--brand-light)}
+  .path h4{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 11px}
+  .path.good h4{color:var(--green)}
+  .path ol{margin:0;padding-left:0;list-style:none;counter-reset:s}
+  .path li{counter-increment:s;display:flex;gap:10px;font-size:13px;line-height:1.5;color:var(--body);margin-bottom:8px}
+  .path li:last-child{margin-bottom:0}
+  .path li::before{content:counter(s);flex:0 0 20px;height:20px;border-radius:50%;background:#efeae0;
+    color:var(--muted);font-size:10.5px;font-weight:700;display:grid;place-items:center;margin-top:1px}
+  .path.good li::before{background:var(--green);color:#fff}
+  .path li b{color:var(--ink);font-weight:600}
+  .path .note{font-size:12px;color:var(--muted);margin-top:11px;padding-top:11px;border-top:1px solid #eae4d8;line-height:1.55}
+  .path.good .note{border-top-color:#cfdfd4}
+
+  .band{max-width:900px;margin:36px auto 2px;padding:0 30px}
+  .band h2{font-family:var(--serif);font-size:21px;color:var(--ink);margin:0 0 5px}
+  .band p{font-size:13px;color:var(--muted);margin:0;line-height:1.55;max-width:720px}
+
+  .row{display:flex;gap:44px;align-items:flex-start;overflow-x:auto;padding:22px 30px 26px}
+  .panel{flex:0 0 auto;width:393px;display:flex;flex-direction:column;gap:14px}
+  .cap{font-size:12.5px;line-height:1.58;color:#655f52}
+  .cap .n{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--green);background:var(--brand-light);border-radius:99px;padding:4px 10px;margin-bottom:7px}
+  .cap b{display:block;font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin-bottom:3px}
+
+  .ph{display:inline-block;vertical-align:middle} .ph svg{display:block;width:100%;height:100%;fill:currentColor}
+
+  .device{position:relative;width:393px;height:852px;border-radius:54px;padding:11px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45)}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:60}
+  .screen{position:relative;width:100%;height:100%;border-radius:43px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg)}
+  .sb{flex:0 0 44px;padding:16px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);z-index:20}
+  .sb .r{display:inline-flex;gap:6px;align-items:center}
+  .sb svg{width:17px;height:11px;fill:var(--ink)} .sb .bat{width:25px}
+
+  /* header */
+  .hdr{flex:0 0 auto;background:var(--bg);border-bottom:1px solid #e6e0d4;padding:2px 12px 0}
+  .hrow{display:flex;align-items:center;gap:10px;padding:4px 4px 10px;position:relative}
+  .ib{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;color:var(--ink)}
+  .ib .ph{width:20px;height:20px}
+  .htap{flex:1;display:flex;align-items:center;gap:10px;min-width:0;border-radius:12px;padding:4px 7px}
+  .htap.mark{outline:2px dashed var(--green);outline-offset:1px;background:rgba(24,99,56,.05)}
+  .ib.mark{outline:2px dashed var(--green);outline-offset:1px;background:rgba(24,99,56,.05)}
+  .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);
+    color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;flex-shrink:0}
+  .nmwrap{min-width:0}
+  .nm{display:block;font-size:15.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nsub{display:block;font-size:11.5px;color:var(--muted);margin-top:1px}
+  .pin{position:absolute;width:21px;height:21px;border-radius:50%;background:var(--green);color:#fff;
+    font-size:11px;font-weight:700;display:grid;place-items:center;z-index:30;box-shadow:0 2px 7px rgba(0,0,0,.25)}
+
+  .tabs{display:flex;gap:4px;padding:0 2px}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 9px;color:#9c9384;
+    border-bottom:2px solid transparent;font-size:11px}
+  .tab .ph{width:19px;height:19px}
+  .tab.on{color:var(--green);border-bottom-color:var(--green);font-weight:600}
+
+  .scroll{flex:1 1 auto;overflow-y:auto;padding:14px 16px 16px;display:flex;flex-direction:column;gap:9px}
+  .day{text-align:center;font-size:11px;color:var(--muted);margin:2px 0 4px}
+  .b{max-width:78%;border-radius:16px;padding:10px 13px;font-size:13.5px;line-height:1.45;box-shadow:var(--shadow-m)}
+  .b.them{background:#fff;color:var(--ink);align-self:flex-start}
+  .b.me{background:var(--green);color:#fff;align-self:flex-end}
+  .b .w{display:block;font-size:11px;font-weight:700;color:var(--green);margin-bottom:3px}
+  .composer{flex:0 0 auto;display:flex;gap:9px;align-items:center;padding:10px 14px 24px}
+  .composer .f{flex:1;background:#fff;border:1px solid var(--border);border-radius:99px;padding:12px 16px;
+    font-size:13.5px;color:#a89e8c}
+  .composer .snd{width:42px;height:42px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;flex-shrink:0}
+  .composer .snd .ph{width:20px;height:20px}
+
+  /* sheet menu */
+  .scrim{position:absolute;inset:0;background:rgba(20,26,22,.42);z-index:40;border-radius:43px}
+  .sheet{position:absolute;left:0;right:0;bottom:0;z-index:50;background:var(--bg);
+    border-radius:26px 26px 43px 43px;padding:10px 16px 30px;box-shadow:0 -12px 40px rgba(0,0,0,.18)}
+  .grab{width:38px;height:4px;border-radius:99px;background:#cfc8ba;margin:0 auto 14px}
+  .shead{display:flex;align-items:center;gap:11px;padding:0 6px 14px;border-bottom:1px solid #e6e0d4;margin-bottom:10px}
+  .shead .nm{font-size:16px}
+  .mrow{display:flex;align-items:center;gap:13px;background:#fff;border-radius:14px;padding:14px 15px;
+    margin-bottom:8px;box-shadow:var(--shadow-m)}
+  .mrow .ph{width:20px;height:20px;color:var(--muted);flex-shrink:0}
+  .mrow .t{flex:1;font-size:14.5px;color:var(--ink);font-weight:500}
+  .mrow .cr{width:16px;height:16px;color:#c3bcae}
+  .mrow.first{border:1.5px solid var(--brand-border);background:var(--brand-light);box-shadow:none}
+  .mrow.first .ph{color:var(--green)} .mrow.first .t{font-weight:600}
+  .mrow.warn .t,.mrow.warn .ph{color:var(--red)}
+
+  /* group info */
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:6px 14px 8px}
+  .top .h{flex:1;text-align:center;font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink)}
+  .top .sp{width:36px;flex-shrink:0}
+  .top .save{width:auto;padding:7px 14px;border-radius:99px;background:var(--green);color:#fff;
+    font-size:13.5px;font-weight:700;flex-shrink:0}
+  .top .save.off{background:#dcd6c9;color:#a49a86}
+  .gbody{flex:1 1 auto;overflow-y:auto;padding:6px 16px 26px}
+  .idb{text-align:center;padding:14px 0 22px}
+  .idb .bav{width:84px;height:84px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);
+    color:#fff;font-size:28px;font-weight:700;display:grid;place-items:center;margin:0 auto 13px}
+  .idb .inm{font-family:var(--serif);font-size:23px;font-weight:600;color:var(--ink)}
+  .idb .imt{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .lbl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0 4px 8px}
+  .group{background:#fff;border-radius:16px;box-shadow:var(--shadow-m);overflow:hidden;margin-bottom:20px}
+  .grow{display:flex;align-items:center;gap:13px;padding:14px 15px;border-bottom:1px solid #f2eee4}
+  .grow:last-child{border-bottom:none}
+  .grow .ph{width:20px;height:20px;color:var(--muted);flex-shrink:0}
+  .grow .t{flex:1;font-size:14.5px;color:var(--ink)}
+  .grow .v{font-size:13px;color:var(--muted)}
+  .grow .cr{width:15px;height:15px;color:#c3bcae}
+  .grow.hi{background:var(--brand-light)}
+  .grow.hi .ph{color:var(--green)} .grow.hi .t{font-weight:600;color:var(--ink)}
+  .grow.warn .t,.grow.warn .ph{color:var(--red)}
+  .mem{display:flex;align-items:center;gap:12px;padding:12px 15px;border-bottom:1px solid #f2eee4}
+  .mem:last-child{border-bottom:none}
+  .mem .ma{width:36px;height:36px;border-radius:50%;background:linear-gradient(145deg,#3a7ca5,#7ec8e3);
+    color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;flex-shrink:0}
+  .mem .mt{flex:1}
+  .mem .mt b{display:block;font-size:14px;color:var(--ink);font-weight:600}
+  .mem .mt span{font-size:11.5px;color:var(--muted)}
+  .badge{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--brand-light);
+    color:var(--green);border-radius:99px;padding:4px 9px}
+
+  /* editor */
+  .ebody{flex:1 1 auto;overflow-y:auto;padding:18px 18px 26px}
+  .idrow{display:flex;gap:14px;align-items:center;margin-bottom:24px}
+  .avbig{position:relative;width:72px;height:72px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);
+    color:#fff;font-size:24px;font-weight:700;display:grid;place-items:center;flex-shrink:0}
+  .avbig .cam{position:absolute;right:-2px;bottom:-2px;width:26px;height:26px;border-radius:50%;
+    background:#fff;border:2px solid var(--bg);display:grid;place-items:center;color:var(--ink)}
+  .avbig .cam .ph{width:13px;height:13px}
+  .fw{flex:1;min-width:0}
+  .flabel{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+  .nameinput{width:100%;background:#fff;border:1.5px solid var(--brand-border);border-radius:14px;
+    padding:13px 15px;font-size:15.5px;color:var(--ink);box-shadow:var(--shadow-m)}
+  .sectlbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 2px 10px}
+  .emojis{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:20px}
+  .emo{width:52px;height:52px;border-radius:50%;background:#fff;border:1.5px solid var(--border);
+    display:grid;place-items:center;font-size:24px;box-shadow:var(--shadow-m)}
+  .emo.mono{font-size:15px;font-weight:700;color:var(--ink);
+    background:linear-gradient(145deg,#1e3e2b,#4fa472);color:#fff;border-color:transparent}
+  .emo.on{box-shadow:0 0 0 2px var(--brand-border) inset,var(--shadow-m);border-color:var(--brand-border)}
+  .hint{display:flex;gap:9px;background:var(--brand-light);border-radius:12px;padding:12px 14px;
+    font-size:12.5px;line-height:1.55;color:var(--ink)}
+  .hint .ph{width:15px;height:15px;color:var(--green);flex-shrink:0;margin-top:2px}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Renaming a class — the way in that was missing</h1>
+  <p class="p">Tony could not rename Miss Taylor's Class from the class itself. The editor exists and
+  always has. What is missing is a door on the screen he actually lands on.</p>
+
+  <div class="quote"><b>Tony, 15 Sep:</b>
+  <i>&ldquo;I have Miss Taylor's class. If I click Miss Taylor's class and I go into here, I can't
+  actually edit anything here. The way I actually can edit, and it's kinda like, I had to figure it
+  out, you have to go into Add, and then you go to, and then I have to click Edit and get to here.
+  But this edit also needs to live behind here too. So if I click here, there should just be an edit
+  thing there as well.&rdquo;</i></div>
+</div>
+
+<div class="paths">
+  <div class="path">
+    <h4>What he had to do</h4>
+    <ol>
+      <li>Open the Chat tab</li>
+      <li>Tap <b>+</b>, the add button</li>
+      <li>Land on <b>Manage Subgroups</b></li>
+      <li>Find the class in that list</li>
+      <li>Tap <b>Edit</b></li>
+    </ol>
+    <div class="note">Five taps, and the third one is a screen called Add, which is not where anyone
+    looks to change something that already exists.</div>
+  </div>
+  <div class="path good">
+    <h4>What he tried, and what it will now do</h4>
+    <ol>
+      <li>Open the class</li>
+      <li>Tap its <b>name in the header</b></li>
+      <li>Tap <b>Edit name &amp; icon</b></li>
+    </ol>
+    <div class="note">No new editor is built. This is routing: two controls that already sit in the
+    header get a destination.</div>
+  </div>
+</div>
+
+<div class="band">
+  <h2>What was actually wrong</h2>
+  <p>Two things, and neither is the editor. The class header already draws a three-dot button that
+  opens nothing, and the name beside it is not tappable. Meanwhile a club has Manage on its own
+  detail screen, which is why Tony found that one in seconds and said never mind.</p>
+</div>
+
+<div class="row" id="row"></div>
+
+<script>
+const I = {
+ back:'M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z',
+ dots:'M140 128a12 12 0 1 1-12-12 12 12 0 0 1 12 12m-12-56a12 12 0 1 0-12-12 12 12 0 0 0 12 12m0 112a12 12 0 1 0 12 12 12 12 0 0 0-12-12',
+ chat:'M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24m0 192a87.87 87.87 0 0 1-44.06-11.81 8 8 0 0 0-6.54-.67L40 216l12.47-37.4a8 8 0 0 0-.66-6.54A88 88 0 1 1 128 216',
+ cal:'M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z',
+ mail:'M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z',
+ link:'m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224h1.13a15.93 15.93 0 0 0 11.64-6.33c19.64-26.1 17.75-47.32 13.19-60L235.33 104a16 16 0 0 0-.01-22.63M224 92.69l-57.27 57.46a8 8 0 0 0-1.49 9.22c9.46 18.93-1.8 38.59-9.34 48.62L48 100.08c12.08-9.74 23.64-12.31 32.48-12.31A40.1 40.1 0 0 1 96.81 91a8 8 0 0 0 9.25-1.51L163.32 32 224 92.68Z',
+ send:'M227.32 28.68a16 16 0 0 0-15.66-4.08h-.15L19.57 82.84a16 16 0 0 0-2.49 29.8L102 154l41.3 84.87a15.86 15.86 0 0 0 14.44 9.13q.69 0 1.38-.06a15.88 15.88 0 0 0 14-11.51l58.2-191.94v-.15a16 16 0 0 0-4-15.66m-69.49 203.17-.05.14v-.07l-40.06-82.3 48-48a8 8 0 0 0-11.31-11.31l-48 48-82.33-40.06h-.07.14L216 40Z',
+ pencil:'M227.31 73.37 182.63 28.7a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63ZM51.31 160 136 75.31 152.69 92 68 176.68ZM48 179.31 76.69 208H48Zm48 25.38L79.31 188 164 103.31 180.69 120Zm96-96L147.31 64l24-24L216 84.68Z',
+ info:'M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12',
+ bell:'M168 224a8 8 0 0 1-8 8H96a8 8 0 1 1 0-16h64a8 8 0 0 1 8 8m53.85-32a15.8 15.8 0 0 1-13.85 8H48a16 16 0 0 1-13.8-24.06C39.75 166.38 48 139.34 48 104a80 80 0 1 1 160 0c0 35.33 8.26 62.38 13.81 71.94a15.89 15.89 0 0 1 .03 16.06ZM208 184c-7.73-13.27-16-43.95-16-80a64 64 0 1 0-128 0c0 36.06-8.28 66.74-16 80Z',
+ pin:'m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224h1.13a15.93 15.93 0 0 0 11.64-6.33c19.64-26.1 17.75-47.32 13.19-60L235.33 104a16 16 0 0 0-.01-22.63M224 92.69l-57.27 57.46a8 8 0 0 0-1.49 9.22c9.46 18.93-1.8 38.59-9.34 48.62L48 100.08c12.08-9.74 23.64-12.31 32.48-12.31A40.1 40.1 0 0 1 96.81 91a8 8 0 0 0 9.25-1.51L163.32 32 224 92.68Z',
+ addusr:'M256 136a8 8 0 0 1-8 8h-16v16a8 8 0 0 1-16 0v-16h-16a8 8 0 0 1 0-16h16v-16a8 8 0 0 1 16 0v16h16a8 8 0 0 1 8 8m-57.87 58.85a8 8 0 0 1-12.26 10.3C170.23 186.builder 128 186.builder c-32.1 0-58.72 14.19-73.87 32.15a8 8 0 0 1-12.26-10.3c14.94-17.72 35.52-30.59 59.06-37.44a68 68 0 1 1 66.14 0c23.54 6.85 44.12 19.72 59.06 37.44M128 168a52 52 0 1 0-52-52 52.06 52.06 0 0 0 52 52',
+ out:'M112 216a8 8 0 0 1-8 8H48a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h56a8 8 0 0 1 0 16H48v160h56a8 8 0 0 1 8 8m109.66-93.66-40-40a8 8 0 0 0-11.32 11.32L196.69 120H104a8 8 0 0 0 0 16h92.69l-26.35 26.34a8 8 0 0 0 11.32 11.32l40-40a8 8 0 0 0 0-11.32',
+ trash:'M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Zm-80-104v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0m48 0v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0',
+ cr:'m181.66 133.66-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32',
+ cam:'M208 56h-27.72l-13.63-20.44A8 8 0 0 0 160 32H96a8 8 0 0 0-6.65 3.56L75.71 56H48a24 24 0 0 0-24 24v112a24 24 0 0 0 24 24h160a24 24 0 0 0 24-24V80a24 24 0 0 0-24-24m8 136a8 8 0 0 1-8 8H48a8 8 0 0 1-8-8V80a8 8 0 0 1 8-8h32a8 8 0 0 0 6.66-3.56L100.28 48h55.43l13.63 20.44A8 8 0 0 0 176 72h32a8 8 0 0 1 8 8ZM128 88a44 44 0 1 0 44 44 44.05 44.05 0 0 0-44-44m0 72a28 28 0 1 1 28-28 28 28 0 0 1-28 28'
+};
+I.addusr='M256 136a8 8 0 0 1-8 8h-16v16a8 8 0 0 1-16 0v-16h-16a8 8 0 0 1 0-16h16v-16a8 8 0 0 1 16 0v16h16a8 8 0 0 1 8 8m-57.87 58.85a8 8 0 1 1-12.26 10.3C170.23 186.85 148.77 176 128 176s-42.23 10.85-57.87 29.15a8 8 0 0 1-12.26-10.3c14.94-17.72 35.52-30.59 59.06-37.44a68 68 0 1 1 66.14 0c23.54 6.85 44.12 19.72 59.06 37.44M128 168a52 52 0 1 0-52-52 52.06 52.06 0 0 0 52 52';
+const ic = (k, cls) => '<span class="' + (cls||'ph') + '"><svg viewBox="0 0 256 256"><path d="' + I[k] + '"/></svg></span>';
+
+const SB = '<div class="sb"><span>9:41</span><span class="r">'
+ + '<svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>'
+ + '<svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>'
+ + '<svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/>'
+ + '<rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>';
+
+function phone(inner, over){
+  return '<div class="device"><div class="island"></div><div class="screen">' + SB + inner + (over||'') + '</div></div>';
+}
+function panel(tag, title, body, inner, over){
+  return '<div class="panel">' + phone(inner, over)
+   + '<div class="cap"><span class="n">' + tag + '</span><b>' + title + '</b>' + body + '</div></div>';
+}
+
+function hubHeader(mark){
+  return '<div class="hdr"><div class="hrow">'
+   + '<div class="ib">' + ic('back') + '</div>'
+   + '<div class="htap' + (mark ? ' mark' : '') + '"><span class="av">MT</span>'
+   + '<span class="nmwrap"><span class="nm">Miss Taylor’s Class</span>'
+   + '<span class="nsub">22 members &middot; All First Grade</span></span></div>'
+   + '<div class="ib' + (mark ? ' mark' : '') + '">' + ic('dots') + '</div>'
+   + (mark ? '<span class="pin" style="left:58px;top:-2px">1</span><span class="pin" style="right:2px;top:-2px">2</span>' : '')
+   + '</div>'
+   + '<div class="tabs">'
+   + '<div class="tab on">' + ic('chat') + '<span>Chat</span></div>'
+   + '<div class="tab">' + ic('cal') + '<span>Calendar</span></div>'
+   + '<div class="tab">' + ic('mail') + '<span>Updates</span></div>'
+   + '<div class="tab">' + ic('link') + '<span>Links</span></div>'
+   + '</div></div>';
+}
+const CHAT = '<div class="scroll"><div class="day">Today</div>'
+ + '<div class="b them"><span class="w">Ana Michel</span>Did everyone get their art bags sent in? 🎨</div>'
+ + '<div class="b them"><span class="w">Marcus Reed</span>Sent ours this morning</div>'
+ + '<div class="b me">On it 👍</div></div>'
+ + '<div class="composer"><div class="f">Message Miss Taylor’s Class…</div>'
+ + '<div class="snd">' + ic('send') + '</div></div>';
+
+/* 1 — the hub, with the two doors marked */
+const p1 = panel('Screen 1', 'The screen he lands on.',
+  ' Two controls in this header. The name is not tappable, and the three dots open nothing. Both are '
+  + 'marked here as annotation, they are not new UI. Tapping either one now reaches the same place.',
+  hubHeader(true) + CHAT);
+
+/* 2 — the overflow sheet */
+const sheet = '<div class="scrim"></div><div class="sheet"><div class="grab"></div>'
+ + '<div class="shead"><span class="av">MT</span><span class="nmwrap">'
+ + '<span class="nm">Miss Taylor’s Class</span><span class="nsub">You are an admin</span></span></div>'
+ + '<div class="mrow first">' + ic('pencil') + '<span class="t">Edit name &amp; icon</span>' + ic('cr','cr ph') + '</div>'
+ + '<div class="mrow">' + ic('info') + '<span class="t">Group info</span>' + ic('cr','cr ph') + '</div>'
+ + '<div class="mrow">' + ic('addusr') + '<span class="t">Add members</span>' + ic('cr','cr ph') + '</div>'
+ + '<div class="mrow">' + ic('bell') + '<span class="t">Mute notifications</span>' + ic('cr','cr ph') + '</div>'
+ + '<div class="mrow warn">' + ic('out') + '<span class="t">Leave group</span></div>'
+ + '</div>';
+const p2 = panel('Screen 2', 'The three dots, given something to open.',
+  ' A sheet, not a popover, because the top right corner of an 852px phone is the hardest place on it '
+  + 'to reach. Edit sits first. Delete is deliberately not here: it lives one level deeper, in Group info.',
+  hubHeader(false) + CHAT, sheet);
+
+/* 3 — group info, merged */
+const info = '<div class="top"><div class="ib">' + ic('back') + '</div>'
+ + '<div class="h">Group Info</div><div class="sp"></div></div>'
+ + '<div class="gbody">'
+ + '<div class="idb"><div class="bav">MT</div><div class="inm">Miss Taylor’s Class</div>'
+ + '<div class="imt">Subgroup &middot; All First Grade &middot; 22 members</div></div>'
+ + '<div class="lbl">Settings</div><div class="group">'
+ + '<div class="grow hi">' + ic('pencil') + '<span class="t">Edit name &amp; icon</span>' + ic('cr','cr ph') + '</div>'
+ + '<div class="grow">' + ic('bell') + '<span class="t">Notifications</span><span class="v">On</span></div>'
+ + '<div class="grow">' + ic('pin') + '<span class="t">Pinned messages</span><span class="v">2</span></div>'
+ + '<div class="grow">' + ic('addusr') + '<span class="t">Add members</span>' + ic('cr','cr ph') + '</div>'
+ + '<div class="grow warn">' + ic('out') + '<span class="t">Leave group</span></div>'
+ + '<div class="grow warn">' + ic('trash') + '<span class="t">Delete subgroup</span></div>'
+ + '</div>'
+ + '<div class="lbl">22 members</div><div class="group">'
+ + '<div class="mem"><span class="ma" style="background:linear-gradient(145deg,#1e3e2b,#4fa472)">You</span>'
+ + '<span class="mt"><b>You (Tony)</b><span>Dad of Cooper &middot; 1st</span></span><span class="badge">Admin</span></div>'
+ + '<div class="mem"><span class="ma">AM</span><span class="mt"><b>Ana Michel</b>'
+ + '<span>Mom of Rory &middot; 1st</span></span><span class="badge">Admin</span></div>'
+ + '<div class="mem"><span class="ma" style="background:linear-gradient(145deg,#c85e20,#f0a060)">MR</span>'
+ + '<span class="mt"><b>Marcus Reed</b><span>Dad of Presley &middot; 1st</span></span></div>'
+ + '</div></div>';
+const p3 = panel('Screen 3', 'One Group Info, not two.',
+  ' This list existed in two files that disagreed. One had Edit and Notifications, the other had '
+  + 'Pinned, Add members, Leave and Delete, and no Edit. Merged here, Edit first, the two destructive '
+  + 'rows last and in red.', info);
+
+/* 4 — the editor, unchanged */
+const edit = '<div class="top"><div class="ib">' + ic('back') + '</div>'
+ + '<div class="h">Edit Group</div><div class="save">Save</div></div>'
+ + '<div class="ebody">'
+ + '<div class="idrow"><div class="avbig">MT<div class="cam">' + ic('cam') + '</div></div>'
+ + '<div class="fw"><div class="flabel">Group name</div>'
+ + '<div class="nameinput">Miss Taylor’s Class</div></div></div>'
+ + '<div class="sectlbl">Icon</div><div class="emojis">'
+ + '<div class="emo mono on">MT</div><div class="emo">🎒</div><div class="emo">⚽</div>'
+ + '<div class="emo">🧁</div><div class="emo">🎨</div><div class="emo">📚</div>'
+ + '</div>'
+ + '<div class="hint">' + ic('info') + '<span>Members will see the new name and icon everywhere this '
+ + 'group shows up — chat, calendar, and the class list.</span></div></div>';
+const p4 = panel('Screen 4', 'Nothing here is new.',
+  ' This is the editor that already exists in <code>subgroup-edit-name-icon.html</code>, reached in two '
+  + 'taps instead of five. The whole fix is the two screens before it.', edit);
+
+document.getElementById('row').innerHTML = [p1,p2,p3,p4].join('');
+</script>
+
+</body>
+</html>

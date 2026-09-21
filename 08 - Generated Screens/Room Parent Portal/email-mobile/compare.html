@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Compose Email mobile — three directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f4f1ea;--ink:#1e3e2b;--body:#4d525b;--muted:#7d715e;--green:#186338;
+        --green-light:#e2e9e3;--border:#e6e0d2;--amber:#c08a2d;--amber-bg:#fbf0d8;
+        --serif:'Playfair Display',Georgia,serif;--sans:'Inter',system-ui,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:var(--sans);color:var(--body);padding:28px 30px 40px}
+  header{max-width:1280px;margin:0 0 26px}
+  h1{font-family:var(--serif);font-size:30px;color:var(--ink);margin:0 0 8px}
+  .lede{font-size:14px;line-height:1.6;max-width:760px;margin:0 0 16px}
+  .facts{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .fact{background:#fff;border:1px solid var(--border);border-radius:12px;padding:9px 13px;font-size:12px}
+  .fact b{display:block;font-family:var(--serif);font-size:19px;color:var(--ink);line-height:1.2}
+  .settled{background:var(--green-light);border:1px solid #cddbd2;border-radius:12px;
+    padding:12px 15px;font-size:12.5px;line-height:1.65;max-width:900px}
+  .settled b{color:var(--green)}
+
+  .row{display:flex;gap:26px;align-items:flex-start;overflow-x:auto;padding-bottom:12px}
+  .col{flex:0 0 auto;width:390px}
+  .cap{margin-bottom:10px}
+  .cap .tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--green);background:var(--green-light);
+    border-radius:999px;padding:4px 10px;margin-bottom:7px}
+  .cap h2{font-family:var(--serif);font-size:19px;color:var(--ink);margin:0 0 5px}
+  .cap p{font-size:12.5px;line-height:1.55;margin:0 0 7px}
+  .cap .pro,.cap .con{font-size:11.5px;line-height:1.5;padding-left:16px;position:relative;margin:3px 0}
+  .cap .pro::before{content:'+';position:absolute;left:3px;color:var(--green);font-weight:700}
+  .cap .con::before{content:'–';position:absolute;left:4px;color:var(--amber);font-weight:700}
+  .rec{background:var(--amber-bg);border:1px solid #ecd9ae;color:#7a5712;
+    border-radius:999px;padding:4px 10px;font-size:10px;font-weight:700;letter-spacing:.07em;
+    text-transform:uppercase;display:inline-block;margin-left:6px}
+
+  .phone{width:390px;height:812px;border-radius:30px;overflow:hidden;
+    border:1px solid #ded8ca;background:#000;box-shadow:0 16px 40px rgba(30,62,43,.13)}
+  iframe{width:390px;height:812px;border:0;display:block;background:#fff}
+  footer{max-width:1280px;margin-top:26px;font-size:12px;color:var(--muted);line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+  <h1>Compose Email on mobile — three directions</h1>
+  <p class="lede">Same content, same tokens, three different structures. All three are live: tap through
+  them. The point is to choose a structure, not to judge polish.</p>
+
+  <div class="facts">
+    <div class="fact"><b>2,770px</b>today, empty template</div>
+    <div class="fact"><b>5,108px</b>today, intro template loaded</div>
+    <div class="fact"><b>6.7</b>phone screens of scrolling</div>
+    <div class="fact"><b>25</b>inputs on one screen</div>
+  </div>
+
+  <div class="settled">
+    <b>Already decided, applied to all three:</b>
+    Previously Sent is out of the send flow · recipients are chosen at the end, after the preview, the
+    way Tony asked for twice · nothing is sent until Send is pressed, so no direction saves a partial
+    draft to the backend between steps.
+  </div>
+</header>
+
+<div class="row">
+  <div class="col">
+    <div class="cap">
+      <span class="tag">Direction A</span>
+      <h2>Wizard</h2>
+      <p>Five full-screen steps with Next, Back and Skip. Literally what Tony and Mohit described in the sync.</p>
+      <div class="pro">Each screen is short, and required fields gate the next step</div>
+      <div class="pro">Guides a room parent sending their first class email</div>
+      <div class="con">A one-paragraph email still costs five screens</div>
+      <div class="con">Changing one word at the review step means going back three</div>
+    </div>
+    <div class="phone"><iframe src="a-wizard.html" title="Direction A"></iframe></div>
+  </div>
+
+  <div class="col">
+    <div class="cap">
+      <span class="tag">Direction B</span>
+      <h2>Collapsed blocks<span class="rec">Recommended</span></h2>
+      <p>One page. Each block collapses to a summary row and opens in place. Preview and Send live in the bar at the bottom.</p>
+      <div class="pro">5,108px becomes 616px: measured, everything fits with no scrolling at all</div>
+      <div class="pro">Jump to any block in any order; edit after preview is one tap</div>
+      <div class="pro">No navigation at all, so nothing to save between steps</div>
+      <div class="con">Less hand-holding on a first send than a wizard</div>
+    </div>
+    <div class="phone"><iframe src="b-accordion.html" title="Direction B"></iframe></div>
+  </div>
+
+  <div class="col">
+    <div class="cap">
+      <span class="tag">Direction C</span>
+      <h2>Preview first</h2>
+      <p>The finished email is the screen. Tap any part of it to edit that part in a sheet.</p>
+      <div class="pro">The scroll-down-to-preview problem disappears entirely</div>
+      <div class="pro">Matches how Tony thinks: on To-Do he said "I'm looking at the preview right now"</div>
+      <div class="con">Most work to build, and the most new interaction for Mohit</div>
+      <div class="con">Tap targets on a rendered email need care to stay obvious</div>
+    </div>
+    <div class="phone"><iframe src="c-preview-first.html" title="Direction C"></iframe></div>
+  </div>
+</div>
+
+<footer>
+  Try this in each: open with two template fields empty, then get to Send. That is the real first-use
+  path, and it is where the three structures feel most different.
+  <br><br>
+  Direction B is also built out as a full working prototype, with the real roster, the real template
+  tokens, the specific-people picker and an actual send: <a href="direction-b-full.html"><b>direction-b-full.html</b></a>
+</footer>
+</body>
+</html>

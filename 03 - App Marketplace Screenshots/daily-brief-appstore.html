@@ -20,7 +20,6 @@
     display:flex; flex-direction:column; align-items:center;
     padding-top:6.2vh;
   }
-  /* faint concentric rings, like the brand screens */
   .stage::before {
     content:''; position:absolute; top:-30vw; right:-30vw; width:90vw; height:90vw;
     border-radius:50%; border:0.15vw solid rgba(255,255,255,0.05);
@@ -47,25 +46,24 @@
   .island { position:absolute; top:2.4vw; left:50%; transform:translateX(-50%);
     width:19vw; height:5.4vw; background:#000; border-radius:99vw; z-index:5; }
   .scr { width:100%; border-radius:8vw 8vw 0 0; background:#f0ede6; overflow:hidden;
-    height:128vw; /* tall — bottom crops off the stage */ display:flex; flex-direction:column; }
+    height:128vw; display:flex; flex-direction:column; }
 
   .sb { padding:3vw 5vw 0; display:flex; justify-content:space-between; align-items:flex-start;
     font-size:2.5vw; font-weight:600; color:#1a1a17; }
   .sb .r { display:flex; gap:1vw; align-items:center; }
   .sb svg { width:3vw; height:2vw; fill:#1a1a17; } .sb .bat{ width:4.3vw; }
 
-  .btop { padding:2vw 4vw 1.4vw; display:flex; align-items:center; gap:2vw; }
-  .bk { width:6vw; height:6vw; border-radius:50%; background:#fff; border:0.2vw solid #ddd9cf; display:grid; place-items:center; }
-  .bk svg { width:3vw; height:3vw; stroke:#1a1a17; fill:none; stroke-width:2.4; }
-  .btitle { flex:1; text-align:center; }
-  .btitle .l { font-size:2vw; letter-spacing:0.18vw; text-transform:uppercase; color:#7a7568;
-    display:flex; align-items:center; justify-content:center; gap:1vw; }
-  .btitle .l .dot { width:1vw; height:1vw; border-radius:50%; background:#3d7a40; }
-  .btitle .n { font-size:3vw; font-weight:600; color:#1a1a17; }
-  .bsp { width:6vw; }
+  /* new topbar — Daily Brief is now the default home tab, no back button, per nav restructure */
+  .topbar2 { padding:2.4vw 5vw 1vw; display:flex; align-items:center; justify-content:center; position:relative; }
+  .topbar2 .brand2 { text-align:center; }
+  .topbar2 .brand2 .t { font-family:'Playfair Display',serif; font-size:3.6vw; font-weight:600; color:#1a1a17; }
+  .topbar2 .brand2 .s { font-size:2vw; color:#7a7568; margin-top:0.3vw; }
+  .topbar2 .cal2 { position:absolute; right:5vw; top:50%; transform:translateY(-50%); width:6.4vw; height:6.4vw;
+    border-radius:50%; background:#fff; display:grid; place-items:center; box-shadow:0 0.4vw 1vw rgba(0,0,0,.08); }
+  .topbar2 .cal2 svg { width:3.2vw; height:3.2vw; fill:#1a1a17; }
 
-  .page { padding:1.6vw 4vw; }
-  .card { background:#fff; border:0.2vw solid #ddd9cf; border-radius:3.4vw; padding:3.6vw 3.2vw; }
+  .page { padding:1.2vw 4vw; }
+  .card { background:#fff; border:0.2vw solid #ddd9cf; border-radius:3.4vw; padding:3.4vw 3.2vw; }
   .greet { font-size:3.3vw; font-weight:700; color:#1a1a17; }
   .subl { font-size:2.8vw; color:#7a7568; margin-top:0.4vw; padding-bottom:2.4vw; border-bottom:0.2vw solid #ddd9cf; }
 
@@ -79,20 +77,41 @@
   .weather .rng .r { font-size:3vw; font-weight:700; color:#1a1a17; font-family:ui-monospace,monospace; text-align:right; white-space:nowrap; }
   .weather .rng .lab { font-size:2.1vw; color:#3d7052; text-align:right; margin-top:0.4vw; white-space:nowrap; }
 
-  .grp { margin-top:3.2vw; }
+  .grp { margin-top:3vw; }
   .gt { font-size:2.9vw; font-weight:700; color:#1a1a17; margin-bottom:1.6vw; }
-  .bday { background:linear-gradient(135deg,#fff8e6,#fef0cc); border:0.2vw solid #f5d98a; border-radius:2.2vw;
-    padding:2.4vw 2.8vw; display:flex; align-items:center; gap:2.4vw; }
-  .bday .e { font-size:5vw; }
-  .bday .n { font-size:2.8vw; font-weight:700; color:#1a1a17; }
-  .bday .s { font-size:2.5vw; color:#a07820; margin-top:0.3vw; }
-  .li { display:flex; gap:2vw; align-items:flex-start; padding:1.2vw 0; }
+
+  /* to-do — moved directly under weather, per Ahmad's correction to the section order */
+  .todohead { display:flex; align-items:center; gap:1.6vw; margin-bottom:1.6vw; }
+  .todohead .chev { width:5.6vw; height:5.6vw; border-radius:50%; background:#e2e9e3; display:grid; place-items:center; flex-shrink:0; }
+  .todohead .chev svg { width:2.6vw; height:2.6vw; fill:#186338; }
+  .todohead .ttl { flex:1; font-family:'Playfair Display',serif; font-size:2.9vw; font-weight:700; color:#1a1a17; }
+  .todohead .seeall { font-size:2.2vw; color:#186338; font-weight:600; }
+  .todo { display:flex; gap:2.2vw; align-items:flex-start; padding:1.1vw 0; }
+  .todo .cb { width:3.4vw; height:3.4vw; border-radius:1vw; border:0.45vw solid #3b6ea5; flex-shrink:0; margin-top:0.4vw; }
+  .todo .cb.on { background:#186338; border-color:#186338; display:grid; place-items:center; }
+  .todo .cb.on svg { width:2.2vw; height:2.2vw; fill:#fff; }
+  .todo .tx { font-size:2.7vw; color:#1a1a17; }
+  .todo .tx .m { font-size:2.1vw; color:#8a8478; margin-top:0.3vw; }
+
+  .li { display:flex; gap:2vw; align-items:flex-start; padding:1.1vw 0; }
   .li .num { font-size:2.7vw; color:#7a7568; font-weight:600; }
   .li .tx { font-size:2.7vw; color:#1a1a17; line-height:1.4; }
   .li .tx b { color:#2d5c2e; }
-  .todo { display:flex; gap:2.2vw; align-items:flex-start; padding:1.2vw 0; }
-  .todo .cb { width:3.4vw; height:3.4vw; border-radius:1vw; border:0.45vw solid #3b6ea5; flex-shrink:0; margin-top:0.4vw; }
-  .todo .tx { font-size:2.7vw; color:#1a1a17; }
+
+  .bday { margin-top:2.8vw; background:linear-gradient(135deg,#fff8e6,#fef0cc); border:0.2vw solid #f5d98a; border-radius:2.2vw;
+    padding:2.2vw 2.6vw; display:flex; align-items:center; gap:2.2vw; }
+  .bday .e { font-size:4.6vw; }
+  .bday .n { font-size:2.6vw; font-weight:700; color:#1a1a17; }
+  .bday .s { font-size:2.3vw; color:#a07820; margin-top:0.2vw; }
+
+  /* floating pill bottom-nav — Daily Brief is now the first, default tab */
+  .pillnav2 { position:fixed; left:50%; bottom:2.6vh; transform:translateX(-50%); width:52vw; z-index:50;
+    border-radius:99vw; background:#f4f1ea; box-shadow:0 0.8vw 2.4vw rgba(0,0,0,.22); border-top:0.15vw solid #fff;
+    display:flex; justify-content:space-around; align-items:center; padding:1.5vw 1vw; }
+  .pillnav2 .pn2 { display:flex; flex-direction:column; align-items:center; gap:0.5vw; color:#9a9284; }
+  .pillnav2 .pn2.on { color:#186338; }
+  .pillnav2 .pn2 svg { width:3.6vw; height:3.6vw; }
+  .pillnav2 .pn2 .l { font-size:1.5vw; font-weight:500; }
 </style>
 </head>
 <body>
@@ -118,15 +137,14 @@
           </span>
         </div>
 
-        <div class="btop">
-          <div class="bk"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
-          <div class="btitle"><div class="l"><span class="dot"></span>Live</div><div class="n">Daily Brief</div></div>
-          <div class="bsp"></div>
+        <div class="topbar2">
+          <div class="brand2"><div class="t">Sprout</div><div class="s">Your daily briefing · 7:31 AM</div></div>
+          <div class="cal2"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160zm-68-76a12 12 0 1 1-12-12 12 12 0 0 1 12 12m44 0a12 12 0 1 1-12-12 12 12 0 0 1 12 12m-88 40a12 12 0 1 1-12-12 12 12 0 0 1 12 12m44 0a12 12 0 1 1-12-12 12 12 0 0 1 12 12m44 0a12 12 0 1 1-12-12 12 12 0 0 1 12 12"/></svg></div>
         </div>
 
         <div class="page">
           <div class="card">
-            <div class="greet">Good morning, Tony.</div>
+            <div class="greet">Good morning, James.</div>
             <div class="subl">Here's your Wednesday:</div>
 
             <div class="weather">
@@ -142,11 +160,13 @@
             </div>
 
             <div class="grp">
-              <div class="gt">🎂 Birthdays</div>
-              <div class="bday">
-                <span class="e">🎉</span>
-                <div><div class="n">Kennedy turns 5 today!</div><div class="s">Say happy birthday at drop-off 👋</div></div>
+              <div class="todohead">
+                <div class="chev"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32"/></svg></div>
+                <div class="ttl">✅ Needs your attention</div>
+                <div class="seeall">See All (3)</div>
               </div>
+              <div class="todo"><div class="cb"></div><div class="tx">Sign Jake's permission slip<div class="m">1st Grade · Due today</div></div></div>
+              <div class="todo"><div class="cb"></div><div class="tx">Confirm snacks for parent-teacher night<div class="m">Kindergarten · Due today</div></div></div>
             </div>
 
             <div class="grp">
@@ -155,14 +175,21 @@
               <div class="li"><span class="num">2.</span><span class="tx">6:00 pm — parent-teacher night · room 14</span></div>
             </div>
 
-            <div class="grp">
-              <div class="gt">✅ To do</div>
-              <div class="todo"><span class="cb"></span><span class="tx">Sign Jake's permission slip</span></div>
-              <div class="todo"><span class="cb"></span><span class="tx">Confirm snacks for parent-teacher night</span></div>
+            <div class="bday">
+              <span class="e">🎉</span>
+              <div><div class="n">Kennedy turns 5 today!</div><div class="s">Say happy birthday at drop-off 👋</div></div>
             </div>
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="pillnav2">
+      <div class="pn2 on"><svg viewBox="0 0 256 256"><path d="M240 152h-40.45a74 74 0 0 0 .45-8 72 72 0 0 0-144 0 74 74 0 0 0 .45 8H16a8 8 0 0 0 0 16h224a8 8 0 0 0 0-16m-168-8a56 56 0 1 1 111.41 8H72.59a56 56 0 0 1-.59-8m144 56a8 8 0 0 1-8 8H48a8 8 0 0 1 0-16h160a8 8 0 0 1 8 8M72.84 43.58a8 8 0 0 1 14.32-7.16l8 16a8 8 0 0 1-14.32 7.16Zm-56 48.84a8 8 0 0 1 10.74-3.57l16 8a8 8 0 0 1-7.16 14.31l-16-8a8 8 0 0 1-3.58-10.74m192 15.16a8 8 0 0 1 3.58-10.73l16-8a8 8 0 1 1 7.16 14.31l-16 8a8 8 0 0 1-10.74-3.58m-48-55.16 8-16a8 8 0 0 1 14.32 7.16l-8 16a8 8 0 1 1-14.32-7.16" fill="currentColor"/></svg><span class="l">Daily Brief</span></div>
+      <div class="pn2"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m51.58 57.79-32 64a4.08 4.08 0 0 1-1.79 1.79l-64 32a4 4 0 0 1-5.37-5.37l32-64a4.08 4.08 0 0 1 1.79-1.79l64-32a4 4 0 0 1 5.37 5.37" fill="currentColor"/></svg><span class="l">Events</span></div>
+      <div class="pn2"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88Z" fill="currentColor"/></svg><span class="l">AI Assist</span></div>
+      <div class="pn2"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24m0 192a87.87 87.87 0 0 1-44.06-11.81 8 8 0 0 0-6.54-.67L40 216l12.47-37.4a8 8 0 0 0-.66-6.54A88 88 0 1 1 128 216" fill="currentColor"/></svg><span class="l">Chat</span></div>
+      <div class="pn2"><svg viewBox="0 0 256 256"><circle cx="88" cy="80" r="40" fill="none" stroke="currentColor" stroke-width="15"/><circle cx="168" cy="80" r="40" fill="none" stroke="currentColor" stroke-width="15"/><path d="M20 200c0-36 30-65 68-65s68 29 68 65" fill="none" stroke="currentColor" stroke-width="15" stroke-linecap="round"/><path d="M100 200c0-36 30-65 68-65s68 29 68 65" fill="none" stroke="currentColor" stroke-width="15" stroke-linecap="round"/></svg><span class="l">Clubs</span></div>
     </div>
   </div>
 </body>

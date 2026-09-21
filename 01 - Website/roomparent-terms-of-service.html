@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#eef0ed">
+<meta name="description" content="The terms for using Room Parent — a free web tool for room parents to run their class calendar, emails, sign-ups, and class fund.">
+<link rel="icon" type="image/svg+xml" href="./roomparent-assets/logo/room-parent-mark.svg">
+<link rel="apple-touch-icon" href="./roomparent-assets/logo/apple-touch-icon.png">
+<title>Terms of Service — Room Parent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:       #f4f1ea;
+    --cream-mid:   #eae6db;
+    --cream-deep:  #dbd5c8;
+    --green:       #186338;
+    --logo-green:  #245c43;
+    --green-bold:  #1e3e2b;
+    --green-xbold: #0f2218;
+    --green-light: #e2e9e3;
+    --green-mid:   #77b691;
+    --text:        #2a2e25;
+    --text-mid:    #4d525b;
+    --text-muted:  #818898;
+    --white:       #ffffff;
+    --r-full:      9999px;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body:    'Manrope', -apple-system, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-body); background: #eef0ed; color: var(--text); line-height: 1.6; }
+  a { text-decoration: none; color: inherit; }
+
+  .skip-link { position: absolute; left: -9999px; top: 0; background: var(--green-bold); color: #fff; padding: 10px 16px; border-radius: 0 0 8px 0; z-index: 200; }
+  .skip-link:focus { left: 0; }
+
+  /* NAV — same floating pill as the landing page */
+  #mainNav {
+    position: fixed; top: 32px; left: 50%; right: auto; width: min(1180px, calc(100% - 40px));
+    padding: 11px 14px 11px 16px; transform: translateX(-50%); z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    border: 1px solid rgba(30,62,43,.1); border-radius: 18px;
+    background: rgba(255,255,255,.62); box-shadow: 0 12px 40px rgba(30,62,43,.08);
+    backdrop-filter: blur(14px) saturate(140%);
+    transition: background .4s, box-shadow .4s;
+  }
+  #mainNav.scrolled { background: rgba(255,255,255,.82); box-shadow: 0 12px 40px rgba(30,62,43,.1); }
+  .nav-logo { display: flex; align-items: center; gap: 11px; }
+  .brand-mark {
+    width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px;
+    background: var(--white); border: 1px solid rgba(30,62,43,.1); box-shadow: 0 3px 12px rgba(30,62,43,.08);
+    padding: 4px; flex-shrink: 0;
+  }
+  .brand-mark img { width: 100%; height: 100%; display: block; object-fit: contain; }
+  .nav-logo-name { font-family: var(--font-body); font-size: 18px; font-weight: 600; color: var(--logo-green); letter-spacing: -0.45px; line-height: 1.15; }
+  .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+  .nav-links a { font-size: 14px; font-weight: 500; color: var(--text-mid); transition: color .2s; }
+  .nav-links a:hover { color: var(--green); }
+  .nav-cta {
+    display: flex; align-items: center; gap: 8px; background: var(--green-bold); color: var(--white);
+    padding: 10px 20px; border-radius: var(--r-full); font-size: 14px; font-weight: 600; transition: background .2s, transform .15s;
+  }
+  .nav-cta:hover { background: var(--green-xbold); transform: translateY(-1px); }
+
+  /* DOC */
+  .doc { max-width: 856px; margin: 0 auto; padding: 152px 48px 96px; }
+  .doc-eyebrow {
+    display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; letter-spacing: 1.54px;
+    text-transform: uppercase; color: var(--green); background: rgba(255,255,255,.7);
+    border: 1px solid rgba(30,62,43,.12); border-radius: 6px; padding: 6px 10px; margin-bottom: 18px;
+  }
+  .doc h1 { font-family: var(--font-display); font-size: clamp(36px, 4.4vw, 50px); font-weight: 600; letter-spacing: -1.5px; line-height: 1.15; color: var(--text); margin-bottom: 14px; }
+  .doc-updated { font-size: 13.5px; color: var(--text-muted); }
+  .doc-lede { font-size: 16px; line-height: 1.7; color: var(--text-mid); margin-top: 20px; max-width: 680px; }
+
+  .doc-card { background: var(--white); border: 1px solid var(--cream-deep); border-radius: 24px; padding: 44px 44px 40px; box-shadow: 0 4px 24px rgba(30,62,43,.06); margin-top: 40px; }
+
+  .toc { border: 1px solid var(--cream-deep); background: #fbfaf7; border-radius: 16px; padding: 22px 24px; margin-bottom: 40px; }
+  .toc-title { font-size: 10.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+  .toc ol { list-style: none; counter-reset: toc; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 28px; }
+  .toc li { counter-increment: toc; font-size: 14px; }
+  .toc li::before { content: counter(toc) ". "; color: var(--green-mid); font-weight: 700; }
+  .toc a { color: var(--text-mid); }
+  .toc a:hover { color: var(--green); text-decoration: underline; }
+
+  .doc-card h2 { font-family: var(--font-display); font-size: 24px; font-weight: 600; color: var(--green-bold); letter-spacing: -.4px; line-height: 1.25; margin: 40px 0 12px; scroll-margin-top: 120px; }
+  .doc-card h2:first-of-type { margin-top: 0; }
+  .doc-card h3 { font-size: 14.5px; font-weight: 700; color: var(--text); margin: 22px 0 8px; }
+  .doc-card p { font-size: 15px; line-height: 1.75; color: var(--text-mid); margin-bottom: 14px; }
+  .doc-card ul { margin: 0 0 16px 20px; }
+  .doc-card li { font-size: 15px; line-height: 1.75; color: var(--text-mid); margin-bottom: 8px; }
+  .doc-card strong { color: var(--text); font-weight: 700; }
+  .doc-card a { color: var(--green); font-weight: 600; }
+  .doc-card a:hover { text-decoration: underline; }
+  .doc-card hr { border: 0; border-top: 1px solid var(--cream-deep); margin: 36px 0; }
+
+  .callout { background: var(--green-light); border-radius: 14px; padding: 18px 20px; margin: 20px 0 24px; }
+  .callout p { margin: 0; font-size: 14.5px; color: var(--green-bold); }
+
+  /* FOOTER — same as the landing page */
+  footer { background: var(--green-xbold); padding: 56px 48px 40px; }
+  .footer-top { display: flex; align-items: flex-start; justify-content: space-between; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 32px; gap: 40px; flex-wrap: wrap; }
+  .footer-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .footer-logo .brand-mark { background: transparent; border-color: transparent; box-shadow: none; }
+  .footer-logo-name { font-family: var(--font-body); font-size: 18px; font-weight: 600; letter-spacing: -.35px; color: var(--white); }
+  .footer-tagline { font-family: var(--font-display); font-style: italic; font-size: 14px; color: rgba(255,255,255,.45); max-width: 280px; line-height: 1.6; }
+  .footer-links { display: flex; gap: 64px; }
+  .footer-col-title { font-size: 10px; font-weight: 600; color: rgba(255,255,255,.4); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 16px; }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-col a { font-size: 14px; color: rgba(255,255,255,.65); transition: color .2s; }
+  .footer-col a:hover { color: var(--white); }
+  .footer-bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .footer-copy { font-size: 12px; color: rgba(255,255,255,.35); }
+  .footer-legal { display: flex; gap: 24px; }
+  .footer-legal a { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.35); transition: color .2s; }
+  .footer-legal a:hover { color: rgba(255,255,255,.7); }
+
+  @media (max-width: 1024px) { .nav-links { display: none; } }
+  @media (max-width: 720px) {
+    #mainNav { top: 10px; width: calc(100% - 20px); padding: 8px 9px 8px 11px; border-radius: 15px; }
+    .brand-mark { width: 38px; height: 38px; }
+    .nav-logo-name { font-size: 17px; }
+    .doc { padding: 104px 18px 72px; }
+    .doc-card { padding: 28px 22px 24px; border-radius: 20px; }
+    .toc ol { grid-template-columns: 1fr; }
+    footer { padding: 48px 20px 32px; }
+    .footer-links { gap: 40px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition-duration: .01ms !important; } }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<nav id="mainNav" aria-label="Primary navigation">
+  <a class="nav-logo" href="./roomparent-com-landing-v2.html" aria-label="Room Parent home">
+    <span class="brand-mark" aria-hidden="true"><img src="./roomparent-assets/logo/room-parent-mark.svg" alt=""></span>
+    <span class="nav-logo-name">Room Parent</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="./roomparent-com-landing-v2.html#see-it">How it works</a></li>
+    <li><a href="./roomparent-com-landing-v2.html#features">Features</a></li>
+    <li><a href="./roomparent-com-landing-v2.html#faq">FAQ</a></li>
+  </ul>
+  <a href="./roomparent-com-request-access.html" class="nav-cta"><span>Request Access</span><span aria-hidden="true">→</span></a>
+</nav>
+
+<main id="main-content" class="doc">
+  <span class="doc-eyebrow">Legal</span>
+  <h1>Terms of Service</h1>
+  <p class="doc-updated">Last updated September 11, 2026</p>
+  <p class="doc-lede">These terms cover your use of Room Parent — the free web tool room parents use to run a classroom's calendar, emails, sign-ups, consent forms, and class fund. Please read them before you sign in or share a Room Parent link with your class.</p>
+
+  <div class="doc-card">
+    <nav class="toc" aria-label="Contents">
+      <p class="toc-title">On this page</p>
+      <ol>
+        <li><a href="#accept">Accepting these terms</a></li>
+        <li><a href="#what">What Room Parent is</a></li>
+        <li><a href="#who">Who can use it</a></li>
+        <li><a href="#responsibilities">Your responsibilities</a></li>
+        <li><a href="#content">Your class content</a></li>
+        <li><a href="#money">Donations and the class fund</a></li>
+        <li><a href="#email">Emails you send</a></li>
+        <li><a href="#acceptable">Acceptable use</a></li>
+        <li><a href="#access">Access, handoff, and suspension</a></li>
+        <li><a href="#availability">Availability and changes</a></li>
+        <li><a href="#disclaimer">Disclaimers and liability</a></li>
+        <li><a href="#general">General terms</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="accept">1. Accepting these terms</h2>
+    <p>By signing in to Room Parent, submitting a form on a Room Parent page, or otherwise using the service, you agree to these terms. If you do not agree, please do not use the service.</p>
+
+    <h2 id="what">2. What Room Parent is</h2>
+    <p>Room Parent is a free, web-based tool for the volunteers who run a classroom. It helps you keep a class calendar, publish a school lunch menu, draft and send class emails, collect volunteer sign-ups and consent forms, share links, track a class fund, and split a checklist with your co-room-parent.</p>
+    <div class="callout">
+      <p>Room Parent is independent. It is not operated by, affiliated with, or endorsed by any school, school district, or parent-teacher organization. Using it does not create any relationship between us and your school.</p>
+    </div>
+    <p>Families do not need an account or an app to take part. They receive your emails and open your links the way they always have.</p>
+
+    <h2 id="who">3. Who can use it</h2>
+    <ul>
+      <li>You must be at least 18 years old to sign in to the portal.</li>
+      <li>You should be a room parent, class volunteer, or someone the class or teacher has asked to help run it.</li>
+      <li>Access is granted per class. Do not sign in to or use a class you have not been given access to.</li>
+    </ul>
+
+    <h2 id="responsibilities">4. Your responsibilities</h2>
+    <p>Room Parent puts other families' details in your hands. When you use it, you agree to:</p>
+    <ul>
+      <li><strong>Follow your school's rules</strong> about handling family and student information, including any rules about rosters, photos, and directories.</li>
+      <li><strong>Only add contact details you are allowed to use</strong> — for example, information a family gave you for class communication, or information your school authorised you to use.</li>
+      <li><strong>Use class information only for running the class.</strong> Do not use it for personal marketing, political campaigning, commercial solicitation, or any purpose a family would not expect.</li>
+      <li><strong>Keep your sign-in to yourself.</strong> Sign-in uses a one-time code sent to your phone; do not share that code, and tell us if you think someone else has access to your class.</li>
+      <li><strong>Keep entries accurate</strong> — particularly class fund records, which other room parents and families may rely on.</li>
+    </ul>
+
+    <h2 id="content">5. Your class content</h2>
+    <p>The content you put into Room Parent — events, menus, emails, links, checklists, fund records, receipts, rosters, and form responses — stays yours and your class's. We do not claim ownership of it.</p>
+    <p>You give us permission to store, copy, and display that content as needed to run the service: showing it to the room parents of your class, delivering the emails you choose to send, and rendering the pages you choose to share.</p>
+    <p>You are responsible for the content you publish or send. Anything you share by link — a checklist, an event page, a sign-up, a consent form, or a class donation page — can be opened by anyone who has that link, so share links with care.</p>
+
+    <h2 id="money">6. Donations and the class fund</h2>
+    <div class="callout">
+      <p>Room Parent never processes, holds, or transfers money. We are not a payment processor, a bank, or a fundraising platform, and we take no fee or percentage of anything your class collects.</p>
+    </div>
+    <p>A class donation page links out to payment accounts you already own — for example Zelle, Venmo, or Apple Pay. Every payment happens in that provider's app or website, under that provider's terms. It is between the giver, you, and that provider.</p>
+    <p>That means:</p>
+    <ul>
+      <li>You are responsible for the payment details you publish, and for making sure they are correct and belong to you or your class.</li>
+      <li>Donation and expense entries in the portal are bookkeeping notes you type in yourself. They are not receipts, financial statements, or proof of a transaction.</li>
+      <li>We are not responsible for lost, mistaken, disputed, or misdirected payments, and we cannot reverse or refund anything.</li>
+      <li>You are responsible for handling class funds honestly and for any reporting your school or the law requires of you.</li>
+    </ul>
+
+    <h2 id="email">7. Emails you send</h2>
+    <p>When you send an email or invitation through Room Parent, you are the sender — we simply deliver it on your behalf. You are responsible for who you send it to and what it says, including complying with anti-spam law and honouring anyone who asks to be removed.</p>
+
+    <h2 id="acceptable">8. Acceptable use</h2>
+    <p>Do not use Room Parent to:</p>
+    <ul>
+      <li>collect or share information you have no right to share;</li>
+      <li>send spam, chain messages, or commercial solicitation;</li>
+      <li>harass, threaten, impersonate, or endanger anyone;</li>
+      <li>publish anything unlawful, hateful, or harmful to children;</li>
+      <li>attempt to access another class's information, or to probe, scan, overload, or break the service;</li>
+      <li>copy, scrape, or resell the service or its contents.</li>
+    </ul>
+
+    <h2 id="access">9. Access, handoff, and suspension</h2>
+    <p>Access is granted per class, so handing a class to next year's room parent takes one step and does not require rebuilding the calendar or the menu. Room parents with access to a class may grant or remove access for others in that class.</p>
+    <p>We may suspend or remove access if we believe these terms are being broken, if information is being misused, or if the service or the people in it are at risk. Where practical, we will tell you why.</p>
+    <p>You can stop using Room Parent whenever you like and ask us to delete your information — see the <a href="./roomparent-privacy-policy.html">Privacy Policy</a>.</p>
+
+    <h2 id="availability">10. Availability and changes</h2>
+    <p>Room Parent is free, and we intend to keep it that way for room parents. We may add, change, or remove features, and we may update these terms. If a change is significant, we will update the date at the top of this page and, where it matters, let room parents know inside the portal. Continuing to use the service after a change means the updated terms apply.</p>
+    <p>We do not promise the service will always be available or uninterrupted. Please keep your own copies of anything you cannot afford to lose.</p>
+
+    <h2 id="disclaimer">11. Disclaimers and liability</h2>
+    <p>Room Parent is provided "as is" and "as available", without warranties of any kind, whether express or implied, including any implied warranties of merchantability, fitness for a particular purpose, or non-infringement. We do not warrant that the service will be error-free, that emails will always be delivered, or that information you enter will always be available.</p>
+    <p>To the fullest extent permitted by law, we are not liable for any indirect, incidental, special, consequential, or punitive damages, or for any lost data, lost funds, or lost opportunities arising from your use of the service. Where liability cannot be excluded, our total liability to you is limited to one hundred United States dollars (US$100), reflecting that the service is provided free of charge.</p>
+    <p>Some jurisdictions do not allow certain exclusions or limitations, so parts of this section may not apply to you.</p>
+
+    <h2 id="general">12. General terms</h2>
+    <p>These terms, together with the <a href="./roomparent-privacy-policy.html">Privacy Policy</a>, are the entire agreement between you and us about Room Parent. If any part is found unenforceable, the rest stays in force. Our not enforcing a term is not a waiver of it.</p>
+    <p>These terms are governed by the laws of the State of Texas, United States, without regard to its conflict-of-laws rules, and you agree that courts located in Travis County, Texas have jurisdiction over any dispute — except where the law where you live gives you the right to bring a claim closer to home.</p>
+    <p>Questions about these terms? Email <a href="mailto:hello@roomparent.com">hello@roomparent.com</a>.</p>
+
+    <hr>
+    <p style="margin-bottom:0;">See also our <a href="./roomparent-privacy-policy.html">Privacy Policy</a>.</p>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <span class="brand-mark" aria-hidden="true"><img src="./roomparent-assets/logo/room-parent-mark-reversed.svg" alt=""></span>
+        <span class="footer-logo-name">Room Parent</span>
+      </div>
+      <p class="footer-tagline">"All-in-one tools for room parents."</p>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <p class="footer-col-title">Product</p>
+        <ul>
+          <li><a href="./roomparent-com-landing-v2.html#see-it">How it works</a></li>
+          <li><a href="./roomparent-com-landing-v2.html#features">Features</a></li>
+          <li><a href="./roomparent-com-request-access.html">Request Access</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p class="footer-col-title">Legal</p>
+        <ul>
+          <li><a href="./roomparent-privacy-policy.html">Privacy</a></li>
+          <li><a href="./roomparent-terms-of-service.html">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2026 Room Parent. All rights reserved.</span>
+    <div class="footer-legal">
+      <a href="./roomparent-privacy-policy.html">Privacy Policy</a>
+      <a href="./roomparent-terms-of-service.html">Terms of Service</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const mainNav = document.getElementById('mainNav');
+const onScroll = () => mainNav.classList.toggle('scrolled', window.scrollY > 12);
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+</script>
+
+</body>
+</html>

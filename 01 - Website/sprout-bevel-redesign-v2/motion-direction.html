@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motion direction — Sprout website</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wdth,wght@75..100,400..700&display=swap" rel="stylesheet">
+<style>
+/* Tokens and easing lifted from the site's own styles.css so the motion is
+   judged in the real design, not an approximation of it. */
+:root{
+  --canvas:#f7f8f6; --white:#fff; --ink:#171b18; --muted:#626b65;
+  --green:#184c36; --green-deep:#103527; --mint:#c5efcf; --sky:#dcecff;
+  --sky-deep:#b9dbef; --lavender:#dedcf8; --peach:#f6ded4; --yellow:#f2db86;
+  --line:#dce1dc;
+  --font:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --panel-radius:1.8rem;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--canvas);font-family:var(--font);color:var(--ink);
+  -webkit-font-smoothing:antialiased;padding:40px 34px 80px}
+
+.head{max-width:860px;margin-bottom:26px}
+.head h1{font-size:2.1rem;font-weight:600;letter-spacing:-.02em;margin-bottom:10px}
+.head p{font-size:1rem;line-height:1.65;color:var(--muted)}
+.principle{background:var(--white);border:1px solid var(--line);border-left:3px solid var(--green);
+  border-radius:1rem;padding:15px 18px;margin:18px 0;max-width:780px;font-size:.92rem;line-height:1.65}
+.principle b{color:var(--green)}
+.already{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px;max-width:900px}
+.already span{background:var(--mint);border-radius:99px;padding:6px 13px;font-size:.78rem;font-weight:600;color:var(--green-deep)}
+
+.bar{display:flex;align-items:center;gap:14px;background:var(--white);border:1px solid var(--line);
+  border-radius:99px;padding:10px 16px;margin:20px 0 34px;max-width:780px;font-size:.85rem;color:var(--muted)}
+.bar b{color:var(--ink)}
+.switch{margin-left:auto;display:inline-flex;align-items:center;gap:9px;cursor:pointer;font-size:.85rem;color:var(--ink)}
+.switch input{width:38px;height:22px;appearance:none;background:var(--line);border-radius:99px;position:relative;cursor:pointer;transition:background .2s}
+.switch input::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:translate .2s var(--ease)}
+.switch input:checked{background:var(--green)}
+.switch input:checked::after{translate:16px 0}
+
+.grid{display:flex;flex-direction:column;gap:30px}
+.moment{background:var(--white);border:1px solid var(--line);border-radius:var(--panel-radius);overflow:hidden}
+.m-head{display:flex;align-items:flex-start;gap:18px;padding:22px 26px 18px;border-bottom:1px solid var(--line)}
+.m-num{width:40px;height:40px;border-radius:50%;background:var(--green);color:#fff;display:grid;
+  place-items:center;font-size:.95rem;font-weight:600;flex-shrink:0}
+.m-tx{flex:1;min-width:0}
+.m-tx h2{font-size:1.18rem;font-weight:600;letter-spacing:-.01em;margin-bottom:5px}
+.m-tx p{font-size:.9rem;line-height:1.6;color:var(--muted);max-width:640px}
+.spec{flex-shrink:0;text-align:right;font-size:.72rem;line-height:1.7;color:var(--muted);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.spec b{display:block;color:var(--ink);font-weight:600}
+.replay{appearance:none;border:1px solid var(--line);background:var(--canvas);border-radius:99px;
+  padding:9px 16px;font-family:var(--font);font-size:.82rem;font-weight:600;color:var(--ink);
+  cursor:pointer;display:inline-flex;align-items:center;gap:7px;flex-shrink:0}
+.replay:hover{background:var(--mint);border-color:var(--mint)}
+.stage{padding:30px 26px 34px;background:linear-gradient(180deg,var(--canvas),#fff)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.lane{min-width:0}
+.lane-t{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.lane-t i{width:7px;height:7px;border-radius:50%;background:var(--line);font-style:normal}
+.lane.new .lane-t i{background:var(--green)}
+
+/* ── shared pieces of the real site ── */
+.shot{width:100%;border-radius:1.1rem;display:block;border:1px solid var(--line)}
+.eyebrow{font-size:.74rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--green);margin-bottom:10px}
+.big{font-size:1.9rem;font-weight:600;letter-spacing:-.025em;line-height:1.14;margin-bottom:10px}
+.sub{font-size:.95rem;line-height:1.6;color:var(--muted);margin-bottom:18px}
+.cta{display:inline-flex;gap:10px}
+.pill{background:var(--green);color:#fff;border-radius:99px;padding:11px 20px;font-size:.88rem;font-weight:600}
+.pill.alt{background:var(--white);color:var(--ink);border:1px solid var(--line)}
+
+/* ═══ 1 · hero, staged on load ═══ */
+.hero-demo{display:grid;grid-template-columns:1.05fr .95fr;gap:26px;align-items:center}
+.hero-demo .phone{max-width:250px;margin-left:auto}
+/* Nothing is hidden at rest. The hidden state lives inside the keyframes and is
+   held only while the animation is pending, via backwards fill. So if the
+   animation never runs — reduced motion, no JS, a CSS mistake — the content is
+   simply there. Hiding at rest means any failure costs the reader the content. */
+@keyframes rise{from{opacity:0;translate:0 14px}to{opacity:1;translate:0 0}}
+@keyframes arrive{from{opacity:0;translate:0 26px;scale:.965}to{opacity:1;translate:0 0;scale:1}}
+.playing .h-step{animation:rise .7s var(--ease) backwards}
+.playing .h-1{animation-delay:.05s}
+.playing .h-2{animation-delay:.16s}
+.playing .h-3{animation-delay:.27s}
+/* the screen arrives last and settles, so the eye lands on the product */
+.playing .h-shot{animation:arrive .95s var(--ease) .34s backwards}
+
+/* ═══ 2 · day switcher ═══ */
+.tabs{display:inline-flex;gap:6px;background:var(--canvas);border:1px solid var(--line);
+  border-radius:99px;padding:5px;margin-bottom:18px}
+.tabs button{appearance:none;border:none;background:none;border-radius:99px;padding:8px 15px;
+  font-family:var(--font);font-size:.82rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .22s var(--ease)}
+.tabs button[aria-selected="true"]{background:var(--green);color:#fff}
+.view{display:grid;grid-template-columns:1fr 200px;gap:22px;align-items:start}
+.v-num{font-size:2.4rem;font-weight:600;color:var(--mint);line-height:1;margin-bottom:8px;
+  font-variant-numeric:tabular-nums}
+.v-title{font-size:1.15rem;font-weight:600;margin-bottom:7px}
+.v-copy{font-size:.88rem;line-height:1.6;color:var(--muted);margin-bottom:12px}
+.v-points{list-style:none;display:flex;flex-direction:column;gap:7px}
+.v-points li{font-size:.85rem;color:var(--ink);padding-left:18px;position:relative}
+.v-points li::before{content:'';position:absolute;left:0;top:.45em;width:7px;height:7px;
+  border-radius:50%;background:var(--sky-deep)}
+/* old: the whole panel blinks. new: the number and each line carry the change. */
+.swap-old{animation:blockfade .34s var(--ease)}
+@keyframes blockfade{from{opacity:.3;transform:translateY(8px)}to{opacity:1;transform:none}}
+.swap-new .v-num{animation:numroll .5s var(--ease)}
+@keyframes numroll{from{opacity:0;translate:0 -12px}to{opacity:1;translate:0 0}}
+.swap-new .v-title,.swap-new .v-copy{animation:rise .45s var(--ease) backwards}
+.swap-new .v-copy{animation-delay:.05s}
+.swap-new .v-points li{animation:rise .45s var(--ease) backwards}
+.swap-new .v-points li:nth-child(1){animation-delay:.10s}
+.swap-new .v-points li:nth-child(2){animation-delay:.17s}
+.swap-new .v-points li:nth-child(3){animation-delay:.24s}
+.swap-new .shot{animation:arrive .6s var(--ease)}
+
+/* ═══ 3 · community stagger ═══ */
+.faces{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.faces img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:1.1rem;border:1px solid var(--line)}
+.playing .f-item{animation:arrive .72s var(--ease) backwards}
+.playing .lane.new .f-item:nth-child(1){animation-delay:.02s}
+.playing .lane.new .f-item:nth-child(2){animation-delay:.12s}
+.playing .lane.new .f-item:nth-child(3){animation-delay:.22s}
+
+/* ═══ 4 · download close ═══ */
+.close-demo{text-align:center;padding:10px 0}
+.close-demo .logo{width:54px;height:54px;border-radius:1rem;object-fit:contain;
+  background:var(--white);border:1px solid var(--line);padding:7px;margin-bottom:14px}
+.badges{display:flex;gap:12px;justify-content:center;margin-top:18px}
+.badges img{height:42px}
+.playing .c-item{animation:rise .68s var(--ease) backwards}
+.playing .c-1{animation-delay:.04s}
+.playing .c-2{animation-delay:.14s}
+.playing .c-3{animation-delay:.24s}
+/* the badges are the last thing on the page, so they get a little weight */
+.playing .c-4{animation:arrive .8s var(--ease) .36s backwards}
+
+.untouched{background:var(--white);border:1px dashed var(--line);border-radius:var(--panel-radius);
+  padding:22px 26px;margin-top:30px}
+.untouched h2{font-size:1.05rem;font-weight:600;margin-bottom:8px}
+.untouched p{font-size:.9rem;line-height:1.65;color:var(--muted);max-width:700px;margin-bottom:12px}
+.untouched .list{display:flex;gap:8px;flex-wrap:wrap}
+.untouched .list span{background:var(--canvas);border:1px solid var(--line);border-radius:99px;
+  padding:6px 13px;font-size:.8rem;color:var(--muted)}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important;transition-duration:.01ms !important}
+}
+body.force-reduce *,body.force-reduce *::before,body.force-reduce *::after{
+  animation:none !important;transition-duration:.01ms !important}
+
+
+@media (max-width:1000px){
+  .two{grid-template-columns:1fr}
+  .hero-demo{grid-template-columns:1fr}
+  .hero-demo .phone{margin:0 auto}
+  .view{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>Motion direction</h1>
+  <p>Four moments worth animating, and six sections deliberately left alone. Every panel replays
+  on demand, because motion cannot be judged from a still.</p>
+
+  <div class="already">
+    <span>Already built: 20 scroll reveals</span>
+    <span>Day switcher animates</span>
+    <span>"Try one tap" demo</span>
+    <span>reduced-motion respected</span>
+  </div>
+
+  <div class="principle">
+    <b>The problem is not too little motion, it is motion with no hierarchy.</b>
+    All twenty reveals use the same 650ms fade and the same 1.5rem rise. When everything moves
+    with equal weight, nothing reads as important, and a page of equal-weight motion is exactly
+    what makes a site feel like a template. So this adds almost no new motion. It varies the
+    weight of what is already there, and puts real craft in four places.
+  </div>
+
+  <div class="bar">
+    <b>Check this too:</b> every moment degrades to an instant, static state.
+    <label class="switch"><input type="checkbox" id="rm"> Simulate reduced motion</label>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- 1 -->
+  <section class="moment" data-m="hero">
+    <div class="m-head">
+      <span class="m-num">1</span>
+      <div class="m-tx">
+        <h2>Hero, staged on load</h2>
+        <p>The only place allowed to announce itself. Today the hero sits above the fold, so the
+        observer fires instantly and it gets the same generic fade as a footnote nine sections
+        later. Here the lines arrive in reading order and the app screen lands last, so the eye
+        finishes on the product.</p>
+      </div>
+      <div class="spec"><b>700ms rise</b>0 / 110 / 220ms<br><b>950ms arrive</b>screen, +340ms</div>
+      <button class="replay">↻ Replay</button>
+    </div>
+    <div class="stage">
+      <div class="hero-demo">
+        <div>
+          <div class="eyebrow h-step h-1">Built for parents</div>
+          <div class="big h-step h-2">Your family life,<br>connected.</div>
+          <div class="sub h-step h-2">One place for the plans, the people, and the small logistics
+            that hold a week together.</div>
+          <div class="cta h-step h-3"><span class="pill">Get Sprout</span><span class="pill alt">See how it works</span></div>
+        </div>
+        <div class="phone"><img class="shot h-shot" src="./assets/events-home.webp" alt="Sprout home screen"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="moment" data-m="day">
+    <div class="m-head">
+      <span class="m-num">2</span>
+      <div class="m-tx">
+        <h2>The day switcher</h2>
+        <p>The most product-explaining moment on the page, and the one already animated. Today the
+        whole panel fades as a block, which reads as a refresh. Move the number and each line
+        separately and it reads as the day changing. Click the tabs on both sides to compare.</p>
+      </div>
+      <div class="spec"><b>Number</b>500ms, drops in<br><b>Lines</b>450ms, 70ms apart</div>
+      <button class="replay">↻ Replay</button>
+    </div>
+    <div class="stage">
+      <div class="two">
+        <div class="lane old">
+          <div class="lane-t"><i></i>Now — one block</div>
+          <div class="tabs" data-lane="old">
+            <button aria-selected="true" data-v="morning">Morning</button>
+            <button aria-selected="false" data-v="after">After school</button>
+            <button aria-selected="false" data-v="weekend">Weekend</button>
+          </div>
+          <div class="view" data-view="old">
+            <div>
+              <div class="v-num">01</div>
+              <div class="v-title">The morning, sorted</div>
+              <div class="v-copy">See the day ahead before anyone has found their shoes.</div>
+              <ul class="v-points"><li>Today's schedule</li><li>Lunch and reminders</li><li>Who is picking up</li></ul>
+            </div>
+            <img class="shot" src="./assets/daily-brief.png" alt="">
+          </div>
+        </div>
+        <div class="lane new">
+          <div class="lane-t"><i></i>Proposed — the content changes</div>
+          <div class="tabs" data-lane="new">
+            <button aria-selected="true" data-v="morning">Morning</button>
+            <button aria-selected="false" data-v="after">After school</button>
+            <button aria-selected="false" data-v="weekend">Weekend</button>
+          </div>
+          <div class="view" data-view="new">
+            <div>
+              <div class="v-num">01</div>
+              <div class="v-title">The morning, sorted</div>
+              <div class="v-copy">See the day ahead before anyone has found their shoes.</div>
+              <ul class="v-points"><li>Today's schedule</li><li>Lunch and reminders</li><li>Who is picking up</li></ul>
+            </div>
+            <img class="shot" src="./assets/daily-brief.png" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="moment" data-m="community">
+    <div class="m-head">
+      <span class="m-num">3</span>
+      <div class="m-tx">
+        <h2>Community, a circle assembling</h2>
+        <p>The one section carrying real photographs of families rather than screenshots, under
+        "Know the parents your kids already know." Three photos arriving at the same instant is a
+        missed beat. A hundred milliseconds apart and it reads as a circle forming.</p>
+      </div>
+      <div class="spec"><b>720ms arrive</b>20 / 120 / 220ms</div>
+      <button class="replay">↻ Replay</button>
+    </div>
+    <div class="stage">
+      <div class="two">
+        <div class="lane old">
+          <div class="lane-t"><i></i>Now — all three at once</div>
+          <div class="faces">
+            <div class="f-item"><img src="./assets/family-activity-1.png" alt=""></div>
+            <div class="f-item"><img src="./assets/family-activity-2.png" alt=""></div>
+            <div class="f-item"><img src="./assets/family-activity-3.png" alt=""></div>
+          </div>
+        </div>
+        <div class="lane new">
+          <div class="lane-t"><i></i>Proposed — 100ms apart</div>
+          <div class="faces">
+            <div class="f-item"><img src="./assets/family-activity-1.png" alt=""></div>
+            <div class="f-item"><img src="./assets/family-activity-2.png" alt=""></div>
+            <div class="f-item"><img src="./assets/family-activity-3.png" alt=""></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="moment" data-m="close">
+    <div class="m-head">
+      <span class="m-num">4</span>
+      <div class="m-tx">
+        <h2>The close</h2>
+        <p>After eight identical fades, the last panel should land rather than appear. The store
+        badges arrive last and with a touch more weight, because they are the only thing on the
+        page you actually want tapped.</p>
+      </div>
+      <div class="spec"><b>680ms rise</b>40 / 140 / 240ms<br><b>800ms arrive</b>badges, +360ms</div>
+      <button class="replay">↻ Replay</button>
+    </div>
+    <div class="stage">
+      <div class="close-demo">
+        <img class="logo c-item c-1" src="./assets/logo.png" alt="">
+        <div class="big c-item c-2">When parents bond,<br>childhoods flourish.</div>
+        <div class="sub c-item c-3">Ready when your family is.</div>
+        <div class="badges c-4">
+          <img src="./assets/app-store.png" alt="Download on the App Store">
+          <img src="./assets/play-store.png" alt="Get it on Google Play">
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="untouched">
+  <h2>Left deliberately alone</h2>
+  <p>These keep the quiet 650ms reveal that already exists. Adding motion here is what would
+  erase the hierarchy the four moments above just created.</p>
+  <div class="list">
+    <span>context-strip</span><span>product-grid</span><span>memory</span>
+    <span>profile</span><span>more</span><span>privacy</span>
+  </div>
+</div>
+
+<script>
+const DAY = {
+  morning:{n:'01',t:'The morning, sorted',c:'See the day ahead before anyone has found their shoes.',
+    p:["Today's schedule",'Lunch and reminders','Who is picking up'],img:'./assets/daily-brief.png'},
+  after:{n:'02',t:'After the bell',c:'Clubs, practices and pickups, without the group-chat archaeology.',
+    p:['Activities and practice','Carpool and pickup','Nearby family plans'],img:'./assets/events-home.webp'},
+  weekend:{n:'03',t:'The plan in one place',c:'Time, place, guest list and the conversation, together.',
+    p:['Birthday parties','Playdates and events','Details shared with guests'],img:'./assets/event-details.webp'}
+};
+
+function paint(view, key){
+  const d = DAY[key];
+  view.querySelector('.v-num').textContent = d.n;
+  view.querySelector('.v-title').textContent = d.t;
+  view.querySelector('.v-copy').textContent = d.c;
+  view.querySelector('.v-points').replaceChildren(...d.p.map(x => {
+    const li = document.createElement('li'); li.textContent = x; return li;
+  }));
+  view.querySelector('.shot').src = d.img;
+}
+
+document.querySelectorAll('.tabs').forEach(tabs => {
+  const lane = tabs.dataset.lane;
+  const view = document.querySelector(`[data-view="${lane}"]`);
+  tabs.addEventListener('click', e => {
+    const btn = e.target.closest('button'); if(!btn) return;
+    tabs.querySelectorAll('button').forEach(b => b.setAttribute('aria-selected', String(b === btn)));
+    paint(view, btn.dataset.v);
+    if (document.body.classList.contains('force-reduce')) return;
+    // restart the animation by removing and reflowing the class
+    view.classList.remove('swap-old','swap-new');
+    void view.offsetWidth;
+    view.classList.add(lane === 'old' ? 'swap-old' : 'swap-new');
+  });
+});
+
+function play(moment){
+  const stage = moment.querySelector('.stage');
+  stage.classList.remove('playing');
+  void stage.offsetWidth;          // reflow, so the animation restarts every time
+  stage.classList.add('playing');
+}
+
+document.querySelectorAll('.replay').forEach(btn => {
+  btn.addEventListener('click', () => play(btn.closest('.moment')));
+});
+
+// play each moment the first time it scrolls into view, the way the real page will
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    play(e.target);
+    io.unobserve(e.target);
+  });
+}, {threshold:.35});
+document.querySelectorAll('.moment[data-m="hero"], .moment[data-m="community"], .moment[data-m="close"]')
+  .forEach(m => io.observe(m));
+
+document.getElementById('rm').addEventListener('change', e => {
+  document.body.classList.toggle('force-reduce', e.target.checked);
+});
+</script>
+</body>
+</html>

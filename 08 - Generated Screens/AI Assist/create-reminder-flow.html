@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AI Assist — Create Reminder · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff; --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+    --green:#186338; --brand-light:#e2e9e3; --brand-border:#77b691; --border:#d0dacf;
+    --field:#e8e2d6; --shadow-m:1px 4px 25px 2px rgba(13,13,18,.05); --shadow-l:1px 4px 25px 2px rgba(13,13,18,.2);
+    --bg-brand-disable:#77b691;
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:30px 48px;padding:40px 24px 60px;}
+
+  .lede{flex:1 0 100%;text-align:center;max-width:820px;margin:0 auto 8px;}
+  .lede h1{font-family:var(--serif);font-size:25px;font-weight:600;color:var(--ink);margin:0 0 6px;}
+  .lede p{font-size:13px;color:var(--muted);margin:0;line-height:1.55;}
+  .lede .flag{display:inline-block;margin-top:10px;font-size:11.5px;color:#8a6a1c;background:#f6ecd1;border:1px solid #e9d9ad;border-radius:999px;padding:5px 12px;}
+
+  .row{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-start;gap:56px;padding:0 24px;overflow-x:auto;width:100%;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0;}
+  .cap{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.03em;text-align:center;max-width:393px;line-height:1.5;color:#6a665b;}
+  .cap b{color:#23271f;font-size:12.5px;}
+
+  .ph{display:inline-block;vertical-align:middle;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+
+  .device{position:relative;width:393px;height:852px;border-radius:54px;padding:11px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:60;}
+  .screen{position:relative;width:100%;height:100%;border-radius:43px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+
+  .sb{flex:0 0 44px;padding:16px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);z-index:20;}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--ink);} .sb .bat{width:25px;}
+
+  /* pill bottom nav (matches this screen area's existing Figma chrome) */
+  .navfade{position:absolute;left:0;right:0;bottom:0;height:110px;background:linear-gradient(to top,var(--bg) 46%,rgba(244,241,234,0));z-index:25;pointer-events:none;}
+  .pillnav{position:absolute;left:16px;right:16px;bottom:18px;border-radius:9999px;background:var(--bg);border-top:1px solid #fff;
+    box-shadow:2px 5px 10px rgba(14,14,16,.05),4px 5px 25px 3px rgba(14,14,16,.15);display:flex;justify-content:space-around;padding:12px 8px;z-index:30;}
+  .pn{display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;color:#818898;}
+  .pn .ph{width:24px;height:24px;}
+  .pn .l{font-size:11px;}
+  .pn.on{color:var(--green);}
+  .pn .nb{position:absolute;top:-4px;right:6px;min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:var(--green);color:#fff;font-size:9.5px;font-weight:600;display:grid;place-items:center;}
+
+  /* ===== Pool page ===== */
+  .pool-body{flex:1 1 auto;overflow-y:auto;padding:12px 16px 140px;display:flex;flex-direction:column;align-items:center;}
+  .blob{width:150px;height:150px;border-radius:50%;margin:20px 0 24px;
+    background:radial-gradient(circle at 35% 30%, #dbd5c8, #eae6db 45%, #f4f1ea 75%);
+    box-shadow:inset 0 0 30px rgba(0,0,0,.04);}
+  .pool-head{width:100%;margin-bottom:24px;}
+  .pool-head h2{font-family:var(--serif);font-size:30px;font-weight:500;color:var(--ink);line-height:1.3;margin:0 0 8px;}
+  .pool-head p{font-size:16px;color:var(--muted);margin:0;}
+  .opt{display:flex;align-items:center;gap:8px;width:100%;background:var(--bg);border-radius:8px;padding:8px 16px;
+    box-shadow:var(--shadow-m);margin-bottom:16px;cursor:pointer;}
+  .opt .ic{width:42px;height:42px;border-radius:8px;background:var(--brand-light);display:grid;place-items:center;flex-shrink:0;font-size:22px;}
+  .opt .tx{flex:1;min-width:0;}
+  .opt .tx .n{font-family:var(--serif);font-size:16px;font-weight:500;color:var(--ink);}
+  .opt .tx .d{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4;}
+  .opt.new{box-shadow:0 0 0 2px var(--brand-border) inset,var(--shadow-m);}
+  .opt.new .ic{background:var(--green);}
+
+  /* ===== Create Reminder — input state ===== */
+  .top2{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:8px 16px 6px;}
+  .ibtn{width:40px;height:40px;border-radius:50%;background:var(--card);border:1px solid var(--border);
+    display:grid;place-items:center;cursor:pointer;flex-shrink:0;box-shadow:var(--shadow-m);}
+  .ibtn svg{width:20px;height:20px;fill:var(--ink);}
+  .top2 .tt{flex:1;text-align:center;}
+  .top2 .tt .t{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);}
+  .top2 .sp{width:40px;flex-shrink:0;}
+
+  .body2{flex:1 1 auto;overflow-y:auto;padding:8px 20px 24px;}
+  .flabel{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin:0 2px 8px;}
+  .finput{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;
+    font-family:var(--sans);font-size:15px;color:var(--ink);box-shadow:var(--shadow-m);margin-bottom:22px;}
+  .finput::placeholder{color:#a89e8c;}
+  textarea.finput{resize:none;font-family:inherit;min-height:76px;}
+  .dtrow{display:flex;gap:10px;margin-bottom:22px;}
+  .dtfield{flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--border);
+    border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-m);}
+  .dtfield .ph{width:18px;height:18px;color:var(--muted);flex-shrink:0;}
+  .dtfield .v{font-size:14px;color:var(--ink);font-weight:500;}
+  .hint{display:flex;gap:8px;align-items:flex-start;background:var(--brand-light);border-radius:12px;padding:12px 14px;font-size:12.5px;color:var(--ink);line-height:1.5;}
+  .hint .ph{width:16px;height:16px;color:var(--green);flex-shrink:0;margin-top:1px;}
+
+  /* recipient picker: Myself / Spouse / Both — big, easy-to-tap, per Tony's ruling */
+  .reciprow{display:flex;gap:8px;margin-bottom:22px;}
+  .ropt{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;background:var(--card);
+    border:1.5px solid var(--border);border-radius:14px;padding:14px 6px;box-shadow:var(--shadow-m);cursor:pointer;}
+  .ropt .ic{width:34px;height:34px;border-radius:50%;background:var(--brand-light);color:var(--muted);display:grid;place-items:center;}
+  .ropt .ic svg{width:18px;height:18px;}
+  .ropt .l{font-size:13px;color:var(--muted);font-weight:500;}
+  .ropt.on{border-color:var(--brand-border);box-shadow:0 0 0 2px var(--brand-border) inset,var(--shadow-m);}
+  .ropt.on .ic{background:var(--green);color:#fff;}
+  .ropt.on .l{color:var(--ink);font-weight:600;}
+
+  /* optional link field — per Tony's ruling: "definitely a good option just to allow for a link if they need it" */
+  .flabel .opt{text-transform:none;font-weight:500;color:#a89e8c;letter-spacing:0;}
+  .linkfield{display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--border);
+    border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-m);margin-bottom:22px;}
+  .linkfield .ph{width:18px;height:18px;color:var(--muted);flex-shrink:0;}
+  .linkfield input{flex:1;min-width:0;border:none;outline:none;background:none;font-family:var(--sans);font-size:14px;color:var(--ink);}
+  .linkfield input::placeholder{color:#a89e8c;}
+
+  .cta{position:absolute;left:0;right:0;bottom:0;padding:16px 16px 30px;
+    background:linear-gradient(to top,var(--bg) 66%,rgba(236,230,218,0));z-index:15;}
+  .btn{width:100%;border:none;border-radius:16px;padding:16px;font-family:var(--serif);font-size:16px;font-weight:500;
+    background:var(--green);color:#fff;cursor:pointer;box-shadow:var(--shadow-l);}
+
+  /* ===== AI confirmation — chat-bubble state, matches Daily Brief aesthetic ===== */
+  .confirm-body{flex:1 1 auto;overflow-y:auto;padding:16px 20px 24px;}
+  .aichip{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+  .aichip .av{width:28px;height:28px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#579a74);display:grid;place-items:center;flex-shrink:0;}
+  .aichip .av svg{width:15px;height:15px;fill:#fff;}
+  .aichip .n{font-family:var(--serif);font-size:13px;font-weight:600;color:var(--ink);}
+  .bubble{background:#fff;border-left:2px solid var(--green);border-radius:12px;padding:16px;box-shadow:var(--shadow-m);margin-bottom:16px;}
+  .bubble .h{font-family:var(--serif);font-size:17px;font-weight:500;color:var(--ink);margin:0 0 6px;}
+  .bubble .p{font-size:14px;color:var(--body);line-height:1.6;margin:0;}
+  .bubble .p b{color:var(--ink);}
+  .footnote{display:flex;gap:8px;align-items:center;justify-content:center;font-size:12.5px;color:var(--muted);padding:4px 0;}
+  .footnote .ph{width:14px;height:14px;flex-shrink:0;}
+  .footnote .u{color:var(--green);font-weight:600;text-decoration:underline;}
+
+  /* ===== Voice capture — tap-and-hold, matches the existing Club voice pattern ===== */
+  .voice-body{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;padding:8px 24px 30px;text-align:center;}
+  .stipple{width:150px;height:150px;border-radius:50%;margin:14px 0 22px;flex-shrink:0;
+    background-color:#eae6db;
+    background-image:radial-gradient(rgba(120,113,94,.55) 1px, transparent 1.3px);
+    background-size:6px 6px;
+    -webkit-mask-image:radial-gradient(circle, #000 62%, transparent 78%);
+    mask-image:radial-gradient(circle, #000 62%, transparent 78%);}
+  .voice-head h2{font-family:var(--serif);font-size:23px;font-weight:600;color:var(--ink);line-height:1.28;margin:0 0 8px;}
+  .voice-head p{font-size:13.5px;color:var(--muted);line-height:1.5;max-width:290px;margin:0 auto;}
+  .voice-mic-zone{margin-top:auto;padding-top:34px;display:flex;flex-direction:column;align-items:center;gap:12px;}
+  .vmic{width:68px;height:68px;border-radius:50%;border:none;display:grid;place-items:center;cursor:pointer;position:relative;
+    background:var(--card);box-shadow:0 0 0 2px #f0c9c9 inset,var(--shadow-m);color:#c94f4f;touch-action:none;}
+  .vmic:disabled{cursor:default;}
+  .vmic .ph{width:26px;height:26px;position:absolute;transition:opacity .15s;}
+  .vmic .muted-ic{opacity:1;}
+  .vmic .mic-ic{opacity:0;}
+  .vmic.on{background:var(--green);box-shadow:0 0 0 10px rgba(24,99,56,.14),0 0 0 22px rgba(24,99,56,.06);color:#fff;transform:scale(1.05);}
+  .vmic.on .muted-ic{opacity:0;} .vmic.on .mic-ic{opacity:1;}
+  .voice-hint{font-size:13px;font-weight:600;color:var(--muted);}
+  .voice-mic-zone.on .voice-hint{color:var(--green);}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>AI Assist — Create Reminder</h1>
+  <p>Port dari Figma node 6332:324967 ("12.1 - AI Assist Page") + tambahan card "Reminder" (4th option, sesuai Loom Tony: "if I need to create a reminder for myself... you just talk to the AI real quick"). Dua arah dibandingkan buat step create: 2 = form ringkas, 2b = obrolan beneran dengan AI (baru ditambahkan) — sama-sama berakhir di konfirmasi yang identik.</p>
+  <div class="flag">Icon 4 opsi (Event/Birthday/Club/Reminder) di sini pakai emoji placeholder yang konsisten, bukan ilustrasi asli Figma — biar nggak timpang (3 asli + 1 placeholder)</div>
+</div>
+
+<div class="row">
+
+<!-- ============ 1. POOL PAGE (4 options) ============ -->
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+
+      <div class="pool-body">
+        <div class="blob"></div>
+        <div class="pool-head">
+          <h2>What are we creating today?</h2>
+          <p>Pick one below</p>
+        </div>
+
+        <div class="opt"><div class="ic">📅</div><div class="tx"><div class="n">Event</div><div class="d">Playdates, outings &amp; parties</div></div></div>
+        <div class="opt"><div class="ic">🎂</div><div class="tx"><div class="n">Birthday</div><div class="d">A magical AI cover for your kid — in seconds</div></div></div>
+        <div class="opt"><div class="ic">🌱</div><div class="tx"><div class="n">Club</div><div class="d">Gather your people by interest</div></div></div>
+        <div class="opt new"><div class="ic">📌</div><div class="tx"><div class="n">Reminder</div><div class="d">A quick nudge just for you — no fuss</div></div></div>
+      </div>
+
+      <div class="navfade"></div>
+      <div class="pillnav">
+        <div class="pn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M240 152h-40.45a74 74 0 0 0 .45-8 72 72 0 0 0-144 0 74 74 0 0 0 .45 8H16a8 8 0 0 0 0 16h224a8 8 0 0 0 0-16m-168-8a56 56 0 1 1 111.41 8H72.59a56 56 0 0 1-.59-8m144 56a8 8 0 0 1-8 8H48a8 8 0 0 1 0-16h160a8 8 0 0 1 8 8M72.84 43.58a8 8 0 0 1 14.32-7.16l8 16a8 8 0 0 1-14.32 7.16Zm-56 48.84a8 8 0 0 1 10.74-3.57l16 8a8 8 0 0 1-7.16 14.31l-16-8a8 8 0 0 1-3.58-10.74m192 15.16a8 8 0 0 1 3.58-10.73l16-8a8 8 0 1 1 7.16 14.31l-16 8a8 8 0 0 1-10.74-3.58m-48-55.16 8-16a8 8 0 0 1 14.32 7.16l-8 16a8 8 0 1 1-14.32-7.16"/></svg></span><span class="l">Daily Brief</span></div>
+        <div class="pn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m51.58 57.79-32 64a4.08 4.08 0 0 1-1.79 1.79l-64 32a4 4 0 0 1-5.37-5.37l32-64a4.08 4.08 0 0 1 1.79-1.79l64-32a4 4 0 0 1 5.37 5.37"/></svg></span><span class="l">Events</span></div>
+        <div class="pn on"><span class="ph"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88ZM137 164.22a8 8 0 0 0-4.74 4.74L112 223.85 91.78 169a8 8 0 0 0-4.78-4.78L32.15 144 87 123.78a8 8 0 0 0 4.78-4.78L112 64.15 132.22 119a8 8 0 0 0 4.74 4.74L191.85 144ZM144 40a8 8 0 0 1 8-8h16V16a8 8 0 0 1 16 0v16h16a8 8 0 0 1 0 16h-16v16a8 8 0 0 1-16 0V48h-16a8 8 0 0 1-8-8m104 48a8 8 0 0 1-8 8h-8v8a8 8 0 0 1-16 0v-8h-8a8 8 0 0 1 0-16h8v-8a8 8 0 0 1 16 0v8h8a8 8 0 0 1 8 8"/></svg></span><span class="l">AI Assist</span></div>
+        <div class="pn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M140 128a12 12 0 1 1-12-12 12 12 0 0 1 12 12m-56-12a12 12 0 1 0 12 12 12 12 0 0 0-12-12m88 0a12 12 0 1 0 12 12 12 12 0 0 0-12-12m60 12a104 104 0 0 1-152.88 91.82l-34.05 11.35a16 16 0 0 1-20.24-20.24l11.35-34.05A104 104 0 1 1 232 128m-16 0a88 88 0 1 0-164.19 44.06 8 8 0 0 1 .66 6.54L40 216l37.4-12.47a7.9 7.9 0 0 1 2.53-.42 8 8 0 0 1 4 1.08A88 88 0 0 0 216 128"/></svg></span><span class="nb">2</span><span class="l">Chat</span></div>
+        <div class="pn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M244.8 150.4a8 8 0 0 1-11.2-1.6A51.6 51.6 0 0 0 192 128a8 8 0 0 1-7.37-4.89 8 8 0 0 1 0-6.22A8 8 0 0 1 192 112a24 24 0 1 0-23.24-30 8 8 0 1 1-15.5-4A40 40 0 1 1 219 117.51a67.94 67.94 0 0 1 27.43 21.68 8 8 0 0 1-1.63 11.21M190.92 212a8 8 0 1 1-13.84 8 57 57 0 0 0-98.16 0 8 8 0 1 1-13.84-8 72.06 72.06 0 0 1 33.74-29.92 48 48 0 1 1 58.36 0A72.06 72.06 0 0 1 190.92 212M128 176a32 32 0 1 0-32-32 32 32 0 0 0 32 32m-56-56a8 8 0 0 0-8-8 24 24 0 1 1 23.24-30 8 8 0 1 0 15.5-4A40 40 0 1 0 37 117.51a67.94 67.94 0 0 0-27.4 21.68 8 8 0 1 0 12.8 9.61A51.6 51.6 0 0 1 64 128a8 8 0 0 0 8-8"/></svg></span><span class="l">Clubs</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="cap"><b>1 — AI Assist pool page.</b> "Reminder" ditambah sebagai opsi ke-4, ring hijau nunjukin ini yang baru. Bottom nav sudah pakai urutan baru (Daily Brief → Events → AI Assist → Chat → Clubs), Memories dihapus.</div>
+</div>
+
+<!-- ============ 2. CREATE REMINDER — input ============ -->
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+
+      <div class="top2">
+        <div class="ibtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span></div>
+        <div class="tt"><div class="t">New Reminder</div></div>
+        <div class="sp"></div>
+      </div>
+
+      <div class="body2">
+        <div class="flabel">What do you want to be reminded of?</div>
+        <textarea class="finput" placeholder="e.g. Sign Jake's permission slip"></textarea>
+
+        <div class="flabel">Remind me</div>
+        <div class="dtrow">
+          <div class="dtfield"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span><span class="v">Tomorrow</span></div>
+          <div class="dtfield"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m4-88V72a8 8 0 0 0-16 0v64a8 8 0 0 0 2.34 5.66l40 40a8 8 0 0 0 11.32-11.32Z"/></svg></span><span class="v">9:00 AM</span></div>
+        </div>
+
+        <div class="flabel">Who's this for?</div>
+        <div class="reciprow">
+          <div class="ropt on" onclick="pickRecip(this)"><div class="ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M230.92 212c-15.23-26.33-38.7-45.21-66.09-54.16a72 72 0 1 0-73.66 0c-27.39 8.94-50.86 27.82-66.09 54.16a8 8 0 1 0 13.85 8c18.84-32.56 52.14-52 89.07-52s70.23 19.44 89.07 52a8 8 0 1 0 13.85-8M72 96a56 56 0 1 1 56 56 56.06 56.06 0 0 1-56-56"/></svg></span></div><div class="l">Myself</div></div>
+          <div class="ropt" onclick="pickRecip(this)"><div class="ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M178 40c-20.65 0-38.73 8.88-50 23.89C116.73 48.88 98.65 40 78 40a62.07 62.07 0 0 0-62 62c0 70 103.79 126.66 108.21 129a8 8 0 0 0 7.58 0C136.21 228.66 240 172 240 102a62.07 62.07 0 0 0-62-62m-50 174.8c-18.26-10.64-96-59.11-96-112.8a46.06 46.06 0 0 1 46-46c19.45 0 35.78 10.36 42.6 27a8 8 0 0 0 14.8 0c6.82-16.67 23.15-27 42.6-27a46.06 46.06 0 0 1 46 46c0 53.61-77.76 102.15-96 112.8"/></svg></span></div><div class="l">Spouse</div></div>
+          <div class="ropt" onclick="pickRecip(this)"><div class="ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="l">Both</div></div>
+        </div>
+
+        <div class="flabel">Add a link <span class="opt">(optional)</span></div>
+        <div class="linkfield">
+          <span class="ph"><svg viewBox="0 0 256 256"><path d="M137.54 186.36a8 8 0 0 1 0 11.31l-9.94 10a56 56 0 0 1-79.22-79.27l24.12-24.13a56 56 0 0 1 76.61-2.44 8 8 0 1 1-10.62 12 40 40 0 0 0-54.63 1.73l-24.12 24.14a40 40 0 0 0 56.57 56.62l9.94-9.95a8 8 0 0 1 11.29 0M226.83 133.11a56.08 56.08 0 0 0-1.62-79.29 56.06 56.06 0 0 0-77.66.02l-9.94 10a8 8 0 0 0 11.29 11.31l9.94-9.95a40 40 0 1 1 56.57 56.62l-24.13 24.14a40 40 0 0 1-54.63 1.73 8 8 0 1 0-10.62 12 56 56 0 0 0 76.61-2.44Z"/></svg></span>
+          <input type="text" placeholder="Paste a link — form, permission slip, sign-up..." />
+        </div>
+
+        <div class="hint">
+          <span class="ph"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88Z"/></svg></span>
+          <span>This will show up in the Daily Brief of whoever it's for.</span>
+        </div>
+      </div>
+
+      <div class="cta"><button class="btn">Set Reminder</button></div>
+    </div>
+  </div>
+  <div class="cap"><b>2 — Create Reminder (form).</b> Text field + date/time + "Who's this for?" (Myself/Spouse/Both, default Myself, tap buat ganti) + optional link. Kalau ada link, reminder-nya tampil di Daily Brief pakai tombol buka-link (bukan checkbox polos) — per Tony's ruling 2026-09-10: "anything with a link, we would use that CTA type of UI because I still have to do something to get that done." Quick capture, bukan form panjang.</div>
+</div>
+
+<!-- ============ 2b. CREATE REMINDER — VOICE (interactive: hold the mic) ============ -->
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+
+      <div class="top2">
+        <div class="ibtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span></div>
+        <div class="sp"></div>
+      </div>
+
+      <div class="voice-body" id="rvBody">
+        <div class="stipple"></div>
+        <div class="voice-head">
+          <h2 id="rvTitle">Reminder</h2>
+          <p id="rvSub">Great, you want to create a Reminder — let's start by telling me what you want to be reminded of and when.</p>
+        </div>
+        <div class="voice-mic-zone">
+          <button class="vmic" id="rvMic"><span class="muted-ic ph"><svg viewBox="0 0 256 256"><path d="m53.92 34.62 174 174a8 8 0 0 1-11.31 11.31l-21.34-21.34A79.7 79.7 0 0 1 136 216.8V232a8 8 0 0 1-16 0v-15.2a80.11 80.11 0 0 1-72-79.6v-8a8 8 0 0 1 16 0v8a64.07 64.07 0 0 0 65.44 64c.72 0 1.42-.08 2.13-.11l-21.4-21.4A47.86 47.86 0 0 1 80 152v-8a8 8 0 0 1 15.62-2.5L42.61 96A8 8 0 0 1 53.92 34.62M176 128v-64a48 48 0 0 0-92.42-18.13L96.4 58.69A32 32 0 0 1 160 64v64a31.6 31.6 0 0 1-1.34 9.09l12.06 12.06A47.6 47.6 0 0 0 176 128"/></svg></span><span class="mic-ic ph"><svg viewBox="0 0 256 256"><path d="M128 176a48.05 48.05 0 0 0 48-48V64a48 48 0 0 0-96 0v64a48.05 48.05 0 0 0 48 48M96 64a32 32 0 0 1 64 0v64a32 32 0 0 1-64 0Zm40 143.6V240a8 8 0 0 1-16 0v-32.4A80.11 80.11 0 0 1 48 128a8 8 0 0 1 16 0 64 64 0 0 0 128 0 8 8 0 0 1 16 0 80.11 80.11 0 0 1-72 79.6"/></svg></span></button>
+          <div class="voice-hint" id="rvHint">Tap and Hold to speak</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cap"><b>2b — Create Reminder (Voice).</b> Sama persis pola tap-and-hold yang udah dipakai di flow Club — bukan ketik, bukan chat bubble. Interaktif: tahan tombol mic di kiri buat lihat state "Release to stop talking".</div>
+</div>
+
+<!-- ============ 2c. GENERATING PREVIEW ============ -->
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+
+      <div class="top2">
+        <div class="ibtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span></div>
+        <div class="sp"></div>
+      </div>
+
+      <div class="voice-body">
+        <div class="stipple"></div>
+        <div class="voice-head">
+          <h2>Great, Generating your preview</h2>
+          <p>We got all the details . . .</p>
+        </div>
+        <div class="voice-mic-zone">
+          <button class="vmic" disabled><span class="muted-ic ph"><svg viewBox="0 0 256 256"><path d="m53.92 34.62 174 174a8 8 0 0 1-11.31 11.31l-21.34-21.34A79.7 79.7 0 0 1 136 216.8V232a8 8 0 0 1-16 0v-15.2a80.11 80.11 0 0 1-72-79.6v-8a8 8 0 0 1 16 0v8a64.07 64.07 0 0 0 65.44 64c.72 0 1.42-.08 2.13-.11l-21.4-21.4A47.86 47.86 0 0 1 80 152v-8a8 8 0 0 1 15.62-2.5L42.61 96A8 8 0 0 1 53.92 34.62M176 128v-64a48 48 0 0 0-92.42-18.13L96.4 58.69A32 32 0 0 1 160 64v64a31.6 31.6 0 0 1-1.34 9.09l12.06 12.06A47.6 47.6 0 0 0 176 128"/></svg></span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cap"><b>2c — Generating preview.</b> Sesudah dilepas, mic balik ke state muted (nggak bisa dipencet lagi) selagi AI narik reminder text + waktu dari yang barusan diomongin.</div>
+</div>
+
+<!-- ============ 2d. REMINDER PREVIEW — EDITABLE ============ -->
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+
+      <div class="top2">
+        <div class="ibtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span></div>
+        <div class="tt"><div class="t">Review Reminder</div></div>
+        <div class="sp"></div>
+      </div>
+
+      <div class="body2">
+        <div class="flabel">What do you want to be reminded of?</div>
+        <textarea class="finput">Sign Jake's permission slip</textarea>
+
+        <div class="flabel">Remind me</div>
+        <div class="dtrow">
+          <div class="dtfield"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span><span class="v">Tomorrow</span></div>
+          <div class="dtfield"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m4-88V72a8 8 0 0 0-16 0v64a8 8 0 0 0 2.34 5.66l40 40a8 8 0 0 0 11.32-11.32Z"/></svg></span><span class="v">9:00 AM</span></div>
+        </div>
+
+        <div class="flabel">Who's this for?</div>
+        <div class="reciprow">
+          <div class="ropt on" onclick="pickRecip(this)"><div class="ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M230.92 212c-15.23-26.33-38.7-45.21-66.09-54.16a72 72 0 1 0-73.66 0c-27.39 8.94-50.86 27.82-66.09 54.16a8 8 0 1 0 13.85 8c18.84-32.56 52.14-52 89.07-52s70.23 19.44 89.07 52a8 8 0 1 0 13.85-8M72 96a56 56 0 1 1 56 56 56.06 56.06 0 0 1-56-56"/></svg></span></div><div class="l">Myself</div></div>
+          <div class="ropt" onclick="pickRecip(this)"><div class="ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M178 40c-20.65 0-38.73 8.88-50 23.89C116.73 48.88 98.65 40 78 40a62.07 62.07 0 0 0-62 62c0 70 103.79 126.66 108.21 129a8 8 0 0 0 7.58 0C136.21 228.66 240 172 240 102a62.07 62.07 0 0 0-62-62m-50 174.8c-18.26-10.64-96-59.11-96-112.8a46.06 46.06 0 0 1 46-46c19.45 0 35.78 10.36 42.6 27a8 8 0 0 0 14.8 0c6.82-16.67 23.15-27 42.6-27a46.06 46.06 0 0 1 46 46c0 53.61-77.76 102.15-96 112.8"/></svg></span></div><div class="l">Spouse</div></div>
+          <div class="ropt" onclick="pickRecip(this)"><div class="ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="l">Both</div></div>
+        </div>
+
+        <div class="flabel">Add a link <span class="opt">(optional)</span></div>
+        <div class="linkfield">
+          <span class="ph"><svg viewBox="0 0 256 256"><path d="M137.54 186.36a8 8 0 0 1 0 11.31l-9.94 10a56 56 0 0 1-79.22-79.27l24.12-24.13a56 56 0 0 1 76.61-2.44 8 8 0 1 1-10.62 12 40 40 0 0 0-54.63 1.73l-24.12 24.14a40 40 0 0 0 56.57 56.62l9.94-9.95a8 8 0 0 1 11.29 0M226.83 133.11a56.08 56.08 0 0 0-1.62-79.29 56.06 56.06 0 0 0-77.66.02l-9.94 10a8 8 0 0 0 11.29 11.31l9.94-9.95a40 40 0 1 1 56.57 56.62l-24.13 24.14a40 40 0 0 1-54.63 1.73 8 8 0 1 0-10.62 12 56 56 0 0 0 76.61-2.44Z"/></svg></span>
+          <input type="text" placeholder="Paste a link — form, permission slip, sign-up..." />
+        </div>
+
+        <div class="hint">
+          <span class="ph"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88Z"/></svg></span>
+          <span>Here's what I got from what you said — tap any field to fix it up before saving.</span>
+        </div>
+      </div>
+
+      <div class="cta"><button class="btn">Set Reminder</button></div>
+    </div>
+  </div>
+  <div class="cap"><b>2d — Reminder Preview (editable).</b> Field sama kayak panel 2 (form), termasuk link opsional — kalau AI salah denger, tinggal edit, bukan ngulang ngomong. "Who's this for?" default ke Myself, tapi kalau yang diomongin nyebut pasangan ("remind my wife to...") ini yang auto-default ke Spouse — bukan berarti user harus tap manual tiap kali.</div>
+</div>
+
+<!-- ============ 3. AI CONFIRMATION ============ -->
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+
+      <div class="top2">
+        <div class="ibtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span></div>
+        <div class="tt"><div class="t">Sprout</div></div>
+        <div class="sp"></div>
+      </div>
+
+      <div class="confirm-body">
+        <div class="aichip">
+          <div class="av"><svg viewBox="0 0 256 256"><path d="m229.66 77.66-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69 218.34 66.34a8 8 0 0 1 11.32 11.32"/></svg></div>
+          <div class="n">Sprout</div>
+        </div>
+        <div class="bubble">
+          <p class="h">Got it! ✅</p>
+          <p class="p">I'll remind you <b>tomorrow at 9:00 AM</b>:<br/>"Sign Jake's permission slip"</p>
+        </div>
+        <div class="footnote">
+          <span class="ph"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88Z"/></svg></span>
+          <span>It'll show up in your <span class="u">Daily Brief</span> tomorrow morning</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cap"><b>3 — AI confirmation (form path).</b> Ini yang muncul setelah submit form di panel 2. Chat-bubble style disamain sama Daily Brief homepage (border-kiri hijau, Playfair heading) — biar kerasa masih satu "Sprout" yang sama ngomong, bukan modal terpisah. Di jalur voice (2b→2c→2d), bubble yang sama ini muncul setelah "Set Reminder" ditekan di panel 2d. Kalau recipient-nya Spouse/Both, bubble ini juga yang muncul di Daily Brief pasangan — bukan cuma punya sendiri.</div>
+</div>
+
+</div>
+
+<script>
+  function pickRecip(el){
+    el.parentElement.querySelectorAll('.ropt').forEach(function(o){ o.classList.toggle('on', o===el); });
+  }
+  var rvMic = document.getElementById('rvMic');
+  var rvZone = rvMic ? rvMic.closest('.voice-mic-zone') : null;
+  var rvHint = document.getElementById('rvHint');
+  if (rvMic) {
+    rvMic.addEventListener('pointerdown', function(e){
+      e.preventDefault();
+      rvMic.classList.add('on');
+      rvZone.classList.add('on');
+      rvHint.textContent = 'Release to stop talking to get response';
+    });
+    window.addEventListener('pointerup', function(){
+      if (rvMic.classList.contains('on')) {
+        rvMic.classList.remove('on');
+        rvZone.classList.remove('on');
+        rvHint.textContent = 'Tap and Hold to speak';
+      }
+    });
+  }
+</script>
+</body>
+</html>

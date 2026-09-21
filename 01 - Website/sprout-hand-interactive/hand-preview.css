@@ -1,0 +1,130 @@
+.hero {
+  height: 100svh;
+  min-height: 42rem;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+  overflow: clip;
+  isolation: isolate;
+}
+
+.hero-copy { padding-block: 6.5rem 1.5rem; }
+.hero-copy h1 { max-width: none; font-size: clamp(2.75rem, min(5.2vw, 9svh), 6.5rem); line-height: 1; }
+.hero-copy h1 span { display: block; }
+.hero-copy h1 .hero-title-line { color: var(--ink); white-space: nowrap; }
+.hero-copy > p:nth-of-type(2) { font-size: clamp(1rem, 1.35vw, 1.25rem); max-width: 30rem; margin-top: 1.4rem; }
+.hero-copy .primary-button { margin-top: 1.4rem; }
+.feature-explorer { margin-top: 1.7rem; width: min(100%, 26rem); }
+.explorer-label { margin-bottom: .75rem; color: var(--green); font-size: .75rem; font-weight: 650; }
+.feature-tabs {
+  display: flex;
+  gap: .25rem;
+  width: fit-content;
+  max-width: 100%;
+  padding: .3rem;
+  background: rgba(255,255,255,.72);
+  border: 1px solid rgba(24,76,54,.12);
+  border-radius: 2rem;
+}
+.feature-tabs button {
+  min-height: 2.9rem;
+  padding: .7rem 1.2rem;
+  border: 0;
+  border-radius: 1.6rem;
+  background: transparent;
+  color: var(--green);
+  font: inherit;
+  font-size: .88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 120ms, background-color 120ms, transform 120ms var(--ease);
+}
+.feature-tabs button[aria-selected="true"] { background: var(--green); color: #fff; }
+.feature-tabs button.is-targeted:not([aria-selected="true"]) {
+  background: #d7e6dc;
+  color: var(--green);
+  transform: scale(.975);
+}
+.feature-tabs button:hover:not([aria-selected="true"]) { background: #dfebe2; }
+.feature-caption { margin-top: .75rem; min-height: 1.4em; color: var(--muted); font-size: .8rem; line-height: 1.4; }
+.hand-stage { position: relative; min-height: 0; align-self: stretch; }
+.hand-scene {
+  position: absolute;
+  top: 50%;
+  left: 43%;
+  width: min(110%, calc((100svh - 9rem) / .83));
+  aspect-ratio: 2 / 3;
+  transform: translate(-50%, -29%);
+}
+.holding-hand { position: absolute; inset: 0; width: 100%; max-width: none; pointer-events: none; }
+.device-screen {
+  position: absolute;
+  left: 30.65%;
+  top: 8.6%;
+  width: 37.6%;
+  height: 53.3%;
+  overflow: hidden;
+  border-radius: 12% / 5.7%;
+  background: #f3f0e7;
+  isolation: isolate;
+}
+.device-screen > img { width: 100%; height: 100%; object-fit: fill; }
+.device-screen::after {
+  content: "";
+  position: absolute;
+  top: 1.65%;
+  left: 34.5%;
+  width: 31%;
+  height: 3.9%;
+  border-radius: 999px;
+  background: #050505;
+  pointer-events: none;
+}
+.tapping-hand {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 62%;
+  max-width: none;
+  opacity: 0;
+  transform-origin: 23.4% 6.7%;
+  pointer-events: none;
+  z-index: 5;
+}
+.tap-ripple {
+  position: absolute;
+  bottom: 8%;
+  left: 30%;
+  width: 1.4rem;
+  height: 1.4rem;
+  margin: -.7rem;
+  border-radius: 50%;
+  border: 2px solid #184c36;
+  opacity: 0;
+  pointer-events: none;
+}
+@media (max-width: 1088px) and (min-width: 801px) {
+  .hero-copy { padding-left: 2rem; }
+  .hero-copy h1 { font-size: 5.1vw; }
+  .hero-copy .eyebrow { font-size: .7rem; }
+  .hero-proof { font-size: .68rem; }
+  .feature-tabs button { padding-inline: .95rem; }
+}
+@media (max-width: 800px) {
+  .hero { display: flex; min-height: 0; height: auto; }
+  .hero-copy { width: min(100% - 3rem, 35rem); padding: 7.5rem 0 0; }
+  .hero-copy h1 { font-size: clamp(2.15rem, 8.5vw, 4rem); }
+  .hero-copy > p:nth-of-type(2) { font-size: 1rem; }
+  .hero-proof { justify-content: center; font-size: .7rem; }
+  .feature-explorer { margin-top: 2rem; }
+  .feature-tabs { margin-inline: auto; }
+  .feature-caption { min-height: 1.4em; }
+  .hand-stage { width: 100%; min-height: 0; height: min(38rem, 115vw); margin-top: .5rem; }
+  .hand-scene { top: -2rem; left: 50%; width: min(47rem, 125%); transform: translateX(-50%); }
+}
+@media (max-width: 360px) {
+  .hero-copy { width: calc(100% - 2rem); }
+  .feature-tabs button { padding-inline: .9rem; }
+  .hero-proof { align-items: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tapping-hand, .tap-ripple { display: none; }
+}

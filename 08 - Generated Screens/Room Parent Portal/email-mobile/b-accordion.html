@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Direction B — Collapsed blocks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_shared.css">
+<style>
+  .blocks{display:flex;flex-direction:column;gap:10px}
+  .block{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+  .block.open{border-color:var(--green-border)}
+  .bhead{display:flex;align-items:center;gap:12px;padding:15px 16px;cursor:pointer}
+  .bicon{width:34px;height:34px;border-radius:11px;background:var(--green-light);display:grid;place-items:center;flex-shrink:0}
+  .bicon svg{width:17px;height:17px;stroke:var(--green);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .btext{flex:1;min-width:0}
+  .btext b{display:block;font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.3}
+  .btext span{display:block;font-size:11.5px;color:var(--muted);margin-top:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chev{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;
+    flex-shrink:0;transition:transform .18s}
+  .block.open .chev{transform:rotate(90deg)}
+  .bbody{padding:2px 16px 16px;border-top:1px solid #f2efe6}
+  .bbody .field:last-child{margin-bottom:0}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="_data.js"></script>
+<script>
+let open = null;               // only one block open at a time
+let sheet = false;             // the preview sheet
+
+const ICONS = {
+  tpl : '<path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/>',
+  write:'<path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3Z"/><path d="M14 6l4 4"/>',
+  cal : '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  link: '<path d="M9 17H7a5 5 0 0 1 0-10h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8"/>',
+};
+
+function block(id, icon, title, summary, body, flag){
+  const on = open === id;
+  return `<div class="block ${on?'open':''}">
+    <div class="bhead" onclick="open = open==='${id}' ? null : '${id}'; render()">
+      <span class="bicon"><svg viewBox="0 0 24 24">${ICONS[icon]}</svg></span>
+      <span class="btext"><b>${title}</b><span>${summary}</span></span>
+      ${flag || ''}
+      <svg class="chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+    </div>
+    ${on ? `<div class="bbody">${body()}</div>` : ''}
+  </div>`;
+}
+
+function render(){
+  const miss = missingFields();
+  const ev = chosenEvents(), lk = chosenLinks();
+
+  const blocks = [
+    block('tpl','tpl','Template details',
+      miss.length ? `${miss.length} of ${TPL_FIELDS.length} still needed` : 'All filled in',
+      () => TPL_FIELDS.map(fieldRow).join(''),
+      miss.length ? `<span class="chip warn">${miss.length}</span>` : `<span class="chip">Done</span>`),
+
+    block('write','write','Subject and message', state.subject,
+      () => `<div class="field"><label>Subject</label>
+               <input type="text" value="${state.subject}" oninput="state.subject=this.value" onchange="render()">
+             </div>
+             <div class="field" style="margin-bottom:0"><label>Message</label>
+               <div style="border:1.5px solid #ddd8cc;border-radius:11px;padding:12px 13px;background:#fff;
+                           font-size:13.5px;line-height:1.6;max-height:230px;overflow:auto">${bodyHtml()}</div>
+             </div>`),
+
+    block('events','cal','Events to include',
+      ev.length ? ev.map(e=>e.t).join(' · ') : 'None selected',
+      () => EVENTS.map(e => pickRow(state.events[e.id], e.t, e.d,
+              `state.events[${e.id}]=!state.events[${e.id}];render()`)).join(''),
+      `<span class="chip grey">${ev.length}</span>`),
+
+    block('links','link','Links to include',
+      lk.length ? lk.map(l=>l.t).join(' · ') : 'None selected',
+      () => LINKS.map(l => pickRow(state.links[l.id], l.t, l.u,
+              `state.links[${l.id}]=!state.links[${l.id}];render()`)).join(''),
+      `<span class="chip grey">${lk.length}</span>`),
+  ].join('');
+
+  const blocked = miss.length > 0;
+
+  document.getElementById('app').outerHTML = `<div id="app" style="display:contents">
+    ${chrome()}
+    <div class="scroll">
+      <h1 class="screen">Compose Class Email</h1>
+      <p class="screen-sub">Events and links are pulled in for you. Open a block to change it.</p>
+      <div class="blocks">${blocks}</div>
+    </div>
+    <div class="dock">
+      <span class="grow sum"><b>${blocked ? miss.length + ' details missing' : 'Ready to review'}</b>
+        ${ev.length} event${ev.length===1?'':'s'} · ${lk.length} link${lk.length===1?'':'s'}</span>
+      <button class="btn btn-ghost" onclick="sheet=true;render()">Preview</button>
+    </div>
+    ${tabbar()}
+
+    <div class="sheet-wrap ${sheet?'open':''}" onclick="if(event.target===this){sheet=false;render()}">
+      <div class="sheet">
+        <div class="sheet-head"><h3>Preview</h3>
+          <button class="x" onclick="sheet=false;render()"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+        </div>
+        <div class="sheet-body">
+          ${mailHtml()}
+          <div class="card" style="margin-top:14px"><h3>Who gets this</h3>
+            ${RECIPIENTS.map(r => pickRow(state.recipient===r.v, r.l, r.m, `state.recipient='${r.v}';render()`, true)).join('')}
+          </div>
+        </div>
+        <div class="sheet-foot">
+          <button class="btn btn-ghost" onclick="sheet=false;render()">Keep editing</button>
+          <button class="btn btn-primary grow" style="flex:1" ${blocked?'disabled':''}
+            onclick="alert('Sent to ' + recipientLabel() + '.\\n\\nNothing left the portal until this tap.')">
+            Send</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+render();
+</script>
+</body>
+</html>

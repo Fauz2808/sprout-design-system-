@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Room Parent Web Portal — 3 Directions (Fundraising/Donations flagship) · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --surface:#ffffff;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+    --green:#186338; --green-mid:#4fa472; --green-light:#e2e9e3; --green-border:#77b691;
+    --border:#e6e0d2; --amber:#c08a2d; --amber-bg:#fbf0d8;
+    --red:#a83f34; --red-bg:#fbe4e0;
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:40px 44px;padding:40px 24px 80px;}
+
+  .page-lede{flex:1 0 100%;text-align:center;max-width:840px;margin:0 auto 8px;}
+  .page-lede h1{font-family:var(--serif);font-weight:600;font-size:23px;color:#23271f;margin:0 0 6px;}
+  .page-lede p{font-size:12.5px;color:#6a665b;margin:0;line-height:1.6;}
+
+  .panel{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .panel-head{text-align:left;width:100%;}
+  .panel-head .tag{display:inline-flex;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);background:var(--amber-bg);padding:3px 9px;border-radius:99px;margin-bottom:7px;}
+  .panel-head h2{font-family:var(--serif);font-size:16px;font-weight:600;color:#23271f;margin:0 0 4px;}
+  .panel-head p{font-size:12px;color:#6a665b;margin:0;line-height:1.5;}
+  .panel-head .tradeoff{margin-top:8px;font-size:11.5px;color:#8a6a1f;background:var(--amber-bg);border-radius:8px;padding:7px 10px;line-height:1.5;}
+  .panel-head .tradeoff b{color:#6a4f16;}
+
+  /* ═══ browser chrome frame (desktop) ═══ */
+  .browser{border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.06),0 24px 70px rgba(0,0,0,.2);}
+  .browser-bar{height:38px;background:#eae4d6;display:flex;align-items:center;gap:6px;padding:0 12px;border-bottom:1px solid #ddd6c5;flex-shrink:0;}
+  .browser-dot{width:9px;height:9px;border-radius:50%;}
+  .browser-url{flex:1;margin-left:8px;background:#fff;border-radius:7px;height:22px;display:flex;align-items:center;padding:0 10px;font-size:10.5px;color:#8a8478;font-family:var(--mono);}
+  .browser-body{background:var(--bg);overflow-y:auto;}
+  .browser-body::-webkit-scrollbar{display:none;}
+
+  /* ═══ shared bits ═══ */
+  .stat-row{display:flex;gap:10px;}
+  .stat-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 14px;}
+  .stat-card .k{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;}
+  .stat-card .v{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--ink);}
+  .stat-card.spent .v{color:var(--red);}
+  .stat-card.balance{background:var(--green-light);border-color:var(--green-border);}
+  .stat-card.balance .v{color:var(--green);}
+
+  .src-chip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--green-light);color:var(--green);white-space:nowrap;}
+  .avatar{border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;flex-shrink:0;}
+
+  .btn{font-family:var(--sans);font-weight:700;border:none;border-radius:11px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;justify-content:center;}
+  .btn-primary{background:var(--green);color:#fff;}
+  .btn-primary:hover{background:var(--ink);}
+  .btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--border);}
+  .btn-ghost:hover{background:var(--green-light);}
+  .btn svg{width:14px;height:14px;flex-shrink:0;}
+
+  select,input[type=text],input[type=number],input[type=date]{
+    font-family:var(--sans);font-size:13px;color:var(--ink);background:#fff;border:1px solid var(--border);
+    border-radius:9px;padding:9px 10px;width:100%;outline:none;
+  }
+  select:focus,input:focus{border-color:var(--green-border);}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .file-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--green);background:var(--green-light);padding:5px 10px;border-radius:99px;cursor:pointer;font-weight:600;}
+  .file-chip input{display:none;}
+  .receipt-thumb{width:34px;height:34px;border-radius:8px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);}
+  .receipt-empty{width:34px;height:34px;border-radius:8px;flex-shrink:0;border:1.5px dashed var(--border);display:grid;place-items:center;color:var(--muted);}
+  .receipt-empty svg{width:14px;height:14px;}
+
+  /* ════════════════════════════ DIRECTION A — Sidebar Admin ════════════════════════════ */
+  .Awrap{width:660px;display:flex;}
+  .Asidebar{width:172px;flex-shrink:0;background:#fbf9f4;border-right:1px solid var(--border);padding:16px 12px;}
+  .Abrand{display:flex;align-items:center;gap:8px;padding:4px 6px 16px;}
+  .Abrand .mark{width:26px;height:26px;border-radius:8px;background:var(--green);display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:700;font-size:13px;}
+  .Abrand .txt{font-family:var(--serif);font-size:13px;font-weight:600;color:var(--ink);line-height:1.2;}
+  .Abrand .txt small{display:block;font-family:var(--sans);font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .Anav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;font-size:12.5px;font-weight:600;color:var(--body);cursor:pointer;margin-bottom:2px;}
+  .Anav-item svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0;}
+  .Anav-item.on{background:var(--green);color:#fff;}
+  .Amain{flex:1;min-width:0;padding:18px 20px 24px;}
+  .Atopbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .Atopbar .cls{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);}
+  .Atopbar .cls span{display:block;font-family:var(--sans);font-size:11px;font-weight:500;color:var(--muted);margin-top:1px;}
+  .Atopbar .me{display:flex;align-items:center;gap:7px;}
+  .Atopbar .me .avatar{width:26px;height:26px;font-size:10px;}
+  .Atopbar .me span{font-size:11.5px;font-weight:600;color:var(--body);}
+  .Asection{margin-top:20px;}
+  .Asection-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .Asection-head h3{font-family:var(--serif);font-size:14.5px;font-weight:600;color:var(--ink);margin:0;}
+  .Abtn-sm{font-size:11.5px;padding:7px 12px;}
+  .Atable{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:12px;}
+  .Atable th{text-align:left;font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;background:#fbf9f4;padding:8px 10px;border-bottom:1px solid var(--border);}
+  .Atable td{padding:8px 10px;border-bottom:1px solid #f0ece0;color:var(--body);}
+  .Atable tr:last-child td{border-bottom:none;}
+  .Atable .who{display:flex;align-items:center;gap:7px;font-weight:600;color:var(--ink);}
+  .Atable .who .avatar{width:22px;height:22px;font-size:9px;}
+  .Aform{background:var(--surface);border:1px solid var(--green-border);border-radius:12px;padding:12px;margin-bottom:10px;display:none;}
+  .Aform.on{display:block;}
+  .Aform .form-grid{margin-bottom:10px;}
+  .Aform-actions{display:flex;gap:8px;justify-content:flex-end;}
+  .Aform-actions .btn{padding:8px 14px;font-size:12px;}
+
+  /* ════════════════════════════ DIRECTION B — Mobile-First Simple ════════════════════════════ */
+  .Bphone{width:100%;height:100%;display:flex;flex-direction:column;}
+  .Bstatus{height:32px;flex-shrink:0;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:12px;font-weight:600;color:var(--ink);}
+  .Baddr{flex-shrink:0;background:#fff;padding:0 12px 8px;}
+  .Baddr .pill{background:#f0ece0;border-radius:99px;padding:6px 12px;font-size:10.5px;color:var(--muted);font-family:var(--mono);text-align:center;}
+  .Btop{flex-shrink:0;background:var(--bg);padding:10px 16px 12px;border-bottom:1px solid var(--border);}
+  .Btop .back{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--green);margin-bottom:6px;}
+  .Btop .back svg{width:11px;height:11px;}
+  .Btop h2{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);margin:0;}
+  .Btop .sub{font-size:11.5px;color:var(--muted);margin-top:1px;}
+  .Bscroll{flex:1;overflow-y:auto;padding:14px 16px 24px;}
+  .Bscroll::-webkit-scrollbar{display:none;}
+  .Bhero{background:linear-gradient(150deg,var(--ink),var(--green));border-radius:18px;padding:20px;color:#fff;margin-bottom:14px;}
+  .Bhero .lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;opacity:.75;margin-bottom:3px;}
+  .Bhero .amt{font-family:var(--serif);font-size:32px;font-weight:700;margin-bottom:14px;}
+  .Bhero .sub-stats{display:flex;gap:16px;}
+  .Bhero .sub-stats div span{display:block;font-size:10px;opacity:.7;margin-bottom:2px;}
+  .Bhero .sub-stats div b{font-size:14px;font-weight:700;}
+  .Bbtn-full{width:100%;height:46px;border-radius:13px;margin-bottom:10px;font-size:13.5px;}
+  .Bcard-item{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:11px 12px;display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .Bcard-item .avatar{width:36px;height:36px;font-size:12px;}
+  .Bcard-item .body{flex:1;min-width:0;}
+  .Bcard-item .nm{font-size:13px;font-weight:600;color:var(--ink);}
+  .Bcard-item .meta{font-size:10.5px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:5px;}
+  .Bcard-item .amt{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--green);}
+  .Bcard-item.expense .amt{color:var(--red);}
+  .Bsec-lbl{font-size:12.5px;font-weight:700;color:var(--ink);margin:16px 0 8px;font-family:var(--serif);}
+  .Bform{background:var(--surface);border:1px solid var(--green-border);border-radius:14px;padding:14px;margin-bottom:12px;display:none;}
+  .Bform.on{display:block;}
+  .Bform .field{margin-bottom:10px;}
+  .Bexport-link{display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:600;color:var(--green);padding:10px 0 2px;cursor:pointer;}
+  .Bexport-link svg{width:13px;height:13px;}
+
+  /* ════════════════════════════ DIRECTION C — Warm Card Dashboard ════════════════════════════ */
+  .Cwrap{width:700px;padding:18px 20px 26px;}
+  .Ctabs{display:flex;gap:6px;margin-bottom:18px;overflow-x:auto;}
+  .Ctab{flex-shrink:0;padding:8px 14px;border-radius:99px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;}
+  .Ctab.on{background:var(--green);color:#fff;}
+  .Cfund-card{background:linear-gradient(155deg,#fff,#f7f4ec);border:1px solid var(--border);border-radius:20px;padding:20px 22px;margin-bottom:16px;}
+  .Cfund-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .Cfund-head h3{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin:0;}
+  .Cfund-head .Cexport{width:32px;height:32px;border-radius:50%;background:var(--green-light);display:grid;place-items:center;cursor:pointer;flex-shrink:0;}
+  .Cfund-head .Cexport svg{width:15px;height:15px;stroke:var(--green);fill:none;stroke-width:2;}
+  .Cbar{height:10px;border-radius:99px;background:var(--red-bg);overflow:hidden;margin-bottom:14px;}
+  .Cbar-fill{height:100%;background:var(--green);border-radius:99px;transition:width .4s;}
+  .Cstats{display:flex;gap:22px;}
+  .Cstats div .v{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink);}
+  .Cstats div .k{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-top:2px;}
+  .Cstats div.spent .v{color:var(--red);}
+  .Cstats div.balance .v{color:var(--green);}
+  .Ccard{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px 18px;margin-bottom:14px;}
+  .Ccard-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .Ccard-head h4{font-family:var(--serif);font-size:14.5px;font-weight:600;color:var(--ink);margin:0;}
+  .Crow{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid #f0ece0;}
+  .Crow:last-child{border-bottom:none;}
+  .Crow .avatar{width:34px;height:34px;font-size:12px;}
+  .Crow .receipt-empty,.Crow .receipt-thumb{}
+  .Crow .body{flex:1;min-width:0;}
+  .Crow .nm{font-size:12.5px;font-weight:600;color:var(--ink);}
+  .Crow .meta{font-size:10.5px;color:var(--muted);margin-top:2px;}
+  .Crow .amt{font-family:var(--serif);font-size:14.5px;font-weight:700;color:var(--green);flex-shrink:0;}
+  .Crow.expense .amt{color:var(--red);}
+  .Cnew-row{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--green);cursor:pointer;padding:6px 0;}
+  .Cnew-row svg{width:16px;height:16px;}
+  .Cinline-form{display:none;background:#fbf9f4;border-radius:12px;padding:12px;margin-top:8px;margin-bottom:4px;}
+  .Cinline-form.on{display:block;}
+  .Cinline-form .form-grid{margin-bottom:8px;}
+</style>
+</head>
+<body>
+
+<div class="page-lede">
+  <h1>Room Parent Web Portal — 3 Directions</h1>
+  <p>New surface Tony described: a lightweight web portal room parents log into (phone number + code) to run the master calendar, lunch menu, event push, AI email compose, and — per Ahmad's follow-up — donation/fundraising tracking, replacing the current spreadsheet. Since this shell will carry all of those sections, three structurally different takes below before committing to one. Fundraising is fleshed out in full on every direction since that's the concrete spec; the other four sections are shown as nav stubs so you can judge the overall shape. <b>All three are live</b> — the donation/expense forms actually add rows, totals recalc, receipt upload shows a real thumbnail, and Export downloads a real CSV of what's in the table.</p>
+</div>
+
+<!-- ═══════════════════════════ DIRECTION A ═══════════════════════════ -->
+<div class="panel">
+  <div class="panel-head" style="width:660px;">
+    <span class="tag">Direction A · Sidebar Admin</span>
+    <h2>Full SaaS dashboard — persistent nav, data tables</h2>
+    <p>Left sidebar with all 5 sections always visible, dense tables for the donation/expense logs. Reads like a proper back-office tool — most scalable if a class ends up with 40+ logged transactions, easiest to scan at a glance.</p>
+    <div class="tradeoff"><b>Trade-off:</b> heaviest of the three, most "enterprise SaaS" — least like the rest of Sprout's warm, parent-facing voice. Best if room parents will mostly use this on a laptop.</div>
+  </div>
+  <div class="browser" style="width:660px;">
+    <div class="browser-bar"><div class="browser-dot" style="background:#ec6a5e;"></div><div class="browser-dot" style="background:#f4bf4f;"></div><div class="browser-dot" style="background:#61c454;"></div><div class="browser-url">room.joinsprout.co/kiker/1st-grade/fundraising</div></div>
+    <div class="browser-body Awrap">
+      <div class="Asidebar">
+        <div class="Abrand"><div class="mark">S</div><div class="txt">Room Parent<small>Portal</small></div></div>
+        <div class="Anav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</div>
+        <div class="Anav-item"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendar</div>
+        <div class="Anav-item"><svg viewBox="0 0 24 24"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 4v5h5"/></svg>Lunch Menu</div>
+        <div class="Anav-item"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Compose Email</div>
+        <div class="Anav-item on"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Fundraising</div>
+      </div>
+      <div class="Amain">
+        <div class="Atopbar">
+          <div class="cls">Mrs. Taylor's Class<span>1st Grade · Kiker Elementary</span></div>
+          <div class="me"><div class="avatar" style="width:26px;height:26px;font-size:10px;background:linear-gradient(145deg,#1e3e2b,#4fa472);">TM</div><span>Tony M. · Room Parent</span></div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-card"><div class="k">Total Raised</div><div class="v" id="A-raised">$0</div></div>
+          <div class="stat-card spent"><div class="k">Total Spent</div><div class="v" id="A-spent">$0</div></div>
+          <div class="stat-card balance"><div class="k">Balance</div><div class="v" id="A-balance">$0</div></div>
+        </div>
+
+        <div class="Asection">
+          <div class="Asection-head"><h3>Donations</h3>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-ghost Abtn-sm" onclick="portalExportCSV('A')"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Export</button>
+              <button class="btn btn-primary Abtn-sm" onclick="toggleForm('A-donForm')">+ Log Donation</button>
+            </div>
+          </div>
+          <div class="Aform" id="A-donForm">
+            <div class="form-grid">
+              <div class="field"><label>Parent</label><select id="A-donParent"></select></div>
+              <div class="field"><label>Amount ($)</label><input type="number" id="A-donAmount" placeholder="0.00" step="0.01" min="0"></div>
+              <div class="field"><label>Source</label><select id="A-donSource"><option>Venmo</option><option>Apple Pay</option><option>Check</option><option>Cash</option></select></div>
+              <div class="field"><label>Date Received</label><input type="date" id="A-donDate"></div>
+            </div>
+            <div class="Aform-actions"><button class="btn btn-ghost" onclick="toggleForm('A-donForm')">Cancel</button><button class="btn btn-primary" onclick="portalAddDonation('A')">Save Donation</button></div>
+          </div>
+          <table class="Atable"><thead><tr><th>Parent</th><th>Amount</th><th>Source</th><th>Date</th></tr></thead><tbody id="A-donRows"></tbody></table>
+        </div>
+
+        <div class="Asection">
+          <div class="Asection-head"><h3>Expenses</h3><button class="btn btn-primary Abtn-sm" onclick="toggleForm('A-expForm')">+ Log Expense</button></div>
+          <div class="Aform" id="A-expForm">
+            <div class="form-grid">
+              <div class="field" style="grid-column:1/-1;"><label>What it was used for</label><input type="text" id="A-expDesc" placeholder="e.g. Spirit Night snacks"></div>
+              <div class="field"><label>Amount Spent ($)</label><input type="number" id="A-expAmount" placeholder="0.00" step="0.01" min="0"></div>
+              <div class="field"><label>Date</label><input type="date" id="A-expDate"></div>
+            </div>
+            <div class="field" style="margin-bottom:10px;"><label>Receipt (optional)</label><label class="file-chip">📎 Attach receipt<input type="file" accept="image/*" id="A-expFile" onchange="handleReceiptPreview('A')"></label> <img class="receipt-thumb" id="A-expPreview" style="display:none;margin-left:8px;vertical-align:middle;"></div>
+            <div class="Aform-actions"><button class="btn btn-ghost" onclick="toggleForm('A-expForm')">Cancel</button><button class="btn btn-primary" onclick="portalAddExpense('A')">Save Expense</button></div>
+          </div>
+          <table class="Atable"><thead><tr><th>What for</th><th>Amount</th><th>Date</th><th>Receipt</th></tr></thead><tbody id="A-expRows"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ DIRECTION B ═══════════════════════════ -->
+<div class="panel">
+  <div class="panel-head" style="width:390px;">
+    <span class="tag">Direction B · Mobile-First Simple</span>
+    <h2>Phone-web portal, one thumb, one column</h2>
+    <p>Since room parents log in with a phone number + code, this direction assumes they'll mostly check it on their phone in a browser tab — big hero stat, stacked cards instead of tables, huge tap targets.</p>
+    <div class="tradeoff"><b>Trade-off:</b> friendliest and fastest to use on the go, but a class with a long transaction history gets a long scroll instead of a scannable table. Best if this is mostly a quick "log it and move on" tool.</div>
+  </div>
+  <div class="browser" style="width:390px;">
+    <div class="browser-bar"><div class="browser-dot" style="background:#ec6a5e;"></div><div class="browser-dot" style="background:#f4bf4f;"></div><div class="browser-dot" style="background:#61c454;"></div><div class="browser-url">room.joinsprout.co/…</div></div>
+    <div class="browser-body Bphone" style="height:700px;">
+      <div class="Bstatus"><span>9:41</span><span>🔋</span></div>
+      <div class="Baddr"><div class="pill">room.joinsprout.co/kiker/fundraising</div></div>
+      <div class="Btop">
+        <div class="back"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>Mrs. Taylor's Class</div>
+        <h2>Fundraising</h2>
+        <div class="sub">1st Grade · Kiker Elementary</div>
+      </div>
+      <div class="Bscroll">
+        <div class="Bhero">
+          <div class="lbl">Total Raised</div>
+          <div class="amt" id="B-raised">$0</div>
+          <div class="sub-stats">
+            <div><span>Spent</span><b id="B-spent">$0</b></div>
+            <div><span>Available</span><b id="B-balance">$0</b></div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary Bbtn-full" onclick="toggleForm('B-donForm')">+ Add Donation</button>
+        <div class="Bform" id="B-donForm">
+          <div class="field"><label>Parent</label><select id="B-donParent"></select></div>
+          <div class="field"><label>Amount ($)</label><input type="number" id="B-donAmount" placeholder="0.00" step="0.01" min="0"></div>
+          <div class="field"><label>Source</label><select id="B-donSource"><option>Venmo</option><option>Apple Pay</option><option>Check</option><option>Cash</option></select></div>
+          <div class="field"><label>Date Received</label><input type="date" id="B-donDate"></div>
+          <div style="display:flex;gap:8px;margin-top:4px;"><button class="btn btn-ghost" style="flex:1;padding:10px;" onclick="toggleForm('B-donForm')">Cancel</button><button class="btn btn-primary" style="flex:1;padding:10px;" onclick="portalAddDonation('B')">Save</button></div>
+        </div>
+
+        <div class="Bsec-lbl">Donations</div>
+        <div id="B-donRows"></div>
+
+        <button class="btn btn-ghost Bbtn-full" onclick="toggleForm('B-expForm')">+ Add Expense</button>
+        <div class="Bform" id="B-expForm">
+          <div class="field"><label>What it was used for</label><input type="text" id="B-expDesc" placeholder="e.g. Spirit Night snacks"></div>
+          <div class="field"><label>Amount Spent ($)</label><input type="number" id="B-expAmount" placeholder="0.00" step="0.01" min="0"></div>
+          <div class="field"><label>Date</label><input type="date" id="B-expDate"></div>
+          <div class="field"><label>Receipt (optional)</label><label class="file-chip">📎 Attach receipt<input type="file" accept="image/*" id="B-expFile" onchange="handleReceiptPreview('B')"></label> <img class="receipt-thumb" id="B-expPreview" style="display:none;margin-top:6px;"></div>
+          <div style="display:flex;gap:8px;margin-top:4px;"><button class="btn btn-ghost" style="flex:1;padding:10px;" onclick="toggleForm('B-expForm')">Cancel</button><button class="btn btn-primary" style="flex:1;padding:10px;" onclick="portalAddExpense('B')">Save</button></div>
+        </div>
+
+        <div class="Bsec-lbl">Expenses</div>
+        <div id="B-expRows"></div>
+
+        <div class="Bexport-link" onclick="portalExportCSV('B')"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Export as spreadsheet</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ DIRECTION C ═══════════════════════════ -->
+<div class="panel">
+  <div class="panel-head" style="width:700px;">
+    <span class="tag">Direction C · Warm Card Dashboard</span>
+    <h2>Desktop-width but Sprout-warm, not SaaS-gray</h2>
+    <p>Light pill tabs instead of a sidebar, everything in soft cream cards matching the app's own visual language (the same avatar/badge treatment as the Member Directory). New entries expand inline in place rather than a separate form panel.</p>
+    <div class="tradeoff"><b>Trade-off:</b> the middle ground — more breathing room and scan-ability than B, warmer and more "Sprout" than A. Slightly less information-dense than A's tables if the log gets very long.</div>
+  </div>
+  <div class="browser" style="width:700px;">
+    <div class="browser-bar"><div class="browser-dot" style="background:#ec6a5e;"></div><div class="browser-dot" style="background:#f4bf4f;"></div><div class="browser-dot" style="background:#61c454;"></div><div class="browser-url">room.joinsprout.co/kiker/1st-grade</div></div>
+    <div class="browser-body Cwrap">
+      <div class="Ctabs">
+        <div class="Ctab">Overview</div>
+        <div class="Ctab">Calendar</div>
+        <div class="Ctab">Lunch Menu</div>
+        <div class="Ctab">Compose Email</div>
+        <div class="Ctab on">Fundraising</div>
+      </div>
+
+      <div class="Cfund-card">
+        <div class="Cfund-head"><h3>Mrs. Taylor's Class Fund</h3><div class="Cexport" onclick="portalExportCSV('C')" title="Export to spreadsheet"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></div></div>
+        <div class="Cbar"><div class="Cbar-fill" id="C-bar" style="width:0%;"></div></div>
+        <div class="Cstats">
+          <div><div class="v" id="C-raised">$0</div><div class="k">Raised</div></div>
+          <div class="spent"><div class="v" id="C-spent">$0</div><div class="k">Spent</div></div>
+          <div class="balance"><div class="v" id="C-balance">$0</div><div class="k">Available</div></div>
+        </div>
+      </div>
+
+      <div class="Ccard">
+        <div class="Ccard-head"><h4>Donations</h4></div>
+        <div class="Cnew-row" onclick="toggleForm('C-donForm')"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>New donation</div>
+        <div class="Cinline-form" id="C-donForm">
+          <div class="form-grid">
+            <div class="field"><label>Parent</label><select id="C-donParent"></select></div>
+            <div class="field"><label>Amount ($)</label><input type="number" id="C-donAmount" placeholder="0.00" step="0.01" min="0"></div>
+            <div class="field"><label>Source</label><select id="C-donSource"><option>Venmo</option><option>Apple Pay</option><option>Check</option><option>Cash</option></select></div>
+            <div class="field"><label>Date Received</label><input type="date" id="C-donDate"></div>
+          </div>
+          <div class="Aform-actions"><button class="btn btn-ghost" onclick="toggleForm('C-donForm')">Cancel</button><button class="btn btn-primary" onclick="portalAddDonation('C')">Save Donation</button></div>
+        </div>
+        <div id="C-donRows"></div>
+      </div>
+
+      <div class="Ccard">
+        <div class="Ccard-head"><h4>Expenses</h4></div>
+        <div class="Cnew-row" onclick="toggleForm('C-expForm')"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>New expense</div>
+        <div class="Cinline-form" id="C-expForm">
+          <div class="form-grid">
+            <div class="field" style="grid-column:1/-1;"><label>What it was used for</label><input type="text" id="C-expDesc" placeholder="e.g. Spirit Night snacks"></div>
+            <div class="field"><label>Amount Spent ($)</label><input type="number" id="C-expAmount" placeholder="0.00" step="0.01" min="0"></div>
+            <div class="field"><label>Date</label><input type="date" id="C-expDate"></div>
+          </div>
+          <div class="field" style="margin-bottom:10px;"><label>Receipt (optional)</label><label class="file-chip">📎 Attach receipt<input type="file" accept="image/*" id="C-expFile" onchange="handleReceiptPreview('C')"></label> <img class="receipt-thumb" id="C-expPreview" style="display:none;margin-left:8px;vertical-align:middle;"></div>
+          <div class="Aform-actions"><button class="btn btn-ghost" onclick="toggleForm('C-expForm')">Cancel</button><button class="btn btn-primary" onclick="portalAddExpense('C')">Save Expense</button></div>
+        </div>
+        <div id="C-expRows"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PARENTS = [
+  {id:'lm', name:'Lydia Martin', initials:'LM', color:'linear-gradient(145deg,#1e3e2b,#4fa472)'},
+  {id:'sj', name:'Sarah Jensen', initials:'SJ', color:'linear-gradient(145deg,#3a7ca5,#7ec8e3)'},
+  {id:'mc', name:'Mike Cherches', initials:'MC', color:'linear-gradient(145deg,#7a3a8a,#ba7aca)'},
+  {id:'ks', name:'Kate Skiff', initials:'KS', color:'linear-gradient(145deg,#c85e20,#f0a060)'},
+  {id:'ar', name:'Amy Rangel', initials:'AR', color:'linear-gradient(145deg,#3a7ca5,#7ec8e3)'},
+  {id:'tm', name:'Tony Martin', initials:'TM', color:'linear-gradient(145deg,#1e3e2b,#4fa472)'}
+];
+function parentById(id){ return PARENTS.find(p=>p.id===id) || PARENTS[0]; }
+function fmt(n){ return '$' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtDate(iso){
+  if(!iso) return '—';
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function sourceEmoji(s){ return {Venmo:'📱','Apple Pay':'📱',Check:'🧾',Cash:'💵'}[s] || '💵'; }
+
+const seedDonations = [
+  {parentId:'lm', amount:50, source:'Venmo', date:'2026-08-12'},
+  {parentId:'sj', amount:25, source:'Cash', date:'2026-08-14'},
+  {parentId:'mc', amount:100, source:'Check', date:'2026-08-15'},
+  {parentId:'tm', amount:40, source:'Apple Pay', date:'2026-08-18'}
+];
+const seedExpenses = [
+  {desc:'Spirit Night snacks & drinks', amount:62.50, date:'2026-08-20', receipt:null}
+];
+
+const scopes = {};
+['A','B','C'].forEach(s => {
+  scopes[s] = { donations: seedDonations.map(d=>({...d})), expenses: seedExpenses.map(e=>({...e})) };
+  const psel = document.getElementById(s+'-donParent');
+  if(psel){ psel.innerHTML = PARENTS.map(p=>`<option value="${p.id}">${p.name}</option>`).join(''); }
+});
+
+function toggleForm(id){
+  const f = document.getElementById(id);
+  f.classList.toggle('on');
+}
+
+function recalc(scope){
+  const st = scopes[scope];
+  const raised = st.donations.reduce((sum,d)=>sum+Number(d.amount),0);
+  const spent = st.expenses.reduce((sum,e)=>sum+Number(e.amount),0);
+  const balance = raised - spent;
+  document.getElementById(scope+'-raised').textContent = fmt(raised);
+  document.getElementById(scope+'-spent').textContent = fmt(spent);
+  document.getElementById(scope+'-balance').textContent = fmt(balance);
+  const bar = document.getElementById(scope+'-bar');
+  if(bar){ bar.style.width = raised > 0 ? Math.min(100,(balance/raised)*100)+'%' : '0%'; }
+}
+
+function renderDonations(scope){
+  const st = scopes[scope];
+  const sorted = [...st.donations].sort((a,b)=> b.date.localeCompare(a.date));
+  const rowsEl = document.getElementById(scope+'-donRows');
+  if(!rowsEl) return;
+
+  if(scope === 'A'){
+    rowsEl.innerHTML = sorted.map(d => {
+      const p = parentById(d.parentId);
+      return `<tr><td><div class="who"><div class="avatar" style="background:${p.color};">${p.initials}</div>${p.name}</div></td><td>${fmt(d.amount)}</td><td><span class="src-chip">${sourceEmoji(d.source)} ${d.source}</span></td><td>${fmtDate(d.date)}</td></tr>`;
+    }).join('') || `<tr><td colspan="4" style="color:var(--muted);text-align:center;padding:16px;">No donations logged yet.</td></tr>`;
+  } else if(scope === 'B'){
+    rowsEl.innerHTML = sorted.map(d => {
+      const p = parentById(d.parentId);
+      return `<div class="Bcard-item"><div class="avatar" style="background:${p.color};">${p.initials}</div><div class="body"><div class="nm">${p.name}</div><div class="meta"><span class="src-chip">${sourceEmoji(d.source)} ${d.source}</span>${fmtDate(d.date)}</div></div><div class="amt">+${fmt(d.amount)}</div></div>`;
+    }).join('') || `<div style="text-align:center;color:var(--muted);font-size:12px;padding:14px 0;">No donations logged yet.</div>`;
+  } else {
+    rowsEl.innerHTML = sorted.map(d => {
+      const p = parentById(d.parentId);
+      return `<div class="Crow"><div class="avatar" style="background:${p.color};">${p.initials}</div><div class="body"><div class="nm">${p.name}</div><div class="meta"><span class="src-chip">${sourceEmoji(d.source)} ${d.source}</span> · ${fmtDate(d.date)}</div></div><div class="amt">+${fmt(d.amount)}</div></div>`;
+    }).join('') || `<div style="text-align:center;color:var(--muted);font-size:12px;padding:14px 0;">No donations logged yet.</div>`;
+  }
+}
+
+function renderExpenses(scope){
+  const st = scopes[scope];
+  const sorted = [...st.expenses].sort((a,b)=> b.date.localeCompare(a.date));
+  const rowsEl = document.getElementById(scope+'-expRows');
+  if(!rowsEl) return;
+
+  const receiptCell = (e) => e.receipt
+    ? `<img class="receipt-thumb" src="${e.receipt}">`
+    : `<div class="receipt-empty" title="No receipt attached"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/></svg></div>`;
+
+  if(scope === 'A'){
+    rowsEl.innerHTML = sorted.map(e => `<tr><td>${e.desc}</td><td style="color:var(--red);">-${fmt(e.amount)}</td><td>${fmtDate(e.date)}</td><td>${receiptCell(e)}</td></tr>`).join('')
+      || `<tr><td colspan="4" style="color:var(--muted);text-align:center;padding:16px;">No expenses logged yet.</td></tr>`;
+  } else if(scope === 'B'){
+    rowsEl.innerHTML = sorted.map(e => `<div class="Bcard-item expense">${receiptCell(e)}<div class="body"><div class="nm">${e.desc}</div><div class="meta">${fmtDate(e.date)}</div></div><div class="amt">-${fmt(e.amount)}</div></div>`).join('')
+      || `<div style="text-align:center;color:var(--muted);font-size:12px;padding:14px 0;">No expenses logged yet.</div>`;
+  } else {
+    rowsEl.innerHTML = sorted.map(e => `<div class="Crow expense">${receiptCell(e)}<div class="body"><div class="nm">${e.desc}</div><div class="meta">${fmtDate(e.date)}</div></div><div class="amt">-${fmt(e.amount)}</div></div>`).join('')
+      || `<div style="text-align:center;color:var(--muted);font-size:12px;padding:14px 0;">No expenses logged yet.</div>`;
+  }
+}
+
+function renderAll(scope){ recalc(scope); renderDonations(scope); renderExpenses(scope); }
+
+function portalAddDonation(scope){
+  const amount = parseFloat(document.getElementById(scope+'-donAmount').value);
+  if(!amount || amount <= 0){ alert('Enter an amount greater than $0.'); return; }
+  const parentId = document.getElementById(scope+'-donParent').value;
+  const source = document.getElementById(scope+'-donSource').value;
+  const dateEl = document.getElementById(scope+'-donDate');
+  const date = dateEl.value || new Date().toISOString().slice(0,10);
+  scopes[scope].donations.push({parentId, amount, source, date});
+  document.getElementById(scope+'-donAmount').value = '';
+  dateEl.value = '';
+  toggleForm(scope+'-donForm');
+  renderAll(scope);
+}
+
+function portalAddExpense(scope){
+  const amount = parseFloat(document.getElementById(scope+'-expAmount').value);
+  const desc = document.getElementById(scope+'-expDesc').value.trim();
+  if(!desc){ alert('Add a short description of what it was used for.'); return; }
+  if(!amount || amount <= 0){ alert('Enter an amount greater than $0.'); return; }
+  const dateEl = document.getElementById(scope+'-expDate');
+  const date = dateEl.value || new Date().toISOString().slice(0,10);
+  const preview = document.getElementById(scope+'-expPreview');
+  const receipt = (preview && preview.style.display !== 'none') ? preview.src : null;
+  scopes[scope].expenses.push({desc, amount, date, receipt});
+  document.getElementById(scope+'-expDesc').value = '';
+  document.getElementById(scope+'-expAmount').value = '';
+  dateEl.value = '';
+  if(preview){ preview.style.display = 'none'; preview.src = ''; }
+  const fileInput = document.getElementById(scope+'-expFile');
+  if(fileInput) fileInput.value = '';
+  toggleForm(scope+'-expForm');
+  renderAll(scope);
+}
+
+function handleReceiptPreview(scope){
+  const input = document.getElementById(scope+'-expFile');
+  const preview = document.getElementById(scope+'-expPreview');
+  if(!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'inline-block'; };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function portalExportCSV(scope){
+  const st = scopes[scope];
+  const rows = [['Type','Parent / Description','Amount','Source','Date']];
+  st.donations.forEach(d => rows.push(['Donation', parentById(d.parentId).name, d.amount.toFixed(2), d.source, d.date]));
+  st.expenses.forEach(e => rows.push(['Expense', e.desc, '-'+e.amount.toFixed(2), '', e.date]));
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'kiker-1st-grade-fundraising.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+['A','B','C'].forEach(renderAll);
+</script>
+
+</body>
+</html>

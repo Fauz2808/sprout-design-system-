@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Create a club — one hold, no dialogue · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#fff; --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+    --green:#186338; --brand-light:#e2e9e3; --brand-border:#77b691; --border:#d0dacf;
+    --amber:#b5872b; --amber-bg:#fbf1da; --amber-br:#e6cd96;
+    --shadow-m:1px 4px 25px 2px rgba(13,13,18,.05); --shadow-l:1px 4px 25px 2px rgba(13,13,18,.2);
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    padding:38px 30px 70px;display:flex;gap:48px;align-items:flex-start;justify-content:center;flex-wrap:wrap}
+
+  .col{max-width:520px}
+  .col h1{font-family:var(--serif);font-size:29px;font-weight:600;color:var(--ink);margin:0 0 10px}
+  .col .p{font-size:14px;color:#5b5648;line-height:1.68;margin:0 0 16px}
+  .quote{background:#fff;border-left:3px solid var(--green);border-radius:12px;padding:14px 17px;
+    font-size:13.5px;line-height:1.65;color:var(--body);margin-bottom:18px}
+  .quote b{color:var(--ink)} .quote i{color:#5b5648}
+  .try{background:var(--brand-light);border:1px solid var(--brand-border);border-radius:14px;padding:15px 17px;margin-bottom:18px}
+  .try h4{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin:0 0 10px}
+  .try ol{margin:0;padding-left:18px}
+  .try li{font-size:13.5px;line-height:1.6;color:var(--body);margin-bottom:7px}
+  .try li:last-child{margin-bottom:0}
+  .try li b{color:var(--ink)}
+  .note{background:#fff;border:1px solid #cfc8ba;border-radius:14px;padding:15px 17px;font-size:13px;
+    line-height:1.65;color:var(--body)}
+  .note b{color:var(--ink)}
+  .ph{display:inline-block;vertical-align:middle} .ph svg{display:block;width:100%;height:100%;fill:currentColor}
+
+  .device{position:relative;width:393px;height:852px;border-radius:54px;padding:11px;flex-shrink:0;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45)}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:60}
+  .screen{position:relative;width:100%;height:100%;border-radius:43px;overflow:hidden;background:var(--bg)}
+  .seg{position:absolute;inset:0;display:none;flex-direction:column}
+  .seg.on{display:flex}
+  .sb{flex:0 0 44px;padding:16px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink)}
+  .sb .r{display:inline-flex;gap:6px;align-items:center}
+  .sb svg{width:17px;height:11px;fill:var(--ink)} .sb .bat{width:25px}
+
+  .voice-body{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;padding:10px 24px 34px;text-align:center}
+  .stipple{width:144px;height:144px;border-radius:50%;margin:16px 0 20px;flex-shrink:0;
+    background-color:#eae6db;
+    background-image:radial-gradient(rgba(120,113,94,.55) 1px, transparent 1.3px);
+    background-size:6px 6px;
+    -webkit-mask-image:radial-gradient(circle,#000 62%,transparent 78%);
+    mask-image:radial-gradient(circle,#000 62%,transparent 78%);transition:box-shadow .2s}
+  .stipple.live{background-image:radial-gradient(rgba(24,99,56,.6) 1.1px, transparent 1.4px);
+    box-shadow:0 0 0 16px rgba(24,99,56,.05);animation:breathe 1.6s ease-in-out infinite}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+  @media (prefers-reduced-motion: reduce){ .stipple.live{animation:none} }
+
+  .vhead h2{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--ink);line-height:1.28;margin:0 0 8px}
+  .vhead p{font-size:13.5px;color:var(--muted);line-height:1.55;max-width:292px;margin:0 auto}
+  .trs{width:100%;background:#fff;border-radius:16px;padding:15px 17px;text-align:left;
+    box-shadow:var(--shadow-m);min-height:86px}
+  .trs .lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:7px}
+  .trs .txt{font-size:15px;line-height:1.55;color:var(--ink)}
+  .trs .car{display:inline-block;width:2px;height:15px;background:var(--green);vertical-align:-2px;
+    animation:blink .9s step-end infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  .slotwrap{width:100%;margin-top:20px}
+  .slothead{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#a49a86;text-align:left;margin-bottom:9px}
+  .slots{display:flex;flex-wrap:wrap;gap:7px}
+  .slot{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:8px 13px 8px 11px;
+    font-size:12.5px;border:1px dashed #c8c0b0;color:#a49a86;background:transparent;transition:.22s}
+  .slot .ph{width:15px;height:15px;flex-shrink:0}
+  .slot i{font-style:normal}
+  .slot.on{border:1px solid var(--brand-border);background:var(--brand-light);color:var(--ink);font-weight:600}
+
+  .mic-zone{margin-top:auto;padding-top:26px;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .vmic{width:74px;height:74px;border-radius:50%;border:none;display:grid;place-items:center;position:relative;
+    background:var(--card);box-shadow:0 0 0 2px #f0c9c9 inset,var(--shadow-m);color:#c94f4f;
+    touch-action:none;cursor:pointer;transition:transform .15s,box-shadow .2s,background .2s;-webkit-user-select:none;user-select:none}
+  .vmic .ph{width:28px;height:28px;position:absolute;transition:opacity .15s}
+  .vmic .mic-ic{opacity:0}
+  .vmic.on{background:var(--green);box-shadow:0 0 0 10px rgba(24,99,56,.14),0 0 0 24px rgba(24,99,56,.06);
+    color:#fff;transform:scale(1.06)}
+  .vmic.on .muted-ic{opacity:0} .vmic.on .mic-ic{opacity:1}
+  .vhint{font-size:13px;font-weight:600;color:var(--muted)}
+  .mic-zone.on .vhint{color:var(--green)}
+
+  .top2{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:8px 16px 6px}
+  .ibtn{width:40px;height:40px;border-radius:50%;background:var(--card);border:1px solid var(--border);
+    display:grid;place-items:center;flex-shrink:0;box-shadow:var(--shadow-m);cursor:pointer}
+  .ibtn .ph{width:20px;height:20px;color:var(--ink)}
+  .top2 .tt{flex:1;text-align:center;font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink)}
+  .top2 .sp{width:40px;flex-shrink:0}
+  .body2{flex:1 1 auto;overflow-y:auto;padding:8px 20px 118px}
+
+  .heard{display:flex;gap:10px;background:var(--brand-light);border-radius:14px;padding:12px 14px;margin-bottom:20px}
+  .heard .ph{width:16px;height:16px;color:var(--green);flex-shrink:0;margin-top:2px}
+  .heard .l{display:block;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--green);margin-bottom:3px}
+  .heard .q{display:block;font-size:13px;line-height:1.5;color:var(--ink)}
+
+  .flabel{font-size:11.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin:0 2px 8px}
+  .fin{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:13px 15px;
+    font-family:var(--sans);font-size:15px;color:var(--ink);box-shadow:var(--shadow-m);margin-bottom:20px;
+    display:block;outline:none}
+  textarea.fin{resize:none;min-height:82px;line-height:1.5;font-size:14px}
+  .fin:focus{border-color:var(--brand-border);box-shadow:0 0 0 3px rgba(119,182,145,.22)}
+  .fin.miss{border-color:var(--amber-br);background:var(--amber-bg);color:var(--amber)}
+  .fin.miss::placeholder{color:var(--amber)}
+
+  .iconrow{display:flex;gap:9px;margin-bottom:20px}
+  .ib{width:52px;height:52px;border-radius:50%;background:var(--card);border:1.5px solid var(--border);
+    display:grid;place-items:center;font-size:24px;box-shadow:var(--shadow-m);cursor:pointer}
+  .ib.on{border-color:var(--brand-border);box-shadow:0 0 0 2px var(--brand-border) inset,var(--shadow-m)}
+  .chiprow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .chip{background:var(--card);border:1.5px solid var(--border);border-radius:99px;padding:11px 15px;
+    font-size:13.5px;color:var(--muted);box-shadow:var(--shadow-m);cursor:pointer}
+  .chip.on{border-color:var(--brand-border);background:var(--brand-light);color:var(--ink);font-weight:600}
+  .chiprow.miss .chip{border-color:var(--amber-br);background:var(--amber-bg);color:var(--amber)}
+
+  .missnote{display:flex;gap:9px;background:var(--amber-bg);border:1px solid var(--amber-br);border-radius:12px;
+    padding:12px 14px;font-size:12.5px;line-height:1.55;color:#7a5a12}
+  .missnote .ph{width:15px;height:15px;color:var(--amber);flex-shrink:0;margin-top:2px}
+
+  .cta{position:absolute;left:0;right:0;bottom:0;padding:16px 16px 30px;
+    background:linear-gradient(to top,var(--bg) 66%,rgba(236,230,218,0))}
+  .btn{width:100%;border:none;border-radius:16px;padding:16px;font-family:var(--serif);font-size:16px;
+    font-weight:500;background:var(--green);color:#fff;box-shadow:var(--shadow-l);cursor:pointer}
+  .btn.ghost{background:none;box-shadow:none;color:var(--muted);font-family:var(--sans);font-size:13.5px;
+    font-weight:600;padding:12px 0 0}
+
+  .done{flex:1 1 auto;padding:30px 24px;text-align:center;display:flex;flex-direction:column;
+    align-items:center;justify-content:center}
+  .ring{width:118px;height:118px;border-radius:50%;background:var(--brand-light);border:4px solid var(--brand-border);
+    display:grid;place-items:center;font-size:54px;margin-bottom:22px;position:relative}
+  .ring .tick{position:absolute;right:0;bottom:0;width:38px;height:38px;border-radius:50%;background:var(--green);
+    color:#fff;display:grid;place-items:center;border:3px solid var(--bg)}
+  .ring .tick .ph{width:18px;height:18px}
+  .done h2{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--ink);margin:0 0 9px}
+  .done p{font-size:14px;color:var(--muted);line-height:1.6;margin:0 0 24px;max-width:290px}
+  .lnk{width:100%;display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--border);
+    border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-m);margin-bottom:12px}
+  .lnk .ph{width:16px;height:16px;color:var(--muted);flex-shrink:0}
+  .lnk .u{flex:1;min-width:0;text-align:left;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lnk .u b{color:var(--ink);font-weight:600}
+  .lnk i{font-style:normal;color:var(--green);font-weight:700;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<div class="col">
+  <h1>Create a club, without the dialogue</h1>
+  <p class="p">A working prototype, not a picture. Hold the microphone and let go whenever you like.
+  What you did not say stays unfilled, and nothing on screen asks you for it.</p>
+
+  <div class="quote"><b>Tony, 15 Sep:</b>
+  <i>&ldquo;The club creation has a ton of dialogue. Remember when we're like, okay, ready to begin?
+  Well, I'm like, yes. And now I have to hit the mute button every time when I'm walkie-talking with
+  them. We won't have any of that&hellip; I'm just gonna be like, I'm doing this, this, this, and this,
+  and then it'll just spit it out.&rdquo;</i></div>
+
+  <div class="try">
+    <h4>Worth trying in this order</h4>
+    <ol>
+      <li><b>Hold all the way to the end.</b> Every chip turns green, the preview is complete.</li>
+      <li><b>Start over, then let go after two seconds.</b> Only the club name was caught. The
+        description and the privacy setting arrive amber, and the assistant still says nothing.</li>
+      <li><b>Type over any field.</b> A mishearing is fixed by editing, never by recording again.</li>
+    </ol>
+  </div>
+
+  <div class="note">
+    <b>Why one flow and not five.</b> Tony has not seen the direction page yet, and in PMF the
+    expensive mistake is building five of something before anyone has held one. Club is the flow he
+    named as the worst offender, so it is the fair test. Once he says the shape is right, the other
+    four are the same three screens with different fields, which is the whole point of the pattern.
+  </div>
+</div>
+
+<div class="device"><div class="island"></div><div class="screen">
+
+  <!-- ══ 1. VOICE ══ -->
+  <div class="seg on" id="s1">
+    <div class="sb"><span>9:41</span><span class="r">
+      <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+      <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+      <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+    </span></div>
+    <div class="voice-body">
+      <div class="stipple" id="orb"></div>
+      <div class="vhead" id="vhead">
+        <h2>Create a club</h2>
+        <p>Hold the button and say it the way you would say it to a friend.</p>
+      </div>
+      <div class="trs" id="trsBox" style="display:none">
+        <div class="lbl" id="trsLbl">Listening</div>
+        <div class="txt"><span id="trsTxt"></span><span class="car" id="car"></span></div>
+      </div>
+      <div class="slotwrap">
+        <div class="slothead" id="slotHead">It is listening for</div>
+        <div class="slots" id="slots"></div>
+      </div>
+      <div class="mic-zone" id="micZone">
+        <button class="vmic" id="mic">
+          <span class="muted-ic ph"><svg viewBox="0 0 256 256"><path d="m53.92 34.62 174 174a8 8 0 0 1-11.31 11.31l-21.34-21.34A79.7 79.7 0 0 1 136 216.8V232a8 8 0 0 1-16 0v-15.2a80.11 80.11 0 0 1-72-79.6v-8a8 8 0 0 1 16 0v8a64.07 64.07 0 0 0 65.44 64c.72 0 1.42-.08 2.13-.11l-21.4-21.4A47.86 47.86 0 0 1 80 152v-8a8 8 0 0 1 15.62-2.5L42.61 96A8 8 0 0 1 53.92 34.62M176 128v-64a48 48 0 0 0-92.42-18.13L96.4 58.69A32 32 0 0 1 160 64v64a31.6 31.6 0 0 1-1.34 9.09l12.06 12.06A47.6 47.6 0 0 0 176 128"/></svg></span>
+          <span class="mic-ic ph"><svg viewBox="0 0 256 256"><path d="M128 176a48.05 48.05 0 0 0 48-48V64a48 48 0 0 0-96 0v64a48.05 48.05 0 0 0 48 48M96 64a32 32 0 0 1 64 0v64a32 32 0 0 1-64 0Zm40 143.6V240a8 8 0 0 1-16 0v-32.4A80.11 80.11 0 0 1 48 128a8 8 0 0 1 16 0 64 64 0 0 0 128 0 8 8 0 0 1 16 0 80.11 80.11 0 0 1-72 79.6"/></svg></span>
+        </button>
+        <div class="vhint" id="hint">Hold to speak</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 2. PREVIEW ══ -->
+  <div class="seg" id="s2">
+    <div class="sb"><span>9:41</span><span class="r">
+      <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+      <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+    </span></div>
+    <div class="top2">
+      <div class="ibtn" onclick="reset()"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span></div>
+      <div class="tt">Check this over</div>
+      <div class="sp"></div>
+    </div>
+    <div class="body2">
+      <div class="heard">
+        <span class="ph"><svg viewBox="0 0 256 256"><path d="M128 176a48.05 48.05 0 0 0 48-48V64a48 48 0 0 0-96 0v64a48.05 48.05 0 0 0 48 48M96 64a32 32 0 0 1 64 0v64a32 32 0 0 1-64 0Zm40 143.6V240a8 8 0 0 1-16 0v-32.4A80.11 80.11 0 0 1 48 128a8 8 0 0 1 16 0 64 64 0 0 0 128 0 8 8 0 0 1 16 0 80.11 80.11 0 0 1-72 79.6"/></svg></span>
+        <span><span class="l">You said</span><span class="q" id="pvHeard"></span></span>
+      </div>
+      <div class="flabel">Icon</div>
+      <div class="iconrow" id="iconRow"></div>
+      <div class="flabel">Club name</div>
+      <input class="fin" id="fName" placeholder="Not mentioned — type a name">
+      <div class="flabel">Description</div>
+      <textarea class="fin" id="fDesc" placeholder="Not mentioned — say what this club is for"></textarea>
+      <div class="flabel">Who can join</div>
+      <div class="chiprow" id="joinRow"></div>
+      <div class="missnote" id="missNote" style="display:none">
+        <span class="ph"><svg viewBox="0 0 256 256"><path d="M88 96a8 8 0 0 1 8-8h64a8 8 0 0 1 0 16H96a8 8 0 0 1-8-8m8 40h64a8 8 0 0 0 0-16H96a8 8 0 0 0 0 16m32 16H96a8 8 0 0 0 0 16h32a8 8 0 0 0 0-16m88-104v168a16 16 0 0 1-16 16H56a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h144a16 16 0 0 1 16 16M200 48H56v168h144Z"/></svg></span>
+        <span id="missTxt"></span>
+      </div>
+    </div>
+    <div class="cta"><button class="btn" onclick="create()">Create club</button></div>
+  </div>
+
+  <!-- ══ 3. DONE ══ -->
+  <div class="seg" id="s3">
+    <div class="sb"><span>9:41</span><span class="r">
+      <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+      <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+    </span></div>
+    <div class="done">
+      <div class="ring"><span id="dIcon">🏘️</span><span class="tick"><span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 77.66-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69 218.34 66.34a8 8 0 0 1 11.32 11.32"/></svg></span></span></div>
+      <h2 id="dName">Circle C Dads</h2>
+      <p id="dSub">Your club is live. Share the link and people can join without the app.</p>
+      <div class="lnk"><span class="ph"><svg viewBox="0 0 256 256"><path d="M137.54 186.36a8 8 0 0 1 0 11.31l-9.94 10a56 56 0 0 1-79.22-79.27l24.12-24.13a56 56 0 0 1 76.61-2.44 8 8 0 1 1-10.62 12 40 40 0 0 0-54.63 1.73l-24.12 24.14a40 40 0 0 0 56.57 56.62l9.94-9.95a8 8 0 0 1 11.29 0M226.83 133.11a56.08 56.08 0 0 0-1.62-79.29 56.06 56.06 0 0 0-77.66.02l-9.94 10a8 8 0 0 0 11.29 11.31l9.94-9.95a40 40 0 1 1 56.57 56.62l-24.13 24.14a40 40 0 0 1-54.63 1.73 8 8 0 1 0-10.62 12 56 56 0 0 0 76.61-2.44Z"/></svg></span>
+        <span class="u" id="dLink">joinsprout.co/c/<b>circle-c-dads</b></span><i>Copy</i></div>
+      <button class="btn" style="width:100%">Share the invite</button>
+      <button class="btn ghost" onclick="reset()">Start over</button>
+    </div>
+  </div>
+
+</div></div>
+
+<script>
+/* Each segment is a piece of speech and the slot it completes. Letting go early
+   leaves every later slot unfilled, which is the whole point of the screen. */
+const SEGMENTS = [
+  { text: 'Start a club ',                                     slot: null },
+  { text: 'for the dads around Circle C, ',                    slot: 'name' },
+  { text: 'poker most months and a cookout when the weather behaves, ', slot: 'desc' },
+  { text: 'anyone with the link can join.',                    slot: 'join' }
+];
+const FULL = SEGMENTS.map(s => s.text).join('');
+const BOUNDS = SEGMENTS.map((s, i) => SEGMENTS.slice(0, i + 1).reduce((n, x) => n + x.text.length, 0));
+
+const VALUES = {
+  name: 'Circle C Dads',
+  desc: 'Poker most months, a cookout when the weather behaves.',
+  join: 'Anyone with the link'
+};
+const SLOTS = [
+  { key: 'name', label: 'Name',            icon: 'users' },
+  { key: 'desc', label: 'What it is for',  icon: 'note'  },
+  { key: 'join', label: 'Open or approval', icon: 'lock' }
+];
+const ICONS = {
+  users:'M117.25 157.92a60 60 0 1 0-66.5 0 95.83 95.83 0 0 0-47.22 37.71 8 8 0 1 0 13.4 8.74 80 80 0 0 1 134.14 0 8 8 0 0 0 13.4-8.74 95.83 95.83 0 0 0-47.22-37.71M40 108a44 44 0 1 1 44 44 44.05 44.05 0 0 1-44-44m210.14 98.7a8 8 0 0 1-11.07-2.33A79.83 79.83 0 0 0 172 168a8 8 0 0 1 0-16 44 44 0 1 0-16.34-84.87 8 8 0 1 1-5.94-14.85 60 60 0 0 1 55.53 105.64 95.83 95.83 0 0 1 47.22 37.71 8 8 0 0 1-2.33 11.07',
+  note:'M88 96a8 8 0 0 1 8-8h64a8 8 0 0 1 0 16H96a8 8 0 0 1-8-8m8 40h64a8 8 0 0 0 0-16H96a8 8 0 0 0 0 16m32 16H96a8 8 0 0 0 0 16h32a8 8 0 0 0 0-16m88-104v168a16 16 0 0 1-16 16H56a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h144a16 16 0 0 1 16 16M200 48H56v168h144Z',
+  lock:'M208 80h-32V56a48 48 0 0 0-96 0v24H48a16 16 0 0 0-16 16v112a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V96a16 16 0 0 0-16-16M96 56a32 32 0 0 1 64 0v24H96Zm112 152H48V96h160z'
+};
+const CLUB_ICONS = ['🏘️','🎮','🍺','⛳','🎨'];
+
+let chars = 0, timer = null, held = false, pickedIcon = 0, pickedJoin = null, caught = {};
+
+const $ = id => document.getElementById(id);
+
+function slotHTML(){
+  return SLOTS.map(s => {
+    const on = caught[s.key];
+    return '<span class="slot' + (on ? ' on' : '') + '">'
+      + '<span class="ph"><svg viewBox="0 0 256 256"><path d="' + ICONS[s.icon] + '"/></svg></span>'
+      + '<i>' + (on ? VALUES[s.key] : s.label) + '</i></span>';
+  }).join('');
+}
+function paintSlots(){ $('slots').innerHTML = slotHTML(); }
+
+function recompute(){
+  caught = {};
+  SEGMENTS.forEach((s, i) => { if (s.slot && chars >= BOUNDS[i]) caught[s.slot] = true; });
+  paintSlots();
+}
+
+function tick(){
+  if (chars >= FULL.length){ stopTyping(); $('hint').textContent = 'Release to continue'; return; }
+  chars++;
+  $('trsTxt').textContent = '“' + FULL.slice(0, chars);
+  recompute();
+}
+function stopTyping(){ if (timer){ clearInterval(timer); timer = null; } }
+
+function down(e){
+  e.preventDefault();
+  if (held) return;
+  held = true;
+  $('mic').classList.add('on');
+  $('micZone').classList.add('on');
+  $('orb').classList.add('live');
+  $('vhead').style.display = 'none';
+  $('trsBox').style.display = 'block';
+  $('slotHead').textContent = 'Caught so far';
+  $('hint').textContent = 'Release when you are done';
+  $('car').style.display = 'inline-block';
+  stopTyping();
+  timer = setInterval(tick, 34);
+}
+function up(){
+  if (!held) return;
+  held = false;
+  stopTyping();
+  $('mic').classList.remove('on');
+  $('micZone').classList.remove('on');
+  $('orb').classList.remove('live');
+  $('car').style.display = 'none';
+  if (chars === 0){
+    $('trsBox').style.display = 'none';
+    $('vhead').style.display = 'block';
+    $('slotHead').textContent = 'It is listening for';
+    $('hint').textContent = 'Hold to speak';
+    return;
+  }
+  $('trsLbl').textContent = 'Got it';
+  $('hint').textContent = 'Opening the preview…';
+  setTimeout(toPreview, 620);
+}
+
+function toPreview(){
+  const heard = FULL.slice(0, chars).trim().replace(/,$/, '');
+  $('pvHeard').textContent = '“' + heard + '”';
+
+  $('fName').value = caught.name ? VALUES.name : '';
+  $('fName').classList.toggle('miss', !caught.name);
+  $('fDesc').value = caught.desc ? VALUES.desc : '';
+  $('fDesc').classList.toggle('miss', !caught.desc);
+
+  pickedJoin = caught.join ? 0 : null;
+  paintJoin();
+  paintIcons();
+
+  const missing = SLOTS.filter(s => !caught[s.key]).map(s => s.label.toLowerCase());
+  if (missing.length){
+    $('missNote').style.display = 'flex';
+    $('missTxt').textContent = missing.length === 1
+      ? 'One thing was never said: ' + missing[0] + '. It is marked, not asked about.'
+      : missing.length + ' things were never said: ' + missing.join(', ')
+        + '. They are marked, not asked about.';
+  } else {
+    $('missNote').style.display = 'none';
+  }
+  show('s2');
+}
+function paintIcons(){
+  $('iconRow').innerHTML = CLUB_ICONS.map((e, i) =>
+    '<span class="ib' + (i === pickedIcon ? ' on' : '') + '" onclick="pickIcon(' + i + ')">' + e + '</span>').join('');
+}
+function pickIcon(i){ pickedIcon = i; paintIcons(); }
+function paintJoin(){
+  const opts = ['Anyone with the link', 'I approve'];
+  $('joinRow').className = 'chiprow' + (pickedJoin === null ? ' miss' : '');
+  $('joinRow').innerHTML = opts.map((o, i) =>
+    '<span class="chip' + (i === pickedJoin ? ' on' : '') + '" onclick="pickJoin(' + i + ')">' + o + '</span>').join('');
+}
+function pickJoin(i){ pickedJoin = i; paintJoin(); }
+
+function create(){
+  const name = $('fName').value.trim() || 'Your club';
+  $('dName').textContent = name;
+  $('dIcon').textContent = CLUB_ICONS[pickedIcon];
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  $('dLink').innerHTML = 'joinsprout.co/c/<b>' + slug + '</b>';
+  $('dSub').textContent = pickedJoin === 1
+    ? 'Your club is live. People request to join and you approve them.'
+    : 'Your club is live. Share the link and people can join without the app.';
+  show('s3');
+}
+function show(id){
+  document.querySelectorAll('.seg').forEach(s => s.classList.remove('on'));
+  $(id).classList.add('on');
+}
+function reset(){
+  chars = 0; held = false; pickedIcon = 0; pickedJoin = null; caught = {};
+  stopTyping();
+  $('trsTxt').textContent = '';
+  $('trsBox').style.display = 'none';
+  $('trsLbl').textContent = 'Listening';
+  $('vhead').style.display = 'block';
+  $('slotHead').textContent = 'It is listening for';
+  $('hint').textContent = 'Hold to speak';
+  $('mic').classList.remove('on');
+  $('micZone').classList.remove('on');
+  $('orb').classList.remove('live');
+  paintSlots();
+  show('s1');
+}
+
+const mic = $('mic');
+mic.addEventListener('pointerdown', down);
+mic.addEventListener('pointerup', up);
+mic.addEventListener('pointerleave', up);
+mic.addEventListener('pointercancel', up);
+mic.addEventListener('contextmenu', e => e.preventDefault());
+paintSlots();
+</script>
+
+</body>
+</html>

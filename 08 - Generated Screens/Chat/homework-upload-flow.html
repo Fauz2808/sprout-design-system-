@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Homework Tab + Upload &amp; AI Digitize Flow · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff; --field:#e8e2d6;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e; --green:#186338; --brand-mid:#4fa472;
+    --brand-light:#e2e9e3; --brand-border:#77b691; --border-light:#d0dacf; --border:#e6e7ea;
+    --amber:#c08a2d; --amber-light:#fbf0d8;
+    --shadow-m:1px 4px 25px rgba(13,13,18,.05); --shadow-l:1px 4px 25px rgba(13,13,18,.12);
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:26px 44px;padding:40px 22px 60px;}
+  .lede{flex:1 0 100%;text-align:center;max-width:780px;margin:0 auto 6px;}
+  .lede h1{font-family:var(--serif);font-weight:600;font-size:23px;color:#23271f;margin:0 0 5px;}
+  .lede p{font-size:12.5px;color:#6a665b;margin:0;line-height:1.55;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:12px;}
+  .cap{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:#8a8478;text-align:center;max-width:393px;line-height:1.5;}
+  .cap b{color:#3a3830;}
+  .ph{display:inline-block;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+
+  .device{position:relative;width:415px;height:874px;border-radius:56px;padding:11px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);box-shadow:0 0 0 2px #000 inset,0 24px 50px -14px rgba(0,0,0,.45);}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:60;}
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+  .sb{flex:0 0 44px;padding:16px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);position:relative;z-index:50;}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--ink);} .sb .bat{width:25px;}
+
+  .hdr{flex:0 0 auto;background:var(--bg);box-shadow:var(--shadow-m);z-index:10;position:relative;}
+  .hrow{display:flex;align-items:center;gap:10px;padding:2px 12px 8px;}
+  .hrow .ib{width:34px;height:34px;display:grid;place-items:center;color:var(--ink);flex-shrink:0;}
+  .hrow .ib .ph{width:23px;height:23px;}
+  .hrow .av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;font-size:12px;background:linear-gradient(145deg,#1e3e2b,#4fa472);flex-shrink:0;}
+  .hrow .nm{flex:1;font-family:var(--serif);font-weight:600;font-size:16px;color:var(--ink);}
+  .tabs{display:flex;border-bottom:1px solid var(--border-light);padding:0 4px;}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 9px;cursor:pointer;color:var(--muted);position:relative;}
+  .tab .ph{width:20px;height:20px;}
+  .tab .tl{font-family:var(--sans);font-size:10px;font-weight:500;}
+  .tab.on{color:var(--green);}
+  .tab.on .tl{font-weight:600;}
+  .tab.on::after{content:"";position:absolute;left:16%;right:16%;bottom:-1px;height:2.5px;background:var(--green);border-radius:2px;}
+  .tab .badge{position:absolute;top:1px;right:calc(50% - 19px);min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:var(--green);color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center;border:1.5px solid var(--bg);}
+  .tab.new-tab .tl{color:var(--amber);}
+  .tab.new-tab .ph{color:var(--amber);}
+  .tab.new-tab.on .tl, .tab.new-tab.on .ph{color:var(--green);}
+
+  .seg{display:none;flex:1;min-height:0;flex-direction:column;position:relative;}
+  .seg.on{display:flex;}
+  .scroll{flex:1;overflow-y:auto;padding:14px 16px;}
+  .scroll::-webkit-scrollbar{display:none;}
+  .slbl{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .slbl .t{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);}
+  .add-fab{width:34px;height:34px;border-radius:50%;background:var(--green);display:grid;place-items:center;color:#fff;cursor:pointer;flex-shrink:0;}
+  .add-fab .ph{width:17px;height:17px;}
+
+  /* homework list card */
+  .hw-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px;display:flex;gap:12px;margin-bottom:10px;box-shadow:var(--shadow-m);cursor:pointer;}
+  .hw-thumb{width:52px;height:52px;border-radius:11px;background:var(--brand-light);display:grid;place-items:center;font-size:22px;flex-shrink:0;position:relative;overflow:hidden;}
+  .hw-thumb .cam{position:absolute;bottom:2px;right:2px;width:16px;height:16px;border-radius:50%;background:var(--green);display:grid;place-items:center;}
+  .hw-thumb .cam svg{width:9px;height:9px;fill:#fff;}
+  .hw-body{flex:1;min-width:0;}
+  .hw-title{font-family:var(--serif);font-size:14.5px;font-weight:600;color:var(--ink);margin-bottom:4px;line-height:1.25;}
+  .hw-meta{font-size:11.5px;color:var(--muted);}
+  .hw-due{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:var(--amber);background:var(--amber-light);padding:3px 8px;border-radius:99px;margin-top:6px;}
+  .hw-empty-list{text-align:center;color:var(--muted);font-size:12.5px;padding:20px 10px 6px;line-height:1.5;}
+
+  /* persistent upload CTA at top of Homework tab — single big rectangle, per Tony's Figma comment */
+  .hw-upload-box{background:var(--card);border:1.5px dashed var(--brand-border);border-radius:22px;padding:26px 20px 22px;margin-bottom:12px;text-align:center;cursor:pointer;}
+  .hw-upload-iconstack{position:relative;width:80px;height:60px;margin:0 auto 14px;}
+  .hw-upload-ic{position:absolute;width:52px;height:52px;border-radius:15px;display:grid;place-items:center;box-shadow:0 2px 7px rgba(20,40,25,.1);}
+  .hw-upload-ic .ph{width:24px;height:24px;}
+  .hw-upload-ic.notebook{left:0;top:8px;background:linear-gradient(160deg,#f0e8d1,#e2d3a8);color:#8a6a1f;transform:rotate(-8deg);}
+  .hw-upload-ic.camera{right:0;top:0;background:linear-gradient(160deg,#bfe0c9,#96c7a9);color:var(--green);transform:rotate(6deg);}
+  .hw-upload-t{font-family:var(--serif);font-size:16.5px;font-weight:600;color:var(--ink);margin-bottom:5px;}
+  .hw-upload-sub{font-size:12px;color:var(--muted);text-align:center;line-height:1.5;}
+  .hw-upload-alt{text-align:center;font-size:12.5px;font-weight:700;color:var(--green);cursor:pointer;margin-bottom:22px;padding:2px 0;}
+
+  /* status pill + row states */
+  .hw-status{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:99px;margin-top:6px;}
+  .hw-status.upcoming{color:var(--amber);background:var(--amber-light);}
+  .hw-status.overdue{color:#a83f34;background:#fbe4e0;}
+  .hw-status.done{color:var(--green);background:var(--brand-light);}
+  .hw-card.overdue{border-color:#eabdb6;}
+  .hw-trash{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#a83f34;flex-shrink:0;align-self:flex-start;cursor:pointer;}
+  .hw-trash svg{width:15px;height:15px;}
+
+  /* pushed flow screens */
+  .flowscreen{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;transform:translateX(101%);transition:transform .32s cubic-bezier(.32,.72,0,1);z-index:20;}
+  .flowscreen.on{transform:translateX(0);}
+  .flowtop{flex:0 0 auto;position:relative;display:flex;align-items:center;justify-content:center;padding:46px 16px 10px;}
+  .flowtop .ib{position:absolute;left:16px;bottom:10px;width:34px;height:34px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;flex-shrink:0;}
+  .flowtop .ib .ph{width:16px;height:16px;color:var(--ink);}
+  .flowtop .tt{font-family:var(--serif);font-size:16.5px;font-weight:600;color:var(--ink);text-align:center;}
+  .flowscroll{flex:1;overflow-y:auto;padding:8px 20px 20px;}
+  .flowscroll::-webkit-scrollbar{display:none;}
+  .flowscroll.centered{display:flex;flex-direction:column;justify-content:center;}
+
+  .manual-textarea{width:100%;border:none;background:transparent;outline:none;font-family:var(--sans);font-size:14.5px;color:var(--fg,var(--ink));font-weight:500;resize:none;min-height:120px;line-height:1.5;}
+
+  /* step: preview */
+  .photo-preview{width:100%;aspect-ratio:4/3;border-radius:18px;overflow:hidden;position:relative;margin-bottom:16px;background:linear-gradient(160deg,#e9e4d4,#cfc7b0);}
+  .photo-preview .doc{position:absolute;inset:14%;background:#fff;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,.15);display:flex;flex-direction:column;padding:14px 12px;gap:5px;overflow:hidden;}
+  .photo-preview .doc .ln{height:5px;background:#d8d2c2;border-radius:3px;}
+  .photo-preview .doc .ln.w60{width:60%;} .photo-preview .doc .ln.w80{width:80%;} .photo-preview .doc .ln.w40{width:40%;}
+  .photo-preview .retake{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.92);border-radius:99px;padding:6px 12px;font-size:11px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:5px;}
+  .photo-preview .pick-library{position:absolute;bottom:10px;left:10px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;cursor:pointer;}
+  .photo-preview .pick-library svg{width:16px;height:16px;}
+  .field-box{background:var(--field);border-radius:14px;padding:11px 14px;margin-bottom:16px;}
+  .field-box .lbl{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:2px;display:flex;align-items:center;gap:5px;}
+  .field-box .val{font-size:15px;font-weight:600;color:var(--ink);}
+  .field-box .val.placeholder{color:#9c9788;font-weight:400;}
+  .due-hero{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--amber-light);border:1.5px solid #e8d2a0;border-radius:14px;padding:15px 16px;font-family:var(--serif);font-size:18px;font-weight:700;color:#8a6a1f;cursor:pointer;}
+  .due-hero .ic{font-size:20px;}
+  .due-hero.placeholder{background:var(--field);border-color:var(--border);color:#9c9788;font-weight:500;font-family:var(--sans);font-size:15px;}
+
+  /* type toggle — Homework vs Document */
+  .type-toggle{display:flex;gap:8px;background:var(--field);border-radius:14px;padding:4px;margin-bottom:16px;}
+  .type-opt{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 0;border-radius:11px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;}
+  .type-opt.on{background:var(--card);color:var(--green);box-shadow:0 2px 6px rgba(0,0,0,.06);}
+  .type-opt .ph{width:15px;height:15px;}
+  .doc-type-chip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:99px;margin-top:6px;color:var(--muted);background:var(--field);}
+
+  /* review: compact confirmation for Type+Due Date already answered during the scan wait */
+  .confirmed-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .confirmed-chip{font-size:12.5px;font-weight:600;color:var(--ink);background:var(--field);padding:8px 12px;border-radius:11px;}
+  .confirmed-edit{margin-left:auto;background:none;border:none;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--green);cursor:pointer;padding:4px;}
+
+  /* editable extracted-text field (review step) */
+  .review-editable{width:100%;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px;font-family:var(--sans);font-size:13px;color:var(--body);line-height:1.6;resize:none;outline:none;min-height:96px;}
+  .review-editable:focus{border-color:var(--brand-border);}
+  .review-editnote{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--muted);margin-top:6px;}
+  .review-editnote .ph{width:11px;height:11px;flex-shrink:0;}
+
+  /* scan error state */
+  .scan-error .scan-icon{animation:none;}
+  .scan-error .t{color:#a83f34;}
+  .error-actions{display:flex;flex-direction:column;gap:10px;margin-top:22px;width:100%;}
+
+  /* step: scanning */
+  .scan-wrap{position:relative;width:100%;aspect-ratio:4/3;border-radius:18px;overflow:hidden;margin-bottom:20px;background:linear-gradient(160deg,#e9e4d4,#cfc7b0);}
+  .scan-wrap.sm{aspect-ratio:16/7;margin-bottom:16px;}
+  .scan-wrap .doc{position:absolute;inset:14%;background:#fff;border-radius:8px;padding:14px 12px;display:flex;flex-direction:column;gap:5px;}
+  .scan-wrap .doc .ln{height:5px;background:#d8d2c2;border-radius:3px;}
+  .scan-line{position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--green),transparent);box-shadow:0 0 14px 2px rgba(24,99,56,.6);animation:scan 1.6s ease-in-out infinite;}
+  @keyframes scan{0%{top:10%;}50%{top:88%;}100%{top:10%;}}
+  .scan-status{text-align:center;}
+  .scan-status.sm{margin-bottom:18px;}
+  .scan-status.sm .scan-icon{font-size:22px;margin-bottom:4px;}
+  .scan-status.sm .t{font-size:14px;}
+  .scan-icon{font-size:34px;margin-bottom:10px;animation:scanIconPulse 1.4s ease-in-out infinite;}
+  @keyframes scanIconPulse{0%,100%{transform:scale(1) rotate(0deg);}50%{transform:scale(1.14) rotate(-6deg);}}
+  .scan-status .t{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin-bottom:5px;}
+  .scan-status .s{font-size:12.5px;color:var(--muted);}
+  .scan-dots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--green);margin:0 2px;animation:dotpulse 1.2s ease-in-out infinite;}
+  .scan-dots span:nth-child(2){animation-delay:.2s;} .scan-dots span:nth-child(3){animation-delay:.4s;}
+  @keyframes dotpulse{0%,60%,100%{opacity:.25;}30%{opacity:1;}}
+
+  /* step: review extracted content */
+  .review-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--green);background:var(--brand-light);padding:5px 12px;border-radius:99px;margin-bottom:14px;}
+  .review-field{margin-bottom:16px;}
+  .review-field .lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+  .review-title-input{width:100%;background:var(--field);border:none;border-radius:12px;padding:11px 13px;font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);outline:none;}
+  .review-list{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px;}
+  .review-list li{font-size:13px;color:var(--body);line-height:1.6;margin-left:16px;}
+  .review-list.sub li{color:var(--muted);}
+  .review-list.freetext{font-size:13px;color:var(--body);line-height:1.65;white-space:pre-wrap;}
+  .field-box textarea.manual-textarea{width:100%;background:transparent;border:none;outline:none;font-family:var(--sans);font-size:14.5px;font-weight:500;color:var(--ink);resize:none;min-height:110px;line-height:1.55;padding:0;}
+
+  .flowdock{flex:0 0 auto;padding:12px 20px calc(16px + env(safe-area-inset-bottom));}
+  .dock-btn{flex:1;width:100%;height:50px;border-radius:14px;background:var(--green);color:#fff;border:none;font-size:14.5px;font-weight:700;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .dock-btn .ph{width:16px;height:16px;}
+  .dock-btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--border);}
+
+  /* homework detail */
+  .det-teacher{display:flex;align-items:center;gap:9px;margin-bottom:16px;}
+  .det-teacher .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);color:#fff;font-family:var(--serif);font-size:13px;font-weight:600;display:grid;place-items:center;}
+  .det-teacher .nm{font-size:13px;font-weight:600;color:var(--ink);}
+  .det-teacher .sub{font-size:11px;color:var(--muted);}
+
+  .toast{position:absolute;left:20px;right:20px;bottom:24px;background:var(--ink);color:#fff;font-size:12.5px;font-weight:600;padding:11px 16px;border-radius:12px;text-align:center;opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s;z-index:70;pointer-events:none;}
+  .toast.on{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Homework Tab + Upload &amp; AI Digitize Flow</h1>
+  <p>Revised per Tony's Figma comments on this flow: one big rectangle CTA (not a chooser screen) — tap it and the camera opens directly, "Choose from Library" lives as a small icon next to the photo instead of a separate button, and manual entry is a de-emphasized text link below. The due-date step before digitizing is removed entirely; due date is now asked on the Review screen, first and biggest. Scanning copy is now "fun and friendly" per his note. Detail view adds the approved "See Original Photo" + "Edit" buttons, and Edit routes back into the same form pre-filled. Sample content is the real "ME Bag" sheet; the second row is placeholder content for the overdue state. <b>New from the 8/26 sync:</b> per Mohit, the digitized rules/suggestions text is now directly editable (not just the title) so a misread photo can be fixed by hand before saving; a scan can also fail (blurry photo) and routes to a friendly error screen with Retake/Enter Manually — try the flow twice to see both the failure and the retry succeeding. Per Tony, there's also a Homework/Document type toggle above Due Date, since not everything coming home is homework. <b>New from Tony's 8/25 Figma comment:</b> the Type toggle and Due Date no longer wait for the Review screen — they're right there on the scanning screen itself, so there's something to do during the "AI is reading it" wait instead of staring at a spinner. Whatever's set there carries straight into Review — and if you answered the due date there, Review shows it as a compact confirmation chip ("Edit" to change it) instead of asking the same two questions again; only skip it during the wait and Review still asks in full.</p>
+</div>
+
+<div class="panel">
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="hdr">
+      <div class="hrow">
+        <div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div>
+        <div class="av">MT</div>
+        <div class="nm">Miss Taylor's Class</div>
+        <div class="ib"><span class="ph"><svg viewBox="0 0 256 256"><path d="M140 128a12 12 0 1 1-12-12 12 12 0 0 1 12 12m-12-56a12 12 0 1 0-12-12 12 12 0 0 0 12 12m0 112a12 12 0 1 0 12 12 12 12 0 0 0-12-12"/></svg></span></div>
+      </div>
+      <div class="tabs">
+        <div class="tab" data-seg="chat" onclick="seg(this)"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24m0 192a87.87 87.87 0 0 1-44.06-11.81 8 8 0 0 0-6.54-.67L40 216l12.47-37.4a8 8 0 0 0-.66-6.54A88 88 0 1 1 128 216"/></svg></span><span class="tl">Chat</span></div>
+        <div class="tab" data-seg="cal" onclick="seg(this)"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span><span class="tl">Calendar</span></div>
+        <div class="tab" data-seg="upd" onclick="seg(this)"><span class="badge">3</span><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15 52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></svg></span><span class="tl">Updates</span></div>
+        <div class="tab new-tab on" data-seg="hw" onclick="seg(this)"><span class="ph"><svg viewBox="0 0 256 256"><path d="M213.66 82.34l-56-56A8 8 0 0 0 152 24H56a16 16 0 0 0-16 16v176a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V88a8 8 0 0 0-2.34-5.66M160 51.31 188.69 80H160ZM200 216H56V40h88v40a8 8 0 0 0 8 8h48zm-32-80a8 8 0 0 1-8 8H96a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8m0 32a8 8 0 0 1-8 8H96a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8m-64-64a8 8 0 0 1 0-16h16a8 8 0 0 1 0 16Z"/></svg></span><span class="tl">Homework</span></div>
+        <div class="tab" data-seg="lnk" onclick="seg(this)"><span class="ph"><svg viewBox="0 0 256 256"><path d="m235.32 81.37-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224h1.13a15.93 15.93 0 0 0 11.64-6.33c19.64-26.1 17.75-47.32 13.19-60L235.33 104a16 16 0 0 0-.01-22.63M224 92.69l-57.27 57.46a8 8 0 0 0-1.49 9.22c9.46 18.93-1.8 38.59-9.34 48.62L48 100.08c12.08-9.74 23.64-12.31 32.48-12.31A40.1 40.1 0 0 1 96.81 91a8 8 0 0 0 9.25-1.51L163.32 32 224 92.68Z"/></svg></span><span class="tl">Links</span></div>
+      </div>
+    </div>
+
+    <!-- CHAT (placeholder, unchanged) -->
+    <div class="seg" id="s-chat">
+      <div class="scroll">
+        <div style="text-align:center;color:var(--muted);font-size:12.5px;padding-top:60px;">Chat tab — unchanged</div>
+      </div>
+    </div>
+    <!-- CALENDAR (placeholder) -->
+    <div class="seg" id="s-cal">
+      <div class="scroll">
+        <div style="text-align:center;color:var(--muted);font-size:12.5px;padding-top:60px;">Calendar tab — unchanged</div>
+      </div>
+    </div>
+    <!-- UPDATES (placeholder) -->
+    <div class="seg" id="s-upd">
+      <div class="scroll">
+        <div style="text-align:center;color:var(--muted);font-size:12.5px;padding-top:60px;">Updates tab — unchanged</div>
+      </div>
+    </div>
+    <!-- LINKS (placeholder) -->
+    <div class="seg" id="s-lnk">
+      <div class="scroll">
+        <div style="text-align:center;color:var(--muted);font-size:12.5px;padding-top:60px;">Links tab — unchanged</div>
+      </div>
+    </div>
+
+    <!-- HOMEWORK (new tab) -->
+    <div class="seg on" id="s-hw">
+      <div class="scroll" id="hwListScroll">
+        <div class="slbl"><span class="t">Homework</span></div>
+        <div class="hw-upload-box" onclick="mockCapture()">
+          <div class="hw-upload-iconstack">
+            <div class="hw-upload-ic notebook"><span class="ph"><svg viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16"><path d="M92.69 216H48a8 8 0 0 1-8-8v-44.69a8 8 0 0 1 2.34-5.65l120-120a8 8 0 0 1 11.32 0l44.69 44.69a8 8 0 0 1 0 11.31l-120 120a8 8 0 0 1-5.66 2.34Z"/><path d="M136 64l56 56"/></svg></span></div>
+            <div class="hw-upload-ic camera"><span class="ph"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M208 56h-33.37l-14.63-19.42A8 8 0 0 0 154 32h-52a8 8 0 0 0-6.4 3.2L81 56H48a24 24 0 0 0-24 24v112a24 24 0 0 0 24 24h160a24 24 0 0 0 24-24V80a24 24 0 0 0-24-24m8 136a8 8 0 0 1-8 8H48a8 8 0 0 1-8-8V80a8 8 0 0 1 8-8h37a8 8 0 0 0 6.4-3.2L106 40h44l14.6 28.8a8 8 0 0 0 6.4 3.2h37a8 8 0 0 1 8 8ZM128 88a44 44 0 1 0 44 44 44 44 0 0 0-44-44m0 72a28 28 0 1 1 28-28 28 28 0 0 1-28 28"/></svg></span></div>
+          </div>
+          <div class="hw-upload-t">Upload Homework</div>
+          <div class="hw-upload-sub">Tap to snap a photo — we'll digitize it with AI.</div>
+        </div>
+        <div class="hw-upload-alt" onclick="startManualEntry()">✏️ Enter manually instead</div>
+        <div class="slbl"><span class="t" style="font-size:14px;">Previous Homework</span></div>
+        <div id="hwList"></div>
+      </div>
+      <div class="toast" id="toast">Added to Homework ✓</div>
+    </div>
+
+    <!-- ═══ FLOW: STEP 1 — PREVIEW (camera opens directly, no chooser screen) ═══ -->
+    <div class="flowscreen" id="flow-preview">
+      <div class="flowtop"><div class="ib" onclick="closeFlow()"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="tt">Add Homework</div></div>
+      <div class="flowscroll">
+        <div class="photo-preview">
+          <div class="doc"><div class="ln w60" style="height:8px;"></div><div class="ln w40"></div><div class="ln w80"></div><div class="ln w60"></div><div class="ln w80"></div><div class="ln w40"></div></div>
+          <div class="retake" onclick="closeFlow()"><svg class="ph" viewBox="0 0 256 256" fill="#1e3e2b" style="width:12px;height:12px;"><path d="M197.67 186.37a8 8 0 0 1-11.34 11.29C165.68 176.99 143.13 168 128 168s-37.68 8.99-58.33 29.66a8 8 0 0 1-11.34-11.29C81.63 163 107.79 152 128 152s46.37 11 69.67 34.37M74.34 69.63a8 8 0 0 0-11.34 11.29A103.9 103.9 0 0 0 128 104a103.9 103.9 0 0 0 65-23.08 8 8 0 1 0-11.34-11.29A88 88 0 0 1 128 88a88 88 0 0 1-53.66-18.37"/></svg>Retake</div>
+          <div class="pick-library" onclick="mockCapture()" title="Choose from Library"><svg viewBox="0 0 256 256" fill="#1e3e2b"><path d="M216 40H40a16 16 0 0 0-16 16v144a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16m0 16v102.75l-26.07-26.06a16 16 0 0 0-22.63 0l-20 20-44-44a16 16 0 0 0-22.62 0L40 149.37V56Zm-176 144v-13.37l52-52 80 80H40Zm176 0h-21.37l-36-36 20-20L216 172.69V200Zm-72-100a12 12 0 1 1 12 12 12 12 0 0 1-12-12"/></svg></div>
+        </div>
+      </div>
+      <div class="flowdock"><button class="dock-btn" id="digitizeBtn" onclick="startScan()">✨ Digitize with AI</button></div>
+    </div>
+
+    <!-- ═══ FLOW: STEP 3 — SCANNING (fields fillable while it processes, per Tony's 8/25 Figma comment) ═══ -->
+    <div class="flowscreen" id="flow-scan">
+      <div class="flowtop"><div class="tt" style="margin:0 auto;">Add Homework</div></div>
+      <div class="flowscroll">
+        <div class="scan-wrap sm">
+          <div class="doc"><div class="ln w60" style="height:8px;"></div><div class="ln w40"></div><div class="ln w80"></div><div class="ln w60"></div></div>
+          <div class="scan-line"></div>
+        </div>
+        <div class="scan-status sm">
+          <div class="scan-icon">✨</div>
+          <div class="t">Working our magic<span class="scan-dots"><span></span><span></span><span></span></span></div>
+          <div class="s">While we read it — go ahead and fill these in:</div>
+        </div>
+
+        <div class="review-field">
+          <div class="lbl">Type</div>
+          <div class="type-toggle" id="scanTypeToggle">
+            <div class="type-opt on" data-type="homework" onclick="setType('scanTypeToggle',this)"><span class="ph"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M213.66 82.34l-56-56A8 8 0 0 0 152 24H56a16 16 0 0 0-16 16v176a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V88a8 8 0 0 0-2.34-5.66M160 51.31 188.69 80H160Z"/></svg></span>Homework</div>
+            <div class="type-opt" data-type="document" onclick="setType('scanTypeToggle',this)"><span class="ph"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M213.66 82.34l-56-56A8 8 0 0 0 152 24H56a16 16 0 0 0-16 16v176a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V88a8 8 0 0 0-2.34-5.66M96 136h64a8 8 0 0 1 0 16H96a8 8 0 0 1 0-16m0 32h64a8 8 0 0 1 0 16H96a8 8 0 0 1 0-16Z"/></svg></span>Document</div>
+          </div>
+        </div>
+        <div class="review-field" style="margin-bottom:0;">
+          <div class="lbl">Due Date</div>
+          <div class="due-hero placeholder" id="scanDueField" onclick="pickDate('scanDueField')"><span class="ic">📅</span><span class="txt">Tap to set due date</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ FLOW: STEP 3b — SCAN FAILED (couldn't read the photo) ═══ -->
+    <div class="flowscreen" id="flow-scan-error">
+      <div class="flowtop"><div class="ib" onclick="closeFlow()"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="tt">Add Homework</div></div>
+      <div class="flowscroll">
+        <div class="scan-wrap"><div class="doc"><div class="ln w60" style="height:8px;"></div><div class="ln w40"></div><div class="ln w80"></div></div></div>
+        <div class="scan-status scan-error">
+          <div class="scan-icon">😅</div>
+          <div class="t">Hmm, that one's tricky</div>
+          <div class="s">The photo was a little blurry, so we couldn't read it clearly. Try snapping it again with good lighting, or type it in yourself.</div>
+        </div>
+        <div class="error-actions">
+          <button class="dock-btn" onclick="retryScan()"><svg class="ph" viewBox="0 0 256 256" fill="#fff"><path d="M197.67 186.37a8 8 0 0 1 0 11.29A104.05 104.05 0 0 1 51.36 156.5a8 8 0 1 1 15.08-5.35 88 88 0 0 0 123.53 34.66l-14-14a8 8 0 0 1 5.66-13.65h40a8 8 0 0 1 8 8v40a8 8 0 0 1-13.66 5.66l-9.3-9.3ZM48 128a8 8 0 0 1-8-8V80a8 8 0 0 1 13.66-5.66l9.3 9.3A104.05 104.05 0 0 1 204.64 99.5a8 8 0 1 1-15.08 5.35A88 88 0 0 0 66 70.19l14 14A8 8 0 0 1 74.34 97.84H40Z"/></svg>Retake Photo</button>
+          <button class="dock-btn ghost" onclick="startManualEntry()">✏️ Enter Manually Instead</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ FLOW: STEP 4 — REVIEW EXTRACTED CONTENT ═══ -->
+    <div class="flowscreen" id="flow-review">
+      <div class="flowtop"><div class="ib" onclick="reviewBack()"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="tt">Review</div></div>
+      <div class="flowscroll">
+        <div class="review-badge">✨ Digitized — check it looks right</div>
+
+        <!-- already answered on the scan/loading screen — show a compact confirmation, not the same ask again -->
+        <div class="review-field confirmed-summary" id="reviewConfirmedSummary" style="display:none;">
+          <div class="lbl">Type &amp; Due Date</div>
+          <div class="confirmed-row">
+            <span class="confirmed-chip" id="confirmedTypeChip">📓 Homework</span>
+            <span class="confirmed-chip" id="confirmedDueChip">📅 —</span>
+            <button class="confirmed-edit" onclick="expandReviewFields()">Edit</button>
+          </div>
+        </div>
+        <div id="reviewFieldsExpanded">
+          <div class="review-field">
+            <div class="lbl">Type</div>
+            <div class="type-toggle" id="reviewTypeToggle">
+              <div class="type-opt on" data-type="homework" onclick="setType('reviewTypeToggle',this)"><span class="ph"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M213.66 82.34l-56-56A8 8 0 0 0 152 24H56a16 16 0 0 0-16 16v176a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V88a8 8 0 0 0-2.34-5.66M160 51.31 188.69 80H160Z"/></svg></span>Homework</div>
+              <div class="type-opt" data-type="document" onclick="setType('reviewTypeToggle',this)"><span class="ph"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M213.66 82.34l-56-56A8 8 0 0 0 152 24H56a16 16 0 0 0-16 16v176a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V88a8 8 0 0 0-2.34-5.66M96 136h64a8 8 0 0 1 0 16H96a8 8 0 0 1 0-16m0 32h64a8 8 0 0 1 0 16H96a8 8 0 0 1 0-16Z"/></svg></span>Document</div>
+            </div>
+          </div>
+          <div class="review-field">
+            <div class="lbl">Due Date</div>
+            <div class="due-hero" id="dueDateConfirm" onclick="pickDate('dueDateConfirm')"><span class="ic">📅</span><span class="txt">Monday, August 24, 2026</span></div>
+          </div>
+        </div>
+        <div class="review-field"><div class="lbl">Title</div><input class="review-title-input" id="hwTitleInput" value="The ME Bag — First Grade Homework"></div>
+
+        <div class="review-field">
+          <div class="lbl">Rules to follow</div>
+          <textarea class="review-editable" id="reviewRulesInput">Only bring things that fit inside the bag.
+Items shouldn't be too heavy — you should be able to carry it yourself.
+Only bring items that can be left at school for the day of sharing.
+Bring no more than 5 items.
+Do not bring very special or breakable items.</textarea>
+          <div class="review-editnote"><span class="ph"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M227.31 73.37 182.63 28.68a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63"/></svg></span>Didn't come out right? Just edit it directly.</div>
+        </div>
+
+        <div class="review-field">
+          <div class="lbl">Suggestions</div>
+          <textarea class="review-editable" id="reviewSuggestionsInput">Something in your favorite color
+The wrapper of your favorite snack
+An award you have won
+Something that tells about your favorite sport/animal/etc.
+Something from a trip
+Photos of your family or pet
+Something you made</textarea>
+        </div>
+      </div>
+      <div class="flowdock"><button class="dock-btn" id="saveHwBtn" onclick="saveHomework()"><svg class="ph" viewBox="0 0 256 256" fill="#fff"><path d="M225.86 102.82c-3.77-3.94-7.67-8-9.14-11.57-1.36-3.27-1.44-8.69-1.52-13.94-.15-9.76-.31-20.82-8-28.51s-18.75-7.85-28.51-8c-5.25-.08-10.67-.16-13.94-1.52-3.56-1.47-7.63-5.37-11.57-9.14C146.28 23.51 138.44 16 128 16s-18.27 7.51-25.18 14.14c-3.94 3.77-8 7.67-11.57 9.14-3.27 1.36-8.69 1.44-13.94 1.52-9.76.15-20.82.31-28.51 8s-7.85 18.75-8 28.51c-.08 5.25-.16 10.67-1.52 13.94-1.47 3.56-5.37 7.63-9.14 11.57C23.51 109.72 16 117.56 16 128s7.51 18.27 14.14 25.18c3.77 3.94 7.67 8 9.14 11.57 1.36 3.27 1.44 8.69 1.52 13.94.15 9.76.31 20.82 8 28.51s18.75 7.85 28.51 8c5.25.08 10.67.16 13.94 1.52 3.56 1.47 7.63 5.37 11.57 9.14C109.72 232.49 117.56 240 128 240s18.27-7.51 25.18-14.14c3.94-3.77 8-7.67 11.57-9.14 3.27-1.36 8.69-1.44 13.94-1.52 9.76-.15 20.82-.31 28.51-8s7.85-18.75 8-28.51c.08-5.25.16-10.67 1.52-13.94 1.47-3.56 5.37-7.63 9.14-11.57C232.49 146.28 240 138.44 240 128s-7.51-18.27-14.14-25.18m-52.2 6.84-56 56a8 8 0 0 1-11.32 0l-24-24a8 8 0 0 1 11.32-11.32L112 148.69l50.34-50.35a8 8 0 0 1 11.32 11.32"/></svg>Save to Homework</button></div>
+    </div>
+
+    <!-- ═══ FLOW: ENTER DETAILS MANUALLY ═══ -->
+    <div class="flowscreen" id="flow-manual">
+      <div class="flowtop"><div class="ib" onclick="manualBack()"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="tt">Enter Homework</div></div>
+      <div class="flowscroll">
+        <div class="review-field">
+          <div class="lbl">Type</div>
+          <div class="type-toggle" id="manualTypeToggle">
+            <div class="type-opt on" data-type="homework" onclick="setType('manualTypeToggle',this)"><span class="ph"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M213.66 82.34l-56-56A8 8 0 0 0 152 24H56a16 16 0 0 0-16 16v176a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V88a8 8 0 0 0-2.34-5.66M160 51.31 188.69 80H160Z"/></svg></span>Homework</div>
+            <div class="type-opt" data-type="document" onclick="setType('manualTypeToggle',this)"><span class="ph"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M213.66 82.34l-56-56A8 8 0 0 0 152 24H56a16 16 0 0 0-16 16v176a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V88a8 8 0 0 0-2.34-5.66M96 136h64a8 8 0 0 1 0 16H96a8 8 0 0 1 0-16m0 32h64a8 8 0 0 1 0 16H96a8 8 0 0 1 0-16Z"/></svg></span>Document</div>
+          </div>
+        </div>
+        <div class="review-field">
+          <div class="lbl">Due Date</div>
+          <div class="due-hero placeholder" id="manualDueField" onclick="pickDate('manualDueField')"><span class="ic">📅</span><span class="txt">Tap to set due date</span></div>
+        </div>
+        <div class="review-field"><div class="lbl">Title</div><input class="review-title-input" id="manualTitleInput" placeholder="e.g. Reading log, Spelling words…"></div>
+        <div class="review-field">
+          <div class="lbl">Details</div>
+          <div class="field-box" style="margin-bottom:0;"><textarea class="manual-textarea" id="manualDetailsInput" placeholder="Type what the sheet says — instructions, what to bring, anything the teacher noted."></textarea></div>
+        </div>
+      </div>
+      <div class="flowdock"><button class="dock-btn" id="saveManualBtn" onclick="saveManualHomework()"><svg class="ph" viewBox="0 0 256 256" fill="#fff"><path d="M225.86 102.82c-3.77-3.94-7.67-8-9.14-11.57-1.36-3.27-1.44-8.69-1.52-13.94-.15-9.76-.31-20.82-8-28.51s-18.75-7.85-28.51-8c-5.25-.08-10.67-.16-13.94-1.52-3.56-1.47-7.63-5.37-11.57-9.14C146.28 23.51 138.44 16 128 16s-18.27 7.51-25.18 14.14c-3.94 3.77-8 7.67-11.57 9.14-3.27 1.36-8.69 1.44-13.94 1.52-9.76.15-20.82.31-28.51 8s-7.85 18.75-8 28.51c-.08 5.25-.16 10.67-1.52 13.94-1.47 3.56-5.37 7.63-9.14 11.57C23.51 109.72 16 117.56 16 128s7.51 18.27 14.14 25.18c3.77 3.94 7.67 8 9.14 11.57 1.36 3.27 1.44 8.69 1.52 13.94.15 9.76.31 20.82 8 28.51s18.75 7.85 28.51 8c5.25.08 10.67.16 13.94 1.52 3.56 1.47 7.63 5.37 11.57 9.14C109.72 232.49 117.56 240 128 240s18.27-7.51 25.18-14.14c3.94-3.77 8-7.67 11.57-9.14 3.27-1.36 8.69-1.44 13.94-1.52 9.76-.15 20.82-.31 28.51-8s7.85-18.75 8-28.51c.08-5.25.16-10.67 1.52-13.94 1.47-3.56 5.37-7.63 9.14-11.57C232.49 146.28 240 138.44 240 128s-7.51-18.27-14.14-25.18m-52.2 6.84-56 56a8 8 0 0 1-11.32 0l-24-24a8 8 0 0 1 11.32-11.32L112 148.69l50.34-50.35a8 8 0 0 1 11.32 11.32"/></svg>Save to Homework</button></div>
+    </div>
+
+    <!-- ═══ FLOW: HOMEWORK DETAIL ═══ -->
+    <div class="flowscreen" id="flow-detail">
+      <div class="flowtop"><div class="ib" onclick="closeFlow()"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="tt">Homework</div></div>
+      <div class="flowscroll">
+        <div class="hw-due" id="detDue" style="margin-top:0;margin-bottom:14px;">📅 Due Monday, August 24, 2026</div>
+        <div id="detTitle" style="font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink);margin-bottom:14px;line-height:1.3;">The ME Bag — First Grade Homework</div>
+        <div class="det-teacher" id="detTeacherRow"><div class="av" id="detTeacherAv">MT</div><div><div class="nm" id="detTeacherName">Miss Taylor</div><div class="sub">Posted yesterday</div></div></div>
+
+        <div id="detBody">
+          <div class="review-field">
+            <div class="lbl">Rules to follow</div>
+            <ul class="review-list">
+              <li>Only bring things that fit inside the bag.</li>
+              <li>Items shouldn't be too heavy — you should be able to carry it yourself.</li>
+              <li>Only bring items that can be left at school for the day of sharing.</li>
+              <li>Bring no more than 5 items.</li>
+              <li>Do not bring very special or breakable items.</li>
+            </ul>
+          </div>
+          <div class="review-field">
+            <div class="lbl">Suggestions</div>
+            <ul class="review-list sub">
+              <li>Something in your favorite color</li>
+              <li>The wrapper of your favorite snack</li>
+              <li>An award you have won</li>
+              <li>Something that tells about your favorite sport/animal/etc.</li>
+              <li>Something from a trip</li>
+              <li>Photos of your family or pet</li>
+              <li>Something you made</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="flowdock" style="display:flex;gap:10px;">
+        <button class="dock-btn ghost" id="detPhotoBtn" onclick="openScreen('flow-photoview')"><svg class="ph" viewBox="0 0 256 256" fill="currentColor" style="width:15px;height:15px;"><path d="M208 56h-33.37l-14.63-19.42A8 8 0 0 0 154 32h-52a8 8 0 0 0-6.4 3.2L81 56H48a24 24 0 0 0-24 24v112a24 24 0 0 0 24 24h160a24 24 0 0 0 24-24V80a24 24 0 0 0-24-24"/></svg>See Original Photo</button>
+        <button class="dock-btn" onclick="editHw()"><svg class="ph" viewBox="0 0 256 256" fill="#fff"><path d="M227.31 73.37 182.63 28.68a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63M92.69 208H48v-44.69l88-88L180.69 120ZM192 108.68 147.31 64l24-24L216 84.68Z"/></svg>Edit</button>
+      </div>
+    </div>
+
+    <!-- ═══ FLOW: ORIGINAL PHOTO VIEWER ═══ -->
+    <div class="flowscreen" id="flow-photoview">
+      <div class="flowtop"><div class="ib" onclick="openScreen('flow-detail')"><span class="ph"><svg viewBox="0 0 256 256"><path d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg></span></div><div class="tt">Original Photo</div></div>
+      <div class="flowscroll">
+        <div class="photo-preview" style="aspect-ratio:3/4;margin-bottom:0;">
+          <div class="doc"><div class="ln w60" style="height:8px;"></div><div class="ln w40"></div><div class="ln w80"></div><div class="ln w60"></div><div class="ln w80"></div><div class="ln w40"></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+  <span class="cap"><b>Interaktif.</b> Tap tab "Homework" → tap kotak besar "Upload Homework" → langsung ke preview foto (icon kecil kiri-bawah = pilih dari Library) → Digitize with AI → percobaan pertama akan gagal (foto blur) untuk demo error state, tap "Retake Photo" buat coba lagi sampai berhasil → Review (Type toggle Homework/Document, Due Date besar tap buat edit, teks Rules &amp; Suggestions sekarang bisa diedit langsung) → Save. Atau tap "Enter manually instead" buat isi tanpa foto. Tap kartu homework buat lihat detail → "See Original Photo" atau "Edit" (edit balik ke form yang sama, terisi otomatis termasuk teks yang sudah diedit).</span>
+</div>
+
+<script>
+let homeworks = [
+  {
+    kind: 'digitized',
+    type: 'homework',
+    title: 'The ME Bag — First Grade Homework',
+    due: 'Monday, August 24, 2026',
+    dueShort: 'Mon, Aug 24',
+    status: 'upcoming',
+    teacher: 'Miss Taylor',
+    hasPhoto: true,
+    rules: `Only bring things that fit inside the bag.
+Items shouldn't be too heavy — you should be able to carry it yourself.
+Only bring items that can be left at school for the day of sharing.
+Bring no more than 5 items.
+Do not bring very special or breakable items.`,
+    suggestions: `Something in your favorite color
+The wrapper of your favorite snack
+An award you have won
+Something that tells about your favorite sport/animal/etc.
+Something from a trip
+Photos of your family or pet
+Something you made`
+  },
+  {
+    kind: 'manual',
+    type: 'homework',
+    title: 'Reading Log — Week 2',
+    due: 'Friday, August 21, 2026',
+    dueShort: 'Fri, Aug 21',
+    status: 'overdue',
+    teacher: null,
+    details: 'Read for 20 minutes each night and log the book title + minutes on the sheet in your folder.'
+  }
+];
+let activeHwIndex = null;
+let editMode = false;
+let scanFailedOnce = false;
+
+function setType(toggleId, el){
+  document.querySelectorAll('#'+toggleId+' .type-opt').forEach(o=>o.classList.remove('on'));
+  el.classList.add('on');
+}
+function getType(toggleId){
+  return document.querySelector('#'+toggleId+' .type-opt.on').dataset.type;
+}
+function typeLabel(t){ return t === 'document' ? 'Document' : 'Homework'; }
+
+function seg(el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.seg').forEach(s=>s.classList.toggle('on', s.id === 's-'+el.dataset.seg));
+  renderHwList();
+}
+
+function statusLabel(s){
+  if(s === 'overdue') return {cls:'overdue', text:'Overdue'};
+  if(s === 'done') return {cls:'done', text:'Completed'};
+  return {cls:'upcoming', text:'Due soon'};
+}
+
+function renderHwList(){
+  const list = document.getElementById('hwList');
+  if(!homeworks.length){
+    list.innerHTML = `<div class="hw-empty-list">No homework yet — use one of the options above to add your first one.</div>`;
+    return;
+  }
+  list.innerHTML = homeworks.map((hw, i) => {
+    const st = statusLabel(hw.status);
+    const thumbIcon = hw.kind === 'digitized'
+      ? `📓<span class="cam"><svg viewBox="0 0 256 256" fill="#fff"><path d="M208 56h-33.37l-14.63-19.42A8 8 0 0 0 154 32h-52a8 8 0 0 0-6.4 3.2L81 56H48a24 24 0 0 0-24 24v112a24 24 0 0 0 24 24h160a24 24 0 0 0 24-24V80a24 24 0 0 0-24-24"/></svg></span>`
+      : `✏️`;
+    return `<div class="hw-card ${hw.status === 'overdue' ? 'overdue' : ''}" onclick="openDetail(${i})">
+      <div class="hw-thumb">${thumbIcon}</div>
+      <div class="hw-body">
+        <div class="hw-title">${hw.title}</div>
+        <div class="hw-meta">${hw.teacher || 'Added manually'} ${hw.type === 'document' ? '<span class="doc-type-chip">Document</span>' : ''}</div>
+        <div class="hw-status ${st.cls}">📅 Due ${hw.dueShort} · ${st.text}</div>
+      </div>
+      <div class="hw-trash" onclick="event.stopPropagation();deleteHw(${i})"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Zm-80-104v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0m48 0v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0"/></svg></div>
+    </div>`;
+  }).join('');
+}
+
+function deleteHw(i){
+  homeworks.splice(i, 1);
+  renderHwList();
+}
+
+function openScreen(id){
+  document.querySelectorAll('.flowscreen').forEach(f=>f.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+function resetDueField(id, placeholderText){
+  const f = document.getElementById(id);
+  f.classList.add('placeholder');
+  f.querySelector('.txt').textContent = placeholderText;
+}
+function closeFlow(){
+  document.querySelectorAll('.flowscreen').forEach(f=>f.classList.remove('on'));
+  editMode = false;
+  activeHwIndex = null;
+  document.getElementById('manualTitleInput').value = '';
+  resetDueField('manualDueField', 'Tap to set due date');
+  document.getElementById('manualDetailsInput').value = '';
+  setType('manualTypeToggle', document.querySelector('#manualTypeToggle .type-opt[data-type="homework"]'));
+  resetDueField('scanDueField', 'Tap to set due date');
+  setType('scanTypeToggle', document.querySelector('#scanTypeToggle .type-opt[data-type="homework"]'));
+}
+function mockCapture(){
+  editMode = false;
+  activeHwIndex = null;
+  scanFailedOnce = false;
+  resetDueField('scanDueField', 'Tap to set due date');
+  setType('scanTypeToggle', document.querySelector('#scanTypeToggle .type-opt[data-type="homework"]'));
+  openScreen('flow-preview');
+}
+/* carries what the parent filled in on the scan/loading screen (Tony's 8/25 comment:
+   let them set Type + Due Date while the AI is still reading the photo) into Review.
+   If Due Date was actually answered during the wait, Review shows a compact confirmation
+   instead of asking the same two questions again — only the leftover gap (an unset due
+   date) still gets the full prompt. */
+function carryScanFieldsToReview(){
+  const scanType = getType('scanTypeToggle');
+  setType('reviewTypeToggle', document.querySelector(`#reviewTypeToggle .type-opt[data-type="${scanType}"]`));
+  const scanDue = document.getElementById('scanDueField');
+  const reviewDue = document.getElementById('dueDateConfirm');
+  if(!scanDue.classList.contains('placeholder')){
+    reviewDue.classList.remove('placeholder');
+    reviewDue.querySelector('.txt').textContent = scanDue.querySelector('.txt').textContent;
+    collapseReviewFields();
+  } else {
+    expandReviewFields();
+  }
+}
+function expandReviewFields(){
+  document.getElementById('reviewConfirmedSummary').style.display = 'none';
+  document.getElementById('reviewFieldsExpanded').style.display = 'block';
+}
+function collapseReviewFields(){
+  const type = getType('reviewTypeToggle');
+  document.getElementById('confirmedTypeChip').textContent = type === 'document' ? '📄 Document' : '📓 Homework';
+  const dueTxt = document.getElementById('dueDateConfirm').querySelector('.txt').textContent;
+  document.getElementById('confirmedDueChip').textContent = '📅 ' + dueTxt;
+  document.getElementById('reviewConfirmedSummary').style.display = 'block';
+  document.getElementById('reviewFieldsExpanded').style.display = 'none';
+}
+function startManualEntry(){
+  editMode = false;
+  activeHwIndex = null;
+  openScreen('flow-manual');
+}
+function reviewBack(){
+  if(editMode){ openScreen('flow-detail'); } else { openScreen('flow-preview'); }
+}
+function manualBack(){
+  if(editMode){ openScreen('flow-detail'); } else { closeFlow(); }
+}
+function pickDate(fieldId){
+  const f = document.getElementById(fieldId);
+  f.classList.remove('placeholder');
+  f.querySelector('.txt').textContent = 'Monday, August 24, 2026';
+}
+function startScan(){
+  openScreen('flow-scan');
+  setTimeout(()=>{
+    if(!scanFailedOnce && !editMode){
+      scanFailedOnce = true;
+      openScreen('flow-scan-error');
+    } else {
+      carryScanFieldsToReview();
+      openScreen('flow-review');
+    }
+  }, 2800);
+}
+function retryScan(){
+  openScreen('flow-scan');
+  setTimeout(()=>{
+    carryScanFieldsToReview();
+    openScreen('flow-review');
+  }, 1800);
+}
+function showSavedToast(){
+  const t = document.getElementById('toast');
+  t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'), 2200);
+}
+function saveHomework(){
+  const data = {
+    kind: 'digitized',
+    type: getType('reviewTypeToggle'),
+    title: document.getElementById('hwTitleInput').value.trim() || 'Untitled homework',
+    due: document.getElementById('dueDateConfirm').querySelector('.txt').textContent,
+    dueShort: 'Mon, Aug 24',
+    status: 'upcoming',
+    teacher: 'Miss Taylor',
+    hasPhoto: true,
+    rules: document.getElementById('reviewRulesInput').value.trim(),
+    suggestions: document.getElementById('reviewSuggestionsInput').value.trim()
+  };
+  if(editMode && activeHwIndex !== null && homeworks[activeHwIndex]){
+    homeworks[activeHwIndex] = {...homeworks[activeHwIndex], ...data};
+    editMode = false;
+    renderDetailScreen();
+    openScreen('flow-detail');
+  } else {
+    homeworks.unshift(data);
+    closeFlow();
+  }
+  renderHwList();
+  showSavedToast();
+}
+function saveManualHomework(){
+  const title = document.getElementById('manualTitleInput').value.trim() || 'Untitled homework';
+  const dueField = document.getElementById('manualDueField');
+  const due = dueField.classList.contains('placeholder') ? 'No due date set' : dueField.querySelector('.txt').textContent;
+  const details = document.getElementById('manualDetailsInput').value.trim() || 'No details added yet.';
+  const type = getType('manualTypeToggle');
+  const data = { kind: 'manual', type, title, due, dueShort: due, status: 'upcoming', teacher: null, details, hasPhoto: false };
+  if(editMode && activeHwIndex !== null && homeworks[activeHwIndex]){
+    homeworks[activeHwIndex] = {...homeworks[activeHwIndex], ...data};
+    editMode = false;
+    renderDetailScreen();
+    openScreen('flow-detail');
+  } else {
+    homeworks.unshift(data);
+    closeFlow();
+  }
+  renderHwList();
+  showSavedToast();
+}
+
+function openDetail(i){
+  activeHwIndex = i;
+  renderDetailScreen();
+  openScreen('flow-detail');
+}
+function editHw(){
+  const hw = homeworks[activeHwIndex];
+  if(!hw) return;
+  editMode = true;
+  if(hw.kind === 'digitized'){
+    document.getElementById('hwTitleInput').value = hw.title;
+    const df = document.getElementById('dueDateConfirm');
+    df.classList.remove('placeholder');
+    df.querySelector('.txt').textContent = hw.due;
+    document.getElementById('reviewRulesInput').value = hw.rules || '';
+    document.getElementById('reviewSuggestionsInput').value = hw.suggestions || '';
+    setType('reviewTypeToggle', document.querySelector(`#reviewTypeToggle .type-opt[data-type="${hw.type || 'homework'}"]`));
+    collapseReviewFields();
+    openScreen('flow-review');
+  } else {
+    document.getElementById('manualTitleInput').value = hw.title;
+    const df = document.getElementById('manualDueField');
+    if(hw.due === 'No due date set'){ resetDueField('manualDueField', 'Tap to set due date'); }
+    else { df.classList.remove('placeholder'); df.querySelector('.txt').textContent = hw.due; }
+    document.getElementById('manualDetailsInput').value = hw.details;
+    setType('manualTypeToggle', document.querySelector(`#manualTypeToggle .type-opt[data-type="${hw.type || 'homework'}"]`));
+    openScreen('flow-manual');
+  }
+}
+function linesToListItems(text){
+  return (text || '').split('\n').map(l=>l.trim()).filter(Boolean)
+    .map(l=>`<li>${l.replace(/</g,'&lt;')}</li>`).join('');
+}
+function renderDetailScreen(){
+  const hw = homeworks[activeHwIndex];
+  if(!hw) return;
+  document.getElementById('detDue').textContent = '📅 Due ' + hw.due;
+  document.getElementById('detTitle').innerHTML = hw.title.replace(/</g,'&lt;') + (hw.type === 'document' ? ' <span class="doc-type-chip" style="vertical-align:middle;">Document</span>' : '');
+  const teacherRow = document.getElementById('detTeacherRow');
+  const photoBtn = document.getElementById('detPhotoBtn');
+  const body = document.getElementById('detBody');
+  if(hw.kind === 'digitized'){
+    teacherRow.style.display = 'flex';
+    document.getElementById('detTeacherName').textContent = hw.teacher;
+    photoBtn.style.display = 'flex';
+    body.innerHTML = `
+      <div class="review-field">
+        <div class="lbl">Rules to follow</div>
+        <ul class="review-list">${linesToListItems(hw.rules)}</ul>
+      </div>
+      <div class="review-field">
+        <div class="lbl">Suggestions</div>
+        <ul class="review-list sub">${linesToListItems(hw.suggestions)}</ul>
+      </div>`;
+  } else {
+    teacherRow.style.display = 'none';
+    photoBtn.style.display = 'none';
+    body.innerHTML = `
+      <div class="review-field">
+        <div class="lbl">Details</div>
+        <div class="review-list freetext">${hw.details.replace(/</g,'&lt;')}</div>
+      </div>`;
+  }
+}
+
+renderHwList();
+</script>
+
+</body>
+</html>

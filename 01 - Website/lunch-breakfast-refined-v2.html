@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lunch &amp; Breakfast — Refined per Live Review · Sprout</title>
+  <style>
+    :root {
+      --bg:        #efe9db;
+      --field:     #e4dcc7;
+      --field-active: #ffffff;
+      --fg:        #23271f;
+      --muted:     #8a8272;
+      --border:    #ded5bf;
+      --green:     #5f9163;
+      --green-dk:  #2d5c2e;
+      --t-noschool:#c0533d;
+      --t-special: #c08a2d;
+      --t-todo:    #3d7a40;
+      --t-lunch:   #c9691f; --t-lunch-bg:#fbe6d3;
+      --amber:#c08a2d; --amber-bg:#fbf0d8;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+      --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+      --serif:'Playfair Display',Georgia,serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {
+      background: #ddd8ce; font-family: var(--font); font-size: 15px; line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+      display: flex; align-items: flex-start; justify-content: center;
+      gap: 40px; padding: 32px 24px 90px; min-height: 100vh; flex-wrap: wrap;
+    }
+    .lede{width:100%;text-align:center;margin-bottom:6px;flex-basis:100%;}
+    .lede h1{font-size:24px;font-weight:700;color:#23271f;margin-bottom:8px;}
+    .lede p{font-size:13px;color:#7a7568;max-width:800px;margin:0 auto;line-height:1.6;}
+    .panel { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .caption {
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #8a8478; text-align: center; max-width: 350px; line-height:1.6;
+    }
+    .caption strong { color: #3a3830; font-weight: 600; }
+
+    .device {
+      position: relative; width: 390px; height: 844px; border-radius: 56px; padding: 12px;
+      background: linear-gradient(160deg, #2a2a2c 0%, #1a1a1c 50%, #0e0e10 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04) inset, 0 0 0 2px #000 inset,
+        0 28px 60px -12px rgba(0,0,0,0.45), 0 8px 20px -8px rgba(0,0,0,0.35);
+    }
+    .island { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); width: 124px; height: 34px; background: #000; border-radius: 999px; z-index: 5; }
+    .screen {
+      position: relative; width: 100%; height: 100%; background: var(--bg);
+      border-radius: 44px; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .statusbar {
+      flex: 0 0 47px; padding: 18px 26px 0; display: flex; justify-content: space-between;
+      align-items: flex-start; font-size: 15px; font-weight: 600; color: var(--fg);
+    }
+
+    .top{flex:0 0 auto;position:relative;display:flex;align-items:center;justify-content:center;padding:8px 16px 14px;}
+    .back{position:absolute;left:16px;width:34px;height:34px;border-radius:50%;background:#dbe5da;display:grid;place-items:center;cursor:pointer;}
+    .back svg{width:15px;height:15px;stroke:var(--green-dk);fill:none;stroke-width:2.2;}
+    .top .title{font-size:16.5px;font-weight:600;color:var(--fg);}
+
+    .scroll{flex:1;overflow-y:auto;padding:2px 18px 16px;}
+    .scroll::-webkit-scrollbar{display:none;}
+
+    .field-box{background:var(--field);border-radius:14px;padding:10px 14px;margin-bottom:14px;}
+    .field-box .lbl{font-size:10.5px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:2px;}
+    .field-box .lbl svg{width:12px;height:12px;stroke:var(--muted);fill:none;stroke-width:1.8;}
+    .field-box .val{font-size:15px;font-weight:600;color:var(--fg);}
+
+    .sec-lbl{font-size:12.5px;color:var(--fg);font-weight:500;margin:2px 0 9px;}
+
+    /* ═══ Reordered pill layout ═══ */
+    .pillrow-main{display:flex;gap:7px;margin-bottom:7px;}
+    .pillrow-sub{display:flex;gap:7px;margin-bottom:16px;}
+    .pill{display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--field);border-radius:12px;padding:10px 4px 9px;cursor:pointer;}
+    .pill.on{background:var(--field-active);box-shadow:0 2px 6px rgba(0,0,0,.08);}
+    .pill .ic{font-size:16px;}
+    .pill .lb{font-size:10.5px;font-weight:600;}
+    .pill.noschool .lb, .pill.noschool .ic{color:var(--t-noschool);}
+    .pill.special .lb, .pill.special .ic{color:var(--t-special);}
+    .pill.todo .lb, .pill.todo .ic{color:var(--t-todo);}
+    .pill.event .lb, .pill.event .ic{color:var(--green-dk);}
+    .pill.lunch .lb, .pill.lunch .ic{color:var(--t-lunch);}
+    .pill:not(.on) .lb, .pill:not(.on) .ic{opacity:.55;}
+    .pillrow-main .pill{flex:1;}
+    .pillrow-sub .pill.todo{flex:2.2;}
+    .pillrow-sub .pill.lunch{flex:1;padding:8px 2px 7px;}
+    .pillrow-sub .pill.lunch .lb{font-size:9.5px;}
+    .pillrow-sub .pill.lunch .ic{font-size:13px;}
+
+    /* ═══ numbered option rows w/ multi-select tags ═══ */
+    .opt-box{background:var(--field);border-radius:14px;padding:12px 14px;margin-bottom:14px;}
+    .opt-box .lbl{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:10px;}
+    .opt-row{margin-bottom:14px;}
+    .opt-row:last-of-type{margin-bottom:0;}
+    .opt-input-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+    .opt-num{width:20px;height:20px;border-radius:50%;background:var(--t-lunch-bg);color:var(--t-lunch);font-size:10.5px;font-weight:700;display:grid;place-items:center;flex-shrink:0;}
+    .opt-row.breakfast .opt-num{background:var(--amber-bg);color:var(--amber);}
+    .opt-input-row input{flex:1;border:none;background:#fff;border-radius:9px;padding:8px 10px;font-family:var(--font);font-size:13.5px;color:var(--fg);outline:none;}
+    .tag-row{display:flex;gap:5px;margin-left:28px;flex-wrap:wrap;}
+    .tag-btn{display:flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;color:var(--muted);background:#fff;border:1px solid var(--border);border-radius:99px;padding:5px 9px;cursor:pointer;}
+    .tag-btn.on{background:#e3efe1;border-color:var(--green);color:var(--green-dk);}
+    .tag-btn .dot{width:5px;height:5px;border-radius:50%;border:1.3px solid var(--muted);flex-shrink:0;}
+    .tag-btn.on .dot{background:var(--green);border-color:var(--green);}
+    .add-opt{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--t-lunch);padding-top:4px;cursor:pointer;}
+    .add-opt.breakfast{color:var(--amber);}
+    .add-opt svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.4;}
+
+    .save-btn{width:100%;height:50px;border-radius:99px;background:var(--green);color:#fff;border:none;font-size:15px;font-weight:700;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;margin-top:4px;}
+    .save-btn svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:3;}
+
+    /* ═══ display views w/ grade specificity ═══ */
+    .brief-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:13px 15px;margin-bottom:12px;}
+    .brief-card-head{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+    .brief-card-head .ic{width:30px;height:30px;border-radius:9px;background:var(--t-lunch-bg);display:grid;place-items:center;font-size:15px;flex-shrink:0;}
+    .brief-card-head .t{font-size:14px;font-weight:700;color:var(--fg);font-family:var(--serif);}
+    .kid-chip{display:inline-flex;align-items:center;gap:5px;background:var(--field);border-radius:99px;padding:3px 9px 3px 3px;margin-left:auto;}
+    .kid-chip .av{width:18px;height:18px;border-radius:50%;background:linear-gradient(145deg,#2d5c2e,#5f9163);color:#fff;font-size:8.5px;font-weight:700;display:grid;place-items:center;}
+    .kid-chip span{font-size:10.5px;font-weight:600;color:var(--fg);}
+    .brief-sub-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:4px 0 6px;}
+    .brief-opt-row{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--fg);padding:5px 0;}
+    .brief-opt-row .tags{display:flex;gap:3px;}
+    .brief-opt-row .tags span{font-size:9px;font-weight:700;color:var(--green-dk);background:#e3efe1;padding:2px 6px;border-radius:99px;}
+  </style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Lunch &amp; Breakfast — Refined Per Live Review</h1>
+  <p>Three changes from watching this live with Tony: (1) note-type pills reordered — Event/Special/No School get equal top billing, To-Do sits below at full size, Lunch shrinks down and tucks in at the end since "lunch isn't that big a deal" for most parents; (2) diet tags become real multi-select buttons that appear under each option line as you type it, not a single toggle icon; (3) Breakfast gets its own numbered list mirroring Lunch exactly, and both surfaces the grade so it's unambiguous when a family has kids in different schools.</p>
+</div>
+
+<!-- ═══ STATE 1 — reordered pills, Event selected ═══ -->
+<div class="panel">
+  <div class="device"><div class="island"></div>
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span>🔋</span></div>
+      <div class="top"><div class="back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><div class="title">Add Note</div></div>
+      <div class="scroll">
+        <div class="field-box">
+          <div class="lbl"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Selected Date</div>
+          <div class="val">Wednesday, August 19</div>
+        </div>
+
+        <div class="sec-lbl">Note type</div>
+        <div class="pillrow-main">
+          <div class="pill event on"><span class="ic">✏️</span><span class="lb">Event</span></div>
+          <div class="pill special"><span class="ic">⭐</span><span class="lb">Special</span></div>
+          <div class="pill noschool"><span class="ic">🚫</span><span class="lb">No School</span></div>
+        </div>
+        <div class="pillrow-sub">
+          <div class="pill todo"><span class="ic">✅</span><span class="lb">To-Do</span></div>
+          <div class="pill lunch"><span class="ic">🍽️</span><span class="lb">Lunch</span></div>
+        </div>
+
+        <div class="field-box"><div class="lbl">Title</div><div class="val" style="color:#9c9788;font-weight:400;">e.g. Field Trip to the Zoo</div></div>
+        <div class="field-box"><div class="lbl">Set Start and End Time (optional)</div><div class="val" style="color:#9c9788;font-weight:400;">Add a time</div></div>
+        <div class="field-box"><div class="lbl">Details (optional)</div><div class="val" style="color:#9c9788;font-weight:400;">Add details</div></div>
+
+        <button class="save-btn"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Save Note</button>
+      </div>
+    </div>
+  </div>
+  <span class="caption"><strong>State 1 — Reordered pills</strong> — Event/Special/No School up top and equal-sized, To-Do below at nearly full width, Lunch shrinks and tucks in beside it. Matches how Tony described it live, tile by tile.</span>
+</div>
+
+<!-- ═══ STATE 2 — Lunch selected, multi-select tags, breakfast mirrors lunch ═══ -->
+<div class="panel">
+  <div class="device"><div class="island"></div>
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span>🔋</span></div>
+      <div class="top"><div class="back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><div class="title">Add Note</div></div>
+      <div class="scroll">
+        <div class="field-box">
+          <div class="lbl"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Selected Date</div>
+          <div class="val">Wednesday, August 19</div>
+        </div>
+
+        <div class="sec-lbl">Note type</div>
+        <div class="pillrow-main">
+          <div class="pill event"><span class="ic">✏️</span><span class="lb">Event</span></div>
+          <div class="pill special"><span class="ic">⭐</span><span class="lb">Special</span></div>
+          <div class="pill noschool"><span class="ic">🚫</span><span class="lb">No School</span></div>
+        </div>
+        <div class="pillrow-sub">
+          <div class="pill todo"><span class="ic">✅</span><span class="lb">To-Do</span></div>
+          <div class="pill lunch on"><span class="ic">🍽️</span><span class="lb">Lunch</span></div>
+        </div>
+
+        <div class="opt-box">
+          <div class="lbl">Breakfast options</div>
+          <div class="opt-row breakfast">
+            <div class="opt-input-row"><div class="opt-num">1</div><input value="Potato, Egg &amp; Cheese Taco"></div>
+            <div class="tag-row">
+              <div class="tag-btn on"><span class="dot"></span>Vegetarian</div>
+              <div class="tag-btn"><span class="dot"></span>Vegan</div>
+              <div class="tag-btn"><span class="dot"></span>Gluten-Free</div>
+              <div class="tag-btn on"><span class="dot"></span>Pre-K</div>
+            </div>
+          </div>
+          <div class="opt-row breakfast">
+            <div class="opt-input-row"><div class="opt-num">2</div><input value="Cereal + Fruit &amp; Milk"></div>
+            <div class="tag-row">
+              <div class="tag-btn on"><span class="dot"></span>Vegetarian</div>
+              <div class="tag-btn"><span class="dot"></span>Vegan</div>
+              <div class="tag-btn"><span class="dot"></span>Gluten-Free</div>
+              <div class="tag-btn"><span class="dot"></span>Pre-K</div>
+            </div>
+          </div>
+          <div class="add-opt breakfast"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add another option</div>
+        </div>
+
+        <div class="opt-box">
+          <div class="lbl">Lunch options</div>
+          <div class="opt-row">
+            <div class="opt-input-row"><div class="opt-num">1</div><input value="Hamburger"></div>
+            <div class="tag-row">
+              <div class="tag-btn"><span class="dot"></span>Vegetarian</div>
+              <div class="tag-btn"><span class="dot"></span>Vegan</div>
+              <div class="tag-btn"><span class="dot"></span>Gluten-Free</div>
+              <div class="tag-btn"><span class="dot"></span>Pre-K</div>
+            </div>
+          </div>
+          <div class="opt-row">
+            <div class="opt-input-row"><div class="opt-num">2</div><input value="Rebellyous Burger"></div>
+            <div class="tag-row">
+              <div class="tag-btn on"><span class="dot"></span>Vegetarian</div>
+              <div class="tag-btn on"><span class="dot"></span>Vegan</div>
+              <div class="tag-btn"><span class="dot"></span>Gluten-Free</div>
+              <div class="tag-btn"><span class="dot"></span>Pre-K</div>
+            </div>
+          </div>
+          <div class="opt-row">
+            <div class="opt-input-row"><div class="opt-num">3</div><input value="SunButter &amp; Jelly Sandwich"></div>
+            <div class="tag-row">
+              <div class="tag-btn on"><span class="dot"></span>Vegetarian</div>
+              <div class="tag-btn"><span class="dot"></span>Vegan</div>
+              <div class="tag-btn"><span class="dot"></span>Gluten-Free</div>
+              <div class="tag-btn on"><span class="dot"></span>Pre-K</div>
+            </div>
+          </div>
+          <div class="add-opt"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add another option</div>
+        </div>
+
+        <button class="save-btn"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Save Note</button>
+      </div>
+    </div>
+  </div>
+  <span class="caption"><strong>State 2 — Multi-select tags + Breakfast mirrors Lunch</strong> — 4 tag buttons appear under each option as you type it, tap any that apply. Breakfast is its own numbered list, identical pattern, right above Lunch.</span>
+</div>
+
+<!-- ═══ STATE 3 — Daily Brief with grade specificity ═══ -->
+<div class="panel">
+  <div class="device"><div class="island"></div>
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span>🔋</span></div>
+      <div class="top"><div class="title">Good morning, Tony</div></div>
+      <div class="scroll">
+        <div class="brief-card">
+          <div class="brief-card-head">
+            <div class="ic">🍽️</div>
+            <div class="t">Today's Lunch (First Grade)</div>
+            <div class="kid-chip"><span class="av">K</span><span>Kennedy</span></div>
+          </div>
+          <div class="brief-sub-lbl">Breakfast</div>
+          <div class="brief-opt-row"><span>Potato, Egg &amp; Cheese Taco</span><span class="tags"><span>V</span><span>PK</span></span></div>
+          <div class="brief-sub-lbl">Lunch</div>
+          <div class="brief-opt-row"><span>1. Hamburger</span></div>
+          <div class="brief-opt-row"><span>2. Rebellyous Burger</span><span class="tags"><span>V</span><span>VG</span></span></div>
+          <div class="brief-opt-row"><span>3. SunButter &amp; Jelly Sandwich</span><span class="tags"><span>V</span><span>PK</span></span></div>
+        </div>
+
+        <div class="brief-card">
+          <div class="brief-card-head">
+            <div class="ic" style="background:var(--amber-bg);">🎉</div>
+            <div class="t">Today's Lunch (CDC)</div>
+            <div class="kid-chip"><span class="av" style="background:linear-gradient(145deg,#7a3a8a,#ba7aca);">M</span><span>Milo</span></div>
+          </div>
+          <div class="brief-opt-row"><span>Pizza Day 🍕</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="caption"><strong>State 3 — Grade-specific labels</strong> — "Today's Lunch (First Grade)" instead of a bare "Today's Lunch," plus the kid's name so it's unambiguous when kids are in different schools. CDC's Pizza Day shown separately, correctly not confused with First Grade's menu.</span>
+</div>
+
+</body>
+</html>

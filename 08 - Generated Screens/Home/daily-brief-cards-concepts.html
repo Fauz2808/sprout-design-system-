@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Daily Brief — Card Redesign, 3 Concepts · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff; --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+    --green:#186338; --brand-light:#e2e9e3; --brand-border:#77b691; --border:#d0dacf;
+    --warning-subtle:#f6ecd1; --error:#d64545; --surface-l2:#dbd5c8;
+    --shadow-m:1px 4px 25px 2px rgba(13,13,18,.05);
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:30px 48px;padding:40px 24px 60px;}
+
+  .lede{flex:1 0 100%;text-align:center;max-width:820px;margin:0 auto 8px;}
+  .lede h1{font-family:var(--serif);font-size:25px;font-weight:600;color:var(--ink);margin:0 0 6px;}
+  .lede p{font-size:13px;color:var(--muted);margin:0;line-height:1.55;}
+  .lede .flag{display:inline-block;margin-top:10px;font-size:11.5px;color:#8a6a1c;background:#f6ecd1;border:1px solid #e9d9ad;border-radius:999px;padding:5px 12px;}
+
+  .row{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-start;gap:48px;padding:0 24px;overflow-x:auto;width:100%;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0;}
+  .cap{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.03em;text-align:center;max-width:415px;line-height:1.5;color:#6a665b;}
+  .cap b{color:#23271f;font-size:12.5px;}
+
+  .ph{display:inline-block;vertical-align:middle;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+
+  .device{position:relative;width:415px;height:874px;border-radius:56px;padding:11px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:60;}
+  .screen{position:relative;width:100%;height:100%;border-radius:43px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+
+  .sb{flex:0 0 44px;padding:16px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);z-index:20;}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--ink);} .sb .bat{width:25px;}
+
+  .top{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 16px 6px;}
+  .top .brand{flex:1;text-align:center;}
+  .top .brand .t{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);}
+  .top .brand .s{font-size:12px;color:var(--muted);margin-top:1px;}
+  .top .cal{width:40px;height:40px;display:grid;place-items:center;color:var(--ink);flex-shrink:0;}
+  .top .cal svg{width:24px;height:24px;}
+  .top .sp{width:40px;flex-shrink:0;}
+
+  .body{flex:1 1 auto;overflow-y:auto;padding:4px 20px 24px;}
+
+  .greet{margin:6px 0 14px;}
+  .greet .h{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);margin:0;}
+  .greet .s{font-family:var(--serif);font-style:italic;font-weight:500;font-size:15px;color:var(--muted);margin:2px 0 0;}
+
+  .gap{height:16px;}
+
+  /* weather card (unchanged across all 3 — already established) */
+  .wx{display:flex;gap:8px;align-items:center;background:#fff;border-left:2px solid var(--green);border-radius:12px;padding:4px;box-shadow:var(--shadow-m);}
+  .wx .ic{width:56px;height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0;}
+  .wx .ic .em{font-size:28px;line-height:1;}
+  .wx .ic .t{font-size:11.5px;color:var(--ink);font-weight:500;}
+  .wx .tx{flex:1;padding:8px 8px 8px 0;}
+  .wx .tx .t{font-family:var(--serif);font-size:17px;font-weight:500;color:var(--ink);}
+  .wx .tx .d{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.35;}
+
+  /* carpool card (unchanged) */
+  .carpool{display:flex;gap:8px;align-items:center;background:var(--brand-light);border:.5px solid var(--green);border-radius:16px;padding:8px;margin-top:10px;}
+  .carpool .av{width:38px;height:38px;border-radius:9px;background:linear-gradient(145deg,#1e3e2b,#579a74);display:grid;place-items:center;font-size:17px;flex-shrink:0;}
+  .carpool .tx{flex:1;font-size:11.5px;line-height:1.5;}
+  .carpool .tx .t{font-weight:500;color:var(--ink);}
+  .carpool .tx .l{color:var(--green);}
+
+  /* section card wrapper (styles A & C) */
+  .stack{background:#fff;border-radius:18px;box-shadow:var(--shadow-m);padding:14px;}
+  .stack .sh{display:flex;align-items:center;gap:8px;font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);margin-bottom:10px;}
+
+  /* chip row (No School / Pizza Day — timeless items folded from old Reminders) */
+  .chiprow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+  .chip{display:inline-flex;align-items:center;gap:5px;background:var(--brand-light);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:600;color:var(--ink);}
+  .chip.warn{background:#f7dada;color:#a04141;}
+
+  /* ===== Style A: timeline ===== */
+  .tl{position:relative;padding-left:6px;}
+  .tl-item{display:flex;gap:12px;position:relative;padding-bottom:16px;}
+  .tl-item:last-child{padding-bottom:0;}
+  .tl-rail{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:10px;}
+  .tl-dot{width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:5px;}
+  .tl-line{width:2px;flex:1;background:var(--border);margin-top:2px;}
+  .tl-item:last-child .tl-line{display:none;}
+  .tl-tx .time{font-family:var(--sans);font-size:13px;font-weight:700;color:var(--ink);}
+  .tl-tx .n{font-size:14px;color:var(--ink);margin-top:1px;}
+  .tl-tx .m{font-size:12.5px;color:var(--muted);margin-top:1px;}
+
+  /* ===== Style B: one mini-card per item ===== */
+  .seclabel-b{font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin:0 2px 8px;}
+  .mini{display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-m);margin-bottom:8px;}
+  .mini .ic{width:36px;height:36px;border-radius:10px;background:var(--brand-light);display:grid;place-items:center;font-size:17px;flex-shrink:0;}
+  .mini .tx .n{font-family:var(--serif);font-size:14.5px;font-weight:600;color:var(--ink);}
+  .mini .tx .m{font-size:12.5px;color:var(--muted);margin-top:1px;}
+  .mini.chipmini{background:var(--brand-light);box-shadow:none;}
+
+  /* ===== Style C: icon-row inside one card ===== */
+  .irow{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);}
+  .irow:last-child{border-bottom:none;padding-bottom:0;}
+  .irow:first-of-type{padding-top:0;}
+  .irow .ic{width:36px;height:36px;border-radius:10px;background:var(--brand-light);display:grid;place-items:center;font-size:16px;flex-shrink:0;}
+  .irow .tx .n{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink);}
+  .irow .tx .m{font-size:12px;color:var(--muted);margin-top:1px;}
+
+  /* redesigned To-Do (unchanged, reused verbatim from daily-brief-homepage.html) */
+  .todo-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;cursor:pointer;}
+  .todo-head .chev{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;flex-shrink:0;}
+  .todo-head .chev svg{width:13px;height:13px;}
+  .todo-head .ttl{flex:1;font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);}
+  .todo-head .seeall{font-size:12.5px;color:var(--green);font-weight:600;}
+  .titem{display:flex;align-items:center;gap:12px;background:#fff;border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-m);margin-bottom:8px;}
+  .tbox{width:24px;height:24px;border-radius:7px;background:var(--brand-light);display:grid;place-items:center;flex-shrink:0;}
+  .tbox .inner{width:10px;height:10px;border-radius:3px;background:#fff;}
+  .titem.done .tbox{background:var(--green);}
+  .titem.done .tbox .inner{display:none;}
+  .titem.done .tbox svg{width:14px;height:14px;fill:#fff;}
+  .tbox svg{display:none;}
+  .titem .ttx .n{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink);}
+  .titem.done .ttx .n{text-decoration:line-through;color:var(--muted);}
+  .titem .ttx .m{font-size:11.5px;color:var(--muted);margin-top:1px;}
+
+  /* birthday hero row (shared across styles, already a card) */
+  .bday{display:flex;gap:8px;align-items:center;background:var(--warning-subtle);border-radius:12px;padding:10px 8px;}
+  .bday .em{font-size:26px;flex-shrink:0;width:36px;text-align:center;}
+  .bday .tx .t{font-family:var(--serif);font-size:14.5px;font-weight:500;color:var(--ink);}
+  .bday .tx .d{font-size:12.5px;color:var(--muted);margin-top:1px;}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Daily Brief — Card Redesign, 3 Concepts</h1>
+  <p>Sesuai ruling meeting terbaru: section "Reminders" dihapus (No School/Pizza Day masuk ke Happening Today sebagai chip, item soccer digabung ke entry yang sudah ada di Happening Today). Urutan final: Happening Today (+Carpool) → To-Do → Upcoming Events → Lunch → Messages → Birthdays. Weather &amp; To-Do dipertahankan persis dari build sebelumnya (sudah card). Tiga arah di bawah beda cara nge-card-in Happening Today, Upcoming Events, Lunch, Messages, Birthdays.</p>
+</div>
+
+<div class="row">
+
+<!-- ============ A: TIMELINE / AGENDA ============ -->
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+      <div class="top"><div class="sp"></div><div class="brand"><div class="t">Sprout</div><div class="s">Your daily briefing · 7:31 AM</div></div>
+        <div class="cal"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span></div>
+      </div>
+
+      <div class="body">
+        <div class="greet"><p class="h">Good morning, James.</p><p class="s">Here's your Wednesday:</p></div>
+
+        <div class="wx"><div class="ic"><span class="em">☀️</span><span class="t">68–86°</span></div>
+          <div class="tx"><div class="t">Austin, TX · Sunny</div><div class="d">T-shirt by afternoon — light jacket this morning</div></div></div>
+        <div class="gap"></div>
+
+        <div class="todo-head"><div class="chev"><span class="ph"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32"/></svg></span></div><div class="ttl">✅ Needs your attention</div><div class="seeall">See All (3)</div></div>
+        <div class="titem"><div class="tbox"><div class="inner"></div></div><div class="ttx"><div class="n">Sign Jake's permission slip</div><div class="m">1st Grade · Due today</div></div></div>
+        <div class="titem"><div class="tbox"><div class="inner"></div></div><div class="ttx"><div class="n">Confirm snacks for parent-teacher night</div><div class="m">Kindergarten · Due today</div></div></div>
+        <div class="titem done"><div class="tbox"><div class="inner"></div><span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 77.66-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69 218.34 66.34a8 8 0 0 1 11.32 11.32"/></svg></span></div><div class="ttx"><div class="n">RSVP: Surfing at Second Point</div><div class="m">Expires today</div></div></div>
+        <div class="gap"></div>
+
+        <div class="stack">
+          <div class="sh">📅 Happening Today</div>
+          <div class="chiprow"><span class="chip warn">🚫 No School · Kindergarten</span><span class="chip">🎉 Pizza Day · 1st Grade</span></div>
+          <div class="tl">
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-tx"><div class="time">8:30 am</div><div class="n">Talent Show</div><div class="m">Kindergarten</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-tx"><div class="time">3:30 pm</div><div class="n">Soccer practice · Field 2</div><div class="m">Little Shots</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div></div><div class="tl-tx"><div class="time">6:00 pm</div><div class="n">Parent-teacher night</div><div class="m">1st Grade</div></div></div>
+          </div>
+          <div class="carpool"><div class="av">🚙</div><div class="tx"><div class="t">You're covering drop-off &amp; pick-up for Mia today</div><div class="l">Tap for pickup details →</div></div></div>
+        </div>
+        <div class="gap"></div>
+
+        <div class="stack">
+          <div class="sh">📆 Upcoming Events</div>
+          <div class="tl">
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-tx"><div class="time">Thu, May 14</div><div class="n">Carpool drop-off</div><div class="m">Mia</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-tx"><div class="time">Fri, May 15</div><div class="n">Field Day</div><div class="m">3rd Grade</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-tx"><div class="time">Mon, May 18</div><div class="n">Book Fair begins</div><div class="m">All Grades</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div></div><div class="tl-tx"><div class="time">Tue, May 19</div><div class="n">Spring Concert</div><div class="m">Kindergarten</div></div></div>
+          </div>
+        </div>
+        <div class="gap"></div>
+
+        <div class="stack">
+          <div class="sh">🥪 Lunch — Kiker Elementary</div>
+          <div class="tl">
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-tx"><div class="n">Hamburger 🍖 🌱</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-tx"><div class="n">Rebellyous Burger 🍖</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div></div><div class="tl-tx"><div class="n">SunButter &amp; Jelly Sandwich 🍖 🥪</div></div></div>
+          </div>
+        </div>
+        <div class="gap"></div>
+
+        <div class="stack">
+          <div class="sh">💬 New Messages</div>
+          <div class="tl">
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-tx"><div class="n">2 unread in Kindergarten</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div></div><div class="tl-tx"><div class="n">1 message from Sarah Chen</div></div></div>
+          </div>
+        </div>
+        <div class="gap"></div>
+
+        <div class="stack">
+          <div class="sh">🎂 Birthdays</div>
+          <div class="bday"><div class="em">🎂</div><div class="tx"><div class="t">Kennedy turns 4 today!</div><div class="d">Say happy birthday at drop-off 👋</div></div></div>
+          <div class="tl" style="margin-top:12px;">
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-tx"><div class="n">Presley (6)</div><div class="m">June 6th</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div></div><div class="tl-tx"><div class="n">Rome (1)</div><div class="m">June 7th</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cap"><b>A — Timeline/Agenda.</b> Satu card per section, dot+garis vertikal. Chip "all day" (No School/Pizza Day) di atas timeline Happening Today. Paling mirip app kalender klasik.</div>
+</div>
+
+<!-- ============ B: ONE MINI-CARD PER ITEM ============ -->
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+      <div class="top"><div class="sp"></div><div class="brand"><div class="t">Sprout</div><div class="s">Your daily briefing · 7:31 AM</div></div>
+        <div class="cal"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span></div>
+      </div>
+
+      <div class="body">
+        <div class="greet"><p class="h">Good morning, James.</p><p class="s">Here's your Wednesday:</p></div>
+
+        <div class="wx"><div class="ic"><span class="em">☀️</span><span class="t">68–86°</span></div>
+          <div class="tx"><div class="t">Austin, TX · Sunny</div><div class="d">T-shirt by afternoon — light jacket this morning</div></div></div>
+        <div class="gap"></div>
+
+        <div class="todo-head"><div class="chev"><span class="ph"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32"/></svg></span></div><div class="ttl">✅ Needs your attention</div><div class="seeall">See All (3)</div></div>
+        <div class="titem"><div class="tbox"><div class="inner"></div></div><div class="ttx"><div class="n">Sign Jake's permission slip</div><div class="m">1st Grade · Due today</div></div></div>
+        <div class="titem"><div class="tbox"><div class="inner"></div></div><div class="ttx"><div class="n">Confirm snacks for parent-teacher night</div><div class="m">Kindergarten · Due today</div></div></div>
+        <div class="titem done"><div class="tbox"><div class="inner"></div><span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 77.66-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69 218.34 66.34a8 8 0 0 1 11.32 11.32"/></svg></span></div><div class="ttx"><div class="n">RSVP: Surfing at Second Point</div><div class="m">Expires today</div></div></div>
+        <div class="gap"></div>
+
+        <div class="seclabel-b">📅 Happening Today</div>
+        <div class="mini chipmini"><div class="ic">🚫</div><div class="tx"><div class="n">No School</div><div class="m">Kindergarten</div></div></div>
+        <div class="mini chipmini"><div class="ic">🎉</div><div class="tx"><div class="n">Pizza Day</div><div class="m">1st Grade</div></div></div>
+        <div class="mini"><div class="ic">🎤</div><div class="tx"><div class="n">Talent Show</div><div class="m">8:30 am · Kindergarten</div></div></div>
+        <div class="mini"><div class="ic">⚽</div><div class="tx"><div class="n">Soccer practice</div><div class="m">3:30 pm · Little Shots · Field 2</div></div></div>
+        <div class="mini"><div class="ic">🍎</div><div class="tx"><div class="n">Parent-teacher night</div><div class="m">6:00 pm · 1st Grade</div></div></div>
+        <div class="carpool" style="margin-top:0;"><div class="av">🚙</div><div class="tx"><div class="t">You're covering drop-off &amp; pick-up for Mia today</div><div class="l">Tap for pickup details →</div></div></div>
+        <div class="gap"></div>
+
+        <div class="seclabel-b">📆 Upcoming Events</div>
+        <div class="mini"><div class="ic">🚗</div><div class="tx"><div class="n">Carpool drop-off · Mia</div><div class="m">Thu, May 14</div></div></div>
+        <div class="mini"><div class="ic">🏃</div><div class="tx"><div class="n">Field Day · 3rd Grade</div><div class="m">Fri, May 15</div></div></div>
+        <div class="mini"><div class="ic">📚</div><div class="tx"><div class="n">Book Fair begins · All Grades</div><div class="m">Mon, May 18</div></div></div>
+        <div class="mini"><div class="ic">🎵</div><div class="tx"><div class="n">Spring Concert · Kindergarten</div><div class="m">Tue, May 19</div></div></div>
+        <div class="gap"></div>
+
+        <div class="seclabel-b">🥪 Lunch — Kiker Elementary</div>
+        <div class="mini"><div class="ic">🍔</div><div class="tx"><div class="n">Hamburger</div><div class="m">Meat &amp; veggie option</div></div></div>
+        <div class="mini"><div class="ic">🍔</div><div class="tx"><div class="n">Rebellyous Burger</div><div class="m">Plant-based</div></div></div>
+        <div class="mini"><div class="ic">🥪</div><div class="tx"><div class="n">SunButter &amp; Jelly Sandwich</div><div class="m">Nut-free</div></div></div>
+        <div class="gap"></div>
+
+        <div class="seclabel-b">💬 New Messages</div>
+        <div class="mini"><div class="ic">💬</div><div class="tx"><div class="n">2 unread</div><div class="m">Kindergarten</div></div></div>
+        <div class="mini"><div class="ic">💬</div><div class="tx"><div class="n">1 message</div><div class="m">Sarah Chen</div></div></div>
+        <div class="gap"></div>
+
+        <div class="seclabel-b">🎂 Birthdays</div>
+        <div class="bday"><div class="em">🎂</div><div class="tx"><div class="t">Kennedy turns 4 today!</div><div class="d">Say happy birthday at drop-off 👋</div></div></div>
+        <div class="mini" style="margin-top:8px;"><div class="ic">🎈</div><div class="tx"><div class="n">Presley (6)</div><div class="m">June 6th</div></div></div>
+        <div class="mini"><div class="ic">🎈</div><div class="tx"><div class="n">Rome (1)</div><div class="m">June 7th</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="cap"><b>B — Satu mini-card per item.</b> Tiap event/reminder/lunch/message dapet card sendiri, konsisten sama To-Do. Paling scannable tapi paling makan tempat vertikal.</div>
+</div>
+
+<!-- ============ C: ICON-ROW DALAM 1 CARD/SECTION ============ -->
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+      <div class="top"><div class="sp"></div><div class="brand"><div class="t">Sprout</div><div class="s">Your daily briefing · 7:31 AM</div></div>
+        <div class="cal"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span></div>
+      </div>
+
+      <div class="body">
+        <div class="greet"><p class="h">Good morning, James.</p><p class="s">Here's your Wednesday:</p></div>
+
+        <div class="wx"><div class="ic"><span class="em">☀️</span><span class="t">68–86°</span></div>
+          <div class="tx"><div class="t">Austin, TX · Sunny</div><div class="d">T-shirt by afternoon — light jacket this morning</div></div></div>
+        <div class="gap"></div>
+
+        <div class="todo-head"><div class="chev"><span class="ph"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32"/></svg></span></div><div class="ttl">✅ Needs your attention</div><div class="seeall">See All (3)</div></div>
+        <div class="titem"><div class="tbox"><div class="inner"></div></div><div class="ttx"><div class="n">Sign Jake's permission slip</div><div class="m">1st Grade · Due today</div></div></div>
+        <div class="titem"><div class="tbox"><div class="inner"></div></div><div class="ttx"><div class="n">Confirm snacks for parent-teacher night</div><div class="m">Kindergarten · Due today</div></div></div>
+        <div class="titem done"><div class="tbox"><div class="inner"></div><span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 77.66-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69 218.34 66.34a8 8 0 0 1 11.32 11.32"/></svg></span></div><div class="ttx"><div class="n">RSVP: Surfing at Second Point</div><div class="m">Expires today</div></div></div>
+        <div class="gap"></div>
+
+        <div class="stack">
+          <div class="sh">📅 Happening Today</div>
+          <div class="chiprow"><span class="chip warn">🚫 No School</span><span class="chip">🎉 Pizza Day</span></div>
+          <div class="irow"><div class="ic">🎤</div><div class="tx"><div class="n">Talent Show</div><div class="m">8:30 am · Kindergarten</div></div></div>
+          <div class="irow"><div class="ic">⚽</div><div class="tx"><div class="n">Soccer practice</div><div class="m">3:30 pm · Little Shots · Field 2</div></div></div>
+          <div class="irow"><div class="ic">🍎</div><div class="tx"><div class="n">Parent-teacher night</div><div class="m">6:00 pm · 1st Grade</div></div></div>
+          <div class="carpool"><div class="av">🚙</div><div class="tx"><div class="t">You're covering drop-off &amp; pick-up for Mia today</div><div class="l">Tap for pickup details →</div></div></div>
+        </div>
+        <div class="gap"></div>
+
+        <div class="stack">
+          <div class="sh">📆 Upcoming Events</div>
+          <div class="irow"><div class="ic">🚗</div><div class="tx"><div class="n">Carpool drop-off · Mia</div><div class="m">Thu, May 14</div></div></div>
+          <div class="irow"><div class="ic">🏃</div><div class="tx"><div class="n">Field Day · 3rd Grade</div><div class="m">Fri, May 15</div></div></div>
+          <div class="irow"><div class="ic">📚</div><div class="tx"><div class="n">Book Fair begins · All Grades</div><div class="m">Mon, May 18</div></div></div>
+          <div class="irow"><div class="ic">🎵</div><div class="tx"><div class="n">Spring Concert · Kindergarten</div><div class="m">Tue, May 19</div></div></div>
+        </div>
+        <div class="gap"></div>
+
+        <div class="stack">
+          <div class="sh">🥪 Lunch — Kiker Elementary</div>
+          <div class="irow"><div class="ic">🍔</div><div class="tx"><div class="n">Hamburger</div><div class="m">Meat &amp; veggie option</div></div></div>
+          <div class="irow"><div class="ic">🍔</div><div class="tx"><div class="n">Rebellyous Burger</div><div class="m">Plant-based</div></div></div>
+          <div class="irow"><div class="ic">🥪</div><div class="tx"><div class="n">SunButter &amp; Jelly Sandwich</div><div class="m">Nut-free</div></div></div>
+        </div>
+        <div class="gap"></div>
+
+        <div class="stack">
+          <div class="sh">💬 New Messages</div>
+          <div class="irow"><div class="ic">💬</div><div class="tx"><div class="n">2 unread</div><div class="m">Kindergarten</div></div></div>
+          <div class="irow"><div class="ic">💬</div><div class="tx"><div class="n">1 message</div><div class="m">Sarah Chen</div></div></div>
+        </div>
+        <div class="gap"></div>
+
+        <div class="stack">
+          <div class="sh">🎂 Birthdays</div>
+          <div class="bday"><div class="em">🎂</div><div class="tx"><div class="t">Kennedy turns 4 today!</div><div class="d">Say happy birthday at drop-off 👋</div></div></div>
+          <div class="irow" style="margin-top:4px;"><div class="ic">🎈</div><div class="tx"><div class="n">Presley (6)</div><div class="m">June 6th</div></div></div>
+          <div class="irow"><div class="ic">🎈</div><div class="tx"><div class="n">Rome (1)</div><div class="m">June 7th</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cap"><b>C — Icon-row dalam 1 card/section.</b> Paling konsisten sama Weather/Carpool yang udah ada duluan — jumlah card = jumlah section, tiap card isinya baris icon-tile + teks.</div>
+</div>
+
+</div>
+</body>
+</html>

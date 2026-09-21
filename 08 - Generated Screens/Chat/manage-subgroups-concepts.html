@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Manage Subgroups — 3 Layout Concepts · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --surface:#ffffff; --card:#ffffff; --field:#e8e2d6;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e; --brand:#186338; --brand-bold:#1e3e2b;
+    --brand-mid:#579a74; --brand-light:#e2e9e3; --brand-border:#77b691; --border:#d0dacf;
+    --surface-l2:#dbd5c8; --bg-brand-disable:#77b691;
+    --shadow-m:1px 4px 25px 2px rgba(13,13,18,.05); --shadow-l:1px 4px 25px 2px rgba(13,13,18,.2);
+    --radius:16px; --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:30px 40px;padding:40px 24px 60px;}
+
+  .lede{flex:1 0 100%;text-align:center;max-width:820px;margin:0 auto 8px;}
+  .lede h1{font-family:var(--serif);font-size:25px;font-weight:600;color:var(--ink);margin:0 0 6px;}
+  .lede p{font-size:13px;color:var(--muted);margin:0;line-height:1.55;}
+  .lede .flag{display:inline-block;margin-top:10px;font-size:11.5px;color:#8a6a1c;background:#f6ecd1;border:1px solid #e9d9ad;border-radius:999px;padding:5px 12px;}
+
+  .row{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-start;gap:48px;padding:0 24px;overflow-x:auto;width:100%;}
+  .panel{display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0;}
+  .cap{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.03em;text-align:center;max-width:390px;line-height:1.5;color:#6a665b;}
+  .cap b{color:#23271f;font-size:12.5px;}
+
+  /* device */
+  .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45);}
+  .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:50;}
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+
+  .sb{flex:0 0 47px;padding:18px 26px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);z-index:20;}
+  .sb .r{display:inline-flex;gap:6px;align-items:center;} .sb svg{width:17px;height:11px;fill:var(--ink);} .sb .bat{width:25px;}
+
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:4px 16px 10px;}
+  .ibtn{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1px solid var(--border);
+    display:grid;place-items:center;cursor:pointer;flex-shrink:0;box-shadow:var(--shadow-m);}
+  .ibtn svg{width:20px;height:20px;fill:var(--ink);}
+  .top .tt{flex:1;line-height:1.1;text-align:center;}
+  .top .tt .t{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);}
+  .top .sp{width:40px;flex-shrink:0;}
+
+  .body{flex:1 1 auto;overflow-y:auto;padding:6px 16px 24px;position:relative;}
+  .body::-webkit-scrollbar{display:none;}
+
+  .ph{display:inline-block;} .ph svg{display:block;width:100%;height:100%;fill:currentColor;}
+
+  /* ===== shared subgroup patterns ===== */
+  .sec-lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:14px 0 8px;}
+  .sec-lbl:first-child{margin-top:2px;}
+  .sub-row{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:14px;padding:11px 13px;box-shadow:var(--shadow-m);margin-bottom:8px;}
+  .sub-ic{width:40px;height:40px;border-radius:12px;background:var(--brand-light);color:var(--brand);display:grid;place-items:center;flex-shrink:0;}
+  .sub-ic svg{width:20px;height:20px;}
+  .sub-tx{flex:1;min-width:0;}
+  .sub-tx .n{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sub-tx .m{font-size:12px;color:var(--muted);margin-top:1px;}
+  .pill{flex-shrink:0;border:none;border-radius:999px;padding:8px 14px;font-family:var(--serif);font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  .pill.join{background:var(--brand);color:#fff;box-shadow:0 2px 8px rgba(24,99,56,.25);}
+  .pill.req{background:var(--surface-l2);color:var(--muted);font-family:var(--sans);font-weight:600;cursor:default;}
+  .empty-note{font-size:12.5px;color:var(--muted);font-style:italic;padding:2px 2px 6px;}
+  .create-row{display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px dashed var(--brand-border);border-radius:14px;padding:12px;margin-top:6px;color:var(--brand);cursor:pointer;}
+  .create-row svg{width:16px;height:16px;}
+  .create-row span{font-family:var(--serif);font-size:13.5px;font-weight:500;}
+
+  /* ===== A: accordion ===== */
+  .grp-card{background:var(--surface);border-radius:18px;box-shadow:var(--shadow-m);margin-bottom:12px;overflow:hidden;}
+  .grp-head{display:flex;align-items:center;gap:12px;padding:16px;cursor:pointer;}
+  .grp-head .gi{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);}
+  .grp-head .gs{font-size:12px;color:var(--muted);margin-top:1px;}
+  .grp-head .car{margin-left:auto;width:20px;height:20px;color:var(--muted);transition:transform .2s ease;flex-shrink:0;}
+  .grp-card.open .grp-head .car{transform:rotate(180deg);}
+  .grp-body{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+  .grp-card.open .grp-body{max-height:900px;}
+  .grp-body .inner{padding:0 16px 16px;}
+
+  /* ===== B: tabs ===== */
+  .tabbar{display:flex;gap:8px;overflow-x:auto;padding:4px 0 14px;}
+  .tabbar::-webkit-scrollbar{display:none;}
+  .tabchip{flex:0 0 auto;font-family:var(--sans);font-size:13.5px;font-weight:600;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:9px 16px;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow-m);}
+  .tabchip.on{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  /* ===== C: continuous + sticky ===== */
+  .sticky-grp{position:sticky;top:0;background:var(--bg);z-index:5;padding:10px 0 4px;margin:0 -2px;}
+  .sticky-grp .gi{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);}
+  .sticky-grp .gs{font-size:12px;color:var(--muted);margin-top:1px;}
+  .grp-block{margin-bottom:8px;}
+  .grp-sep{height:1px;background:var(--border);margin:14px 0 4px;}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Manage Subgroups — 3 layout directions</h1>
+  <p>Plus button di chat list → langsung ke halaman ini (bukan dropdown). Terminologi final: "subgroups" (bukan "clubs"). Tiap primary group (Kiker First Grade, Kiker Kindergarten) punya section "Groups you're in" + "Groups you can join" + create action sendiri — supaya jelas subgroup baru masuk grup mana. Data di sini fiktif untuk demo layout, bukan roster asli.</p>
+  <div class="flag">Pilih satu arah → lanjut desain sub-screen "Create new subgroup"</div>
+</div>
+
+<div class="row">
+
+<!-- ============ A: ACCORDION ============ -->
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+
+      <div class="top">
+        <div class="ibtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span></div>
+        <div class="tt"><div class="t">Manage Subgroups</div></div>
+        <div class="sp"></div>
+      </div>
+
+      <div class="body">
+        <div class="grp-card open" id="acc-1">
+          <div class="grp-head" onclick="document.getElementById('acc-1').classList.toggle('open')">
+            <div><div class="gi">Kiker First Grade</div><div class="gs">1 subgroup joined</div></div>
+            <span class="ph car"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32"/></svg></span>
+          </div>
+          <div class="grp-body"><div class="inner">
+            <div class="sec-lbl">Groups you're in</div>
+            <div class="sub-row"><div class="sub-ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="sub-tx"><div class="n">Room Parents 1A</div><div class="m">24 members</div></div></div>
+
+            <div class="sec-lbl">Groups you can join</div>
+            <div class="sub-row"><div class="sub-ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="sub-tx"><div class="n">Soccer Club</div><div class="m">18 members</div></div><button class="pill join">Tap to join</button></div>
+            <div class="sub-row"><div class="sub-ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="sub-tx"><div class="n">Book Club</div><div class="m">9 members</div></div><span class="pill req">Requested</span></div>
+
+            <div class="create-row"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8h-80v80a8 8 0 0 1-16 0v-80H40a8 8 0 0 1 0-16h80V40a8 8 0 0 1 16 0v80h80a8 8 0 0 1 8 8"/></svg></span><span>Create new subgroup for Kiker First Grade</span></div>
+          </div></div>
+        </div>
+
+        <div class="grp-card" id="acc-2">
+          <div class="grp-head" onclick="document.getElementById('acc-2').classList.toggle('open')">
+            <div><div class="gi">Kiker Kindergarten</div><div class="gs">Not joined yet</div></div>
+            <span class="ph car"><svg viewBox="0 0 256 256"><path d="m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32"/></svg></span>
+          </div>
+          <div class="grp-body"><div class="inner">
+            <div class="sec-lbl">Groups you're in</div>
+            <div class="empty-note">You haven't joined a subgroup here yet.</div>
+
+            <div class="sec-lbl">Groups you can join</div>
+            <div class="sub-row"><div class="sub-ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="sub-tx"><div class="n">Craft Club</div><div class="m">12 members</div></div><button class="pill join">Tap to join</button></div>
+            <div class="sub-row"><div class="sub-ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="sub-tx"><div class="n">Morning Drop-off Crew</div><div class="m">31 members</div></div><button class="pill join">Tap to join</button></div>
+
+            <div class="create-row"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8h-80v80a8 8 0 0 1-16 0v-80H40a8 8 0 0 1 0-16h80V40a8 8 0 0 1 16 0v80h80a8 8 0 0 1 8 8"/></svg></span><span>Create new subgroup for Kiker Kindergarten</span></div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cap"><b>A — Accordion per grup.</b> Tiap primary group jadi card collapsible, grup pertama expanded default. Scroll pendek walau banyak grup, tapi butuh 1 tap extra untuk buka grup lain.</div>
+</div>
+
+<!-- ============ B: TABS ============ -->
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+
+      <div class="top">
+        <div class="ibtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span></div>
+        <div class="tt"><div class="t">Manage Subgroups</div></div>
+        <div class="sp"></div>
+      </div>
+
+      <div class="body">
+        <div class="tabbar" id="tabbar-b">
+          <span class="tabchip on" onclick="showTab('b','kiker-1st',this)">Kiker First Grade</span>
+          <span class="tabchip" onclick="showTab('b','kiker-k',this)">Kiker Kindergarten</span>
+        </div>
+
+        <div class="tab-panel active" data-group="kiker-1st" id="b-kiker-1st">
+          <div class="sec-lbl">Groups you're in</div>
+          <div class="sub-row"><div class="sub-ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="sub-tx"><div class="n">Room Parents 1A</div><div class="m">24 members</div></div></div>
+
+          <div class="sec-lbl">Groups you can join</div>
+          <div class="sub-row"><div class="sub-ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="sub-tx"><div class="n">Soccer Club</div><div class="m">18 members</div></div><button class="pill join">Tap to join</button></div>
+          <div class="sub-row"><div class="sub-ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="sub-tx"><div class="n">Book Club</div><div class="m">9 members</div></div><span class="pill req">Requested</span></div>
+
+          <div class="create-row"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8h-80v80a8 8 0 0 1-16 0v-80H40a8 8 0 0 1 0-16h80V40a8 8 0 0 1 16 0v80h80a8 8 0 0 1 8 8"/></svg></span><span>Create new subgroup for Kiker First Grade</span></div>
+        </div>
+
+        <div class="tab-panel" data-group="kiker-k" id="b-kiker-k">
+          <div class="sec-lbl">Groups you're in</div>
+          <div class="empty-note">You haven't joined a subgroup here yet.</div>
+
+          <div class="sec-lbl">Groups you can join</div>
+          <div class="sub-row"><div class="sub-ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="sub-tx"><div class="n">Craft Club</div><div class="m">12 members</div></div><button class="pill join">Tap to join</button></div>
+          <div class="sub-row"><div class="sub-ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="sub-tx"><div class="n">Morning Drop-off Crew</div><div class="m">31 members</div></div><button class="pill join">Tap to join</button></div>
+
+          <div class="create-row"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8h-80v80a8 8 0 0 1-16 0v-80H40a8 8 0 0 1 0-16h80V40a8 8 0 0 1 16 0v80h80a8 8 0 0 1 8 8"/></svg></span><span>Create new subgroup for Kiker Kindergarten</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cap"><b>B — Tabs per grup.</b> Pill tab switch di atas, cuma 1 grup keliatan sekaligus. Halaman pendek & fokus, tapi nggak bisa lihat overview semua grup tanpa tap tab dulu.</div>
+</div>
+
+<!-- ============ C: CONTINUOUS + STICKY ============ -->
+<div class="panel">
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="sb"><span>9:41</span><span class="r">
+        <svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+        <svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>
+        <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg>
+      </span></div>
+
+      <div class="top">
+        <div class="ibtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span></div>
+        <div class="tt"><div class="t">Manage Subgroups</div></div>
+        <div class="sp"></div>
+      </div>
+
+      <div class="body">
+        <div class="grp-block">
+          <div class="sticky-grp"><div class="gi">Kiker First Grade</div><div class="gs">1 subgroup joined</div></div>
+          <div class="sec-lbl">Groups you're in</div>
+          <div class="sub-row"><div class="sub-ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="sub-tx"><div class="n">Room Parents 1A</div><div class="m">24 members</div></div></div>
+
+          <div class="sec-lbl">Groups you can join</div>
+          <div class="sub-row"><div class="sub-ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="sub-tx"><div class="n">Soccer Club</div><div class="m">18 members</div></div><button class="pill join">Tap to join</button></div>
+          <div class="sub-row"><div class="sub-ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="sub-tx"><div class="n">Book Club</div><div class="m">9 members</div></div><span class="pill req">Requested</span></div>
+
+          <div class="create-row"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8h-80v80a8 8 0 0 1-16 0v-80H40a8 8 0 0 1 0-16h80V40a8 8 0 0 1 16 0v80h80a8 8 0 0 1 8 8"/></svg></span><span>Create new subgroup for Kiker First Grade</span></div>
+        </div>
+
+        <div class="grp-sep"></div>
+
+        <div class="grp-block">
+          <div class="sticky-grp"><div class="gi">Kiker Kindergarten</div><div class="gs">Not joined yet</div></div>
+          <div class="sec-lbl">Groups you're in</div>
+          <div class="empty-note">You haven't joined a subgroup here yet.</div>
+
+          <div class="sec-lbl">Groups you can join</div>
+          <div class="sub-row"><div class="sub-ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="sub-tx"><div class="n">Craft Club</div><div class="m">12 members</div></div><button class="pill join">Tap to join</button></div>
+          <div class="sub-row"><div class="sub-ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M164.38 181.1a52 52 0 1 0-72.76 0 75.9 75.9 0 0 0-30 28.89 12 12 0 0 0 20.78 12 53 53 0 0 1 91.22 0 12 12 0 1 0 20.78-12 75.9 75.9 0 0 0-30.02-28.89M100 144a28 28 0 1 1 28 28 28 28 0 0 1-28-28"/></svg></span></div><div class="sub-tx"><div class="n">Morning Drop-off Crew</div><div class="m">31 members</div></div><button class="pill join">Tap to join</button></div>
+
+          <div class="create-row"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8h-80v80a8 8 0 0 1-16 0v-80H40a8 8 0 0 1 0-16h80V40a8 8 0 0 1 16 0v80h80a8 8 0 0 1 8 8"/></svg></span><span>Create new subgroup for Kiker Kindergarten</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cap"><b>C — Continuous scroll + sticky header.</b> Semua grup dalam satu scroll, header nama grup sticky. Paling gampang scan sekali jalan; scroll ke bawah untuk lihat efek sticky di device ini.</div>
+</div>
+
+</div>
+
+<script>
+function showTab(prefix, groupId, chipEl){
+  var bar = chipEl.parentElement;
+  bar.querySelectorAll('.tabchip').forEach(function(c){ c.classList.toggle('on', c===chipEl); });
+  var body = bar.parentElement;
+  body.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.toggle('active', p.dataset.group===groupId); });
+}
+</script>
+</body>
+</html>

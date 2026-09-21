@@ -1,0 +1,42 @@
+/* Native scroll supplies the timeline; the document remains fully navigable. */
+.day-scroll-track { width: 100%; }
+.scroll-story .day-scroll-track { margin-top: 5rem; height: 280svh; }
+.scroll-story .day-panel {
+  position: sticky;
+  top: 7rem;
+  height: calc(100svh - 8rem);
+  min-height: 32rem;
+  margin-top: 0;
+  opacity: 1;
+  translate: none;
+}
+.scroll-story .day-viewport {
+  height: calc(100% - 5.5rem);
+  overflow: hidden;
+  scroll-snap-type: none;
+}
+.scroll-story .day-slides {
+  transform: translate3d(calc(var(--day-shift, 0) * -66.6667%), 0, 0);
+  will-change: transform;
+}
+.scroll-story .day-view {
+  height: 100%;
+  padding: 1.5rem clamp(2rem, 5vw, 5rem) 0;
+}
+.scroll-story .day-device { height: 100%; align-items: flex-start; }
+.scroll-story .day-device img { width: auto; height: 100%; max-width: 90%; object-fit: contain; }
+.scroll-story .day-copy h3 { font-size: clamp(2rem, 3.4vw, 3.8rem); }
+.scroll-story .day-copy ul { margin-top: 1.25rem; }
+.scroll-story .day-tabs { position: relative; overflow: hidden; }
+.scroll-story .day-tabs::after {
+  content: ''; position: absolute; bottom: 0; left: 0;
+  width: 100%; height: 2px; background: var(--green);
+  transform: scaleX(var(--day-progress, 0)); transform-origin: left;
+}
+.scroll-motion .hand-stage { translate: 0 var(--hero-drift, 0px); }
+.scroll-motion .memory-photo { inset: -4rem 0; translate: 0 var(--photo-drift, 0px); }
+.scroll-motion .memory-phone { translate: 0 var(--phone-drift, 0px); }
+.scroll-motion .product-device { translate: 0 var(--device-drift, 0px); }
+@media (prefers-reduced-motion: reduce) {
+  .hand-stage, .memory-photo, .memory-phone, .product-device { translate: none !important; }
+}

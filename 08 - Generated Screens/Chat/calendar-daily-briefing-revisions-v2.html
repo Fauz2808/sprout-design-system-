@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Daily Brief + Notes — Revision v2 · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff; --field:#e8e2d6;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e; --green:#186338; --brand-mid:#4fa472;
+    --brand-light:#e2e9e3; --brand-border:#77b691; --border-light:#d0dacf; --border:#e6e7ea;
+    --amber:#c08a2d; --amber-light:#fbf0d8; --red:#b23b3b; --orange:#c9691f;
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:34px 44px;padding:34px 26px 70px;}
+
+  /* ═══ page header ═══ */
+  .sheet-head{flex:1 0 100%;max-width:1180px;}
+  .sheet-head h1{font-family:var(--serif);font-size:22px;font-weight:600;color:#23271f;margin:0 0 4px;}
+  .sheet-head .meta{font-size:12px;color:#6a665b;margin:0 0 16px;}
+  .src{display:flex;flex-wrap:wrap;gap:10px;}
+  .src-card{flex:1 1 300px;background:#fffdf8;border:1px solid #ded7c7;border-left:3px solid var(--amber);border-radius:10px;padding:10px 13px;}
+  .src-card .who{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--amber);margin-bottom:5px;}
+  .src-card q{display:block;font-size:12px;color:#3f4a41;line-height:1.55;font-style:italic;}
+  .src-card .where{font-size:10.5px;color:#8d8778;margin-top:6px;font-family:ui-monospace,Menlo,monospace;}
+  .src-card.done{border-left-color:var(--brand-mid);}
+  .src-card.done .who{color:var(--green);}
+
+  /* ═══ panels ═══ */
+  .panel{display:flex;flex-direction:column;align-items:flex-start;gap:14px;width:393px;}
+  .panel-head{width:100%;}
+  .panel-head .tag{display:inline-flex;font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);background:var(--amber-light);padding:3px 9px;border-radius:99px;margin-bottom:7px;}
+  .panel-head h2{font-family:var(--serif);font-size:16px;font-weight:600;color:#23271f;margin:0 0 5px;}
+  .panel-head p{font-size:12px;color:#6a665b;margin:0;line-height:1.55;}
+  .orderdiff{display:flex;gap:10px;margin-top:11px;}
+  .orderdiff > div{flex:1;background:#fffdf8;border:1px solid #ded7c7;border-radius:9px;padding:9px 11px;}
+  .orderdiff h4{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9a9483;margin:0 0 6px;}
+  .orderdiff ol{margin:0;padding-left:16px;font-size:11px;color:#5c6459;line-height:1.7;}
+  .orderdiff .new h4{color:var(--green);}
+  .orderdiff .new ol{color:var(--ink);font-weight:500;}
+  .orderdiff s{color:#b3aa97;}
+
+  .device{position:relative;width:393px;border-radius:54px;overflow:hidden;background:var(--bg);
+    box-shadow:0 0 0 1px rgba(0,0,0,.07),0 24px 80px rgba(0,0,0,.22);display:flex;flex-direction:column;}
+  .device.h852{height:852px;}
+  .device.tall{height:auto;min-height:852px;}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:20px;z-index:10;}
+  .sb{height:44px;flex-shrink:0;padding:14px 26px 0;display:flex;justify-content:space-between;font-size:15px;font-weight:600;color:var(--ink);}
+  .scroll{flex:1;overflow-y:auto;padding:0 18px 26px;}
+  .scroll.noscroll{overflow:visible;}
+  .scroll::-webkit-scrollbar{display:none;}
+  .homebar{height:26px;flex-shrink:0;display:grid;place-items:center;}
+  .homebar i{display:block;width:134px;height:5px;border-radius:3px;background:#1d1d1d;opacity:.85;}
+
+  /* ═══ DAILY BRIEF ═══ */
+  .db-top{display:flex;align-items:center;gap:10px;padding:10px 0 16px;}
+  .db-back{width:34px;height:34px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:grid;place-items:center;flex-shrink:0;color:var(--ink);font-size:16px;}
+  .db-titlewrap{flex:1;text-align:center;}
+  .db-title{font-family:var(--serif);font-size:16.5px;font-weight:600;color:var(--ink);}
+  .db-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+  .db-sub .school{color:var(--green);font-weight:700;}
+  .db-cal-ic{width:34px;height:34px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:grid;place-items:center;flex-shrink:0;font-size:15px;}
+
+  .db-greet{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+  .db-greet-sub{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--body);margin-bottom:16px;}
+
+  .db-weather{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--brand-border);border-radius:14px;padding:13px 15px;}
+  .db-weather .ic{font-size:26px;}
+  .db-weather .loc{font-size:13.5px;font-weight:700;color:var(--ink);}
+  .db-weather .desc{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.4;}
+  .db-weather .temp{margin-left:auto;font-size:12px;color:var(--muted);text-align:right;flex-shrink:0;}
+
+  .db-div{height:1px;background:var(--border-light);margin:16px 0;}
+  .db-section{}
+  .db-section-t{font-size:11.5px;font-weight:700;color:var(--ink);margin-bottom:9px;display:flex;align-items:center;gap:6px;}
+  .db-line{font-size:12.5px;color:var(--body);padding:4px 0;line-height:1.5;}
+  .db-line b{color:var(--ink);}
+  .db-line a{color:var(--green);text-decoration:underline;font-weight:600;}
+
+  /* to-do: checkbox for plain reminders, CTA row (reusing .up-row/.chev) for anything with a link — per Tony's ruling 2026-09-10 */
+  .todo-item{display:flex;align-items:center;gap:10px;padding:6px 0;}
+  .todo-check{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border-light);flex-shrink:0;}
+  .todo-tx{flex:1;min-width:0;}
+  .todo-t{font-size:12.5px;color:var(--ink);font-weight:600;}
+  .todo-s{font-size:11.5px;color:var(--muted);margin-top:1px;}
+  .db-lunch-hdr{font-size:11.5px;font-weight:700;color:var(--ink);margin-bottom:9px;}
+  .db-lunch-hdr .school{color:var(--green);}
+
+  /* ═══ Happening today — full-day items on top (extra gap), timed items below in a chronological rail ═══ */
+  .hd-group{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;}
+  .hd-row{display:flex;gap:8px;align-items:center;}
+  /* label always reads "Today" — color is the only signal: red = cautionary (no school), green = neutral/positive all-day, per Tony's ruling 2026-09-10 */
+  .hd-label{flex:0 0 52px;font-size:11px;font-weight:600;text-align:right;}
+  .hd-label.danger{color:var(--red);}
+  .hd-label.special{color:var(--green);}
+  .hd-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .hd-dot.danger{background:var(--red);}
+  .hd-dot.special{background:var(--green);}
+  .hd-card{flex:1;min-width:0;background:var(--card);border-left:3px solid;border-radius:12px;padding:8px 12px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+  .hd-card.danger{border-left-color:var(--red);}
+  .hd-card.special{border-left-color:var(--green);}
+  .hd-title{font-family:var(--serif);font-size:14px;font-weight:600;}
+  .hd-title.danger{color:var(--red);}
+  .hd-title.special{color:var(--ink);}
+  .hd-desc{font-size:11.5px;color:var(--muted);margin-top:1px;}
+
+  .hd-timeline{display:flex;flex-direction:column;}
+  .hd-t-item{display:flex;gap:8px;position:relative;padding-bottom:12px;}
+  .hd-t-item:last-child{padding-bottom:0;}
+  .hd-t-label{flex:0 0 52px;font-size:11px;font-weight:600;color:var(--ink);text-align:right;padding-top:9px;}
+  .hd-t-rail{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:7px;}
+  .hd-t-dot{width:7px;height:7px;border-radius:50%;background:var(--green);margin-top:9px;flex-shrink:0;}
+  .hd-t-line{width:1px;flex:1;background:var(--border-light);margin-top:2px;}
+  .hd-t-item:last-child .hd-t-line{display:none;}
+  .hd-t-card{flex:1;min-width:0;background:var(--card);border-left:3px solid var(--brand-mid);border-radius:12px;padding:8px 12px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+  .hd-t-title{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink);}
+  .hd-t-desc{font-size:11.5px;color:var(--muted);margin-top:1px;}
+
+  .db-carpool-card{background:var(--brand-light);border:1px solid var(--brand-border);border-radius:14px;padding:12px 14px;display:flex;gap:11px;align-items:center;}
+  .db-carpool-card .ic{width:36px;height:36px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+  .db-carpool-card .t{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.4;}
+  .db-carpool-card .s{font-size:11px;color:var(--green);margin-top:2px;font-weight:600;}
+
+  .db-up-row{display:flex;gap:10px;padding:5px 0;align-items:baseline;}
+  .db-up-row .dt{flex:0 0 74px;font-size:11.5px;font-weight:700;color:var(--ink);}
+  .db-up-row .tx{flex:1;font-size:12.5px;color:var(--body);line-height:1.45;}
+
+  .db-bday-card{background:var(--amber-light);border:1px solid #e8d2a0;border-radius:14px;padding:12px 14px;display:flex;gap:11px;align-items:center;margin-bottom:8px;}
+  .db-bday-card .ic{font-size:22px;}
+  .db-bday-card .t{font-size:13px;font-weight:700;color:#8a6a1f;}
+  .db-bday-card .s{font-size:11.5px;color:#a08543;margin-top:1px;}
+  .db-bday-row{font-size:12.5px;color:var(--body);padding:3px 0;}
+  .db-bday-row b{color:var(--ink);}
+
+  /* ═══ NOTES / CALENDAR ═══ */
+  .n-hdr{padding:10px 0 12px;display:flex;align-items:center;gap:10px;}
+  .n-hdr .avatar{width:38px;height:38px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-family:var(--serif);font-size:14px;font-weight:600;flex-shrink:0;}
+  .n-hdr .nm{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);}
+  .n-hdr .sb2{font-size:11px;color:var(--muted);margin-top:1px;}
+  .n-hdr .pen{margin-left:auto;width:34px;height:34px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:grid;place-items:center;font-size:14px;}
+
+  .n-tabs{display:flex;border-bottom:1px solid var(--border-light);margin-bottom:14px;}
+  .n-tab{flex:1;text-align:center;padding:0 0 9px;font-size:11.5px;font-weight:600;color:var(--muted);position:relative;}
+  .n-tab .ic{display:block;font-size:15px;margin-bottom:4px;}
+  .n-tab.on{color:var(--ink);}
+  .n-tab.on::after{content:'';position:absolute;bottom:-1px;left:22%;right:22%;height:2px;border-radius:2px;background:var(--green);}
+  .n-tab .badge{position:absolute;top:-3px;right:24%;min-width:15px;height:15px;border-radius:99px;background:var(--red);color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center;padding:0 4px;}
+
+  .cal-top{display:flex;align-items:center;gap:8px;padding:2px 0 10px;}
+  .cal-month{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink);}
+  .cal-expand{width:32px;height:32px;border-radius:9px;background:var(--field);display:grid;place-items:center;font-size:12px;color:var(--ink);}
+  .cal-nav{display:flex;gap:8px;margin-left:auto;}
+  .cal-nav div{width:32px;height:32px;border-radius:50%;background:var(--field);display:grid;place-items:center;color:var(--ink);font-size:13px;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;margin-bottom:8px;}
+  .cal-grid .dow{font-size:11px;font-weight:700;color:var(--muted);padding-bottom:6px;}
+  .cal-grid .day{font-size:13px;color:var(--ink);padding:9px 0;border-radius:10px;position:relative;}
+  .cal-grid .day.today{background:var(--ink);color:#fff;font-weight:700;}
+  .cal-grid .day.dim{color:#c7c0af;}
+  .cal-grid .day.has-note::after{content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#8a6a4a;}
+  .cal-grid .day.today.has-note::after{background:#fff;}
+  .cal-grid .day.noschool::after{background:var(--red);}
+  .cal-legend{display:flex;gap:16px;font-size:10.5px;color:var(--muted);padding:4px 0 13px;border-bottom:1px solid var(--border-light);margin-bottom:14px;flex-wrap:wrap;}
+  .cal-legend span{display:inline-flex;align-items:center;gap:5px;}
+  .cal-legend i{width:8px;height:8px;border-radius:2px;display:block;}
+
+  .n-list-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;}
+  .n-list-hdr .d{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);}
+  .n-list-hdr .sub{font-size:11px;color:var(--muted);margin-top:2px;}
+  .addnote{display:inline-flex;align-items:center;gap:5px;background:var(--green);color:#fff;font-family:var(--serif);font-size:12.5px;font-weight:600;padding:9px 15px;border-radius:99px;flex-shrink:0;}
+
+  .daygroup{margin-bottom:16px;}
+  .daylabel{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+  .daylabel::after{content:'';flex:1;height:1px;background:var(--border-light);}
+  .daylabel.is-today{color:var(--green);}
+
+  .note-card{background:var(--card);border-left:3px solid var(--green);border-radius:10px;padding:11px 13px;margin-bottom:9px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+  .note-t{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+  .note-b{font-size:12px;color:var(--body);line-height:1.5;}
+  .note-b b{color:var(--ink);}
+  .note-list{margin:4px 0 0;padding-left:0;list-style:none;font-size:12px;color:var(--body);}
+  .note-list li{padding:1px 0;}
+  .note-by{font-size:10.5px;color:var(--muted);text-align:right;margin-top:7px;}
+
+  .up-row{background:var(--card);border-left:3px solid var(--border-light);border-radius:9px;padding:10px 12px;margin-bottom:7px;box-shadow:0 1px 3px rgba(0,0,0,.03);display:flex;align-items:center;gap:10px;}
+  .up-row .body{flex:1;}
+  .up-t{font-size:12.5px;font-weight:700;color:var(--ink);}
+  .up-s{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4;}
+  .up-row .chev{color:#c2bcae;font-size:14px;flex-shrink:0;}
+
+  .type-special{border-left-color:var(--amber)!important;}
+  .type-noschool{border-left-color:var(--red)!important;}
+  .type-todo{border-left-color:#3d7a40!important;}
+  .type-lunch{border-left-color:var(--orange)!important;}
+  .type-event{border-left-color:var(--green)!important;}
+  .type-carpool{border-left-color:var(--brand-mid)!important;}
+
+  .callout{background:var(--brand-light);border:1px dashed var(--brand-border);border-radius:10px;padding:10px 12px;font-size:11px;color:var(--green);margin-top:12px;line-height:1.55;}
+  .callout b{color:#0f4526;}
+  .callout.warn{background:var(--amber-light);border-color:#e0c689;color:#7d5c17;}
+  .callout.warn b{color:#5f4510;}
+</style>
+</head>
+<body>
+
+<div class="sheet-head">
+  <h1>Daily Brief + Notes — revision v2</h1>
+  <p class="meta">Source: Figma comments on section <b>10768:141552</b> ("Implemented and Set on Room Parents Dashboard") · read 2026-09-03 · supersedes <i>calendar-daily-briefing-revisions.html</i></p>
+  <div class="src">
+    <div class="src-card">
+      <div class="who">Tony Martin · Daily Brief · open</div>
+      <q>Let's move birthdays down. Let's start with 'Happening Today', Carpool, Then Today's lunch, Reminders, To-do, Upcoming events, then the last thing is birthdays.</q>
+      <div class="where">pinned on 10290:184591 · 2026-09-02 15:04</div>
+    </div>
+    <div class="src-card">
+      <div class="who">Tony Martin · Daily Brief · open</div>
+      <q>Let's remove the tomorrow UI to simplify. Now that we have Upcoming events in the daily brief I don't think we need a tomorrow button.</q>
+      <div class="where">pinned on 10290:184591 · 2026-09-02 15:21</div>
+    </div>
+    <div class="src-card done">
+      <div class="who">Tony Martin · Notes · resolved</div>
+      <q>I would put the emojis in this as well.</q>
+      <div class="where">pinned on 10290:182846 · 2026-08-25 00:28</div>
+    </div>
+    <div class="src-card">
+      <div class="who">Tony Martin &amp; Ahmad · Team call · 2026-09-09</div>
+      <q>Let's add anything that's a full day or that's just no school... it's the first thing you see, and then you have the other things below those. — Ahmad: at the top and also create like different spacing, more space.</q>
+      <div class="where">Roomparent progress call · applied to Happening today below</div>
+    </div>
+    <div class="src-card">
+      <div class="who">Tony Martin · Figma comment · open</div>
+      <q>Let's try and use a similar UI as happening today above. But it will show the day's in big text (like we do in the subgroup calendar)</q>
+      <div class="where">pinned on 11546:196777 · 2026-09-08 19:26 · applied to Upcoming events below</div>
+    </div>
+    <div class="src-card">
+      <div class="who">Tony Martin · Figma comment · open</div>
+      <q>Move birthdays above the New messages section.</q>
+      <div class="where">pinned on 11546:196777 · 2026-09-08 19:27 · applied below</div>
+    </div>
+    <div class="src-card">
+      <div class="who">Tony Martin · Live review · 2026-09-10</div>
+      <q>I would not say full day, I would just say today... if it wasn't a no school thing, it's not gonna be red — if it was just like water day, it would say today in green with a green dot.</q>
+      <div class="where">Data &amp; Daily Brief UX call · applied to Happening today below</div>
+    </div>
+    <div class="src-card">
+      <div class="who">Tony Martin · Live review · 2026-09-10</div>
+      <q>Anything with a link, I guess, we would use that CTA type of UI because I still have to do something to get that done... bring towels for water day, I just need to check it off.</q>
+      <div class="where">Data &amp; Daily Brief UX call · applied to To do below</div>
+    </div>
+    <div class="src-card">
+      <div class="who">Tony Martin · Live review · 2026-09-10</div>
+      <q>We don't need the to do because that's gonna live in the reminders and to do thing — you can remove that.</q>
+      <div class="where">Data &amp; Daily Brief UX call · applied to Upcoming events below</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PANEL 1 — DAILY BRIEF, REORDERED ══════════ -->
+<div class="panel">
+  <div class="panel-head">
+    <span class="tag">Daily Brief</span>
+    <h2>Reordered to Tony's sequence, Tomorrow tab gone</h2>
+    <p>Both open comments applied in one screen. The Today/Tomorrow segmented control is deleted — <b>Upcoming events</b> now carries the forward-looking job, so the brief is a single scroll again. Weather stays pinned under the greeting as day context, not as a section. Carpool is a new section, sitting second, right after Happening today.</p>
+    <div class="orderdiff">
+      <div>
+        <h4>Before</h4>
+        <ol>
+          <li><s>Tomorrow tab</s></li>
+          <li>Birthdays</li>
+          <li>Happening today</li>
+          <li>Today's Lunch</li>
+          <li>Reminders</li>
+          <li>To do</li>
+          <li>New messages</li>
+        </ol>
+      </div>
+      <div class="new">
+        <h4>After</h4>
+        <ol>
+          <li>Happening today <i>(full-day items on top, per 2026-09-09 call)</i></li>
+          <li>Carpool</li>
+          <li>Today's Lunch</li>
+          <li>To do</li>
+          <li>Upcoming events <i>(day-label cards, per Figma comment)</i></li>
+          <li>Birthdays <i>(moved up, per Figma comment)</i></li>
+          <li>New messages</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <div class="device tall">
+    <div class="island"></div>
+    <div class="sb"><span>9:41</span><span>🔋</span></div>
+    <div class="scroll noscroll">
+      <div class="db-top">
+        <div class="db-back">‹</div>
+        <div class="db-titlewrap">
+          <div class="db-title">Sprout AI</div>
+          <div class="db-sub"><span class="school">Kiker Elementary</span> · 7:31 AM</div>
+        </div>
+        <div class="db-cal-ic">📅</div>
+      </div>
+
+      <div class="db-greet">Good morning, James.</div>
+      <div class="db-greet-sub">Here's your Wednesday:</div>
+
+      <div class="db-weather">
+        <div class="ic">☀️</div>
+        <div>
+          <div class="loc">Austin, TX · Sunny</div>
+          <div class="desc">T-shirt by afternoon — light jacket this morning</div>
+        </div>
+        <div class="temp">68–86°</div>
+      </div>
+
+      <div class="db-div"></div>
+      <div class="db-section">
+        <div class="db-section-t">🎪 Happening today</div>
+        <div class="hd-group">
+          <div class="hd-row">
+            <div class="hd-label danger">Today</div>
+            <div class="hd-dot danger"></div>
+            <div class="hd-card danger">
+              <div class="hd-title danger">No School</div>
+              <div class="hd-desc">Kindergarten</div>
+            </div>
+          </div>
+          <div class="hd-row">
+            <div class="hd-label special">Today</div>
+            <div class="hd-dot special"></div>
+            <div class="hd-card special">
+              <div class="hd-title special">Pizza Day</div>
+              <div class="hd-desc">1st Grade</div>
+            </div>
+          </div>
+        </div>
+        <div class="hd-timeline">
+          <div class="hd-t-item">
+            <div class="hd-t-label">8:30 am</div>
+            <div class="hd-t-rail"><div class="hd-t-dot"></div><div class="hd-t-line"></div></div>
+            <div class="hd-t-card"><div class="hd-t-title">Talent Show</div><div class="hd-t-desc">Kindergarten</div></div>
+          </div>
+          <div class="hd-t-item">
+            <div class="hd-t-label">3:30 pm</div>
+            <div class="hd-t-rail"><div class="hd-t-dot"></div><div class="hd-t-line"></div></div>
+            <div class="hd-t-card"><div class="hd-t-title">Soccer practice</div><div class="hd-t-desc">Little Shots</div></div>
+          </div>
+          <div class="hd-t-item">
+            <div class="hd-t-label">6:00 pm</div>
+            <div class="hd-t-rail"><div class="hd-t-dot"></div></div>
+            <div class="hd-t-card"><div class="hd-t-title">Parent-teacher night</div><div class="hd-t-desc">1st Grade</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="db-div"></div>
+      <div class="db-section">
+        <div class="db-section-t">🚗 Carpool</div>
+        <div class="db-carpool-card">
+          <div class="ic">🚗</div>
+          <div>
+            <div class="t">You're covering pick-up for Mia today</div>
+            <div class="s">3:00 pm · Kiker Elementary — tap for details →</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="db-div"></div>
+      <div class="db-section">
+        <div class="db-lunch-hdr">🍔 Today's Lunch – (<span class="school">Kiker Elementary</span>)</div>
+        <div class="db-line">1. Hamburger 🍔 🍟</div>
+        <div class="db-line">2. Rebellyous Burger 🍔</div>
+        <div class="db-line">3. SunButter &amp; Jelly Sandwich 🥪 🍇</div>
+      </div>
+
+      <div class="db-div"></div>
+      <div class="db-section">
+        <div class="db-section-t">✅ To do</div>
+        <div class="up-row type-todo" style="margin-bottom:8px;"><div class="body"><div class="up-t">📝 Sign Jake's permission slip</div><div class="up-s">1st Grade · opens the form</div></div><div class="chev">›</div></div>
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-tx"><div class="todo-t">Confirm snacks for parent-teacher night</div><div class="todo-s">Kindergarten</div></div>
+        </div>
+        <div class="up-row type-todo" style="margin-top:8px;"><div class="body"><div class="up-t">📝 RSVP: Surfing at Second Point</div><div class="up-s">Expires today · opens the form</div></div><div class="chev">›</div></div>
+      </div>
+
+      <div class="db-div"></div>
+      <div class="db-section">
+        <div class="db-section-t">📅 Upcoming events</div>
+        <div class="daygroup" style="margin-bottom:12px;">
+          <div class="daylabel">Thu, May 14</div>
+          <div class="up-row type-carpool"><div class="body"><div class="up-t">🚗 Carpool drop-off · Mia</div><div class="up-s">Sarah's kid</div></div><div class="chev">›</div></div>
+        </div>
+        <div class="daygroup" style="margin-bottom:12px;">
+          <div class="daylabel">Fri, May 15</div>
+          <div class="up-row type-event"><div class="body"><div class="up-t">🎪 Field Day</div><div class="up-s">3rd Grade</div></div><div class="chev">›</div></div>
+        </div>
+        <div class="daygroup" style="margin-bottom:12px;">
+          <div class="daylabel">Mon, May 18</div>
+          <div class="up-row type-event"><div class="body"><div class="up-t">📚 Book Fair begins</div><div class="up-s">All Grades</div></div><div class="chev">›</div></div>
+        </div>
+        <div class="daygroup" style="margin-bottom:0;">
+          <div class="daylabel">Tue, May 19</div>
+          <div class="up-row type-event"><div class="body"><div class="up-t">🎵 Spring Concert</div><div class="up-s">Kindergarten</div></div><div class="chev">›</div></div>
+        </div>
+      </div>
+
+      <div class="db-div"></div>
+      <div class="db-section">
+        <div class="db-section-t">🎂 Birthdays</div>
+        <div class="db-bday-card">
+          <div class="ic">🎂</div>
+          <div><div class="t">Kennedy turns 4 today!</div><div class="s">Say happy birthday at drop-off 👋</div></div>
+        </div>
+        <div class="db-bday-row"><b>Presley (6)</b> — June 6th</div>
+        <div class="db-bday-row"><b>Rome (1)</b> — June 7th</div>
+      </div>
+
+      <div class="db-div"></div>
+      <div class="db-section">
+        <div class="db-section-t">💬 New messages</div>
+        <div class="db-line">2 unread in <a href="#">Kindergarten</a></div>
+        <div class="db-line">1 message from <a href="#">Sarah Chen</a></div>
+      </div>
+
+      <div class="callout"><b>New messages moved below Birthdays:</b> per Tony's Figma comment on 2026-09-08 — "Move birthdays above the New messages section" — settling the earlier open question about where New messages belongs.</div>
+      <div class="callout"><b>Upcoming events restyled:</b> per Tony's comment on this same section — "use a similar UI as happening today above, but show the day's in big text like the subgroup calendar" — now reuses the day-label + card pattern from the Notes/Calendar tab (Panel 2/3) instead of the small inline date column.</div>
+      <div class="callout"><b>Reminders section removed:</b> per the 2026-09-09 call, No School and Pizza Day now live in Happening today as full-day cards, and the Little Shots soccer note was already the same event as the 3:30 pm entry above it — so all three lines that used to sit under Reminders are now accounted for elsewhere. Say the word if Reminders should stay for a different kind of note.</div>
+      <div class="callout"><b>"Full Day" renamed to "Today":</b> per Tony reviewing this live on 2026-09-10 — "I would not say full day, I would just say today... if it wasn't a no school thing, it's not gonna be red, if it was just like water day it would say today in green with a green dot." Label text no longer carries the meaning — color does: red = cautionary (No School), green = neutral/positive all-day (Pizza Day and anything like it).</div>
+      <div class="callout"><b>To do now splits by link:</b> per the same review — "anything with a link, we would use that CTA type of UI because I still have to do something to get that done" vs. a plain reminder that's just check-it-off. Sign Jake's permission slip and the surfing RSVP both open a form, so they're CTA rows (reusing the Upcoming-events card style); confirming snacks is a plain checkbox.</div>
+      <div class="callout"><b>Yearbook line removed from Upcoming events:</b> per the same review — "we don't need the to do because that's gonna live in the reminders and to do thing" — a to-do-flavored item doesn't belong mixed into Upcoming events, so "Last day to order yearbooks" is cut from this section (it can live in To do instead if it still needs surfacing).</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PANEL 2 — NOTES, UPCOMING (DEFAULT) ══════════ -->
+<div class="panel">
+  <div class="panel-head">
+    <span class="tag">Notes · Calendar tab</span>
+    <h2>Notes open on Upcoming, not on one single day</h2>
+    <p>Same simplification as the brief, applied to Notes: no per-day gate. The month strip stays for picking a date to write a note on, but what reads below is every note and event in chronological order, grouped by day — so the Calendar tab and the brief's <b>Upcoming events</b> section are the same list at two depths. Every type carries a leading emoji, and the left border colour-codes it.</p>
+  </div>
+  <div class="device tall">
+    <div class="island"></div>
+    <div class="sb"><span>9:41</span><span>🔋</span></div>
+    <div class="scroll noscroll">
+      <div class="n-hdr">
+        <div class="avatar">MT</div>
+        <div><div class="nm">Miss Taylor Class</div><div class="sb2">10 members</div></div>
+        <div class="pen">✎</div>
+      </div>
+      <div class="n-tabs">
+        <div class="n-tab"><span class="ic">💬</span>Chat</div>
+        <div class="n-tab on"><span class="ic">🗓</span>Calendar</div>
+        <div class="n-tab"><span class="ic">✉️</span>Updates<span class="badge">2</span></div>
+        <div class="n-tab"><span class="ic">📌</span>Links</div>
+      </div>
+
+      <div class="cal-top">
+        <div class="cal-month">May 2026</div>
+        <div class="cal-expand">⤢</div>
+        <div class="cal-nav"><div>‹</div><div>›</div></div>
+      </div>
+      <div class="cal-grid">
+        <div class="dow">S</div><div class="dow">M</div><div class="dow">T</div><div class="dow">W</div><div class="dow">T</div><div class="dow">F</div><div class="dow">S</div>
+        <div class="day dim">10</div><div class="day dim">11</div><div class="day dim">12</div>
+        <div class="day today has-note">13</div><div class="day has-note">14</div><div class="day has-note">15</div><div class="day">16</div>
+      </div>
+      <div class="cal-legend">
+        <span><i style="background:var(--ink)"></i>Today</span>
+        <span><i style="background:var(--red)"></i>No school</span>
+        <span><i style="background:#8a6a4a"></i>Has notes</span>
+      </div>
+
+      <div class="n-list-hdr">
+        <div>
+          <div class="d">Upcoming</div>
+          <div class="sub">Next 7 days · Miss Taylor Class</div>
+        </div>
+        <div class="addnote">+ Add Note</div>
+      </div>
+
+      <div class="daygroup">
+        <div class="daylabel is-today">Today · Wed, May 13</div>
+        <div class="up-row type-special"><div class="body"><div class="up-t">📝 Art Exhibition</div><div class="up-s">11 AM – 6 PM · by James Martin</div></div><div class="chev">›</div></div>
+        <div class="up-row type-carpool"><div class="body"><div class="up-t">🚗 Carpool pick-up · Mia</div><div class="up-s">3:00 pm · you're driving</div></div><div class="chev">›</div></div>
+        <div class="up-row type-lunch"><div class="body"><div class="up-t">🍔 Today's Lunch</div><div class="up-s">Hamburger · Rebellyous Burger · SunButter &amp; Jelly</div></div><div class="chev">›</div></div>
+        <div class="up-row type-todo"><div class="body"><div class="up-t">✅ Field Trip Permission Slip</div><div class="up-s">Due back Friday · by Veronica Taylor</div></div><div class="chev">›</div></div>
+      </div>
+
+      <div class="daygroup">
+        <div class="daylabel">Thu, May 14</div>
+        <div class="up-row type-carpool"><div class="body"><div class="up-t">🚗 Carpool drop-off · Mia</div><div class="up-s">Sarah Jensen driving</div></div><div class="chev">›</div></div>
+        <div class="up-row type-noschool"><div class="body"><div class="up-t">🚫 No School — Staff Development Day</div><div class="up-s">Kindergarten campus closed</div></div><div class="chev">›</div></div>
+      </div>
+
+      <div class="daygroup">
+        <div class="daylabel">Fri, May 15</div>
+        <div class="up-row type-event"><div class="body"><div class="up-t">🎪 Field Day</div><div class="up-s">3rd Grade · 9:00 am</div></div><div class="chev">›</div></div>
+      </div>
+
+      <div class="daygroup">
+        <div class="daylabel">Mon, May 18</div>
+        <div class="up-row type-event"><div class="body"><div class="up-t">📚 Book Fair begins</div><div class="up-s">All Grades · runs through Friday</div></div><div class="chev">›</div></div>
+      </div>
+
+      <div class="daygroup">
+        <div class="daylabel">Tue, May 19</div>
+        <div class="up-row type-event"><div class="body"><div class="up-t">🎵 Spring Concert</div><div class="up-s">Kindergarten · 6:00 pm</div></div><div class="chev">›</div></div>
+      </div>
+
+      <div class="daygroup">
+        <div class="daylabel">Wed, May 20</div>
+        <div class="up-row type-todo"><div class="body"><div class="up-t">✅ Last day to order yearbooks</div><div class="up-s">No specific time</div></div><div class="chev">›</div></div>
+      </div>
+
+      <div class="callout"><b>Type vocabulary is now shared</b> between Notes and the brief: 📝 Event · 🚗 Carpool · 🍔 Lunch · 🚫 No School · ✅ To-do · 🎪 / 📚 / 🎵 school events. 🚗 Carpool is the new one — it's what feeds the brief's Carpool section.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PANEL 3 — NOTES, SINGLE DAY ══════════ -->
+<div class="panel">
+  <div class="panel-head">
+    <span class="tag">Notes · one day</span>
+    <h2>Tapping a date still drills into that day</h2>
+    <p>Authoring isn't lost. Tap 13 in the month strip and Notes filters to that day with the full note cards — title, body, author — and <b>+ Add Note</b> writes to the date you're standing on. This is the old default view, demoted to a drill-down. Emoji is on every type here too, including the new carpool note.</p>
+  </div>
+  <div class="device tall">
+    <div class="island"></div>
+    <div class="sb"><span>9:41</span><span>🔋</span></div>
+    <div class="scroll noscroll">
+      <div class="n-hdr">
+        <div class="avatar">MT</div>
+        <div><div class="nm">Miss Taylor Class</div><div class="sb2">10 members</div></div>
+        <div class="pen">✎</div>
+      </div>
+      <div class="n-tabs">
+        <div class="n-tab"><span class="ic">💬</span>Chat</div>
+        <div class="n-tab on"><span class="ic">🗓</span>Calendar</div>
+        <div class="n-tab"><span class="ic">✉️</span>Updates<span class="badge">2</span></div>
+        <div class="n-tab"><span class="ic">📌</span>Links</div>
+      </div>
+
+      <div class="cal-top">
+        <div class="cal-month">May 2026</div>
+        <div class="cal-expand">⤢</div>
+        <div class="cal-nav"><div>‹</div><div>›</div></div>
+      </div>
+      <div class="cal-grid">
+        <div class="dow">S</div><div class="dow">M</div><div class="dow">T</div><div class="dow">W</div><div class="dow">T</div><div class="dow">F</div><div class="dow">S</div>
+        <div class="day dim">10</div><div class="day dim">11</div><div class="day dim">12</div>
+        <div class="day today has-note">13</div><div class="day has-note">14</div><div class="day has-note">15</div><div class="day">16</div>
+      </div>
+      <div class="cal-legend">
+        <span><i style="background:var(--ink)"></i>Today</span>
+        <span><i style="background:var(--red)"></i>No school</span>
+        <span><i style="background:#8a6a4a"></i>Has notes</span>
+      </div>
+
+      <div class="n-list-hdr">
+        <div>
+          <div class="d">Wednesday, May 13</div>
+          <div class="sub">4 notes · <span style="color:var(--green);font-weight:600;">back to Upcoming</span></div>
+        </div>
+        <div class="addnote">+ Add Note</div>
+      </div>
+
+      <div class="note-card type-special">
+        <div class="note-t">📝 Art Exhibition</div>
+        <div class="note-b">Explore stunning artworks from local artists! Open from 11 AM to 6 PM.</div>
+        <div class="note-by">By: James Martin</div>
+      </div>
+
+      <div class="note-card type-carpool">
+        <div class="note-t">🚗 Carpool pick-up — Mia</div>
+        <div class="note-b">You're driving today. Pick-up 3:00 pm at the Kiker front loop.</div>
+        <div class="note-by">By: Sarah Jensen</div>
+      </div>
+
+      <div class="note-card type-lunch">
+        <div class="note-t">🍔 Today's Lunch:</div>
+        <div class="note-b"><b>Breakfast:</b></div>
+        <ul class="note-list"><li>Potato, Egg 🥔 &amp; Cheese Taco 🧀</li></ul>
+        <div class="note-b" style="margin-top:6px;"><b>Lunch:</b></div>
+        <ul class="note-list">
+          <li>Hamburger 🍔 🍟</li>
+          <li>Rebellyous Burger 🍔</li>
+          <li>SunButter &amp; Jelly Sandwich 🥪 🍇</li>
+        </ul>
+        <div class="note-by">By: Mohit Rai</div>
+      </div>
+
+      <div class="note-card type-todo">
+        <div class="note-t">✅ Field Trip Permission Slip</div>
+        <div class="note-b">Due back by Friday — sign and return with your child.</div>
+        <div class="note-by">By: Veronica Taylor</div>
+      </div>
+    </div>
+    <div class="homebar"><i></i></div>
+  </div>
+</div>
+
+</body>
+</html>

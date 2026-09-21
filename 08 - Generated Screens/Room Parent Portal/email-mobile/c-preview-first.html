@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Direction C — Preview first</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_shared.css">
+<style>
+  .paper{background:#fff;border:1px solid var(--border);border-radius:16px;padding:6px;margin-bottom:12px}
+  /* every editable region of the email is a tap target */
+  .zone{position:relative;border-radius:11px;padding:11px 38px 11px 12px;cursor:pointer;transition:background .12s}
+  .zone:active{background:#f6f3ec}
+  .zone + .zone{margin-top:2px}
+  .zone .pen{position:absolute;top:11px;right:11px;width:15px;height:15px;stroke:#bdb6a6;
+    fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .zone:active .pen{stroke:var(--green)}
+  .zone h4{font-family:var(--serif);font-size:16px;color:var(--ink);margin:0}
+  .zone .to{font-size:11px;color:var(--muted);margin-top:3px}
+  .zone p{margin:0 0 10px;font-size:13.5px;line-height:1.6;color:var(--body)}
+  .zone p:last-child{margin-bottom:0}
+  .zone.empty{color:var(--muted);font-size:12.5px;font-style:italic}
+  .blkz{margin:2px 0;padding:12px 38px 12px 14px;background:#f8f6f0;border-radius:11px;position:relative;cursor:pointer}
+  .blkz b{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:7px}
+  .blkz div{font-size:12.5px;color:var(--ink);padding:3px 0}
+  .banner{display:flex;align-items:center;gap:9px;background:var(--red-bg);border:1px solid #f0cfc8;
+    border-radius:12px;padding:11px 13px;margin-bottom:12px;cursor:pointer}
+  .banner svg{width:17px;height:17px;stroke:var(--red);fill:none;stroke-width:2;flex-shrink:0}
+  .banner span{font-size:12px;line-height:1.45;color:var(--red);font-weight:600}
+  .tohint{font-size:11px;color:var(--muted);text-align:center;padding:2px 0 10px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="_data.js"></script>
+<script>
+let sheet = null;   // 'details' | 'subject' | 'events' | 'links' | 'recipients'
+
+const PEN = '<svg class="pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3Z"/><path d="M14 6l4 4"/></svg>';
+
+function sheetContent(){
+  if (sheet === 'details') return {
+    title:'Template details',
+    body:`<div class="note">Every red gap in the email fills in from these.</div>${TPL_FIELDS.map(fieldRow).join('')}`};
+  if (sheet === 'subject') return {
+    title:'Subject',
+    body:`<div class="field"><label>Subject line</label>
+            <input type="text" value="${state.subject}" oninput="state.subject=this.value" onchange="render()"></div>`};
+  if (sheet === 'events') return {
+    title:'Events to include',
+    body:EVENTS.map(e => pickRow(state.events[e.id], e.t, e.d,
+          `state.events[${e.id}]=!state.events[${e.id}];render()`)).join('')};
+  if (sheet === 'links') return {
+    title:'Links to include',
+    body:LINKS.map(l => pickRow(state.links[l.id], l.t, l.u,
+          `state.links[${l.id}]=!state.links[${l.id}];render()`)).join('')};
+  if (sheet === 'recipients') return {
+    title:'Who gets this',
+    body:RECIPIENTS.map(r => pickRow(state.recipient===r.v, r.l, r.m,
+          `state.recipient='${r.v}';render()`, true)).join('')};
+  return {title:'', body:''};
+}
+
+function render(){
+  const miss = missingFields();
+  const ev = chosenEvents(), lk = chosenLinks();
+  const sc = sheetContent();
+
+  document.getElementById('app').outerHTML = `<div id="app" style="display:contents">
+    ${chrome()}
+    <div class="scroll">
+      ${miss.length ? `<div class="banner" onclick="sheet='details';render()">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+          <span>${miss.length} detail${miss.length>1?'s':''} still missing. Tap to fill them in.</span></div>` : ''}
+
+      <div class="paper">
+        <div class="zone" onclick="sheet='subject';render()">
+          ${PEN}<h4>${state.subject}</h4>
+          <div class="to">from Tony Martin</div>
+        </div>
+
+        <div class="zone" onclick="sheet='details';render()">
+          ${PEN}${bodyHtml()}
+        </div>
+
+        <div class="blkz" onclick="sheet='events';render()">
+          ${PEN}<b>Coming up</b>
+          ${ev.length ? ev.map(e=>`<div>${e.t} · ${e.d}</div>`).join('')
+                      : '<div style="color:var(--muted)">No events included</div>'}
+        </div>
+
+        <div class="blkz" onclick="sheet='links';render()">
+          ${PEN}<b>Links</b>
+          ${lk.length ? lk.map(l=>`<div>${l.t}</div>`).join('')
+                      : '<div style="color:var(--muted)">No links included</div>'}
+        </div>
+      </div>
+      <div class="tohint">Tap any part of the email to edit it.</div>
+    </div>
+
+    <div class="dock">
+      <span class="grow sum" onclick="sheet='recipients';render()" style="cursor:pointer">
+        <b>${recipientLabel()}</b>Tap to change who gets this</span>
+      <button class="btn btn-primary" ${miss.length?'disabled':''}
+        onclick="alert('Sent to ' + recipientLabel() + '.\\n\\nNothing left the portal until this tap.')">Send</button>
+    </div>
+    ${tabbar()}
+
+    <div class="sheet-wrap ${sheet?'open':''}" onclick="if(event.target===this){sheet=null;render()}">
+      <div class="sheet">
+        <div class="sheet-head"><h3>${sc.title}</h3>
+          <button class="x" onclick="sheet=null;render()"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+        </div>
+        <div class="sheet-body">${sc.body}</div>
+        <div class="sheet-foot">
+          <button class="btn btn-primary btn-full" onclick="sheet=null;render()">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+render();
+</script>
+</body>
+</html>

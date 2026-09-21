@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Direction A — Invitation Card · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#f4f1ea; --surface:#ffffff; --field:#e8e2d6;
+  --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e; --subtlest:#818898;
+  --brand:#186338; --brand-bold:#1e3e2b; --brand-mid:#579a74; --brand-light:#e2e9e3;
+  --border:#d0dacf; --line:#e3ded2; --l1:#eae6db; --l2:#dbd5c8; --gold:#aa9e83;
+  --shadow-m:1px 4px 25px 2px rgba(13,13,18,.05);
+  --shadow-l:1px 4px 25px 2px rgba(13,13,18,.2);
+  --radius:16px;
+  --serif:'Playfair Display',Georgia,serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+}
+.h1{font-family:var(--serif);font-weight:500;font-size:30px;line-height:39px}
+.h2{font-family:var(--serif);font-weight:500;font-size:24px;line-height:36px}
+.h3{font-family:var(--serif);font-weight:500;font-size:18px;line-height:25.2px}
+.h4{font-family:var(--serif);font-weight:500;font-size:16px;line-height:24px}
+.h5{font-family:var(--serif);font-weight:500;font-size:14px;line-height:22.4px}
+.p2{font-family:var(--sans);font-weight:400;font-size:14px;line-height:21.7px}
+.p3{font-family:var(--sans);font-weight:400;font-size:12px;line-height:18.6px}
+.s2{font-family:var(--sans);font-weight:500;font-size:14px;line-height:21.7px}
+.s3{font-family:var(--sans);font-weight:500;font-size:12px;line-height:18.6px}
+.c1{font-family:var(--sans);font-weight:600;font-size:10px;line-height:15.5px}
+body{background:#c9c3b8;font-family:var(--sans);-webkit-font-smoothing:antialiased;padding:36px 34px 70px}
+.lede{max-width:940px;margin:0 auto 30px;text-align:center}
+.lede .tagline{font-size:10px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:#6d6759;margin-bottom:9px}
+.lede h1{font-family:var(--serif);font-size:28px;font-weight:600;color:#23271f;margin-bottom:9px;line-height:1.25}
+.lede p{font-size:13.5px;color:#55503f;line-height:1.62}
+.row{display:flex;gap:38px;align-items:flex-end;width:max-content;margin:0 auto;padding-bottom:10px}
+.panel{width:393px;display:flex;flex-direction:column}
+.phead{min-height:92px;margin-bottom:15px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start}
+.phead .k{font-size:9px;font-weight:700;letter-spacing:1.25px;text-transform:uppercase;color:#fff;background:#3d4438;display:inline-block;padding:3.5px 8px;border-radius:5px;margin-bottom:8px}
+.phead .k.warm{background:#8a6a3c}
+.phead h2,.phead p{align-self:stretch}
+.phead h2{font-family:var(--serif);font-size:17.5px;font-weight:600;color:#23271f;margin-bottom:4px;line-height:1.3}
+.phead p{font-size:11.5px;line-height:1.52;color:#55503f}
+.browser{width:393px;height:852px;border-radius:46px;overflow:hidden;background:#f4f3f1;position:relative;
+  display:flex;flex-direction:column;
+  box-shadow:0 0 0 11px #16161a,0 0 0 12.5px #414147,0 26px 54px -14px rgba(0,0,0,.45)}
+.island{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:33px;background:#000;border-radius:999px;z-index:70}
+.bstat{flex:0 0 auto;padding:16px 26px 0;display:flex;justify-content:space-between;align-items:center;height:30px;
+  font-size:14.5px;font-weight:600;color:#16161a;letter-spacing:.1px}
+.bstat .r{display:flex;gap:5px;align-items:center}
+.bstat svg{fill:#16161a}
+.bstat .bat{width:25px;height:12px}
+.bback{flex:0 0 auto;padding:1px 20px 0;font-size:14px;font-weight:500;color:#0a7cff;display:flex;align-items:center;gap:3px}
+.bback svg{width:9px;height:11px;fill:#0a7cff}
+.urlbar{flex:0 0 auto;margin:9px 10px 10px;height:38px;border-radius:11px;background:#e5e4e2;
+  display:flex;align-items:center;justify-content:space-between;padding:0 13px}
+.urlbar .u{font-size:15px;color:#16161a;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+.urlbar .ic{width:17px;height:17px;color:#57575c}
+.viewport{flex:1 1 auto;overflow-y:auto;background:var(--bg);position:relative}
+.viewport::-webkit-scrollbar{display:none}
+.btoolbar{flex:0 0 auto;height:72px;background:#f4f3f1;border-top:.5px solid rgba(0,0,0,.13);
+  display:flex;align-items:flex-start;justify-content:space-between;padding:14px 27px 0}
+.btoolbar .ic{width:21px;height:21px;color:#0a7cff}
+.btoolbar .ic.dim{color:#b6b6ba}
+.tabsq{width:19px;height:19px;border:2px solid #0a7cff;border-radius:5px;display:grid;place-items:center;
+  font-size:9px;font-weight:700;color:#0a7cff;margin-top:1px}
+.homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:140px;height:5px;border-radius:3px;background:#16161a;opacity:.9;z-index:70}
+.ph,.ic{display:inline-block}
+.ph svg,.ic svg{display:block;width:100%;height:100%;fill:currentColor}
+.crest{border-radius:50%;background:#6b1f2a;display:grid;place-items:center;flex-shrink:0;
+  box-shadow:inset 0 0 0 2px #c9a227,inset 0 0 0 3.5px #6b1f2a,inset 0 0 0 5px #c9a227}
+.crest span{font-family:var(--serif);font-weight:700;color:#f7f2e6;letter-spacing:-1px}
+.av{border-radius:50%;background:linear-gradient(150deg,#1e3e2b,#579a74);display:grid;place-items:center;
+  color:#fff;font-family:var(--sans);font-weight:600;flex-shrink:0}
+.appbanner{background:var(--brand-bold);padding:11px 16px;display:flex;align-items:center;gap:11px}
+.appbanner .ico{width:34px;height:34px;border-radius:9px;background:#f4f1ea;display:grid;place-items:center;font-size:18px;flex-shrink:0}
+.appbanner .tx{flex:1;min-width:0}
+.appbanner .t1{font-size:12.5px;font-weight:600;color:#fff;line-height:1.3}
+.appbanner .t2{font-size:10.5px;color:#a9c4b3;line-height:1.4;margin-top:1px}
+.appbanner .op{background:#f4f1ea;color:var(--brand-bold);font-family:var(--serif);font-weight:600;font-size:12.5px;
+  padding:7px 15px;border-radius:99px;flex-shrink:0}
+.btn{width:100%;border:none;border-radius:var(--radius);padding:16px;font-family:var(--serif);font-size:16px;font-weight:600;
+  background:var(--brand);color:#fff;cursor:pointer;box-shadow:var(--shadow-l);display:flex;align-items:center;justify-content:center;gap:8px}
+.btn.ghost{background:transparent;color:var(--brand);box-shadow:none;border:1.5px solid var(--border);padding:14px}
+.btn .ic{width:18px;height:18px}
+.txtlink{display:block;text-align:center;font-size:12.5px;font-weight:500;color:var(--muted);text-decoration:underline;
+  text-underline-offset:2.5px;margin-top:12px}
+.sfoot{border-top:1px solid var(--line);margin-top:26px;padding:18px 0 26px;display:flex;align-items:center;gap:9px;justify-content:center}
+.sfoot .mk{width:22px;height:22px;border-radius:6px;background:var(--brand-light);display:grid;place-items:center;font-size:12px}
+.sfoot .t{font-size:10.5px;color:var(--subtlest)}
+.sfoot .t b{font-family:var(--serif);font-weight:600;color:var(--muted);font-size:11.5px}
+.photo{border-radius:14px;overflow:hidden;position:relative;
+  background:linear-gradient(180deg,#cfe1e9 0%,#dfeadb 34%,#93b978 36%,#6b9a56 72%,#4f7d41 100%)}
+.photo::after{content:'';position:absolute;top:13%;right:15%;width:34px;height:34px;border-radius:50%;
+  background:radial-gradient(circle,#fdf3d0,rgba(253,243,208,0));opacity:.9}
+.photo .hint{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:20px;opacity:.5}
+
+/* ── direction-specific ── */
+
+.pgA{padding:22px 26px 0}
+.crestrow{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.crestrow .crest{width:46px;height:46px}
+.crestrow .crest span{font-size:16px}
+.crestrow .cn{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--brand);line-height:1.4}
+.crestrow .cs{font-family:var(--serif);font-style:italic;font-size:13.5px;color:var(--muted);line-height:1.35;margin-top:1px}
+.ruleA{height:1px;background:var(--border);border:0}
+.titleA{font-family:var(--serif);font-weight:600;font-size:34px;line-height:38px;color:var(--ink);letter-spacing:-.5px;margin:19px 0 19px}
+.whenA{padding-top:17px}
+.whenA .d1{font-size:10px;font-weight:700;letter-spacing:2.3px;text-transform:uppercase;color:var(--gold)}
+.whenA .d2{font-family:var(--serif);font-weight:600;font-size:25px;line-height:31px;color:var(--ink);margin:4px 0 1px}
+.whenA .d3{font-size:13.5px;font-weight:500;color:var(--body)}
+.whereA{margin:17px 0 18px}
+.whereA .w1{font-family:var(--serif);font-weight:600;font-size:16.5px;color:var(--ink);line-height:1.3}
+.whereA .w2{font-size:12px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:5px}
+.whereA .w2 .ic{color:var(--gold)}
+.bandA{height:146px;margin-bottom:20px}
+.hostA{display:flex;align-items:center;gap:9px;justify-content:center;margin-top:15px}
+.hostA .av{width:26px;height:26px;font-size:10px}
+.hostA .t{font-size:12px;color:var(--muted)}
+.hostA .t b{font-weight:600;color:var(--body)}
+.secA{margin-top:30px}
+.secA .lbl{font-size:9.5px;font-weight:700;letter-spacing:1.9px;text-transform:uppercase;color:var(--gold);
+  display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.secA .lbl::after{content:'';flex:1;height:1px;background:var(--border)}
+.dl{display:grid;grid-template-columns:78px 1fr;row-gap:11px;column-gap:14px}
+.dl dt{font-size:10px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--subtlest);padding-top:3px}
+.dl dd{font-size:13.5px;line-height:20px;color:var(--body)}
+.goingA{display:flex;align-items:center;gap:12px}
+.stack{display:flex}
+.stack .av{width:34px;height:34px;font-size:12px;border:2px solid var(--bg);margin-left:-10px}
+.stack .av:first-child{margin-left:0}
+.stack .more{width:34px;height:34px;border-radius:50%;background:var(--l1);border:2px solid var(--bg);margin-left:-10px;
+  display:grid;place-items:center;font-size:10.5px;font-weight:600;color:var(--muted)}
+.goingA .gt{font-size:12.5px;color:var(--muted);line-height:1.45}
+.goingA .gt b{font-weight:600;color:var(--body)}
+.proseA{font-size:13.5px;line-height:22px;color:var(--body)}
+.duoA{display:flex;gap:10px;margin-top:20px}
+.duoA .btn.ghost{font-size:13.5px;padding:13px 8px;gap:7px}
+.signed{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:14px;font-size:11.5px;color:var(--subtlest)}
+.signed .av{width:20px;height:20px;font-size:8.5px}
+
+.kickA{font-size:10px;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:var(--gold);margin:16px 0 7px}
+.tagA{font-family:var(--serif);font-style:italic;font-size:15px;line-height:23px;color:var(--muted);margin:17px 0}
+.statrail{display:flex;padding:15px 0}
+.statrail>div{flex:1;text-align:center;border-right:1px solid var(--border)}
+.statrail>div:last-child{border-right:0}
+.statrail .n{font-family:var(--serif);font-weight:600;font-size:21px;color:var(--ink);line-height:1.2}
+.statrail .l{font-size:9.5px;font-weight:600;letter-spacing:1.1px;text-transform:uppercase;color:var(--subtlest);margin-top:3px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0 20px}
+.chip{border:1px solid var(--border);border-radius:99px;padding:5.5px 12px;font-size:11.5px;font-weight:500;color:var(--muted);background:#faf8f3}
+.evrow{display:flex;align-items:center;gap:13px;padding:11px 0;border-bottom:1px solid var(--line)}
+.evrow:last-child{border-bottom:0}
+.evrow .dt{width:42px;text-align:center;flex-shrink:0}
+.evrow .dt .m{display:block;font-size:9.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--gold)}
+.evrow .dt .d{display:block;font-family:var(--serif);font-weight:600;font-size:20px;color:var(--ink);line-height:1.15}
+.evrow .ev{flex:1;min-width:0}
+.evrow .en{font-family:var(--serif);font-weight:600;font-size:14.5px;color:var(--ink);line-height:1.35}
+.evrow .em{font-size:11.5px;color:var(--muted);margin-top:1px}
+.evrow .cr{color:var(--border);flex-shrink:0}
+
+</style>
+</head>
+<body>
+<div class="lede">
+  <div class="tagline">Sprout · public share page · app.joinsprout.co</div>
+  <h1>Direction A — Invitation Card</h1>
+  <p>The link is treated like a paper invite, not an app screen. No app chrome at the top. Above the fold the page answers <b>what, when, where</b> in one typographic block. Playfair does the work, the club logo shrinks to a crest, and the photo becomes a band instead of the hero. One green CTA. Everything else is proof, below the fold.</p>
+</div>
+<div class="row">
+<div class="panel">
+  <div class="phead"><span class="k">Event · cold</span><h2>Event detail, visitor has no Sprout app</h2><p>The default case: a link forwarded into a group text. Fold carries crest, title, date block, venue, band, RSVP. No sign-in wall, no app-chrome header stealing the top row.</p></div>
+  <div class="browser">
+  <div class="island"></div>
+  <div class="bstat"><span>12:17</span><span class="r">
+  <svg width="18" height="12" viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+  <svg width="17" height="12" viewBox="0 0 18 12"><path d="M9 3.2c2.5 0 4.8 1 6.5 2.7l-1.4 1.4A7.2 7.2 0 0 0 9 5.3 7.2 7.2 0 0 0 3.9 7.3L2.5 5.9A9.2 9.2 0 0 1 9 3.2Zm0 4.1c1.3 0 2.6.5 3.5 1.5l-1.4 1.4A3 3 0 0 0 9 9.3a3 3 0 0 0-2.1.9L5.5 8.8A5 5 0 0 1 9 7.3Z"/></svg>
+  <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2.4" fill="none" stroke="#16161a" stroke-opacity=".38"/><rect x="2.6" y="3.6" width="6" height="4.8" rx="1.2"/><rect x="22.2" y="4.6" width="1.6" height="3"/></svg>
+</span></div>
+  <div class="bback"><svg viewBox="0 0 9 12"><path d="M8 0.8 2.6 6 8 11.2 6.9 12 0.6 6 6.9 0z"/></svg>Messages</div>
+  <div class="urlbar">
+  <span class="ic" style="width:17px;height:17px"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88ZM137 164.22a8 8 0 0 0-4.74 4.74L112 223.85 91.78 169a8 8 0 0 0-4.78-4.78L32.15 144 87 123.78a8 8 0 0 0 4.78-4.78L112 64.15 132.22 119a8 8 0 0 0 4.74 4.74L191.85 144ZM144 40a8 8 0 0 1 8-8h16V16a8 8 0 0 1 16 0v16h16a8 8 0 0 1 0 16h-16v16a8 8 0 0 1-16 0V48h-16a8 8 0 0 1-8-8m104 48a8 8 0 0 1-8 8h-8v8a8 8 0 0 1-16 0v-8h-8a8 8 0 0 1 0-16h8v-8a8 8 0 0 1 16 0v8h8a8 8 0 0 1 8 8"/></svg></span>
+  <span class="u">app.joinsprout.co</span>
+  <span class="ic" style="width:17px;height:17px;color:#57575c"><svg viewBox="0 0 256 256"><path d="M176 104h-24a8 8 0 0 1 0-16h24a16 16 0 0 1 16 16v88a16 16 0 0 1-16 16H80a16 16 0 0 1-16-16v-88a16 16 0 0 1 16-16h24a8 8 0 0 1 0 16H80v88h96Zm-53.66-42.34a8 8 0 0 0 11.32 0L152 43.31V144a8 8 0 0 0 16 0V43.31l18.34 18.35a8 8 0 0 0 11.32-11.32l-32-32a8 8 0 0 0-11.32 0l-32 32a8 8 0 0 0 0 11.32"/></svg></span>
+</div>
+  <div class="viewport"><div class="pgA">
+  <div class="crestrow"><div class="crest" style="width:46px;height:46px"><span style="font-size:17px">CC</span></div>
+    <div><div class="cn">Circle C Dads</div><div class="cs">invites you to</div></div>
+  </div>
+  <hr class="ruleA">
+  <h1 class="titleA">Dads' Golf<br>Scramble</h1>
+  <hr class="ruleA">
+  <div class="whenA">
+    <div class="d1">Saturday</div>
+    <div class="d2">September 19</div>
+    <div class="d3">8:00 – 11:30 AM</div>
+  </div>
+  <div class="whereA">
+    <div class="w1">Grey Rock Golf Club</div>
+    <div class="w2"><span class="ic " style="width:13px;height:13px"><svg viewBox="0 0 256 256"><path d="M128 64a40 40 0 1 0 40 40 40 40 0 0 0-40-40m0 64a24 24 0 1 1 24-24 24 24 0 0 1-24 24m0-112a88.1 88.1 0 0 0-88 88c0 31.4 14.51 64.68 42 96.25a254.2 254.2 0 0 0 41.45 38.3 8 8 0 0 0 9.18 0 254.2 254.2 0 0 0 41.37-38.3c27.45-31.57 42-64.85 42-96.25a88.1 88.1 0 0 0-88-88m0 206c-16.53-13-72-60.75-72-118a72 72 0 0 1 144 0c0 57.23-55.47 105-72 118"/></svg></span>7401 Highway 45, Austin TX</div>
+  </div>
+  <div class="photo bandA"><div class="hint">⛳</div></div>
+  <button class="btn">RSVP</button>
+  <div class="hostA"><div class="av" style="width:26px;height:26px;font-size:10px">TM</div><div class="t">Hosted by <b>Tony Martin</b></div></div>
+  
+  <div class="secA">
+    <div class="lbl">Who's in</div>
+    <div class="goingA">
+      <div class="stack"><div class="av" style="width:34px;height:34px;font-size:13px">TM</div><div class="av" style="width:34px;height:34px;font-size:13px;background:linear-gradient(150deg,#7e6154,#b39e95)">DR</div><div class="av" style="width:34px;height:34px;font-size:13px;background:linear-gradient(150deg,#234a63,#3a7ca5)">JC</div><div class="av" style="width:34px;height:34px;font-size:13px;background:linear-gradient(150deg,#375337,#5c8a5c)">MK</div><div class="more">+8</div></div>
+      <div class="gt"><b>12 dads</b> are playing<br>4 spots left before the tee sheet closes</div>
+    </div>
+  </div>
+  <div class="secA">
+    <div class="lbl">The particulars</div>
+    <dl class="dl">
+      <dt>Format</dt><dd>Four-man scramble, shotgun start at 8:00 sharp.</dd>
+      <dt>Green fee</dt><dd>$45 per player — cart and range balls included.</dd>
+      <dt>Bring</dt><dd>Clubs, sunscreen, and a competitive streak.</dd>
+      <dt>After</dt><dd>Breakfast tacos on the patio. Stick around.</dd>
+    </dl>
+  </div>
+  <div class="secA">
+    <div class="lbl">From Tony</div>
+    <p class="proseA">All skill levels welcome — we're here for the hang, not the handicap. If you've never played, we'll put you with someone who has. Rain date is the following Saturday.</p>
+  </div>
+  <div class="duoA">
+    <button class="btn ghost"><span class="ic " style="width:18px;height:18px"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160zm-48-56a8 8 0 0 1-8 8h-16v16a8 8 0 0 1-16 0v-16h-16a8 8 0 0 1 0-16h16v-16a8 8 0 0 1 16 0v16h16a8 8 0 0 1 8 8"/></svg></span>Add to calendar</button>
+    <button class="btn ghost"><span class="ic " style="width:18px;height:18px"><svg viewBox="0 0 256 256"><path d="M176 160a39.9 39.9 0 0 0-28.62 12.09l-46.1-29.63a39.8 39.8 0 0 0 0-28.92l46.1-29.63a40 40 0 1 0-8.66-13.45l-46.1 29.63a40 40 0 1 0 0 55.82l46.1 29.63A40 40 0 1 0 176 160m0-128a24 24 0 1 1-24 24 24 24 0 0 1 24-24M64 152a24 24 0 1 1 24-24 24 24 0 0 1-24 24m112 72a24 24 0 1 1 24-24 24 24 0 0 1-24 24"/></svg></span>Share</button>
+  </div>
+</div><div class="sfoot" style="margin:26px 26px 0"><div class="mk">🍀</div>
+  <div class="t">This event lives in <b>Sprout</b> · joinsprout.co</div></div></div>
+  <div class="btoolbar">
+  <span class="ic" style="width:21px;height:21px;color:#0a7cff"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span>
+  <span class="ic dim" style="width:21px;height:21px;color:#b6b6ba"><svg viewBox="0 0 256 256"><path d="m221.66 133.66-72 72a8 8 0 0 1-11.32-11.32L196.69 136H40a8 8 0 0 1 0-16h156.69l-58.35-58.34a8 8 0 0 1 11.32-11.32l72 72a8 8 0 0 1 0 11.32"/></svg></span>
+  <span class="ic" style="width:21px;height:21px;color:#0a7cff"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8h-80v80a8 8 0 0 1-16 0v-80H40a8 8 0 0 1 0-16h80V40a8 8 0 0 1 16 0v80h80a8 8 0 0 1 8 8"/></svg></span>
+  <span class="tabsq">29</span>
+  <span class="ic" style="width:21px;height:21px;color:#0a7cff"><svg viewBox="0 0 256 256"><path d="M156 128a28 28 0 1 1-28-28 28 28 0 0 1 28 28M48 100a28 28 0 1 0 28 28 28 28 0 0 0-28-28m160 0a28 28 0 1 0 28 28 28 28 0 0 0-28-28"/></svg></span>
+</div>
+  <div class="homebar"></div>
+</div>
+</div>
+<div class="panel">
+  <div class="phead"><span class="k warm">Event · has app</span><h2>Event detail, Sprout is installed</h2><p>Green banner under the URL bar hands the visitor off to the app. Primary CTA flips to <b>Open in Sprout</b>; RSVP-in-browser stays available as a text link. Identity is known, so no form is ever shown.</p></div>
+  <div class="browser">
+  <div class="island"></div>
+  <div class="bstat"><span>12:17</span><span class="r">
+  <svg width="18" height="12" viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+  <svg width="17" height="12" viewBox="0 0 18 12"><path d="M9 3.2c2.5 0 4.8 1 6.5 2.7l-1.4 1.4A7.2 7.2 0 0 0 9 5.3 7.2 7.2 0 0 0 3.9 7.3L2.5 5.9A9.2 9.2 0 0 1 9 3.2Zm0 4.1c1.3 0 2.6.5 3.5 1.5l-1.4 1.4A3 3 0 0 0 9 9.3a3 3 0 0 0-2.1.9L5.5 8.8A5 5 0 0 1 9 7.3Z"/></svg>
+  <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2.4" fill="none" stroke="#16161a" stroke-opacity=".38"/><rect x="2.6" y="3.6" width="6" height="4.8" rx="1.2"/><rect x="22.2" y="4.6" width="1.6" height="3"/></svg>
+</span></div>
+  <div class="bback"><svg viewBox="0 0 9 12"><path d="M8 0.8 2.6 6 8 11.2 6.9 12 0.6 6 6.9 0z"/></svg>Messages</div>
+  <div class="urlbar">
+  <span class="ic" style="width:17px;height:17px"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88ZM137 164.22a8 8 0 0 0-4.74 4.74L112 223.85 91.78 169a8 8 0 0 0-4.78-4.78L32.15 144 87 123.78a8 8 0 0 0 4.78-4.78L112 64.15 132.22 119a8 8 0 0 0 4.74 4.74L191.85 144ZM144 40a8 8 0 0 1 8-8h16V16a8 8 0 0 1 16 0v16h16a8 8 0 0 1 0 16h-16v16a8 8 0 0 1-16 0V48h-16a8 8 0 0 1-8-8m104 48a8 8 0 0 1-8 8h-8v8a8 8 0 0 1-16 0v-8h-8a8 8 0 0 1 0-16h8v-8a8 8 0 0 1 16 0v8h8a8 8 0 0 1 8 8"/></svg></span>
+  <span class="u">app.joinsprout.co</span>
+  <span class="ic" style="width:17px;height:17px;color:#57575c"><svg viewBox="0 0 256 256"><path d="M176 104h-24a8 8 0 0 1 0-16h24a16 16 0 0 1 16 16v88a16 16 0 0 1-16 16H80a16 16 0 0 1-16-16v-88a16 16 0 0 1 16-16h24a8 8 0 0 1 0 16H80v88h96Zm-53.66-42.34a8 8 0 0 0 11.32 0L152 43.31V144a8 8 0 0 0 16 0V43.31l18.34 18.35a8 8 0 0 0 11.32-11.32l-32-32a8 8 0 0 0-11.32 0l-32 32a8 8 0 0 0 0 11.32"/></svg></span>
+</div>
+  <div class="viewport"><div class="appbanner">
+  <div class="ico">🍀</div>
+  <div class="tx"><div class="t1">You have Sprout installed</div><div class="t2">Open this event in the app</div></div>
+  <div class="op">Open</div>
+</div><div class="pgA">
+  <div class="crestrow"><div class="crest" style="width:46px;height:46px"><span style="font-size:17px">CC</span></div>
+    <div><div class="cn">Circle C Dads</div><div class="cs">invites you to</div></div>
+  </div>
+  <hr class="ruleA">
+  <h1 class="titleA">Dads' Golf<br>Scramble</h1>
+  <hr class="ruleA">
+  <div class="whenA">
+    <div class="d1">Saturday</div>
+    <div class="d2">September 19</div>
+    <div class="d3">8:00 – 11:30 AM</div>
+  </div>
+  <div class="whereA">
+    <div class="w1">Grey Rock Golf Club</div>
+    <div class="w2"><span class="ic " style="width:13px;height:13px"><svg viewBox="0 0 256 256"><path d="M128 64a40 40 0 1 0 40 40 40 40 0 0 0-40-40m0 64a24 24 0 1 1 24-24 24 24 0 0 1-24 24m0-112a88.1 88.1 0 0 0-88 88c0 31.4 14.51 64.68 42 96.25a254.2 254.2 0 0 0 41.45 38.3 8 8 0 0 0 9.18 0 254.2 254.2 0 0 0 41.37-38.3c27.45-31.57 42-64.85 42-96.25a88.1 88.1 0 0 0-88-88m0 206c-16.53-13-72-60.75-72-118a72 72 0 0 1 144 0c0 57.23-55.47 105-72 118"/></svg></span>7401 Highway 45, Austin TX</div>
+  </div>
+  <div class="photo bandA"><div class="hint">⛳</div></div>
+  <button class="btn"><span class="ic " style="width:18px;height:18px"><svg viewBox="0 0 256 256"><path d="M224 104a8 8 0 0 1-16 0V59.32l-66.33 66.34a8 8 0 0 1-11.32-11.32L196.68 48H152a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8Zm-40 24a8 8 0 0 0-8 8v72H48V80h72a8 8 0 0 0 0-16H48a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-72a8 8 0 0 0-8-8"/></svg></span>Open in Sprout</button>
+  <a class="txtlink">RSVP here in the browser instead</a>
+  <div class="signed"><div class="av" style="width:20px;height:20px;font-size:8px;background:linear-gradient(150deg,#234a63,#3a7ca5)">MR</div>Signed in as Marcus R.</div>
+  
+  <div class="secA">
+    <div class="lbl">Who's in</div>
+    <div class="goingA">
+      <div class="stack"><div class="av" style="width:34px;height:34px;font-size:13px">TM</div><div class="av" style="width:34px;height:34px;font-size:13px;background:linear-gradient(150deg,#7e6154,#b39e95)">DR</div><div class="av" style="width:34px;height:34px;font-size:13px;background:linear-gradient(150deg,#234a63,#3a7ca5)">JC</div><div class="av" style="width:34px;height:34px;font-size:13px;background:linear-gradient(150deg,#375337,#5c8a5c)">MK</div><div class="more">+8</div></div>
+      <div class="gt"><b>12 dads</b> are playing<br>4 spots left before the tee sheet closes</div>
+    </div>
+  </div>
+  <div class="secA">
+    <div class="lbl">The particulars</div>
+    <dl class="dl">
+      <dt>Format</dt><dd>Four-man scramble, shotgun start at 8:00 sharp.</dd>
+      <dt>Green fee</dt><dd>$45 per player — cart and range balls included.</dd>
+      <dt>Bring</dt><dd>Clubs, sunscreen, and a competitive streak.</dd>
+      <dt>After</dt><dd>Breakfast tacos on the patio. Stick around.</dd>
+    </dl>
+  </div>
+  <div class="secA">
+    <div class="lbl">From Tony</div>
+    <p class="proseA">All skill levels welcome — we're here for the hang, not the handicap. If you've never played, we'll put you with someone who has. Rain date is the following Saturday.</p>
+  </div>
+  <div class="duoA">
+    <button class="btn ghost"><span class="ic " style="width:18px;height:18px"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160zm-48-56a8 8 0 0 1-8 8h-16v16a8 8 0 0 1-16 0v-16h-16a8 8 0 0 1 0-16h16v-16a8 8 0 0 1 16 0v16h16a8 8 0 0 1 8 8"/></svg></span>Add to calendar</button>
+    <button class="btn ghost"><span class="ic " style="width:18px;height:18px"><svg viewBox="0 0 256 256"><path d="M176 160a39.9 39.9 0 0 0-28.62 12.09l-46.1-29.63a39.8 39.8 0 0 0 0-28.92l46.1-29.63a40 40 0 1 0-8.66-13.45l-46.1 29.63a40 40 0 1 0 0 55.82l46.1 29.63A40 40 0 1 0 176 160m0-128a24 24 0 1 1-24 24 24 24 0 0 1 24-24M64 152a24 24 0 1 1 24-24 24 24 0 0 1-24 24m112 72a24 24 0 1 1 24-24 24 24 0 0 1-24 24"/></svg></span>Share</button>
+  </div>
+</div><div class="sfoot" style="margin:26px 26px 0"><div class="mk">🍀</div>
+  <div class="t">This event lives in <b>Sprout</b> · joinsprout.co</div></div></div>
+  <div class="btoolbar">
+  <span class="ic" style="width:21px;height:21px;color:#0a7cff"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span>
+  <span class="ic dim" style="width:21px;height:21px;color:#b6b6ba"><svg viewBox="0 0 256 256"><path d="m221.66 133.66-72 72a8 8 0 0 1-11.32-11.32L196.69 136H40a8 8 0 0 1 0-16h156.69l-58.35-58.34a8 8 0 0 1 11.32-11.32l72 72a8 8 0 0 1 0 11.32"/></svg></span>
+  <span class="ic" style="width:21px;height:21px;color:#0a7cff"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8h-80v80a8 8 0 0 1-16 0v-80H40a8 8 0 0 1 0-16h80V40a8 8 0 0 1 16 0v80h80a8 8 0 0 1 8 8"/></svg></span>
+  <span class="tabsq">29</span>
+  <span class="ic" style="width:21px;height:21px;color:#0a7cff"><svg viewBox="0 0 256 256"><path d="M156 128a28 28 0 1 1-28-28 28 28 0 0 1 28 28M48 100a28 28 0 1 0 28 28 28 28 0 0 0-28-28m160 0a28 28 0 1 0 28 28 28 28 0 0 0-28-28"/></svg></span>
+</div>
+  <div class="homebar"></div>
+</div>
+</div>
+<div class="panel">
+  <div class="phead"><span class="k">Club · cold</span><h2>Club detail, visitor has no Sprout app</h2><p>Same invite grammar applied to a club. The crest gets its moment (76px, centred), then name, pull-quote, stat rail, and the six tags <b>wrap</b> instead of running off the right edge.</p></div>
+  <div class="browser">
+  <div class="island"></div>
+  <div class="bstat"><span>12:17</span><span class="r">
+  <svg width="18" height="12" viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+  <svg width="17" height="12" viewBox="0 0 18 12"><path d="M9 3.2c2.5 0 4.8 1 6.5 2.7l-1.4 1.4A7.2 7.2 0 0 0 9 5.3 7.2 7.2 0 0 0 3.9 7.3L2.5 5.9A9.2 9.2 0 0 1 9 3.2Zm0 4.1c1.3 0 2.6.5 3.5 1.5l-1.4 1.4A3 3 0 0 0 9 9.3a3 3 0 0 0-2.1.9L5.5 8.8A5 5 0 0 1 9 7.3Z"/></svg>
+  <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2.4" fill="none" stroke="#16161a" stroke-opacity=".38"/><rect x="2.6" y="3.6" width="6" height="4.8" rx="1.2"/><rect x="22.2" y="4.6" width="1.6" height="3"/></svg>
+</span></div>
+  <div class="bback"><svg viewBox="0 0 9 12"><path d="M8 0.8 2.6 6 8 11.2 6.9 12 0.6 6 6.9 0z"/></svg>Messages</div>
+  <div class="urlbar">
+  <span class="ic" style="width:17px;height:17px"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88ZM137 164.22a8 8 0 0 0-4.74 4.74L112 223.85 91.78 169a8 8 0 0 0-4.78-4.78L32.15 144 87 123.78a8 8 0 0 0 4.78-4.78L112 64.15 132.22 119a8 8 0 0 0 4.74 4.74L191.85 144ZM144 40a8 8 0 0 1 8-8h16V16a8 8 0 0 1 16 0v16h16a8 8 0 0 1 0 16h-16v16a8 8 0 0 1-16 0V48h-16a8 8 0 0 1-8-8m104 48a8 8 0 0 1-8 8h-8v8a8 8 0 0 1-16 0v-8h-8a8 8 0 0 1 0-16h8v-8a8 8 0 0 1 16 0v8h8a8 8 0 0 1 8 8"/></svg></span>
+  <span class="u">app.joinsprout.co</span>
+  <span class="ic" style="width:17px;height:17px;color:#57575c"><svg viewBox="0 0 256 256"><path d="M176 104h-24a8 8 0 0 1 0-16h24a16 16 0 0 1 16 16v88a16 16 0 0 1-16 16H80a16 16 0 0 1-16-16v-88a16 16 0 0 1 16-16h24a8 8 0 0 1 0 16H80v88h96Zm-53.66-42.34a8 8 0 0 0 11.32 0L152 43.31V144a8 8 0 0 0 16 0V43.31l18.34 18.35a8 8 0 0 0 11.32-11.32l-32-32a8 8 0 0 0-11.32 0l-32 32a8 8 0 0 0 0 11.32"/></svg></span>
+</div>
+  <div class="viewport"><div class="pgA">
+  <div style="display:flex;justify-content:center;padding-top:6px"><div class="crest" style="width:76px;height:76px"><span style="font-size:27px">CC</span></div></div>
+  <div class="kickA" style="text-align:center">Circle C Ranch · Social Club</div>
+  <h1 class="titleA" style="text-align:center;margin:0 0 17px">Circle C Dads</h1>
+  <hr class="ruleA">
+  <p class="tagA" style="text-align:center">“Getting out of the house,<br>on purpose.”</p>
+  <hr class="ruleA">
+  <div class="statrail">
+    <div><div class="n">34</div><div class="l">Members</div></div>
+    <div><div class="n">12</div><div class="l">Events a yr</div></div>
+    <div><div class="n">'24</div><div class="l">Since</div></div>
+  </div>
+  <hr class="ruleA">
+  <div class="chips"><span class="chip">Hangouts</span><span class="chip">Dranks</span><span class="chip">Dads</span><span class="chip">Social</span><span class="chip">Golf</span><span class="chip">Pickleball</span></div>
+  <button class="btn">Join the club</button>
+  <div class="hostA"><div class="av" style="width:26px;height:26px;font-size:10px">TM</div><div class="t">Started by <b>Tony Martin</b></div></div>
+  
+  <div class="secA">
+    <div class="lbl">What this is</div>
+    <p class="proseA">A social club for the dads of Circle C Ranch — an easy way to connect and build some real friendships. Think standing golf games, patio hangs, and the occasional pickleball beating.</p>
+  </div>
+  <div class="secA">
+    <div class="lbl">Coming up</div>
+    <div class="evrow"><div class="dt"><span class="m">Sep</span><span class="d">19</span></div>
+      <div class="ev"><div class="en">Dads' Golf Scramble</div><div class="em">8:00 AM · Grey Rock Golf Club</div></div><span class="ic cr" style="width:15px;height:15px"><svg viewBox="0 0 256 256"><path d="m181.66 133.66-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32"/></svg></span></div>
+    <div class="evrow"><div class="dt"><span class="m">Oct</span><span class="d">04</span></div>
+      <div class="ev"><div class="en">Patio Night at Moontower</div><div class="em">7:00 PM · Moontower Saloon</div></div><span class="ic cr" style="width:15px;height:15px"><svg viewBox="0 0 256 256"><path d="m181.66 133.66-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32"/></svg></span></div>
+    <div class="evrow"><div class="dt"><span class="m">Oct</span><span class="d">18</span></div>
+      <div class="ev"><div class="en">Pickleball Round Robin</div><div class="em">9:00 AM · Circle C Courts</div></div><span class="ic cr" style="width:15px;height:15px"><svg viewBox="0 0 256 256"><path d="m181.66 133.66-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32"/></svg></span></div>
+  </div>
+  <div class="secA">
+    <div class="lbl">Members</div>
+    <div class="goingA">
+      <div class="stack"><div class="av" style="width:34px;height:34px;font-size:13px">TM</div><div class="av" style="width:34px;height:34px;font-size:13px;background:linear-gradient(150deg,#7e6154,#b39e95)">DR</div><div class="av" style="width:34px;height:34px;font-size:13px;background:linear-gradient(150deg,#234a63,#3a7ca5)">JC</div><div class="av" style="width:34px;height:34px;font-size:13px;background:linear-gradient(150deg,#375337,#5c8a5c)">MK</div><div class="av" style="width:34px;height:34px;font-size:13px;background:linear-gradient(150deg,#7f600e,#d4a017)">BW</div><div class="more">+29</div></div>
+      <div class="gt"><b>34 dads</b> from the neighborhood<br>Tony started it in March 2024</div>
+    </div>
+  </div>
+</div><div class="sfoot" style="margin:26px 26px 0"><div class="mk">🍀</div>
+  <div class="t">This event lives in <b>Sprout</b> · joinsprout.co</div></div></div>
+  <div class="btoolbar">
+  <span class="ic" style="width:21px;height:21px;color:#0a7cff"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span>
+  <span class="ic dim" style="width:21px;height:21px;color:#b6b6ba"><svg viewBox="0 0 256 256"><path d="m221.66 133.66-72 72a8 8 0 0 1-11.32-11.32L196.69 136H40a8 8 0 0 1 0-16h156.69l-58.35-58.34a8 8 0 0 1 11.32-11.32l72 72a8 8 0 0 1 0 11.32"/></svg></span>
+  <span class="ic" style="width:21px;height:21px;color:#0a7cff"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8h-80v80a8 8 0 0 1-16 0v-80H40a8 8 0 0 1 0-16h80V40a8 8 0 0 1 16 0v80h80a8 8 0 0 1 8 8"/></svg></span>
+  <span class="tabsq">29</span>
+  <span class="ic" style="width:21px;height:21px;color:#0a7cff"><svg viewBox="0 0 256 256"><path d="M156 128a28 28 0 1 1-28-28 28 28 0 0 1 28 28M48 100a28 28 0 1 0 28 28 28 28 0 0 0-28-28m160 0a28 28 0 1 0 28 28 28 28 0 0 0-28-28"/></svg></span>
+</div>
+  <div class="homebar"></div>
+</div>
+</div>
+<div class="panel">
+  <div class="phead"><span class="k warm">Club · has app</span><h2>Club detail, Sprout is installed</h2><p>Identical structure with the handoff banner and the flipped CTA. Members, upcoming events and the about text sit below as social proof either way.</p></div>
+  <div class="browser">
+  <div class="island"></div>
+  <div class="bstat"><span>12:17</span><span class="r">
+  <svg width="18" height="12" viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>
+  <svg width="17" height="12" viewBox="0 0 18 12"><path d="M9 3.2c2.5 0 4.8 1 6.5 2.7l-1.4 1.4A7.2 7.2 0 0 0 9 5.3 7.2 7.2 0 0 0 3.9 7.3L2.5 5.9A9.2 9.2 0 0 1 9 3.2Zm0 4.1c1.3 0 2.6.5 3.5 1.5l-1.4 1.4A3 3 0 0 0 9 9.3a3 3 0 0 0-2.1.9L5.5 8.8A5 5 0 0 1 9 7.3Z"/></svg>
+  <svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2.4" fill="none" stroke="#16161a" stroke-opacity=".38"/><rect x="2.6" y="3.6" width="6" height="4.8" rx="1.2"/><rect x="22.2" y="4.6" width="1.6" height="3"/></svg>
+</span></div>
+  <div class="bback"><svg viewBox="0 0 9 12"><path d="M8 0.8 2.6 6 8 11.2 6.9 12 0.6 6 6.9 0z"/></svg>Messages</div>
+  <div class="urlbar">
+  <span class="ic" style="width:17px;height:17px"><svg viewBox="0 0 256 256"><path d="M197.58 129.06 146 110l-19-51.62a15.92 15.92 0 0 0-29.88 0L78 110l-51.62 19a15.92 15.92 0 0 0 0 29.88L78 178l19 51.62a15.92 15.92 0 0 0 29.88 0L146 178l51.62-19a15.92 15.92 0 0 0 0-29.88ZM137 164.22a8 8 0 0 0-4.74 4.74L112 223.85 91.78 169a8 8 0 0 0-4.78-4.78L32.15 144 87 123.78a8 8 0 0 0 4.78-4.78L112 64.15 132.22 119a8 8 0 0 0 4.74 4.74L191.85 144ZM144 40a8 8 0 0 1 8-8h16V16a8 8 0 0 1 16 0v16h16a8 8 0 0 1 0 16h-16v16a8 8 0 0 1-16 0V48h-16a8 8 0 0 1-8-8m104 48a8 8 0 0 1-8 8h-8v8a8 8 0 0 1-16 0v-8h-8a8 8 0 0 1 0-16h8v-8a8 8 0 0 1 16 0v8h8a8 8 0 0 1 8 8"/></svg></span>
+  <span class="u">app.joinsprout.co</span>
+  <span class="ic" style="width:17px;height:17px;color:#57575c"><svg viewBox="0 0 256 256"><path d="M176 104h-24a8 8 0 0 1 0-16h24a16 16 0 0 1 16 16v88a16 16 0 0 1-16 16H80a16 16 0 0 1-16-16v-88a16 16 0 0 1 16-16h24a8 8 0 0 1 0 16H80v88h96Zm-53.66-42.34a8 8 0 0 0 11.32 0L152 43.31V144a8 8 0 0 0 16 0V43.31l18.34 18.35a8 8 0 0 0 11.32-11.32l-32-32a8 8 0 0 0-11.32 0l-32 32a8 8 0 0 0 0 11.32"/></svg></span>
+</div>
+  <div class="viewport"><div class="appbanner">
+  <div class="ico">🍀</div>
+  <div class="tx"><div class="t1">You have Sprout installed</div><div class="t2">Open this club in the app</div></div>
+  <div class="op">Open</div>
+</div><div class="pgA">
+  <div style="display:flex;justify-content:center;padding-top:6px"><div class="crest" style="width:76px;height:76px"><span style="font-size:27px">CC</span></div></div>
+  <div class="kickA" style="text-align:center">Circle C Ranch · Social Club</div>
+  <h1 class="titleA" style="text-align:center;margin:0 0 17px">Circle C Dads</h1>
+  <hr class="ruleA">
+  <p class="tagA" style="text-align:center">“Getting out of the house,<br>on purpose.”</p>
+  <hr class="ruleA">
+  <div class="statrail">
+    <div><div class="n">34</div><div class="l">Members</div></div>
+    <div><div class="n">12</div><div class="l">Events a yr</div></div>
+    <div><div class="n">'24</div><div class="l">Since</div></div>
+  </div>
+  <hr class="ruleA">
+  <div class="chips"><span class="chip">Hangouts</span><span class="chip">Dranks</span><span class="chip">Dads</span><span class="chip">Social</span><span class="chip">Golf</span><span class="chip">Pickleball</span></div>
+  <button class="btn"><span class="ic " style="width:18px;height:18px"><svg viewBox="0 0 256 256"><path d="M224 104a8 8 0 0 1-16 0V59.32l-66.33 66.34a8 8 0 0 1-11.32-11.32L196.68 48H152a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8Zm-40 24a8 8 0 0 0-8 8v72H48V80h72a8 8 0 0 0 0-16H48a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-72a8 8 0 0 0-8-8"/></svg></span>Open in Sprout</button>
+  <a class="txtlink">Join here in the browser instead</a>
+  <div class="signed"><div class="av" style="width:20px;height:20px;font-size:8px;background:linear-gradient(150deg,#234a63,#3a7ca5)">MR</div>Signed in as Marcus R.</div>
+  
+  <div class="secA">
+    <div class="lbl">What this is</div>
+    <p class="proseA">A social club for the dads of Circle C Ranch — an easy way to connect and build some real friendships. Think standing golf games, patio hangs, and the occasional pickleball beating.</p>
+  </div>
+  <div class="secA">
+    <div class="lbl">Coming up</div>
+    <div class="evrow"><div class="dt"><span class="m">Sep</span><span class="d">19</span></div>
+      <div class="ev"><div class="en">Dads' Golf Scramble</div><div class="em">8:00 AM · Grey Rock Golf Club</div></div><span class="ic cr" style="width:15px;height:15px"><svg viewBox="0 0 256 256"><path d="m181.66 133.66-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32"/></svg></span></div>
+    <div class="evrow"><div class="dt"><span class="m">Oct</span><span class="d">04</span></div>
+      <div class="ev"><div class="en">Patio Night at Moontower</div><div class="em">7:00 PM · Moontower Saloon</div></div><span class="ic cr" style="width:15px;height:15px"><svg viewBox="0 0 256 256"><path d="m181.66 133.66-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32"/></svg></span></div>
+    <div class="evrow"><div class="dt"><span class="m">Oct</span><span class="d">18</span></div>
+      <div class="ev"><div class="en">Pickleball Round Robin</div><div class="em">9:00 AM · Circle C Courts</div></div><span class="ic cr" style="width:15px;height:15px"><svg viewBox="0 0 256 256"><path d="m181.66 133.66-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32"/></svg></span></div>
+  </div>
+  <div class="secA">
+    <div class="lbl">Members</div>
+    <div class="goingA">
+      <div class="stack"><div class="av" style="width:34px;height:34px;font-size:13px">TM</div><div class="av" style="width:34px;height:34px;font-size:13px;background:linear-gradient(150deg,#7e6154,#b39e95)">DR</div><div class="av" style="width:34px;height:34px;font-size:13px;background:linear-gradient(150deg,#234a63,#3a7ca5)">JC</div><div class="av" style="width:34px;height:34px;font-size:13px;background:linear-gradient(150deg,#375337,#5c8a5c)">MK</div><div class="av" style="width:34px;height:34px;font-size:13px;background:linear-gradient(150deg,#7f600e,#d4a017)">BW</div><div class="more">+29</div></div>
+      <div class="gt"><b>34 dads</b> from the neighborhood<br>Tony started it in March 2024</div>
+    </div>
+  </div>
+</div><div class="sfoot" style="margin:26px 26px 0"><div class="mk">🍀</div>
+  <div class="t">This event lives in <b>Sprout</b> · joinsprout.co</div></div></div>
+  <div class="btoolbar">
+  <span class="ic" style="width:21px;height:21px;color:#0a7cff"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span>
+  <span class="ic dim" style="width:21px;height:21px;color:#b6b6ba"><svg viewBox="0 0 256 256"><path d="m221.66 133.66-72 72a8 8 0 0 1-11.32-11.32L196.69 136H40a8 8 0 0 1 0-16h156.69l-58.35-58.34a8 8 0 0 1 11.32-11.32l72 72a8 8 0 0 1 0 11.32"/></svg></span>
+  <span class="ic" style="width:21px;height:21px;color:#0a7cff"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8h-80v80a8 8 0 0 1-16 0v-80H40a8 8 0 0 1 0-16h80V40a8 8 0 0 1 16 0v80h80a8 8 0 0 1 8 8"/></svg></span>
+  <span class="tabsq">29</span>
+  <span class="ic" style="width:21px;height:21px;color:#0a7cff"><svg viewBox="0 0 256 256"><path d="M156 128a28 28 0 1 1-28-28 28 28 0 0 1 28 28M48 100a28 28 0 1 0 28 28 28 28 0 0 0-28-28m160 0a28 28 0 1 0 28 28 28 28 0 0 0-28-28"/></svg></span>
+</div>
+  <div class="homebar"></div>
+</div>
+</div>
+</div>
+</body>
+</html>

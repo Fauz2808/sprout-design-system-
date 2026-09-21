@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Club Invite — web landing page · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --brand-500:#186338; --brand-600:#134f2d; --brand-700:#1e3e2b;
+  --brand-200:#77b691; --brand-50:#e2e9e3;
+  --secondary-500:#f4f1ea; --secondary-600:#eae6db; --secondary-700:#dbd5c8;
+  --grey-300:#b3b8c1; --grey-500:#818898; --grey-700:#4d525b; --grey-900:#1a1b1e;
+  --amber:#c08a2d; --amber-bg:#fbf0d8;
+  --serif:'Playfair Display',Georgia,serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+}
+body{background:var(--secondary-500);font-family:var(--sans);color:var(--grey-700);
+  -webkit-font-smoothing:antialiased;padding:34px 30px 60px}
+
+.page-head{max-width:920px;margin-bottom:14px}
+.page-head h1{font-family:var(--serif);font-size:30px;color:var(--brand-700);margin-bottom:8px}
+.page-head p{font-size:14px;line-height:1.65;max-width:780px}
+.rule{background:#fff;border:1px solid var(--secondary-700);border-left:3px solid var(--brand-500);
+  border-radius:12px;padding:13px 16px;margin:16px 0 8px;max-width:780px;font-size:13px;line-height:1.6}
+.rule b{color:var(--brand-700)}
+.applied{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0 32px}
+.tick{background:#fff;border:1px solid var(--secondary-700);border-radius:12px;padding:9px 13px;
+  font-size:12px;max-width:268px;line-height:1.5}
+.tick b{display:block;color:var(--brand-700);margin-bottom:2px}
+.tick s{color:var(--grey-500)}
+
+.band{font-family:var(--serif);font-size:20px;color:var(--brand-700);margin:8px 0 18px}
+.flow{display:flex;gap:30px;align-items:flex-start;overflow-x:auto;padding-bottom:18px;margin-bottom:26px}
+.step{flex:0 0 auto;width:393px}
+.cap{margin-bottom:12px;min-height:80px}
+.cap .n{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--brand-500);background:var(--brand-50);border-radius:99px;padding:4px 10px;margin-bottom:7px}
+.cap h2{font-family:var(--serif);font-size:19px;color:var(--brand-700);margin-bottom:4px}
+.cap p{font-size:12.5px;line-height:1.55}
+
+.device{position:relative;width:393px;height:852px;border-radius:54px;overflow:hidden;background:#fff;
+  box-shadow:0 0 0 1px rgba(0,0,0,.07),0 24px 80px rgba(30,62,43,.16);display:flex;flex-direction:column}
+.browser{flex:0 0 auto;background:#f7f5f0;border-bottom:1px solid var(--secondary-700);
+  padding:16px 16px 10px;display:flex;align-items:center;gap:8px}
+.url{flex:1;background:#fff;border:1px solid var(--secondary-700);border-radius:99px;
+  padding:8px 14px;font-size:11.5px;color:var(--grey-500);text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.url b{color:var(--grey-900);font-weight:600}
+.screen{flex:1 1 auto;overflow-y:auto;padding:26px 20px 26px}
+
+.kicker{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--brand-500);text-align:center;margin-bottom:16px}
+.inviter{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:26px}
+.av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;
+  font-size:11px;font-weight:700;flex-shrink:0;background:linear-gradient(145deg,#1e3e2b,#4fa472)}
+.av.m{width:42px;height:42px;font-size:14px}
+.inviter span{font-size:13.5px;color:var(--grey-700)}
+.inviter b{color:var(--grey-900);font-weight:600}
+
+/* Tony: "I would make this icon much bigger, since we're not going to have too
+   much content on the page." Circular, per the 52px club icon in the app. */
+.club-icon{width:152px;height:152px;border-radius:50%;background:var(--brand-50);
+  border:4px solid var(--brand-200);display:grid;place-items:center;font-size:74px;
+  margin:0 auto 20px;box-shadow:0 14px 34px rgba(24,99,56,.12)}
+.club-name{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--brand-700);
+  text-align:center;line-height:1.18;margin-bottom:12px}
+.club-desc{font-size:14.5px;line-height:1.62;text-align:center;color:var(--grey-700);
+  margin:0 auto 26px;max-width:320px}
+
+.lock{display:inline-flex;align-items:center;gap:6px;background:var(--amber-bg);
+  border-radius:99px;padding:6px 13px;font-size:12px;font-weight:600;color:#7a5712;
+  margin:0 auto 16px}
+.lock-wrap{display:flex;justify-content:center}
+
+.btn{width:100%;border:none;border-radius:99px;padding:17px;font-family:var(--sans);
+  font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;gap:8px}
+.btn-primary{background:var(--brand-500);color:#fff;box-shadow:0 10px 22px rgba(24,99,56,.2)}
+.btn-ghost{background:#fff;border:1.5px solid var(--secondary-700);color:var(--grey-900);
+  margin-top:10px;font-size:14.5px;padding:14px}
+.store{text-align:center;font-size:11.5px;color:var(--grey-500);margin-top:10px}
+.after-cta{font-size:12.5px;line-height:1.55;color:var(--grey-500);text-align:center;margin-top:11px}
+
+.mem-head{display:flex;align-items:baseline;justify-content:space-between;
+  margin:30px 0 4px;padding-top:22px;border-top:1px solid var(--secondary-600)}
+.mem-head h3{font-family:var(--serif);font-size:19px;color:var(--brand-700)}
+.mem-head span{font-size:12px;color:var(--grey-500)}
+.mem{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f1eee6}
+.mem:last-child{border-bottom:none}
+.mem .tx{flex:1;min-width:0}
+.mem .tx b{display:block;font-size:14.5px;color:var(--grey-900);font-weight:600}
+.mem .tx span{font-size:12px;color:var(--grey-500)}
+.tag{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  background:var(--brand-50);color:var(--brand-500);border-radius:99px;padding:4px 9px;flex-shrink:0}
+.more-mem{font-size:13px;color:var(--grey-500);padding:13px 0 0;text-align:center}
+
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--grey-500);margin-bottom:7px}
+.field input{width:100%;font-family:var(--sans);font-size:17px;color:var(--grey-900);
+  background:#fff;border:1.5px solid var(--secondary-700);border-radius:14px;padding:15px 16px}
+.mini-club{display:flex;align-items:center;gap:12px;background:var(--brand-50);
+  border-radius:16px;padding:13px 15px;margin-bottom:26px}
+.mini-club .ic{width:48px;height:48px;border-radius:50%;background:#fff;display:grid;
+  place-items:center;font-size:24px;flex-shrink:0}
+.mini-club .tx b{display:block;font-family:var(--serif);font-size:16px;color:var(--brand-700)}
+.mini-club .tx span{font-size:12px;color:var(--grey-700)}
+.hint{font-size:12.5px;line-height:1.6;color:var(--grey-500);text-align:center;margin-top:14px}
+
+.done{text-align:center;padding:26px 0 10px}
+.done .ring{width:152px;height:152px;border-radius:50%;background:var(--brand-50);
+  border:4px solid var(--brand-200);display:grid;place-items:center;margin:0 auto 22px;font-size:74px;
+  position:relative;box-shadow:0 14px 34px rgba(24,99,56,.12)}
+.done .ring .tickmark{position:absolute;right:2px;bottom:2px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand-500);color:#fff;display:grid;place-items:center;font-size:23px;border:4px solid #fff}
+.done h2{font-family:var(--serif);font-size:27px;color:var(--brand-700);margin-bottom:10px}
+.done p{font-size:14.5px;line-height:1.6}
+
+/* ── code entry, app handoff, pending state ── */
+.back-line{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--grey-500);margin-bottom:20px}
+.back-line b{color:var(--brand-500);font-weight:600;cursor:pointer}
+.sent-to{font-size:13.5px;line-height:1.6;margin-bottom:22px}
+.sent-to b{color:var(--grey-900);font-weight:600}
+.sent-to a{color:var(--brand-500);font-weight:600;text-decoration:none}
+.code-row{display:flex;gap:9px;margin-bottom:22px}
+.code-row .cell{flex:1;height:62px;border:1.5px solid var(--secondary-700);border-radius:14px;background:#fff;
+  display:grid;place-items:center;font-size:25px;font-weight:700;color:var(--grey-900)}
+.code-row .cell.on{border-color:var(--brand-500);box-shadow:0 0 0 3px rgba(24,99,56,.13)}
+.resend{font-size:12.5px;color:var(--grey-500);text-align:center;margin-top:12px}
+.resend b{color:var(--grey-700);font-weight:600}
+
+.stores{display:flex;gap:10px;margin-top:12px}
+.store-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;background:var(--grey-900);
+  color:#fff;border-radius:15px;padding:12px 8px;text-align:left}
+.store-btn .gl{font-size:20px;line-height:1}
+.store-btn i{font-style:normal;font-size:13.5px;font-weight:700;display:block;line-height:1.15}
+.store-btn small{font-size:9.5px;font-weight:500;opacity:.72;letter-spacing:.03em}
+
+.ring.wait{background:var(--amber-bg);border-color:#e6c982}
+.ring.wait .tickmark{background:var(--amber)}
+.next-list{border-top:1px solid var(--secondary-600);margin-top:28px;padding-top:20px}
+.next-list h4{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--grey-500);margin-bottom:13px}
+.next-list ul{list-style:none}
+.next-list li{display:flex;gap:11px;font-size:13.5px;line-height:1.5;margin-bottom:12px;color:var(--grey-700)}
+.next-list li:last-child{margin-bottom:0}
+.next-list li .b{flex:0 0 22px;height:22px;border-radius:50%;background:var(--brand-50);color:var(--brand-500);
+  font-size:11px;font-weight:700;display:grid;place-items:center;margin-top:1px}
+.next-list li b{color:var(--grey-900);font-weight:600}
+
+/* ── desktop ── */
+.mac{width:1040px;border-radius:16px;overflow:hidden;background:#fff;
+  box-shadow:0 0 0 1px rgba(0,0,0,.07),0 26px 70px rgba(30,62,43,.16)}
+.mac-bar{background:#f7f5f0;border-bottom:1px solid var(--secondary-700);padding:12px 16px;
+  display:flex;align-items:center;gap:9px}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--secondary-700)}
+.mac-url{flex:1;background:#fff;border:1px solid var(--secondary-700);border-radius:99px;
+  padding:7px 16px;font-size:12px;color:var(--grey-500);text-align:center;margin:0 60px}
+.mac-url b{color:var(--grey-900);font-weight:600}
+.mac-body{background:var(--secondary-500);padding:52px 40px 60px;display:flex;justify-content:center}
+/* content is sparse by design, so desktop centres a card instead of stretching it
+   into columns that would only be padded with air */
+.card-desk{width:560px;background:#fff;border:1px solid var(--secondary-700);border-radius:26px;
+  padding:44px 44px 36px;box-shadow:0 12px 40px rgba(30,62,43,.07)}
+.card-desk .club-icon{width:168px;height:168px;font-size:82px}
+.card-desk .club-name{font-size:34px}
+.card-desk .club-desc{font-size:15.5px;max-width:420px}
+.card-desk .btn{max-width:320px;margin:0 auto}
+.card-desk .store,.card-desk .after-cta{max-width:340px;margin-left:auto;margin-right:auto}
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <h1>Club invite — the page you land on</h1>
+  <p>Rebuilt against Tony's four comments on the Figma. Same flow the event invite already uses:
+  verify your number on the web, the app is offered rather than required.</p>
+
+  <div class="rule">
+    <b>The rule his comments add up to:</b> only show what the club creation flow guarantees.
+    A club always has a name, an icon, a description (required at creation) and at least one
+    member, its creator. Everything else — a school, an area, a calendar — may simply not exist,
+    so none of it can be load-bearing.
+  </div>
+
+  <div class="rule" style="border-left-color:var(--amber)">
+    <b>Added after the 15 Sep call.</b> Tony: <i>"I don't know what happens after request to join.
+    I think it's you just add your phone number and then it sends a code, with the Sprout download
+    thing."</i> Steps 3 and 4 are that code screen and that handoff, plus the two endings the flow
+    actually splits into and the one it had no ending for at all.
+  </div>
+
+  <div class="applied">
+    <div class="tick"><b>Icon is the page</b><s>small icon, busy page</s></div>
+    <div class="tick"><b>Members and description only</b><s>Upcoming events section</s></div>
+    <div class="tick"><b>No school or area line</b><s>Class group · Lincoln Elementary</s></div>
+    <div class="tick"><b>Desktop layout added</b><s>mobile only</s></div>
+  </div>
+</div>
+
+<div class="band">Mobile &middot; the whole path, first tap to member</div>
+<div class="flow">
+
+  <div class="step">
+    <div class="cap">
+      <span class="n">Step 1</span>
+      <h2>The invite opens</h2>
+      <p>Icon, name, description, members. That is the whole page, because that is everything
+      every club is guaranteed to have.</p>
+    </div>
+    <div class="device">
+      <div class="browser"><div class="url">joinsprout.co/c/<b>circle-c-dads</b></div></div>
+      <div class="screen">
+        <div class="kicker">Club invite</div>
+        <div class="inviter"><span class="av">TM</span><span><b>Tony Martin</b> invited you</span></div>
+
+        <div class="club-icon">🏘️</div>
+        <div class="club-name">Circle C Dads</div>
+        <div class="club-desc">A standing excuse for the dads around Circle C to get out of the
+          house. Poker most months, a cookout when the weather behaves.</div>
+
+        <button class="btn btn-primary">Join Circle C Dads</button>
+        <button class="btn btn-ghost">Open in the Sprout app</button>
+        <div class="store">Free on the App Store and Google Play</div>
+
+        <div class="mem-head"><h3>Members</h3><span>9</span></div>
+        <div class="mem"><span class="av m">TM</span>
+          <span class="tx"><b>Tony Martin</b><span>Created this club</span></span>
+          <span class="tag">Admin</span></div>
+        <div class="mem"><span class="av m" style="background:linear-gradient(145deg,#3a7ca5,#7ec8e3)">MC</span>
+          <span class="tx"><b>Mike Cherches</b><span>Joined last week</span></span></div>
+        <div class="mem"><span class="av m" style="background:linear-gradient(145deg,#c85e20,#f0a060)">FO</span>
+          <span class="tx"><b>Frank Osei</b><span>Joined last week</span></span></div>
+        <div class="mem"><span class="av m" style="background:linear-gradient(145deg,#7a3a8a,#ba7aca)">DR</span>
+          <span class="tx"><b>Diane Ruiz</b><span>Joined in August</span></span></div>
+        <div class="more-mem">and 5 others</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="cap">
+      <span class="n">Step 2</span>
+      <h2>Verify to join</h2>
+      <p>The same phone verification the event invite and the room parent portal use. The club
+      stays on screen so nobody forgets what they are joining.</p>
+    </div>
+    <div class="device">
+      <div class="browser"><div class="url">joinsprout.co/c/<b>circle-c-dads</b>/join</div></div>
+      <div class="screen">
+        <div class="kicker">Club invite</div>
+        <div class="mini-club">
+          <span class="ic">🏘️</span>
+          <span class="tx"><b>Circle C Dads</b><span>Invited by Tony Martin</span></span>
+        </div>
+        <h2 style="font-family:var(--serif);font-size:24px;color:var(--brand-700);margin-bottom:8px">
+          Verify your number to join</h2>
+        <p style="font-size:13.5px;line-height:1.6;margin-bottom:24px">
+          We'll text you a six digit code. Your number is only visible to members of this club.</p>
+        <div class="field">
+          <label>Your mobile number</label>
+          <input type="tel" value="(512) 555-0188">
+        </div>
+        <button class="btn btn-primary">Send code</button>
+        <div class="hint">Already on Sprout? Verifying adds this club to the account you have.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="cap">
+      <span class="n">Step 3</span>
+      <h2>The code arrives</h2>
+      <p>Six digits, autofilled from the text on iOS. One screen between tapping join and being a
+      member, which is the whole reason this runs on the web and not in the app.</p>
+    </div>
+    <div class="device">
+      <div class="browser"><div class="url">joinsprout.co/c/<b>circle-c-dads</b>/verify</div></div>
+      <div class="screen">
+        <div class="kicker">Club invite</div>
+        <div class="mini-club">
+          <span class="ic">🏘️</span>
+          <span class="tx"><b>Circle C Dads</b><span>Invited by Tony Martin</span></span>
+        </div>
+        <div class="back-line"><b>&larr;</b> Back</div>
+        <h2 style="font-family:var(--serif);font-size:24px;color:var(--brand-700);margin-bottom:8px">
+          Enter the code we texted</h2>
+        <p class="sent-to">Sent to <b>(512) 555-0188</b>. <a href="#">Change number</a></p>
+        <div class="code-row">
+          <span class="cell">4</span><span class="cell">1</span><span class="cell">8</span>
+          <span class="cell on"></span><span class="cell"></span><span class="cell"></span>
+        </div>
+        <button class="btn btn-primary">Join Circle C Dads</button>
+        <div class="resend">Didn't get it? <b>Send again</b> in 0:24</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="cap">
+      <span class="n">Step 4</span>
+      <h2>In the club, now get the app</h2>
+      <p>You are a member before you download anything. The app is what the page offers next, not
+      what it demands first. This is the screen for someone who has never heard of Sprout.</p>
+    </div>
+    <div class="device">
+      <div class="browser"><div class="url">joinsprout.co/c/<b>circle-c-dads</b>/joined</div></div>
+      <div class="screen">
+        <div class="done">
+          <div class="ring">🏘️<span class="tickmark">&check;</span></div>
+          <h2>You're in</h2>
+          <p>You're a member of <b style="color:var(--grey-900)">Circle C Dads</b>.<br>
+             Tony has been told you joined.</p>
+        </div>
+
+        <div class="next-list">
+          <h4>What the app gets you</h4>
+          <ul>
+            <li><span class="b">1</span><span>The <b>group chat</b>. It is where this club actually
+              talks, and it does not exist on this page.</span></li>
+            <li><span class="b">2</span><span>Anything they <b>plan</b>, on your calendar, with a
+              reminder the day before.</span></li>
+            <li><span class="b">3</span><span>Every other club and class you get pulled into, in
+              <b>one place</b>.</span></li>
+          </ul>
+        </div>
+
+        <div class="stores">
+          <span class="store-btn"><span class="gl">&#63743;</span><span><small>Download on the</small><i>App Store</i></span></span>
+          <span class="store-btn"><span class="gl">&#9654;</span><span><small>Get it on</small><i>Google Play</i></span></span>
+        </div>
+        <div class="store">We also texted you the link, so you can do this later</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="band">Variants and endings</div>
+<div class="flow">
+
+  <div class="step">
+    <div class="cap">
+      <span class="n">Step 4 &middot; already on Sprout</span>
+      <h2>Same ending, one tap shorter</h2>
+      <p>The number you verified already has an account, so there is nothing to download. The club
+      is added to the account you have and the page hands you straight to it.</p>
+    </div>
+    <div class="device">
+      <div class="browser"><div class="url">joinsprout.co/c/<b>circle-c-dads</b>/joined</div></div>
+      <div class="screen">
+        <div class="done">
+          <div class="ring">🏘️<span class="tickmark">&check;</span></div>
+          <h2>You're in</h2>
+          <p>Added to your Sprout account.<br>
+             <b style="color:var(--grey-900)">Circle C Dads</b> is in your clubs now.</p>
+        </div>
+        <div style="margin-top:28px">
+          <button class="btn btn-primary">Open Circle C Dads</button>
+          <div class="after-cta">Opens the Sprout app. The group chat is waiting there.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="cap">
+      <span class="n">Variant &middot; closed club</span>
+      <h2>Club that vets people</h2>
+      <p>Your Figma already had an "Approval required" state, so it is kept. The only change is
+      honesty about the outcome: you request, you do not walk in.</p>
+    </div>
+    <div class="device">
+      <div class="browser"><div class="url">joinsprout.co/c/<b>kiker-1st-parents</b></div></div>
+      <div class="screen">
+        <div class="kicker">Club invite</div>
+        <div class="inviter"><span class="av">TM</span><span><b>Tony Martin</b> invited you</span></div>
+
+        <div class="club-icon">☘️</div>
+        <div class="club-name">Kiker 1st Grade Parents</div>
+        <div class="lock-wrap"><span class="lock">🔒 Approval required</span></div>
+        <div class="club-desc">Parents of first graders at Kiker. We plan the class parties,
+          share the pickup roster, and complain about the heat.</div>
+
+        <button class="btn btn-primary">Request to join</button>
+        <button class="btn btn-ghost">Open in the Sprout app</button>
+        <div class="after-cta">Tony approves new members. You'll get a text either way.</div>
+
+        <div class="mem-head"><h3>Members</h3><span>26</span></div>
+        <div class="mem"><span class="av m">TM</span>
+          <span class="tx"><b>Tony Martin</b><span>Created this club</span></span>
+          <span class="tag">Admin</span></div>
+        <div class="mem"><span class="av m" style="background:linear-gradient(145deg,#3a7ca5,#7ec8e3)">LM</span>
+          <span class="tx"><b>Lydia Martin</b><span>Room parent</span></span></div>
+        <div class="mem"><span class="av m" style="background:linear-gradient(145deg,#c85e20,#f0a060)">KS</span>
+          <span class="tx"><b>Kate Skiff</b><span>Joined in August</span></span></div>
+        <div class="more-mem">and 23 others</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="cap">
+      <span class="n">Ending &middot; approval required</span>
+      <h2>Requested, not joined</h2>
+      <p>The flow above had no ending for this. You verify the same way, but the club is closed, so
+      what you get is a wait. Saying "you're in" here would be a lie, and members is the one number
+      we cannot show you yet.</p>
+    </div>
+    <div class="device">
+      <div class="browser"><div class="url">joinsprout.co/c/<b>kiker-1st-parents</b>/requested</div></div>
+      <div class="screen">
+        <div class="done">
+          <div class="ring wait">☘️<span class="tickmark">&hellip;</span></div>
+          <h2>Request sent</h2>
+          <p>Tony Martin approves who joins
+             <b style="color:var(--grey-900)">Kiker 1st Grade Parents</b>.<br>
+             We'll text you either way, usually the same day.</p>
+        </div>
+
+        <div class="next-list">
+          <h4>While you wait</h4>
+          <ul>
+            <li><span class="b">&darr;</span><span>Get the app now and the club <b>appears by
+              itself</b> the moment Tony approves you.</span></li>
+            <li><span class="b">&#9993;</span><span>Nothing else to do. Do not request twice, it is
+              the same request.</span></li>
+          </ul>
+        </div>
+
+        <div class="stores">
+          <span class="store-btn"><span class="gl">&#63743;</span><span><small>Download on the</small><i>App Store</i></span></span>
+          <span class="store-btn"><span class="gl">&#9654;</span><span><small>Get it on</small><i>Google Play</i></span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="cap">
+      <span class="n">Edge case</span>
+      <h2>A club created five minutes ago</h2>
+      <p>Tony's Circle C Dads on day one. A club is never empty: its creator is a member. So the
+      page says exactly that instead of rendering a blank list.</p>
+    </div>
+    <div class="device">
+      <div class="browser"><div class="url">joinsprout.co/c/<b>circle-c-dads</b></div></div>
+      <div class="screen">
+        <div class="kicker">Club invite</div>
+        <div class="inviter"><span class="av">TM</span><span><b>Tony Martin</b> invited you</span></div>
+
+        <div class="club-icon">🏘️</div>
+        <div class="club-name">Circle C Dads</div>
+        <div class="club-desc">A standing excuse for the dads around Circle C to get out of the
+          house. Poker most months, a cookout when the weather behaves.</div>
+
+        <button class="btn btn-primary">Join Circle C Dads</button>
+        <button class="btn btn-ghost">Open in the Sprout app</button>
+        <div class="after-cta">You'd be the second member. Tony started this today.</div>
+
+        <div class="mem-head"><h3>Members</h3><span>1</span></div>
+        <div class="mem"><span class="av m">TM</span>
+          <span class="tx"><b>Tony Martin</b><span>Created this club today</span></span>
+          <span class="tag">Admin</span></div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="band">Desktop</div>
+<div class="flow">
+  <div class="step" style="width:1040px">
+    <div class="cap" style="min-height:0">
+      <span class="n">Comment 4</span>
+      <h2>Same page, opened on a laptop</h2>
+      <p>The content is deliberately sparse, so desktop centres a card rather than spreading four
+      elements across two columns and padding the rest with air. One layout, one set of rules.</p>
+    </div>
+    <div class="mac">
+      <div class="mac-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <div class="mac-url">joinsprout.co/c/<b>circle-c-dads</b></div>
+      </div>
+      <div class="mac-body">
+        <div class="card-desk">
+          <div class="kicker">Club invite</div>
+          <div class="inviter"><span class="av">TM</span><span><b>Tony Martin</b> invited you</span></div>
+          <div class="club-icon">🏘️</div>
+          <div class="club-name">Circle C Dads</div>
+          <div class="club-desc">A standing excuse for the dads around Circle C to get out of the
+            house. Poker most months, a cookout when the weather behaves.</div>
+          <button class="btn btn-primary">Join Circle C Dads</button>
+          <div class="store">Free on the App Store and Google Play</div>
+
+          <div class="mem-head"><h3>Members</h3><span>9</span></div>
+          <div class="mem"><span class="av m">TM</span>
+            <span class="tx"><b>Tony Martin</b><span>Created this club</span></span>
+            <span class="tag">Admin</span></div>
+          <div class="mem"><span class="av m" style="background:linear-gradient(145deg,#3a7ca5,#7ec8e3)">MC</span>
+            <span class="tx"><b>Mike Cherches</b><span>Joined last week</span></span></div>
+          <div class="mem"><span class="av m" style="background:linear-gradient(145deg,#c85e20,#f0a060)">FO</span>
+            <span class="tx"><b>Frank Osei</b><span>Joined last week</span></span></div>
+          <div class="mem"><span class="av m" style="background:linear-gradient(145deg,#7a3a8a,#ba7aca)">DR</span>
+            <span class="tx"><b>Diane Ruiz</b><span>Joined in August</span></span></div>
+          <div class="more-mem">and 5 others</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

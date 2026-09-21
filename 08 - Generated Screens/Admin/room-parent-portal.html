@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Room Parent Portal — Live Prototype · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --surface:#ffffff; --sidebar:#fbf9f4;
+    --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+    --green:#186338; --green-mid:#4fa472; --green-light:#e2e9e3; --green-border:#77b691;
+    --border:#e6e0d2; --amber:#c08a2d; --amber-bg:#fbf0d8;
+    --red:#a83f34; --red-bg:#fbe4e0; --blue:#2f6690; --blue-bg:#e3edf5;
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;flex-direction:column;align-items:center;gap:14px;padding:32px 24px 60px;}
+
+  .page-lede{width:100%;max-width:1100px;text-align:center;margin:0 auto 4px;}
+  .page-lede h1{font-family:var(--serif);font-weight:600;font-size:22px;color:#23271f;margin:0 0 5px;}
+  .page-lede p{font-size:12.5px;color:#6a665b;margin:0;line-height:1.6;}
+
+  /* browser chrome frame */
+  .browser{width:1100px;border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.06),0 30px 80px rgba(0,0,0,.25);}
+  .browser-bar{height:40px;background:#eae4d6;display:flex;align-items:center;gap:6px;padding:0 14px;border-bottom:1px solid #ddd6c5;flex-shrink:0;}
+  .browser-dot{width:10px;height:10px;border-radius:50%;}
+  .browser-url{flex:1;margin-left:10px;background:#fff;border-radius:7px;height:24px;display:flex;align-items:center;padding:0 12px;font-size:11px;color:#8a8478;font-family:var(--mono);}
+  .browser-nav{display:flex;gap:8px;color:#a9a293;}
+  .browser-nav svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;}
+
+  .app{display:flex;height:760px;}
+
+  /* sidebar */
+  .sidebar{width:212px;flex-shrink:0;background:var(--sidebar);border-right:1px solid var(--border);padding:18px 14px;display:flex;flex-direction:column;}
+  .brand{display:flex;align-items:center;gap:9px;padding:4px 6px 20px;}
+  .brand .mark{width:30px;height:30px;border-radius:9px;background:var(--green);display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:700;font-size:15px;flex-shrink:0;}
+  .brand .txt{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink);line-height:1.25;}
+  .brand .txt small{display:block;font-family:var(--sans);font-size:9.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:10px;font-size:13px;font-weight:600;color:var(--body);cursor:pointer;margin-bottom:3px;transition:background .12s;}
+  .nav-item:hover{background:#f0ece0;}
+  .nav-item svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0;}
+  .nav-item.on{background:var(--green);color:#fff;}
+  .nav-item.on:hover{background:var(--green);}
+  .sidebar-foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--border);}
+  .sidebar-foot .who{display:flex;align-items:center;gap:9px;padding:6px;}
+  .sidebar-foot .who span{font-size:11.5px;}
+  .sidebar-foot .who .nm{font-weight:700;color:var(--ink);display:block;}
+  .sidebar-foot .who .role{color:var(--muted);}
+
+  /* main */
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .topbar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:16px 26px;border-bottom:1px solid var(--border);background:var(--surface);}
+  .topbar .cls{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink);}
+  .topbar .cls span{display:block;font-family:var(--sans);font-size:11.5px;font-weight:500;color:var(--muted);margin-top:1px;}
+  .topbar .me{display:flex;align-items:center;gap:8px;}
+  .topbar .me .avatar{width:28px;height:28px;font-size:11px;}
+  .topbar .me span{font-size:12px;font-weight:600;color:var(--body);}
+  .content{flex:1;overflow-y:auto;padding:22px 28px 40px;background:var(--bg);}
+  .content::-webkit-scrollbar{width:8px;} .content::-webkit-scrollbar-thumb{background:#d8d2c2;border-radius:99px;}
+
+  .sec{display:none;}
+  .sec.on{display:block;animation:fadein .18s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  .sec-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:16px;}
+  .sec-head h2{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);margin:0 0 4px;}
+  .sec-head p{font-size:12.5px;color:var(--muted);margin:0;max-width:520px;line-height:1.5;}
+  .sec-head .actions{display:flex;gap:8px;flex-shrink:0;}
+
+  /* shared */
+  .stat-row{display:flex;gap:12px;margin-bottom:20px;}
+  .stat-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;}
+  .stat-card .k{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+  .stat-card .v{font-family:var(--serif);font-size:24px;font-weight:700;color:var(--ink);}
+  .stat-card.spent .v{color:var(--red);}
+  .stat-card.balance{background:var(--green-light);border-color:var(--green-border);}
+  .stat-card.balance .v{color:var(--green);}
+  .stat-card .sub{font-size:11px;color:var(--muted);margin-top:3px;}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:16px;}
+  .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .card-head h3{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);margin:0;}
+
+  .src-chip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--green-light);color:var(--green);white-space:nowrap;}
+  .avatar{border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-weight:600;flex-shrink:0;}
+
+  .btn{font-family:var(--sans);font-weight:700;border:none;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;justify-content:center;padding:10px 15px;font-size:12.5px;transition:background .12s,opacity .12s;}
+  .btn-primary{background:var(--green);color:#fff;}
+  .btn-primary:hover{background:var(--ink);}
+  .btn-primary:disabled{opacity:.55;cursor:default;}
+  .btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--border);}
+  .btn-ghost:hover{background:var(--green-light);}
+  .btn-sm{padding:7px 12px;font-size:11.5px;}
+  .btn svg{width:14px;height:14px;flex-shrink:0;}
+
+  select,input[type=text],input[type=number],input[type=date],textarea{
+    font-family:var(--sans);font-size:13px;color:var(--ink);background:#fff;border:1px solid var(--border);
+    border-radius:9px;padding:9px 10px;width:100%;outline:none;
+  }
+  select:focus,input:focus,textarea:focus{border-color:var(--green-border);}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .file-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--green);background:var(--green-light);padding:5px 10px;border-radius:99px;cursor:pointer;font-weight:600;}
+  .file-chip input{display:none;}
+  .receipt-thumb{width:34px;height:34px;border-radius:8px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);}
+  .receipt-empty{width:34px;height:34px;border-radius:8px;flex-shrink:0;border:1.5px dashed var(--border);display:grid;place-items:center;color:var(--muted);}
+  .receipt-empty svg{width:14px;height:14px;}
+
+  .inline-form{background:#fbf9f4;border:1px solid var(--green-border);border-radius:12px;padding:14px;margin-bottom:14px;display:none;}
+  .inline-form.on{display:block;}
+  .inline-form .form-grid{margin-bottom:10px;}
+  .inline-form-actions{display:flex;gap:8px;justify-content:flex-end;}
+
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);background:var(--ink);color:#fff;font-size:12.5px;font-weight:600;padding:11px 20px;border-radius:12px;opacity:0;transition:opacity .25s,transform .25s;z-index:999;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.25);}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ── Fundraising ── */
+  .table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:12.5px;}
+  .table th{text-align:left;font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;background:#fbf9f4;padding:9px 12px;border-bottom:1px solid var(--border);}
+  .table td{padding:9px 12px;border-bottom:1px solid #f0ece0;color:var(--body);}
+  .table tr:last-child td{border-bottom:none;}
+  .table .who{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--ink);}
+  .table .who .avatar{width:24px;height:24px;font-size:9.5px;}
+  .table .empty{color:var(--muted);text-align:center;padding:18px;}
+
+  /* ── Dashboard ── */
+  .dash-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;}
+  .quick-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .ev-row-mini{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #f0ece0;cursor:pointer;}
+  .ev-row-mini:last-child{border-bottom:none;}
+  .ev-row-mini:hover .ev-title{color:var(--green);}
+  .ev-date-badge{width:42px;height:42px;border-radius:10px;background:var(--green-light);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
+  .ev-date-badge .mo{font-size:8.5px;font-weight:700;color:var(--green);text-transform:uppercase;}
+  .ev-date-badge .dy{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--ink);line-height:1;}
+  .ev-title{font-size:12.5px;font-weight:600;color:var(--ink);}
+  .ev-status{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;flex-shrink:0;}
+  .ev-status.draft{color:var(--amber);background:var(--amber-bg);}
+  .ev-status.published{color:var(--green);background:var(--green-light);}
+  .lunch-mini{display:flex;flex-direction:column;gap:2px;}
+  .lunch-mini .day{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid #f0ece0;}
+  .lunch-mini .day:last-child{border-bottom:none;}
+  .lunch-mini .day b{color:var(--ink);font-weight:600;}
+  .lunch-mini .day span{color:var(--muted);text-align:right;}
+
+  /* ── Calendar ── */
+  .ev-row{display:flex;align-items:center;gap:14px;padding:12px 4px;border-bottom:1px solid #f0ece0;}
+  .ev-row:last-child{border-bottom:none;}
+  .ev-date-badge.lg{width:52px;height:52px;}
+  .ev-date-badge.lg .dy{font-size:18px;}
+  .ev-body{flex:1;min-width:0;}
+  .ev-body .t{font-family:var(--serif);font-size:14.5px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+  .ev-body .d{font-size:11.5px;color:var(--muted);line-height:1.4;}
+  .ev-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .ev-trash{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:var(--red);cursor:pointer;flex-shrink:0;}
+  .ev-trash svg{width:14px;height:14px;}
+  .ev-trash:hover{background:var(--red-bg);}
+
+  /* ── Lunch Menu ── */
+  .lunch-row{display:grid;grid-template-columns:110px 1fr 1fr;gap:14px;align-items:center;padding:11px 0;border-bottom:1px solid #f0ece0;}
+  .lunch-row:last-child{border-bottom:none;}
+  .lunch-row .dayname{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink);}
+
+  /* ── Compose Email ── */
+  .email-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+  .chk-row{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid #f0ece0;}
+  .chk-row:last-child{border-bottom:none;}
+  .chk-row input{margin-top:3px;accent-color:var(--green);width:15px;height:15px;flex-shrink:0;}
+  .chk-row .body{flex:1;min-width:0;}
+  .chk-row .t{font-size:12.5px;font-weight:600;color:var(--ink);}
+  .chk-row .d{font-size:11px;color:var(--muted);margin-top:1px;}
+  .email-preview{background:#fdfcf9;border:1px solid var(--border);border-radius:12px;padding:16px 18px;font-size:12.5px;color:var(--body);line-height:1.65;white-space:pre-wrap;min-height:280px;font-family:var(--sans);}
+  .email-preview .subj{font-family:var(--serif);font-size:14.5px;font-weight:700;color:var(--ink);margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);white-space:normal;}
+  .regen-spin{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<div class="page-lede">
+  <h1>Room Parent Web Portal — Live Prototype</h1>
+  <p>Direction A (Sidebar Admin), built out fully per your pick. Click through the sidebar — every section is real: add a calendar event and push it to Discover, edit the lunch menu, watch Compose Email auto-assemble from your calendar + class links, and run the donation/expense tracker end to end (export downloads an actual CSV).</p>
+</div>
+
+<div class="browser">
+  <div class="browser-bar">
+    <div class="browser-dot" style="background:#ec6a5e;"></div><div class="browser-dot" style="background:#f4bf4f;"></div><div class="browser-dot" style="background:#61c454;"></div>
+    <div class="browser-nav"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+    <div class="browser-url" id="urlbar">room.joinsprout.co/kiker/1st-grade/dashboard</div>
+  </div>
+  <div class="app">
+    <div class="sidebar">
+      <div class="brand"><div class="mark">S</div><div class="txt">Room Parent<small>Portal</small></div></div>
+      <div class="nav-item on" data-sec="dashboard" onclick="goTo('dashboard')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</div>
+      <div class="nav-item" data-sec="calendar" onclick="goTo('calendar')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendar</div>
+      <div class="nav-item" data-sec="lunch" onclick="goTo('lunch')"><svg viewBox="0 0 24 24"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 4v5h5"/></svg>Lunch Menu</div>
+      <div class="nav-item" data-sec="email" onclick="goTo('email')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Compose Email</div>
+      <div class="nav-item" data-sec="fundraising" onclick="goTo('fundraising')"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Fundraising</div>
+      <div class="sidebar-foot"><div class="who"><div class="avatar" style="width:30px;height:30px;font-size:11px;background:linear-gradient(145deg,#1e3e2b,#4fa472);">TM</div><span><span class="nm">Tony M.</span><span class="role">Room Parent</span></span></div></div>
+    </div>
+
+    <div class="main">
+      <div class="topbar">
+        <div class="cls">Mrs. Taylor's Class<span>1st Grade · Kiker Elementary</span></div>
+        <div class="me"><div class="avatar" style="background:linear-gradient(145deg,#1e3e2b,#4fa472);">TM</div><span>Tony M.</span></div>
+      </div>
+
+      <div class="content">
+
+        <!-- ═══ DASHBOARD ═══ -->
+        <div class="sec on" id="sec-dashboard">
+          <div class="sec-head"><div><h2>Welcome back, Tony 👋</h2><p>Here's what's happening in Mrs. Taylor's Class this week.</p></div></div>
+
+          <div class="stat-row">
+            <div class="stat-card balance"><div class="k">Fund Balance</div><div class="v" id="dash-balance">$0</div><div class="sub">$0 raised so far</div></div>
+            <div class="stat-card"><div class="k">Upcoming Events</div><div class="v" id="dash-eventcount">0</div><div class="sub" id="dash-eventsub">nothing scheduled</div></div>
+            <div class="stat-card"><div class="k">Class Size</div><div class="v">24</div><div class="sub">families in Mrs. Taylor's Class</div></div>
+          </div>
+
+          <div class="dash-grid">
+            <div class="card">
+              <div class="card-head"><h3>Upcoming Events</h3><span class="btn btn-ghost btn-sm" onclick="goTo('calendar')">View Calendar</span></div>
+              <div id="dash-eventlist"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>This Week's Lunch</h3><span class="btn btn-ghost btn-sm" onclick="goTo('lunch')">Edit</span></div>
+              <div class="lunch-mini" id="dash-lunch"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Quick Actions</h3></div>
+            <div class="quick-actions">
+              <button class="btn btn-primary" onclick="goTo('calendar'); toggleForm('evForm');">+ Add Event</button>
+              <button class="btn btn-ghost" onclick="goTo('email')">✉️ Compose Email</button>
+              <button class="btn btn-ghost" onclick="goTo('fundraising'); toggleForm('donForm');">+ Log Donation</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ CALENDAR ═══ -->
+        <div class="sec" id="sec-calendar">
+          <div class="sec-head">
+            <div><h2>Master Calendar</h2><p>Preload events for the year, then push them to Discover when it's time to notify parents.</p></div>
+            <div class="actions"><button class="btn btn-primary" onclick="toggleForm('evForm')">+ Add Event</button></div>
+          </div>
+
+          <div class="inline-form" id="evForm">
+            <div class="form-grid">
+              <div class="field"><label>Title</label><input type="text" id="evTitle" placeholder="e.g. Fall Book Fair"></div>
+              <div class="field"><label>Date</label><input type="date" id="evDate"></div>
+              <div class="field" style="grid-column:1/-1;"><label>Description</label><input type="text" id="evDesc" placeholder="A line parents will see"></div>
+            </div>
+            <div class="inline-form-actions"><button class="btn btn-ghost" onclick="toggleForm('evForm')">Cancel</button><button class="btn btn-primary" onclick="addEvent()">Save Event (as Draft)</button></div>
+          </div>
+
+          <div class="card"><div id="ev-rows"></div></div>
+        </div>
+
+        <!-- ═══ LUNCH MENU ═══ -->
+        <div class="sec" id="sec-lunch">
+          <div class="sec-head">
+            <div><h2>Weekly Lunch &amp; Breakfast Menu</h2><p>This is the master menu for the whole school — it flows down to every grade's calendar automatically, no need to re-enter it per class.</p></div>
+            <div class="actions"><button class="btn btn-primary" onclick="saveLunch()"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>Save Menu</button></div>
+          </div>
+          <div class="card">
+            <div class="lunch-row" style="border-bottom:2px solid var(--border);padding-top:0;"><div></div><div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;">Breakfast</div><div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;">Lunch</div></div>
+            <div id="lunch-rows"></div>
+          </div>
+        </div>
+
+        <!-- ═══ COMPOSE EMAIL ═══ -->
+        <div class="sec" id="sec-email">
+          <div class="sec-head">
+            <div><h2>Compose Class Email</h2><p>Pulls upcoming calendar events and your class links in automatically — uncheck anything you don't want included, then regenerate.</p></div>
+            <div class="actions"><button class="btn btn-ghost" id="regenBtn" onclick="regenerateEmail()">✨ Regenerate with AI</button><button class="btn btn-primary" onclick="sendEmail()">Send to Class</button></div>
+          </div>
+
+          <div class="card">
+            <div class="field"><label>Subject</label><input type="text" id="emailSubject" value="September Updates from Mrs. Taylor's Class 🍎"></div>
+          </div>
+
+          <div class="email-grid">
+            <div>
+              <div class="card">
+                <div class="card-head"><h3>Your Message</h3></div>
+                <textarea id="emailIntro" rows="3" style="resize:vertical;">Hi everyone! A few things coming up this month —</textarea>
+              </div>
+              <div class="card">
+                <div class="card-head"><h3>Events to Include</h3></div>
+                <div id="email-events"></div>
+              </div>
+              <div class="card">
+                <div class="card-head"><h3>Links to Include</h3></div>
+                <div id="email-links"></div>
+              </div>
+            </div>
+            <div class="card" style="position:sticky;top:0;">
+              <div class="card-head"><h3>Preview</h3></div>
+              <div class="email-preview" id="email-preview"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ FUNDRAISING ═══ -->
+        <div class="sec" id="sec-fundraising">
+          <div class="sec-head">
+            <div><h2>Fundraising</h2><p>Track donations and how the class fund gets spent — replaces the spreadsheet.</p></div>
+            <div class="actions"><button class="btn btn-ghost" onclick="exportCSV()"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Export</button></div>
+          </div>
+
+          <div class="stat-row">
+            <div class="stat-card"><div class="k">Total Raised</div><div class="v" id="fr-raised">$0</div></div>
+            <div class="stat-card spent"><div class="k">Total Spent</div><div class="v" id="fr-spent">$0</div></div>
+            <div class="stat-card balance"><div class="k">Balance</div><div class="v" id="fr-balance">$0</div></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Donations</h3><button class="btn btn-primary btn-sm" onclick="toggleForm('donForm')">+ Log Donation</button></div>
+            <div class="inline-form" id="donForm">
+              <div class="form-grid">
+                <div class="field"><label>Parent</label><select id="donParent"></select></div>
+                <div class="field"><label>Amount ($)</label><input type="number" id="donAmount" placeholder="0.00" step="0.01" min="0"></div>
+                <div class="field"><label>Source</label><select id="donSource"><option>Venmo</option><option>Apple Pay</option><option>Check</option><option>Cash</option></select></div>
+                <div class="field"><label>Date Received</label><input type="date" id="donDate"></div>
+              </div>
+              <div class="inline-form-actions"><button class="btn btn-ghost" onclick="toggleForm('donForm')">Cancel</button><button class="btn btn-primary" onclick="addDonation()">Save Donation</button></div>
+            </div>
+            <table class="table"><thead><tr><th>Parent</th><th>Amount</th><th>Source</th><th>Date</th></tr></thead><tbody id="don-rows"></tbody></table>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Expenses</h3><button class="btn btn-primary btn-sm" onclick="toggleForm('expForm')">+ Log Expense</button></div>
+            <div class="inline-form" id="expForm">
+              <div class="form-grid">
+                <div class="field" style="grid-column:1/-1;"><label>What it was used for</label><input type="text" id="expDesc" placeholder="e.g. Spirit Night snacks"></div>
+                <div class="field"><label>Amount Spent ($)</label><input type="number" id="expAmount" placeholder="0.00" step="0.01" min="0"></div>
+                <div class="field"><label>Date</label><input type="date" id="expDate"></div>
+              </div>
+              <div class="field" style="margin-bottom:10px;"><label>Receipt (optional)</label><label class="file-chip">📎 Attach receipt<input type="file" accept="image/*" id="expFile" onchange="handleReceiptPreview()"></label> <img class="receipt-thumb" id="expPreview" style="display:none;margin-left:8px;vertical-align:middle;"></div>
+              <div class="inline-form-actions"><button class="btn btn-ghost" onclick="toggleForm('expForm')">Cancel</button><button class="btn btn-primary" onclick="addExpense()">Save Expense</button></div>
+            </div>
+            <table class="table"><thead><tr><th>What for</th><th>Amount</th><th>Date</th><th>Receipt</th></tr></thead><tbody id="exp-rows"></tbody></table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PARENTS = [
+  {id:'lm', name:'Lydia Martin', initials:'LM', color:'linear-gradient(145deg,#1e3e2b,#4fa472)'},
+  {id:'sj', name:'Sarah Jensen', initials:'SJ', color:'linear-gradient(145deg,#3a7ca5,#7ec8e3)'},
+  {id:'mc', name:'Mike Cherches', initials:'MC', color:'linear-gradient(145deg,#7a3a8a,#ba7aca)'},
+  {id:'ks', name:'Kate Skiff', initials:'KS', color:'linear-gradient(145deg,#c85e20,#f0a060)'},
+  {id:'ar', name:'Amy Rangel', initials:'AR', color:'linear-gradient(145deg,#3a7ca5,#7ec8e3)'},
+  {id:'tm', name:'Tony Martin', initials:'TM', color:'linear-gradient(145deg,#1e3e2b,#4fa472)'}
+];
+function parentById(id){ return PARENTS.find(p=>p.id===id) || PARENTS[0]; }
+function fmt(n){ return '$' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtDate(iso){
+  if(!iso) return '—';
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function fmtMonthDay(iso){
+  const d = new Date(iso + 'T00:00:00');
+  return {mo:d.toLocaleDateString('en-US',{month:'short'}), dy:d.getDate()};
+}
+function sourceEmoji(s){ return {Venmo:'📱','Apple Pay':'📱',Check:'🧾',Cash:'💵'}[s] || '💵'; }
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(showToast._tm);
+  showToast._tm = setTimeout(()=>t.classList.remove('on'), 2400);
+}
+function toggleForm(id){ document.getElementById(id).classList.toggle('on'); }
+
+/* ═══ NAVIGATION ═══ */
+const sectionUrls = {
+  dashboard:'room.joinsprout.co/kiker/1st-grade/dashboard',
+  calendar:'room.joinsprout.co/kiker/1st-grade/calendar',
+  lunch:'room.joinsprout.co/kiker/1st-grade/lunch-menu',
+  email:'room.joinsprout.co/kiker/1st-grade/compose',
+  fundraising:'room.joinsprout.co/kiker/1st-grade/fundraising'
+};
+function goTo(sec){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('on', n.dataset.sec === sec));
+  document.querySelectorAll('.sec').forEach(s=>s.classList.toggle('on', s.id === 'sec-'+sec));
+  document.getElementById('urlbar').textContent = sectionUrls[sec];
+  if(sec === 'dashboard') renderDashboard();
+  if(sec === 'email') renderEmailChecklists();
+}
+
+/* ═══ EVENTS / CALENDAR ═══ */
+let events = [
+  {id:1, title:'Back to School Picnic', date:'2026-09-05', desc:'Meet-and-greet on the front lawn, 5:30–7pm. Bring a folding chair!', status:'published'},
+  {id:2, title:"Spirit Night at Mandola's", date:'2026-09-12', desc:'20% of proceeds go to our class fund — just mention Kiker 1st Grade.', status:'draft'},
+  {id:3, title:"Miss Taylor's Class Photo Day", date:'2026-09-18', desc:'Order forms go home the week before.', status:'draft'},
+  {id:4, title:'Fall Fundraiser Kickoff', date:'2026-10-02', desc:"Kicking off this year's fundraiser — details TBD.", status:'draft'}
+];
+let nextEventId = 5;
+
+function renderEvents(){
+  const sorted = [...events].sort((a,b)=> a.date.localeCompare(b.date));
+  const wrap = document.getElementById('ev-rows');
+  wrap.innerHTML = sorted.map(ev => {
+    const md = fmtMonthDay(ev.date);
+    return `<div class="ev-row">
+      <div class="ev-date-badge lg"><div class="mo">${md.mo}</div><div class="dy">${md.dy}</div></div>
+      <div class="ev-body"><div class="t">${ev.title}</div><div class="d">${ev.desc}</div></div>
+      <div class="ev-actions">
+        <span class="ev-status ${ev.status}">${ev.status === 'published' ? 'Live in Discover' : 'Draft'}</span>
+        ${ev.status === 'draft'
+          ? `<button class="btn btn-primary btn-sm" onclick="pushEvent(${ev.id})">Push to Discover</button>`
+          : `<button class="btn btn-ghost btn-sm" onclick="unpushEvent(${ev.id})">Unpublish</button>`}
+        <div class="ev-trash" onclick="deleteEvent(${ev.id})"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Zm-80-104v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0m48 0v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0"/></svg></div>
+      </div>
+    </div>`;
+  }).join('') || `<div class="table empty">No events yet — add your first one.</div>`;
+}
+function addEvent(){
+  const title = document.getElementById('evTitle').value.trim();
+  const date = document.getElementById('evDate').value;
+  const desc = document.getElementById('evDesc').value.trim() || 'No description added yet.';
+  if(!title){ alert('Give the event a title.'); return; }
+  if(!date){ alert('Pick a date.'); return; }
+  events.push({id: nextEventId++, title, date, desc, status:'draft'});
+  document.getElementById('evTitle').value = '';
+  document.getElementById('evDate').value = '';
+  document.getElementById('evDesc').value = '';
+  toggleForm('evForm');
+  renderEvents();
+  showToast('Event saved as draft ✓');
+}
+function pushEvent(id){
+  const ev = events.find(e=>e.id===id); if(!ev) return;
+  ev.status = 'published';
+  renderEvents();
+  showToast(`"${ev.title}" pushed to Discover ✓`);
+}
+function unpushEvent(id){
+  const ev = events.find(e=>e.id===id); if(!ev) return;
+  ev.status = 'draft';
+  renderEvents();
+  showToast(`"${ev.title}" pulled back to draft`);
+}
+function deleteEvent(id){
+  events = events.filter(e=>e.id!==id);
+  renderEvents();
+}
+
+/* ═══ LUNCH MENU ═══ */
+let lunchMenu = {
+  Mon:{breakfast:'Yogurt Parfait & Fruit', lunch:'Chicken Tenders & Green Beans'},
+  Tue:{breakfast:'Mini Pancakes', lunch:'Cheese Quesadilla & Corn'},
+  Wed:{breakfast:'Oatmeal Bar', lunch:'Turkey & Cheese Sandwich, Apple Slices'},
+  Thu:{breakfast:'Breakfast Burrito', lunch:'Spaghetti & Marinara, Garlic Bread'},
+  Fri:{breakfast:'Bagel & Cream Cheese', lunch:'Pizza Day 🍕'}
+};
+function renderLunch(){
+  const wrap = document.getElementById('lunch-rows');
+  wrap.innerHTML = Object.keys(lunchMenu).map(day => `
+    <div class="lunch-row">
+      <div class="dayname">${day}</div>
+      <input type="text" value="${lunchMenu[day].breakfast}" oninput="lunchMenu['${day}'].breakfast=this.value">
+      <input type="text" value="${lunchMenu[day].lunch}" oninput="lunchMenu['${day}'].lunch=this.value">
+    </div>`).join('');
+}
+function saveLunch(){ showToast('Lunch menu updated — synced to every grade ✓'); renderDashboard(); }
+
+/* ═══ COMPOSE EMAIL ═══ */
+let classLinks = [
+  {id:1, label:'Room Parent Sign-Up (Volunteers)', url:'sprout.link/kiker-1st-volunteer', checked:true},
+  {id:2, label:'Class WhatsApp Group', url:'sprout.link/kiker-1st-whatsapp', checked:true},
+  {id:3, label:'Shared Photo Album', url:'sprout.link/kiker-1st-photos', checked:false}
+];
+function renderEmailChecklists(){
+  const evWrap = document.getElementById('email-events');
+  const upcoming = [...events].sort((a,b)=> a.date.localeCompare(b.date));
+  evWrap.innerHTML = upcoming.map(ev => `
+    <label class="chk-row"><input type="checkbox" data-evid="${ev.id}" ${ev.includeInEmail !== false ? 'checked' : ''} onchange="toggleEventInclude(${ev.id}, this.checked)">
+      <div class="body"><div class="t">${ev.title} — ${fmtDate(ev.date)}</div><div class="d">${ev.desc}</div></div>
+    </label>`).join('') || `<div class="table empty">No upcoming events.</div>`;
+
+  const lnWrap = document.getElementById('email-links');
+  lnWrap.innerHTML = classLinks.map(l => `
+    <label class="chk-row"><input type="checkbox" data-linkid="${l.id}" ${l.checked ? 'checked' : ''} onchange="toggleLinkInclude(${l.id}, this.checked)">
+      <div class="body"><div class="t">${l.label}</div><div class="d">${l.url}</div></div>
+    </label>`).join('');
+
+  buildEmailPreview();
+}
+function toggleEventInclude(id, checked){
+  const ev = events.find(e=>e.id===id); if(ev) ev.includeInEmail = checked;
+}
+function toggleLinkInclude(id, checked){
+  const l = classLinks.find(l=>l.id===id); if(l) l.checked = checked;
+}
+function buildEmailPreview(){
+  const subject = document.getElementById('emailSubject').value.trim() || 'Class Update';
+  const intro = document.getElementById('emailIntro').value.trim();
+  const includedEvents = [...events].filter(e => e.includeInEmail !== false).sort((a,b)=> a.date.localeCompare(b.date));
+  const includedLinks = classLinks.filter(l => l.checked);
+
+  let body = intro ? intro + '\n\n' : '';
+  if(includedEvents.length){
+    body += '📅 Upcoming Events\n';
+    includedEvents.forEach(ev => { body += `• ${ev.title} — ${fmtDate(ev.date)}\n   ${ev.desc}\n`; });
+    body += '\n';
+  }
+  if(includedLinks.length){
+    body += '🔗 Helpful Links\n';
+    includedLinks.forEach(l => { body += `• ${l.label} — ${l.url}\n`; });
+    body += '\n';
+  }
+  body += 'Thanks!\nTony — Room Parent, Mrs. Taylor\'s Class';
+
+  document.getElementById('email-preview').innerHTML = `<div class="subj">${subject.replace(/</g,'&lt;')}</div>` + body.replace(/</g,'&lt;');
+}
+function regenerateEmail(){
+  const btn = document.getElementById('regenBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="regen-spin"></span> Regenerating…';
+  setTimeout(()=>{
+    buildEmailPreview();
+    btn.disabled = false;
+    btn.innerHTML = '✨ Regenerate with AI';
+    showToast('Draft regenerated from your calendar & links ✓');
+  }, 650);
+}
+function sendEmail(){
+  showToast('Sent to 24 families in Mrs. Taylor\'s Class ✓');
+}
+
+/* ═══ FUNDRAISING ═══ */
+let donations = [
+  {parentId:'lm', amount:50, source:'Venmo', date:'2026-08-12'},
+  {parentId:'sj', amount:25, source:'Cash', date:'2026-08-14'},
+  {parentId:'mc', amount:100, source:'Check', date:'2026-08-15'},
+  {parentId:'tm', amount:40, source:'Apple Pay', date:'2026-08-18'}
+];
+let expenses = [
+  {desc:'Spirit Night snacks & drinks', amount:62.50, date:'2026-08-20', receipt:null}
+];
+
+function recalcFund(){
+  const raised = donations.reduce((sum,d)=>sum+Number(d.amount),0);
+  const spent = expenses.reduce((sum,e)=>sum+Number(e.amount),0);
+  const balance = raised - spent;
+  document.getElementById('fr-raised').textContent = fmt(raised);
+  document.getElementById('fr-spent').textContent = fmt(spent);
+  document.getElementById('fr-balance').textContent = fmt(balance);
+  return {raised, spent, balance};
+}
+function renderDonations(){
+  const sorted = [...donations].sort((a,b)=> b.date.localeCompare(a.date));
+  document.getElementById('don-rows').innerHTML = sorted.map(d => {
+    const p = parentById(d.parentId);
+    return `<tr><td><div class="who"><div class="avatar" style="background:${p.color};">${p.initials}</div>${p.name}</div></td><td>${fmt(d.amount)}</td><td><span class="src-chip">${sourceEmoji(d.source)} ${d.source}</span></td><td>${fmtDate(d.date)}</td></tr>`;
+  }).join('') || `<tr><td colspan="4" class="table empty">No donations logged yet.</td></tr>`;
+}
+function renderExpenses(){
+  const sorted = [...expenses].sort((a,b)=> b.date.localeCompare(a.date));
+  const receiptCell = (e) => e.receipt
+    ? `<img class="receipt-thumb" src="${e.receipt}">`
+    : `<div class="receipt-empty" title="No receipt attached"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/></svg></div>`;
+  document.getElementById('exp-rows').innerHTML = sorted.map(e =>
+    `<tr><td>${e.desc}</td><td style="color:var(--red);">-${fmt(e.amount)}</td><td>${fmtDate(e.date)}</td><td>${receiptCell(e)}</td></tr>`
+  ).join('') || `<tr><td colspan="4" class="table empty">No expenses logged yet.</td></tr>`;
+}
+function renderFundraising(){ recalcFund(); renderDonations(); renderExpenses(); }
+
+function addDonation(){
+  const amount = parseFloat(document.getElementById('donAmount').value);
+  if(!amount || amount <= 0){ alert('Enter an amount greater than $0.'); return; }
+  const parentId = document.getElementById('donParent').value;
+  const source = document.getElementById('donSource').value;
+  const dateEl = document.getElementById('donDate');
+  const date = dateEl.value || new Date().toISOString().slice(0,10);
+  donations.push({parentId, amount, source, date});
+  document.getElementById('donAmount').value = '';
+  dateEl.value = '';
+  toggleForm('donForm');
+  renderFundraising();
+  showToast('Donation logged ✓');
+}
+function addExpense(){
+  const amount = parseFloat(document.getElementById('expAmount').value);
+  const desc = document.getElementById('expDesc').value.trim();
+  if(!desc){ alert('Add a short description of what it was used for.'); return; }
+  if(!amount || amount <= 0){ alert('Enter an amount greater than $0.'); return; }
+  const dateEl = document.getElementById('expDate');
+  const date = dateEl.value || new Date().toISOString().slice(0,10);
+  const preview = document.getElementById('expPreview');
+  const receipt = (preview && preview.style.display !== 'none') ? preview.src : null;
+  expenses.push({desc, amount, date, receipt});
+  document.getElementById('expDesc').value = '';
+  document.getElementById('expAmount').value = '';
+  dateEl.value = '';
+  if(preview){ preview.style.display = 'none'; preview.src = ''; }
+  const fileInput = document.getElementById('expFile');
+  if(fileInput) fileInput.value = '';
+  toggleForm('expForm');
+  renderFundraising();
+  showToast('Expense logged ✓');
+}
+function handleReceiptPreview(){
+  const input = document.getElementById('expFile');
+  const preview = document.getElementById('expPreview');
+  if(!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'inline-block'; };
+  reader.readAsDataURL(input.files[0]);
+}
+function exportCSV(){
+  const rows = [['Type','Parent / Description','Amount','Source','Date']];
+  donations.forEach(d => rows.push(['Donation', parentById(d.parentId).name, d.amount.toFixed(2), d.source, d.date]));
+  expenses.forEach(e => rows.push(['Expense', e.desc, '-'+e.amount.toFixed(2), '', e.date]));
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'kiker-1st-grade-fundraising.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('CSV downloaded ✓');
+}
+
+/* ═══ DASHBOARD ═══ */
+function renderDashboard(){
+  const {balance, raised} = recalcFund();
+  document.getElementById('dash-balance').textContent = fmt(balance);
+  document.querySelector('#sec-dashboard .stat-card.balance .sub').textContent = `${fmt(raised)} raised so far`;
+
+  const upcoming = [...events].sort((a,b)=> a.date.localeCompare(b.date)).slice(0,4);
+  document.getElementById('dash-eventcount').textContent = events.length;
+  document.getElementById('dash-eventsub').textContent = events.length === 1 ? '1 event on the calendar' : `${events.length} events on the calendar`;
+  document.getElementById('dash-eventlist').innerHTML = upcoming.map(ev => {
+    const md = fmtMonthDay(ev.date);
+    return `<div class="ev-row-mini" onclick="goTo('calendar')">
+      <div class="ev-date-badge"><div class="mo">${md.mo}</div><div class="dy">${md.dy}</div></div>
+      <div style="flex:1;min-width:0;"><div class="ev-title">${ev.title}</div></div>
+      <span class="ev-status ${ev.status}">${ev.status === 'published' ? 'Live' : 'Draft'}</span>
+    </div>`;
+  }).join('') || `<div class="table empty">Nothing on the calendar yet.</div>`;
+
+  document.getElementById('dash-lunch').innerHTML = Object.keys(lunchMenu).map(day =>
+    `<div class="day"><b>${day}</b><span>${lunchMenu[day].lunch}</span></div>`
+  ).join('');
+}
+
+/* ═══ INIT ═══ */
+document.getElementById('donParent').innerHTML = PARENTS.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+renderEvents();
+renderLunch();
+renderFundraising();
+renderDashboard();
+</script>
+
+</body>
+</html>
