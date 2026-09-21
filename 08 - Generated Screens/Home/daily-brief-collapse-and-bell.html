@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Daily Brief — collapse, and the bell · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F1EA; --card:#FFFFFF; --ink:#1E3E2B; --muted:#7D715E; --green:#186338;
+  --light:#E2E9E3; --border:#77B691; --div:#DBD5C8; --hair:#E6E7EA; --red:#D64545;
+  --amber-bg:#FBF1DA; --amber-br:#E6CD96; --amber:#B5872B;
+  --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif;
+  --shadow-m:1px 4px 25px 2px rgba(13,13,18,.05);
+  --shadow-l:1px 4px 25px 2px rgba(13,13,18,.1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#DDD8CE;font-family:var(--sans);-webkit-font-smoothing:antialiased;padding:38px 0 70px}
+
+.lede{max-width:940px;margin:0 auto 10px;padding:0 30px}
+.lede h1{font-family:var(--serif);font-size:29px;font-weight:600;color:var(--ink);margin:0 0 8px}
+.lede .p{font-size:14px;color:#5b5648;line-height:1.65;margin:0 0 14px}
+.quote{background:#fff;border-left:3px solid var(--green);border-radius:12px;padding:14px 17px;
+  font-size:13.5px;line-height:1.65;color:#4d525b}
+.quote b{color:var(--ink)}
+.band{max-width:940px;margin:34px auto 4px;padding:0 30px}
+.band h2{font-family:var(--serif);font-size:21px;color:var(--ink);margin:0 0 5px}
+.band p{font-size:13px;color:var(--muted);margin:0;line-height:1.55;max-width:720px}
+.row{display:flex;gap:44px;align-items:flex-start;overflow-x:auto;padding:22px 30px 26px}
+/* captions share one height so the three phones start at the same y and the
+   190px the collapse gives back is visible as a real offset, not hidden by alignment */
+.panel .cap{min-height:320px}
+.panel{flex:0 0 auto;width:393px;display:flex;flex-direction:column;gap:14px}
+.cap{font-size:12.5px;line-height:1.58;color:#655f52;max-width:393px}
+.cap .n{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--green);background:var(--light);border-radius:99px;padding:4px 10px;margin-bottom:7px}
+.cap b{display:block;font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.cap .k{font-weight:700;color:var(--ink)}
+.openq{background:var(--amber-bg);border:1px solid var(--amber-br);border-radius:12px;
+  padding:11px 13px;font-size:12px;line-height:1.55;color:#7a5a12;margin-top:9px}
+.openq b{display:inline;font-family:var(--sans);font-size:12px;color:#5f460e;margin:0}
+
+/* ── device ─────────────────────────────────────────────────────────────── */
+.device{position:relative;width:393px;border-radius:54px;padding:11px;
+  background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+  box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45)}
+.screen{position:relative;width:100%;border-radius:43px;overflow:hidden;background:var(--bg);
+  display:flex;flex-direction:column}
+.sb{flex:0 0 auto;padding:12px 36px 12px 47px;display:flex;justify-content:space-between;align-items:center;
+  font-size:16px;font-weight:500;color:var(--ink)}
+.sb .r{display:inline-flex;gap:5px;align-items:center}
+.sb svg{width:18px;height:11px;fill:var(--ink)} .sb .bat{width:25px}
+
+/* header — avatar left, title centred, icons right (ported from the Figma frame) */
+.hd{flex:0 0 auto;height:43px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;gap:16px}
+.hd .av{width:40px;height:40px;border-radius:50%;flex-shrink:0;object-fit:cover;
+  background:linear-gradient(145deg,#6b5a45,#b09a7d)}
+.hd .mid{flex:1;text-align:center}
+.hd .mid .t{font-family:var(--serif);font-size:16px;font-weight:500;color:var(--ink);line-height:150%}
+.hd .mid .d{font-size:12px;color:var(--muted);line-height:155%}
+.hd .ico{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.hd .ib{position:relative;width:40px;height:40px;display:grid;place-items:center}
+.hd .ib svg{width:24px;height:24px;stroke:var(--ink);fill:none;stroke-width:1.39;stroke-linecap:round;stroke-linejoin:round}
+.hd .ib .dot{fill:var(--ink);stroke:none}
+.hd .ib .badge{position:absolute;top:2px;right:2px;min-width:17px;height:17px;border-radius:99px;
+  background:#C0492F;color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 5px;
+  border:2px solid var(--bg)}
+
+.body{flex:1 1 auto;padding:0 16px;display:flex;flex-direction:column;gap:12px}
+.div{height:0;border-top:1px solid var(--div)}
+
+.tt{display:flex;align-items:center;gap:12px;padding-top:8px}
+.tt .l{flex:1}
+.tt h2{font-family:var(--serif);font-size:24px;font-weight:500;color:var(--ink);margin:0;line-height:150%}
+.tt .sub{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--muted);line-height:150%}
+.wx{width:66px;background:#fff;box-shadow:var(--shadow-m);border-radius:12px;padding:10px;text-align:center;flex-shrink:0}
+.wx .e{font-size:22px;line-height:1}
+.wx .t{font-size:12px;color:var(--ink);margin-top:6px}
+
+/* needs your attention */
+.todo{border-radius:16px;overflow:hidden}
+.todo .hdr{background:#fff;padding:16px;display:flex;align-items:center;gap:12px;cursor:default}
+.todo .hdr .l{flex:1}
+.todo .hdr .t{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--ink);line-height:140%}
+.todo .hdr .s{font-size:14px;color:var(--muted);line-height:150%;margin-top:2px}
+.ring{width:42px;height:42px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;
+  background:conic-gradient(var(--green) 0 100%,var(--light) 0);position:relative}
+.ring::after{content:'';position:absolute;inset:4px;border-radius:50%;background:#fff}
+.ring span{position:relative;z-index:1;font-size:12px;font-weight:500;color:var(--ink)}
+.todo .chev{width:20px;height:20px;flex-shrink:0;stroke:var(--muted);fill:none;stroke-width:2;transition:transform .2s}
+.todo.closed .chev{transform:rotate(-90deg)}
+.todo .list{max-height:400px;overflow:hidden;transition:max-height .25s ease}
+.todo.closed .list{max-height:0}
+.trow{background:#fff;padding:8px;display:flex;align-items:center;gap:12px;border-top:1px solid var(--hair)}
+.tbox{width:36px;height:36px;border-radius:8px;background:var(--light);display:grid;place-items:center;flex-shrink:0}
+.tbox i{width:20px;height:20px;border-radius:6px;background:var(--green);display:grid;place-items:center}
+.tbox svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.trow .bd{flex:1;min-width:0}
+.trow .t{font-size:14px;font-weight:600;color:var(--ink);line-height:155%;text-decoration:line-through}
+.trow .m{font-size:14px;color:var(--muted);line-height:150%}
+.trow .m small{font-size:12px}
+.trow .go{width:24px;height:24px;border-radius:8px;background:var(--light);display:grid;place-items:center;flex-shrink:0}
+.trow .go svg{width:16px;height:16px;stroke:var(--ink);fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+
+.sec{font-size:14px;font-weight:700;color:var(--ink);line-height:28px}
+.cpool{background:var(--light);border:.5px solid var(--green);border-radius:16px;padding:8px;display:flex;align-items:center;gap:8px}
+.cpool .ic{width:40px;height:40px;border-radius:9px;background:var(--light);border:.5px solid var(--border);
+  display:grid;place-items:center;font-size:22px;flex-shrink:0}
+.cpool .t{font-size:12px;font-weight:500;color:var(--ink);line-height:155%}
+.cpool .s{font-size:12px;color:var(--green);line-height:155%}
+
+.inv{display:flex;justify-content:space-between;align-items:center}
+.inv .n{font-size:12px;color:var(--ink)}
+.evc{background:var(--bg);box-shadow:var(--shadow-l);border-radius:16px;padding:12px}
+.evc .top{display:flex;gap:8px;align-items:center}
+.evc .img{width:75px;height:75px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(140deg,#3a2f22,#8a6f4b)}
+.evc .t{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--ink);line-height:140%}
+.evc .d{font-size:12px;color:var(--muted);line-height:155%;margin-top:4px}
+.evc .host{display:flex;align-items:center;gap:6px;margin-top:6px}
+.evc .host .a{width:24px;height:24px;border-radius:50%;background:linear-gradient(145deg,#3a7ca5,#7ec8e3)}
+.evc .host span{font-size:12px;color:var(--muted)}
+.evc .acts{display:flex;gap:12px;margin-top:12px}
+.evc .acts .b{flex:1;height:40px;border-radius:999px;display:grid;place-items:center;
+  font-family:var(--serif);font-size:12px;font-weight:500}
+.evc .acts .deny{background:var(--light);border:1px solid #D0DACF;color:var(--ink)}
+.evc .acts .join{background:var(--green);color:#fff;box-shadow:0 1px 2px rgba(13,13,18,.06)}
+
+.hap{display:flex;align-items:center;gap:8px}
+.hap .tm{width:49px;font-size:12px;font-weight:500;color:var(--ink);text-align:center;flex-shrink:0}
+.hap .tm.red{color:var(--red)}
+.hap .dot{width:7px;height:7px;border-radius:50%;background:var(--ink);flex-shrink:0}
+.hap .dot.red{background:var(--red)}
+.hap .c{flex:1;background:#fff;border-left:4px solid var(--ink);border-radius:16px;padding:8px 16px;
+  box-shadow:var(--shadow-m)}
+.hap .c.red{border-left-color:var(--red)}
+.hap .c .t{font-family:var(--serif);font-size:16px;font-weight:500;color:var(--ink);line-height:150%}
+.hap .c .t.red{color:var(--red)}
+.hap .c .m{font-size:14px;color:var(--muted);line-height:155%}
+
+.up{background:#fff;border-radius:16px;box-shadow:var(--shadow-m);overflow:hidden}
+.uprow{display:flex;gap:10px;padding:12px;border-bottom:1px solid var(--hair)}
+.uprow:last-child{border-bottom:none}
+.uprow .dt{width:44px;flex-shrink:0;background:var(--light);border-radius:8px;text-align:center;padding:4px 0;height:fit-content}
+.uprow .dt .mo{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:600}
+.uprow .dt .dy{font-family:var(--serif);font-size:16px;color:var(--ink)}
+.uprow .bd{flex:1;min-width:0}
+.uprow .t{font-size:13px;font-weight:600;color:var(--ink);line-height:1.4}
+.uprow .s{font-size:12px;color:var(--muted);line-height:1.5;margin-top:3px}
+.uprow .by{font-size:11px;color:var(--muted);text-align:right;margin-top:4px}
+
+.lun{font-size:14px;color:var(--ink);line-height:1.9}
+.bday{background:var(--amber-bg);border-radius:16px;padding:12px;display:flex;gap:10px;align-items:center}
+.bday .e{font-size:22px}
+.bday .t{font-family:var(--serif);font-size:16px;color:var(--ink);line-height:150%}
+.bday .s{font-size:13px;color:var(--muted)}
+.blist{font-size:14px;color:var(--ink);line-height:1.9}
+.blist span{color:var(--muted)}
+
+.tabs{flex:0 0 auto;margin:10px 16px 0;background:#fff;border-radius:99px;box-shadow:var(--shadow-l);
+  display:flex;padding:10px 6px}
+.tabs .t{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:var(--muted);position:relative}
+.tabs .t svg{width:22px;height:22px;stroke:var(--muted);fill:none;stroke-width:1.6}
+.tabs .t.on{color:var(--green)} .tabs .t.on svg{stroke:var(--green)}
+.tabs .t .b{position:absolute;top:-3px;right:14px;min-width:16px;height:16px;border-radius:99px;background:var(--green);
+  color:#fff;font-size:9.5px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+.home{height:5px;width:140px;background:#1c1c1e;border-radius:99px;margin:12px auto 10px}
+</style>
+</head>
+<body>
+
+<div class="lede"><h1>Daily Brief — the collapse, and the bell</h1><p class="p">Both fixes drawn on the real frame this time, not on a simplified stand-in. Left to right: the screen as it is today, the same screen with the finished to-dos collapsed, and the notification door put back into the actual header.</p><div class="quote"><b>Tony, 17 Sep, on the collapse:</b> <i>“That’s a great idea.”</i> <b>And on the bell:</b> <i>“At the very least right now, if someone requests to join a club, I need to receive a notification on my phone… because if you don’t put it in here, the guys will forget.”</i></div></div>
+
+<div class="band"><h2>What 250px of finished work costs</h2><p>The first two screens are identical except for one collapsed section. Read them side by side.</p></div>
+<div class="row">
+<div class="panel"><div class="cap"><span class="n">As built</span><b>Done, and still taking the top of the screen.</b> Ported from <span class="k">7.1 — Home - Daily Briefing - After</span>. All three to-dos are ticked and struck through, the ring reads 3/3, and the card still says “Great, you got everything done today.” It is finished work, and it is still the tallest thing on the screen — roughly 250px before Carpool even starts.</div><div class="device"><div class="screen"><div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1E3E2B"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div><div class="hd"><div class="av"></div><div class="mid"><div class="t">Sprout AI</div><div class="d">Tuesday, September 8</div></div><div class="ico"><span class="ib"><svg viewBox="0 0 24 24"><rect x="3.75" y="3.75" width="16.5" height="16.5" rx="3"/><path d="M16.5 2.25v3M7.5 2.25v3M3.75 8.25h16.5"/><circle class="dot" cx="12" cy="13.5" r="1"/><circle class="dot" cx="16.2" cy="13.5" r="1"/><circle class="dot" cx="7.8" cy="17.2" r="1"/><circle class="dot" cx="12" cy="17.2" r="1"/><circle class="dot" cx="16.2" cy="17.2" r="1"/></svg></span></div></div><div class="body"><div class="tt"><div class="l"><h2>Your day, in order.</h2><div class="sub">Full, but manageable.</div></div><div class="wx"><div class="e">☀️</div><div class="t">68–86°</div></div></div><div class="div"></div><div class="todo"><div class="hdr"><div class="l"><div class="t">Needs your attention</div><div class="s">Great, you got everything done today.</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg><div class="ring"><span>3/3</span></div></div><div class="list"><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Bring towels for water day</div><div class="m">1st Grade Class · <small>Due Today</small></div></div></div><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Presley Submit project reports</div><div class="m">Miss Taylor Class · <small>Due Friday</small></div></div><div class="go"><svg viewBox="0 0 24 24"><path d="M3.75 12h16.5M14 5.75 20.25 12 14 18.25"/></svg></div></div><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Plan field trip itinerary</div><div class="m">4th Grade Class · <small>Due Saturday</small></div></div></div></div></div><div class="div"></div><div class="sec">🚗 Carpool</div><div class="cpool"><div class="ic">🚌</div><div><div class="t">You’re covering drop-off &amp; pick-up for Mia today</div><div class="s">Tap for pickup details →</div></div></div><div class="div"></div><div class="inv"><div class="sec">📅 Your Invitations</div><span class="n">2 Event</span></div><div class="evc"><div class="top"><div class="img"></div><div><div class="t">Presley’s Birthday Party!</div><div class="d">Sat, Nov 9 · 6:30pm CST</div><div class="host"><span class="a"></span><span>Patrick Collison</span></div></div></div><div class="acts"><span class="b deny">Deny</span><span class="b join">Join</span></div></div><div class="div"></div><div class="sec">📅 Happening today</div><div class="hap"><span class="tm red">Today</span><span class="dot red"></span><div class="c red"><div class="t red">No School</div><div class="m">It’s holiday now</div></div></div><div class="hap"><span class="tm">8:30 AM</span><span class="dot"></span><div class="c"><div class="t">Talent Show</div><div class="m">Kindergarten · Auditorium</div></div></div><div class="hap"><span class="tm">1:30 PM</span><span class="dot"></span><div class="c"><div class="t">Soccer practice</div><div class="m">Little Shots · Field 2</div></div></div><div class="hap"><span class="tm">6:30 PM</span><span class="dot"></span><div class="c"><div class="t">Parent-teacher night</div><div class="m">1st Grade · Room 102</div></div></div><div class="div"></div><div class="sec">📅 Upcoming events</div><div class="up"><div class="uprow"><div class="dt"><div class="mo">Sep</div><div class="dy">5</div></div><div class="bd"><div class="t">✅ Mrs. Taylor’s Class Photo Day <span style="font-weight:400;color:var(--muted)">8:30AM</span></div><div class="s">Don’t FORGET to fill the photo slot in the link that i provided Mom’s and Dad’s</div><div class="by">By: James Martin</div></div></div><div class="uprow"><div class="dt"><div class="mo">Sep</div><div class="dy">6</div></div><div class="bd"><div class="t">📝 Spirit Night at Mandola’s</div><div class="s">20% of proceeds go to our class fund — just mention Kiker 1st Grade.</div><div class="by">By: Mohit Rai</div></div></div><div class="uprow"><div class="dt" style="background:#F7E3E0"><div class="mo">Sep</div><div class="dy">7</div></div><div class="bd"><div class="t">🚫 No School</div><div class="s">US Independence Day</div><div class="by">By: Mohit Rai</div></div></div></div><div class="div"></div><div class="sec">🥪 Today’s Lunch - (Kiker Elementary)</div><div class="lun">1. Hamburger 🍔 🥬<br>2. Rebellyous Burger 🍔<br>3. SunButter &amp; Jelly Sandwich 🍔 🥪</div><div class="div"></div><div class="sec">🎂 Birthdays</div><div class="bday"><span class="e">🎂</span><div><div class="t">Kennedy turns 4 today!</div><div class="s">Say happy birthday at drop-off 👋</div></div></div><div class="blist">Presley (6) <span>— June 6th</span><br>Rome (1) <span>— June 7th</span></div><div class="div"></div><div class="sec">💬 New messages</div></div><div class="tabs"><div class="t on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.2 12H1.8M22.2 12h-2.4M6.5 6.5 4.8 4.8M19.2 19.2l-1.7-1.7M6.5 17.5l-1.7 1.7M19.2 4.8l-1.7 1.7"/></svg><span>Daily Brief</span></div><div class="t"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m14.8 9.2-1.6 4.4-4.4 1.6 1.6-4.4z"/></svg><span>Events</span></div><div class="t"><svg viewBox="0 0 24 24"><path d="M12 3.5 13.8 9l5.5 1.8-5.5 1.8L12 18l-1.8-5.4L4.7 10.8 10.2 9z"/></svg><span>AI Assist</span></div><div class="t"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.6-.7L3 21l1.8-5A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4Z"/></svg><span class="b">2</span><span>Chat</span></div><div class="t"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4"/><path d="M2.6 19a6.5 6.5 0 0 1 12.8 0"/><path d="M16.5 5.2a3.4 3.4 0 0 1 0 6.6M17.5 13.6A6.5 6.5 0 0 1 21.4 19"/></svg><span>Clubs</span></div></div><div class="home"></div></div></div></div><div class="panel"><div class="cap"><span class="n">Collapsed</span><b>Done, and out of the way.</b> The same screen with the section collapsed. The header row stays, so the 3/3 ring still tells you the day is clear, but everything underneath lifts by about 190px: Carpool, the invitation, and the first two items of Happening today all move above the fold. Tony: <span class="k">“whenever you’re done with your to do, you wanna focus on anything else… you can just collapse it, and you can see the other things here clearly.”</span><div class="openq"><b>Two things the prototype does not decide:</b> whether the collapsed state survives an app restart or resets daily, and whether ticking the last item auto-collapses or always waits for a tap. Both are Tony’s call.</div></div><div class="device"><div class="screen"><div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1E3E2B"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div><div class="hd"><div class="av"></div><div class="mid"><div class="t">Sprout AI</div><div class="d">Tuesday, September 8</div></div><div class="ico"><span class="ib"><svg viewBox="0 0 24 24"><rect x="3.75" y="3.75" width="16.5" height="16.5" rx="3"/><path d="M16.5 2.25v3M7.5 2.25v3M3.75 8.25h16.5"/><circle class="dot" cx="12" cy="13.5" r="1"/><circle class="dot" cx="16.2" cy="13.5" r="1"/><circle class="dot" cx="7.8" cy="17.2" r="1"/><circle class="dot" cx="12" cy="17.2" r="1"/><circle class="dot" cx="16.2" cy="17.2" r="1"/></svg></span></div></div><div class="body"><div class="tt"><div class="l"><h2>Your day, in order.</h2><div class="sub">Full, but manageable.</div></div><div class="wx"><div class="e">☀️</div><div class="t">68–86°</div></div></div><div class="div"></div><div class="todo closed"><div class="hdr"><div class="l"><div class="t">Needs your attention</div><div class="s">Great, you got everything done today.</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg><div class="ring"><span>3/3</span></div></div><div class="list"><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Bring towels for water day</div><div class="m">1st Grade Class · <small>Due Today</small></div></div></div><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Presley Submit project reports</div><div class="m">Miss Taylor Class · <small>Due Friday</small></div></div><div class="go"><svg viewBox="0 0 24 24"><path d="M3.75 12h16.5M14 5.75 20.25 12 14 18.25"/></svg></div></div><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Plan field trip itinerary</div><div class="m">4th Grade Class · <small>Due Saturday</small></div></div></div></div></div><div class="div"></div><div class="sec">🚗 Carpool</div><div class="cpool"><div class="ic">🚌</div><div><div class="t">You’re covering drop-off &amp; pick-up for Mia today</div><div class="s">Tap for pickup details →</div></div></div><div class="div"></div><div class="inv"><div class="sec">📅 Your Invitations</div><span class="n">2 Event</span></div><div class="evc"><div class="top"><div class="img"></div><div><div class="t">Presley’s Birthday Party!</div><div class="d">Sat, Nov 9 · 6:30pm CST</div><div class="host"><span class="a"></span><span>Patrick Collison</span></div></div></div><div class="acts"><span class="b deny">Deny</span><span class="b join">Join</span></div></div><div class="div"></div><div class="sec">📅 Happening today</div><div class="hap"><span class="tm red">Today</span><span class="dot red"></span><div class="c red"><div class="t red">No School</div><div class="m">It’s holiday now</div></div></div><div class="hap"><span class="tm">8:30 AM</span><span class="dot"></span><div class="c"><div class="t">Talent Show</div><div class="m">Kindergarten · Auditorium</div></div></div><div class="hap"><span class="tm">1:30 PM</span><span class="dot"></span><div class="c"><div class="t">Soccer practice</div><div class="m">Little Shots · Field 2</div></div></div><div class="hap"><span class="tm">6:30 PM</span><span class="dot"></span><div class="c"><div class="t">Parent-teacher night</div><div class="m">1st Grade · Room 102</div></div></div><div class="div"></div><div class="sec">📅 Upcoming events</div><div class="up"><div class="uprow"><div class="dt"><div class="mo">Sep</div><div class="dy">5</div></div><div class="bd"><div class="t">✅ Mrs. Taylor’s Class Photo Day <span style="font-weight:400;color:var(--muted)">8:30AM</span></div><div class="s">Don’t FORGET to fill the photo slot in the link that i provided Mom’s and Dad’s</div><div class="by">By: James Martin</div></div></div><div class="uprow"><div class="dt"><div class="mo">Sep</div><div class="dy">6</div></div><div class="bd"><div class="t">📝 Spirit Night at Mandola’s</div><div class="s">20% of proceeds go to our class fund — just mention Kiker 1st Grade.</div><div class="by">By: Mohit Rai</div></div></div><div class="uprow"><div class="dt" style="background:#F7E3E0"><div class="mo">Sep</div><div class="dy">7</div></div><div class="bd"><div class="t">🚫 No School</div><div class="s">US Independence Day</div><div class="by">By: Mohit Rai</div></div></div></div><div class="div"></div><div class="sec">🥪 Today’s Lunch - (Kiker Elementary)</div><div class="lun">1. Hamburger 🍔 🥬<br>2. Rebellyous Burger 🍔<br>3. SunButter &amp; Jelly Sandwich 🍔 🥪</div><div class="div"></div><div class="sec">🎂 Birthdays</div><div class="bday"><span class="e">🎂</span><div><div class="t">Kennedy turns 4 today!</div><div class="s">Say happy birthday at drop-off 👋</div></div></div><div class="blist">Presley (6) <span>— June 6th</span><br>Rome (1) <span>— June 7th</span></div><div class="div"></div><div class="sec">💬 New messages</div></div><div class="tabs"><div class="t on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.2 12H1.8M22.2 12h-2.4M6.5 6.5 4.8 4.8M19.2 19.2l-1.7-1.7M6.5 17.5l-1.7 1.7M19.2 4.8l-1.7 1.7"/></svg><span>Daily Brief</span></div><div class="t"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m14.8 9.2-1.6 4.4-4.4 1.6 1.6-4.4z"/></svg><span>Events</span></div><div class="t"><svg viewBox="0 0 24 24"><path d="M12 3.5 13.8 9l5.5 1.8-5.5 1.8L12 18l-1.8-5.4L4.7 10.8 10.2 9z"/></svg><span>AI Assist</span></div><div class="t"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.6-.7L3 21l1.8-5A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4Z"/></svg><span class="b">2</span><span>Chat</span></div><div class="t"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4"/><path d="M2.6 19a6.5 6.5 0 0 1 12.8 0"/><path d="M16.5 5.2a3.4 3.4 0 0 1 0 6.6M17.5 13.6A6.5 6.5 0 0 1 21.4 19"/></svg><span>Clubs</span></div></div><div class="home"></div></div></div></div><div class="panel"><div class="cap"><span class="n">With the bell</span><b>The door, on the header that actually exists.</b> The bell, on the real header rather than the one I invented yesterday. The frame has avatar left, title centred, one icon right — so this is not “add a second icon”, it is spending the last of the right-hand room. The calendar keeps its place on the outside edge because that is where the thumb already goes for it.<div class="openq"><b>Worth testing on a phone:</b> with two icons the centred title loses about 40px and “Tuesday, September 8” sits closer to the bell than to the avatar. If it reads lopsided, the alternative is moving the date under “Your day, in order.” and leaving the header with the app name alone.</div></div><div class="device"><div class="screen"><div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1E3E2B"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div><div class="hd"><div class="av"></div><div class="mid"><div class="t">Sprout AI</div><div class="d">Tuesday, September 8</div></div><div class="ico"><span class="ib"><svg viewBox="0 0 24 24"><path d="M5.5 9.5a6.5 6.5 0 1 1 13 0c0 3.3.8 5.8 1.4 7.1a.8.8 0 0 1-.7 1.1H4.8a.8.8 0 0 1-.7-1.1c.6-1.3 1.4-3.8 1.4-7.1Z"/><path d="M9.2 17.7a2.9 2.9 0 0 0 5.6 0"/></svg><span class="badge">1</span></span><span class="ib"><svg viewBox="0 0 24 24"><rect x="3.75" y="3.75" width="16.5" height="16.5" rx="3"/><path d="M16.5 2.25v3M7.5 2.25v3M3.75 8.25h16.5"/><circle class="dot" cx="12" cy="13.5" r="1"/><circle class="dot" cx="16.2" cy="13.5" r="1"/><circle class="dot" cx="7.8" cy="17.2" r="1"/><circle class="dot" cx="12" cy="17.2" r="1"/><circle class="dot" cx="16.2" cy="17.2" r="1"/></svg></span></div></div><div class="body"><div class="tt"><div class="l"><h2>Your day, in order.</h2><div class="sub">Full, but manageable.</div></div><div class="wx"><div class="e">☀️</div><div class="t">68–86°</div></div></div><div class="div"></div><div class="todo closed"><div class="hdr"><div class="l"><div class="t">Needs your attention</div><div class="s">Great, you got everything done today.</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg><div class="ring"><span>3/3</span></div></div><div class="list"><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Bring towels for water day</div><div class="m">1st Grade Class · <small>Due Today</small></div></div></div><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Presley Submit project reports</div><div class="m">Miss Taylor Class · <small>Due Friday</small></div></div><div class="go"><svg viewBox="0 0 24 24"><path d="M3.75 12h16.5M14 5.75 20.25 12 14 18.25"/></svg></div></div><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Plan field trip itinerary</div><div class="m">4th Grade Class · <small>Due Saturday</small></div></div></div></div></div><div class="div"></div><div class="sec">🚗 Carpool</div><div class="cpool"><div class="ic">🚌</div><div><div class="t">You’re covering drop-off &amp; pick-up for Mia today</div><div class="s">Tap for pickup details →</div></div></div><div class="div"></div><div class="inv"><div class="sec">📅 Your Invitations</div><span class="n">2 Event</span></div><div class="evc"><div class="top"><div class="img"></div><div><div class="t">Presley’s Birthday Party!</div><div class="d">Sat, Nov 9 · 6:30pm CST</div><div class="host"><span class="a"></span><span>Patrick Collison</span></div></div></div><div class="acts"><span class="b deny">Deny</span><span class="b join">Join</span></div></div><div class="div"></div><div class="sec">📅 Happening today</div><div class="hap"><span class="tm red">Today</span><span class="dot red"></span><div class="c red"><div class="t red">No School</div><div class="m">It’s holiday now</div></div></div><div class="hap"><span class="tm">8:30 AM</span><span class="dot"></span><div class="c"><div class="t">Talent Show</div><div class="m">Kindergarten · Auditorium</div></div></div><div class="hap"><span class="tm">1:30 PM</span><span class="dot"></span><div class="c"><div class="t">Soccer practice</div><div class="m">Little Shots · Field 2</div></div></div><div class="hap"><span class="tm">6:30 PM</span><span class="dot"></span><div class="c"><div class="t">Parent-teacher night</div><div class="m">1st Grade · Room 102</div></div></div><div class="div"></div><div class="sec">📅 Upcoming events</div><div class="up"><div class="uprow"><div class="dt"><div class="mo">Sep</div><div class="dy">5</div></div><div class="bd"><div class="t">✅ Mrs. Taylor’s Class Photo Day <span style="font-weight:400;color:var(--muted)">8:30AM</span></div><div class="s">Don’t FORGET to fill the photo slot in the link that i provided Mom’s and Dad’s</div><div class="by">By: James Martin</div></div></div><div class="uprow"><div class="dt"><div class="mo">Sep</div><div class="dy">6</div></div><div class="bd"><div class="t">📝 Spirit Night at Mandola’s</div><div class="s">20% of proceeds go to our class fund — just mention Kiker 1st Grade.</div><div class="by">By: Mohit Rai</div></div></div><div class="uprow"><div class="dt" style="background:#F7E3E0"><div class="mo">Sep</div><div class="dy">7</div></div><div class="bd"><div class="t">🚫 No School</div><div class="s">US Independence Day</div><div class="by">By: Mohit Rai</div></div></div></div><div class="div"></div><div class="sec">🥪 Today’s Lunch - (Kiker Elementary)</div><div class="lun">1. Hamburger 🍔 🥬<br>2. Rebellyous Burger 🍔<br>3. SunButter &amp; Jelly Sandwich 🍔 🥪</div><div class="div"></div><div class="sec">🎂 Birthdays</div><div class="bday"><span class="e">🎂</span><div><div class="t">Kennedy turns 4 today!</div><div class="s">Say happy birthday at drop-off 👋</div></div></div><div class="blist">Presley (6) <span>— June 6th</span><br>Rome (1) <span>— June 7th</span></div><div class="div"></div><div class="sec">💬 New messages</div></div><div class="tabs"><div class="t on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.2 12H1.8M22.2 12h-2.4M6.5 6.5 4.8 4.8M19.2 19.2l-1.7-1.7M6.5 17.5l-1.7 1.7M19.2 4.8l-1.7 1.7"/></svg><span>Daily Brief</span></div><div class="t"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m14.8 9.2-1.6 4.4-4.4 1.6 1.6-4.4z"/></svg><span>Events</span></div><div class="t"><svg viewBox="0 0 24 24"><path d="M12 3.5 13.8 9l5.5 1.8-5.5 1.8L12 18l-1.8-5.4L4.7 10.8 10.2 9z"/></svg><span>AI Assist</span></div><div class="t"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.6-.7L3 21l1.8-5A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4Z"/></svg><span class="b">2</span><span>Chat</span></div><div class="t"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4"/><path d="M2.6 19a6.5 6.5 0 0 1 12.8 0"/><path d="M16.5 5.2a3.4 3.4 0 0 1 0 6.6M17.5 13.6A6.5 6.5 0 0 1 21.4 19"/></svg><span>Clubs</span></div></div><div class="home"></div></div></div></div></div>
+
+</body>
+</html>

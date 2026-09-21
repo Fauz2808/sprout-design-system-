@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AI Assist — Reminder v2 · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#fff; --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+    --green:#186338; --brand-light:#e2e9e3; --brand-border:#77b691; --border:#d0dacf;
+    --amber:#b5872b; --amber-bg:#fbf1da; --amber-br:#e6cd96;
+    --shadow-m:1px 4px 25px 2px rgba(13,13,18,.05); --shadow-l:1px 4px 25px 2px rgba(13,13,18,.2);
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;padding:38px 0 70px}
+
+  .lede{max-width:900px;margin:0 auto 10px;padding:0 30px}
+  .lede h1{font-family:var(--serif);font-size:29px;font-weight:600;color:var(--ink);margin:0 0 8px}
+  .lede .p{font-size:14px;color:#5b5648;line-height:1.65;margin:0 0 14px}
+  .quote{background:#fff;border-left:3px solid var(--green);border-radius:12px;padding:14px 17px;
+    font-size:13.5px;line-height:1.65;color:var(--body)}
+  .quote b{color:var(--ink)}
+  .quote i{color:#5b5648}
+  .gone{display:flex;gap:9px;flex-wrap:wrap;margin:16px 0 4px}
+  .gone span{background:#fff;border:1px solid #cfc8ba;border-radius:99px;padding:7px 13px;font-size:12px;color:var(--muted)}
+  .gone span s{color:#b3aa98}
+  .gone span b{color:var(--ink);font-weight:600}
+
+  .band{max-width:900px;margin:34px auto 4px;padding:0 30px}
+  .band h2{font-family:var(--serif);font-size:21px;color:var(--ink);margin:0 0 5px}
+  .band p{font-size:13px;color:var(--muted);margin:0;line-height:1.55;max-width:700px}
+
+  .row{display:flex;gap:44px;align-items:flex-start;overflow-x:auto;padding:22px 30px 26px}
+  .panel{flex:0 0 auto;width:393px;display:flex;flex-direction:column;gap:14px}
+  .cap{font-size:12.5px;line-height:1.58;color:#655f52;max-width:393px}
+  .cap .n{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--green);background:var(--brand-light);border-radius:99px;padding:4px 10px;margin-bottom:7px}
+  .cap b{display:block;font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin-bottom:3px}
+
+  .ph{display:inline-block;vertical-align:middle} .ph svg{display:block;width:100%;height:100%;fill:currentColor}
+
+  .device{position:relative;width:393px;height:852px;border-radius:54px;padding:11px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45)}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:60}
+  .screen{position:relative;width:100%;height:100%;border-radius:43px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg)}
+  .sb{flex:0 0 44px;padding:16px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);z-index:20}
+  .sb .r{display:inline-flex;gap:6px;align-items:center}
+  .sb svg{width:17px;height:11px;fill:var(--ink)} .sb .bat{width:25px}
+
+  /* ── voice capture ── */
+  .voice-body{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;padding:10px 24px 34px;text-align:center}
+  .stipple{width:144px;height:144px;border-radius:50%;margin:16px 0 20px;flex-shrink:0;
+    background-color:#eae6db;
+    background-image:radial-gradient(rgba(120,113,94,.55) 1px, transparent 1.3px);
+    background-size:6px 6px;
+    -webkit-mask-image:radial-gradient(circle,#000 62%,transparent 78%);
+    mask-image:radial-gradient(circle,#000 62%,transparent 78%)}
+  .stipple.live{background-image:radial-gradient(rgba(24,99,56,.6) 1.1px, transparent 1.4px);
+    box-shadow:0 0 0 14px rgba(24,99,56,.05)}
+  .voice-head h2{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--ink);line-height:1.28;margin:0 0 8px}
+  .voice-head p{font-size:13.5px;color:var(--muted);line-height:1.55;max-width:292px;margin:0 auto}
+
+  .trs{width:100%;background:#fff;border-radius:16px;padding:15px 17px;text-align:left;
+    box-shadow:var(--shadow-m);margin-bottom:6px}
+  .trs .lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:7px}
+  .trs .txt{font-size:15px;line-height:1.55;color:var(--ink)}
+  .trs .cur{color:#a49a86}
+
+  .slotwrap{width:100%;margin-top:22px}
+  .slothead{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#a49a86;
+    text-align:left;margin-bottom:9px}
+  .slots{display:flex;flex-wrap:wrap;gap:7px}
+  .slot{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:8px 13px 8px 11px;
+    font-size:12.5px;border:1px dashed #c8c0b0;color:#a49a86;background:transparent}
+  .slot .ph{width:15px;height:15px;flex-shrink:0}
+  .slot i{font-style:normal}
+  .slot.on{border:1px solid var(--brand-border);border-style:solid;background:var(--brand-light);
+    color:var(--ink);font-weight:600}
+  .slot.miss{border-color:var(--amber-br);color:var(--amber);background:var(--amber-bg);border-style:solid}
+
+  .voice-mic-zone{margin-top:auto;padding-top:28px;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .vmic{width:68px;height:68px;border-radius:50%;border:none;display:grid;place-items:center;position:relative;
+    background:var(--card);box-shadow:0 0 0 2px #f0c9c9 inset,var(--shadow-m);color:#c94f4f}
+  .vmic .ph{width:26px;height:26px;position:absolute}
+  .vmic .mic-ic{opacity:0}
+  .vmic.on{background:var(--green);box-shadow:0 0 0 10px rgba(24,99,56,.14),0 0 0 22px rgba(24,99,56,.06);
+    color:#fff;transform:scale(1.05)}
+  .vmic.on .muted-ic{opacity:0} .vmic.on .mic-ic{opacity:1}
+  .voice-hint{font-size:13px;font-weight:600;color:var(--muted)}
+  .voice-mic-zone.on .voice-hint{color:var(--green)}
+
+  /* ── preview / form ── */
+  .top2{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:8px 16px 6px}
+  .ibtn{width:40px;height:40px;border-radius:50%;background:var(--card);border:1px solid var(--border);
+    display:grid;place-items:center;flex-shrink:0;box-shadow:var(--shadow-m)}
+  .ibtn .ph{width:20px;height:20px;color:var(--ink)}
+  .top2 .tt{flex:1;text-align:center}
+  .top2 .tt .t{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink)}
+  .top2 .sp{width:40px;flex-shrink:0}
+  .body2{flex:1 1 auto;overflow-y:auto;padding:8px 20px 118px}
+
+  .heard{display:flex;gap:10px;background:var(--brand-light);border-radius:14px;padding:12px 14px;margin-bottom:20px}
+  .heard .ph{width:16px;height:16px;color:var(--green);flex-shrink:0;margin-top:2px}
+  .heard .l{display:block;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--green);margin-bottom:3px}
+  .heard .q{font-size:13px;line-height:1.5;color:var(--ink)}
+
+  .flabel{font-size:11.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin:0 2px 8px}
+  .flabel .o{text-transform:none;letter-spacing:0;font-weight:500;color:#a89e8c}
+  .finput{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;
+    font-size:15px;color:var(--ink);box-shadow:var(--shadow-m);margin-bottom:20px}
+  .finput.ico{display:flex;align-items:center;gap:9px}
+  .finput .ph{width:18px;height:18px;color:var(--muted);flex-shrink:0}
+  .finput .v{flex:1;min-width:0;line-height:1.45}
+  .finput.miss{border-color:var(--amber-br);background:var(--amber-bg)}
+  .finput.miss .v,.finput.miss .ph{color:var(--amber)}
+
+  .dtrow{display:flex;gap:10px;margin-bottom:20px}
+  .dtfield{flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--border);
+    border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-m)}
+  .dtfield .ph{width:18px;height:18px;color:var(--muted);flex-shrink:0}
+  .dtfield .v{font-size:13.5px;color:var(--ink);font-weight:500}
+  .dtfield.miss{border-color:var(--amber-br);background:var(--amber-bg)}
+  .dtfield.miss .v,.dtfield.miss .ph{color:var(--amber)}
+
+  .reciprow{display:flex;gap:8px;margin-bottom:20px}
+  .ropt{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;background:var(--card);
+    border:1.5px solid var(--border);border-radius:14px;padding:14px 6px;box-shadow:var(--shadow-m)}
+  .ropt .ic{width:34px;height:34px;border-radius:50%;background:var(--brand-light);color:var(--muted);display:grid;place-items:center}
+  .ropt .ic .ph{width:18px;height:18px}
+  .ropt .l{font-size:13px;color:var(--muted);font-weight:500}
+  .ropt.on{border-color:var(--brand-border);box-shadow:0 0 0 2px var(--brand-border) inset,var(--shadow-m)}
+  .ropt.on .ic{background:var(--green);color:#fff}
+  .ropt.on .l{color:var(--ink);font-weight:600}
+
+  .chiprow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .chip{background:var(--card);border:1.5px solid var(--border);border-radius:99px;padding:11px 15px;
+    font-size:13.5px;color:var(--muted);box-shadow:var(--shadow-m)}
+  .chip.on{border-color:var(--brand-border);background:var(--brand-light);color:var(--ink);font-weight:600}
+
+  .iconrow{display:flex;gap:9px;margin-bottom:20px}
+  .ib{width:52px;height:52px;border-radius:50%;background:var(--card);border:1.5px solid var(--border);
+    display:grid;place-items:center;font-size:24px;box-shadow:var(--shadow-m)}
+  .ib.on{border-color:var(--brand-border);box-shadow:0 0 0 2px var(--brand-border) inset,var(--shadow-m)}
+
+  .missnote{display:flex;gap:9px;background:var(--amber-bg);border:1px solid var(--amber-br);border-radius:12px;
+    padding:12px 14px;font-size:12.5px;line-height:1.55;color:#7a5a12}
+  .missnote .ph{width:15px;height:15px;color:var(--amber);flex-shrink:0;margin-top:2px}
+
+  .bdcover{margin-bottom:20px}
+  .bdimg{height:150px;border-radius:16px;background:linear-gradient(135deg,#e6e0d2,#f2eee4);
+    border:1.5px dashed var(--border);display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:9px;color:var(--muted);font-size:12.5px}
+  .bdimg .ph{width:26px;height:26px;color:var(--brand-border)}
+
+  .cta{position:absolute;left:0;right:0;bottom:0;padding:16px 16px 30px;
+    background:linear-gradient(to top,var(--bg) 66%,rgba(236,230,218,0));z-index:15}
+  .btn{width:100%;border:none;border-radius:16px;padding:16px;font-family:var(--serif);font-size:16px;
+    font-weight:500;background:var(--green);color:#fff;box-shadow:var(--shadow-l)}
+
+  .donebody{flex:1 1 auto;padding:30px 24px;text-align:center;display:flex;flex-direction:column;
+    align-items:center;justify-content:center}
+  .donering{width:96px;height:96px;border-radius:50%;background:var(--brand-light);border:3px solid var(--brand-border);
+    display:grid;place-items:center;margin-bottom:22px;color:var(--green)}
+  .donering .ph{width:44px;height:44px}
+  .donebody h2{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--ink);margin:0 0 9px}
+  .donebody p{font-size:14px;color:var(--muted);line-height:1.6;margin:0 0 26px;max-width:290px}
+  .rescard{width:100%;background:#fff;border-radius:18px;box-shadow:var(--shadow-m);overflow:hidden;margin-bottom:14px}
+  .resimg{height:118px;background:linear-gradient(135deg,#e6e0d2,#f2eee4);display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:7px;color:var(--muted);font-size:12.5px}
+  .resimg .ph{width:24px;height:24px;color:var(--brand-border)}
+  .restx{padding:14px 16px;text-align:left}
+  .restx b{display:block;font-family:var(--serif);font-size:17px;color:var(--ink)}
+  .restx span{font-size:12.5px;color:var(--muted)}
+  .reslink{width:100%;display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--border);
+    border-radius:14px;padding:12px 14px;font-size:12.5px;color:var(--muted);box-shadow:var(--shadow-m)}
+  .reslink .ph{width:16px;height:16px;color:var(--muted);flex-shrink:0}
+  .reslink .u{flex:1;min-width:0;text-align:left;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .reslink b{color:var(--ink);font-weight:600}
+  .reslink i{font-style:normal;color:var(--green);font-weight:700;flex-shrink:0}
+  .resacts{display:flex;gap:10px;width:100%;margin-top:12px}
+  .ghost{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:13px 8px;
+    font-size:13.5px;font-weight:600;color:var(--ink);box-shadow:var(--shadow-m)}
+
+  /* ═══ v2 · voice capture — idle and recording share ONE geometry ═══
+     Tony, 17 Sep: "I also don't like that this button jumps from here to here.
+     We should keep that the same, wherever it is, so I'm not moving my thumb to
+     try and grab it. It should just stay on the same plane."
+     So the control lives in .cta, absolutely positioned against the screen, and
+     every region above it has a fixed height. Nothing below the orb reflows. */
+  .vbody{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;
+    padding:6px 24px 130px;text-align:center}
+
+  .vhint{width:100%;margin-top:6px}
+  .vhint .h{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:#a49a86;margin-bottom:11px}
+  .vhint ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+  .vhint li{font-family:var(--serif);font-size:19px;font-weight:500;color:var(--ink);line-height:1.25}
+
+  .vex{width:100%;background:#fff;border-radius:16px;padding:14px 16px;text-align:left;
+    box-shadow:var(--shadow-m);margin-top:20px}
+  .vex .l{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--green);margin-bottom:7px}
+  .vex p{margin:0;font-size:14.5px;line-height:1.6;color:var(--body)}
+  .vex b{font-weight:600;color:var(--ink);background:var(--brand-light);border-radius:5px;padding:1px 4px}
+
+  /* orb + level meter occupy the same box in both states, so nothing shifts */
+  .vorb{height:196px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+  .vorb .stipple{margin:0}
+  .wave{height:24px;display:flex;align-items:center;gap:4px}
+  .wave span{width:3px;border-radius:2px;background:#cfc7b6;height:4px}
+  .wave.live span{background:var(--green)}
+  .wave.live span:nth-child(1){height:9px}   .wave.live span:nth-child(2){height:18px}
+  .wave.live span:nth-child(3){height:24px}  .wave.live span:nth-child(4){height:13px}
+  .wave.live span:nth-child(5){height:21px}  .wave.live span:nth-child(6){height:7px}
+  .wave.live span:nth-child(7){height:16px}  .wave.live span:nth-child(8){height:24px}
+  .wave.live span:nth-child(9){height:11px}
+
+  .vstate{margin-top:auto;font-size:13.5px;font-weight:600;color:var(--muted)}
+  .vstate.on{color:var(--green)}
+
+  .btn.rec{display:flex;align-items:center;justify-content:center;gap:9px}
+  .btn.rec .dot{width:11px;height:11px;border-radius:50%;background:#fff}
+  .btn.rec .ph{width:19px;height:19px;color:#fff}
+
+  /* ── review: the card grows with its text, it is not a fixed box ──
+     Tony: "I would just think, as if this was bigger, then it would show another
+     line if this was a longer one." */
+  .rfield{width:100%;background:var(--card);border:1.5px solid var(--brand-border);border-radius:14px;
+    padding:14px 16px;font-size:15px;line-height:1.5;color:var(--ink);box-shadow:var(--shadow-m);
+    margin-bottom:20px;text-align:left}
+  .rfield .caret{display:inline-block;width:1.5px;height:17px;background:var(--green);
+    vertical-align:-3px;margin-left:1px}
+
+  .who{display:flex;gap:8px;margin-bottom:20px}
+  .who .o{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;background:var(--card);
+    border:1.5px solid var(--border);border-radius:14px;padding:12px 6px;box-shadow:var(--shadow-m)}
+  .who .av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+    font-size:14px;font-weight:700;color:#fff;background:#b9b1a1}
+  .who .l{font-size:12.5px;color:var(--muted);font-weight:500}
+  .who .o.on{border-color:var(--brand-border);box-shadow:0 0 0 2px var(--brand-border) inset,var(--shadow-m)}
+  .who .o.on .l{color:var(--ink);font-weight:600}
+  .who .o.on .av{background:linear-gradient(145deg,#3a7ca5,#7ec8e3)}
+
+  /* ── lock screen ── */
+  .lock{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;padding:34px 16px 0;
+    background:linear-gradient(170deg,#24422f 0%,#16281d 60%,#101a14 100%)}
+  .lock .time{font-family:var(--serif);font-size:70px;font-weight:500;color:#fff;line-height:1;letter-spacing:-1px}
+  .lock .date{font-size:14px;color:rgba(255,255,255,.72);margin:8px 0 30px}
+  .notif{width:100%;background:rgba(255,255,255,.93);border-radius:20px;padding:13px 15px;
+    display:flex;gap:11px;text-align:left;box-shadow:0 8px 26px rgba(0,0,0,.28)}
+  .notif .ic{width:34px;height:34px;border-radius:9px;background:var(--green);display:grid;place-items:center;flex-shrink:0}
+  .notif .ic .ph{width:19px;height:19px;color:#fff}
+  .notif .bd{flex:1;min-width:0}
+  .notif .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+  .notif .ap{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--green)}
+  .notif .ago{font-size:11px;color:var(--muted)}
+  .notif .t{font-size:14px;font-weight:700;color:var(--ink);line-height:1.35;margin-bottom:2px}
+  .notif .s{font-size:13px;color:var(--body);line-height:1.45}
+
+  /* ── daily brief ── */
+  .bbody{flex:1 1 auto;overflow-y:auto;padding:4px 20px 26px;text-align:left}
+  .bhead{padding:2px 0 16px}
+  .bhead .e{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:5px}
+  .bhead h2{font-family:var(--serif);font-size:25px;font-weight:600;color:var(--ink);margin:0}
+  .bsec{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#a49a86;margin:0 0 9px}
+  .brow{display:flex;gap:11px;background:#fff;border-radius:14px;padding:13px 14px;
+    box-shadow:var(--shadow-m);margin-bottom:9px;align-items:flex-start}
+  .brow.hl{box-shadow:0 0 0 1.5px var(--brand-border),var(--shadow-m)}
+  .brow .tick{width:21px;height:21px;border-radius:6px;border:1.6px solid #cfc7b6;flex-shrink:0;margin-top:1px}
+  .brow .bd{flex:1;min-width:0}
+  .brow .t{font-size:14px;font-weight:600;color:var(--ink);line-height:1.35}
+  .brow .m{font-size:12px;color:var(--muted);margin-top:3px}
+  .brow .from{display:inline-block;font-size:10.5px;font-weight:700;color:var(--green);
+    background:var(--brand-light);border-radius:99px;padding:3px 8px;margin-top:7px}
+  .bgroup{margin-bottom:22px}
+
+  .openq{background:var(--amber-bg);border:1px solid var(--amber-br);border-radius:12px;
+    padding:11px 13px;font-size:12px;line-height:1.55;color:#7a5a12;margin-top:9px}
+  .openq b{display:inline;font-family:var(--sans);font-size:12px;font-weight:700;color:#5f460e;margin:0}
+  /* every device is 852px, so bottom-aligning the panels lines the phones up
+     no matter how long each caption runs */
+  .row{align-items:flex-end}
+  /* .cap b is the panel title and is display:block — inline emphasis needs its own hook */
+  .cap .k{font-weight:700;color:var(--ink)}
+  /* at rest the meter keeps its space but shows nothing, so the two states stay
+     the same height without leaving visual debris on the idle screen */
+  .wave:not(.live){visibility:hidden}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>AI Assist — Reminder, second pass</h1>
+  <p class="p">Six screens, left to right, one reminder from spoken to delivered. The capture
+  screen is rebuilt around a single question Tony kept asking: how do I know when to stop?</p>
+
+  <div class="quote"><b>Tony, 17 Sep:</b>
+  <i>&ldquo;The thing that is missing here is when I&rsquo;m done&hellip; if you don&rsquo;t have a closed thing,
+  then how&rsquo;s it gonna know? The problem with this UI is, like, I guess I just don&rsquo;t know when to stop,
+  or I don&rsquo;t know to hit this to stop.&rdquo;</i></div>
+
+  <div class="gone">
+    <span><s>Hold to speak</s> &rarr; <b>Tap to start, tap to stop</b></span>
+    <span><s>Caught so far</s> <b>gone</b></span>
+    <span><s>Live transcript</s> <b>gone</b></span>
+    <span><s>Button that moves</s> <b>anchored</b></span>
+    <span><s>Save reminder</s> <b>gone</b></span>
+    <span><b>+ notification</b></span>
+    <span><b>+ his Daily Brief</b></span>
+  </div>
+</div>
+
+<div class="band">
+  <h2>Capture</h2>
+  <p>Two states of one screen. Put them side by side and nothing moves except the orb and two words.</p>
+</div>
+
+<div class="row">
+<div class="panel">
+  <div class="cap"><span class="n">Step 1</span><b>Idle. The example does the teaching.</b> Three questions on top, then one sentence in quotes showing exactly how to say it. Tony: &ldquo;that example is actually pretty powerful&hellip; remember, these are all new users, and they&rsquo;re not gonna really know how to use it.&rdquo; The brackets mark the parts you swap.<div class="openq"><b>Still open:</b> quotes and brackets are both here. Tony liked the brackets when Ahmad argued they signal what is customizable, then tried it without them. Settle this one on screen together.</div></div>
+  <div class="device"><div class="island"></div><div class="screen"><div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+<div class="vbody">
+  <div class="vhint"><div class="h">It needs three things</div>
+    <ul><li>Who&rsquo;s it for?</li><li>What&rsquo;s it about?</li><li>When&rsquo;s it happening?</li></ul></div>
+  <div class="vex"><span class="l">Say it like this</span>
+    <p>&ldquo;Remind <b>[my husband]</b> to <b>[pick up Presley from school]</b> at <b>[2PM today]</b>.&rdquo;</p></div>
+  <div class="vorb"><div class="stipple"></div><div class="wave"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+  <div class="vstate">Tap to start.</div>
+</div>
+<div class="cta"><button class="btn rec"><span class="dot"></span>Start</button></div>
+</div></div>
+</div>
+<div class="panel">
+  <div class="cap"><span class="n">Step 2</span><b>Recording. Same layout, two words different.</b> The orb goes green, the bars move, the line reads <span class="k">Tap to stop.</span> and the button becomes Done. Nothing else changes and nothing shifts, so the thumb stays where it was. No transcript, no chips: n8n does not run until you stop talking, so anything filling in live would be theatre.</div>
+  <div class="device"><div class="island"></div><div class="screen"><div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+<div class="vbody">
+  <div class="vhint"><div class="h">It needs three things</div>
+    <ul><li>Who&rsquo;s it for?</li><li>What&rsquo;s it about?</li><li>When&rsquo;s it happening?</li></ul></div>
+  <div class="vex"><span class="l">Say it like this</span>
+    <p>&ldquo;Remind <b>[my husband]</b> to <b>[pick up Presley from school]</b> at <b>[2PM today]</b>.&rdquo;</p></div>
+  <div class="vorb"><div class="stipple live"></div><div class="wave live"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+  <div class="vstate on">Tap to stop.</div>
+</div>
+<div class="cta"><button class="btn rec"><span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 77.66-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69 218.34 66.34a8 8 0 0 1 11.32 11.32"/></svg></span>Done</button></div>
+</div></div>
+</div>
+</div>
+
+<div class="band">
+  <h2>Review</h2>
+  <p>This is the edit surface. Tony: &ldquo;I almost want this to be the place where they edit it.&rdquo;</p>
+</div>
+
+<div class="row">
+<div class="panel">
+  <div class="cap"><span class="n">Step 3</span><b>It arrives filled in, cursor already in the text.</b> Spouse is preselected because it heard &ldquo;my husband&rdquo;, and the avatar is his. The reminder box grows with its text instead of holding a fixed height with dead space under it. No Save button &mdash; Set reminder is the only way out.</div>
+  <div class="device"><div class="island"></div><div class="screen"><div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+<div class="top2"><div class="ibtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span></div><div class="tt"><div class="t">Review reminder</div></div><div class="sp"></div></div>
+<div class="body2">
+  <div class="heard"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 176a48.05 48.05 0 0 0 48-48V64a48 48 0 0 0-96 0v64a48.05 48.05 0 0 0 48 48M96 64a32 32 0 0 1 64 0v64a32 32 0 0 1-64 0Zm40 143.6V240a8 8 0 0 1-16 0v-32.4A80.11 80.11 0 0 1 48 128a8 8 0 0 1 16 0 64 64 0 0 0 128 0 8 8 0 0 1 16 0 80.11 80.11 0 0 1-72 79.6"/></svg></span><div class="tx"><span class="l">You said</span><span class="q">Remind my husband to pick up Presley from school at 2PM today</span></div></div>
+  <div class="flabel">Reminder</div>
+  <div class="rfield">Pick up Presley from school<span class="caret"></span></div>
+  <div class="flabel">Who it&rsquo;s for</div>
+  <div class="who">
+    <div class="o"><span class="av">TM</span><span class="l">Myself</span></div>
+    <div class="o on"><span class="av">DM</span><span class="l">Spouse</span></div>
+    <div class="o"><span class="av">2</span><span class="l">Both</span></div>
+  </div>
+  <div class="flabel">When</div>
+  <div class="dtrow">
+    <div class="dtfield"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span><span class="v">Today, 17 Sep</span></div>
+    <div class="dtfield"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m4-88V72a8 8 0 0 0-16 0v64a8 8 0 0 0 2.34 5.66l40 40a8 8 0 0 0 11.32-11.32Z"/></svg></span><span class="v">2:00 PM</span></div>
+  </div>
+  <div class="flabel">Remind him <span class="o">&mdash; optional</span></div>
+  <div class="finput ico"><span class="ph"><svg viewBox="0 0 256 256"><path d="M221.8 175.94c-5.55-9.56-13.8-36.61-13.8-71.94a80 80 0 1 0-160 0c0 35.34-8.26 62.38-13.81 71.94A16 16 0 0 0 48 200h40.81a40 40 0 0 0 78.38 0H208a16 16 0 0 0 13.8-24.06M128 216a24 24 0 0 1-22.62-16h45.24A24 24 0 0 1 128 216M48 184c7.7-13.24 16-43.92 16-80a64 64 0 1 1 128 0c0 36.05 8.28 66.73 16 80Z"/></svg></span><span class="v">15 minutes before</span></div>
+</div>
+<div class="cta"><button class="btn">Set reminder</button></div>
+</div></div>
+</div>
+<div class="panel">
+  <div class="cap"><span class="n">Step 4</span><b>Set, and it says what happens next.</b> The old flow ended here without saying where the reminder went. Now it names both destinations, so the next two screens are not a surprise.</div>
+  <div class="device"><div class="island"></div><div class="screen"><div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+<div class="donebody">
+  <div class="donering"><span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 77.66-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69 218.34 66.34a8 8 0 0 1 11.32 11.32"/></svg></span></div>
+  <h2>Reminder is set</h2>
+  <p>Dana gets a notification at 1:45 PM, and it is already sitting in his Daily Brief for today.</p>
+  <div class="rescard"><div class="restx"><b>Pick up Presley from school</b><span>Today &middot; 2:00 PM &middot; for Dana</span></div></div>
+  <div class="resacts"><span class="ghost">Edit</span><span class="ghost">Done</span></div>
+</div>
+</div></div>
+</div>
+</div>
+
+<div class="band">
+  <h2>What Dana actually gets</h2>
+  <p>The part Tony asked for by name: &ldquo;show how daily brief gets updated for husband, show notification.&rdquo;</p>
+</div>
+
+<div class="row">
+<div class="panel">
+  <div class="cap"><span class="n">Step 5</span><b>The notification, 15 minutes early.</b> Tony: &ldquo;the dumb dad that&rsquo;s not gonna open Sprout until they see, oh shit, I gotta go.&rdquo; It names who set it, because a reminder from your wife reads differently than one from an app.</div>
+  <div class="device"><div class="island"></div><div class="screen" style="background:#101a14">
+<div class="sb" style="color:#fff"><span>1:45</span><span class="r" style="filter:invert(1)"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg></span></div>
+<div class="lock">
+  <div class="time">1:45</div>
+  <div class="date">Thursday, 17 September</div>
+  <div class="notif"><div class="ic"><span class="ph"><svg viewBox="0 0 256 256"><path d="M221.8 175.94c-5.55-9.56-13.8-36.61-13.8-71.94a80 80 0 1 0-160 0c0 35.34-8.26 62.38-13.81 71.94A16 16 0 0 0 48 200h40.81a40 40 0 0 0 78.38 0H208a16 16 0 0 0 13.8-24.06M128 216a24 24 0 0 1-22.62-16h45.24A24 24 0 0 1 128 216M48 184c7.7-13.24 16-43.92 16-80a64 64 0 1 1 128 0c0 36.05 8.28 66.73 16 80Z"/></svg></span></div><div class="bd">
+    <div class="hd"><span class="ap">Sprout</span><span class="ago">now</span></div>
+    <div class="t">Pick up Presley from school</div>
+    <div class="s">In 15 minutes, 2:00 PM. Tony set this for you.</div>
+  </div></div>
+</div>
+</div></div>
+</div>
+<div class="panel">
+  <div class="cap"><span class="n">Step 6</span><b>And it is waiting in his brief.</b> Same reminder, second surface. The <span class="k">From Tony</span> chip is what makes a shared reminder feel like a household, not a task manager. This is the half of the battle Tony described: parent to parent, him to his wife.</div>
+  <div class="device"><div class="island"></div><div class="screen"><div class="sb"><span>1:46</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+<div class="bbody">
+  <div class="bhead"><div class="e">Thursday, 17 September</div><h2>Good afternoon, Dana.</h2></div>
+  <div class="bgroup"><div class="bsec">Your to-do</div>
+    <div class="brow hl"><span class="tick"></span><div class="bd">
+      <div class="t">Pick up Presley from school</div><div class="m">2:00 PM</div>
+      <span class="from">From Tony</span></div></div>
+    <div class="brow"><span class="tick"></span><div class="bd">
+      <div class="t">Sign the field trip permission slip</div><div class="m">Due Friday</div></div></div>
+  </div>
+  <div class="bgroup"><div class="bsec">Happening today</div>
+    <div class="brow"><span class="tick" style="border:none;background:var(--brand-light)"></span><div class="bd">
+      <div class="t">Mrs. Taylor&rsquo;s Class Photo Day</div><div class="m">All day &middot; 1st Grade</div></div></div>
+  </div>
+</div>
+</div></div>
+</div>
+</div>
+
+</body>
+</html>

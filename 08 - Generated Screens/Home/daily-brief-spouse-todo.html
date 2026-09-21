@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Daily Brief — your list and theirs · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F1EA; --card:#FFFFFF; --ink:#1E3E2B; --muted:#7D715E; --green:#186338;
+  --light:#E2E9E3; --border:#77B691; --div:#DBD5C8; --hair:#E6E7EA; --red:#D64545;
+  --amber-bg:#FBF1DA; --amber-br:#E6CD96; --amber:#B5872B;
+  --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif;
+  --shadow-m:1px 4px 25px 2px rgba(13,13,18,.05);
+  --shadow-l:1px 4px 25px 2px rgba(13,13,18,.1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#DDD8CE;font-family:var(--sans);-webkit-font-smoothing:antialiased;padding:38px 0 70px}
+
+.lede{max-width:940px;margin:0 auto 10px;padding:0 30px}
+.lede h1{font-family:var(--serif);font-size:29px;font-weight:600;color:var(--ink);margin:0 0 8px}
+.lede .p{font-size:14px;color:#5b5648;line-height:1.65;margin:0 0 14px}
+.quote{background:#fff;border-left:3px solid var(--green);border-radius:12px;padding:14px 17px;
+  font-size:13.5px;line-height:1.65;color:#4d525b}
+.quote b{color:var(--ink)}
+.band{max-width:940px;margin:34px auto 4px;padding:0 30px}
+.band h2{font-family:var(--serif);font-size:21px;color:var(--ink);margin:0 0 5px}
+.band p{font-size:13px;color:var(--muted);margin:0;line-height:1.55;max-width:720px}
+.row{display:flex;gap:44px;align-items:flex-start;overflow-x:auto;padding:22px 30px 26px}
+/* captions share one height so the three phones start at the same y and the
+   190px the collapse gives back is visible as a real offset, not hidden by alignment */
+.panel .cap{min-height:320px}
+.panel{flex:0 0 auto;width:393px;display:flex;flex-direction:column;gap:14px}
+.cap{font-size:12.5px;line-height:1.58;color:#655f52;max-width:393px}
+.cap .n{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--green);background:var(--light);border-radius:99px;padding:4px 10px;margin-bottom:7px}
+.cap b{display:block;font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.cap .k{font-weight:700;color:var(--ink)}
+.openq{background:var(--amber-bg);border:1px solid var(--amber-br);border-radius:12px;
+  padding:11px 13px;font-size:12px;line-height:1.55;color:#7a5a12;margin-top:9px}
+.openq b{display:inline;font-family:var(--sans);font-size:12px;color:#5f460e;margin:0}
+
+/* ── device ─────────────────────────────────────────────────────────────── */
+.device{position:relative;width:393px;border-radius:54px;padding:11px;
+  background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+  box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45)}
+.screen{position:relative;width:100%;border-radius:43px;overflow:hidden;background:var(--bg);
+  display:flex;flex-direction:column}
+.sb{flex:0 0 auto;padding:12px 36px 12px 47px;display:flex;justify-content:space-between;align-items:center;
+  font-size:16px;font-weight:500;color:var(--ink)}
+.sb .r{display:inline-flex;gap:5px;align-items:center}
+.sb svg{width:18px;height:11px;fill:var(--ink)} .sb .bat{width:25px}
+
+/* header — avatar left, title centred, icons right (ported from the Figma frame) */
+.hd{flex:0 0 auto;height:43px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;gap:16px}
+.hd .av{width:40px;height:40px;border-radius:50%;flex-shrink:0;object-fit:cover;
+  background:linear-gradient(145deg,#6b5a45,#b09a7d)}
+.hd .mid{flex:1;text-align:center}
+.hd .mid .t{font-family:var(--serif);font-size:16px;font-weight:500;color:var(--ink);line-height:150%}
+.hd .mid .d{font-size:12px;color:var(--muted);line-height:155%}
+.hd .ico{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.hd .ib{position:relative;width:40px;height:40px;display:grid;place-items:center}
+.hd .ib svg{width:24px;height:24px;stroke:var(--ink);fill:none;stroke-width:1.39;stroke-linecap:round;stroke-linejoin:round}
+.hd .ib .dot{fill:var(--ink);stroke:none}
+.hd .ib .badge{position:absolute;top:2px;right:2px;min-width:17px;height:17px;border-radius:99px;
+  background:#C0492F;color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 5px;
+  border:2px solid var(--bg)}
+
+.body{flex:1 1 auto;padding:0 16px;display:flex;flex-direction:column;gap:12px}
+.div{height:0;border-top:1px solid var(--div)}
+
+.tt{display:flex;align-items:center;gap:12px;padding-top:8px}
+.tt .l{flex:1}
+.tt h2{font-family:var(--serif);font-size:24px;font-weight:500;color:var(--ink);margin:0;line-height:150%}
+.tt .sub{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--muted);line-height:150%}
+.wx{width:66px;background:#fff;box-shadow:var(--shadow-m);border-radius:12px;padding:10px;text-align:center;flex-shrink:0}
+.wx .e{font-size:22px;line-height:1}
+.wx .t{font-size:12px;color:var(--ink);margin-top:6px}
+
+/* needs your attention */
+.todo{border-radius:16px;overflow:hidden}
+.todo .hdr{background:#fff;padding:16px;display:flex;align-items:center;gap:12px;cursor:default}
+.todo .hdr .l{flex:1}
+.todo .hdr .t{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--ink);line-height:140%}
+.todo .hdr .s{font-size:14px;color:var(--muted);line-height:150%;margin-top:2px}
+.ring{width:42px;height:42px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;
+  background:conic-gradient(var(--green) 0 100%,var(--light) 0);position:relative}
+.ring::after{content:'';position:absolute;inset:4px;border-radius:50%;background:#fff}
+.ring span{position:relative;z-index:1;font-size:12px;font-weight:500;color:var(--ink)}
+.todo .chev{width:20px;height:20px;flex-shrink:0;stroke:var(--muted);fill:none;stroke-width:2;transition:transform .2s}
+.todo.closed .chev{transform:rotate(-90deg)}
+.todo .list{max-height:400px;overflow:hidden;transition:max-height .25s ease}
+.todo.closed .list{max-height:0}
+.trow{background:#fff;padding:8px;display:flex;align-items:center;gap:12px;border-top:1px solid var(--hair)}
+.tbox{width:36px;height:36px;border-radius:8px;background:var(--light);display:grid;place-items:center;flex-shrink:0}
+.tbox i{width:20px;height:20px;border-radius:6px;background:var(--green);display:grid;place-items:center}
+.tbox svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.trow .bd{flex:1;min-width:0}
+.trow .t{font-size:14px;font-weight:600;color:var(--ink);line-height:155%;text-decoration:line-through}
+.trow .m{font-size:14px;color:var(--muted);line-height:150%}
+.trow .m small{font-size:12px}
+.trow .go{width:24px;height:24px;border-radius:8px;background:var(--light);display:grid;place-items:center;flex-shrink:0}
+.trow .go svg{width:16px;height:16px;stroke:var(--ink);fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+
+.sec{font-size:14px;font-weight:700;color:var(--ink);line-height:28px}
+.cpool{background:var(--light);border:.5px solid var(--green);border-radius:16px;padding:8px;display:flex;align-items:center;gap:8px}
+.cpool .ic{width:40px;height:40px;border-radius:9px;background:var(--light);border:.5px solid var(--border);
+  display:grid;place-items:center;font-size:22px;flex-shrink:0}
+.cpool .t{font-size:12px;font-weight:500;color:var(--ink);line-height:155%}
+.cpool .s{font-size:12px;color:var(--green);line-height:155%}
+
+.inv{display:flex;justify-content:space-between;align-items:center}
+.inv .n{font-size:12px;color:var(--ink)}
+.evc{background:var(--bg);box-shadow:var(--shadow-l);border-radius:16px;padding:12px}
+.evc .top{display:flex;gap:8px;align-items:center}
+.evc .img{width:75px;height:75px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(140deg,#3a2f22,#8a6f4b)}
+.evc .t{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--ink);line-height:140%}
+.evc .d{font-size:12px;color:var(--muted);line-height:155%;margin-top:4px}
+.evc .host{display:flex;align-items:center;gap:6px;margin-top:6px}
+.evc .host .a{width:24px;height:24px;border-radius:50%;background:linear-gradient(145deg,#3a7ca5,#7ec8e3)}
+.evc .host span{font-size:12px;color:var(--muted)}
+.evc .acts{display:flex;gap:12px;margin-top:12px}
+.evc .acts .b{flex:1;height:40px;border-radius:999px;display:grid;place-items:center;
+  font-family:var(--serif);font-size:12px;font-weight:500}
+.evc .acts .deny{background:var(--light);border:1px solid #D0DACF;color:var(--ink)}
+.evc .acts .join{background:var(--green);color:#fff;box-shadow:0 1px 2px rgba(13,13,18,.06)}
+
+.hap{display:flex;align-items:center;gap:8px}
+.hap .tm{width:49px;font-size:12px;font-weight:500;color:var(--ink);text-align:center;flex-shrink:0}
+.hap .tm.red{color:var(--red)}
+.hap .dot{width:7px;height:7px;border-radius:50%;background:var(--ink);flex-shrink:0}
+.hap .dot.red{background:var(--red)}
+.hap .c{flex:1;background:#fff;border-left:4px solid var(--ink);border-radius:16px;padding:8px 16px;
+  box-shadow:var(--shadow-m)}
+.hap .c.red{border-left-color:var(--red)}
+.hap .c .t{font-family:var(--serif);font-size:16px;font-weight:500;color:var(--ink);line-height:150%}
+.hap .c .t.red{color:var(--red)}
+.hap .c .m{font-size:14px;color:var(--muted);line-height:155%}
+
+.up{background:#fff;border-radius:16px;box-shadow:var(--shadow-m);overflow:hidden}
+.uprow{display:flex;gap:10px;padding:12px;border-bottom:1px solid var(--hair)}
+.uprow:last-child{border-bottom:none}
+.uprow .dt{width:44px;flex-shrink:0;background:var(--light);border-radius:8px;text-align:center;padding:4px 0;height:fit-content}
+.uprow .dt .mo{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:600}
+.uprow .dt .dy{font-family:var(--serif);font-size:16px;color:var(--ink)}
+.uprow .bd{flex:1;min-width:0}
+.uprow .t{font-size:13px;font-weight:600;color:var(--ink);line-height:1.4}
+.uprow .s{font-size:12px;color:var(--muted);line-height:1.5;margin-top:3px}
+.uprow .by{font-size:11px;color:var(--muted);text-align:right;margin-top:4px}
+
+.lun{font-size:14px;color:var(--ink);line-height:1.9}
+.bday{background:var(--amber-bg);border-radius:16px;padding:12px;display:flex;gap:10px;align-items:center}
+.bday .e{font-size:22px}
+.bday .t{font-family:var(--serif);font-size:16px;color:var(--ink);line-height:150%}
+.bday .s{font-size:13px;color:var(--muted)}
+.blist{font-size:14px;color:var(--ink);line-height:1.9}
+.blist span{color:var(--muted)}
+
+.tabs{flex:0 0 auto;margin:10px 16px 0;background:#fff;border-radius:99px;box-shadow:var(--shadow-l);
+  display:flex;padding:10px 6px}
+.tabs .t{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:var(--muted);position:relative}
+.tabs .t svg{width:22px;height:22px;stroke:var(--muted);fill:none;stroke-width:1.6}
+.tabs .t.on{color:var(--green)} .tabs .t.on svg{stroke:var(--green)}
+.tabs .t .b{position:absolute;top:-3px;right:14px;min-width:16px;height:16px;border-radius:99px;background:var(--green);
+  color:#fff;font-size:9.5px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+.home{height:5px;width:140px;background:#1c1c1e;border-radius:99px;margin:12px auto 10px}
+
+  /* ── the spouse's list — a sibling of your own, never a copy of it ──────────
+     Tony, 17 Sep: get the spouses using it with the reminders and "that's half
+     the battle". Visibility runs both ways: dad's list and mom's list, on both
+     phones. The differences below are deliberate, not decoration. */
+  .todo.theirs .hdr{gap:10px}
+  .todo.theirs .who{width:32px;height:32px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(145deg,#3a7ca5,#7ec8e3);display:grid;place-items:center;
+    color:#fff;font-size:12px;font-weight:700}
+  /* their rows carry a status dot, not a checkbox: you cannot tick work you did
+     not do, or the list stops meaning anything */
+  .tdot{width:36px;height:36px;border-radius:8px;background:#F1EDE3;display:grid;place-items:center;flex-shrink:0}
+  .tdot i{width:18px;height:18px;border-radius:50%;border:2px solid #C8C0B0;display:block}
+  .tdot.done i{border-color:var(--green);background:var(--green)}
+  .tdot.done svg{position:absolute;width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.6;
+    stroke-linecap:round;stroke-linejoin:round}
+  .tdot.done{position:relative}
+  .tdot.late i{border-color:var(--amber);background:var(--amber-bg)}
+  .trow.open .t{text-decoration:none}
+  .trow .m .late{color:var(--amber);font-weight:600}
+  .from{display:inline-block;font-size:10.5px;font-weight:700;color:var(--green);
+    background:var(--light);border-radius:99px;padding:2px 8px;margin-left:6px;vertical-align:1px}
+  .nudge{background:#fff;border-top:1px solid var(--hair);padding:10px 12px;display:flex;
+    align-items:center;gap:10px}
+  .nudge .tx{flex:1;font-size:12px;color:var(--muted);line-height:1.45}
+  .nudge .b{flex-shrink:0;background:var(--light);border:1px solid var(--border);border-radius:99px;
+    padding:8px 14px;font-size:12px;font-weight:700;color:var(--green)}
+  /* your own unticked item: an empty box you can still tap, not a filled tick */
+  .tbox i.off{background:#fff;border:2px solid #C8C0B0}
+  .tbox i.off svg{display:none}
+  .pairnote{font-size:11.5px;color:var(--muted);line-height:1.5;padding:0 2px}
+</style>
+</head>
+<body>
+
+<div class="lede"><h1>Daily Brief — your list, and theirs</h1><p class="p">A second to-do block under your own, showing your spouse&rsquo;s. Both parents see both lists, on both phones, so the household has one shared picture of what is left today instead of two private ones. Drawn on the real 7.1 frame.</p><div class="quote"><b>Tony, 17 Sep:</b> <i>&ldquo;From parent to parent, like me to my wife. And if we can get the spouses using it with the reminders, then… that&rsquo;s half the battle.&rdquo;</i></div></div>
+
+<div class="band"><h2>Two lists, one scroll</h2><p>Yours never moves. Theirs sits directly under it, above Carpool, because it answers the same question: what is still left today.</p></div>
+<div class="row">
+<div class="panel"><div class="cap"><span class="n">Tony’s phone</span><b>Yours folded, hers open.</b> Your list, then theirs, in one scroll. Yours is done so it has collapsed; hers has one item left so it stays open. That is the rule: <span class="k">a finished list folds, an unfinished one does not</span> — so the screen always opens on whatever is actually left, whoever it belongs to. The ring on her card reads 1/3 at a glance, which is the whole point of the section.<div class="openq"><b>The one hard rule here:</b> her rows carry a status dot, not a checkbox. The shape carries it without a word of copy — <span class="k">square boxes are yours and tappable, round dots are theirs and are not</span>. You cannot tick her items. Ticking work you did not do makes the list lie, and a list that lies is worse than no list — it is exactly the thing that would make Tony stop trusting the 1/3.</div></div><div class="device"><div class="screen"><div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1E3E2B"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div><div class="hd"><div class="av"></div><div class="mid"><div class="t">Sprout AI</div><div class="d">Tuesday, September 8</div></div><div class="ico"><span class="ib"><svg viewBox="0 0 24 24"><rect x="3.75" y="3.75" width="16.5" height="16.5" rx="3"/><path d="M16.5 2.25v3M7.5 2.25v3M3.75 8.25h16.5"/><circle class="dot" cx="12" cy="13.5" r="1"/><circle class="dot" cx="16.2" cy="13.5" r="1"/><circle class="dot" cx="7.8" cy="17.2" r="1"/><circle class="dot" cx="12" cy="17.2" r="1"/><circle class="dot" cx="16.2" cy="17.2" r="1"/></svg></span></div></div><div class="body"><div class="tt"><div class="l"><h2>Your day, in order.</h2><div class="sub">Full, but manageable.</div></div><div class="wx"><div class="e">☀️</div><div class="t">68–86°</div></div></div><div class="div"></div><div class="todo closed"><div class="hdr"><div class="l"><div class="t">Needs your attention</div><div class="s">Great, you got everything done today.</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg><div class="ring"><span>3/3</span></div></div><div class="list"><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Bring towels for water day</div><div class="m">1st Grade Class · <small>Due Today</small></div></div></div><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Presley Submit project reports</div><div class="m">Miss Taylor Class · <small>Due Friday</small></div></div></div><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Plan field trip itinerary</div><div class="m">4th Grade Class · <small>Due Saturday</small></div></div></div></div></div><div class="todo theirs"><div class="hdr"><span class="who">DM</span><div class="l"><div class="t">Dana&rsquo;s list</div><div class="s">2 still open.</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg><div class="ring"><span>1/3</span></div></div><div class="list"><div class="trow"><div class="tdot done"><i></i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div><div class="bd"><div class="t">Sign the field trip permission slip</div><div class="m">1st Grade Class · <small>Due today</small></div></div></div><div class="trow open"><div class="tdot"><i></i></div><div class="bd"><div class="t">Pick up Presley from school<span class="from">From you</span></div><div class="m">Reminder · <small>2:00 PM</small></div></div></div><div class="trow open"><div class="tdot"><i></i></div><div class="bd"><div class="t">Send Mia’s form to the office</div><div class="m">Kindergarten · <small>Due Friday</small></div></div></div></div></div><div class="pairnote">Dana sees the same pair on her phone, with your list underneath hers.</div><div class="div"></div><div class="sec">🚗 Carpool</div><div class="cpool"><div class="ic">🚌</div><div><div class="t">You’re covering drop-off &amp; pick-up for Mia today</div><div class="s">Tap for pickup details →</div></div></div><div class="div"></div><div class="inv"><div class="sec">📅 Your Invitations</div><span class="n">2 Event</span></div><div class="evc"><div class="top"><div class="img"></div><div><div class="t">Presley’s Birthday Party!</div><div class="d">Sat, Nov 9 · 6:30pm CST</div><div class="host"><span class="a"></span><span>Patrick Collison</span></div></div></div><div class="acts"><span class="b deny">Deny</span><span class="b join">Join</span></div></div><div class="div"></div><div class="sec">📅 Happening today</div><div class="hap"><span class="tm red">Today</span><span class="dot red"></span><div class="c red"><div class="t red">No School</div><div class="m">It’s holiday now</div></div></div><div class="hap"><span class="tm">8:30 AM</span><span class="dot"></span><div class="c"><div class="t">Talent Show</div><div class="m">Kindergarten · Auditorium</div></div></div><div class="hap"><span class="tm">1:30 PM</span><span class="dot"></span><div class="c"><div class="t">Soccer practice</div><div class="m">Little Shots · Field 2</div></div></div></div><div class="tabs"><div class="t on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.2 12H1.8M22.2 12h-2.4M6.5 6.5 4.8 4.8M19.2 19.2l-1.7-1.7M6.5 17.5l-1.7 1.7M19.2 4.8l-1.7 1.7"/></svg><span>Daily Brief</span></div><div class="t"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m14.8 9.2-1.6 4.4-4.4 1.6 1.6-4.4z"/></svg><span>Events</span></div><div class="t"><svg viewBox="0 0 24 24"><path d="M12 3.5 13.8 9l5.5 1.8-5.5 1.8L12 18l-1.8-5.4L4.7 10.8 10.2 9z"/></svg><span>AI Assist</span></div><div class="t"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.6-.7L3 21l1.8-5A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4Z"/></svg><span class="b">2</span><span>Chat</span></div><div class="t"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4"/><path d="M2.6 19a6.5 6.5 0 0 1 12.8 0"/><path d="M16.5 5.2a3.4 3.4 0 0 1 0 6.6M17.5 13.6A6.5 6.5 0 0 1 21.4 19"/></svg><span>Clubs</span></div></div><div class="home"></div></div></div></div><div class="panel"><div class="cap"><span class="n">When it slips</span><b>Overdue, and the one thing you can do about it.</b> What monitoring is actually for. Her overdue item turns amber and the card grows a footer that says what is wrong in plain words, with one button. <span class="k">Nudge</span> sends her a push; it does not edit her list. The alternative — you fixing it on her phone — is the thing that starts arguments.<div class="openq"><b>Not decided, needs Tony:</b> whether Nudge is always available or only appears once something is actually overdue, and whether she can see that you nudged her. Silent nudging is a different product from “Tony poked you”.</div></div><div class="device"><div class="screen"><div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1E3E2B"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div><div class="hd"><div class="av"></div><div class="mid"><div class="t">Sprout AI</div><div class="d">Tuesday, September 8</div></div><div class="ico"><span class="ib"><svg viewBox="0 0 24 24"><rect x="3.75" y="3.75" width="16.5" height="16.5" rx="3"/><path d="M16.5 2.25v3M7.5 2.25v3M3.75 8.25h16.5"/><circle class="dot" cx="12" cy="13.5" r="1"/><circle class="dot" cx="16.2" cy="13.5" r="1"/><circle class="dot" cx="7.8" cy="17.2" r="1"/><circle class="dot" cx="12" cy="17.2" r="1"/><circle class="dot" cx="16.2" cy="17.2" r="1"/></svg></span></div></div><div class="body"><div class="tt"><div class="l"><h2>Your day, in order.</h2><div class="sub">Full, but manageable.</div></div><div class="wx"><div class="e">☀️</div><div class="t">68–86°</div></div></div><div class="div"></div><div class="todo closed"><div class="hdr"><div class="l"><div class="t">Needs your attention</div><div class="s">Great, you got everything done today.</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg><div class="ring"><span>3/3</span></div></div><div class="list"><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Bring towels for water day</div><div class="m">1st Grade Class · <small>Due Today</small></div></div></div><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Presley Submit project reports</div><div class="m">Miss Taylor Class · <small>Due Friday</small></div></div></div><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Plan field trip itinerary</div><div class="m">4th Grade Class · <small>Due Saturday</small></div></div></div></div></div><div class="todo theirs"><div class="hdr"><span class="who">DM</span><div class="l"><div class="t">Dana&rsquo;s list</div><div class="s">2 still open.</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg><div class="ring"><span>1/3</span></div></div><div class="list"><div class="trow"><div class="tdot done"><i></i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div><div class="bd"><div class="t">Sign the field trip permission slip</div><div class="m">1st Grade Class · <small>Due today</small></div></div></div><div class="trow open"><div class="tdot"><i></i></div><div class="bd"><div class="t">Pick up Presley from school<span class="from">From you</span></div><div class="m">Reminder · <small>2:00 PM</small></div></div></div><div class="trow open"><div class="tdot late"><i></i></div><div class="bd"><div class="t">Send Mia’s form to the office</div><div class="m">Kindergarten · <span class="late">2 days overdue</span></div></div></div></div><div class="nudge"><span class="tx">Mia’s form is 2 days overdue. Dana has not opened it since Monday.</span><span class="b">Nudge</span></div></div><div class="div"></div><div class="sec">🚗 Carpool</div><div class="cpool"><div class="ic">🚌</div><div><div class="t">You’re covering drop-off &amp; pick-up for Mia today</div><div class="s">Tap for pickup details →</div></div></div><div class="div"></div><div class="inv"><div class="sec">📅 Your Invitations</div><span class="n">2 Event</span></div><div class="evc"><div class="top"><div class="img"></div><div><div class="t">Presley’s Birthday Party!</div><div class="d">Sat, Nov 9 · 6:30pm CST</div><div class="host"><span class="a"></span><span>Patrick Collison</span></div></div></div><div class="acts"><span class="b deny">Deny</span><span class="b join">Join</span></div></div><div class="div"></div><div class="sec">📅 Happening today</div><div class="hap"><span class="tm red">Today</span><span class="dot red"></span><div class="c red"><div class="t red">No School</div><div class="m">It’s holiday now</div></div></div><div class="hap"><span class="tm">8:30 AM</span><span class="dot"></span><div class="c"><div class="t">Talent Show</div><div class="m">Kindergarten · Auditorium</div></div></div><div class="hap"><span class="tm">1:30 PM</span><span class="dot"></span><div class="c"><div class="t">Soccer practice</div><div class="m">Little Shots · Field 2</div></div></div></div><div class="tabs"><div class="t on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.2 12H1.8M22.2 12h-2.4M6.5 6.5 4.8 4.8M19.2 19.2l-1.7-1.7M6.5 17.5l-1.7 1.7M19.2 4.8l-1.7 1.7"/></svg><span>Daily Brief</span></div><div class="t"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m14.8 9.2-1.6 4.4-4.4 1.6 1.6-4.4z"/></svg><span>Events</span></div><div class="t"><svg viewBox="0 0 24 24"><path d="M12 3.5 13.8 9l5.5 1.8-5.5 1.8L12 18l-1.8-5.4L4.7 10.8 10.2 9z"/></svg><span>AI Assist</span></div><div class="t"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.6-.7L3 21l1.8-5A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4Z"/></svg><span class="b">2</span><span>Chat</span></div><div class="t"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4"/><path d="M2.6 19a6.5 6.5 0 0 1 12.8 0"/><path d="M16.5 5.2a3.4 3.4 0 0 1 0 6.6M17.5 13.6A6.5 6.5 0 0 1 21.4 19"/></svg><span>Clubs</span></div></div><div class="home"></div></div></div></div><div class="panel"><div class="cap"><span class="n">Dana’s phone</span><b>The same screen, the other way round.</b> Dana’s phone. Her list on top, Tony’s underneath, same component, names swapped. This is what makes it monitoring rather than supervision: there is no master phone and no one-way mirror. Note the <span class="k">From you</span> chip surviving the trip — on his phone it marks what he set for her, on hers it marks what she set for him.</div><div class="device"><div class="screen"><div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1E3E2B"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div><div class="hd"><div class="av" style="background:linear-gradient(145deg,#3a7ca5,#7ec8e3)"></div><div class="mid"><div class="t">Sprout AI</div><div class="d">Tuesday, September 8</div></div><div class="ico"><span class="ib"><svg viewBox="0 0 24 24"><rect x="3.75" y="3.75" width="16.5" height="16.5" rx="3"/><path d="M16.5 2.25v3M7.5 2.25v3M3.75 8.25h16.5"/><circle class="dot" cx="12" cy="13.5" r="1"/><circle class="dot" cx="16.2" cy="13.5" r="1"/><circle class="dot" cx="7.8" cy="17.2" r="1"/><circle class="dot" cx="12" cy="17.2" r="1"/><circle class="dot" cx="16.2" cy="17.2" r="1"/></svg></span></div></div><div class="body"><div class="tt"><div class="l"><h2>Your day, in order.</h2><div class="sub">Two things left.</div></div><div class="wx"><div class="e">☀️</div><div class="t">68–86°</div></div></div><div class="div"></div><div class="todo"><div class="hdr"><div class="l"><div class="t">Needs your attention</div><div class="s">2 left before the day gets away.</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg><div class="ring"><span>1/3</span></div></div><div class="list"><div class="trow"><div class="tbox"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Sign the field trip permission slip</div><div class="m">1st Grade Class · <small>Due today</small></div></div></div><div class="trow open"><div class="tbox"><i class="off"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Pick up Presley from school</div><div class="m">Reminder · from Tony · <small>2:00 PM</small></div></div></div><div class="trow open"><div class="tbox"><i class="off"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></div><div class="bd"><div class="t">Send Mia’s form to the office</div><div class="m">Kindergarten · <small>Due Friday</small></div></div></div></div></div><div class="todo theirs"><div class="hdr"><span class="who">TM</span><div class="l"><div class="t">Tony&rsquo;s list</div><div class="s">1 still open.</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg><div class="ring"><span>2/3</span></div></div><div class="list"><div class="trow"><div class="tdot done"><i></i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div><div class="bd"><div class="t">Bring towels for water day</div><div class="m">1st Grade Class · <small>Due Today</small></div></div></div><div class="trow open"><div class="tdot"><i></i></div><div class="bd"><div class="t">Book the sitter for Friday<span class="from">From you</span></div><div class="m">Reminder · <small>Due Friday</small></div></div></div><div class="trow"><div class="tdot done"><i></i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div><div class="bd"><div class="t">Plan field trip itinerary</div><div class="m">4th Grade Class · <small>Due Saturday</small></div></div></div></div></div><div class="pairnote">Same component, same order, names swapped. Neither phone is the master copy.</div><div class="div"></div><div class="sec">🚗 Carpool</div><div class="cpool"><div class="ic">🚌</div><div><div class="t">You’re covering drop-off &amp; pick-up for Mia today</div><div class="s">Tap for pickup details →</div></div></div><div class="div"></div><div class="inv"><div class="sec">📅 Your Invitations</div><span class="n">2 Event</span></div><div class="evc"><div class="top"><div class="img"></div><div><div class="t">Presley’s Birthday Party!</div><div class="d">Sat, Nov 9 · 6:30pm CST</div><div class="host"><span class="a"></span><span>Patrick Collison</span></div></div></div><div class="acts"><span class="b deny">Deny</span><span class="b join">Join</span></div></div><div class="div"></div><div class="sec">📅 Happening today</div><div class="hap"><span class="tm red">Today</span><span class="dot red"></span><div class="c red"><div class="t red">No School</div><div class="m">It’s holiday now</div></div></div><div class="hap"><span class="tm">8:30 AM</span><span class="dot"></span><div class="c"><div class="t">Talent Show</div><div class="m">Kindergarten · Auditorium</div></div></div><div class="hap"><span class="tm">1:30 PM</span><span class="dot"></span><div class="c"><div class="t">Soccer practice</div><div class="m">Little Shots · Field 2</div></div></div></div><div class="tabs"><div class="t on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.2 12H1.8M22.2 12h-2.4M6.5 6.5 4.8 4.8M19.2 19.2l-1.7-1.7M6.5 17.5l-1.7 1.7M19.2 4.8l-1.7 1.7"/></svg><span>Daily Brief</span></div><div class="t"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m14.8 9.2-1.6 4.4-4.4 1.6 1.6-4.4z"/></svg><span>Events</span></div><div class="t"><svg viewBox="0 0 24 24"><path d="M12 3.5 13.8 9l5.5 1.8-5.5 1.8L12 18l-1.8-5.4L4.7 10.8 10.2 9z"/></svg><span>AI Assist</span></div><div class="t"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.6-.7L3 21l1.8-5A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4Z"/></svg><span class="b">2</span><span>Chat</span></div><div class="t"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4"/><path d="M2.6 19a6.5 6.5 0 0 1 12.8 0"/><path d="M16.5 5.2a3.4 3.4 0 0 1 0 6.6M17.5 13.6A6.5 6.5 0 0 1 21.4 19"/></svg><span>Clubs</span></div></div><div class="home"></div></div></div></div></div>
+
+</body>
+</html>

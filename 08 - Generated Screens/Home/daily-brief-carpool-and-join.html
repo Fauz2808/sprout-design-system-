@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Daily Brief — carpool icon and the Join headcount · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#fff; --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+    --green:#186338; --brand-light:#e2e9e3; --brand-border:#77b691; --border:#d0dacf;
+    --amber:#b5872b; --amber-bg:#fbf1da; --amber-br:#e6cd96;
+    --shadow-m:1px 4px 25px 2px rgba(13,13,18,.05); --shadow-l:1px 4px 25px 2px rgba(13,13,18,.2);
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;padding:38px 0 70px}
+
+  .lede{max-width:900px;margin:0 auto;padding:0 30px}
+  .lede h1{font-family:var(--serif);font-size:29px;font-weight:600;color:var(--ink);margin:0 0 8px}
+  .lede .p{font-size:14px;color:#5b5648;line-height:1.65;margin:0 0 14px;max-width:760px}
+  .quote{background:#fff;border-left:3px solid var(--green);border-radius:12px;padding:14px 17px;
+    font-size:13.5px;line-height:1.65;color:var(--body);margin-bottom:10px;max-width:780px}
+  .quote b{color:var(--ink)} .quote i{color:#5b5648}
+
+  .band{max-width:900px;margin:36px auto 2px;padding:0 30px}
+  .band h2{font-family:var(--serif);font-size:21px;color:var(--ink);margin:0 0 5px}
+  .band p{font-size:13px;color:var(--muted);margin:0;line-height:1.55;max-width:720px}
+
+  .before{max-width:900px;margin:16px auto 0;padding:0 30px;display:flex;gap:10px;flex-wrap:wrap}
+  .bcell{background:#fff;border:1px solid #cfc8ba;border-radius:14px;padding:11px 14px;display:flex;
+    align-items:center;gap:11px;font-size:12px;color:var(--muted);line-height:1.45}
+  .bcell .g{width:34px;height:34px;border-radius:9px;background:#efeae0;display:grid;place-items:center;
+    font-size:17px;flex-shrink:0;color:var(--muted)}
+  .bcell .g .ph{width:19px;height:19px}
+  .bcell b{display:block;color:var(--ink);font-weight:600;font-size:12.5px}
+  .bcell code{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8a8375}
+
+  .row{display:flex;gap:44px;align-items:flex-start;overflow-x:auto;padding:22px 30px 26px}
+  .panel{flex:0 0 auto;width:393px;display:flex;flex-direction:column;gap:14px}
+  .cap{font-size:12.5px;line-height:1.58;color:#655f52}
+  .cap .n{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--green);background:var(--brand-light);border-radius:99px;padding:4px 10px;margin-bottom:7px}
+  .cap b{display:block;font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin-bottom:3px}
+
+  .ph{display:inline-block;vertical-align:middle} .ph svg{display:block;width:100%;height:100%;fill:currentColor}
+
+  .device{position:relative;width:393px;height:852px;border-radius:54px;padding:11px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45)}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:60}
+  .screen{position:relative;width:100%;height:100%;border-radius:43px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg)}
+  .sb{flex:0 0 44px;padding:16px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);z-index:20}
+  .sb .r{display:inline-flex;gap:6px;align-items:center}
+  .sb svg{width:17px;height:11px;fill:var(--ink)} .sb .bat{width:25px}
+
+  .top{flex:0 0 auto;display:flex;align-items:center;padding:6px 20px 10px}
+  .top .brand{flex:1;text-align:center}
+  .top .brand .t{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink)}
+  .top .brand .s{font-size:11px;color:var(--muted);margin-top:1px}
+  .top .sp,.top .cal{width:36px;height:36px}
+  .top .cal{border-radius:50%;background:#fff;border:1px solid var(--border);display:grid;place-items:center;box-shadow:var(--shadow-m)}
+  .top .cal .ph{width:18px;height:18px;color:var(--ink)}
+
+  .body{flex:1 1 auto;overflow-y:auto;padding:4px 18px 28px}
+  .greet .h{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--ink);margin:0 0 3px}
+  .greet .s{font-size:13.5px;color:var(--muted);margin:0 0 16px}
+
+  .wx{display:flex;align-items:center;gap:11px;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:var(--shadow-m);margin-bottom:8px}
+  .wx .ic{display:flex;flex-direction:column;align-items:center;gap:1px;flex-shrink:0}
+  .wx .ic .em{font-size:22px} .wx .ic .t{font-size:11px;font-weight:700;color:var(--ink)}
+  .wx .tx .t{font-size:13px;font-weight:600;color:var(--ink)}
+  .wx .tx .d{font-size:11.5px;color:var(--muted);margin-top:1px;line-height:1.4}
+
+  .sh{font-size:13px;font-weight:700;color:var(--ink);margin:18px 2px 9px}
+  .line{font-size:13px;color:var(--body);line-height:1.75;margin:0 2px}
+  .line b{color:var(--ink);font-weight:600}
+
+  /* ── the carpool card: one icon, three sides ── */
+  .carpool{display:flex;gap:11px;align-items:center;background:var(--brand-light);
+    border:1px solid var(--brand-border);border-radius:16px;padding:11px 13px}
+  .carpool .ic{width:42px;height:42px;border-radius:11px;background:var(--green);display:grid;
+    place-items:center;flex-shrink:0;color:#fff}
+  .carpool .ic .ph{width:24px;height:24px}
+  .carpool .tx{flex:1;min-width:0}
+  .carpool .tx .t{font-size:13px;font-weight:600;color:var(--ink);line-height:1.45}
+  .carpool .tx .l{font-size:12px;color:var(--green);margin-top:3px;font-weight:600}
+  .carpool.wait{background:var(--amber-bg);border-color:var(--amber-br)}
+  .carpool.wait .ic{background:var(--amber)}
+  .carpool.wait .tx .l{color:#8a6714}
+
+  .todo{display:flex;gap:10px;align-items:flex-start;background:#fff;border-radius:14px;padding:11px 13px;
+    box-shadow:var(--shadow-m);margin-bottom:8px}
+  .todo .tb{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px}
+  .todo .tt{flex:1;font-size:13px;font-weight:600;color:var(--ink);line-height:1.4}
+  .todo .tt small{display:block;font-size:11.5px;color:var(--muted);font-weight:400;margin-top:2px}
+
+  /* ── upcoming events with headcount ── */
+  .ev{background:#fff;border-radius:16px;padding:13px 14px;box-shadow:var(--shadow-m);margin-bottom:10px}
+  .ev .when{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--green);margin-bottom:4px}
+  .ev .nm{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink);line-height:1.25}
+  .ev .mt{font-size:12px;color:var(--muted);margin-top:3px}
+  .going{display:flex;align-items:center;gap:7px;margin-top:11px;padding-top:11px;border-top:1px solid #efeade}
+  .going .ph{width:15px;height:15px;color:var(--muted);flex-shrink:0}
+  .going .c{font-size:12.5px;color:var(--body)}
+  .going .c b{color:var(--ink);font-weight:600}
+  .ev .act{display:flex;gap:8px;margin-top:11px}
+  .jbtn{flex:1;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:700;
+    background:var(--green);color:#fff;box-shadow:0 5px 14px rgba(24,99,56,.22)}
+  .jbtn.ghost{background:#fff;border:1.5px solid var(--border);color:var(--body);box-shadow:none;font-weight:600}
+  .ev.mine{border:1.5px solid var(--brand-border);background:var(--brand-light);box-shadow:none}
+  .yours{display:flex;align-items:center;gap:8px;margin-top:11px;padding-top:11px;border-top:1px solid #cfdfd4}
+  .yours .tick{width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;flex-shrink:0}
+  .yours .tick .ph{width:13px;height:13px}
+  .yours .tx{flex:1;font-size:12.5px;color:var(--ink);font-weight:600}
+  .yours .ed{font-size:12px;color:var(--green);font-weight:700}
+
+  /* ── the sheet ── */
+  .scrim{position:absolute;inset:0;background:rgba(20,26,22,.42);z-index:40;border-radius:43px}
+  .sheet{position:absolute;left:0;right:0;bottom:0;z-index:50;background:var(--bg);
+    border-radius:26px 26px 43px 43px;padding:10px 20px 30px;box-shadow:0 -12px 40px rgba(0,0,0,.18)}
+  .grab{width:38px;height:4px;border-radius:99px;background:#cfc8ba;margin:0 auto 16px}
+  .sheet h3{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--ink);margin:0 0 3px}
+  .sheet .sub{font-size:12.5px;color:var(--muted);margin:0 0 18px}
+  .qlab{font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:0 2px 9px}
+
+  .step{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--border);
+    border-radius:14px;padding:11px 13px;margin-bottom:10px;box-shadow:var(--shadow-m)}
+  .step .ph{width:19px;height:19px;color:var(--muted);flex-shrink:0}
+  .step .l{flex:1;font-size:14.5px;color:var(--ink);font-weight:500}
+  .step .l small{display:block;font-size:11.5px;color:var(--muted);font-weight:400;margin-top:1px}
+  .stp{display:flex;align-items:center;gap:13px;flex-shrink:0}
+  .stp .b{width:32px;height:32px;border-radius:50%;background:var(--brand-light);color:var(--green);
+    display:grid;place-items:center;font-size:19px;font-weight:600;line-height:1}
+  .stp .b.off{background:#f1ede4;color:#c3bcae}
+  .stp .v{min-width:16px;text-align:center;font-size:17px;font-weight:700;color:var(--ink)}
+
+  .kid{display:flex;align-items:center;gap:11px;background:#fff;border:1.5px solid var(--border);
+    border-radius:14px;padding:11px 13px;margin-bottom:10px;box-shadow:var(--shadow-m)}
+  .kid.on{border-color:var(--brand-border);background:var(--brand-light);box-shadow:none}
+  .kid .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(145deg,#1e3e2b,#4fa472);
+    color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;flex-shrink:0}
+  .kid .tx{flex:1}
+  .kid .tx b{display:block;font-size:14.5px;color:var(--ink);font-weight:600}
+  .kid .tx span{font-size:11.5px;color:var(--muted)}
+  .box{width:24px;height:24px;border-radius:7px;border:1.5px solid var(--border);background:#fff;
+    display:grid;place-items:center;flex-shrink:0;color:transparent}
+  .kid.on .box{background:var(--green);border-color:var(--green);color:#fff}
+  .box .ph{width:14px;height:14px}
+
+  .tot{display:flex;align-items:center;gap:8px;background:var(--brand-light);border-radius:12px;
+    padding:11px 13px;font-size:12.5px;color:var(--ink);margin:4px 0 16px}
+  .tot .ph{width:15px;height:15px;color:var(--green);flex-shrink:0}
+  .tot b{font-weight:700}
+  .sbtn{width:100%;border:none;border-radius:16px;padding:15px;font-family:var(--serif);font-size:16px;
+    font-weight:500;background:var(--green);color:#fff;box-shadow:var(--shadow-l)}
+  .sno{width:100%;background:none;border:none;padding:13px 0 0;font-size:13.5px;color:var(--muted);font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Daily Brief — two corrections</h1>
+  <p class="p">Both from the 15 Sep call. One is a one-line fix, the other is a mechanism that has to
+  agree with what the Room Parent Portal already sends out.</p>
+
+  <div class="quote"><b>Tony, on the carpool card:</b>
+  <i>&ldquo;Let's just keep the bus for both sides. The copy is changing depending on who you are,
+  right? Morning, okay, you're covering drop off and pickup for me. Great. Let's just keep those icons
+  the same.&rdquo;</i></div>
+
+  <div class="quote"><b>Tony, on Join:</b>
+  <i>&ldquo;For the join thing, I think we do wanna have a pop up that happens&hellip; we need to be able
+  to display how many parents or kids are going to a certain event. So however you think we should do
+  that.&rdquo;</i> &mdash; and earlier, on the portal: <i>&ldquo;If they say yes on Sprout, it'll have a pop up
+  that needs to tell us how many parents or kids they're taking. That information feeds the room
+  parent.&rdquo;</i></div>
+</div>
+
+<div class="band">
+  <h2>1. The carpool card, one icon, three sides</h2>
+  <p>The icon was not the same across the builds. Three files, three different glyphs for the same
+  card, which is what Tony spotted. Now it is the bus everywhere, and only the sentence changes.</p>
+</div>
+
+<div class="before">
+  <div class="bcell"><span class="g">🚙</span><span><b>Was</b><code>daily-brief-homepage.html</code></span></div>
+  <div class="bcell"><span class="g"><span class="ph"><svg viewBox="0 0 256 256"><path d="M117.25 157.92a60 60 0 1 0-66.5 0 95.83 95.83 0 0 0-47.22 37.71 8 8 0 1 0 13.4 8.74 80 80 0 0 1 134.14 0 8 8 0 0 0 13.4-8.74 95.83 95.83 0 0 0-47.22-37.71M40 108a44 44 0 1 1 44 44 44.05 44.05 0 0 1-44-44m210.14 98.7a8 8 0 0 1-11.07-2.33A79.83 79.83 0 0 0 172 168a8 8 0 0 1 0-16 44 44 0 1 0-16.34-84.87 8 8 0 1 1-5.94-14.85 60 60 0 0 1 55.53 105.64 95.83 95.83 0 0 1 47.22 37.71 8 8 0 0 1-2.33 11.07"/></svg></span></span><span><b>Was</b><code>daily-brief-exploration.html</code></span></div>
+  <div class="bcell"><span class="g">🚌</span><span><b>Was</b><code>carpool-widget-flow.html</code></span></div>
+  <div class="bcell" style="border-color:var(--brand-border);background:var(--brand-light)"><span class="g" style="background:var(--green);color:#fff"><span class="ph"><svg viewBox="0 0 256 256"><path d="M184 32H72a32 32 0 0 0-32 32v144a16 16 0 0 0 16 16h24a16 16 0 0 0 16-16v-16h64v16a16 16 0 0 0 16 16h24a16 16 0 0 0 16-16V64a32 32 0 0 0-32-32M56 176v-56h144v56Zm0-96h144v24H56Zm16-32h112a16 16 0 0 1 16 16H56a16 16 0 0 1 16-16m8 160H56v-16h24Zm96 0v-16h24v16Zm-72-60a12 12 0 1 1-12-12 12 12 0 0 1 12 12m72 0a12 12 0 1 1-12-12 12 12 0 0 1 12 12m72-68v24a8 8 0 0 1-16 0V80a8 8 0 0 1 16 0M24 80v24a8 8 0 0 1-16 0V80a8 8 0 0 1 16 0"/></svg></span></span><span><b>Now, all three sides</b><code>Phosphor Bus, regular</code></span></div>
+</div>
+
+<div class="row" id="rowCarpool"></div>
+
+<div class="band">
+  <h2>2. Join: show the headcount, then collect yours</h2>
+  <p>Two halves of the same number. The event says how many are coming before you decide; tapping
+  Join asks what you are bringing. Same two words the portal already uses, Parents and Kids, so the
+  count a room parent reads is one number, not two that disagree.</p>
+</div>
+
+<div class="row" id="rowJoin"></div>
+
+<script>
+const BUS = 'M184 32H72a32 32 0 0 0-32 32v144a16 16 0 0 0 16 16h24a16 16 0 0 0 16-16v-16h64v16a16 16 0 0 0 16 16h24a16 16 0 0 0 16-16V64a32 32 0 0 0-32-32M56 176v-56h144v56Zm0-96h144v24H56Zm16-32h112a16 16 0 0 1 16 16H56a16 16 0 0 1 16-16m8 160H56v-16h24Zm96 0v-16h24v16Zm-72-60a12 12 0 1 1-12-12 12 12 0 0 1 12 12m72 0a12 12 0 1 1-12-12 12 12 0 0 1 12 12m72-68v24a8 8 0 0 1-16 0V80a8 8 0 0 1 16 0M24 80v24a8 8 0 0 1-16 0V80a8 8 0 0 1 16 0';
+const CAL = 'M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z';
+const USERS = 'M117.25 157.92a60 60 0 1 0-66.5 0 95.83 95.83 0 0 0-47.22 37.71 8 8 0 1 0 13.4 8.74 80 80 0 0 1 134.14 0 8 8 0 0 0 13.4-8.74 95.83 95.83 0 0 0-47.22-37.71M40 108a44 44 0 1 1 44 44 44.05 44.05 0 0 1-44-44m210.14 98.7a8 8 0 0 1-11.07-2.33A79.83 79.83 0 0 0 172 168a8 8 0 0 1 0-16 44 44 0 1 0-16.34-84.87 8 8 0 1 1-5.94-14.85 60 60 0 0 1 55.53 105.64 95.83 95.83 0 0 1 47.22 37.71 8 8 0 0 1-2.33 11.07';
+const USER = 'M230.92 212c-15.23-26.33-38.7-45.21-66.09-54.16a72 72 0 1 0-73.66 0c-27.39 8.94-50.86 27.82-66.09 54.16a8 8 0 1 0 13.85 8c18.84-32.56 52.14-52 89.07-52s70.23 19.44 89.07 52a8 8 0 1 0 13.85-8M72 96a56 56 0 1 1 56 56 56.06 56.06 0 0 1-56-56';
+const CHECK = 'm229.66 77.66-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69 218.34 66.34a8 8 0 0 1 11.32 11.32';
+const INFO = 'M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m16-40a8 8 0 0 1-8 8 16 16 0 0 1-16-16v-40a8 8 0 0 1 0-16 16 16 0 0 1 16 16v40a8 8 0 0 1 8 8m-32-92a12 12 0 1 1 12 12 12 12 0 0 1-12-12';
+const ic = (d, cls) => '<span class="' + (cls||'ph') + '"><svg viewBox="0 0 256 256"><path d="' + d + '"/></svg></span>';
+
+const SB = '<div class="sb"><span>9:41</span><span class="r">'
+ + '<svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg>'
+ + '<svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg>'
+ + '<svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/>'
+ + '<rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>';
+
+const TOP = '<div class="top"><div class="sp"></div><div class="brand"><div class="t">Sprout</div>'
+ + '<div class="s">Your daily briefing &middot; 7:31 AM</div></div>'
+ + '<div class="cal">' + ic(CAL) + '</div></div>';
+
+function phone(inner, extra){
+  return '<div class="device"><div class="island"></div><div class="screen">' + SB + TOP + inner + (extra||'') + '</div></div>';
+}
+function panel(tag, title, body, inner, extra){
+  return '<div class="panel">' + phone(inner, extra)
+       + '<div class="cap"><span class="n">' + tag + '</span><b>' + title + '</b>' + body + '</div></div>';
+}
+function head(name, day){
+  return '<div class="greet"><p class="h">Good morning, ' + name + '.</p><p class="s">Here’s your ' + day + ':</p></div>'
+   + '<div class="wx"><div class="ic"><span class="em">&#9728;&#65039;</span><span class="t">70–88°</span></div>'
+   + '<div class="tx"><div class="t">Austin, TX &middot; Sunny</div><div class="d">T-shirt weather all day</div></div></div>';
+}
+function carpoolCard(text, link, wait){
+  return '<div class="carpool' + (wait ? ' wait' : '') + '"><div class="ic">' + ic(BUS) + '</div>'
+   + '<div class="tx"><div class="t">' + text + '</div><div class="l">' + link + '</div></div></div>';
+}
+
+
+function tail(){
+  return '<div class="sh">&#9989; Needs your attention</div>'
+   + '<div class="todo"><span class="tb"></span><span class="tt">Sign Jake\u2019s permission slip<small>1st Grade &middot; due today</small></span></div>'
+   + '<div class="todo"><span class="tb"></span><span class="tt">Confirm snacks for parent-teacher night<small>Kindergarten &middot; due Friday</small></span></div>'
+   + '<div class="sh">&#127874; Birthdays</div>'
+   + '<p class="line">Kennedy turns 4 today &mdash; say happy birthday at drop-off</p>';
+}
+
+/* ── band 1 ───────────────────────────────────────── */
+const drv = '<div class="body">' + head('Tony','Friday')
+ + '<div class="sh">&#127914; Happening today</div>'
+ + '<p class="line"><b>8:15 am</b> Carpool drop-off &middot; Mia</p>'
+ + '<p class="line"><b>3:00 pm</b> Carpool pick-up &middot; Mia</p>'
+ + '<div class="sh">&#128663; Carpool</div>'
+ + carpoolCard('You’re covering drop-off and pick-up for Mia today', 'Pickup at 214 Bluebonnet Ln →')
+ + '<div class="sh">&#127828; Today’s lunch &mdash; Kiker Elementary</div>'
+ + '<p class="line">1. Pizza Day &#127829;</p><p class="line">2. Gluten-free pizza</p>' + tail() + '</div>';
+
+const rid = '<div class="body">' + head('Sarah','Friday')
+ + '<div class="sh">&#127914; Happening today</div>'
+ + '<p class="line"><b>8:15 am</b> Mia gets picked up</p>'
+ + '<p class="line"><b>3:00 pm</b> Mia gets dropped home</p>'
+ + '<div class="sh">&#128663; Carpool</div>'
+ + carpoolCard('Tony is covering drop-off and pick-up for Mia today', 'Track him from 8:00 am →')
+ + '<div class="sh">&#127828; Today’s lunch &mdash; Kiker Elementary</div>'
+ + '<p class="line">1. Pizza Day &#127829;</p><p class="line">2. Gluten-free pizza</p>' + tail() + '</div>';
+
+const wait = '<div class="body">' + head('Sarah','Thursday')
+ + '<div class="sh">&#127914; Happening today</div>'
+ + '<p class="line"><b>8:30 am</b> Talent show &middot; Kindergarten</p>'
+ + '<div class="sh">&#128663; Carpool</div>'
+ + carpoolCard('Nobody has picked up Mia’s ride for tomorrow', 'Asked 26 parents yesterday &middot; Nudge them →', true)
+ + '<div class="sh">&#127828; Today’s lunch &mdash; Kiker Elementary</div>'
+ + '<p class="line">1. Hamburger</p><p class="line">2. SunButter &amp; jelly</p>' + tail() + '</div>';
+
+document.getElementById('rowCarpool').innerHTML = [
+  panel('Driver', 'You are the one driving.',
+    ' The sentence is about what you owe someone, so the link goes to the address you need.', drv),
+  panel('Covered', 'Someone is driving for you.',
+    ' Same card, same bus, same green. Only the subject of the sentence moves, from you to Tony, and the link becomes tracking instead of an address.', rid),
+  panel('Unanswered', 'The state nobody had designed.',
+    ' You asked and nobody has said yes. Still the bus, because Tony’s rule holds, but amber, because at 7am this is the only thing on the page you can still do something about. Flagging it as my call, not his.', wait)
+].join('');
+
+/* ── band 2 ───────────────────────────────────────── */
+function evCard(when, name, meta, parents, kids, cls){
+  return '<div class="ev' + (cls ? ' ' + cls : '') + '"><div class="when">' + when + '</div>'
+   + '<div class="nm">' + name + '</div><div class="mt">' + meta + '</div>'
+   + '<div class="going">' + ic(USERS) + '<span class="c"><b>' + parents + ' parents</b> and <b>' + kids
+   + ' kids</b> are going</span></div>';
+}
+
+const before = '<div class="body">' + head('Tony','Friday')
+ + '<div class="sh">&#128198; Upcoming events</div>'
+ + evCard('Sat, 20 Sep', 'Back to School Picnic', 'Kiker 1st Grade &middot; 5:30–7:00 PM &middot; Front Lawn', 6, 5)
+ + '<div class="act"><button class="jbtn">Join</button>'
+ + '<button class="jbtn ghost">Can’t make it</button></div></div>'
+ + evCard('Fri, 26 Sep', 'Field Day', 'Kiker 1st Grade &middot; 9:00 AM', 11, 14)
+ + '</div>'
+ + evCard('Tue, 30 Sep', 'Spring Concert', 'Kindergarten &middot; 6:00 PM', 3, 4) + '</div>' + tail() + '</div>';
+
+const sheetInner = '<div class="body">' + head('Tony','Friday')
+ + '<div class="sh">&#128198; Upcoming events</div>'
+ + evCard('Sat, 20 Sep', 'Back to School Picnic', 'Kiker 1st Grade &middot; 5:30–7:00 PM &middot; Front Lawn', 6, 5)
+ + '<div class="act"><button class="jbtn">Join</button>'
+ + '<button class="jbtn ghost">Can’t make it</button></div></div></div>';
+
+const sheet = '<div class="scrim"></div><div class="sheet"><div class="grab"></div>'
+ + '<h3>Who’s coming?</h3>'
+ + '<p class="sub">Back to School Picnic &middot; Sat, 20 Sep</p>'
+ + '<div class="qlab">Grown-ups</div>'
+ + '<div class="step">' + ic(USER) + '<span class="l">Parents<small>Counts you, and anyone you bring</small></span>'
+ + '<span class="stp"><span class="b">–</span><span class="v">1</span><span class="b">+</span></span></div>'
+ + '<div class="qlab">Kids</div>'
+ + '<div class="kid on"><span class="av">MA</span><span class="tx"><b>Mia</b><span>1st Grade &middot; Mrs. Taylor</span></span>'
+ + '<span class="box">' + ic(CHECK) + '</span></div>'
+ + '<div class="kid"><span class="av" style="background:linear-gradient(145deg,#8a5a1e,#d99a4e)">JA</span>'
+ + '<span class="tx"><b>Jake</b><span>3rd Grade &middot; Mr. Alvarez</span></span>'
+ + '<span class="box">' + ic(CHECK) + '</span></div>'
+ + '<div class="tot">' + ic(INFO) + '<span>You are bringing <b>1 parent and 1 kid</b>. The room parent sees the total, not the names.</span></div>'
+ + '<button class="sbtn">Join 2</button>'
+ + '<button class="sno">Can’t make it</button></div>';
+
+const after = '<div class="body">' + head('Tony','Friday')
+ + '<div class="sh">&#128198; Upcoming events</div>'
+ + evCard('Sat, 20 Sep', 'Back to School Picnic', 'Kiker 1st Grade &middot; 5:30–7:00 PM &middot; Front Lawn', 7, 6, 'mine')
+ + '<div class="yours"><span class="tick">' + ic(CHECK) + '</span>'
+ + '<span class="tx">You’re going &middot; you and Mia</span><span class="ed">Change</span></div></div>'
+ + evCard('Fri, 26 Sep', 'Field Day', 'Kiker 1st Grade &middot; 9:00 AM', 11, 14) + '</div>'
+ + '<div class="sh">&#128172; New messages</div>'
+ + '<p class="line"><b>Kiker 1st Grade:</b> 3 new</p>' + tail() + '</div>';
+
+document.getElementById('rowJoin').innerHTML = [
+  panel('Before', 'The number is on the card, not behind a tap.',
+    ' Tony asked to display how many parents and kids are going. It reads as a sentence under the event, because &ldquo;6 and 5&rdquo; in two boxes means nothing at a glance.', before),
+  panel('Join tapped', 'A sheet, and it already knows your kids.',
+    ' Parents is a stepper, because a grandparent is not in the app. Kids are names with checkboxes, because Sprout knows them, and picking Mia is easier than counting to one. It still produces the two numbers the portal expects. The button is <b>Join</b> plus the headcount and nothing else &mdash; Tony, 17 Sep: &ldquo;just say join one&hellip; you can even say join five here. I don&rsquo;t think you need <i>of us</i>.&rdquo; So it reads Join 1, Join 2, Join 5, and it is never pluralised.', sheetInner, sheet),
+  panel('After', 'Your answer becomes part of the count.',
+    ' 6 and 5 became 7 and 6. The card turns green and gains a Change link, so a plan that falls through is one tap, not a support message to the room parent.', after)
+].join('');
+</script>
+
+</body>
+</html>

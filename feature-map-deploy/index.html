@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Sprout — Feature Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F1EA; --card:#fff; --ink:#1E3E2B; --body:#4d525b; --muted:#7D715E;
+  --green:#186338; --light:#E2E9E3; --border:#77B691; --line:#D9D2C4;
+  --amber:#B5872B; --amber-bg:#FBF1DA; --amber-br:#E6CD96;
+  --red:#A83F34; --red-bg:#F7E3E0; --blue:#2F6690; --blue-bg:#E3EDF5;
+  --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif;
+  --sh:1px 3px 12px rgba(13,13,18,.05);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);font-family:var(--sans);color:var(--body)}
+.wrap{max-width:1560px;margin:0 auto;padding:30px 26px 90px}
+h1{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--ink);margin:0 0 6px}
+.sub{font-size:14px;line-height:1.6;margin:0 0 18px;max-width:700px}
+
+.topbar{display:flex;gap:16px;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap}
+.risk{flex:1;min-width:420px;background:var(--amber-bg);border:1px solid var(--amber-br);border-radius:14px;padding:12px 14px}
+.risk h2{font-family:var(--serif);font-size:15px;color:#6d5310;margin:0 0 8px}
+.risk .rs{display:flex;gap:6px;flex-wrap:wrap}
+.risk .rs span{background:#fff;border:1px solid #efe6cf;border-radius:99px;padding:5px 11px;font-size:12px;
+  color:var(--ink);cursor:pointer}
+.risk .rs span:hover{border-color:var(--amber-br)}
+.risk .rs span b{color:var(--red);font-weight:700}
+.key{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:12px;
+  line-height:1.9;box-shadow:var(--sh);min-width:250px}
+.key b{color:var(--ink)}
+.key i{display:inline-block;width:20px;height:0;border-top:2px solid var(--green);vertical-align:3px;margin-right:6px}
+.key i.d{border-top-color:var(--amber)}
+
+/* ── the tree ──────────────────────────────────────────────────────────── */
+.stage{position:relative}
+#wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+/* dependency curves belong IN FRONT of the cards — behind them they are invisible,
+   which defeats the one interaction this page exists for */
+#wires2{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+.root{position:relative;z-index:2;width:fit-content;margin:0 auto 34px;background:var(--ink);color:#fff;
+  font-family:var(--serif);font-size:17px;padding:10px 26px;border-radius:99px;box-shadow:var(--sh)}
+.surfaces{position:relative;z-index:2;display:grid;grid-template-columns:repeat(5,1fr);gap:14px;align-items:start}
+@media(max-width:1180px){.surfaces{grid-template-columns:repeat(2,1fr)}}
+.surf .sh{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;text-align:center;
+  box-shadow:var(--sh);margin-bottom:26px}
+.surf .sh .t{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink)}
+.surf .sh .n{font-size:11px;color:var(--muted);margin-top:1px}
+
+.grp{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 11px 11px;margin-bottom:16px;
+  box-shadow:var(--sh)}
+.grp .gt{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:9px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.c{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:8px;
+  padding:6px 9px;font-size:12px;color:var(--ink);cursor:pointer;background:#FBFAF7;line-height:1.25}
+.c:hover{border-color:var(--border)}
+.c .d{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--green)}
+.c[data-st="designed"] .d{background:var(--blue)}
+.c[data-st="broken"] .d{background:var(--amber)}
+.c[data-st="missing"] .d{background:var(--red)}
+.c[data-st="parked"] .d{background:#BDB5A5}
+.c[data-st="removed"] .d{background:#DAD3C6}
+.c[data-st="removed"]{text-decoration:line-through;color:#A09684}
+
+body.sel .c{opacity:.2}
+body.sel .grp,body.sel .surf .sh{opacity:.45}
+body.sel .c.root-n{opacity:1;background:var(--ink);color:#fff;border-color:var(--ink)}
+body.sel .c.root-n .d{background:#fff}
+body.sel .c.dep{opacity:1;background:var(--amber-bg);border-color:var(--amber-br)}
+body.sel .c.need{opacity:1;background:var(--light);border-color:var(--border)}
+body.sel .grp.has,body.sel .surf.has .sh{opacity:1}
+
+/* ── panel ── */
+.pan{position:fixed;right:22px;bottom:22px;width:330px;max-height:74vh;overflow-y:auto;background:#fff;
+  border:1px solid var(--line);border-radius:16px;box-shadow:0 14px 44px rgba(0,0,0,.18);padding:16px 17px;
+  z-index:60;display:none}
+.pan.on{display:block}
+.pan h3{font-family:var(--serif);font-size:18px;color:var(--ink);margin:0 0 2px}
+.pan .w{font-size:11.5px;color:var(--muted);margin-bottom:10px}
+.pan .lead{font-size:13.5px;line-height:1.6;color:var(--ink);background:var(--bg);border-radius:10px;
+  padding:10px 12px;margin-bottom:10px}
+.pan .lead b{font-weight:700}
+.pan .note{font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:12px}
+.pan .k{font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:12px 0 6px}
+.pan ul{list-style:none;margin:0;padding:0}
+.pan li{font-size:12.5px;line-height:1.45;color:var(--ink);padding:5px 0;border-bottom:1px solid #F1EDE2;cursor:pointer}
+.pan li:last-child{border-bottom:none}
+.pan li span{color:var(--muted);font-size:11px}
+.pan .none{font-size:12.5px;color:var(--muted);font-style:italic}
+.pan .warn{background:var(--red-bg);border:1px solid #e9c4bd;border-radius:10px;padding:9px 11px;
+  font-size:12px;line-height:1.5;color:#7a2c23;margin-top:12px}
+.pan .x{position:absolute;top:11px;right:13px;border:none;background:none;font-size:19px;color:var(--muted);cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Sprout &mdash; Feature Map</h1>
+  <p class="sub">The whole product as one tree: five surfaces, ten groups, every feature inside them.
+  Tap any feature to light up what it needs and what breaks without it, wherever those sit on the tree.</p>
+
+  <div class="topbar">
+    <div class="risk"><h2>Missing or broken right now</h2><div class="rs" id="rs"></div></div>
+    <div class="key">
+      <b>Tap a feature.</b><br>
+      <i></i><b>Green</b> &mdash; what it needs to work<br>
+      <i class="d"></i><b>Amber</b> &mdash; what breaks without it<br>
+      <span style="color:var(--muted)">Dot colour is status: shipped, designed, broken, missing, parked.</span>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <svg id="wires"></svg>
+    <svg id="wires2"></svg>
+    <div class="root" id="root">Sprout</div>
+    <div class="surfaces" id="surfaces"></div>
+  </div>
+</div>
+
+<div class="pan" id="pan"><button class="x" id="x">&times;</button>
+  <h3 id="pt"></h3><div class="w" id="pw"></div>
+  <div class="lead" id="pl"></div><div class="note" id="pn"></div>
+  <div class="k">Breaks without it</div><ul id="pd"></ul>
+  <div class="k">Cannot work without</div><ul id="pr"></ul>
+  <div id="pwarn"></div>
+</div>
+
+<script>
+/* ═══ THE ONLY THING TO EDIT ═══════════════════════════════════════════════
+   status: shipped | designed | broken | missing | parked | removed
+   g: group id · needs: ids it cannot work without
+   ═══════════════════════════════════════════════════════════════════════ */
+const F = [
+
+  /* ── APP ───────────────────────────────────────────────────────────────── */
+  {id:'onboarding', g:'acct', t:'Onboarding', st:'shipped', needs:['otp'],
+   n:'Phone → code → profile → kids → school → class group. Same flow as the portal.'},
+  {id:'brief', g:'brief', t:'Daily Brief', st:'shipped', needs:['todo','weather','lunch-app','events','chat','birthdays','onboarding'],
+   n:'Default tab since the Sep nav restructure. Weather → To-Do → Happening today → Events → Lunch → Messages → Birthdays.'},
+  {id:'todo', g:'brief', t:'To-Do', st:'shipped', needs:[],
+   n:'Collapsible section, approved 17 Sep. Receives items from AI reminders and from room parents.'},
+  {id:'weather', g:'brief', t:'Weather', st:'shipped', needs:[]},
+  {id:'lunch-app', g:'brief', t:'Lunch in the brief', st:'shipped', needs:['p-lunch'],
+   n:'Reads the school-wide menu the master portal maintains.'},
+  {id:'events', g:'events', t:'Events tab', st:'shipped', needs:['discover','invites','onboarding'],
+   n:'Took the old Memories slot. Lost its brief section to the Daily Brief tab.'},
+  {id:'discover', g:'events', t:'Discover', st:'shipped', needs:[], n:'Parks, camps, activities near you.'},
+  {id:'invites', g:'events', t:'Invitations & RSVP', st:'shipped', needs:['headcount']},
+  {id:'headcount', g:'events', t:'Join headcount', st:'designed', needs:[],
+   n:'Who is coming: parents stepper + kid checkboxes. Approved 17 Sep. Button reads “Join 2”.'},
+  {id:'calendar-app', g:'acct', t:'Calendar', st:'shipped', needs:['onboarding'],
+   n:'Personal calendar with the kids’ calendar overlaid. Kept on purpose — Tony: parents should not leave the app to check their own schedule.'},
+  {id:'notifs', g:'acct', t:'Notifications screen', st:'broken', needs:['brief'],
+   n:'The screen exists and shipped. The nav restructure took its door: the one icon in the brief header now opens the calendar. Fix designed 17 Sep.'},
+  {id:'push', g:'infra', t:'Push notifications', st:'missing', needs:[],
+   n:'Nothing sends one yet. Tony: “if you don’t put it in here, the guys will forget.”'},
+  {id:'ai', g:'ai', t:'AI Assist', st:'designed', needs:['n8n','onboarding'],
+   n:'Speech to text, then n8n. Nothing is spoken back.'},
+  {id:'ai-reminder', g:'ai', t:'AI · Reminder', st:'designed', needs:['ai','spouse','push','brief'],
+   n:'Rebuilt 17 Sep: tap to start, tap to stop, anchored button, nothing fake-live.'},
+  {id:'ai-event', g:'ai', t:'AI · Event', st:'designed', needs:['ai','events']},
+  {id:'ai-note', g:'ai', t:'AI · Note', st:'designed', needs:['ai']},
+  {id:'ai-birthday', g:'ai', t:'AI · Birthday', st:'designed', needs:['ai','birthdays']},
+  {id:'ai-carpool', g:'ai', t:'AI · Carpool', st:'parked', needs:['ai','carpool'],
+   n:'Tony, 17 Sep: “a carpool is gonna get a little tricky, I need to think about this a little bit more.”'},
+  {id:'carpool', g:'brief', t:'Carpool', st:'shipped', needs:[]},
+  {id:'birthdays', g:'brief', t:'Birthdays', st:'shipped', needs:[]},
+  {id:'spouse', g:'acct', t:'Spouse / household', st:'shipped', needs:[],
+   n:'Without it a reminder has nobody to send to. Tony: “from parent to parent, like me to my wife — that is half the battle.”'},
+  {id:'chat', g:'groups', t:'Chat', st:'shipped', needs:['subgroups','onboarding']},
+  {id:'clubs', g:'groups', t:'Clubs & grades', st:'shipped', needs:['onboarding'],
+   n:'Grades are admin-created and uneditable. Clubs and subgroups can be edited by their admins.'},
+  {id:'subgroups', g:'groups', t:'Subgroups', st:'shipped', needs:['clubs']},
+  {id:'join-req', g:'groups', t:'Join request', st:'designed', needs:['clubs','push','notifs'],
+   n:'Approve / deny, designed 17 Sep. Needs a push to be worth anything.'},
+  {id:'memories', g:'acct', t:'Memories', st:'removed', needs:[],
+   n:'Cut in the Sep nav restructure to make room for Daily Brief.'},
+  {id:'profile', g:'acct', t:'Profile', st:'shipped', needs:['onboarding']},
+  {id:'live-act', g:'acct', t:'Live Activities', st:'designed', needs:[]},
+
+  /* ── PORTAL ────────────────────────────────────────────────────────────── */
+  {id:'p-onboarding', g:'pcomm', t:'Room parent onboarding', st:'shipped', needs:['otp','clubs'],
+   n:'Shows classes that already exist for the grade so a second room parent joins instead of creating a duplicate. Finishing here makes you a Sprout user, not an email-only one.'},
+  {id:'p-dash', g:'pcont', t:'Dashboard', st:'shipped', needs:['p-todo','p-fund','p-cal']},
+  {id:'p-parents', g:'pcomm', t:'Parents', st:'shipped', needs:['p-consent'],
+   n:'The recipient list everything else sends to. Filled by consent form submissions.'},
+  {id:'p-consent', g:'pcomm', t:'Consent Forms', st:'shipped', needs:[],
+   n:'A submission auto-creates a parent record. Decided 17 Sep: no button in between.'},
+  {id:'p-email', g:'pcomm', t:'Compose Email', st:'shipped', needs:['p-parents','p-cal','p-links'],
+   n:'Pulls upcoming events and class links in automatically.'},
+  {id:'p-cal', g:'pcont', t:'Portal calendar', st:'shipped', needs:[]},
+  {id:'p-links', g:'pcont', t:'Links', st:'shipped', needs:[]},
+  {id:'p-signups', g:'pcont', t:'Sign-Up Links', st:'shipped', needs:['p-parents','p-cal'],
+   n:'Rebuilt 17 Sep into three kinds: time slots, anytime, and a supply list parents claim from.'},
+  {id:'p-donations', g:'pcont', t:'Donation Links', st:'shipped', needs:[]},
+  {id:'p-reminders', g:'pcont', t:'Reminders (links tab)', st:'shipped', needs:[]},
+  {id:'p-fund', g:'pcont', t:'Fundraising', st:'shipped', needs:['p-donations']},
+  {id:'p-todo', g:'pcont', t:'Room Parent To-Do', st:'shipped', needs:['p-parents']},
+  {id:'p-lunch', g:'pcont', t:'Lunch Menu (master)', st:'shipped', needs:[],
+   n:'Master context only. Shared across every class on purpose.'},
+  {id:'p-rps', g:'pcomm', t:'Room Parents & Activity', st:'shipped', needs:[]},
+
+  /* ── PUBLIC PAGES (no login) ───────────────────────────────────────────── */
+  {id:'pub-event', g:'public', t:'Event page', st:'shipped', needs:['p-cal'], n:'roomparent.com/e/…'},
+  {id:'pub-consent', g:'public', t:'Consent form page', st:'shipped', needs:['p-consent'], n:'roomparent.com/f/…'},
+  {id:'pub-todo', g:'public', t:'Shared checklist', st:'shipped', needs:['p-todo'], n:'roomparent.com/todo/…'},
+  {id:'pub-donate', g:'public', t:'Donate page', st:'shipped', needs:['p-donations'], n:'roomparent.com/d/…'},
+  {id:'pub-signup', g:'public', t:'Sign-up claim page', st:'missing', needs:['p-signups'],
+   n:'The URL shape is decided (roomparent.com/s/…) and the layout is specified by the Share preview, but no file exists.'},
+  {id:'pub-chat', g:'public', t:'Web group chat', st:'missing', needs:['chat','p-email'],
+   n:'The “Join group chat” link in the class email lands here. Mohit, 17 Sep: “this page is not built yet, I need a design to build it.” Whether that design was ever sent is unresolved.'},
+
+  /* ── PLUMBING ──────────────────────────────────────────────────────────── */
+  {id:'n8n', g:'infra', t:'n8n', st:'shipped', needs:[],
+   n:'Runs after speech ends, never during. This is why nothing on the recording screen can fill in live.'},
+  {id:'otp', g:'infra', t:'Phone + OTP', st:'shipped', needs:[]},
+  {id:'mail', g:'infra', t:'Email sending', st:'broken', needs:[],
+   n:'Sent directly from the room parent’s own inbox, not through an email API, so first-time mail lands in spam.'},
+
+  /* ── MARKETING ─────────────────────────────────────────────────────────── */
+  {id:'rp-com', g:'market', t:'roomparent.com', st:'shipped', needs:[],
+   n:'A separate React build behind Cloudflare, owned by Mohit — not the Vercel prototype bundle.'},
+  {id:'rp-landing', g:'market', t:'Landing design source', st:'shipped', needs:[],
+   n:'roomparent-com-landing-v2.html, deployed to Vercel. Changes here do not reach roomparent.com by themselves.'},
+  {id:'sprout-landing', g:'market', t:'Sprout landing', st:'shipped', needs:[]}
+  ,{id:'spouse-todo', g:'brief', t:'Spouse’s to-do block', st:'designed', needs:['todo','spouse','brief'],
+   n:'Their list under yours, on both phones. Designed 17 Sep. Read-only rows, plus Nudge.'}
+];
+
+const GROUPS = [
+  {id:'brief',  s:'app',    t:'Daily Brief'},
+  {id:'ai',     s:'app',    t:'AI Assist'},
+  {id:'events', s:'app',    t:'Events & RSVP'},
+  {id:'groups', s:'app',    t:'Groups & Chat'},
+  {id:'acct',   s:'app',    t:'Account & shell'},
+  {id:'pcomm',  s:'portal', t:'Reaching parents'},
+  {id:'pcont',  s:'portal', t:'Running the class'},
+  {id:'public', s:'public', t:'Public pages'},
+  {id:'infra',  s:'infra',  t:'Plumbing'},
+  {id:'market', s:'market', t:'Marketing'}
+];
+const SURF = [
+  {id:'app',    t:'App',            n:'React Native · 5 tabs'},
+  {id:'portal', t:'Room Parent Portal', n:'the class web tool'},
+  {id:'public', t:'Public pages',   n:'no login, opened from a link'},
+  {id:'infra',  t:'Plumbing',       n:'not screens'},
+  {id:'market', t:'Marketing',      n:'before any of this'}
+];
+
+const byId=Object.fromEntries(F.map(f=>[f.id,f]));
+const GT=Object.fromEntries(GROUPS.map(g=>[g.id,g.t]));
+const GS=Object.fromEntries(GROUPS.map(g=>[g.id,g.s]));
+const dependentsOf=id=>{const o=new Set();let fr=[id];
+  while(fr.length){const nx=[];for(const f of F) if(!o.has(f.id)&&f.needs.some(n=>fr.includes(n))){o.add(f.id);nx.push(f.id);} fr=nx;} return [...o];};
+const needsOf=id=>{const o=new Set();let fr=[id];
+  while(fr.length){const nx=[];for(const c of fr) for(const n of (byId[c]?.needs||[])) if(!o.has(n)){o.add(n);nx.push(n);} fr=nx;} return [...o];};
+
+/* ── render the tree ── */
+document.getElementById('surfaces').innerHTML = SURF.map(s=>
+  `<div class="surf" data-s="${s.id}">
+     <div class="sh" data-surf="${s.id}"><div class="t">${s.t}</div><div class="n">${s.n}</div></div>`+
+   GROUPS.filter(g=>g.s===s.id).map(g=>
+     `<div class="grp" data-g="${g.id}"><div class="gt">${g.t}</div><div class="chips">`+
+      F.filter(f=>f.g===g.id).map(f=>
+        `<span class="c" data-id="${f.id}" data-st="${f.st}"><span class="d"></span>${f.t}</span>`).join('')+
+     `</div></div>`).join('')+
+   `</div>`).join('');
+
+document.getElementById('rs').innerHTML = F.filter(f=>f.st==='missing'||f.st==='broken')
+  .map(f=>`<span onclick="pick('${f.id}')"><b>${f.st==='missing'?'●':'▲'}</b> ${f.t}</span>`).join('');
+
+/* ── wires: the tree itself, drawn once and kept faint ── */
+function drawTree(){
+  const st=document.getElementById('stage'), box=st.getBoundingClientRect();
+  const svg=document.getElementById('wires');
+  svg.setAttribute('viewBox',`0 0 ${box.width} ${box.height}`);
+  svg.style.height=box.height+'px';
+  const svg2=document.getElementById('wires2');
+  svg2.setAttribute('viewBox',`0 0 ${box.width} ${box.height}`);
+  svg2.style.height=box.height+'px';
+  const R=el=>{const r=el.getBoundingClientRect();return {x:r.left-box.left,y:r.top-box.top,w:r.width,h:r.height};};
+  const root=R(document.getElementById('root'));
+  let out='';
+  const busY=root.y+root.h+14;
+  out+=`<path d="M${root.x+root.w/2} ${root.y+root.h} V${busY}" stroke="#CFC7B6" stroke-width="1.4" fill="none"/>`;
+  const heads=[...document.querySelectorAll('.sh')].map(R);
+  const xs=heads.map(h=>h.x+h.w/2);
+  out+=`<path d="M${Math.min(...xs)} ${busY} H${Math.max(...xs)}" stroke="#CFC7B6" stroke-width="1.4" fill="none"/>`;
+  heads.forEach(h=>{ out+=`<path d="M${h.x+h.w/2} ${busY} V${h.y}" stroke="#CFC7B6" stroke-width="1.4" fill="none"/>`; });
+  document.querySelectorAll('.surf').forEach(sf=>{
+    const head=R(sf.querySelector('.sh'));
+    const gs=[...sf.querySelectorAll('.grp')].map(R);
+    if(!gs.length) return;
+    const spineX=head.x+16, bottom=gs[gs.length-1].y+18;
+    out+=`<path d="M${spineX} ${head.y+head.h} V${bottom}" stroke="#E2DACB" stroke-width="1.3" fill="none"/>`;
+    gs.forEach(g=>{ out+=`<path d="M${spineX} ${g.y+18} H${g.x}" stroke="#E2DACB" stroke-width="1.3" fill="none"/>`; });
+  });
+  svg.innerHTML=out;
+  svg2.innerHTML='<g id="deps"></g>';
+}
+
+/* ── dependency wires, only for the tapped feature ── */
+function drawDeps(id,deps,nds){
+  const box=document.getElementById('stage').getBoundingClientRect();
+  const C=i=>{const el=document.querySelector(`.c[data-id="${i}"]`); if(!el) return null;
+    const r=el.getBoundingClientRect(); return {x:r.left-box.left+r.width/2,y:r.top-box.top+r.height/2};};
+  const curve=(a,b,col)=>{const A=C(a),B=C(b); if(!A||!B) return '';
+    const dx=Math.abs(B.x-A.x), lift=Math.min(90,30+dx*0.18);
+    const d=`M${A.x} ${A.y} C ${A.x} ${A.y-lift}, ${B.x} ${B.y-lift}, ${B.x} ${B.y}`;
+    return `<path d="${d}" fill="none" stroke="#F4F1EA" stroke-width="5" opacity=".85"/>`+
+           `<path d="${d}" fill="none" stroke="${col}" stroke-width="2" opacity=".9"/>`+
+           `<circle cx="${B.x}" cy="${B.y}" r="3.2" fill="${col}"/>`;};
+  let out='';
+  for(const n of byId[id].needs) out+=curve(id,n,'#186338');
+  for(const n of nds) for(const m of (byId[n].needs||[])) if(nds.includes(m)) out+=curve(n,m,'#186338');
+  for(const d of F.filter(f=>f.needs.includes(id)).map(f=>f.id)) out+=curve(d,id,'#B5872B');
+  for(const d of deps) for(const m of byId[d].needs) if(m===id||deps.includes(m)) out+=curve(d,m,'#B5872B');
+  document.getElementById('deps').innerHTML=out;
+}
+
+let sel=null;
+function clear(){ sel=null; document.body.classList.remove('sel');
+  document.querySelectorAll('.c').forEach(c=>c.classList.remove('root-n','dep','need'));
+  document.querySelectorAll('.grp,.surf').forEach(e=>e.classList.remove('has'));
+  const d=document.getElementById('deps'); if(d) d.innerHTML='';
+  document.getElementById('pan').classList.remove('on'); }
+function pick(id){
+  const f=byId[id], deps=dependentsOf(id), nds=needsOf(id);
+  sel=id; document.body.classList.add('sel');
+  document.querySelectorAll('.c').forEach(c=>{ c.classList.remove('root-n','dep','need');
+    const i=c.dataset.id;
+    if(i===id) c.classList.add('root-n'); else if(deps.includes(i)) c.classList.add('dep');
+    else if(nds.includes(i)) c.classList.add('need'); });
+  const lit=new Set([id,...deps,...nds]);
+  document.querySelectorAll('.grp').forEach(g=>
+    g.classList.toggle('has', F.some(f2=>f2.g===g.dataset.g && lit.has(f2.id))));
+  document.querySelectorAll('.surf').forEach(s=>
+    s.classList.toggle('has', F.some(f2=>GS[f2.g]===s.dataset.s && lit.has(f2.id))));
+  document.getElementById('pt').textContent=f.t;
+  document.getElementById('pw').textContent=GT[f.g]+' · '+f.st;
+  document.getElementById('pl').innerHTML = deps.length
+    ? `Remove <b>${f.t}</b> and <b>${deps.length}</b> other feature${deps.length===1?'':'s'} stop working.`
+    : `Nothing is built on <b>${f.t}</b>. It can go on its own.`;
+  document.getElementById('pn').textContent=f.n||'';
+  const li=l=>l.length?l.map(i=>`<li onclick="pick('${i}')">${byId[i].t} <span>· ${GT[byId[i].g]}</span></li>`).join('')
+    :`<li class="none">Nothing.</li>`;
+  document.getElementById('pd').innerHTML=li(deps);
+  document.getElementById('pr').innerHTML=li(nds);
+  const weak=deps.filter(i=>['missing','broken'].includes(byId[i].st));
+  document.getElementById('pwarn').innerHTML=weak.length
+    ? `<div class="warn"><b>${weak.length} thing${weak.length===1?'':'s'} above it ${weak.length===1?'is':'are'} already missing or broken:</b> ${weak.map(i=>byId[i].t).join(', ')}.</div>` : '';
+  document.getElementById('pan').classList.add('on');
+  drawDeps(id,deps,nds);
+}
+document.addEventListener('click',e=>{
+  const c=e.target.closest('.c');
+  if(c){ c.dataset.id===sel ? clear() : pick(c.dataset.id); return; }
+  if(e.target.id==='x'){ clear(); return; }
+});
+drawTree();
+window.addEventListener('resize',()=>{ drawTree(); if(sel) pick(sel); });
+</script>
+</body>
+</html>
