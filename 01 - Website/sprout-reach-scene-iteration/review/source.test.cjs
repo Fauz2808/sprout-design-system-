@@ -68,6 +68,8 @@ test("Sprout Assist story keeps the requested feature order and source screens",
   assert.equal(assistAssets.length, 5);
   for (const asset of assistAssets)
     assert.ok(fs.existsSync(path.join(root, asset)), asset);
+  assert.ok(script.includes("mobileChapterObserver"));
+  assert.ok(script.includes('rootMargin: "-68% 0px -22% 0px"'));
 });
 test("closing banner uses its own generated landscape", () => {
   const closing =

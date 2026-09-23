@@ -12,7 +12,7 @@ This is a separate option, inspired by the user's Reach reference. It retains th
 - The compact preview selector sits below the phone and above the closing rail, leaving the phone bezel and in-app navigation fully visible.
 - A horizontal accordion groups four family moments. The first card opens by default; hover, focus, click, and arrow keys move the expanded state. Expanded cards align text and imagery side by side, while collapsed cards retain only their text. Mobile stacks the cards vertically and expands the card whose heading crosses a narrow center band in the viewport; tapping remains available.
 - The sticky product preview changes beside each story on desktop, connecting the narrative directly to real UI.
-- Mobile uses an explicit feature selector and one chapter at a time to avoid a long pinned or scroll-hijacked sequence.
+- Mobile keeps the product preview compact and sticky while the five chapters move through a reading band beneath it. Each chapter updates the screen automatically; the feature selector remains a direct touch shortcut.
 - A family photograph and solid green community section shift the focus from coordination to real people.
 - The closing section is a centered, full-bleed landscape banner. A new golden-hour field, wildflowers, and winding path keep the outdoor motif while avoiding a repeat of the hero meadow composition.
 - Shadows mark elevated app previews only; one white floating navigation keeps the site controls legible.

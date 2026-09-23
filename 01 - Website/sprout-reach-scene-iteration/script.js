@@ -307,11 +307,24 @@ function setStory(key) {
   chapters.forEach((chapter) =>
     chapter.classList.toggle("active", chapter.dataset.story === key),
   );
+  let activeLink;
   storyLinks.forEach((link) => {
-    if (link.hash === `#story-${key}`)
+    if (link.hash === `#story-${key}`) {
       link.setAttribute("aria-current", "step");
-    else link.removeAttribute("aria-current");
+      activeLink = link;
+    } else {
+      link.removeAttribute("aria-current");
+    }
   });
+  if (mobile.matches && activeLink && changed) {
+    const selector = activeLink.parentElement;
+    selector.scrollTo({
+      left:
+        activeLink.offsetLeft -
+        (selector.clientWidth - activeLink.offsetWidth) / 2,
+      behavior: motion.matches ? "auto" : "smooth",
+    });
+  }
   if (changed) enter(storyScreen, 10, 280);
 }
 setStory(
@@ -320,35 +333,47 @@ setStory(
     : "assist",
 );
 storyLinks.forEach((link) =>
-  link.addEventListener("click", (event) => {
+  link.addEventListener("click", () => {
     const key = link.hash.replace("#story-", "");
-    if (mobile.matches) event.preventDefault();
     setStory(key);
   }),
 );
+function setStoryFromEntries(entries) {
+  const candidates = entries
+    .filter((entry) => entry.isIntersecting)
+    .sort(
+      (a, b) =>
+        Math.abs(
+          a.boundingClientRect.top +
+            a.boundingClientRect.height / 2 -
+            innerHeight / 2,
+        ) -
+        Math.abs(
+          b.boundingClientRect.top +
+            b.boundingClientRect.height / 2 -
+            innerHeight / 2,
+        ),
+    );
+  if (candidates.length) setStory(candidates[0].target.dataset.story);
+}
 const chapterObserver = new IntersectionObserver(
   (entries) => {
     if (mobile.matches) return;
-    const candidates = entries
-      .filter((entry) => entry.isIntersecting)
-      .sort(
-        (a, b) =>
-          Math.abs(
-            a.boundingClientRect.top +
-              a.boundingClientRect.height / 2 -
-              innerHeight / 2,
-          ) -
-          Math.abs(
-            b.boundingClientRect.top +
-              b.boundingClientRect.height / 2 -
-              innerHeight / 2,
-          ),
-      );
-    if (candidates.length) setStory(candidates[0].target.dataset.story);
+    setStoryFromEntries(entries);
   },
   { rootMargin: "-35% 0px -35% 0px", threshold: 0 },
 );
-chapters.forEach((chapter) => chapterObserver.observe(chapter));
+const mobileChapterObserver = new IntersectionObserver(
+  (entries) => {
+    if (!mobile.matches) return;
+    setStoryFromEntries(entries);
+  },
+  { rootMargin: "-68% 0px -22% 0px", threshold: 0 },
+);
+chapters.forEach((chapter) => {
+  chapterObserver.observe(chapter);
+  mobileChapterObserver.observe(chapter);
+});
 mobile.addEventListener("change", () => setStory(activeStory));
 const reveals = new IntersectionObserver(
   (entries) => {

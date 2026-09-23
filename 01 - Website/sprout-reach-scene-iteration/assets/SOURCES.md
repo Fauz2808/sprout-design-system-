@@ -11,6 +11,9 @@ The base assets are copied from ../sprout-reach-inspired/assets in the Sprout we
 - sprout-assist-carpool-figma.png: exact 393 x 852 PNG export from Figma node 12618:166505.
 - sprout-assist-event-figma.png: exact 393 x 852 PNG export from Figma node 12632:172323.
 - sprout-assist-club-figma.png: exact 393 x 852 PNG export from Figma node 12632:172575.
+- moments-events-meadow-v1.png / moments-events-meadow-v1.webp: generated with the built-in image generation tool for the Events family-moment card; wide rolling meadow with a winding path.
+- moments-invitation-meadow-v1.png / moments-invitation-meadow-v1.webp: generated with the built-in image generation tool for the Invitation family-moment card; open wildflower meadow and distant hills.
+- moments-chat-meadow-v1.png / moments-chat-meadow-v1.webp: generated with the built-in image generation tool for the Chat family-moment card; cool early-morning green valley.
 - daily-brief-attention-card.png / birthday-invitation-card.png: previously supplied Figma card exports.
 - hand-mom-iphone-17-pro-max.png / hand-mom-tap.png: existing transparent mom-hand assets copied from ../sprout-hand-interactive/assets for the interactive hero. The two floating card exports are no longer used in the hero.
 - family-hills-closing-v1.png / family-hills-closing-v1.webp: generated specifically for the centered closing banner with the built-in image generation tool. The WebP is the optimized website asset; the PNG is retained as the lossless source.
