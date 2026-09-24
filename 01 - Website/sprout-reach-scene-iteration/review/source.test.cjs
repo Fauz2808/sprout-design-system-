@@ -34,22 +34,60 @@ test("hero uses the interactive mom hand without floating invitation or task car
   assert.ok(!hero.includes("birthday-invitation-card.png"));
   assert.ok(!hero.includes("daily-brief-attention-card.png"));
 });
+test("hero preview uses the latest Daily Brief, Chat, and Clubs screens", () => {
+  const hero =
+    html.match(/<section class="hero"[\s\S]*?<\/section>/)?.[0] ?? "";
+  const keys = [...hero.matchAll(/data-preview="([^"]+)"/g)].map(
+    (match) => match[1],
+  );
+  assert.deepEqual(keys, ["brief", "chat", "clubs"]);
+  assert.ok(script.includes('./assets/daily-brief-updated.png'));
+  assert.ok(script.includes('./assets/chat-updated.png'));
+  assert.ok(script.includes('./assets/clubs-updated.png'));
+  assert.ok(!hero.includes('data-preview="events"'));
+});
 test("family moments accordion starts with only the first card expanded", () => {
   const moments =
     html.match(/<section\s+class="moments section"[\s\S]*?<\/section>/)?.[0] ??
     "";
   const cards = [...moments.matchAll(/class="moment-card([^"]*)" data-moment="(\d)"/g)];
-  assert.equal(cards.length, 4);
+  assert.equal(cards.length, 3);
   assert.deepEqual(
     cards.map((card) => card[1].includes("is-active")),
-    [true, false, false, false],
+    [true, false, false],
   );
   const expanded = [...moments.matchAll(/aria-expanded="(true|false)"/g)].map(
     (match) => match[1],
   );
-  assert.deepEqual(expanded, ["true", "false", "false", "false"]);
+  assert.deepEqual(expanded, ["true", "false", "false"]);
   assert.ok(!moments.includes("previous-moment"));
   assert.ok(!moments.includes("next-moment"));
+});
+test("family moments do not repeat the hero's Daily Brief or Chat screens", () => {
+  const moments =
+    html.match(/<section\s+class="moments section"[\s\S]*?<\/section>/)?.[0] ??
+    "";
+  assert.ok(!moments.includes("daily-brief-updated.png"));
+  assert.ok(!moments.includes("chat-updated.png"));
+  assert.ok(moments.includes("daily-brief-attention-card-v2.png"));
+});
+test("classes section keeps chat, calendar, emails, and links in one place", () => {
+  const classes =
+    html.match(/<section\s+class="classes section"[\s\S]*?<\/section>/)?.[0] ??
+    "";
+  const views = [...classes.matchAll(/data-class-view="([^"]+)"/g)].map(
+    (match) => match[1],
+  );
+  assert.deepEqual(views, ["chat", "calendar", "updates", "links"]);
+  for (const view of views)
+    assert.ok(script.includes(`./assets/class-${view}.png`), view);
+  assert.ok(html.indexOf('id="classes"') < html.indexOf('id="features"'));
+  assert.ok(!/gmail\.com/i.test(html + script));
+});
+test("headings use Sprout's display face", () => {
+  const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  assert.ok(html.includes("family=Playfair+Display"));
+  assert.ok(css.includes('--display: "Playfair Display"'));
 });
 test("Sprout Assist story keeps the requested feature order and source screens", () => {
   const product =

@@ -14,11 +14,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260923-3" />
-    <script src="./script.js?v=20260923-1" defer></script>
+    <link rel="stylesheet" href="./styles.css?v=20260924-3" />
+    <script src="./script.js?v=20260924-1" defer></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -33,8 +33,8 @@
           />Sprout</a
         >
         <div class="nav-links">
-          <a href="#moments">Family life</a><a href="#features">The app</a
-          ><a href="#community">Community</a>
+          <a href="#moments">Family life</a><a href="#classes">Classes</a
+          ><a href="#features">The app</a><a href="#community">Community</a>
         </div>
         <a class="button nav-download" href="#download">Download app</a>
         <button
@@ -48,8 +48,8 @@
         </button>
       </nav>
       <div id="mobile-nav" hidden>
-        <a href="#moments">Family life</a><a href="#features">The app</a
-        ><a href="#community">Community</a
+        <a href="#moments">Family life</a><a href="#classes">Classes</a
+        ><a href="#features">The app</a><a href="#community">Community</a
         ><a href="#download">Download Sprout</a>
       </div>
     </header>
@@ -130,21 +130,21 @@
                 role="tab"
                 aria-selected="false"
                 aria-controls="hero-screen-panel"
-                id="preview-events"
-                data-preview="events"
+                id="preview-chat"
+                data-preview="chat"
                 tabindex="-1"
               >
-                Events</button
+                Chat</button
               ><button
                 type="button"
                 role="tab"
                 aria-selected="false"
                 aria-controls="hero-screen-panel"
-                id="preview-chat"
-                data-preview="chat"
+                id="preview-clubs"
+                data-preview="clubs"
                 tabindex="-1"
               >
-                Chat
+                Clubs
               </button>
             </div>
             <p id="preview-status" aria-live="polite" class="sr-only">
@@ -210,12 +210,12 @@
                   alt="A quiet green meadow under a blue sky"
                   loading="lazy"
                 /><img
-                  class="card-screen"
-                  src="./assets/daily-brief-updated.png"
-                  alt="Sprout Daily Brief showing reminders, carpool, and today's schedule"
+                  class="attention-cutout"
+                  src="./assets/daily-brief-attention-card-v2.png"
+                  alt="Daily Brief to-dos with class names and due days"
                   loading="lazy"
-                  width="393"
-                  height="852"
+                  width="722"
+                  height="516"
                 />
               </div>
             </div>
@@ -290,42 +290,103 @@
               </div>
             </div>
           </article>
-          <article class="moment-card" data-moment="3">
+        </div>
+      </section>
+
+      <section
+        class="classes section"
+        id="classes"
+        aria-labelledby="classes-title"
+      >
+        <div class="classes-copy reveal">
+          <p class="eyebrow">For every class your kids are in</p>
+          <h2 id="classes-title">
+            Everything for their class.<br /><em>In one place.</em>
+          </h2>
+          <p class="classes-intro">
+            The group chat, the class calendar, emails from the teacher and room
+            parents, and the links you always end up hunting for. Each class
+            keeps them together, one tap apart.
+          </p>
+          <div
+            class="class-tabs"
+            role="tablist"
+            aria-label="What lives in each class"
+          >
             <button
-              class="moment-trigger"
               type="button"
-              aria-expanded="false"
-              aria-controls="moment-panel-4"
+              role="tab"
+              id="class-tab-chat"
+              aria-selected="true"
+              aria-controls="class-screen-panel"
+              data-class-view="chat"
             >
-              <span class="moment-number">04</span>
-              <span class="moment-copy">
-                <span class="moment-time">Through it all</span>
-                <strong>Keep the conversation close.</strong>
-                <span class="moment-description"
-                  >From class chats to one-to-one messages, stay connected to
-                  your circle.</span
-                >
-              </span>
+              <span class="class-tab-name">Class group chat</span
+              ><span class="class-tab-desc"
+                >Every parent in the class, in one thread.</span
+              ></button
+            ><button
+              type="button"
+              role="tab"
+              id="class-tab-calendar"
+              aria-selected="false"
+              aria-controls="class-screen-panel"
+              data-class-view="calendar"
+              tabindex="-1"
+            >
+              <span class="class-tab-name">Class calendar</span
+              ><span class="class-tab-desc"
+                >Events, no-school days, and to-dos the whole class sees.</span
+              ></button
+            ><button
+              type="button"
+              role="tab"
+              id="class-tab-updates"
+              aria-selected="false"
+              aria-controls="class-screen-panel"
+              data-class-view="updates"
+              tabindex="-1"
+            >
+              <span class="class-tab-name">Teacher and room parent emails</span
+              ><span class="class-tab-desc"
+                >Class updates pulled from your inbox, so nothing gets
+                buried.</span
+              ></button
+            ><button
+              type="button"
+              role="tab"
+              id="class-tab-links"
+              aria-selected="false"
+              aria-controls="class-screen-panel"
+              data-class-view="links"
+              tabindex="-1"
+            >
+              <span class="class-tab-name">Important links</span
+              ><span class="class-tab-desc"
+                >School site, wish list, donations. Pinned, not scrolled
+                for.</span
+              >
             </button>
-            <div class="moment-panel" id="moment-panel-4">
-              <div class="moment-visual conversations">
-                <img
-                  class="card-landscape"
-                  src="./assets/moments-chat-meadow-v1.webp"
-                  alt="A calm open valley with rolling green hills and a blue sky"
-                  loading="lazy"
-                />
-                <img
-                  class="card-screen"
-                  src="./assets/chat-updated.png"
-                  alt="School circles and direct messages in Sprout Chat"
-                  loading="lazy"
-                  width="786"
-                  height="1704"
-                />
-              </div>
-            </div>
-          </article>
+          </div>
+        </div>
+        <div class="classes-stage">
+          <div
+            class="classes-phone phone"
+            id="class-screen-panel"
+            role="tabpanel"
+            aria-labelledby="class-tab-chat"
+            tabindex="0"
+          >
+            <img
+              id="class-screen"
+              src="./assets/class-chat.png"
+              alt="Miss Taylor Class group chat in Sprout"
+              width="393"
+              height="852"
+              loading="lazy"
+            />
+            <div class="island" aria-hidden="true"></div>
+          </div>
         </div>
       </section>
 

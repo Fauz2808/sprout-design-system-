@@ -20,3 +20,9 @@ This is a separate option, inspired by the user's Reach reference. It retains th
 - Existing copy is condensed; new editorial lines describe existing product concepts. No testimonials, statistics, pricing, or product capabilities are invented.
 
 The earlier Bevel, hand, and Reach-inspired options are untouched. The hand assets are reused from the existing Sprout hand-interactive option. App exports retain their native resolution and are displayed proportionally, without inventing detail.
+
+## 24 Sep, after Tony's 23 Sep review
+
+- Headings (h1 to h3, the wordmark, moment titles, class tab names) are set in Playfair Display, Sprout's own display face. Tony: the headers read as "very basic text" and he wanted "our Sprout text". Body copy stays DM Sans. The hero's second line and the classes heading use Playfair italic, the same move as the app's "Here's your Wednesday:".
+- New Classes section between Family life and Sprout Assist: one class, four things (group chat, class calendar, teacher and room parent emails, important links), switched like the app's own class tabs. Tony: "that's a core thing that a lot of parents are gonna enjoy." On stacked layouts the phone sits between the intro and the tabs so a tap changes a screen that is still in view.
+- Redundancy removed. The chat moment card is gone (chat now lives in Classes and in the hero), and moment 01 shows the to-do card cut-out instead of repeating the full Daily Brief screen the hero already opens on. Family life is now three cards.

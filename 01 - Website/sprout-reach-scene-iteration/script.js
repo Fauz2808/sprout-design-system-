@@ -7,17 +7,17 @@ const screens = {
     label: "A calmer start",
     name: "Daily Brief",
   },
-  events: {
-    src: "./assets/events-updated.png",
-    alt: "Sprout Events showing nearby family activities",
-    label: "A plan around the corner",
-    name: "Events",
-  },
   chat: {
     src: "./assets/chat-updated.png",
     alt: "Sprout Chat showing school circles and direct messages",
     label: "Your people, close",
     name: "Chat",
+  },
+  clubs: {
+    src: "./assets/clubs-updated.png",
+    alt: "Sprout Clubs showing school communities and the parent directory",
+    label: "Your circles, together",
+    name: "Clubs",
   },
 };
 const assistScreens = {
@@ -84,7 +84,7 @@ const handScene = document.querySelector(".hand-scene");
 const tappingHand = document.querySelector(".tapping-hand");
 const heroPanel = document.querySelector("#hero-screen-panel");
 const tapRipple = document.querySelector(".tap-ripple");
-const tapPoints = { brief: 0.137, events: 0.349, chat: 0.682 };
+const tapPoints = { brief: 0.137, chat: 0.682, clubs: 0.862 };
 let previewRequest = 0;
 let previewTimer;
 let previewAnimations = [];
@@ -391,3 +391,58 @@ document
   .forEach((element) => reveals.observe(element));
 enter(document.querySelector(".hero-copy"), 18, 650, 60);
 enter(document.querySelector(".hand-scene"), 24, 850, 120);
+const classScreens = {
+  chat: {
+    src: "./assets/class-chat.png",
+    alt: "Miss Taylor Class group chat in Sprout",
+  },
+  calendar: {
+    src: "./assets/class-calendar.png",
+    alt: "Miss Taylor Class calendar with school days and notes",
+  },
+  updates: {
+    src: "./assets/class-updates.png",
+    alt: "Teacher email updates collected inside the class",
+  },
+  links: {
+    src: "./assets/class-links.png",
+    alt: "Pinned class links for the school website, wish list, and donations",
+  },
+};
+const classTabs = [...document.querySelectorAll("[data-class-view]")];
+const classScreen = document.getElementById("class-screen");
+const classPanel = document.getElementById("class-screen-panel");
+Object.values(classScreens).forEach((screen) => {
+  const image = new Image();
+  image.src = screen.src;
+});
+function setClassView(tab, focus = false) {
+  const view = classScreens[tab.dataset.classView];
+  classTabs.forEach((item) => {
+    const active = item === tab;
+    item.setAttribute("aria-selected", String(active));
+    item.tabIndex = active ? 0 : -1;
+  });
+  classPanel.setAttribute("aria-labelledby", tab.id);
+  if (focus) tab.focus();
+  if (classScreen.getAttribute("src") === view.src) return;
+  classScreen.src = view.src;
+  classScreen.alt = view.alt;
+  enter(classScreen, 10, 380);
+}
+classTabs.forEach((tab, index) => {
+  tab.addEventListener("click", () => setClassView(tab));
+  tab.addEventListener("keydown", (event) => {
+    let target;
+    if (event.key === "ArrowDown" || event.key === "ArrowRight")
+      target = (index + 1) % classTabs.length;
+    if (event.key === "ArrowUp" || event.key === "ArrowLeft")
+      target = (index - 1 + classTabs.length) % classTabs.length;
+    if (event.key === "Home") target = 0;
+    if (event.key === "End") target = classTabs.length - 1;
+    if (target !== undefined) {
+      event.preventDefault();
+      setClassView(classTabs[target], true);
+    }
+  });
+});

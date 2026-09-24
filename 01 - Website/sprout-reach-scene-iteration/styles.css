@@ -1257,7 +1257,7 @@ footer a:hover {
     left: 0;
     margin: 0;
     padding: 0 10px;
-    justify-content: flex-start;
+    justify-content: center;
     overscroll-behavior-x: contain;
   }
   .story-selector a {
@@ -1674,6 +1674,9 @@ footer a:hover {
 }
 
 @media (max-width: 360px) {
+  .story-selector {
+    justify-content: flex-start;
+  }
   .hand-scene {
     width: 120%;
   }
@@ -1947,5 +1950,169 @@ footer a:hover {
   .download .store-links {
     flex-direction: column;
     align-items: center;
+  }
+}
+
+/* Sprout display type. Tony, 23 Sep: the headers read as "very basic text";
+   he wants them in Sprout's own type. Playfair Display is the app's display
+   face (headers and button labels), so every heading moves onto it. Body copy
+   stays DM Sans. Playfair needs looser tracking than the DM Sans headings had. */
+:root {
+  --display: "Playfair Display", Georgia, serif;
+}
+h1,
+h2,
+h3,
+.brand,
+.moment-copy strong {
+  font-family: var(--display);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+.hero h1 {
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+}
+.hero h1 span,
+h2 em {
+  font-style: italic;
+}
+.brand {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.moment-copy strong {
+  line-height: 1.12;
+}
+@media (max-width: 600px) {
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Classes: the class hub, one tap apart */
+.classes {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: center;
+  gap: 80px;
+  max-width: 1180px;
+  padding-top: 40px;
+}
+.classes h2 {
+  font-size: clamp(38px, 4vw, 58px);
+}
+.classes h2 em {
+  color: var(--green);
+}
+.classes-intro {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--muted);
+  max-width: 470px;
+  margin-top: 25px;
+}
+.class-tabs {
+  display: flex;
+  flex-direction: column;
+  margin-top: 38px;
+  max-width: 470px;
+  border-top: 1px solid var(--line);
+}
+.class-tabs button {
+  display: grid;
+  gap: 5px;
+  text-align: left;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  padding: 17px 18px 17px 20px;
+  position: relative;
+  color: var(--ink);
+  transition: background 0.2s;
+}
+.class-tabs button::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--green);
+  transform: scaleY(0);
+  transition: transform 0.35s var(--ease);
+}
+.class-tabs button:hover {
+  background: #f4f7f2;
+}
+.class-tabs button[aria-selected="true"] {
+  background: #f0f3ed;
+}
+.class-tabs button[aria-selected="true"]::before {
+  transform: scaleY(1);
+}
+.class-tab-name {
+  font-family: var(--display);
+  font-size: 19px;
+  font-weight: 500;
+}
+.class-tab-desc {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.classes-stage {
+  display: grid;
+  place-items: center;
+  padding: 36px 0;
+  border-radius: 30px;
+  background: #f0f3ed;
+}
+.classes-phone {
+  width: min(300px, 74%);
+}
+@media (max-width: 900px) {
+  /* stacked: the phone sits between the intro and the tabs, so a tap on a
+     tab changes a screen that is still in view */
+  .classes {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .classes-copy {
+    display: contents;
+  }
+  .classes-copy > .eyebrow,
+  .classes-copy > h2,
+  .classes-intro {
+    order: 1;
+  }
+  .classes-stage {
+    order: 2;
+    margin-top: 32px;
+    padding: 28px 0;
+  }
+  .class-tabs {
+    order: 3;
+    max-width: none;
+    margin-top: 20px;
+  }
+}
+@media (max-width: 600px) {
+  .classes.section {
+    padding: 20px 20px 70px;
+  }
+  .class-tab-name {
+    font-size: 17px;
+  }
+  .classes-phone {
+    width: min(200px, 58%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .class-tabs button::before {
+    transition: none;
   }
 }
