@@ -59,7 +59,12 @@ dictate. Mulai dari **reminder**, lalu events.
   ucapkan → step 5. Versi dropdown yang lama: `daily-brief-spouse-todo.html`.
   Tony bilang *"let me think about this"*, jadi **kirim dua-duanya berdampingan.**
 
-- [ ] **S2 Kirim link iterasi ke Tony.** Kamu janji di call: *"I'll send you the link for this."*
+- [ ] **S2 Kirim link iterasi ke Tony.** Link sudah live (24 Sep):
+  reminder loop `https://sprout-reminder-loop.vercel.app`, website
+  `https://sprout-reach-scene-iteration.vercel.app`. Tinggal dikirim.
+  Deploy reminder loop = salinan `daily-brief-reminder-loop.html` + noindex, di-deploy manual
+  dari scratchpad. Kalau file-nya berubah, deploy ulang (link ini tidak ikut update sendiri).
+  Detail awal: Kamu janji di call: *"I'll send you the link for this."*
   Tony juga bilang akan nonton video kamu. Kalau lewat file dia nggak buka (pelajaran 18 Sep),
   kirim Loom singkat yang membuka `daily-brief-reminder-loop.html` dari kiri ke kanan.
 
@@ -83,8 +88,8 @@ dictate. Mulai dari **reminder**, lalu events.
 - Test: `node --test review/*.test.cjs` lulus 15/15 (ada 3 test baru untuk Classes, dedupe,
   dan font display). Sudah dicek di browser 1440px dan 375px, tanpa horizontal scroll dan
   tanpa error di console.
-- **Belum di-commit dan belum deploy.** Perubahan ini numpuk di atas WIP-mu yang belum di-commit
-  (hero Events→Clubs). Vercel project `sprout-reach-scene-iteration` deploy dari folder ini.
+- Commit `85b5a8f` (ikut membawa WIP hero Events→Clubs). Live di
+  `https://sprout-reach-scene-iteration.vercel.app` (deploy CLI `vercel deploy --prod` dari folder ini).
 
 ---
 
