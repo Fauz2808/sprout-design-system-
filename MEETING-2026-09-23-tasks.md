@@ -26,6 +26,12 @@ dictate. Mulai dari **reminder**, lalu events.
   → `08 - Generated Screens/Home/daily-brief-reminder-loop.html` step 2.
   Ekstra: dari CTA brief, layar voice **langsung mendengarkan**, jadi tombol Start juga hilang.
   Perlu dicek ke Mohit: auto-start butuh izin mic sudah diberikan.
+  **Figma juga sudah direvisi (24 Sep)** di salinan Ahmad, section `New Sprout Assist (Revise)`
+  `12798:18362`, keempat flow (Reminder, Carpool, Event, Club): centang kanan atas dihapus (diganti
+  spacer 40px supaya tombol back tetap di kiri), kartu diberi label "SAY IT LIKE THIS" dan teksnya
+  jadi warna body (bukan abu-abu placeholder yang terbaca seperti transcript), status "Listening…"
+  di sebelah orb, dan centang di sebelah orb jadi hijau solid. Copy hint yang salah copy-paste di
+  Event/Club/Carpool dibetulkan, em dash dibuang. Original tidak disentuh.
 
 - [x] **R2 CTA "Add a reminder" di Daily Brief**, terutama kalau hari itu belum ada to-do.
   Tap → langsung ke voice reminder. Kalau list sudah ada isinya, CTA mengecil jadi link
