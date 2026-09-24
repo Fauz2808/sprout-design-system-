@@ -71,7 +71,7 @@ Tony nyetir waktu meeting, jadi dia komentar dari ingatan/Loom, bukan dari layar
 - [ ] **AI1** **Perlu diklarifikasi dulu sebelum dikerjakan.** "AI generated UI" bisa berarti
   dua hal yang jauh berbeda: (a) UI untuk fitur AI Assist, atau (b) UI yang digenerate AI,
   alias hasil eksplorasinya. Arah kerjanya beda total. Tanya Tony.
-- [ ] **AI2** Yang jelas dan bisa dikerjakan sekarang: **orb bukan isi layar.** Yang mengajari
+- [x] **AI2** _(24 Sep: done. Example sentence on top, small listening orb, one check)_ Yang jelas dan bisa dikerjakan sekarang: **orb bukan isi layar.** Yang mengajari
   cara pakai lebih penting. Ini menguatkan keputusan 17 Sep — contoh kalimat naik ke atas,
   orb mengecil. Kalau desain yang dia lihat masih menempatkan orb sebagai hero, itu yang ditolak.
 - [ ] **AI3** Yang dia suka dan jangan diubah: warna hijau + animasi blob hasil adaptasi.
@@ -79,7 +79,7 @@ Tony nyetir waktu meeting, jadi dia komentar dari ingatan/Loom, bukan dari layar
 
 ## P1 · Sisa daftar Ahmad yang Tony baca di call
 
-- [ ] **W1** Website design — masih tanpa scope detail, Tony bilang akan lihat
+- [x] **W1** _(24 Sep: done. Website W1-W3 from the 23 Sep meeting, live)_ Website design — masih tanpa scope detail, Tony bilang akan lihat
 - [ ] **EV1** **Link website di halaman Events** — permintaan lama Tony, sekarang hilang.
   Tony: *"because we don't have that anymore."* Implementasi ulang.
 - [x] **SP** Spouse to-dos — sudah dibangun 17 Sep, Tony konfirmasi ini buat Daily Brief,

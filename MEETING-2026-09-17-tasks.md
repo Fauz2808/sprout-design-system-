@@ -73,7 +73,7 @@ disandingkan sama baseline. Belum ada yang dipilih. Sisa: A12 carpool parkir.
 
 ## P1 · Website
 
-- [ ] **W1** Tony belum kasih detail di meeting ini, cuma "we have the website stuff to do". Canonical sekarang `roomparent-com-landing-v2.html`. → **butuh konfirmasi scope dari Tony**
+- [x] **W1** _(24 Sep: superseded by the 23 Sep website scope, done)_ Tony belum kasih detail di meeting ini, cuma "we have the website stuff to do". Canonical sekarang `roomparent-com-landing-v2.html`. → **butuh konfirmasi scope dari Tony**
 
 ## P2 · Notifikasi — nggak ada rumahnya
 
@@ -136,6 +136,6 @@ kalau dihapus. 5/5 test lolos.
 
 ## Perlu dikonfirmasi
 
-- [ ] **C1** Halaman chat web buat parent email-only yang klik "Join group chat" di email — Mohit bilang "I need a design to build it", Tony kira sudah dikirim. Desainnya ada atau belum?
-- [ ] **C2** Scope "website stuff" (W1)
+- [x] **C1** _(24 Sep: designed, chat.html. On hold until Tony confirms the direction, see MEETING-2026-09-23)_ Halaman chat web buat parent email-only yang klik "Join group chat" di email — Mohit bilang "I need a design to build it", Tony kira sudah dikirim. Desainnya ada atau belum?
+- [x] **C2** _(24 Sep: scoped by Tony on 23 Sep, done as W1-W3)_ Scope "website stuff" (W1)
 - [ ] **C3** A5: contoh dalam kutip **dan** bracket sekaligus — perlu dilihat bareng di layar, Tony sempat bolak-balik soal ini

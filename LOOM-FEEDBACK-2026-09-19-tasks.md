@@ -28,7 +28,7 @@ seperti menolak. Yang dia tolak bukan blob-nya.
 > UI. Let's remove this UI and not require them to click start. Just immediately go
 > to the next page to save a click."*
 
-- [ ] **L1** Buang layar Start. Pilih Reminder di AI Assist → **langsung** mendarat di
+- [x] **L1** _(24 Sep: done. Voice opens already listening, one check under the orb. Figma 12798:18362 + daily-brief-reminder-loop.html)_ Buang layar Start. Pilih Reminder di AI Assist → **langsung** mendarat di
   layar yang sudah merekam. Hemat satu ketukan.
 
 **Ini persis Alternative B** di `08 - Generated Screens/AI Assist/voice-capture-alternatives.html`,
