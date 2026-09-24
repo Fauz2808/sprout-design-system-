@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Daily Brief · Reminder loop · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#fff; --ink:#1e3e2b; --body:#4d525b; --muted:#7d715e;
+    --green:#186338; --brand-light:#e2e9e3; --brand-border:#77b691; --border:#d0dacf;
+    --warning-subtle:#f6ecd1; --error:#d64545; --amber:#b5872b; --amber-bg:#fbf1da; --amber-br:#e6cd96;
+    --shadow-m:1px 4px 25px 2px rgba(13,13,18,.05); --shadow-l:1px 4px 25px 2px rgba(13,13,18,.2);
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#ddd8ce;font-family:var(--sans);-webkit-font-smoothing:antialiased;padding:38px 0 70px}
+  .ph{display:inline-block;vertical-align:middle} .ph svg{display:block;width:100%;height:100%;fill:currentColor}
+
+  .lede{max-width:940px;margin:0 auto 10px;padding:0 30px}
+  .lede h1{font-family:var(--serif);font-size:29px;font-weight:600;color:var(--ink);margin:0 0 8px}
+  .lede .p{font-size:14px;color:#5b5648;line-height:1.65;margin:0 0 14px}
+  .quote{background:#fff;border-left:3px solid var(--green);border-radius:12px;padding:14px 17px;
+    font-size:13.5px;line-height:1.65;color:var(--body);margin-bottom:10px}
+  .quote b{color:var(--ink)} .quote i{color:#5b5648}
+  .gone{display:flex;gap:9px;flex-wrap:wrap;margin:16px 0 4px}
+  .gone span{background:#fff;border:1px solid #cfc8ba;border-radius:99px;padding:7px 13px;font-size:12px;color:var(--muted)}
+  .gone span s{color:#b3aa98} .gone span b{color:var(--ink);font-weight:600}
+
+  .band{max-width:940px;margin:34px auto 4px;padding:0 30px}
+  .band h2{font-family:var(--serif);font-size:21px;color:var(--ink);margin:0 0 5px}
+  .band p{font-size:13px;color:var(--muted);margin:0;line-height:1.55;max-width:720px}
+
+  .row{display:flex;gap:44px;align-items:flex-end;overflow-x:auto;padding:22px 30px 26px}
+  .panel{flex:0 0 auto;width:393px;display:flex;flex-direction:column;gap:14px}
+  .cap{font-size:12.5px;line-height:1.58;color:#655f52;max-width:393px}
+  .cap .n{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--green);background:var(--brand-light);border-radius:99px;padding:4px 10px;margin-bottom:7px}
+  .cap b{display:block;font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin-bottom:3px}
+  .cap .k{font-weight:700;color:var(--ink)}
+  .openq{background:var(--amber-bg);border:1px solid var(--amber-br);border-radius:12px;
+    padding:11px 13px;font-size:12px;line-height:1.55;color:#7a5a12;margin-top:9px}
+  .openq .k{color:#5f460e}
+
+  .device{position:relative;width:393px;height:852px;border-radius:54px;padding:11px;
+    background:linear-gradient(160deg,#2a2a2c,#0e0e10);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 0 2px #000 inset,0 28px 60px -12px rgba(0,0,0,.45)}
+  .island{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:999px;z-index:60}
+  .screen{position:relative;width:100%;height:100%;border-radius:43px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg)}
+  .sb{flex:0 0 44px;padding:16px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;font-weight:600;color:var(--ink);z-index:20}
+  .sb .r{display:inline-flex;gap:6px;align-items:center} .sb svg{width:17px;height:11px;fill:var(--ink)} .sb .bat{width:25px}
+
+  /* ── Daily Brief (ported from daily-brief-homepage.html, Figma 11351:103830) ── */
+  .top{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 16px 6px}
+  .top .brand{flex:1;text-align:center}
+  .top .brand .t{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink)}
+  .top .brand .s{font-size:12px;color:var(--muted);margin-top:1px}
+  .top .cal{width:40px;height:40px;display:grid;place-items:center;color:var(--ink);flex-shrink:0}
+  .top .cal .ph{width:24px;height:24px}
+  .top .sp{width:40px;flex-shrink:0}
+  .body{flex:1 1 auto;overflow-y:auto;padding:4px 20px 24px}
+  .body::-webkit-scrollbar{display:none}
+  .greet{margin:8px 0 14px}
+  .greet .h{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--ink);margin:0}
+  .greet .s{font-family:var(--serif);font-style:italic;font-weight:500;font-size:16px;color:var(--muted);margin:2px 0 0}
+  .div{height:1px;background:var(--border);margin:14px 0}
+  .wx{display:flex;gap:8px;align-items:center;background:#fff;border-left:2px solid var(--green);border-radius:12px;padding:4px;box-shadow:var(--shadow-m)}
+  .wx .ic{width:58px;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0}
+  .wx .ic .em{font-size:30px;line-height:1} .wx .ic .t{font-size:12px;color:var(--ink);font-weight:500}
+  .wx .tx{flex:1;padding:8px 8px 8px 0}
+  .wx .tx .t{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--ink)}
+  .wx .tx .d{font-size:14px;color:var(--muted);margin-top:2px;line-height:1.4}
+  .sec{font-size:14px;color:var(--ink)}
+  .sec .h{font-weight:700;line-height:1.9;margin:0}
+  .sec p{margin:0;line-height:1.9} .sec p b{font-weight:700}
+  .sec .sub{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#a49a86;margin:8px 0 0;line-height:1.6}
+  .going{display:inline-block;font-size:10.5px;font-weight:700;color:var(--green);background:var(--brand-light);
+    border-radius:99px;padding:2px 7px;margin-left:4px;vertical-align:1px}
+
+  /* section header shared by To do / Invitations */
+  .shead{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .shead .ttl{flex:1;font-size:14px;font-weight:700;color:var(--ink);line-height:1.9}
+  .shead .add{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--green);
+    background:none;border:none;padding:6px 0;cursor:pointer;font-family:var(--sans)}
+  .shead .add .ph{width:14px;height:14px}
+
+  /* empty state card */
+  .empty{background:#fff;border-radius:14px;padding:16px;box-shadow:var(--shadow-m);text-align:left}
+  .empty .t{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink)}
+  .empty .d{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.45}
+  .empty.quiet{padding:13px 16px;box-shadow:none;background:transparent;border:1.5px dashed var(--border)}
+  .empty.quiet .t{font-size:14.5px}
+  .rembtn{margin-top:13px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;border:none;
+    border-radius:12px;padding:13px;background:var(--green);color:#fff;font-family:var(--serif);font-size:15px;font-weight:500;
+    cursor:pointer;box-shadow:0 6px 16px -6px rgba(24,99,56,.55)}
+  .rembtn .ph{width:18px;height:18px}
+
+  /* household to-do list: one list, a face next to every check */
+  .tlist{display:flex;flex-direction:column;gap:8px}
+  .titem{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-m);cursor:pointer}
+  .titem.new{box-shadow:0 0 0 1.5px var(--brand-border),var(--shadow-m)}
+  .tbox{width:26px;height:26px;border-radius:8px;background:var(--brand-light);display:grid;place-items:center;flex-shrink:0}
+  .tbox .inner{width:11px;height:11px;border-radius:3px;background:#fff}
+  .tbox .ph{display:none;width:15px;height:15px;color:#fff}
+  .titem.done .tbox{background:var(--green)} .titem.done .tbox .inner{display:none} .titem.done .tbox .ph{display:block}
+  .face{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;
+    font-size:11px;font-weight:700;color:#fff;border:2px solid #fff;box-shadow:0 0 0 1px var(--border)}
+  .face.me{background:linear-gradient(145deg,#1e3e2b,#579a74)}
+  .face.sp{background:linear-gradient(145deg,#3a7ca5,#7ec8e3)}
+  .face.both{background:linear-gradient(90deg,#2b5f45 50%,#4d93b8 50%);font-size:10px}
+  .titem .ttx{flex:1;min-width:0}
+  .titem .ttx .n{font-family:var(--serif);font-size:14.5px;font-weight:600;color:var(--ink);line-height:1.3}
+  .titem.done .ttx .n{text-decoration:line-through;color:var(--muted)}
+  .titem .ttx .m{font-size:12px;color:var(--muted);margin-top:2px}
+  .titem .ttx .by{color:var(--green);font-weight:600}
+
+  /* invitations */
+  .inv{display:flex;gap:11px;align-items:center;background:#fff;border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-m)}
+  .inv .thumb{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#e6e0d2,#cfe0d4);flex-shrink:0;
+    display:grid;place-items:center;font-size:20px}
+  .inv .tx{flex:1;min-width:0}
+  .inv .tx .n{font-family:var(--serif);font-size:14px;line-height:1.3;font-weight:600;color:var(--ink)}
+  .inv .tx .m{font-size:12px;color:var(--muted);margin-top:2px}
+  .inv .acts{display:flex;gap:6px}
+  .inv .acts{flex-shrink:0} .inv .acts span{font-size:12px;font-weight:600;border-radius:99px;padding:6px 10px;border:1.5px solid var(--border);color:var(--ink);background:#fff}
+  .inv .acts span.y{background:var(--green);border-color:var(--green);color:#fff}
+
+  /* ── voice capture: listening on arrival, one check, no transcript ── */
+  .vtop{flex:0 0 auto;display:flex;align-items:center;padding:8px 16px 6px}
+  .ibtn{width:40px;height:40px;border-radius:50%;background:var(--card);border:1px solid var(--border);
+    display:grid;place-items:center;flex-shrink:0;box-shadow:var(--shadow-m);color:var(--ink)}
+  .ibtn .ph{width:18px;height:18px}
+  .vtop .tt{flex:1;text-align:center;font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink)}
+  .vtop .sp{width:40px}
+  .vbody{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;padding:10px 24px 0;text-align:center}
+  .vhint{width:100%}
+  .vhint .h{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#a49a86;margin-bottom:11px}
+  .vhint ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+  .vhint li{font-family:var(--serif);font-size:19px;font-weight:500;color:var(--ink);line-height:1.25}
+  .vex{width:100%;background:#fff;border-radius:16px;padding:14px 16px;text-align:left;box-shadow:var(--shadow-m);margin-top:20px}
+  .vex .l{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:7px}
+  .vex p{margin:0;font-size:15px;line-height:1.6;color:var(--body)}
+  .vex b{font-weight:600;color:var(--ink);background:var(--brand-light);border-radius:5px;padding:1px 4px}
+
+  /* the listening zone is fixed to the bottom so the check never moves */
+  .vzone{position:absolute;left:0;right:0;bottom:0;height:392px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:40px}
+  .orbwrap{position:relative;width:170px;height:170px;display:grid;place-items:center}
+  .stipple{width:140px;height:140px;border-radius:50%;
+    background-color:#eae6db;
+    background-image:radial-gradient(rgba(120,113,94,.55) 1px, transparent 1.3px);
+    background-size:6px 6px;
+    -webkit-mask-image:radial-gradient(circle,#000 62%,transparent 78%);
+    mask-image:radial-gradient(circle,#000 62%,transparent 78%)}
+  .stipple.live{background-color:#e4ecE5;background-image:radial-gradient(rgba(24,99,56,.62) 1.1px, transparent 1.4px);
+    animation:breathe 1.6s ease-in-out infinite, drift 7s linear infinite}
+  .orbwrap .ring{position:absolute;inset:6px;border-radius:50%;border:1.5px solid rgba(24,99,56,.18);animation:ripple 1.8s ease-out infinite}
+  .orbwrap .ring.r2{animation-delay:.9s}
+  @keyframes breathe{0%,100%{transform:scale(.95)}35%{transform:scale(1.05)}60%{transform:scale(.99)}80%{transform:scale(1.03)}}
+  @keyframes drift{from{background-position:0 0}to{background-position:36px 18px}}
+  @keyframes ripple{from{transform:scale(.82);opacity:.9}to{transform:scale(1.18);opacity:0}}
+  .vstate{font-size:13.5px;font-weight:600;color:var(--green);margin:6px 0 16px;display:flex;align-items:center;gap:7px}
+  .vstate .dot{width:8px;height:8px;border-radius:50%;background:var(--error);animation:blink 1.2s ease-in-out infinite}
+  @keyframes blink{50%{opacity:.25}}
+  .donebtn{width:72px;height:72px;border-radius:50%;border:none;background:var(--green);color:#fff;display:grid;place-items:center;
+    box-shadow:0 0 0 8px rgba(24,99,56,.12),var(--shadow-l);cursor:pointer}
+  .donebtn .ph{width:32px;height:32px}
+  .donelbl{font-size:12.5px;color:var(--muted);margin-top:12px}
+
+  /* generating */
+  .gen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px 80px}
+  .gen .stipple{animation:spin 3s linear infinite, breathe 1.6s ease-in-out infinite;background-image:radial-gradient(rgba(24,99,56,.45) 1.1px, transparent 1.4px)}
+  @keyframes spin{from{background-position:0 0}to{background-position:60px 0}}
+  .gen h2{font-family:var(--serif);font-size:23px;font-weight:600;color:var(--ink);margin:26px 0 8px}
+  .gen p{font-size:13.5px;color:var(--muted);line-height:1.55;margin:0;max-width:270px}
+
+  /* review (from reminder-flow-v2.html step 3) */
+  .top2{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:8px 16px 6px}
+  .top2 .tt{flex:1;text-align:center;font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink)}
+  .top2 .sp{width:40px;flex-shrink:0}
+  .body2{flex:1 1 auto;overflow-y:auto;padding:8px 20px 118px}
+  .flabel{font-size:11.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin:0 2px 8px}
+  .flabel .o{text-transform:none;letter-spacing:0;font-weight:500;color:#a89e8c}
+  .rfield{width:100%;background:var(--card);border:1.5px solid var(--brand-border);border-radius:14px;
+    padding:14px 16px;font-size:15px;line-height:1.5;color:var(--ink);box-shadow:var(--shadow-m);margin-bottom:20px}
+  .rfield .caret{display:inline-block;width:1.5px;height:17px;background:var(--green);vertical-align:-3px;margin-left:1px;animation:blink 1s steps(1) infinite}
+  .who{display:flex;gap:8px;margin-bottom:20px}
+  .who .o{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;background:var(--card);
+    border:1.5px solid var(--border);border-radius:14px;padding:12px 6px;box-shadow:var(--shadow-m);cursor:pointer}
+  .who .av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;color:#fff;background:#b9b1a1}
+  .who .l{font-size:12.5px;color:var(--muted);font-weight:500}
+  .who .o.on{border-color:var(--brand-border);box-shadow:0 0 0 2px var(--brand-border) inset,var(--shadow-m)}
+  .who .o.on .l{color:var(--ink);font-weight:600}
+  .who .o.on .av.me{background:linear-gradient(145deg,#1e3e2b,#579a74)}
+  .who .o.on .av.sp{background:linear-gradient(145deg,#3a7ca5,#7ec8e3)}
+  .who .o.on .av.both{background:linear-gradient(90deg,#2b5f45 50%,#4d93b8 50%)}
+  .dtrow{display:flex;gap:10px;margin-bottom:20px}
+  .dtfield{flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--border);
+    border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-m)}
+  .dtfield .ph{width:18px;height:18px;color:var(--muted);flex-shrink:0}
+  .dtfield .v{font-size:13.5px;color:var(--ink);font-weight:500}
+  .finput{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;
+    font-size:15px;color:var(--ink);box-shadow:var(--shadow-m);display:flex;align-items:center;gap:9px}
+  .finput .ph{width:18px;height:18px;color:var(--muted);flex-shrink:0}
+  .cta{position:absolute;left:0;right:0;bottom:0;padding:16px 16px 30px;
+    background:linear-gradient(to top,var(--bg) 66%,rgba(236,230,218,0));z-index:15}
+  .btn{width:100%;border:none;border-radius:16px;padding:16px;font-family:var(--serif);font-size:16px;
+    font-weight:500;background:var(--green);color:#fff;box-shadow:var(--shadow-l)}
+
+  .hl-note{position:absolute;z-index:40;background:var(--ink);color:#fff;font-size:11px;font-weight:600;line-height:1.35;
+    border-radius:9px;padding:6px 9px;box-shadow:0 6px 16px rgba(0,0,0,.25);max-width:160px}
+  .hl-note:after{content:"";position:absolute;width:8px;height:8px;background:var(--ink);transform:rotate(45deg)}
+  .hl-note.down:after{bottom:-4px;left:18px} .hl-note.up:after{top:-4px;left:18px}
+
+  table.spec{border-collapse:collapse;width:100%;max-width:880px;background:#fff;border-radius:14px;overflow:hidden;box-shadow:var(--shadow-m);font-size:13px}
+  table.spec th{background:var(--brand-light);color:var(--ink);text-align:left;font-weight:700;padding:10px 12px;font-size:12px}
+  table.spec td{padding:10px 12px;border-top:1px solid #ece7dc;color:var(--body);vertical-align:top;line-height:1.5}
+  table.spec td b{color:var(--ink)}
+  table.spec td s{color:#b3aa98}
+  .specwrap{max-width:940px;margin:14px auto 0;padding:0 30px}
+</style>
+</head>
+<body>
+
+<div class="lede">
+  <h1>Daily Brief, reminder loop</h1>
+  <p class="p">From the 23 Sep call. Tony wants reminders and events right before anything else ships in Sprout Assist.
+  Left to right: the brief with nothing to do, one tap into voice, one check, review, and the reminder landing in a single
+  household list with a face next to every check.</p>
+  <div class="quote"><b>Tony, 23 Sep:</b> <i>&ldquo;I just don&rsquo;t wanna hit two buttons&hellip; I don&rsquo;t think we need to show a messy
+  transcript to them there. It&rsquo;s just once they&rsquo;re done, they can hit one check mark, and then that&rsquo;s gonna generate it.&rdquo;</i></div>
+  <div class="quote"><b>Tony, 23 Sep:</b> <i>&ldquo;Especially when there&rsquo;s no reminders for that day, how could we allow people to click that
+  and then it just takes them right into the voice reminder?&rdquo;</i></div>
+  <div class="gone">
+    <span><s>Top check mark</s> <b>gone</b></span>
+    <span><s>Live transcript</s> <b>gone</b></span>
+    <span><s>Start button</s> <b>listening on arrival</b></span>
+    <span><s>&ldquo;You got a free day&rdquo;</s> <b>only when the day is actually empty</b></span>
+    <span><b>+ Add reminder CTA</b></span>
+    <span><s>Spouse dropdown block</s> <b>one list, faces</b></span>
+  </div>
+</div>
+
+<div class="band">
+  <h2>Capture: from the brief to a set reminder</h2>
+  <p>Five screens. The only decisions the parent makes are what to say and when to tap the check.</p>
+</div>
+
+<div class="row">
+
+<!-- 1 · brief, nothing to do -->
+<div class="panel">
+  <div class="cap"><span class="n">Step 1</span><b>Nothing to do, but the day is not empty.</b>
+  School picture day is on today, so the to-do empty state talks about to-dos only: <span class="k">You&rsquo;re all caught up.</span>
+  The CTA lives inside that empty card, where the space is already free. When the list has items, the same action shrinks
+  to the <span class="k">+ Add</span> link in the section header (step 5).</div>
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="top"><div class="sp"></div><div class="brand"><div class="t">Sprout</div><div class="s">Your daily briefing · 7:31 AM</div></div>
+      <div class="cal"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160zm-68-76a12 12 0 1 1-12-12 12 12 0 0 1 12 12m44 0a12 12 0 1 1-12-12 12 12 0 0 1 12 12m-88 40a12 12 0 1 1-12-12 12 12 0 0 1 12 12m44 0a12 12 0 1 1-12-12 12 12 0 0 1 12 12m44 0a12 12 0 1 1-12-12 12 12 0 0 1 12 12"/></svg></span></div></div>
+    <div class="body">
+      <div class="greet"><p class="h">Good morning, Tony.</p><p class="s">Here&rsquo;s your Wednesday:</p></div>
+      <div class="wx"><div class="ic"><span class="em">&#9728;&#65039;</span><span class="t">68&ndash;86&deg;</span></div>
+        <div class="tx"><div class="t">Austin, TX · Sunny</div><div class="d">T-shirt by afternoon, light jacket this morning</div></div></div>
+      <div class="div"></div>
+      <div class="shead"><div class="ttl">&#9989; To do</div></div>
+      <div class="empty">
+        <div class="t">You&rsquo;re all caught up.</div>
+        <div class="d">Nothing left on your list today. Need to remember something?</div>
+        <button class="rembtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 176a48.05 48.05 0 0 0 48-48V64a48 48 0 0 0-96 0v64a48.05 48.05 0 0 0 48 48M96 64a32 32 0 0 1 64 0v64a32 32 0 0 1-64 0Zm40 143.6V240a8 8 0 0 1-16 0v-32.4A80.11 80.11 0 0 1 48 128a8 8 0 0 1 16 0 64 64 0 0 0 128 0 8 8 0 0 1 16 0 80.11 80.11 0 0 1-72 79.6"/></svg></span>Add a reminder</button>
+      </div>
+      <div class="div"></div>
+      <div class="sec"><p class="h">&#128197; Happening today</p>
+        <p><b>All day</b>: School picture day · Kiker Elementary</p></div>
+      <div class="div"></div>
+      <div class="shead"><div class="ttl">&#9993;&#65039; Your invitations</div></div>
+      <div class="empty quiet"><div class="t">No invitations waiting.</div><div class="d">When someone invites you, it shows up here first.</div></div>
+      <div class="div"></div>
+      <div class="sec"><p class="h">&#128198; Upcoming events</p>
+        <p><b>Fri, Sep 25</b>: Fall Book Fair · All Grades</p>
+        <p><b>Tue, Sep 29</b>: Class starts · 2nd Grade</p></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 2 · listening on arrival -->
+<div class="panel">
+  <div class="cap"><span class="n">Step 2</span><b>Already listening. One check, nothing else.</b>
+  Coming from the CTA, the mic is on the moment the screen opens, so there is no Start tap. The moving orb is the only
+  sign it is listening. No transcript: background noise would show as junk, and the AI sorts out what matters after.
+  The only other control is <span class="k">X</span> to cancel, top left, never a second check.
+  <div class="openq"><span class="k">Check with Mohit:</span> auto-start needs the mic permission already granted. First time
+  only, the OS prompt appears before listening starts.</div></div>
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:42</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="vtop"><div class="ibtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128 50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg></span></div><div class="tt">New reminder</div><div class="sp"></div></div>
+    <div class="vbody">
+      <div class="vhint"><div class="h">Tell it three things</div>
+        <ul><li>Who&rsquo;s it for?</li><li>What&rsquo;s it about?</li><li>When&rsquo;s it happening?</li></ul></div>
+      <div class="vex"><span class="l">Say it like this</span>
+        <p>&ldquo;Remind <b>my husband</b> to <b>pick up Presley from school</b> at <b>2PM</b>.&rdquo;</p></div>
+    </div>
+    <div class="vzone">
+      <div class="orbwrap"><span class="ring"></span><span class="ring r2"></span><div class="stipple live"></div></div>
+      <div class="vstate"><span class="dot"></span>Listening</div>
+      <button class="donebtn" aria-label="Done"><span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 77.66-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69 218.34 66.34a8 8 0 0 1 11.32 11.32"/></svg></span></button>
+      <div class="donelbl">Tap when you&rsquo;re done</div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 3 · generating -->
+<div class="panel">
+  <div class="cap"><span class="n">Step 3</span><b>One beat while n8n works.</b>
+  Same orb, now thinking instead of listening. No buttons, because there is nothing to decide yet. This is the only
+  wait in the flow, and it is where the speech-to-text plus parsing actually runs.</div>
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:42</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="gen"><div class="stipple"></div>
+      <h2>Putting it together</h2>
+      <p>Pulling out who, what and when. This takes a second.</p></div>
+  </div></div>
+</div>
+
+<!-- 4 · review -->
+<div class="panel">
+  <div class="cap"><span class="n">Step 4</span><b>Review is the edit surface.</b>
+  Unchanged from v2 on purpose, Tony signed it off. It heard &ldquo;my husband&rdquo;, so Spouse is preselected with Dana&rsquo;s face,
+  the same face that will sit next to the check in the brief. Tap Myself / Spouse / Both to switch.</div>
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:42</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="top2"><div class="ibtn"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8H59.31l58.35 58.34a8 8 0 0 1-11.32 11.32l-72-72a8 8 0 0 1 0-11.32l72-72a8 8 0 0 1 11.32 11.32L59.31 120H216a8 8 0 0 1 8 8"/></svg></span></div><div class="tt">Review reminder</div><div class="sp"></div></div>
+    <div class="body2">
+      <div class="flabel">Reminder</div>
+      <div class="rfield">Pick up Presley from school<span class="caret"></span></div>
+      <div class="flabel">Who it&rsquo;s for</div>
+      <div class="who" id="who">
+        <div class="o" data-v="me"><span class="av me">TM</span><span class="l">Myself</span></div>
+        <div class="o on" data-v="sp"><span class="av sp">DM</span><span class="l">Spouse</span></div>
+        <div class="o" data-v="both"><span class="av both">2</span><span class="l">Both</span></div>
+      </div>
+      <div class="flabel">When</div>
+      <div class="dtrow">
+        <div class="dtfield"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160z"/></svg></span><span class="v">Today, 23 Sep</span></div>
+        <div class="dtfield"><span class="ph"><svg viewBox="0 0 256 256"><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88m4-88V72a8 8 0 0 0-16 0v64a8 8 0 0 0 2.34 5.66l40 40a8 8 0 0 0 11.32-11.32Z"/></svg></span><span class="v">2:00 PM</span></div>
+      </div>
+      <div class="flabel">Notify <span class="o">optional</span></div>
+      <div class="finput"><span class="ph"><svg viewBox="0 0 256 256"><path d="M221.8 175.94c-5.55-9.56-13.8-36.61-13.8-71.94a80 80 0 1 0-160 0c0 35.34-8.26 62.38-13.81 71.94A16 16 0 0 0 48 200h40.81a40 40 0 0 0 78.38 0H208a16 16 0 0 0 13.8-24.06M128 216a24 24 0 0 1-22.62-16h45.24A24 24 0 0 1 128 216M48 184c7.7-13.24 16-43.92 16-80a64 64 0 1 1 128 0c0 36.05 8.28 66.73 16 80Z"/></svg></span><span>15 minutes before</span></div>
+    </div>
+    <div class="cta"><button class="btn">Set reminder</button></div>
+  </div></div>
+</div>
+
+<!-- 5 · brief after -->
+<div class="panel">
+  <div class="cap"><span class="n">Step 5</span><b>One household list, a face on every item.</b>
+  Tony&rsquo;s idea from the call, drawn as he said it: no dropdown header for the spouse, just the reminder with the person&rsquo;s
+  face next to the check. Both parents see the same list. When Dana ticks one off, Tony&rsquo;s screen updates:
+  <span class="k">Dana did this</span>. Tap any row to tick it.
+  <div class="openq"><span class="k">Tony is still thinking about this one</span> (&ldquo;let me just think about this&rdquo;).
+  The dropdown version is <span class="k">daily-brief-spouse-todo.html</span>, keep both open when he reviews.</div></div>
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:43</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="top"><div class="sp"></div><div class="brand"><div class="t">Sprout</div><div class="s">Your daily briefing · 9:43 AM</div></div>
+      <div class="cal"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160zm-68-76a12 12 0 1 1-12-12 12 12 0 0 1 12 12m44 0a12 12 0 1 1-12-12 12 12 0 0 1 12 12m-88 40a12 12 0 1 1-12-12 12 12 0 0 1 12 12m44 0a12 12 0 1 1-12-12 12 12 0 0 1 12 12m44 0a12 12 0 1 1-12-12 12 12 0 0 1 12 12"/></svg></span></div></div>
+    <div class="body">
+      <div class="greet"><p class="h">Good morning, Tony.</p><p class="s">Here&rsquo;s your Wednesday:</p></div>
+      <div class="wx"><div class="ic"><span class="em">&#9728;&#65039;</span><span class="t">68&ndash;86&deg;</span></div>
+        <div class="tx"><div class="t">Austin, TX · Sunny</div><div class="d">T-shirt by afternoon, light jacket this morning</div></div></div>
+      <div class="div"></div>
+      <div class="shead"><div class="ttl">&#9989; To do</div>
+        <button class="add"><span class="ph"><svg viewBox="0 0 256 256"><path d="M224 128a8 8 0 0 1-8 8h-80v80a8 8 0 0 1-16 0v-80H40a8 8 0 0 1 0-16h80V40a8 8 0 0 1 16 0v80h80a8 8 0 0 1 8 8"/></svg></span>Add</button></div>
+      <div class="tlist">
+        <div class="titem new"><div class="tbox"><div class="inner"></div><span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 77.66-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69 218.34 66.34a8 8 0 0 1 11.32 11.32"/></svg></span></div>
+          <span class="face sp">DM</span>
+          <div class="ttx"><div class="n">Pick up Presley from school</div><div class="m">Today · 2:00 PM · <span class="by">from you</span></div></div></div>
+        <div class="titem"><div class="tbox"><div class="inner"></div><span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 77.66-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69 218.34 66.34a8 8 0 0 1 11.32 11.32"/></svg></span></div>
+          <span class="face me">TM</span>
+          <div class="ttx"><div class="n">Sign Jake&rsquo;s permission slip</div><div class="m">1st Grade · Due Friday</div></div></div>
+        <div class="titem done"><div class="tbox"><div class="inner"></div><span class="ph"><svg viewBox="0 0 256 256"><path d="m229.66 77.66-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69 218.34 66.34a8 8 0 0 1 11.32 11.32"/></svg></span></div>
+          <span class="face sp">DM</span>
+          <div class="ttx"><div class="n">Bring towels for Water Day</div><div class="m"><span class="by">Dana did this</span> · 8:12 AM</div></div></div>
+      </div>
+      <div class="div"></div>
+      <div class="sec"><p class="h">&#128197; Happening today</p>
+        <p><b>All day</b>: School picture day · Kiker Elementary</p></div>
+    </div>
+  </div></div>
+</div>
+</div>
+
+<div class="band">
+  <h2>Events: what goes where</h2>
+  <p>Tony laid out two kinds of event on the call. One needs an RSVP and waits in Your invitations until you answer.
+  The other just sits on the calendar. Upcoming events shows both kinds once they are settled, for the next 14 days.</p>
+</div>
+
+<div class="row">
+<div class="panel">
+  <div class="cap"><span class="n">Events</span><b>Invitations wait, Upcoming looks two weeks ahead.</b>
+  Say yes to Pickleball and it leaves Your invitations and shows up in Upcoming with a <span class="k">Going</span> tag.
+  School-calendar items (including CMS events with no RSVP) go straight to Upcoming. Split into This week and Next week so
+  14 days still reads fast. Today&rsquo;s picture day is <span class="k">not</span> in Upcoming: today lives in Happening today only.
+  That is the bug Tony saw on the call.</div>
+  <div class="device"><div class="island"></div><div class="screen">
+    <div class="sb"><span>9:41</span><span class="r"><svg viewBox="0 0 18 12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 2h2v9h-2z"/></svg><svg viewBox="0 0 18 12"><path d="M9 3c2.5 0 4.7 1 6.4 2.6l-1.4 1.4C12.7 6 10.9 5.2 9 5.2S5.3 6 4 7L2.6 5.6C4.3 4 6.5 3 9 3z"/></svg><svg class="bat" viewBox="0 0 25 12"><rect x="1" y="2" width="20" height="8" rx="2" fill="none" stroke="#1e3e2b"/><rect x="2.5" y="3.5" width="15" height="5" rx="1"/><rect x="22" y="4.5" width="1.6" height="3"/></svg></span></div>
+    <div class="top"><div class="sp"></div><div class="brand"><div class="t">Sprout</div><div class="s">Your daily briefing · 7:31 AM</div></div>
+      <div class="cal"><span class="ph"><svg viewBox="0 0 256 256"><path d="M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160zm-68-76a12 12 0 1 1-12-12 12 12 0 0 1 12 12m44 0a12 12 0 1 1-12-12 12 12 0 0 1 12 12m-88 40a12 12 0 1 1-12-12 12 12 0 0 1 12 12m44 0a12 12 0 1 1-12-12 12 12 0 0 1 12 12m44 0a12 12 0 1 1-12-12 12 12 0 0 1 12 12"/></svg></span></div></div>
+    <div class="body">
+      <div class="sec"><p class="h">&#128197; Happening today</p>
+        <p><b>All day</b>: School picture day · Kiker Elementary</p></div>
+      <div class="div"></div>
+      <div class="shead"><div class="ttl">&#9993;&#65039; Your invitations</div></div>
+      <div class="inv"><div class="thumb">&#127934;</div><div class="tx"><div class="n">Pickleball at Circle C</div><div class="m">Sat, Sep 26 · from Jake R.</div></div>
+        <div class="acts"><span>No</span><span class="y">Yes</span></div></div>
+      <div class="div"></div>
+      <div class="sec"><p class="h">&#128198; Upcoming events <span style="font-weight:500;color:var(--muted)">· next 14 days</span></p>
+        <p class="sub">This week</p>
+        <p><b>Fri, Sep 25</b>: Fall Book Fair · All Grades</p>
+        <p><b>Sat, Sep 26</b>: Presley&rsquo;s birthday party <span class="going">Going</span></p>
+        <p class="sub">Next week</p>
+        <p><b>Tue, Sep 29</b>: Class starts · 2nd Grade</p>
+        <p><b>Thu, Oct 1</b>: Bring canned food · 2nd Grade</p>
+        <p><b>Wed, Oct 7</b>: Fall picture retakes · All Grades</p></div>
+      <div class="div"></div>
+      <div class="sec"><p class="h">&#128172; New messages</p>
+        <p>2 unread in <b style="text-decoration:underline">Circle C Dads</b></p></div>
+    </div>
+  </div></div>
+</div>
+</div>
+
+<div class="band">
+  <h2>Section icons and empty-state copy</h2>
+  <p>Tony asked Ahmad to confirm the Daily Brief icons against the design; Ahmad confirmed on the call that some in the build
+  are not updated. The approved design uses emoji for section heads and one Phosphor icon in the header. Copy here is a
+  draft; Tony said he will send final copy, so treat these as placeholders that already follow the right logic.</p>
+</div>
+<div class="specwrap">
+<table class="spec">
+  <tr><th>Where</th><th>Design (source of truth)</th><th>Notes for the build</th></tr>
+  <tr><td><b>Header, top right</b></td><td>Phosphor <b>CalendarDots</b>, regular, 24px, ink #1e3e2b</td><td>Opens the calendar view. Not a filled or duotone variant.</td></tr>
+  <tr><td><b>Happening today</b></td><td>&#128197; calendar with a date number</td><td>Tony: the one with the number makes sense for today.</td></tr>
+  <tr><td><b>Upcoming events</b></td><td>&#128198; tear-off calendar, no number</td><td>Keep the two calendars distinct. Swapping them is the most likely mismatch.</td></tr>
+  <tr><td><b>Your invitations</b></td><td>&#9993;&#65039; envelope</td><td>Tony approved the mail icon on the call. Not in Figma yet, this table is the spec.</td></tr>
+  <tr><td><b>To do</b></td><td>&#9989; check box</td><td>Section title is &ldquo;To do&rdquo;; the long &ldquo;Needs your attention&rdquo; title is still fine if Tony prefers it.</td></tr>
+  <tr><td><b>Messages / Lunch / Birthdays / Carpool</b></td><td>&#128172; / &#129386; / &#127874; / &#128663;</td><td>Unchanged from Figma 11351:103830.</td></tr>
+</table>
+<br>
+<table class="spec">
+  <tr><th>State</th><th>Show</th><th>Never show</th></tr>
+  <tr><td><b>No to-dos, but events today</b></td><td>&ldquo;You&rsquo;re all caught up.&rdquo; + &ldquo;Nothing left on your list today. Need to remember something?&rdquo; + <b>Add a reminder</b></td><td><s>&ldquo;You got a free day&rdquo;</s>: contradicts Happening today right below it.</td></tr>
+  <tr><td><b>No to-dos and nothing today</b></td><td>&ldquo;Your day is wide open.&rdquo; + same Add a reminder button</td><td></td></tr>
+  <tr><td><b>All to-dos ticked</b></td><td>List stays (done items struck through) and collapses, per the 17 Sep handoff</td><td>Empty-state card. It is not empty, it is done.</td></tr>
+  <tr><td><b>No invitations</b></td><td>&ldquo;No invitations waiting.&rdquo; + &ldquo;When someone invites you, it shows up here first.&rdquo; Quiet dashed card, no button</td><td></td></tr>
+  <tr><td><b>Nothing upcoming in 14 days</b></td><td>&ldquo;Nothing on the calendar for the next two weeks.&rdquo;</td><td>Hiding the section. The brief should never look empty.</td></tr>
+</table>
+</div>
+
+<script>
+  document.querySelectorAll('.titem').forEach(r=>r.addEventListener('click',()=>r.classList.toggle('done')));
+  document.querySelectorAll('#who .o').forEach(o=>o.addEventListener('click',()=>{
+    document.querySelectorAll('#who .o').forEach(x=>x.classList.remove('on'));o.classList.add('on');
+  }));
+</script>
+</body>
+</html>
