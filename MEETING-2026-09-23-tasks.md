@@ -99,6 +99,15 @@ dictate. Mulai dari **reminder**, lalu events.
 
 ---
 
+## ON HOLD · Web group chat (24 Sep)
+
+- [ ] **C1** Desain `roomparent.com/chat/<classId>` sudah jadi (`chat.html`, board di
+  `https://room-parent-portal.vercel.app/review/chat-flow.html`, spec/24, release v2026-09-24.3).
+  **Hold atas keputusan Ahmad:** Tony belum pernah secara eksplisit meminta desain ini. Dia
+  menabrak halaman yang belum ada di call 17 Sep, dan arah "join gate" (baca di web, balas di app)
+  adalah keputusan Ahmad. Jangan jadikan item di issue #2 sebelum Tony mengonfirmasi arahnya.
+  Catatan: portal sudah menunjuk ke halaman ini, dan label "Page not built yet" sudah dicabut.
+
 ## Punya Mohit (track, bukan kita)
 
 **Selesai di call:** member subgroup muncul (kode chat belum di-merge, sudah dia upload ke backend).
