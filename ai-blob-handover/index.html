@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f4f1ea" />
+    <title>Sprout Thinking Orb · FE handover</title>
+    <style>
+      :root {
+        --cream: #f4f1ea;
+        --paper: #fcfcfc;
+        --ink: #1e3e2b;
+        --green: #186338;
+        --sage: #d0dacf;
+        --muted: #6e756f;
+      }
+      * { box-sizing: border-box; }
+      html { background: var(--cream); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+      body { margin: 0; min-height: 100vh; }
+      button { font: inherit; }
+      .preview-shell {
+        min-height: 100vh;
+        padding: clamp(24px, 5vw, 64px);
+        background:
+          radial-gradient(circle at 18% 15%, rgba(119, 182, 145, .2), transparent 30%),
+          radial-gradient(circle at 86% 82%, rgba(208, 218, 207, .7), transparent 28%),
+          var(--cream);
+      }
+      header {
+        width: min(1040px, 100%);
+        margin: 0 auto 36px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 24px;
+      }
+      .brand { display: flex; align-items: center; gap: 12px; font-family: Georgia, serif; font-size: 24px; }
+      .mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; background: var(--paper); box-shadow: 0 5px 18px rgba(30, 62, 43, .12); }
+      .mark svg { width: 23px; fill: var(--green); }
+      .handover { color: var(--muted); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+      main {
+        width: min(1040px, 100%);
+        margin: auto;
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+        gap: 24px;
+      }
+      .stage, .details { border-radius: 28px; border: 1px solid rgba(30, 62, 43, .09); }
+      .stage {
+        min-height: 520px;
+        position: relative;
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+        padding: 44px;
+        background: rgba(252, 252, 252, .78);
+        box-shadow: 0 24px 80px rgba(30, 62, 43, .11);
+      }
+      .stage::before {
+        content: "";
+        position: absolute;
+        width: 390px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: rgba(226, 233, 227, .68);
+        filter: blur(2px);
+      }
+      .orb-wrap { position: relative; z-index: 1; display: grid; justify-items: center; gap: 28px; }
+      #hero-orb { width: 190px; height: 190px; image-rendering: auto; }
+      .state-copy { text-align: center; }
+      .state-copy p { margin: 0 0 8px; color: var(--muted); font-size: 13px; }
+      .state-copy h1 { margin: 0; font-family: Georgia, serif; font-size: clamp(38px, 5vw, 64px); font-weight: 500; letter-spacing: -.035em; }
+      .controls { display: flex; gap: 8px; padding: 5px; border-radius: 999px; background: rgba(255, 255, 255, .78); box-shadow: 0 8px 28px rgba(30, 62, 43, .1); }
+      .controls button { border: 0; border-radius: 999px; padding: 10px 16px; color: var(--muted); background: transparent; cursor: pointer; transition: color .2s, background .2s, transform .2s; }
+      .controls button:hover { transform: translateY(-1px); color: var(--ink); }
+      .controls button[aria-pressed="true"] { color: white; background: var(--green); }
+      .details { padding: 34px; background: var(--ink); color: white; display: flex; flex-direction: column; justify-content: space-between; }
+      .details h2 { margin: 0 0 14px; font-family: Georgia, serif; font-size: 34px; font-weight: 500; }
+      .details > div > p { color: #d7e1d8; line-height: 1.65; margin: 0; }
+      .state-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 34px 0; }
+      .mini { min-width: 0; padding: 14px 8px 12px; text-align: center; border-radius: 16px; background: rgba(255, 255, 255, .075); }
+      .mini canvas { width: 58px; height: 58px; }
+      .mini span { display: block; margin-top: 8px; color: #d7e1d8; font-size: 11px; }
+      pre { overflow: auto; margin: 0; padding: 18px; border-radius: 16px; color: #dce8dd; background: rgba(0, 0, 0, .24); font: 12px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace; }
+      footer { margin-top: 22px; color: #aebdb1; font-size: 11px; line-height: 1.6; }
+      @media (max-width: 780px) {
+        header { align-items: flex-start; }
+        main { grid-template-columns: 1fr; }
+        .stage { min-height: 460px; padding: 28px 16px; }
+        #hero-orb { width: 150px; height: 150px; }
+        .details { min-height: 480px; }
+        .controls button { padding: 9px 11px; font-size: 12px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation: none !important; transition: none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="preview-shell">
+      <header>
+        <div class="brand">
+          <span class="mark" aria-hidden="true"><svg viewBox="0 0 20 20"><circle cx="7" cy="7" r="4"/><circle cx="13" cy="7" r="4"/><circle cx="7" cy="13" r="4"/><circle cx="13" cy="13" r="4"/></svg></span>
+          <span>Sprout</span>
+        </div>
+        <span class="handover">Thinking Orb · FE handover</span>
+      </header>
+      <main>
+        <section class="stage" aria-labelledby="state-title">
+          <div class="orb-wrap">
+            <canvas id="hero-orb"></canvas>
+            <div class="state-copy"><p>Sprout Assist is</p><h1 id="state-title">Working…</h1></div>
+            <div class="controls" aria-label="Preview state">
+              <button type="button" data-state="working" aria-pressed="true">Working</button>
+              <button type="button" data-state="listening" aria-pressed="false">Listening</button>
+              <button type="button" data-state="composing" aria-pressed="false">Composing</button>
+            </div>
+          </div>
+        </section>
+        <aside class="details">
+          <div>
+            <h2>Three states.<br />One small API.</h2>
+            <p>The original geometry stays intact. Only the depth ramp changes, moving from botanical ink to soft sage.</p>
+            <div class="state-list">
+              <div class="mini"><canvas data-mini="working"></canvas><span>Working</span></div>
+              <div class="mini"><canvas data-mini="listening"></canvas><span>Listening</span></div>
+              <div class="mini"><canvas data-mini="composing"></canvas><span>Composing</span></div>
+            </div>
+          </div>
+          <div>
+            <pre><code>const orb = SproutThinkingOrb.create(canvas, {
+  state: "working",
+  theme: "light",
+});
+
+orb.play();
+orb.setState("listening");</code></pre>
+            <footer>No dependencies · Canvas 2D · Intersection-aware · Reduced-motion safe · MIT upstream</footer>
+          </div>
+        </aside>
+      </main>
+    </div>
+    <script src="./thinking-orb.js"></script>
+    <script>
+      const states = ["working", "listening", "composing"];
+      const labels = { working: "Working…", listening: "Listening…", composing: "Composing…" };
+      const hero = SproutThinkingOrb.create(document.querySelector("#hero-orb"), { state: "working", theme: "light" });
+      hero.play();
+      document.querySelectorAll("[data-mini]").forEach((canvas) => {
+        const orb = SproutThinkingOrb.create(canvas, { state: canvas.dataset.mini, theme: "dark" });
+        orb.play();
+      });
+      let active = 0;
+      let autoplay = setInterval(() => selectState(states[(active + 1) % states.length]), 2400);
+      function selectState(state) {
+        active = states.indexOf(state);
+        hero.setState(state);
+        document.querySelector("#state-title").textContent = labels[state];
+        document.querySelectorAll("[data-state]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.state === state)));
+      }
+      document.querySelectorAll("[data-state]").forEach((button) => button.addEventListener("click", () => {
+        clearInterval(autoplay);
+        selectState(button.dataset.state);
+      }));
+    </script>
+  </body>
+</html>
