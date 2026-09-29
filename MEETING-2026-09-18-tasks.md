@@ -46,6 +46,15 @@ Diskusi terpanjang di call ini, dan Tony menutupnya dengan:
   → Perlu desain: di mana History tinggal, gimana bedanya di app vs portal, dan apakah
   blok pasangan juga punya History sendiri.
 
+**29 Sep: didesain (arah A, satu list, dipilih Ahmad)** →
+`08 - Generated Screens/Home/daily-brief-reminder-lifecycle.html` (dibangun oleh
+`build-reminder-lifecycle.py` dari shell reminder loop). Satu item diikuti Senin sampai Sabtu:
+chip Due Fri → Due tomorrow → Due today, dicentang tetap tampil ~24 jam dengan wajah yang
+mencentang, lalu pindah ke History lewat **Done (n)**. Reminder portal yang tidak dicentang
+hilang sehari setelah due date, masuk History bagian "Not ticked". Masih perlu Tony: 24 jam vs
+akhir hari berikutnya, reminder pribadi yang lewat due date, masa simpan History, sisi portal.
+Centang T1–T4 setelah Tony review.
+
 Ketiganya satu paket. Jangan didesain terpisah, karena satu item bergerak melewati
 keempat state itu: hidup → lewat due date → dicentang → masuk history.
 

@@ -59,7 +59,7 @@ Lanjutan dari `MEETING-2026-09-23-tasks.md`. Tony: *"we can go deeper tomorrow."
 
 ## P1 · Punya kita, Tony bilang nggak buru-buru
 
-- [ ] **A2 Ganti preview "recent messages" di join page dengan preview chat yang hidup.**
+- [x] **A2 Ganti preview "recent messages" di join page dengan preview chat yang hidup.**
   C1 dari 23 Sep sekarang **tidak on hold lagi**: Tony sudah mengonfirmasi arahnya.
   - Sumber gerak: segmen chat di `SPROUT VIDEO/Video 5 - Launch/episodes/seg4.js`, dibangun
     ulang sebagai HTML interaktif (pola hero `01 - Website/sprout-reach-scene-iteration/`),
@@ -82,6 +82,7 @@ Lanjutan dari `MEETING-2026-09-23-tasks.md`. Tony: *"we can go deeper tomorrow."
     tab lain dibuka, "Type Message" memulai join. Commit portal `90ca10f` (lokal). Link review sama,
     sudah di-deploy ulang.
     Lalu (Ahmad): tombol Join tetap langsung di bawah kartu kelas, peek di bawahnya. Commit `018b2e5`.
+  - **Dirilis 29 Sep atas permintaan Ahmad (sebelum Tony review):** v2026-09-29.3, item 13 di issue #2.
 
 - [x] **A3 Video Class Group Chat: isi chat dan foto.** *Koreksi:* pacing-nya sudah beres
   pagi ini di sesi lain. `card()` di `core.js:127` menahan tiap card 0,34 s/kata + 0,8 s dan
@@ -112,6 +113,12 @@ Lanjutan dari `MEETING-2026-09-23-tasks.md`. Tony: *"we can go deeper tomorrow."
   dan Class Group Chat (yang Tony sebut "both of these") sudah tampil sebagai "Shareable link"
   plus ikon copy, bukan URL panjang (`index.html:1596-1609`). URL panjang hanya ada di build
   Mohit, dan dia sudah bilang akan membetulkannya.
+
+---
+
+**Terkirim 29 Sep (Ahmad):** ringkasan v2026-09-29.1–.3 (issue #2 item 11–13) ke Mohit; link review
+join page + film ke Tony. Tinggal tunggu: feedback Tony (A2 review, A5 coordinator), dan Mohit
+membangun item 11–13.
 
 ---
 
