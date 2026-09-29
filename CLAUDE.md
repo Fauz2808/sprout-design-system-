@@ -82,6 +82,31 @@ Summer Camp V.1/V.2 (`9730:123008`, `9730:124457` — unresolved parallel explor
 
 ## Keputusan Penting (Decision Log)
 
+- **2026-09-29 — Web group chat join asks no name.** The 28 Sep flow asked a number new
+  to the class "What's your name?" on the Code step. Tony, 29 Sep standup: "Just get rid
+  of it. We don't need it. Why are we even asking for a name?" *Why:* Sprout onboarding
+  asks for the name anyway, so the web asked twice; the flow should match request-to-join
+  on joinsprout (number → code → in → download Sprout). *How to apply:* a new number joins
+  the class with no name ("You're in."), and the name comes from Sprout onboarding. Don't
+  add a name, email, or child field back to this page without Tony.
+- **2026-09-28 — Web group chat join gate reversed same-day: any OTP-verified number
+  can join, not just ones on the class roster.** Shipped 24 Sep requiring the phone
+  number to already be on the room parent's list; Tony tested the live link on his own
+  phone on 28 Sep, got refused, and said "I don't really want to limit people from
+  joining." Reversed within hours. *Why:* verification (a working phone that receives
+  an SMS code) is the actual anti-abuse gate — pre-approval on a roster was extra
+  friction Tony didn't want, and it directly worked against the adoption flywheel
+  (every refused parent is one who doesn't become a Sprout user). *How to apply:*
+  `chat.html` + `spec/24-web-group-chat.md` (rule 2) are the source of truth — a number
+  new to a class joins as a member (no name prompt since 29 Sep, see above); the only
+  refusal left is an incomplete (non-10-digit) number. Don't reintroduce a roster
+  allowlist for this flow without checking with Tony first, even if it looks like an
+  obvious anti-abuse improvement — it was deliberately removed. Also fixed same day
+  while testing this: a parent's number from one class could wrongly join a different
+  class's chat (now scoped per-class, spec rule 7), and an unknown/mistyped classId
+  silently showed the wrong class instead of failing closed (now a "link unavailable"
+  state). Shipped to Mohit as GitHub Releases v2026-09-28.1 through .3 on
+  `Fauz2808/roomparent-portal`.
 - **2026-09-23 — Sprout Assist order: reminders and events first, get them right, then birthdays,
   then clubs.** Voice capture has ONE control (a check beside the listening orb), no live transcript,
   and the Daily Brief gets an "Add a reminder" CTA that opens voice already listening. *Why (Tony):*
