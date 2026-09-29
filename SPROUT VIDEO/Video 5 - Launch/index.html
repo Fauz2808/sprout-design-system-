@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<title>Sprout Launch Film</title>
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="film.css">
+<link rel="stylesheet" href="screens-v2.css">
+</head>
+<body class="film">
+<div id="viewport">
+  <div id="stage">
+    <div class="layer" id="bg"></div>
+    <div class="layer" id="noise"></div>
+    <div class="layer" id="world"></div>
+    <div class="layer" id="type"></div>
+    <div class="layer" id="fx"></div>
+    <div class="layer" id="top"></div>
+  </div>
+</div>
+<div id="hud"><button id="play">Play</button><input id="scrub" type="range" min="0" max="60" step="0.01" value="0"><span id="clock">0.00</span></div>
+<script src="assets/gsap.min.js"></script>
+<script src="assets/thinking-orb.js"></script>
+<script src="screens.js"></script>
+<script>
+  // wait for fonts and every image, so layout (and every measurement) is final
+  (async () => {
+    await document.fonts.load('500 84px "Playfair Display"');
+    await document.fonts.load('italic 500 64px "Playfair Display"');
+    await document.fonts.load('600 128px "Playfair Display"');
+    await document.fonts.load('400 27px Inter');
+    await document.fonts.load('600 17px Inter');
+    await document.fonts.ready;
+    // ?ep=full (default) is the film; ?ep=1..5 plays one section with the end card
+    const ep = new URLSearchParams(location.search).get("ep") || "full";
+    const add = (src) => new Promise((r) => { const s = document.createElement("script"); s.src = src; s.onload = r; document.body.appendChild(s); });
+    await add("core.js");
+    for (const n of [1, 2, 3, 4, 5]) await add(`episodes/seg${n}.js`);
+    window.SproutPlay(ep);
+  })();
+  // preview player: fit the stage, play in real time, scrub, ?t= to jump
+  const render = new URLSearchParams(location.search).has("render");
+  if (render) document.body.classList.add("render");
+  document.addEventListener("film-ready", () => {
+    const stage = document.getElementById("stage");
+    const imgs = [...document.images].map((i) => (i.complete ? Promise.resolve() : i.decode().catch(() => {})));
+    Promise.all(imgs).then(() => { window.__imagesReady = true; });
+    if (render) return;
+    const fit = () => { const k = Math.min(innerWidth / 1080, (innerHeight - 44) / 1920); stage.style.transform = `scale(${k})`; stage.style.marginTop = "-44px"; };
+    fit(); addEventListener("resize", fit);
+    const scrub = document.getElementById("scrub"), clock = document.getElementById("clock"), btn = document.getElementById("play");
+    let t = +(new URLSearchParams(location.search).get("t") || 0), playing = false, last = 0;
+    const show = () => { window.seek(t); scrub.value = t; clock.textContent = t.toFixed(2) + " s"; };
+    show();
+    const loop = (now) => { if (!playing) return; t += (now - last) / 1000; last = now; if (t >= window.DURATION) { t = window.DURATION; playing = false; btn.textContent = "Play"; } show(); requestAnimationFrame(loop); };
+    const toggle = () => { playing = !playing; btn.textContent = playing ? "Pause" : "Play"; if (playing) { if (t >= window.DURATION) t = 0; last = performance.now(); requestAnimationFrame(loop); } };
+    btn.onclick = toggle;
+    scrub.max = window.DURATION;
+    scrub.oninput = () => { t = +scrub.value; show(); };
+    addEventListener("keydown", (e) => { if (e.code === "Space") { e.preventDefault(); toggle(); } if (e.code === "ArrowRight") { t = Math.min(window.DURATION, t + (e.shiftKey ? 0.1 : 1)); show(); } if (e.code === "ArrowLeft") { t = Math.max(0, t - (e.shiftKey ? 0.1 : 1)); show(); } });
+  });
+</script>
+</body>
+</html>
