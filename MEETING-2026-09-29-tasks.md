@@ -73,6 +73,9 @@ Lanjutan dari `MEETING-2026-09-23-tasks.md`. Tony: *"we can go deeper tomorrow."
     lokal `Web group chat: preview plays an example class chat`, **belum dirilis**. Kurang:
     7 potret AI (prompt di `assets/chat/people/PROMPTS.md`; Weave belum di-link ke akun Figma),
     lalu review Tony, baru rilis + item di issue #2.
+  - **Update 29 Sep siang:** 7 potret masuk (ChatGPT via Codex), dipasang, avatar kelas jadi foto
+    guru. Link review untuk Tony: https://roomparent-chat-review.vercel.app (semua state:
+    `/review/chat-flow.html`). Commit portal `d81fa27` + `38190b8` masih lokal sampai Tony oke.
 
 - [ ] **A3 Video Class Group Chat: isi chat dan foto.** *Koreksi:* pacing-nya sudah beres
   pagi ini di sesi lain. `card()` di `core.js:127` menahan tiap card 0,34 s/kata + 0,8 s dan
@@ -86,8 +89,10 @@ Lanjutan dari `MEETING-2026-09-23-tasks.md`. Tony: *"we can go deeper tomorrow."
     dan "Robert: my golf score" di chat list (`screens.js:220, 272`).
   - Foto lama, dan avatar grup masih "MT".
   Rencana: cast dan naskah disamakan dengan chat contoh di join page (Mrs. Taylor, Lydia, Priya,
-  Marcus, Jen, Aisha), pakai potret yang sama, lalu render sekali. **Menunggu potret** (sedang
-  dibuat Ahmad lewat Codex/ChatGPT).
+  Marcus, Jen, Aisha), pakai potret yang sama, lalu render sekali.
+  **Dikerjakan 29 Sep siang:** cast + naskah join page, foto guru menggantikan MT (chat list,
+  header, pengirim email), catatan kalender dan email guru diganti, chat scroll supaya balasan
+  guru terlihat (layar chat 3,9 → 8,6 s). Detail di README film. Render ulang kedua cut.
 
 - [x] **A4 State "sudah login / sudah member" di join page.** Tony minta ke Mohit, tapi copy
   dan state-nya lebih rapi kalau ada di spec kita. Contoh: "You're already in Miss Taylor's
