@@ -76,8 +76,14 @@ Lanjutan dari `MEETING-2026-09-23-tasks.md`. Tony: *"we can go deeper tomorrow."
   - **Update 29 Sep siang:** 7 potret masuk (ChatGPT via Codex), dipasang, avatar kelas jadi foto
     guru. Link review untuk Tony: https://roomparent-chat-review.vercel.app (semua state:
     `/review/chat-flow.html`). Commit portal `d81fa27` + `38190b8` masih lokal sampai Tony oke.
+  - **Update 29 Sep sore (Ahmad):** sneak peek dibangun ulang jadi layar Class Group Chat app dari
+    Figma (Chat `8728:99165`, Calendar `8766:154859`, Updates `8827:117674`, Links `8198:109833`):
+    header app, 4 tab yang bisa di-tap, chat tetap jalan dengan pacing yang sama dan berhenti saat
+    tab lain dibuka, "Type Message" memulai join. Commit portal `90ca10f` (lokal). Link review sama,
+    sudah di-deploy ulang.
+    Lalu (Ahmad): tombol Join tetap langsung di bawah kartu kelas, peek di bawahnya. Commit `018b2e5`.
 
-- [ ] **A3 Video Class Group Chat: isi chat dan foto.** *Koreksi:* pacing-nya sudah beres
+- [x] **A3 Video Class Group Chat: isi chat dan foto.** *Koreksi:* pacing-nya sudah beres
   pagi ini di sesi lain. `card()` di `core.js:127` menahan tiap card 0,34 s/kata + 0,8 s dan
   menggeser sisanya otomatis, "Teacher emails" sudah benar, dan hasilnya sudah dirender
   (`out/sprout-launch.mp4` dan `out/sprout-launch-no-families.mp4`, 29 Sep). Klaim awal soal
@@ -92,7 +98,7 @@ Lanjutan dari `MEETING-2026-09-23-tasks.md`. Tony: *"we can go deeper tomorrow."
   Marcus, Jen, Aisha), pakai potret yang sama, lalu render sekali.
   **Dikerjakan 29 Sep siang:** cast + naskah join page, foto guru menggantikan MT (chat list,
   header, pengirim email), catatan kalender dan email guru diganti, chat scroll supaya balasan
-  guru terlihat (layar chat 3,9 → 8,6 s). Detail di README film. Render ulang kedua cut.
+  guru terlihat (layar chat 3,9 → 8,6 s). Detail di README film. Render ulang kedua cut. **Selesai:** `out/sprout-launch.mp4` (128,4 s) dan `out/sprout-launch-no-families.mp4` (112,4 s).
 
 - [x] **A4 State "sudah login / sudah member" di join page.** Tony minta ke Mohit, tapi copy
   dan state-nya lebih rapi kalau ada di spec kita. Contoh: "You're already in Miss Taylor's
