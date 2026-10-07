@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Share Sprout · concepts</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<!-- R1 (meeting 7 Oct): Tony wants a "Share Sprout" in the Daily Brief that opens the phone's own share
+     sheet, so parents can send Sprout to close friends (seen in Orbits: share a code, send it by text).
+     Three placements to choose from, then the one share sheet they all open. Not a final design.
+     Daily Brief values from Figma 13266:241031. Faces: join-page cast placeholders. -->
+<style>
+  :root { --bg: #f4f1ea; --ink: #1e3e2b; --muted: #7d715e; --green: #186338; --gs: #e2e9e3; --gb: #d0dacf; --serif: "Playfair Display", Georgia, serif; --sans: "Inter", system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #e9e4d8; font-family: var(--sans); color: #4d525b; -webkit-font-smoothing: antialiased; }
+  .page-head { padding: 36px 40px 8px; max-width: 1100px; }
+  .page-head h1 { font-family: var(--serif); font-weight: 500; color: var(--ink); font-size: 34px; margin: 0; }
+  .page-head p { margin: 10px 0 0; font-size: 15px; line-height: 1.55; max-width: 820px; }
+  .rec { margin-top: 14px; display: inline-block; padding: 10px 14px; border-radius: 12px; background: #fff; box-shadow: 0 0 0 1px rgb(30 62 43 / .12); font-size: 14px; color: var(--ink); }
+  .row { display: flex; gap: 36px; padding: 28px 40px 60px; overflow-x: auto; align-items: flex-start; }
+  .panel { flex: 0 0 auto; width: 330px; }
+  .panel h2 { font-family: var(--serif); font-weight: 500; font-size: 20px; color: var(--ink); margin: 0; }
+  .panel .ctx { margin: 6px 0 0; font-size: 13px; line-height: 1.5; min-height: 78px; }
+  .panel .ctx b { color: var(--ink); }
+  .tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; background: var(--gs); color: var(--green); margin-bottom: 6px; }
+  .tag.alt { background: #f6ecd1; color: #7f600e; }
+  .phone { margin-top: 14px; width: 330px; height: 715px; border-radius: 46px; overflow: hidden; position: relative; background: var(--bg); box-shadow: 0 0 0 2.5px rgb(24 99 56 / .5), 0 28px 56px -22px rgb(16 52 32 / .38); }
+  .app { position: absolute; top: 0; left: 0; width: 393px; height: 852px; transform: scale(.8397); transform-origin: 0 0; overflow: hidden; background: var(--bg); }
+  .sb { height: 51px; display: flex; align-items: center; justify-content: space-between; padding: 8px 34px 0 47px; font-weight: 600; color: var(--ink); font-size: 16px; }
+  .top { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 40px; }
+  .top img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+  .top .t { text-align: center; } .top b { display: block; font-family: var(--serif); font-weight: 500; font-size: 16px; color: var(--ink); } .top small { font-size: 12px; color: var(--muted); }
+  .top .icons { display: flex; gap: 4px; } .top .icons i { font-size: 24px; color: var(--ink); padding: 0 6px; }
+  .top .icons .hot { position: relative; color: var(--green); }
+  .top .icons .hot::after { content: ""; position: absolute; inset: -6px -2px; border-radius: 12px; box-shadow: 0 0 0 2px #e0b25a; }
+  .body { padding: 22px 16px 0; display: flex; flex-direction: column; gap: 12px; }
+  .hello h3 { font-family: var(--serif); font-weight: 500; font-size: 24px; color: var(--ink); margin: 0; } .hello em { font-family: var(--serif); color: var(--muted); }
+  hr { border: 0; border-top: 1px solid #e3ddd0; margin: 0; }
+  .h { margin: 0; font-size: 14px; font-weight: 700; line-height: 28px; color: var(--ink); }
+  .todos { background: #fff; border-radius: 16px; }
+  .todo { display: flex; align-items: center; gap: 10px; padding: 12px; border-bottom: .5px solid #e6e7ea; }
+  .todo:last-child { border: 0; }
+  .todo .box { width: 20px; height: 20px; border-radius: 6px; border: 1px solid #dfe1e7; }
+  .todo b { display: block; font-family: var(--serif); font-weight: 500; font-size: 14px; color: var(--ink); }
+  .todo small { font-size: 12px; color: var(--muted); }
+  .faces { display: flex; } .faces img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; } .faces img + img { margin-left: -14px; }
+  .msgs ul { margin: 0; padding-left: 21px; font-size: 14px; font-weight: 500; line-height: 28px; color: var(--ink); }
+  .nav { position: absolute; left: 16px; right: 16px; bottom: 34px; height: 69px; border-radius: 99px; display: flex; justify-content: space-around; align-items: center; background: rgb(244 241 234 / .95); box-shadow: 1px 4px 25px 2px rgba(13,13,18,.12); }
+  .nav span { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; color: var(--muted); } .nav span.on { color: var(--ink); } .nav i { font-size: 24px; }
+  .ind { position: absolute; left: 50%; bottom: 10px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: var(--ink); }
+  /* A · card at the end of the brief */
+  .share-card { border-radius: 16px; padding: 16px; background: var(--gs); border: 1px solid var(--gb); display: flex; flex-direction: column; gap: 10px; }
+  .share-card .r { display: flex; gap: 12px; align-items: center; }
+  .share-card .ic { width: 44px; height: 44px; border-radius: 12px; background: #fff; display: grid; place-items: center; color: var(--green); font-size: 22px; flex-shrink: 0; }
+  .share-card b { display: block; font-family: var(--serif); font-weight: 500; font-size: 18px; line-height: 1.35; color: var(--ink); }
+  .share-card p { margin: 2px 0 0; font-size: 13px; line-height: 1.45; color: var(--muted); }
+  .btn { height: 44px; border-radius: 99px; background: var(--green); color: #fff; font-family: var(--serif); font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn.sec { background: #fff; color: var(--ink); border: 1px solid var(--gb); }
+  /* C · after a good moment */
+  .moment { border-radius: 16px; padding: 16px; background: #fff; box-shadow: 1px 4px 25px 2px rgba(13,13,18,.08); display: flex; flex-direction: column; gap: 12px; position: relative; }
+  .moment .x { position: absolute; right: 12px; top: 12px; color: var(--muted); font-size: 18px; }
+  .moment .faces img { width: 44px; height: 44px; }
+  .moment b { font-family: var(--serif); font-weight: 500; font-size: 18px; color: var(--ink); line-height: 1.35; }
+  .moment p { margin: 0; font-size: 13px; line-height: 1.45; color: var(--muted); }
+  .moment .btns { display: flex; gap: 10px; } .moment .btns .btn { flex: 1; }
+  /* B · profile menu */
+  .menu { position: absolute; inset: 0; background: rgb(13 13 18 / .28); }
+  .menu .sheet { position: absolute; left: 0; top: 0; bottom: 0; width: 300px; background: var(--bg); padding: 70px 18px 0; }
+  .menu .me { display: flex; gap: 12px; align-items: center; padding-bottom: 18px; border-bottom: 1px solid #e3ddd0; }
+  .menu .me img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; }
+  .menu .me b { display: block; font-family: var(--serif); font-weight: 500; font-size: 18px; color: var(--ink); } .menu .me small { color: var(--muted); font-size: 13px; }
+  .menu .it { display: flex; align-items: center; gap: 12px; padding: 14px 4px; font-size: 15px; color: var(--ink); border-bottom: 1px solid #ece8de; }
+  .menu .it i { font-size: 22px; color: var(--muted); }
+  .menu .it.hot { background: #fff; border-radius: 12px; padding: 14px 10px; border: 0; box-shadow: 0 0 0 2px #e0b25a; margin: 6px 0; }
+  .menu .it.hot i { color: var(--green); }
+  /* the native share sheet (iOS) */
+  .dim { position: absolute; inset: 0; background: rgb(13 13 18 / .35); }
+  .ios { position: absolute; left: 0; right: 0; bottom: 0; height: 600px; border-radius: 14px 14px 0 0; background: #f2f2f7; font-family: -apple-system, "SF Pro Text", var(--sans); }
+  .ios .prev { display: flex; gap: 12px; align-items: center; padding: 18px 16px 14px; border-bottom: .5px solid #c6c6c8; }
+  .ios .prev img { width: 54px; height: 54px; border-radius: 12px; }
+  .ios .prev b { display: block; font-size: 15px; color: #000; } .ios .prev small { font-size: 13px; color: #6e6e73; }
+  .ios .prev .xx { margin-left: auto; width: 30px; height: 30px; border-radius: 50%; background: #e3e3e8; display: grid; place-items: center; color: #6e6e73; }
+  .ios .people { display: flex; gap: 18px; padding: 18px 16px; border-bottom: .5px solid #c6c6c8; }
+  .ios .people span { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; color: #000; width: 62px; text-align: center; }
+  .ios .people .av { width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 22px; font-weight: 600; position: relative; }
+  .ios .people .av em { position: absolute; right: -2px; bottom: -2px; width: 22px; height: 22px; border-radius: 6px; background: #34c759; display: grid; place-items: center; font-style: normal; font-size: 13px; border: 2px solid #f2f2f7; }
+  .ios .apps { display: flex; gap: 18px; padding: 18px 16px; border-bottom: .5px solid #c6c6c8; }
+  .ios .apps span { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; color: #000; width: 62px; }
+  .ios .apps i { width: 60px; height: 60px; border-radius: 14px; display: grid; place-items: center; font-size: 30px; color: #fff; }
+  .ios .list { margin: 16px; border-radius: 12px; background: #fff; }
+  .ios .list div { display: flex; justify-content: space-between; align-items: center; padding: 13px 16px; font-size: 16px; color: #000; border-bottom: .5px solid #c6c6c8; }
+  .ios .list div:last-child { border: 0; } .ios .list i { font-size: 20px; }
+  .msgprev { position: absolute; left: 16px; right: 16px; top: 120px; padding: 12px 14px; border-radius: 18px; background: #fff; font-size: 14px; line-height: 1.45; color: #1c1c1e; box-shadow: 0 8px 24px rgb(0 0 0 / .12); }
+  .msgprev small { display: block; font-size: 11px; color: #8e8e93; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
+  .msgprev u { color: #0a7aff; text-decoration: none; }
+  .q { margin: 8px 40px 0; padding: 16px 20px; max-width: 1100px; border-radius: 14px; background: #fff; box-shadow: 0 0 0 1px rgb(30 62 43 / .12); font-size: 14px; line-height: 1.6; color: var(--ink); }
+  .q h3 { margin: 0 0 6px; font-family: var(--serif); font-weight: 500; font-size: 18px; }
+  .q ol { margin: 0; padding-left: 20px; }
+</style>
+</head>
+<body>
+  <header class="page-head">
+    <h1>Share Sprout, from the Daily Brief</h1>
+    <p>Tony, 7 Oct: "In our daily brief, it's probably important to have a share Sprout thing in it." One tap opens the phone's own share sheet with a message and the link already written, so a parent can text Sprout to close friends. Three places it could live, then the sheet they all open. A + C is the pick.</p>
+    <span class="rec"><b>Picked (Ahmad, 7 Oct): A + C.</b> A is the always-there home at the end of the brief; C shows once, right after the spouse connects. B is not used: too hidden in the menu, and as a header icon it would crowd the bell we just added.</span>
+  </header>
+
+  <div class="row">
+    <!-- A -->
+    <section class="panel">
+      <span class="tag">A · Picked</span>
+      <h2>A card at the end of the brief</h2>
+      <p class="ctx">Sits under New messages every day, where a parent lands after reading the brief. <b>Share Sprout</b> opens the sheet. "Not now" hides it for 2 weeks. Never above to-dos or invitations.</p>
+      <div class="phone"><div class="app">
+        <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="body" style="padding-top:8px">
+          <p class="h">🎂 Birthdays</p>
+          <p style="margin:0;font-size:14px;color:var(--ink)"><b>Presley (6)</b> <span style="color:var(--muted)">— Oct 10th</span></p>
+          <hr>
+          <div class="msgs"><p class="h">💬 New messages</p><ul><li>2 unread in <u>Kindergarten</u></li><li>1 message from <u>Sarah Chen</u></li></ul></div>
+          <hr>
+          <div class="share-card">
+            <div class="r"><span class="ic"><i class="ph ph-hand-heart"></i></span><span><b>Know a parent who'd like this?</b><p>Send Sprout to a friend. Their kids' classes and calendar are waiting when they join.</p></span></div>
+            <div class="btn"><i class="ph ph-share-fat"></i>Share Sprout</div>
+            <span style="text-align:center;font-size:13px;color:var(--muted)">Not now</span>
+          </div>
+        </div>
+        <div class="nav"><span class="on"><i class="ph-fill ph-sun-horizon"></i>Daily Brief</span><span><i class="ph ph-compass"></i>Events</span><span><i class="ph ph-clover"></i>Sprout Assist</span><span><i class="ph ph-chat-circle-dots"></i>Chat</span><span><i class="ph ph-users"></i>Clubs</span></div>
+        <span class="ind"></span>
+      </div></div>
+    </section>
+
+    <!-- B -->
+    <section class="panel">
+      <span class="tag alt">B · Not used</span>
+      <h2>In the profile menu</h2>
+      <p class="ctx">A row in the menu behind your photo, top left of the brief. Always findable, never in the way, but parents rarely open that menu, so few would see it. A header icon instead would sit next to the bell.</p>
+      <div class="phone"><div class="app">
+        <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="top"><img src="./assets/people/marcus.webp" alt=""><span class="t"><b>Sprout AI</b><small>Wednesday, October 7</small></span><span class="icons"><i class="ph ph-bell"></i></span></div>
+        <div class="body"><div class="hello"><h3>Your day, in order.</h3><em>Full, but manageable.</em></div></div>
+        <div class="menu"><div class="sheet">
+          <div class="me"><img src="./assets/people/marcus.webp" alt=""><span><b>Tony Martin</b><small>Presley, Jake and Mia's dad</small></span></div>
+          <div class="it"><i class="ph ph-user"></i>Profile</div>
+          <div class="it"><i class="ph ph-heart"></i>Spouse</div>
+          <div class="it hot"><i class="ph ph-share-fat"></i>Share Sprout with a friend</div>
+          <div class="it"><i class="ph ph-gear"></i>Settings</div>
+          <div class="it"><i class="ph ph-question"></i>Help</div>
+        </div></div>
+        <span class="ind"></span>
+      </div></div>
+    </section>
+
+    <!-- C -->
+    <section class="panel">
+      <span class="tag">C · Picked, with A</span>
+      <h2>Once, after a good moment</h2>
+      <p class="ctx">Shows one time at the top of the brief right after the spouse connects (the moment Sprout feels like "ours"). Dismiss it and it's gone; A stays at the bottom. Other triggers later: first class joined, first reminder done.</p>
+      <div class="phone"><div class="app">
+        <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="top"><img src="./assets/people/marcus.webp" alt=""><span class="t"><b>Sprout AI</b><small>Wednesday, October 7</small></span><span class="icons"><i class="ph ph-bell"></i></span></div>
+        <div class="body">
+          <div class="moment">
+            <i class="ph ph-x x"></i>
+            <div class="faces"><img src="./assets/people/marcus.webp" alt=""><img src="./assets/people/jen.webp" alt=""></div>
+            <b>You and Lydia are on Sprout together.</b>
+            <p>Who else should be here? Send Sprout to the friends you trade pickups and playdates with.</p>
+            <div class="btns"><div class="btn"><i class="ph ph-share-fat"></i>Share Sprout</div></div>
+          </div>
+          <div class="hello"><h3>Your day, in order.</h3><em>Full, but manageable.</em></div>
+          <div class="todos">
+            <div class="todo"><span class="box"></span><span class="faces"><img src="./assets/people/marcus.webp" alt=""><img src="./assets/people/jen.webp" alt=""></span><span><b>Sign Jake's permission slip</b><small>4th Grade Class</small></span></div>
+            <div class="todo"><span class="box"></span><span class="faces"><img src="./assets/people/marcus.webp" alt=""></span><span><b>Return library book</b><small>Miss Taylor Class</small></span></div>
+          </div>
+        </div>
+        <div class="nav"><span class="on"><i class="ph-fill ph-sun-horizon"></i>Daily Brief</span><span><i class="ph ph-compass"></i>Events</span><span><i class="ph ph-clover"></i>Sprout Assist</span><span><i class="ph ph-chat-circle-dots"></i>Chat</span><span><i class="ph ph-users"></i>Clubs</span></div>
+        <span class="ind"></span>
+      </div></div>
+    </section>
+
+    <!-- the sheet -->
+    <section class="panel">
+      <span class="tag alt">All three open this</span>
+      <h2>The phone's own share sheet</h2>
+      <p class="ctx">Nothing to design or build beyond the message: iOS and Android draw the sheet, with recent contacts first (Tony: "my closest friends are the ones I'm gonna add"). The text and link are prefilled; the parent can edit before sending.</p>
+      <div class="phone"><div class="app">
+        <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="dim"></div>
+        <div class="msgprev"><small>Message that goes out</small>I'm using Sprout for the kids' classes, the school calendar and our family to-dos. It's free, come join: <u>joinsprout.co</u></div>
+        <div class="ios">
+          <div class="prev"><img src="./assets/sprout-logo.png" alt=""><span><b>Sprout: The App for Parents</b><small>joinsprout.co</small></span><span class="xx"><i class="ph ph-x"></i></span></div>
+          <div class="people">
+            <span><span class="av" style="background:#b7791f">SB<em>💬</em></span>Sarah Baker</span>
+            <span><span class="av" style="background:#6b6fb3">EC<em>💬</em></span>Emily C.</span>
+            <span><span class="av" style="background:#186338">JT<em>💬</em></span>Jake T.</span>
+            <span><span class="av" style="background:#a0525c">MJ<em>💬</em></span>Mike J.</span>
+          </div>
+          <div class="apps">
+            <span><i style="background:#34c759" class="ph-fill ph-chat-circle"></i>Messages</span>
+            <span><i style="background:#25d366" class="ph-fill ph-whatsapp-logo"></i>WhatsApp</span>
+            <span><i style="background:#0a7aff" class="ph-fill ph-envelope-simple"></i>Mail</span>
+            <span><i style="background:#8e8e93" class="ph-fill ph-dots-three"></i>More</span>
+          </div>
+          <div class="list"><div>Copy <i class="ph ph-copy"></i></div><div>Add to Reading List <i class="ph ph-eyeglasses"></i></div></div>
+        </div>
+      </div></div>
+    </section>
+  </div>
+
+  <div class="q">
+    <h3>Questions for Tony before A + C goes to Syed</h3>
+    <ol>
+      <li>Should the link do more than download? A link that knows who sent it could drop the friend straight into the same class (or show "Tony invited you") once they sign up. That needs Mohit; a plain joinsprout.co link needs nothing.</li>
+      <li>We picked A + C. If A every day starts to feel like wallpaper, "Not now" hides it for 2 weeks; OK, or longer?</li>
+      <li>The Orbits recording you're sending: anything in their share flow beyond the native sheet we should copy?</li>
+    </ol>
+  </div>
+</body>
+</html>

@@ -14,6 +14,11 @@ The design uses a photographic meadow hero, an interactive mom-hand phone mockup
 
 The editorial headings are new; product capabilities, UI exports, store destinations, and family imagery come from the existing Sprout work. The closing landscape is a project-specific generated asset with a different composition from the hero meadow. No invented metrics or testimonials are included. The linked Vercel project publishes this iteration for review.
 
+**Website v2 (7 Oct), `home-v2.html`:** Tony's structure pass. Header about parents (5 options behind a "Review only"
+pill, `?h=N`), then Daily Brief (pinned, scroll drives the brief), Class group chats, Member directory, Sprout Assist as
+a carousel near the bottom, and the close with Share Sprout. No waitlist: the CTA is download. All screens are coded.
+`home-v2-gp.css` is generated: run `review/sync-v2-gp.sh` after editing the `.gp` block in `assist-landing.css`.
+
 Validation:
 
 ```sh

@@ -1,0 +1,120 @@
+/* Shared by assist.html and home-v2.html (moved out of assist-landing.css, 7 Oct): the sky video hero, the live
+   mascot, and the portal (the mascot's circle grows into the next scene on scroll). Uses the page's --green,
+   --bg and --ink. Load it after the page's own stylesheet. */
+/* ── v5 hero (6 Oct, Ahmad: "take Cove's background video and its blur settings"). The loop and every value
+   below come from Recreate Library / recreations/mercury (immersive-hero.css): the still underneath, the loop
+   fading in over 900 ms once it plays, a top haze (white 30% to 8%, blur 9px saturate 1.05, masked out by 90%),
+   an edge focus (radial, deep blue-grey 20%) and a 5px blur over the bottom 22%. Controls over the scene are
+   Cove's glass: white 24%, blur 18px saturate 1.6, a 55% white hairline and a 70% top highlight. Sprout's
+   only changes: ink and green for text instead of Cove's navy, and only the loop's clean pixels are shown (no table or laptop). ── */
+/* no laptop to clear any more: the copy sits in the optical centre (the 64px bar on top, "Learn more" below) */
+.hero-sky { position: relative; min-height: max(100vh, 720px); justify-content: center; padding: 64px 24px 72px; overflow: hidden; isolation: isolate; }
+.sky { position: absolute; inset: 0; z-index: -1; overflow: hidden; background: #a9c6e3; }
+.sky-still, .sky-loop { position: absolute; left: 0; top: 0; width: 100%; height: 100%; max-width: none; }
+.sky-loop { opacity: 0; transition: opacity 900ms ease; }
+.sky-loop[data-ready="true"] { opacity: 1; }
+.sky-haze, .sky-focus { position: absolute; pointer-events: none; }
+.sky-haze { inset: 0 0 auto; height: 50%; background: linear-gradient(to bottom, rgb(245 249 253 / .3), rgb(245 249 253 / .08) 70%, transparent);
+  -webkit-backdrop-filter: blur(9px) saturate(1.05); backdrop-filter: blur(9px) saturate(1.05);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 90%); mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 90%); }
+.sky-focus { inset: 0; background: radial-gradient(130% 95% at 50% 42%, transparent 58%, rgb(20 44 70 / .2) 100%); }
+.sky-focus::before { content: ""; position: absolute; inset: auto 0 0; height: 22%; -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 25%, transparent 100%); mask-image: linear-gradient(to top, #000 0%, #000 25%, transparent 100%); }
+
+.hero-copy { position: relative; display: flex; flex-direction: column; align-items: center; }
+.hero-sky h1 { color: #14231a; font-size: clamp(38px, 4.6vw, 64px); text-shadow: 0 1px 24px rgb(245 249 253 / .55); }
+.hero-sky .h-rot { color: #0f5a30; }
+
+/* glass, Cove's numbers */
+.glass, .glass-form .join-row { background: rgb(255 255 255 / .24); -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(18px) saturate(1.6);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .55), inset 0 1px 0 rgb(255 255 255 / .7), 0 10px 30px -14px rgb(20 44 70 / .45); }
+.glass-form { margin-top: 26px; width: min(520px, 100%); }
+.glass-form .join-label { color: #22362a; font-weight: 500; text-shadow: 0 1px 12px rgb(245 249 253 / .7); }
+.glass-form .join-row { display: flex; gap: 6px; padding: 6px; border-radius: 20px; }
+.glass-form input { flex: 1; min-width: 0; height: 50px; background: rgb(255 255 255 / .7); border-radius: 14px; color: #14231a; }
+.glass-form input::placeholder { color: #5e6b60; }
+.glass-form input:focus { background: #fff; box-shadow: 0 0 0 2px var(--green); }
+.glass-form button { height: 50px; padding: 0 22px; border-radius: 14px; white-space: nowrap; }
+.glass-form .join-msg { color: #0f4a29; font-weight: 600; text-shadow: 0 1px 10px rgb(255 255 255 / .8); }
+.more.glass { color: #14231a; bottom: 26px; }
+
+/* the top bar: glass over the sky, cream once the hero has scrolled away */
+.top { transition: background 0.3s, box-shadow 0.3s; }
+/* over the sky the bar uses the hero's own bottom blur (5px, no saturation boost, Ahmad 6 Oct: 18px was too much) */
+/* softer still (Ahmad 6 Oct): no hairline and no hard bottom edge. The blur lives on a layer that reaches past
+   the bar and fades out with a mask, so the sky goes from slightly soft to sharp instead of stopping at a line. */
+.top.over { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
+.top::before { content: ""; position: absolute; inset: 0 0 -28px; z-index: -1; pointer-events: none; opacity: 0; transition: opacity 0.3s;
+  background: linear-gradient(to bottom, rgb(255 255 255 / .14), rgb(255 255 255 / 0));
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 100%); }
+.top.over::before { opacity: 1; }
+.top.over .logo { color: #14231a; }
+
+@media (max-width: 640px) {
+  /* phone: the clean left strip of the loop, full height; the headline and form in the sky */
+  .hero-sky { padding: 92px 16px 80px; min-height: max(100svh, 720px); justify-content: flex-start; } /* phone: keep the copy in the sky, above the treeline */
+  .hero-sky h1 { font-size: 33px; }
+  .hero-sky .h-obj { display: none; }
+  .glass-form { margin-top: 18px; }
+  .glass-form .join-row { flex-direction: column; }
+  .glass-form input { flex: none; width: 100%; }
+  .glass-form button { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .sky-loop { display: none; } }
+
+/* ── the live mascot (6 Oct, Ahmad: a circle container, eyes that follow the cursor, less passive). Two layers
+   from Blender (body without eyes, leaves) and the eyes drawn here, placed from live.json (export_live.py).
+   JS sets --ex/--ey (eye offset), --tilt, --lean, --sway, --blink and --squash; CSS only renders them. ── */
+.ml { position: relative; display: inline-block; flex: 0 0 auto; }
+.ml-in { position: absolute; inset: 0; transform-origin: 50% 92%;
+  transform: translateX(var(--lean, 0px)) rotate(var(--tilt, 0deg)) scale(calc(1 + var(--squash, 0)), calc(1 - var(--squash, 0))); }
+.ml-body, .ml-leaves { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.ml-leaves { transform: rotate(var(--sway, 0deg)); }
+.ml-eye { position: absolute; border-radius: 50%; transform: translate(var(--ex, 0%), var(--ey, 0%)) scaleY(var(--blink, 1));
+  background: radial-gradient(circle at 36% 30%, #fff 0 15%, transparent 16%), radial-gradient(circle at 60% 72%, rgb(255 255 255 / .35) 0 9%, transparent 10%),
+    radial-gradient(circle at 45% 40%, #2c5a3c, #12271a 70%); }
+.ml.joy .ml-eye { border-radius: 50% 50% 46% 46% / 30% 30% 70% 70%; }
+.ml.hop .ml-in { animation: ml-hop 0.6s cubic-bezier(0.3, 0, 0.3, 1); }
+@keyframes ml-hop { 40% { translate: 0 -22%; } 75% { translate: 0 2%; } }
+
+/* in a circle: Muse's avatar treatment, in cream */
+.ml-circle { border-radius: 50%; background: radial-gradient(circle at 50% 35%, #fffdf8 0%, #f4ecda 100%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .9), 0 8px 20px -10px rgb(70 55 30 / .45); overflow: hidden; }
+.ml-circle .ml-in { inset: 13% 13% 5%; }
+.hero-sky .h-orb.ml { width: 1.18em; height: 1.18em; vertical-align: -0.24em; margin: 0 0.04em 0 0.06em; animation: none; filter: none; }
+.who-ml { width: 62px; height: 62px; position: relative; z-index: 1; box-shadow: 0 0 0 3px var(--bg), 0 8px 18px -8px rgb(70 55 30 / .4); }
+.end-ml { width: 220px; height: 220px; margin-bottom: 6px; filter: drop-shadow(0 22px 20px rgb(0 0 0 / .25)); }
+@media (prefers-reduced-motion: reduce) { .ml-in, .ml-eye, .ml-leaves { transform: none !important; } }
+
+/* ── the portal (6 Oct, Ahmad): scroll and the mascot's circle grows into the next scene; Sprout's 3D objects
+   fly out of it toward you. The hero is pinned in a tall section; JS writes --p (0-1 scroll progress), the circle
+   (--cx, --cy, --cr) and each object's 3D transform. Real perspective: objects travel along translateZ, so they
+   grow and spread on their own, and blur once they are close (a little depth of field). ── */
+.portal { position: relative; height: 340vh; }
+.portal-pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+.portal .hero-sky { min-height: 0; height: 100%; }
+.portal .hero-copy, .portal .more { opacity: calc(1 - var(--p, 0) * 3.2); }
+.portal-anchor { position: absolute; top: 230vh; left: 0; }
+.portal-layer { position: absolute; inset: 0; z-index: 5; pointer-events: none;
+  background: radial-gradient(circle at 50% 46%, #fffdf8 0%, #f6efe0 45%, #ebe1cc 100%);
+  clip-path: circle(var(--cr, 0px) at var(--cx, 50%) var(--cy, 50%)); }
+.portal-ml { position: absolute; left: var(--mx, 50%); top: var(--my, 50%); width: var(--ms, 60px); height: var(--ms, 60px); transform: translate(-50%, -50%); opacity: var(--mo, 1); }
+.fly { position: absolute; inset: 0; perspective: 900px; perspective-origin: 50% 48%; transform-style: preserve-3d; }
+.fly-i { position: absolute; left: 50%; top: 48%; width: 150px; height: 150px; margin: -75px 0 0 -75px; object-fit: contain; opacity: 0; will-change: transform, opacity, filter;
+  filter: drop-shadow(0 22px 24px rgb(70 55 30 / .22)); }
+.portal-title { position: absolute; left: 50%; top: 50%; width: min(680px, calc(100% - 32px)); transform: translate(-50%, calc(-50% + (1 - var(--t, 0)) * 24px)); text-align: center; opacity: var(--t, 0); }
+.portal-title .lede { max-width: 560px; margin: 16px auto 0; }
+@media (prefers-reduced-motion: reduce) {
+  .portal { height: auto; }
+  .portal-pin { position: relative; height: auto; }
+  .portal .hero-sky { height: 100vh; }
+  .portal-layer { position: relative; height: 70vh; clip-path: none; }
+  .portal-ml { display: none; }
+  .portal-title { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+/* the older `.who img` avatar rule (62px, padding, white circle) also caught the live mascot's own layers and
+   cut them up; inside a live mascot the layers always fill it */
+.who .ml img, .ml .ml-body, .ml .ml-leaves { position: absolute; inset: 0; z-index: auto; width: 100%; height: 100%; padding: 0; margin: 0; border-radius: 0; background: none; box-shadow: none; }
+

@@ -1,11 +1,23 @@
 const motion = matchMedia("(prefers-reduced-motion: reduce)");
 const mobile = matchMedia("(max-width: 600px)");
 const screens = {
+  assist: {
+    src: "./assets/sprout-assist-home.png",
+    alt: "Sprout Assist menu for reminders, carpool, events, birthdays, and clubs",
+    label: "Say it, and it's handled",
+    name: "Sprout Assist",
+  },
   brief: {
     src: "./assets/daily-brief-updated.png",
     alt: "Sprout Daily Brief showing tasks, carpool, and today’s schedule",
     label: "A calmer start",
     name: "Daily Brief",
+  },
+  events: {
+    src: "./assets/events-updated.png",
+    alt: "Sprout Events showing nearby family events for the week",
+    label: "Plans around the corner",
+    name: "Events",
   },
   chat: {
     src: "./assets/chat-updated.png",
@@ -78,14 +90,25 @@ Object.values(assistScreens).forEach((screen) => {
   const img = new Image();
   img.src = screen.src;
 });
+const navDownload = document.querySelector(".nav-download");
+if (navDownload) {
+  let navDownloadVisible = true;
+  const updateNavDownloadMotion = () => {
+    navDownload.classList.toggle(
+      "motion-paused",
+      document.hidden || !navDownloadVisible,
+    );
+  };
+  new IntersectionObserver(([entry]) => {
+    navDownloadVisible = entry.isIntersecting;
+    updateNavDownloadMotion();
+  }).observe(navDownload);
+  document.addEventListener("visibilitychange", updateNavDownloadMotion);
+}
 const heroScreen = document.querySelector("#hero-screen");
-const previewTabs = [...document.querySelectorAll("[data-preview]")];
-const handScene = document.querySelector(".hand-scene");
-const tappingHand = document.querySelector(".tapping-hand");
 const heroPanel = document.querySelector("#hero-screen-panel");
 const tapRipple = document.querySelector(".tap-ripple");
-const tapPoints = { brief: 0.137, chat: 0.682, clubs: 0.862 };
-let previewRequest = 0;
+const tapPoints = { brief: 0.137, events: 0.318, assist: 0.5, chat: 0.682, clubs: 0.862 };
 let previewTimer;
 let previewAnimations = [];
 
@@ -93,22 +116,18 @@ function cancelPreviewMotion() {
   clearTimeout(previewTimer);
   previewAnimations.forEach((animation) => animation.cancel());
   previewAnimations = [];
-  previewTabs.forEach((tab) => tab.classList.remove("is-targeted"));
   heroPanel.removeAttribute("aria-busy");
 }
 
-function commitPreview(key, focus = false, animate = true) {
+function commitPreview(key, animate = true) {
   const data = screens[key];
-  previewTabs.forEach((tab) => {
-    const active = tab.dataset.preview === key;
-    tab.setAttribute("aria-selected", String(active));
-    tab.tabIndex = active ? 0 : -1;
-    tab.classList.remove("is-targeted");
-    if (active && focus) tab.focus();
-  });
   heroScreen.src = data.src;
   heroScreen.alt = data.alt;
-  heroPanel.setAttribute("aria-labelledby", `preview-${key}`);
+  // Sprout Assist is a live demo (assist-demo.js); the other tabs are screenshots
+  if (window.sproutAssistDemo) {
+    if (key === "assist") window.sproutAssistDemo.show("home");
+    else window.sproutAssistDemo.show(key);
+  }
   heroPanel.removeAttribute("aria-busy");
   document.querySelector("#preview-status").textContent =
     `${data.name} preview`;
@@ -134,72 +153,16 @@ function commitPreview(key, focus = false, animate = true) {
   }
 }
 
-function selectPreview(key, focus = false) {
-  const request = ++previewRequest;
+// the phone's own tab bar is the only switcher (the hero tab row is gone):
+// assist-demo.js calls this, and the ripple lands on the tab that was tapped
+function selectPreview(key) {
+  if (!screens[key]) return;
   cancelPreviewMotion();
-  const targetTab = previewTabs.find((tab) => tab.dataset.preview === key);
-  targetTab.classList.add("is-targeted");
-  heroPanel.setAttribute("aria-busy", "true");
-  if (focus) targetTab.focus();
-
-  if (motion.matches || !tappingHand.complete || !tappingHand.naturalWidth) {
-    commitPreview(key, focus, false);
-    return;
-  }
-
-  const sceneBounds = handScene.getBoundingClientRect();
-  const screenBounds = heroPanel.getBoundingClientRect();
-  const handWidth = tappingHand.getBoundingClientRect().width;
-  const tapX = tapPoints[key];
-  const tapY = 0.914;
-  const x =
-    screenBounds.left -
-    sceneBounds.left +
-    screenBounds.width * tapX -
-    handWidth * 0.234;
-  const y =
-    screenBounds.top -
-    sceneBounds.top +
-    screenBounds.height * tapY -
-    handWidth * 1.5 * 0.0684;
-  const pose = (dx, dy, rotation = 0, scale = 1) =>
-    `translate3d(${x + dx}px,${y + dy}px,0) rotate(${rotation}deg) scale(${scale})`;
-
-  previewAnimations.push(
-    tappingHand.animate(
-      [
-        { offset: 0, opacity: 0, transform: pose(45, 52, 5) },
-        { offset: 0.25, opacity: 1, transform: pose(8, 11, 1.5) },
-        { offset: 0.4, opacity: 1, transform: pose(0, 0) },
-        { offset: 0.54, opacity: 1, transform: pose(0, 3, 0, 0.985) },
-        { offset: 0.66, opacity: 1, transform: pose(0, 0) },
-        { offset: 1, opacity: 0, transform: pose(40, 55, 5) },
-      ],
-      { duration: 520, easing: "cubic-bezier(.22,.7,.3,1)" },
-    ),
-  );
-  previewTimer = setTimeout(() => {
-    if (request !== previewRequest) return;
-    tapRipple.style.left = `${tapX * 100}%`;
-    tapRipple.style.bottom = `${(1 - tapY) * 100}%`;
-    commitPreview(key, focus, true);
-  }, 155);
+  tapRipple.style.left = `${tapPoints[key] * 100}%`;
+  tapRipple.style.bottom = `${(1 - 0.914) * 100}%`;
+  commitPreview(key, !motion.matches);
 }
-previewTabs.forEach((tab, index) => {
-  tab.addEventListener("click", () => selectPreview(tab.dataset.preview));
-  tab.addEventListener("keydown", (event) => {
-    let next;
-    if (event.key === "ArrowRight") next = (index + 1) % previewTabs.length;
-    if (event.key === "ArrowLeft")
-      next = (index - 1 + previewTabs.length) % previewTabs.length;
-    if (event.key === "Home") next = 0;
-    if (event.key === "End") next = previewTabs.length - 1;
-    if (next !== undefined) {
-      event.preventDefault();
-      selectPreview(previewTabs[next].dataset.preview, true);
-    }
-  });
-});
+window.sproutHero = { select: selectPreview };
 const menu = document.querySelector("#mobile-nav");
 const menuButton = document.querySelector(".menu-button");
 function closeMenu(restore = false) {
@@ -300,6 +263,8 @@ function setStory(key) {
   const data = assistScreens[key];
   storyScreen.src = data.src;
   storyScreen.alt = data.alt;
+  // the phone is coded (sections-demo.js); the screenshot is only the no-JS fallback
+  if (window.sproutStory) window.sproutStory.show(key);
   document.querySelector(".story-scene").dataset.screen = key;
   document.querySelector("#scene-label").textContent = data.label;
   document.querySelector("#scene-number").textContent =
@@ -390,7 +355,7 @@ document
   .querySelectorAll(".reveal")
   .forEach((element) => reveals.observe(element));
 enter(document.querySelector(".hero-copy"), 18, 650, 60);
-enter(document.querySelector(".hand-scene"), 24, 850, 120);
+enter(document.querySelector(".phone-scene"), 24, 850, 120);
 const classScreens = {
   chat: {
     src: "./assets/class-chat.png",
@@ -425,6 +390,7 @@ function setClassView(tab, focus = false) {
   });
   classPanel.setAttribute("aria-labelledby", tab.id);
   if (focus) tab.focus();
+  if (window.sproutClasses) window.sproutClasses.show(tab.dataset.classView);
   if (classScreen.getAttribute("src") === view.src) return;
   classScreen.src = view.src;
   classScreen.alt = view.alt;

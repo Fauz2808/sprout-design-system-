@@ -14,11 +14,22 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260924-3" />
-    <script src="./script.js?v=20260924-1" defer></script>
+    <script>
+      // Centered hero is the default (Ahmad, 25 Sep). ?hero=side shows the earlier
+      // copy-left / phone-right layout. Set before first paint so it never jumps.
+      if (new URLSearchParams(location.search).get("hero") !== "side")
+        document.documentElement.classList.add("hero-center");
+    </script>
+    <link rel="stylesheet" href="./styles.css?v=20260925-33" />
+    <link rel="stylesheet" href="./assist-demo.css?v=20260925-27" />
+    <link rel="stylesheet" href="./sections-demo.css?v=20260925-2" />
+    <script src="./script.js?v=20260925-8" defer></script>
+    <script src="./thinking-orb.js?v=20260925-3" defer></script>
+    <script src="./assist-demo.js?v=20260925-21" defer></script>
+    <script src="./sections-demo.js?v=20260925-2" defer></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -36,7 +47,26 @@
           <a href="#moments">Family life</a><a href="#classes">Classes</a
           ><a href="#features">The app</a><a href="#community">Community</a>
         </div>
-        <a class="button nav-download" href="#download">Download app</a>
+        <a class="button nav-download" href="#download"
+          ><span class="nav-clover-field" aria-hidden="true">
+            <svg class="nav-clover nav-clover-a" viewBox="0 0 20 20">
+              <circle cx="7" cy="7" r="3.5" /><circle cx="13" cy="7" r="3.5" />
+              <circle cx="7" cy="13" r="3.5" /><circle cx="13" cy="13" r="3.5" />
+            </svg>
+            <svg class="nav-clover nav-clover-b" viewBox="0 0 20 20">
+              <circle cx="7" cy="7" r="3.5" /><circle cx="13" cy="7" r="3.5" />
+              <circle cx="7" cy="13" r="3.5" /><circle cx="13" cy="13" r="3.5" />
+            </svg>
+            <svg class="nav-clover nav-clover-c" viewBox="0 0 20 20">
+              <circle cx="7" cy="7" r="3.5" /><circle cx="13" cy="7" r="3.5" />
+              <circle cx="7" cy="13" r="3.5" /><circle cx="13" cy="13" r="3.5" />
+            </svg>
+          </span>
+          <span class="nav-download-label">Download app</span
+          ><svg class="nav-download-arrow" aria-hidden="true" viewBox="0 0 20 20">
+            <path d="M4 10h11M11 6l4 4-4 4" />
+          </svg></a
+        >
         <button
           class="menu-button"
           type="button"
@@ -73,82 +103,27 @@
               Meet parents from school, find plans around the corner, and keep
               everyone in the loop.
             </p>
-            <div class="hero-actions">
-              <a class="button" href="#download">Download Sprout</a
-              ><a class="watch-link" href="#features"
-                ><span aria-hidden="true">▷</span> Take a look inside</a
-              >
-            </div>
           </div>
           <div class="hero-stage" aria-label="Interactive Sprout preview">
-            <div class="hand-scene">
-              <img
-                class="holding-hand"
-                src="./assets/hand-mom-iphone-17-pro-max.png"
-                width="1024"
-                height="1536"
-                alt=""
-                fetchpriority="high"
-              />
+            <div class="phone-scene">
               <div
                 class="device-screen"
                 id="hero-screen-panel"
-                role="tabpanel"
-                aria-labelledby="preview-brief"
-                tabindex="0"
+                role="region"
+                aria-label="Sprout app, interactive: use its own tab bar"
               >
                 <img
                   id="hero-screen"
-                  src="./assets/daily-brief-updated.png"
-                  alt="Sprout Daily Brief showing tasks, carpool, and today's schedule"
+                  src="./assets/sprout-assist-home.png"
+                  alt="Sprout Assist menu for reminders, carpool, events, birthdays, and clubs"
                   width="393"
                   height="852"
                 />
                 <span class="tap-ripple" aria-hidden="true"></span>
               </div>
-              <img
-                class="tapping-hand"
-                src="./assets/hand-mom-tap.png"
-                width="1024"
-                height="1536"
-                alt=""
-                aria-hidden="true"
-              />
-            </div>
-            <div class="hero-tabs" role="tablist" aria-label="Preview the app">
-              <button
-                type="button"
-                role="tab"
-                aria-selected="true"
-                aria-controls="hero-screen-panel"
-                id="preview-brief"
-                data-preview="brief"
-              >
-                Daily Brief</button
-              ><button
-                type="button"
-                role="tab"
-                aria-selected="false"
-                aria-controls="hero-screen-panel"
-                id="preview-chat"
-                data-preview="chat"
-                tabindex="-1"
-              >
-                Chat</button
-              ><button
-                type="button"
-                role="tab"
-                aria-selected="false"
-                aria-controls="hero-screen-panel"
-                id="preview-clubs"
-                data-preview="clubs"
-                tabindex="-1"
-              >
-                Clubs
-              </button>
             </div>
             <p id="preview-status" aria-live="polite" class="sr-only">
-              Daily Brief preview
+              Sprout Assist preview
             </p>
           </div>
         </div>

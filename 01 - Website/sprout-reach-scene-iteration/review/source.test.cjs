@@ -26,25 +26,49 @@ test("new option retains the supplied store destinations", () => {
   assert.ok(html.includes("id=com.meetingpoint"));
   assert.ok(!html.includes('href="#"'));
 });
-test("hero uses the interactive mom hand without floating invitation or task cards", () => {
+test("hero phone is a coded screen: no hand photo, no island, a soft gray stroke", () => {
   const hero =
     html.match(/<section class="hero"[\s\S]*?<\/section>/)?.[0] ?? "";
-  assert.ok(hero.includes("hand-mom-iphone-17-pro-max.png"));
-  assert.ok(hero.includes("hand-mom-tap.png"));
+  assert.ok(hero.includes('class="phone-scene"'));
+  assert.ok(!hero.includes("hand-mom"));
+  const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  assert.ok(!/\.device-screen::after/.test(css));
+  assert.match(css, /--phone-stroke: rgba\(24, 99, 56, 0\.5\)/);
   assert.ok(!hero.includes("birthday-invitation-card.png"));
   assert.ok(!hero.includes("daily-brief-attention-card.png"));
 });
-test("hero preview uses the latest Daily Brief, Chat, and Clubs screens", () => {
+test("hero opens on the live Sprout Assist demo; the phone's own tab bar switches screens", () => {
   const hero =
     html.match(/<section class="hero"[\s\S]*?<\/section>/)?.[0] ?? "";
-  const keys = [...hero.matchAll(/data-preview="([^"]+)"/g)].map(
-    (match) => match[1],
-  );
-  assert.deepEqual(keys, ["brief", "chat", "clubs"]);
+  const demo = fs.readFileSync(path.join(root, "assist-demo.js"), "utf8");
+  assert.ok(!hero.includes("hero-tabs"));
+  assert.ok(!hero.includes("data-preview"));
+  assert.ok(script.includes("window.sproutHero = { select: selectPreview }"));
+  assert.ok(demo.includes("window.sproutHero.select(key)"));
+  // all five tabs live, in the app's order, from one persistent tab bar
+  const tabs = [...demo.matchAll(/^\s*\["(\w+)", "[\w-]*", "[^"]+"\],?$/gm)].map((m) => m[1]);
+  assert.deepEqual(tabs, ["brief", "events", "assist", "chat", "clubs"]);
+  assert.ok(!demo.includes('aria-disabled="true"'));
+  assert.ok(demo.includes('app.insertAdjacentHTML("beforeend", navBar("assist"))'));
   assert.ok(script.includes('./assets/daily-brief-updated.png'));
   assert.ok(script.includes('./assets/chat-updated.png'));
   assert.ok(script.includes('./assets/clubs-updated.png'));
-  assert.ok(!hero.includes('data-preview="events"'));
+});
+
+test("navbar Download app CTA has a constant, pausable botanical current", () => {
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  const js = fs.readFileSync(path.join(root, "script.js"), "utf8");
+  assert.match(html, /class="nav-clover-field"[\s\S]*?nav-clover-a[\s\S]*?nav-clover-b[\s\S]*?nav-clover-c/);
+  assert.ok(css.includes("@keyframes nav-download-wave"));
+  assert.ok(css.includes("@keyframes nav-clover-rise"));
+  assert.match(css, /animation: nav-download-wave 3\.8s linear infinite/);
+  assert.match(css, /animation: nav-clover-rise 5\.4s linear infinite/);
+  assert.ok(css.includes("animation-play-state: paused"));
+  assert.match(css, /\.nav-download:hover \.nav-download-arrow,[\s\S]*?translateX\(3px\)/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?animation: none !important/);
+  assert.ok(js.includes('document.addEventListener("visibilitychange", updateNavDownloadMotion)'));
+  assert.ok(js.includes("navDownloadVisible = entry.isIntersecting"));
 });
 test("family moments accordion starts with only the first card expanded", () => {
   const moments =
@@ -103,7 +127,7 @@ test("Sprout Assist story keeps the requested feature order and source screens",
   const assistAssets = [
     ...script.matchAll(/src: "(\.\/assets\/sprout-assist-[^"]+\.png)"/g),
   ].map((match) => match[1]);
-  assert.equal(assistAssets.length, 5);
+  assert.equal(new Set(assistAssets).size, 5);
   for (const asset of assistAssets)
     assert.ok(fs.existsSync(path.join(root, asset)), asset);
   assert.ok(script.includes("mobileChapterObserver"));
@@ -136,3 +160,142 @@ test("brand text pairs meet 4.5:1 contrast", () => {
     assert.ok((Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05) >= 4.5);
   }
 });
+
+test("assist demo uses only its own assets and never touches the microphone", () => {
+  const demo = fs.readFileSync(path.join(root, "assist-demo.js"), "utf8");
+  for (const m of demo.matchAll(/\$\{A\}([a-z0-9-]+\.png)/g))
+    assert.ok(fs.existsSync(path.join(root, "assets/assist", m[1])), m[1]);
+  assert.ok(!/getUserMedia|webkitSpeech|SpeechRecognition/.test(demo));
+  assert.ok(html.includes("assist-demo.js"));
+});
+
+test("Sprout Assist uses Thinking Orbs for listening and composing", () => {
+  const demo = fs.readFileSync(path.join(root, "assist-demo.js"), "utf8");
+  const orb = fs.readFileSync(path.join(root, "thinking-orb.js"), "utf8");
+  assert.ok(html.includes('src="./thinking-orb.js'));
+  assert.ok(!html.includes('src="./ai-blob.js'));
+  assert.ok(demo.includes("window.SproutThinkingOrb"));
+  assert.ok(demo.includes('state: "listening"'));
+  assert.ok(orb.includes('processing: "composing"'));
+  assert.ok(orb.includes("function drawListening"));
+  assert.ok(orb.includes("function drawComposing"));
+  assert.ok(orb.includes('getContext("2d")'));
+  for (const token of ["30, 62, 43", "24, 99, 56", "87, 154, 116", "226, 233, 227"])
+    assert.ok(orb.includes(token), `missing Sprout orb token ${token}`);
+  assert.ok(!/webgl/i.test(orb));
+  assert.ok(fs.existsSync(path.join(root, "vendor", "THINKING-ORBS-LICENSE")));
+});
+
+test("Daily Brief tab is coded and scrollable, not a screenshot", () => {
+  const demo = fs.readFileSync(path.join(root, "assist-demo.js"), "utf8");
+  const css = fs.readFileSync(path.join(root, "assist-demo.css"), "utf8");
+  assert.ok(demo.includes('data-s="brief"'));
+  assert.ok(demo.includes('class="db-scroll"'));
+  assert.ok(/\.db-scroll\s*\{[^}]*overflow-y:\s*auto/.test(css));
+  assert.ok(script.includes("window.sproutAssistDemo.show(key)"));
+});
+
+test("every hero tab is a coded screen; screenshots are only the no-JS fallback", () => {
+  const demo = fs.readFileSync(path.join(root, "assist-demo.js"), "utf8");
+  for (const k of ["brief", "chat", "clubs", "home"]) assert.ok(demo.includes(`data-s="${k}"`), k);
+  assert.ok(script.includes("window.sproutAssistDemo.show(key)"));
+});
+
+test("Events tab is coded from Figma 12900:24890 with a working week strip and Discover / My Events", () => {
+  const demo = fs.readFileSync(path.join(root, "assist-demo.js"), "utf8");
+  const css = fs.readFileSync(path.join(root, "assist-demo.css"), "utf8");
+  assert.ok(demo.includes('data-s="events"'));
+  assert.ok(demo.includes("function pickDay(") && demo.includes("function pickEvTab("));
+  for (const d of [24, 25, 26, 27, 28, 29, 30]) assert.ok(new RegExp(`\\b${d}: \\[\\[`).test(demo), `events for ${d}`);
+  assert.ok(/\.ev-scroll\s*\{[^}]*overflow-y:\s*auto/.test(css));
+  for (const f of ["ev-storytime", "ev-nature", "ev-splash", "ev-share"])
+    assert.ok(fs.existsSync(path.join(root, "assets", "assist", f + ".webp")), f);
+});
+
+test("Carpool runs in the phone and lands as a Live Activity on Lydia's Lock Screen", () => {
+  const demo = fs.readFileSync(path.join(root, "assist-demo.js"), "utf8");
+  const css = fs.readFileSync(path.join(root, "assist-demo.css"), "utf8");
+  // the idle slot: the card at 50% under the "Try" button
+  assert.ok(demo.includes('<button class="la-try" data-la-try="carpool">Try a carpool request</button>'));
+  const previewRule = css.match(
+    /\.la-slot\.is-idle \.la-card,[\s\S]*?\{\s*opacity:\s*0\.5/,
+  )?.[0] ?? "";
+  assert.ok(previewRule.includes(".la-slot.is-running .la-card"));
+  // Figma 12798:18485: 144 listening, 149 review, 150 posted, all coded
+  assert.ok(demo.includes("Can you help me grab my kids on Friday morning and take them to Kiker Elementary?"));
+  for (const k of ["cp-review", "cp-posted"]) assert.ok(demo.includes(`data-s="${k}"`), k);
+  assert.ok(demo.includes("Post to Class Chat") && demo.includes("Open Class Chat"));
+  // Figma 11106:244182: acceptance opens an interactive, locally simulated room
+  assert.ok(demo.includes('data-s="carpool-chat"'));
+  assert.ok(demo.includes('go("carpool-chat")'));
+  assert.ok(demo.includes('class="cc-compose"') && demo.includes('class="cc-input"'));
+  assert.ok(demo.includes("function appendCarpoolMessage(") && demo.includes("function sarahReplyFor("));
+  assert.ok(demo.includes('message.textContent = text'));
+  // the story's own people; no placeholder names or real people
+  assert.ok(demo.includes("Lydia Martin") && demo.includes("Sarah Baker") && demo.includes("Sarah is arriving soon"));
+  assert.ok(!demo.includes("Sarah Becker"));
+  assert.ok(!demo.includes("Emily Centineo, Flore") && !/Tony is arriving/.test(demo));
+  for (const f of ["la-busav", "la-home", "la-school", "la-bus", "bus-lg", "need-where"])
+    assert.ok(fs.existsSync(path.join(root, "assets", "assist", f + ".webp")), f);
+});
+
+test("Event runs in the phone and lands on Emily's phone, with no real people in the invite list", () => {
+  const demo = fs.readFileSync(path.join(root, "assist-demo.js"), "utf8");
+  const css = fs.readFileSync(path.join(root, "assist-demo.css"), "utf8");
+  assert.ok(demo.includes('<button class="la-try" data-la-try="event">Try creating an event</button>'));
+  for (const k of ["ev-review", "ev-invite", "ev-sent"]) assert.ok(demo.includes(`data-s="${k}"`), k);
+  assert.ok(/const order = \[[^\]]*"ev-review", "ev-invite"[^\]]*"ev-sent"\]/.test(demo));
+  assert.ok(demo.includes("const evScreens"));
+  // Emily's phone lives outside the app, so it needs the app's tokens
+  assert.ok(/\.assist-app,\s*\.spouse-phone,\s*\.la-stack,\s*\.sx-app\s*\{\s*--sa-bg/.test(css));
+  for (const name of ["Noah Lyles", "Noah Kahan", "Noah Cyrus", "Frost Bank Center", "San Antonio"]) assert.ok(!demo.includes(name), name);
+});
+
+test("Birthday cover sits above Matt's phone and runs the listening → cover flow", () => {
+  const demo = fs.readFileSync(path.join(root, "assist-demo.js"), "utf8");
+  const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  assert.ok(demo.includes('<button class="la-try" data-la-try="birthday">Try a birthday cover</button>'));
+  assert.ok(demo.includes('data-s="bd-ready"') && demo.includes("const bdScreens"));
+  assert.ok(demo.includes("<em>Oct 3</em>2PM (CST)"));
+  // the card is on top of the right column; Matt's phone starts under it
+  assert.match(css, /\.hero-center \.bd-slot\.la-slot \{[^}]*top: 0/);
+  assert.match(css, /\.hero-center \.spouse-phone \{[^}]*top: calc\(295px \* 0\.7 \+ 14px\)/);
+});
+
+test("Matt's phone never hides when the phone changes screens", () => {
+  const demo = fs.readFileSync(path.join(root, "assist-demo.js"), "utf8");
+  const go = demo.slice(demo.indexOf("function go(next)"), demo.indexOf("function switchTab("));
+  assert.ok(go.includes("spouse.hidden = false"));
+  assert.ok(!/spouse\.hidden = !/.test(go));
+});
+
+test("the orb works for a beat before it listens", () => {
+  const demo = fs.readFileSync(path.join(root, "assist-demo.js"), "utf8");
+  const orb = fs.readFileSync(path.join(root, "thinking-orb.js"), "utf8");
+  // upstream thinking-orbs `working` (orbits mode, 64 px preset) is ported
+  assert.ok(orb.includes("function drawWorking(") && orb.includes('working: "Working…"'));
+  const start = demo.slice(demo.indexOf("function startListening()"), demo.indexOf("function finishListening()"));
+  assert.ok(start.indexOf('setState("working")') < start.indexOf('setState("listeningActive")'));
+  assert.ok(start.includes('"Working…"') && start.includes("2400"));
+});
+
+test("hovering a menu row grows the card that row acts on", () => {
+  const demo = fs.readFileSync(path.join(root, "assist-demo.js"), "utf8");
+  const css = fs.readFileSync(path.join(root, "assist-demo.css"), "utf8");
+  for (const k of ["reminder", "carpool", "event", "birthday"]) assert.ok(new RegExp(`\\b${k}: \\(\\) =>`).test(demo), k);
+  assert.ok(demo.includes('row.addEventListener("pointerenter"') && demo.includes('row.addEventListener("focus"'));
+  assert.match(css, /\.la-card\.is-hinted,[\s\S]*?\{\s*scale: 1\.06/);
+});
+
+test("Classes, the Sprout Assist story and the moments card are coded, not screenshots", () => {
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const sx = fs.readFileSync(path.join(root, "sections-demo.js"), "utf8");
+  assert.ok(html.includes("sections-demo.js") && html.includes("sections-demo.css"));
+  for (const v of ["chat", "calendar", "updates", "links"]) assert.ok(sx.includes(`data-v="${v}"`), v);
+  for (const k of ["reminder", "carpool", "event", "club"]) assert.ok(new RegExp(`\\b${k}: \\["`).test(sx), k);
+  assert.ok(script.includes("window.sproutClasses.show(") && script.includes("window.sproutStory.show("));
+  assert.ok(sx.includes("cut.replaceWith(box)"));
+  // no real people or retired names in the coded copies
+  for (const bad of ["Anthonyjhonmartin", "Meeting Point", "Mohit Rai"]) assert.ok(!sx.includes(bad), bad);
+});
+

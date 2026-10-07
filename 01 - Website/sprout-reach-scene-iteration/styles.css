@@ -172,9 +172,122 @@ button:disabled {
   color: #47735c;
 }
 .nav-download {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   min-height: 46px;
   padding: 12px 21px;
   font-size: 13px;
+  gap: 8px;
+  box-shadow: 0 5px 16px rgba(13, 57, 44, 0.18);
+  transition:
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    background 220ms ease,
+    box-shadow 220ms ease;
+}
+.nav-download::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: -45% auto -45% -65%;
+  width: 80%;
+  transform: translate3d(0, 0, 0) skewX(-14deg);
+  background: linear-gradient(
+    100deg,
+    transparent 0 22%,
+    rgba(107, 171, 128, 0.16) 40%,
+    rgba(244, 241, 232, 0.24) 54%,
+    rgba(107, 171, 128, 0.12) 68%,
+    transparent 82% 100%
+  );
+  animation: nav-download-wave 3.8s linear infinite;
+}
+.nav-download-label,
+.nav-download-arrow {
+  position: relative;
+  z-index: 2;
+}
+.nav-download-arrow {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-clover-field {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.nav-clover {
+  position: absolute;
+  bottom: -12px;
+  width: 11px;
+  height: 11px;
+  fill: rgba(244, 241, 232, 0.72);
+  opacity: 0;
+  animation: nav-clover-rise 5.4s linear infinite;
+}
+.nav-clover-a {
+  left: 17%;
+  animation-delay: -0.4s;
+}
+.nav-clover-b {
+  left: 52%;
+  width: 9px;
+  height: 9px;
+  animation-delay: -2.2s;
+}
+.nav-clover-c {
+  left: 79%;
+  width: 10px;
+  height: 10px;
+  animation-delay: -4s;
+}
+.nav-download.motion-paused::before,
+.nav-download.motion-paused .nav-clover {
+  animation-play-state: paused;
+}
+.nav-download:hover,
+.nav-download:focus-visible {
+  background: #0d392c;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 9px 24px rgba(13, 57, 44, 0.24);
+}
+.nav-download:hover .nav-download-arrow,
+.nav-download:focus-visible .nav-download-arrow {
+  transform: translateX(3px);
+}
+.nav-download:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 110ms;
+}
+@keyframes nav-download-wave {
+  to {
+    transform: translate3d(230%, 0, 0) skewX(-14deg);
+  }
+}
+@keyframes nav-clover-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) rotate(-12deg) scale(0.76);
+  }
+  16% {
+    opacity: 0.38;
+  }
+  72% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(5px, -58px, 0) rotate(24deg) scale(1.06);
+  }
 }
 .menu-button {
   display: none;
@@ -235,29 +348,6 @@ button:disabled {
   max-width: 435px;
   margin-top: 29px;
   color: #0c291f;
-}
-.hero-actions {
-  display: flex;
-  align-items: center;
-  gap: 25px;
-  margin-top: 31px;
-}
-.watch-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  font-weight: 550;
-}
-.watch-link span {
-  width: 36px;
-  height: 36px;
-  border: 1px solid #31504770;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 21px;
-  background: #ffffff52;
 }
 .hero-note {
   font-size: 12px;
@@ -327,30 +417,6 @@ button:disabled {
   position: absolute;
   left: 20px;
   top: 0;
-}
-.hero-tabs {
-  position: absolute;
-  right: 0;
-  top: 535px;
-  padding: 4px;
-  background: #fffffff5;
-  border-radius: 30px;
-  display: flex;
-  gap: 2px;
-  box-shadow: 0 8px 22px #123e2510;
-  z-index: 4;
-}
-.hero-tabs button {
-  border: 0;
-  background: transparent;
-  padding: 12px 14px;
-  border-radius: 24px;
-  font-size: 12px;
-  min-height: 40px;
-}
-.hero-tabs button[aria-selected="true"] {
-  background: var(--green);
-  color: white;
 }
 .hero-bottom {
   position: absolute;
@@ -818,12 +884,6 @@ footer a:hover {
     width: 160px;
     left: 0;
   }
-  .hero-tabs {
-    top: 505px;
-  }
-  .hero-actions {
-    gap: 16px;
-  }
   .intro {
     font-size: 16px;
     max-width: 390px;
@@ -875,9 +935,6 @@ footer a:hover {
     margin: 25px auto 0;
     max-width: 460px;
   }
-  .hero-actions {
-    justify-content: center;
-  }
   .hero-copy .eyebrow {
     font-size: 12px;
     margin-bottom: 24px;
@@ -902,10 +959,6 @@ footer a:hover {
   .floating-invite {
     left: 40px;
     top: 0;
-  }
-  .hero-tabs {
-    right: 18px;
-    top: 505px;
   }
   .hero-bottom {
     padding: 22px 30px;
@@ -1099,24 +1152,6 @@ footer a:hover {
     max-width: 340px;
     margin-top: 23px;
   }
-  .hero-actions {
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-top: 26px;
-  }
-  .hero-actions .button {
-    min-height: 49px;
-    padding: 13px 21px;
-    font-size: 12px;
-  }
-  .watch-link {
-    font-size: 12px;
-    gap: 7px;
-  }
-  .watch-link span {
-    width: 30px;
-    height: 30px;
-  }
   .hero-note {
     font-size: 10px;
     margin-top: 21px;
@@ -1146,15 +1181,6 @@ footer a:hover {
   .floating-task figcaption {
     font-size: 8px;
     padding: 10px 5px;
-  }
-  .hero-tabs {
-    right: 0;
-    top: 420px;
-  }
-  .hero-tabs button {
-    font-size: 10px;
-    padding: 10px 12px;
-    min-height: 38px;
   }
   .hero-bottom {
     padding: 21px 23px;
@@ -1392,12 +1418,6 @@ footer a:hover {
   .floating-invite {
     width: 118px;
   }
-  .hero-tabs {
-    top: 390px;
-  }
-  .hero-tabs button {
-    padding: 10px;
-  }
   .hero-note {
     font-size: 9px;
   }
@@ -1429,17 +1449,6 @@ footer a:hover {
     scroll-behavior: auto;
   }
 }
-/* Keep secondary actions legible when the meadow passes behind them. */
-.watch-link {
-  background: #fbfcf9;
-  padding: 8px 15px 8px 8px;
-  border-radius: 30px;
-  min-height: 50px;
-}
-.watch-link span {
-  background: transparent;
-  border-color: #ced8cf;
-}
 @media (min-width: 901px) and (max-height: 820px) {
   .hero {
     min-height: 690px;
@@ -1462,9 +1471,6 @@ footer a:hover {
     width: 150px;
     left: 32px;
   }
-  .hero-tabs {
-    top: 455px;
-  }
   .hero h1 {
     font-size: clamp(54px, 5.7vw, 82px);
   }
@@ -1473,9 +1479,6 @@ footer a:hover {
   }
   .hero .intro {
     margin-top: 23px;
-  }
-  .hero-actions {
-    margin-top: 25px;
   }
   .hero-bottom {
     padding-top: 17px;
@@ -1505,13 +1508,6 @@ footer a:hover {
   .floating-invite {
     width: 38%;
   }
-  .watch-link {
-    padding: 7px 12px 7px 7px;
-    min-height: 45px;
-  }
-  .hero-actions {
-    gap: 12px;
-  }
 }
 @media (min-width: 901px) {
   .hero-copy {
@@ -1531,66 +1527,47 @@ footer a:hover {
   }
 }
 
-/* Hero phone-in-hand interaction */
+/* Hero phone: pure CSS, no hand photo and no island. One variable, --pw (the
+   screen's width), sizes the phone and the stage at every breakpoint. The phone's
+   own tab bar is the only screen switcher. */
 .hero-stage {
+  --pw: 236px;
+  --ph: calc(var(--pw) * 852 / 393);
+  /* Sprout brand green (#186338) at 50%, glowing so the live phone is the focus */
+  --phone-stroke: rgba(24, 99, 56, 0.5);
   overflow: visible;
+  height: calc(var(--ph) + 32px);
 }
-.hand-scene {
+.phone-scene {
   position: absolute;
-  top: -108px;
-  left: 51%;
-  width: min(116%, 620px);
-  aspect-ratio: 2 / 3;
+  top: 0;
+  left: 50%;
+  width: var(--pw);
   translate: -50% 0;
 }
-.holding-hand {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  width: 100%;
-  max-width: none;
-  pointer-events: none;
-  user-select: none;
-}
 .device-screen {
-  position: absolute;
-  top: 8.6%;
-  left: 30.65%;
+  position: relative;
   z-index: 3;
-  width: 37.6%;
-  height: 53.3%;
+  width: var(--pw);
+  height: var(--ph);
   overflow: hidden;
-  border-radius: 12% / 5.7%;
-  background: #f3f0e7;
+  /* iPhone screen corners: 55 pt on a 393 pt screen */
+  border-radius: calc(var(--pw) * 0.14);
+  background: #f4f1ea;
   isolation: isolate;
+  /* the stroke is a spread shadow so it follows the radius and takes no layout */
+  box-shadow:
+    0 0 0 2.5px var(--phone-stroke),
+    0 0 14px 4px rgba(24, 99, 56, 0.42),
+    0 0 44px 14px rgba(24, 99, 56, 0.26),
+    0 0 110px 36px rgba(24, 99, 56, 0.14),
+    0 28px 56px -22px rgba(16, 52, 32, 0.38);
 }
 .device-screen > img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: fill;
-}
-.device-screen::after {
-  content: "";
-  position: absolute;
-  top: 1.65%;
-  left: 34.5%;
-  width: 31%;
-  height: 3.9%;
-  border-radius: 999px;
-  background: #050505;
-  pointer-events: none;
-}
-.tapping-hand {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 6;
-  width: 62%;
-  max-width: none;
-  opacity: 0;
-  transform-origin: 23.4% 6.7%;
-  pointer-events: none;
-  user-select: none;
 }
 .tap-ripple {
   position: absolute;
@@ -1605,71 +1582,22 @@ footer a:hover {
   opacity: 0;
   pointer-events: none;
 }
-.hero-tabs {
-  top: calc(100% + 10px);
-  right: auto;
-  bottom: auto;
-  left: 50%;
-  z-index: 8;
-  translate: -50% 0;
-  white-space: nowrap;
-  padding: 3px;
-}
-.hero-tabs button {
-  min-height: 34px;
-  padding: 8px 12px;
-  font-size: 11px;
-  transition:
-    color 120ms,
-    background-color 120ms,
-    transform 120ms var(--ease);
-}
-.hero-tabs button.is-targeted:not([aria-selected="true"]) {
-  background: #d7e6dc;
-  color: var(--green);
-  transform: scale(0.975);
-}
 
 @media (max-width: 1200px) and (min-width: 901px) {
-  .hand-scene {
-    top: -70px;
-    left: 50%;
-    width: min(120%, 560px);
-  }
-  .hero-tabs {
-    top: calc(100% + 8px);
-    bottom: auto;
+  .hero-stage {
+    --pw: 222px;
   }
 }
 
 @media (max-width: 900px) {
-  .hand-scene {
-    top: -64px;
-    left: 50%;
-    width: min(118%, 560px);
-  }
-  .hero-tabs {
-    top: calc(100% + 4px);
-    right: auto;
-    bottom: auto;
-    left: 50%;
+  .hero-stage {
+    --pw: 220px;
   }
 }
 
 @media (max-width: 600px) {
-  .hand-scene {
-    top: -29px;
-    width: 116%;
-  }
-  .hero-tabs {
-    top: calc(100% - 42px);
-    right: auto;
-    bottom: auto;
-  }
-  .hero-tabs button {
-    min-height: 32px;
-    padding: 7px 10px;
-    font-size: 9.5px;
+  .hero-stage {
+    --pw: 196px;
   }
 }
 
@@ -1677,17 +1605,12 @@ footer a:hover {
   .story-selector {
     justify-content: flex-start;
   }
-  .hand-scene {
-    width: 120%;
-  }
-  .hero-tabs {
-    top: calc(100% - 38px);
-    bottom: auto;
+  .hero-stage {
+    --pw: 184px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tapping-hand,
   .tap-ripple {
     display: none;
   }
@@ -2114,5 +2037,156 @@ h2 em {
 @media (prefers-reduced-motion: reduce) {
   .class-tabs button::before {
     transition: none;
+  }
+}
+
+/* Centered hero variant (?hero=center, 25 Sep): copy on top, the live phone
+   below it as the focal point. Desktop only; under 900px the hero already stacks. */
+@media (min-width: 901px) {
+  .hero-center .hero {
+    height: auto;
+    max-height: none;
+    min-height: 0;
+  }
+  .hero-center .hero-inner {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 0;
+    height: auto;
+    padding: 156px 64px 150px;
+    text-align: center;
+  }
+  .hero-center .hero-copy {
+    padding: 0;
+    max-width: 900px;
+  }
+  .hero-center .hero-copy .eyebrow {
+    margin-bottom: 14px;
+  }
+  /* a touch smaller than before so the phone can take the room (Ahmad, 25 Sep) */
+  .hero-center .hero h1 {
+    font-size: clamp(48px, 4.4vw, 68px);
+  }
+  .hero-center .hero h1 br {
+    display: none;
+  }
+  .hero-center .hero h1 span::before {
+    content: " ";
+  }
+  /* one line under the title on desktop */
+  .hero-center .intro {
+    margin: 12px auto 0;
+    max-width: none;
+    white-space: nowrap;
+    font-size: 17px;
+  }
+  .hero-center .intro br {
+    display: none;
+  }
+  /* the phone is sized from the window height so the whole screen shows in the
+     first view: 852/393 tall, starting about 310px down the page, plus a 40px margin */
+  .hero-center .hero-stage {
+    --pw: clamp(240px, calc((100svh - 300px) * 393 / 852), 300px);
+    justify-self: center;
+    width: 520px;
+    max-width: 520px;
+    margin-top: -32px;
+  }
+  /* Matt's phone sits beside Lydia's, a step lower, upright so its text stays sharp;
+     anchored to the main phone's edge so the gap holds as the phone grows */
+  /* under the birthday cover (it starts with the stage and is 295 x 0.7 tall),
+     14 px below it, at 92% so the right column ends with the main phone */
+  .hero-center .spouse-phone {
+    left: calc(50% + var(--pw) / 2 + 44px);
+    right: auto;
+    top: calc(295px * 0.7 + 14px);
+    transform: scale(0.92);
+    transform-origin: 0 0;
+  }
+}
+@media (min-width: 901px) and (max-width: 1100px) {
+  .hero-center .hero-stage {
+    --pw: clamp(220px, calc((100svh - 300px) * 393 / 852), 270px);
+  }
+}
+/* short desktop windows (laptops, browser chrome): keep the phone in the first view */
+@media (min-width: 901px) and (max-height: 760px) {
+  .hero-center .hero-inner {
+    padding-top: 168px;
+  }
+  .hero-center .hero-copy .eyebrow {
+    margin-bottom: 12px;
+  }
+  .hero-center .hero h1 {
+    font-size: clamp(44px, 4.3vw, 62px);
+  }
+  .hero-center .intro {
+    margin-top: 12px;
+    font-size: 16px;
+  }
+  .hero-center .hero-stage {
+    --pw: clamp(196px, calc((100svh - 280px) * 393 / 852), 236px);
+  }
+  .hero-center .spouse-phone {
+    left: calc(50% + var(--pw) / 2 + 36px);
+    top: calc(295px * 0.62 + 10px);
+    transform: scale(0.64);
+    transform-origin: 0 0;
+  }
+}
+/* above 1600px the stage is scaled 1.08 from its centre, which eats the gap under
+   the intro: give it back so the phone sits the same distance below the copy */
+@media (min-width: 1600px) {
+  .hero-center .hero-stage {
+    margin-top: -6px;
+    /* the stage is drawn at 1.08 here, so size the phone for that */
+    --pw: clamp(240px, calc((100svh - 288px) * 393 / 852 / 1.08), 300px);
+  }
+}
+/* Lydia's Lock Screen (Live Activities) mirrors Matt's phone on the other side */
+@media (min-width: 1101px) {
+  .hero-center .la-stack {
+    display: block;
+    right: calc(50% + var(--pw) / 2 + 44px);
+  }
+}
+@media (min-width: 1101px) and (max-height: 760px) {
+  .hero-center .la-stack {
+    --la-s: 0.55;
+  }
+  .hero-center .ev-phone {
+    --la-e: 0.3;
+  }
+  /* on the smaller phone the button wraps instead of spilling past the screen */
+  .hero-center .la-evslot .la-try {
+    height: auto;
+    padding: 6px 12px;
+    white-space: normal;
+    line-height: 1.25;
+    text-align: center;
+    font-size: 11px;
+  }
+}
+/* the birthday cover sits above Matt's phone, set 40 px further out so the phone
+   below keeps its own room: each side reads card on top, phone underneath */
+@media (min-width: 1101px) {
+  .hero-center .bd-slot.la-slot {
+    display: block;
+    left: calc(50% + var(--pw) / 2 + 44px + 40px);
+    top: 0;
+  }
+}
+@media (min-width: 1101px) and (max-height: 760px) {
+  .hero-center .bd-slot.la-slot {
+    left: calc(50% + var(--pw) / 2 + 36px + 30px);
+    top: 0;
+    width: calc(231px * 0.62);
+  }
+  .hero-center .bd-slot .bd-card {
+    --bd-s: 0.62;
+  }
+  .hero-center .bd-slot .la-try {
+    padding: 0 10px;
+    font-size: 11px;
   }
 }
