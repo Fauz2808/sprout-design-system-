@@ -145,6 +145,22 @@ Folder: `01 - Website/sprout-reach-scene-iteration/`. Review link: https://sprou
   - **Dipilih Ahmad 7 Okt: A + C** (B tidak dipakai). Tinggal jawaban Tony soal link (download saja atau langsung ke kelas
     pengirim) sebelum dibawa ke Figma Dev Ready untuk Syed.
 
+## T · Request Tony (pesan, 7 Okt)
+
+- [x] **T1 Sprout Assist: chip saran di atas kolom ketik, ala Orbits (Bit).** Tony kirim screenshot chat Bit: baris chip
+  yang bisa di-scroll ke samping tepat di atas "Ask Bit anything..." (What did I miss? · Event · Task · ...), dengan
+  tombol + , mic, dan voice di kanan. "I like this UI for Sprout Assist." Versi Sprout: chip = jenis yang sudah ada di
+  menu Assist (Reminder, Event, Carpool, Birthday, Club) + "What did I miss?".
+  - **Dikerjakan 7 Okt (website, kata Ahmad):** semua phone Assist di `home-v2.html` (carousel) dan `assist.html`: baris chip
+    What did I miss? · Reminder · Event · Carpool · Birthday (terpotong di tepi, fade), lalu + · "Ask Sprout anything…" ·
+    mic hijau · tombol voice. CSS di `assist-landing.css`, disalin ke `home-v2-gp.css` lewat `review/sync-v2-gp.sh`.
+    Belum diterapkan di prototipe app (`08 …/AI Assist/family-agent-r2-sprout.html`) atau Figma.
+
+- [x] **T2 Kalender kelas di website: event saja, seperti video (Tony, 7 Okt malam).** "We have to fix this screen. I want
+  just the events showing like we did with the video." Grid bulan dibuang dari tab Calendar di `home-v2`; diganti list
+  "Coming up" (pola Video 6 rev 2 / Upcoming events Daily Brief): Oct 9 Picture Day, Oct 10 bake sale, Oct 12 No School,
+  Oct 16 field trip, Oct 30 Halloween party. Hanya di home-v2 (`sections-demo.js` tidak diubah, index.html tetap). Deployed.
+
 ## S · Punya Tony / Mohit / Syed (track)
 
 **Mohit**

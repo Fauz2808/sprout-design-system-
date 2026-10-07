@@ -571,7 +571,18 @@ footer a:hover { color: #fff; }
 .gp-sender .tog { background: rgb(255 255 255 / .16); }
 .gp-sender .tog.on { background: #2f8a52; }
 
-.gp-foot { position: absolute; z-index: 3; left: 10px; right: 10px; bottom: 14px; display: flex; gap: 8px; align-items: center; }
+/* composer after Orbits' Bit (Tony, 7 Oct: "I like this UI for Sprout Assist"): a row of suggestion chips that runs off
+   the edge, then +, the input, a filled mic and a voice button. The chips are Assist's own actions. */
+.gp-foot { position: absolute; z-index: 3; left: 10px; right: 10px; bottom: 14px; display: flex; flex-direction: column; gap: 10px; }
+.gp-bar { display: flex; gap: 5px; align-items: center; }
+.gp-bar .gp-plus, .gp-bar .gp-mic, .gp-bar .gp-wave { width: 40px; height: 40px; }
+.gp-bar .gp-input { height: 40px; min-width: 0; padding: 0 6px 0 12px; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 40px; }
+.gp-chips { display: flex; gap: 6px; overflow: hidden; margin-right: -10px;
+  -webkit-mask-image: linear-gradient(to right, #000 82%, transparent); mask-image: linear-gradient(to right, #000 82%, transparent); }
+.gp-chips span { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 99px; font-size: 13px; white-space: nowrap; }
+.gp-chips i { font-size: 15px; }
+.gp-mic, .gp-wave { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 19px; flex: 0 0 auto; }
+.gp-screen:has(.gp-chips) .gp-feed { bottom: 116px; }
 .gp-plus { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font-size: 19px; color: #e4e2db; background: rgb(255 255 255 / .07); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .08); flex: 0 0 auto; }
 .gp-input { flex: 1; height: 42px; border-radius: 99px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px 0 16px; font-size: 14px; color: #8f948f;
   background: rgb(255 255 255 / .05); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .08); }
@@ -647,3 +658,7 @@ footer a:hover { color: #fff; }
 .gp-plus { color: #2b3a30; background: #fff; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .08), 0 4px 12px -6px rgb(40 50 35 / .25); }
 .gp-input { color: #9a9384; background: #fff; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .08), 0 4px 12px -6px rgb(40 50 35 / .2); }
 .gp-input i { color: #2b3a30; background: #f1ede4; }
+.gp-chips span { color: #2b3a30; background: #fff; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .1); }
+.gp-chips i { color: #6f6a5e; }
+.gp-mic { color: #fff; background: #186338; box-shadow: 0 6px 14px -6px rgb(24 99 56 / .6); }
+.gp-wave { color: #2b3a30; background: #fff; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .08); }

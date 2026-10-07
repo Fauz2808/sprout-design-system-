@@ -200,26 +200,56 @@
   let chats;
   if (classBox) {
     chats = mount(classBox, "v2-chats");
-    const kids = [["Presley", "1st Grade", "p"], ["Jake", "4th Grade", "j"], ["Mia", "Kindergarten", "m"]];
-    const row = (img, name, kid, msg, t, n) => `<div class="ch-dm"><img src="${A}${img}.webp" alt=""><div class="tx"><b>${name}</b><span><em class="kid">${kid}</em>${msg}</span></div>
-        <div class="meta"><small>${t}</small>${n ? `<i>${n}</i>` : ""}</div></div>`;
+    // the app's own Chat screen (Figma 12398:209125, as in Video 6): the kids' classes are the teachers' faces;
+    // on the scroll each one gets its kid's name and a green ring (updateKids)
+    const groups = [["cast-teacher-taylor", "Mrs. Taylor’s", "Presley"], ["cast-aisha", "Ms. Jessica’s", "Jake"], ["cast-teacher-kruszone", "Mrs. Kruszone’s", "Mia"]];
+    const dms = [["raj", "Raj Singh", "Raj: See you there!", "8:30 PM", 4], ["joe", "Joe Mravca", "You: Yeah I’ll call you again in a minute", "9:00 PM", 4],
+      ["robert", "Robert Hugos", "Robert: my golf score was so good today!", "8:45 PM", 2], ["scott", "Scott Vogelgesang", "Scott: I don’t think so, let me think again", "8:50 PM", 5],
+      ["eitan", "Eitan Miller", "You: I’ll go surf with you as well", "8:55 PM", 1], ["fatima", "Fatima Ali", "Fatima: Looking forward to it!", "9:15 PM", 6]];
     chats.innerHTML = `${statusBar}
       <section class="sa-screen sa-chat is-on">
         <div class="ch-head"><span class="sq brand">${phi("plus")}</span><h3>Chat</h3>
           <span class="r"><span class="sq">${phi("magnifying-glass")}</span><span class="sq">${phi("note-pencil")}</span></span></div>
         <div class="ch-scroll">
-          <div class="v2-kids">${kids.map(([n, g, c], i) => `<span class="kid-chip k-${c}" style="--i:${i}"><i>${n[0]}</i><b>${n}</b><small>${g}</small></span>`).join("")}</div>
-          <div class="ch-dmh"><h4>Classes</h4></div>
-          ${row("club-first", "Miss Taylor Class", "Presley", "Dana: Photo day is Friday!", "8:30 PM", 4)}
-          ${row("club-fourth", "Mrs. Kruszone’s Class", "Jake", "Raj: Who has the spelling list?", "7:12 PM", 2)}
-          ${row("club-kinder", "Kindergarten", "Mia", "You: We’ll bring the towels", "6:05 PM", 0)}
-          <div class="ch-dmh"><h4>Subgroups</h4></div>
-          ${row("grp-first-grade", "First Grade Dads", "Presley", "Joe: Pickleball Saturday?", "5:40 PM", 1)}
-          ${row("grp-bday", "Richard’s B-day", "Jake", "Robert: See everyone at 2!", "Yesterday", 0)}
+          <div class="ch-groups">
+            ${groups.map(([img, n, kid]) => `<span data-kid><i class="kidpill">${kid}</i><img src="${V}${img}.webp" alt="">${n}</span>`).join("")}
+            <span><img class="tile" src="${A}grp-bday.webp" alt="">Richard’s B-day</span>
+          </div>
+          <div class="ch-dmh"><h4>Direct Messages</h4><i class="ph ph-caret-down"></i></div>
+          ${dms.map(([img, n, m, t, c]) => `<div class="ch-dm"><img src="${A}dm-${img}.webp" alt=""><div class="tx"><b>${n}</b><span>${m}</span></div>
+            <div class="meta"><small>${t}</small><i>${c}</i></div></div>`).join("")}
         </div>
         ${nav("Chat")}
         <span class="sa-home-ind"></span>
       </section>`;
+  }
+  // the kids' names come in one by one as the first class step scrolls up, and go again on the way back.
+  // Ahmad, 7 Oct: all three in one scroll was too fast; now about a third of a screen apart (Presley as the step
+  // becomes active, then Jake, then Mia), over the longer runway the first step has (home-v2.css)
+  const kidSpans = chats ? [...chats.querySelectorAll("[data-kid]")] : [];
+  const listStep = document.querySelector('#classes .step[data-step="list"]');
+  const updateKids = () => {
+    if (!listStep) return;
+    const r = listStep.getBoundingClientRect();
+    // phone width: the steps come up under the pinned phone, so the names start as the card first shows below it
+    const start = matchMedia("(max-width: 900px)").matches ? 0.85 : 0.6;
+    const p = (innerHeight * start - r.top) / (innerHeight * 1.2);
+    kidSpans.forEach((s, i) => s.classList.toggle("on", p > 0.05 + i * 0.29));
+  };
+
+  /* The class Calendar tab (Tony, 7 Oct: "just the events showing like we did with the video"): no month grid, the
+     coming events as a list, like Video 6 rev 2 and Upcoming events in the Daily Brief. Same dates as the brief. */
+  const calView = classBox && classBox.querySelector('.cls-view[data-v="calendar"]');
+  if (calView) {
+    calView.innerHTML = `<div class="v2-cal"><div class="hd"><b>Coming up</b><span class="add"><i class="ph ph-plus"></i>Add Note</span></div>
+      <div class="v2-ups">
+        ${up("Oct", 9, "📸 Picture Day", "Order forms went home in the blue folders. Retakes are October 20.", "Dana Reyes", false, "8:30 AM")}
+        ${up("Oct", 10, "🍪 Fall Festival bake sale", "Four volunteer spots left at the bake sale table.", "Dana Reyes", false, "10 AM")}
+        ${up("Oct", 12, "🚫 No School", "Fall Holiday", "Kiker Elementary", true)}
+        ${up("Oct", 16, "🚌 Science museum field trip", "Permission slips are due Monday. Pack a lunch.", "Dana Reyes")}
+        ${up("Oct", 30, "🎃 Class Halloween party", "Costumes welcome. Sign up for snacks in Links.", "Dana Reyes", false, "2 PM")}
+      </div></div><span class="ind"></span>`;
+    calView.inert = true;
   }
 
   /* ── Member directory ── */
@@ -315,32 +345,18 @@
     car.scrollBy({ left: Number(b.dataset.dir) * (card.offsetWidth + 24), behavior: reduce.matches ? "auto" : "smooth" });
   }));
 
-  /* ── Share Sprout: the phone's own share sheet where there is one, otherwise copy the link ── */
-  const share = document.getElementById("shareSprout");
-  const shareMsg = document.querySelector(".share-msg");
-  const SHARE = { title: "Sprout", text: "I'm using Sprout for our kids' classes and the school calendar. It's free:", url: "https://joinsprout.co" };
-  share.addEventListener("click", async () => {
-    try {
-      if (navigator.share) { await navigator.share(SHARE); return; }
-      await navigator.clipboard.writeText(`${SHARE.text} ${SHARE.url}`);
-      shareMsg.textContent = "Link copied. Paste it into a text to a friend.";
-    } catch (e) {
-      if (e && e.name === "AbortError") return;
-      shareMsg.textContent = "Send your friends to joinsprout.co";
-    }
-  });
+  /* ── "Join your schools" (Tony, 7 Oct) is the only CTA: straight to the store. Android gets Google Play; iPhone and
+     computers keep the App Store link in the markup. ── */
+  if (/Android/.test(navigator.userAgent))
+    document.querySelectorAll("a[data-join]").forEach((a) => (a.href = "https://play.google.com/store/apps/details?id=com.meetingpoint"));
 
-  /* ── "Join your schools" (Tony, 7 Oct): straight to the store on a phone; on a computer, down to the
-     store buttons in the close ── */
-  const STORE = /iPhone|iPad|iPod/.test(navigator.userAgent) ? "https://apps.apple.com/in/app/sprout-the-app-for-parents/id6739574052"
-    : /Android/.test(navigator.userAgent) ? "https://play.google.com/store/apps/details?id=com.meetingpoint" : "";
-  if (STORE) document.querySelectorAll("a[data-join]").forEach((a) => (a.href = STORE));
-  // on a computer: jump, don't glide. Smooth-scrolling ~13,000 px past every pinned section takes ~5 s.
-  else document.querySelectorAll("a[data-join]").forEach((a) => a.addEventListener("click", (e) => {
-    e.preventDefault();
-    document.getElementById("download").scrollIntoView({ behavior: "instant", block: "start" });
-    history.replaceState(null, "", "#download");
-  }));
+  /* ── the close: Sprout's icons fly in once the section comes up, then bob (CSS) ── */
+  const endTiles = document.querySelector(".end .tiles");
+  if (endTiles) new IntersectionObserver((es, io) => es.forEach((e) => {
+    if (!e.isIntersecting) return;
+    endTiles.classList.add("in");
+    io.disconnect();
+  }), { threshold: 0.25 }).observe(endTiles);
 
   /* ── start ── */
   const start = () => {
@@ -353,7 +369,7 @@
   addEventListener("scroll", () => {
     if (ticking) return;
     ticking = true;
-    requestAnimationFrame(() => { scrubBrief(); ticking = false; });
+    requestAnimationFrame(() => { scrubBrief(); updateKids(); ticking = false; });
   }, { passive: true });
   addEventListener("resize", () => { measureBrief(); scrubBrief(); });
   // fonts change the brief's height, so measure once they're in

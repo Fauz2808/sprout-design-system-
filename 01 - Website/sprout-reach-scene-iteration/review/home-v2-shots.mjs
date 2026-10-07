@@ -89,6 +89,19 @@ async function run(width, height, scale, tag) {
   const s3 = await shared();
   if (s3.row > 2) problems.push(`${tag}: scrolling back up should take the to-do back out (row ${s3.row}px)`);
   await at(p, "brief", 0.75); await shot(p, `${tag}-07-brief-scrolled`, 1500);
+  // the kids' names on the class chats follow the scroll: none before the first class step, all three once it is up
+  const kidsOn = (f) => p.evaluate((f) => {
+    const st = document.querySelector('#classes .step[data-step="list"]');
+    scrollTo(0, st.getBoundingClientRect().top + scrollY - innerHeight * f);
+  }, f).then(() => wait(900)).then(() => p.evaluate(() => document.querySelectorAll("#classPhone [data-kid].on").length));
+  const [f1, f3] = width > 900 ? [0.35, -0.2] : [0.6, 0];
+  const k0 = await kidsOn(1.1), k1 = await kidsOn(f1);
+  await shot(p, `${tag}-07b-class-kids-one`, 100);
+  const k3 = await kidsOn(f3);
+  const stillList = await p.evaluate(() => document.getElementById("classPhone").dataset.step);
+  if (stillList !== "list") problems.push(`${tag}: the phone left the Chat list before all three names were in (${stillList})`);
+  await shot(p, `${tag}-07c-class-kids-all`, 600);
+  if (k0 !== 0 || k3 !== 3 || !(k1 > 0 && k1 < 3)) problems.push(`${tag}: kids' names should come in one by one on the scroll (0/${k1}/${k3}, got ${k0}/${k1}/${k3})`);
   await step(p, '#classes .step[data-step="calendar"]'); await shot(p, `${tag}-08-class-calendar`, 1200);
   await step(p, '#directory .step[data-step="profile"]'); await shot(p, `${tag}-09-dir-profile`, 1200);
   await p.evaluate(() => document.getElementById("assist").scrollIntoView()); await shot(p, `${tag}-10-assist`);
