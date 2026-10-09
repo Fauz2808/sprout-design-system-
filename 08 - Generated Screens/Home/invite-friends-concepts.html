@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Invite Friends Concepts</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<!-- A4 (meeting 9 Oct): Tony, "the only other thing Ahmad needs to think about": how does a well-connected parent invite
+     friends, even from other schools? Three directions, not a final design. Builds on R1 (share-sprout-concepts.html,
+     7 Oct), which settled WHERE share lives (A: card at the end of the brief, C: once after a good moment). This page is
+     about WHEN to ask and WHY a parent would. Same cast and phone frame as R1. -->
+<style>
+  :root { --bg: #f4f1ea; --ink: #1e3e2b; --muted: #7d715e; --green: #186338; --gs: #e2e9e3; --gb: #d0dacf; --amber: #f6ecd1; --serif: "Playfair Display", Georgia, serif; --sans: "Inter", system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #e9e4d8; font-family: var(--sans); color: #4d525b; -webkit-font-smoothing: antialiased; }
+  .page-head { padding: 36px 40px 8px; max-width: 1180px; }
+  .page-head h1 { font-family: var(--serif); font-weight: 500; color: var(--ink); font-size: 34px; margin: 0; }
+  .page-head p { margin: 10px 0 0; font-size: 15px; line-height: 1.55; max-width: 900px; }
+  .rec { margin-top: 14px; padding: 14px 18px; border-radius: 14px; background: #fff; box-shadow: 0 0 0 1px rgb(30 62 43 / .12); font-size: 14px; line-height: 1.55; color: var(--ink); max-width: 900px; }
+  .dir { margin-top: 34px; padding: 0 40px; }
+  .dir-h { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .dir-h .letter { font-family: var(--serif); font-size: 15px; color: #fff; background: var(--green); border-radius: 8px; padding: 2px 10px; }
+  .dir-h h2 { font-family: var(--serif); font-weight: 500; font-size: 26px; color: var(--ink); margin: 0; }
+  .dir-h .src { font-size: 13px; color: var(--muted); }
+  .dir > p { margin: 8px 0 0; font-size: 14.5px; line-height: 1.55; max-width: 980px; }
+  .meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .meta span { font-size: 12.5px; padding: 5px 10px; border-radius: 99px; background: #fff; box-shadow: 0 0 0 1px rgb(30 62 43 / .1); color: var(--ink); }
+  .meta span b { font-weight: 600; }
+  .row { display: flex; gap: 32px; padding: 20px 40px 30px; overflow-x: auto; align-items: flex-start; }
+  .panel { flex: 0 0 auto; width: 330px; }
+  .panel h3 { font-family: var(--serif); font-weight: 500; font-size: 19px; color: var(--ink); margin: 0; }
+  .panel .ctx { margin: 6px 0 0; font-size: 13px; line-height: 1.5; min-height: 78px; }
+  .panel .ctx b { color: var(--ink); }
+  .tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; background: var(--gs); color: var(--green); margin-bottom: 6px; }
+  .tag.sys { background: #e6e6ec; color: #4b4b55; }
+  .tag.webt { background: var(--amber); color: #7f600e; }
+  .phone { margin-top: 14px; width: 330px; height: 715px; border-radius: 46px; overflow: hidden; position: relative; background: var(--bg); box-shadow: 0 0 0 2.5px rgb(24 99 56 / .5), 0 28px 56px -22px rgb(16 52 32 / .38); }
+  .app { position: absolute; top: 0; left: 0; width: 393px; height: 852px; transform: scale(.8397); transform-origin: 0 0; overflow: hidden; background: var(--bg); }
+  .sb { height: 51px; display: flex; align-items: center; justify-content: space-between; padding: 8px 34px 0 47px; font-weight: 600; color: var(--ink); font-size: 16px; }
+  .sb i { font-size: 15px; }
+  .top { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 40px; }
+  .top img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+  .top .t { text-align: center; } .top b { display: block; font-family: var(--serif); font-weight: 500; font-size: 16px; color: var(--ink); } .top small { font-size: 12px; color: var(--muted); }
+  .top .ph { font-size: 24px; color: var(--ink); padding: 0 6px; }
+  .body { padding: 22px 16px 0; display: flex; flex-direction: column; gap: 12px; }
+  .hello h4 { font-family: var(--serif); font-weight: 500; font-size: 24px; color: var(--ink); margin: 0; } .hello em { font-family: var(--serif); color: var(--muted); }
+  hr { border: 0; border-top: 1px solid #e3ddd0; margin: 0; width: 100%; }
+  .h { margin: 0; font-size: 14px; font-weight: 700; line-height: 28px; color: var(--ink); }
+  .todos { background: #fff; border-radius: 16px; }
+  .todo { display: flex; align-items: center; gap: 10px; padding: 12px; border-bottom: .5px solid #e6e7ea; }
+  .todo:last-child { border: 0; }
+  .todo .box { width: 20px; height: 20px; border-radius: 6px; border: 1px solid #dfe1e7; flex-shrink: 0; }
+  .todo .box.done { background: var(--green); border-color: var(--green); position: relative; }
+  .todo .box.done::after { content: ""; position: absolute; left: 6px; top: 3px; width: 5px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  .todo b { display: block; font-family: var(--serif); font-weight: 500; font-size: 14px; color: var(--ink); }
+  .todo small { font-size: 12px; color: var(--muted); }
+  .faces { display: flex; flex-shrink: 0; } .faces img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; } .faces img + img { margin-left: -14px; }
+  .ini { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 600; font-size: 14px; flex-shrink: 0; }
+  .nav { position: absolute; left: 16px; right: 16px; bottom: 34px; height: 69px; border-radius: 99px; display: flex; justify-content: space-around; align-items: center; background: rgb(244 241 234 / .95); box-shadow: 1px 4px 25px 2px rgba(13,13,18,.12); z-index: 2; }
+  .nav span { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; color: var(--muted); } .nav span.on { color: var(--ink); } .nav i { font-size: 24px; }
+  .ind { position: absolute; left: 50%; bottom: 10px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: var(--ink); z-index: 9; }
+  .btn { height: 48px; border-radius: 99px; background: var(--green); color: #fff; font-family: var(--serif); font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn.sec { background: #fff; color: var(--ink); border: 1px solid var(--gb); }
+  .link { text-align: center; font-size: 14px; color: var(--muted); }
+  .dim { position: absolute; inset: 0; background: rgb(13 13 18 / .38); z-index: 3; }
+  .hot { box-shadow: 0 0 0 2px #e0b25a !important; }
+
+  /* A · the first-week sheet */
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; border-radius: 28px 28px 0 0; background: var(--bg); padding: 12px 20px 40px; display: flex; flex-direction: column; gap: 14px; }
+  .sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: #d6cfbf; margin: 0 auto 4px; }
+  .sheet .faces img { width: 52px; height: 52px; }
+  .sheet h4 { font-family: var(--serif); font-weight: 500; font-size: 26px; line-height: 1.2; color: var(--ink); margin: 0; }
+  .sheet p { margin: 0; font-size: 14.5px; line-height: 1.5; }
+  .week { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .week div { background: #fff; border-radius: 14px; padding: 12px 10px; text-align: center; }
+  .week b { display: block; font-family: var(--serif); font-weight: 500; font-size: 26px; color: var(--green); line-height: 1.1; }
+  .week small { font-size: 11.5px; color: var(--muted); line-height: 1.3; display: block; margin-top: 4px; }
+  /* iOS review prompt (system) */
+  .alert { position: absolute; z-index: 5; left: 50%; top: 50%; width: 270px; transform: translate(-50%, -50%); border-radius: 14px; background: rgb(242 242 247 / .97); text-align: center; font-family: -apple-system, "SF Pro Text", var(--sans); overflow: hidden; }
+  .alert .in { padding: 20px 16px 14px; }
+  .alert img { width: 60px; height: 60px; border-radius: 14px; }
+  .alert b { display: block; margin-top: 10px; font-size: 17px; color: #000; }
+  .alert p { margin: 4px 0 0; font-size: 13px; color: #000; line-height: 1.35; }
+  .alert .stars { display: flex; justify-content: center; gap: 6px; padding: 12px 0; border-top: .5px solid #c6c6c8; color: #0a7aff; font-size: 26px; }
+  .alert .nn { padding: 11px; border-top: .5px solid #c6c6c8; color: #0a7aff; font-size: 17px; }
+  /* share sheet (system) */
+  .ios { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; height: 560px; border-radius: 14px 14px 0 0; background: #f2f2f7; font-family: -apple-system, "SF Pro Text", var(--sans); }
+  .ios .prev { display: flex; gap: 12px; align-items: center; padding: 18px 16px 14px; border-bottom: .5px solid #c6c6c8; }
+  .ios .prev img { width: 54px; height: 54px; border-radius: 12px; }
+  .ios .prev b { display: block; font-size: 15px; color: #000; } .ios .prev small { font-size: 13px; color: #6e6e73; }
+  .ios .people { display: flex; gap: 18px; padding: 18px 16px; border-bottom: .5px solid #c6c6c8; }
+  .ios .people > span { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; color: #000; width: 62px; text-align: center; }
+  .ios .people .ini { width: 60px; height: 60px; font-size: 20px; }
+  .ios .apps { display: flex; gap: 18px; padding: 18px 16px; }
+  .ios .apps span { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; color: #000; width: 62px; }
+  .ios .apps i { width: 60px; height: 60px; border-radius: 14px; display: grid; place-items: center; font-size: 30px; color: #fff; }
+  .msgprev { position: absolute; z-index: 4; left: 16px; right: 16px; top: 120px; padding: 12px 14px; border-radius: 18px; background: #fff; font-size: 14px; line-height: 1.45; color: #1c1c1e; box-shadow: 0 8px 24px rgb(0 0 0 / .12); }
+  .msgprev small { display: block; font-size: 11px; color: #8e8e93; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
+  .msgprev u { color: #0a7aff; text-decoration: none; }
+
+  /* B · invites */
+  .inv-card { border-radius: 16px; padding: 16px; background: #fff; box-shadow: 1px 4px 25px 2px rgba(13,13,18,.06); display: flex; flex-direction: column; gap: 12px; }
+  .inv-card .r { display: flex; justify-content: space-between; align-items: center; }
+  .inv-card b { font-family: var(--serif); font-weight: 500; font-size: 18px; color: var(--ink); }
+  .inv-card p { margin: 0; font-size: 13px; line-height: 1.45; color: var(--muted); }
+  .seats { display: flex; gap: 6px; }
+  .seats i { width: 28px; height: 28px; border-radius: 50%; border: 1.5px dashed #bfc9bf; display: grid; place-items: center; font-style: normal; font-size: 11px; color: var(--muted); }
+  .seats i.used { border: 0; background: var(--green); color: #fff; font-weight: 600; }
+  .scr-h { display: flex; align-items: center; gap: 12px; padding: 4px 16px 0; }
+  .back { width: 40px; height: 40px; border-radius: 50%; background: var(--gs); border: 1px solid var(--gb); display: grid; place-items: center; color: var(--ink); font-size: 18px; }
+  .scr-h b { font-family: var(--serif); font-weight: 500; font-size: 20px; color: var(--ink); }
+  .mylink { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; background: #fff; border: 1px dashed var(--gb); }
+  .mylink span { flex: 1; font-size: 14px; color: var(--ink); font-weight: 500; }
+  .mylink em { font-style: normal; font-size: 13px; font-weight: 600; color: var(--green); }
+  .contact { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #ece8de; }
+  .contact div { flex: 1; } .contact b { display: block; font-size: 15px; color: var(--ink); font-weight: 500; } .contact small { font-size: 12.5px; color: var(--muted); }
+  .pill { padding: 7px 14px; border-radius: 99px; font-family: var(--serif); font-size: 14px; background: var(--green); color: #fff; }
+  .pill.sent { background: var(--gs); color: var(--green); }
+  .pill.joined { background: transparent; color: var(--green); padding: 7px 0; }
+  .sub { font-size: 13px; color: var(--muted); margin: 0; }
+  /* web join page (Safari) */
+  .safari { position: absolute; left: 0; right: 0; top: 0; height: 51px; }
+  .urlbar { position: absolute; z-index: 3; left: 12px; right: 12px; bottom: 30px; height: 50px; border-radius: 16px; background: rgb(255 255 255 / .92); box-shadow: 0 4px 20px rgb(0 0 0 / .12); display: flex; align-items: center; justify-content: center; gap: 6px; font-family: -apple-system, var(--sans); font-size: 15px; color: #1c1c1e; }
+  .web { padding: 20px 22px 0; display: flex; flex-direction: column; gap: 16px; }
+  .web .brand { display: flex; align-items: center; gap: 8px; font-family: var(--serif); font-size: 20px; color: var(--ink); }
+  .web .brand img { width: 30px; height: 30px; border-radius: 8px; }
+  .invited { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 18px; background: #fff; }
+  .invited img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; }
+  .invited b { display: block; font-family: var(--serif); font-weight: 500; font-size: 18px; color: var(--ink); line-height: 1.3; }
+  .invited small { font-size: 13px; color: var(--muted); }
+  .web h4 { font-family: var(--serif); font-weight: 500; font-size: 30px; line-height: 1.15; color: var(--ink); margin: 0; }
+  .web p { margin: 0; font-size: 15px; line-height: 1.5; }
+  .school { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.5px rgb(24 99 56 / .45); }
+  .school .lg { width: 40px; height: 40px; border-radius: 12px; background: #1d3b8f; color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 13px; }
+  .school div { flex: 1; } .school b { display: block; font-size: 15px; color: var(--ink); } .school small { font-size: 12.5px; color: var(--muted); }
+  .other { font-size: 13.5px; color: var(--green); text-align: center; }
+  /* push */
+  .lock { position: absolute; inset: 0; background: linear-gradient(160deg, #6f8fae, #c7d6c4 60%, #e7dcc2); }
+  .lock .time { position: absolute; top: 90px; left: 0; right: 0; text-align: center; color: #fff; font-family: -apple-system, var(--sans); }
+  .lock .time small { display: block; font-size: 19px; font-weight: 500; }
+  .lock .time b { font-size: 84px; font-weight: 600; letter-spacing: -2px; line-height: 1; }
+  .push { position: absolute; left: 12px; right: 12px; top: 300px; display: flex; gap: 10px; padding: 12px 14px; border-radius: 22px; background: rgb(250 250 247 / .92); box-shadow: 0 12px 32px -10px rgb(13 13 18 / .3); font-family: -apple-system, var(--sans); }
+  .push img { width: 38px; height: 38px; border-radius: 9px; }
+  .push div { flex: 1; } .push .hd { display: flex; justify-content: space-between; font-size: 14px; color: #1c1c1e; } .push .hd small { color: #8a8a8e; font-size: 13px; }
+  .push p { margin: 2px 0 0; font-size: 14.5px; line-height: 1.35; color: #1c1c1e; }
+  .push + .push { top: 400px; transform: scale(.96); opacity: .8; }
+
+  /* C · Assist early access */
+  .assist { padding: 18px 20px 0; display: flex; flex-direction: column; gap: 16px; align-items: center; text-align: center; }
+  .assist .mascot { width: 120px; height: 120px; }
+  .assist .eb { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--green); margin: 0; }
+  .assist h4 { font-family: var(--serif); font-weight: 500; font-size: 28px; line-height: 1.2; color: var(--ink); margin: 0; }
+  .assist p { margin: 0; font-size: 14.5px; line-height: 1.5; }
+  .unlock { align-self: stretch; text-align: left; border-radius: 18px; padding: 16px; background: #fff; display: flex; flex-direction: column; gap: 12px; }
+  .unlock .r { display: flex; justify-content: space-between; align-items: center; }
+  .unlock b { font-family: var(--serif); font-weight: 500; font-size: 17px; color: var(--ink); }
+  .unlock .count { font-size: 13px; font-weight: 600; color: var(--green); }
+  .bar3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .bar3 i { height: 8px; border-radius: 4px; background: #e6e1d4; } .bar3 i.on { background: var(--green); }
+  .who { display: flex; gap: 8px; }
+  .who span { display: flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; border-radius: 99px; background: var(--gs); font-size: 12.5px; color: var(--ink); }
+  .who .ini { width: 24px; height: 24px; font-size: 10px; }
+  .who span.wait { background: transparent; border: 1px dashed var(--gb); color: var(--muted); padding: 4px 10px; }
+  .beta { align-self: stretch; text-align: left; border-radius: 18px; padding: 16px; background: var(--gs); border: 1px solid var(--gb); display: flex; gap: 12px; align-items: center; }
+  .beta i { font-size: 26px; color: var(--green); }
+  .beta b { display: block; font-family: var(--serif); font-weight: 500; font-size: 17px; color: var(--ink); } .beta small { font-size: 13px; color: var(--muted); }
+
+  .q { margin: 26px 40px 60px; padding: 18px 22px; max-width: 1100px; border-radius: 14px; background: #fff; box-shadow: 0 0 0 1px rgb(30 62 43 / .12); font-size: 14px; line-height: 1.6; color: var(--ink); }
+  .q h3 { margin: 0 0 6px; font-family: var(--serif); font-weight: 500; font-size: 19px; }
+  .q ol { margin: 0; padding-left: 20px; }
+</style>
+</head>
+<body>
+  <header class="page-head">
+    <h1>Inviting friends to Sprout: three directions</h1>
+    <p>Tony, 9 Oct: "For the parent that's super connected at a school, how do we allow them to invite their friends, even friends from other schools?" R1 (7 Oct) already decided <i>where</i> share lives: a card at the end of the brief, and once after the spouse connects. These are about <i>when</i> to ask and <i>why</i> a parent would. Each one ends in the phone's own share sheet or a personal link.</p>
+    <div class="rec"><b>Recommendation: A now, then C on top of B's links.</b> A needs no backend and can ship with the next release (a 7-day timer, the system rating prompt, the share sheet). C is the strongest reason to invite, because Sprout Assist is in beta anyway, but it can only count invites once B's personal links exist, and those need Mohit. Never in onboarding (Tony: "I don't like the app yet"), and nothing parents rely on is ever locked: Sprout stays free for parents, always.</div>
+  </header>
+
+  <!-- A -->
+  <section class="dir">
+    <div class="dir-h"><span class="letter">A</span><h2>One week in</h2><span class="src">Mohit's idea at the 9 Oct standup; Tony: "I totally agree with that approach"</span></div>
+    <p>After seven days of using Sprout, once, the brief opens with a short recap of the week, then asks for two things: share Sprout with a friend, and rate it. By then the parent knows it's helpful, so the ask is earned. One sheet, two asks, never again unless they tap "Maybe later".</p>
+    <div class="meta"><span><b>Build:</b> app only, a 7-day timer</span><span><b>Mohit:</b> no backend</span><span><b>Risk:</b> one more sheet on day 7</span></div>
+  </section>
+  <div class="row">
+    <section class="panel">
+      <span class="tag">A1 · Day 7, the brief</span>
+      <h3>The week, then the ask</h3>
+      <p class="ctx">Shows once, the first morning after 7 days of use. The numbers are <b>this family's own</b>, never class totals. <b>Share Sprout</b> leads; rating is secondary.</p>
+      <div class="phone"><div class="app">
+        <div class="sb"><span>7:02</span><i class="ph-fill ph-cell-signal-full"></i></div>
+        <div class="top"><img src="./assets/people/marcus.webp" alt=""><span class="t"><b>Sprout AI</b><small>Thursday, October 15</small></span><i class="ph ph-bell"></i></div>
+        <div class="body"><div class="hello"><h4>Your day, in order.</h4><em>Full, but manageable.</em></div></div>
+        <div class="dim"></div>
+        <div class="sheet">
+          <span class="grab"></span>
+          <div class="faces"><img src="./assets/people/marcus.webp" alt=""><img src="./assets/people/jen.webp" alt=""></div>
+          <h4>Your first week with Sprout</h4>
+          <div class="week"><div><b>14</b><small>to-dos done between you and Lydia</small></div><div><b>3</b><small>invitations answered</small></div><div><b>1</b><small>No School day caught early</small></div></div>
+          <p>Know a parent who'd like their week like this? Send them Sprout.</p>
+          <div class="btn"><i class="ph ph-share-fat"></i>Share Sprout with a friend</div>
+          <div class="btn sec"><i class="ph ph-star"></i>Rate Sprout</div>
+          <span class="link">Maybe later</span>
+        </div>
+        <span class="ind"></span>
+      </div></div>
+    </section>
+    <section class="panel">
+      <span class="tag sys">A2 · iOS draws this</span>
+      <h3>The system rating prompt</h3>
+      <p class="ctx">"Rate Sprout" calls Apple's own prompt (Android has the same). <b>Rules:</b> no reward for a review, and no "are you happy?" filter before it. Apple decides if it appears, at most 3 times a year.</p>
+      <div class="phone"><div class="app">
+        <div class="sb"><span>7:02</span><i class="ph-fill ph-cell-signal-full"></i></div>
+        <div class="top"><img src="./assets/people/marcus.webp" alt=""><span class="t"><b>Sprout AI</b><small>Thursday, October 15</small></span><i class="ph ph-bell"></i></div>
+        <div class="body"><div class="hello"><h4>Your day, in order.</h4><em>Full, but manageable.</em></div>
+          <div class="todos"><div class="todo"><span class="box"></span><span class="faces"><img src="./assets/people/marcus.webp" alt=""></span><span><b>Drive the morning carpool</b><small>Kiker Elementary</small></span></div></div></div>
+        <div class="dim"></div>
+        <div class="alert"><div class="in"><img src="./assets/sprout-logo.png" alt=""><b>Enjoying Sprout?</b><p>Tap a star to rate it on the App Store.</p></div>
+          <div class="stars"><i class="ph ph-star"></i><i class="ph ph-star"></i><i class="ph ph-star"></i><i class="ph ph-star"></i><i class="ph ph-star"></i></div><div class="nn">Not Now</div></div>
+        <span class="ind"></span>
+      </div></div>
+    </section>
+    <section class="panel">
+      <span class="tag sys">A3 · iOS draws this</span>
+      <h3>The share sheet, prefilled</h3>
+      <p class="ctx">Same sheet as R1. Recent contacts come first, which are usually the parents you trade pickups with. The message is editable before sending.</p>
+      <div class="phone"><div class="app">
+        <div class="sb"><span>7:03</span><i class="ph-fill ph-cell-signal-full"></i></div>
+        <div class="dim"></div>
+        <div class="msgprev"><small>Message that goes out</small>I've been using Sprout for a week: the kids' classes, the school calendar and our family to-dos in one app. It's free, try it: <u>joinsprout.co</u></div>
+        <div class="ios">
+          <div class="prev"><img src="./assets/sprout-logo.png" alt=""><span><b>Sprout: The App for Parents</b><small>joinsprout.co</small></span></div>
+          <div class="people"><span><span class="ini" style="background:#b7791f">SB</span>Sarah Baker</span><span><span class="ini" style="background:#6b6fb3">EC</span>Emily C.</span><span><span class="ini" style="background:#186338">JT</span>Jake T.</span><span><span class="ini" style="background:#a0525c">MJ</span>Mike J.</span></div>
+          <div class="apps"><span><i style="background:#34c759" class="ph-fill ph-chat-circle"></i>Messages</span><span><i style="background:#25d366" class="ph-fill ph-whatsapp-logo"></i>WhatsApp</span><span><i style="background:#0a7aff" class="ph-fill ph-envelope-simple"></i>Mail</span><span><i style="background:#8e8e93" class="ph-fill ph-dots-three"></i>More</span></div>
+        </div>
+      </div></div>
+    </section>
+  </div>
+
+  <!-- B -->
+  <section class="dir">
+    <div class="dir-h"><span class="letter">B</span><h2>Five personal invites</h2><span class="src">Instinct's model, from Tony at the 9 Oct standup: 5 invites each, growing 10% a day</span></div>
+    <p>Every parent has 5 invites. Each one is a personal link, so the friend's page says who invited them and drops them at their school, the same one or another. When a friend joins, the inviter hears about it and gets the invite back. A limit makes an invite feel like something you give, not spam, and the links show which parents bring others.</p>
+    <div class="meta"><span><b>Build:</b> app + web join page</span><span><b>Mohit:</b> personal links, who-invited-whom, a join notification</span><span><b>Risk:</b> a limit we don't need (no compute crunch like Instinct)</span></div>
+  </section>
+  <div class="row">
+    <section class="panel">
+      <span class="tag">B1 · End of the brief</span>
+      <h3>Your invites</h3>
+      <p class="ctx">Takes R1's card spot at the end of the brief. The five circles fill with faces as friends join, so the card shows progress, not a counter.</p>
+      <div class="phone"><div class="app">
+        <div class="sb"><span>9:41</span><i class="ph-fill ph-cell-signal-full"></i></div>
+        <div class="body" style="padding-top:8px">
+          <p class="h">💬 New messages</p>
+          <ul style="margin:0;padding-left:21px;font-size:14px;font-weight:500;line-height:28px;color:var(--ink)"><li>2 unread in <u>Kindergarten</u></li><li>1 message from <u>Sarah Chen</u></li></ul>
+          <hr>
+          <div class="inv-card hot">
+            <div class="r"><b>You have 3 invites left</b><i class="ph ph-gift" style="font-size:22px;color:var(--green)"></i></div>
+            <div class="seats"><i class="used">SB</i><i class="used">EC</i><i>3</i><i>4</i><i>5</i></div>
+            <p>Sarah and Emily joined from your invites. Who else should be here? Friends from other schools count too.</p>
+            <div class="btn"><i class="ph ph-user-plus"></i>Invite a parent</div>
+          </div>
+        </div>
+        <div class="nav"><span class="on"><i class="ph-fill ph-sun-horizon"></i>Daily Brief</span><span><i class="ph ph-compass"></i>Events</span><span><i class="ph ph-clover"></i>Sprout Assist</span><span><i class="ph ph-chat-circle-dots"></i>Chat</span><span><i class="ph ph-users"></i>Clubs</span></div>
+        <span class="ind"></span>
+      </div></div>
+    </section>
+    <section class="panel">
+      <span class="tag">B2 · Invite a parent</span>
+      <h3>Pick a friend, or copy your link</h3>
+      <p class="ctx">Contacts from the phone (permission asked here, not before). <b>Invite</b> opens Messages with the personal link already in it. Each sent invite counts once it's used, not when it's sent.</p>
+      <div class="phone"><div class="app">
+        <div class="sb"><span>9:41</span><i class="ph-fill ph-cell-signal-full"></i></div>
+        <div class="scr-h"><span class="back"><i class="ph ph-caret-left"></i></span><b>Invite a parent</b></div>
+        <div class="body">
+          <p class="sub">3 of 5 invites left. A friend who joins gives you the invite back.</p>
+          <div class="mylink"><i class="ph ph-link" style="font-size:20px;color:var(--green)"></i><span>joinsprout.co/i/tony</span><em>Copy</em></div>
+          <p class="h" style="margin-top:4px">From your contacts</p>
+          <div>
+            <div class="contact"><span class="ini" style="background:#b7791f">SB</span><div><b>Sarah Baker</b><small>Joined Tuesday</small></div><span class="pill joined">On Sprout</span></div>
+            <div class="contact"><span class="ini" style="background:#6b6fb3">EC</span><div><b>Emily Centineo</b><small>Joined yesterday</small></div><span class="pill joined">On Sprout</span></div>
+            <div class="contact"><span class="ini" style="background:#a0525c">MJ</span><div><b>Mike Johnson</b><small>Invited 2 days ago</small></div><span class="pill sent">Sent</span></div>
+            <div class="contact"><span class="ini" style="background:#186338">JT</span><div><b>Jake Thompson</b><small>Baranoff Elementary</small></div><span class="pill">Invite</span></div>
+            <div class="contact"><span class="ini" style="background:#5a7d9a">PS</span><div><b>Priya Shah</b><small>Mobile</small></div><span class="pill">Invite</span></div>
+          </div>
+        </div>
+        <span class="ind"></span>
+      </div></div>
+    </section>
+    <section class="panel">
+      <span class="tag webt">B3 · The friend's phone, web</span>
+      <h3>"Tony invited you"</h3>
+      <p class="ctx">The personal link opens a web page with the inviter's face. Same school: the school is already picked. Another school: <b>Find your school</b> (needs the Austin ISD upload Tony described).</p>
+      <div class="phone"><div class="app" style="background:#f4f1ea">
+        <div class="sb"><span>9:44</span><i class="ph-fill ph-cell-signal-full"></i></div>
+        <div class="web">
+          <span class="brand"><img src="./assets/sprout-logo.png" alt="">Sprout</span>
+          <div class="invited"><img src="./assets/people/marcus.webp" alt=""><span><b>Tony Martin invited you to Sprout</b><small>Presley, Jake and Mia's dad</small></span></div>
+          <h4>The parent community for your school.</h4>
+          <p>Your kids' classes, the school calendar and a daily plan you share with your spouse. Free for parents. Always.</p>
+          <div class="school"><span class="lg">KE</span><div><b>Kiker Elementary</b><small>Circle C, Austin · Tony's school</small></div><i class="ph-fill ph-check-circle" style="font-size:22px;color:var(--green)"></i></div>
+          <span class="other">Different school? Find yours</span>
+          <div class="btn">Get Sprout <i class="ph ph-arrow-right"></i></div>
+        </div>
+        <div class="urlbar"><i class="ph-fill ph-lock-simple" style="font-size:13px"></i>joinsprout.co</div>
+      </div></div>
+    </section>
+    <section class="panel">
+      <span class="tag">B4 · Tony's phone, later</span>
+      <h3>The loop closes</h3>
+      <p class="ctx">The inviter hears back when it worked, and gets the invite back. This is the moment that makes them invite the next person.</p>
+      <div class="phone"><div class="app">
+        <div class="lock"><div class="time"><small>Friday, October 16</small><b>4:12</b></div>
+          <div class="push"><img src="./assets/sprout-logo.png" alt=""><div><div class="hd"><b>Sprout</b><small>now</small></div><p><b>Mike Johnson joined Sprout from your invite.</b> You have your invite back: 3 left.</p></div></div>
+          <div class="push"><img src="./assets/sprout-logo.png" alt=""><div><div class="hd"><b>Sprout</b><small>Tue</small></div><p><b>Sarah Baker joined Sprout from your invite.</b></p></div></div>
+        </div>
+        <span class="ind" style="background:#fff"></span>
+      </div></div>
+    </section>
+  </div>
+
+  <!-- C -->
+  <section class="dir">
+    <div class="dir-h"><span class="letter">C</span><h2>Invite to get Sprout Assist first</h2><span class="src">Tony's "unlock" examples at the 9 Oct standup (the sports app: 35% of new users organic)</span></div>
+    <p>Sprout Assist is arriving in stages, so early access is the reward: invite 3 parents and you're in the beta. Nothing parents already use gets locked. It gives a real reason to invite, and it paces the beta the way Instinct paces its compute. It ties to Tony's January goal: Assist signing up for summer camp.</p>
+    <div class="meta"><span><b>Build:</b> app, on the Assist tab</span><span><b>Mohit:</b> counts joins from B's personal links</span><span><b>Risk:</b> only works when there's a beta to open</span></div>
+  </section>
+  <div class="row">
+    <section class="panel">
+      <span class="tag">C1 · The Assist tab</span>
+      <h3>Skip the line</h3>
+      <p class="ctx">Replaces today's "coming soon" page. The mascot lives here (Tony: "the AI guy"). The friends you invite get the same offer, so they invite too.</p>
+      <div class="phone"><div class="app">
+        <div class="sb"><span>9:41</span><i class="ph-fill ph-cell-signal-full"></i></div>
+        <div class="assist">
+          <img class="mascot" src="./assets/sprout-happy.webp" alt="">
+          <p class="eb">Sprout Assist · beta</p>
+          <h4>Get Sprout Assist before everyone else</h4>
+          <p>It's arriving in stages, starting with reminders you can say out loud. Invite 3 parents and you're in the first group.</p>
+          <div class="unlock"><div class="r"><b>Your invites</b><span class="count">0 of 3</span></div><div class="bar3"><i></i><i></i><i></i></div></div>
+          <div class="btn" style="align-self:stretch"><i class="ph ph-user-plus"></i>Invite a parent</div>
+        </div>
+        <div class="nav"><span><i class="ph ph-sun-horizon"></i>Daily Brief</span><span><i class="ph ph-compass"></i>Events</span><span class="on"><i class="ph-fill ph-clover"></i>Sprout Assist</span><span><i class="ph ph-chat-circle-dots"></i>Chat</span><span><i class="ph ph-users"></i>Clubs</span></div>
+        <span class="ind"></span>
+      </div></div>
+    </section>
+    <section class="panel">
+      <span class="tag">C2 · Two days later</span>
+      <h3>Progress you can see</h3>
+      <p class="ctx">Each friend who joins fills a bar and shows their name. Invites only count when the friend actually joins, so there's no reason to spam.</p>
+      <div class="phone"><div class="app">
+        <div class="sb"><span>9:41</span><i class="ph-fill ph-cell-signal-full"></i></div>
+        <div class="assist">
+          <img class="mascot" src="./assets/sprout-happy.webp" alt="">
+          <p class="eb">Sprout Assist · beta</p>
+          <h4>One more parent and you're in</h4>
+          <div class="unlock hot"><div class="r"><b>Your invites</b><span class="count">2 of 3</span></div><div class="bar3"><i class="on"></i><i class="on"></i><i></i></div>
+            <div class="who"><span><span class="ini" style="background:#b7791f">SB</span>Sarah</span><span><span class="ini" style="background:#6b6fb3">EC</span>Emily</span><span class="wait">Waiting</span></div></div>
+          <div class="btn" style="align-self:stretch"><i class="ph ph-user-plus"></i>Invite a parent</div>
+          <span class="link">Your link: joinsprout.co/i/tony</span>
+        </div>
+        <div class="nav"><span><i class="ph ph-sun-horizon"></i>Daily Brief</span><span><i class="ph ph-compass"></i>Events</span><span class="on"><i class="ph-fill ph-clover"></i>Sprout Assist</span><span><i class="ph ph-chat-circle-dots"></i>Chat</span><span><i class="ph ph-users"></i>Clubs</span></div>
+        <span class="ind"></span>
+      </div></div>
+    </section>
+    <section class="panel">
+      <span class="tag">C3 · Unlocked</span>
+      <h3>You're in the beta</h3>
+      <p class="ctx">The third join opens Assist on the spot, starting with the first thing it does well (a voice reminder). Lydia gets it too: the family shares one Assist.</p>
+      <div class="phone"><div class="app">
+        <div class="sb"><span>9:41</span><i class="ph-fill ph-cell-signal-full"></i></div>
+        <div class="assist">
+          <img class="mascot" src="./assets/sprout-happy.webp" alt="">
+          <p class="eb">Sprout Assist · beta</p>
+          <h4>You and Lydia are in</h4>
+          <p>Thanks for bringing Sarah, Emily and Mike. Start with a reminder: say it out loud, Sprout puts it in your brief.</p>
+          <div class="beta"><i class="ph-fill ph-microphone"></i><span><b>"Remind Lydia to pack Mia's PJs Thursday"</b><small>Try a reminder</small></span></div>
+          <div class="btn" style="align-self:stretch"><i class="ph ph-microphone"></i>Add a reminder</div>
+        </div>
+        <div class="nav"><span><i class="ph ph-sun-horizon"></i>Daily Brief</span><span><i class="ph ph-compass"></i>Events</span><span class="on"><i class="ph-fill ph-clover"></i>Sprout Assist</span><span><i class="ph ph-chat-circle-dots"></i>Chat</span><span><i class="ph ph-users"></i>Clubs</span></div>
+        <span class="ind"></span>
+      </div></div>
+    </section>
+  </div>
+
+  <div class="q">
+    <h3>Questions for Tony</h3>
+    <ol>
+      <li><b>A:</b> one sheet on day 7 that asks for a share and a rating together, as Mohit suggested. OK, or two separate moments?</li>
+      <li><b>B:</b> a limit of 5, or unlimited? We don't have Instinct's compute problem, so the limit would only be there to make invites feel valuable.</li>
+      <li><b>C:</b> is Sprout Assist early access the reward you want, or something else? Whatever it is must never lock what parents already use.</li>
+      <li><b>Links (from R1, still open):</b> should an invite link just download the app, or drop the friend into the inviter's school and class? B and C need the second kind, and that's Mohit's work.</li>
+    </ol>
+  </div>
+</body>
+</html>

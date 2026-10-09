@@ -77,11 +77,18 @@ Lanjutan dari `MEETING-2026-10-08-tasks.md`.
   Android kanan, tutup lewat Esc / tombol / klik di luar. HP: langsung ke store sesuai OS (iPad ikut App Store). Link App
   Store diganti ke storefront US (sebelumnya India). Live di link review + `sprout-website` (Syed tinggal deploy).
   Desain QR Mohit belum dilihat; kalau beda gaya, sesuaikan.
-- [ ] **A3 Screenshot App Store/Play Store untuk rilis ini** (`03 - App Marketplace Screenshots/`): Daily Brief baru,
+- [x] **A3 Screenshot App Store/Play Store untuk rilis ini** (`03 - App Marketplace Screenshots/`): Daily Brief baru,
   spouse, reminder. Harus siap sebelum Mohit push (target besok).
+  - **Selesai 9 Okt:** sudah di-handover Ahmad ke Mohit.
 - [ ] **A4 Invite teman / growth loop: 2–3 arah, belum desain final.** Bahan: pop-up sesudah seminggu (rating + share,
   usul Mohit, Tony setuju), tombol invite di Daily Brief, batas 5 undangan ala Instinct, imbalan/fitur terbuka karena
   mengajak. Gabungkan dengan R1 Share Sprout (A + C sudah dipilih 7 Okt). Bukan di onboarding.
+  - **Konsep 9 Okt:** `08 - Generated Screens/Home/invite-friends-concepts.html`, review link
+    https://sprout-invite-concepts.vercel.app. A "One week in" (sheet hari ke-7: rekap minggu keluarga sendiri, lalu
+    Share + Rate; prompt rating sistem, tanpa hadiah/filter), B "Five personal invites" (link pribadi, halaman web "Tony
+    invited you", invite kembali saat teman join), C "Invite to get Sprout Assist first" (3 teman = masuk beta Assist).
+    Rekomendasi: A sekarang (tanpa backend), C di atas link pribadi B (butuh Mohit). 4 pertanyaan untuk Tony di bawah
+    halaman. Menunggu pilihan Ahmad / Tony.
 - [ ] **A5 (nanti) Logo sekolah Austin ISD** kalau batch upload ~70 SD jatuh ke desain: satu gaya logo yang bisa
   di-generate konsisten.
 
