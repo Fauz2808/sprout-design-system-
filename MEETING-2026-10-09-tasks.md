@@ -98,6 +98,11 @@ Lanjutan dari `MEETING-2026-10-08-tasks.md`.
   - **Tambahan 9 Okt (D, Ahmad):** invite juga dari class chat: tombol Invite di header chat kelas + baris pertama di daftar
     member ("Invite a parent to Miss Taylor's Class", jumlah parent sebagai angka, bukan daftar yang belum join). Link dari
     kelas membawa kelasnya, jadi halaman web teman langsung "Join Miss Taylor's Class" tanpa pilih kelas.
+  - **Figma 9 Okt (A1 "The week, then the ask"):** section `13634:213791` (Exploration Page), screen
+    `13635:199628` di sebelah screen Ahmad (tidak diubah). Komponen lokal baru di "Components · Daily Brief":
+    `DB / Week Recap Sheet` 13635:199582, `DB / Stat Tile` 13635:17826, `DB / Sheet Grabber` 13635:17825. Variable baru
+    `color/background/scrim` (alias `color/alpha/black-40`). Effect style baru `Shadow XS` (bayangan mentah Button, nilai
+    sama, 60 varian diikat). Audit: 0 masalah.
 - [ ] **A5 (nanti) Logo sekolah Austin ISD** kalau batch upload ~70 SD jatuh ke desain: satu gaya logo yang bisa
   di-generate konsisten.
 
