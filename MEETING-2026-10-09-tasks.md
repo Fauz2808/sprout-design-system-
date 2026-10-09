@@ -103,6 +103,11 @@ Lanjutan dari `MEETING-2026-10-08-tasks.md`.
     `DB / Week Recap Sheet` 13635:199582, `DB / Stat Tile` 13635:17826, `DB / Sheet Grabber` 13635:17825. Variable baru
     `color/background/scrim` (alias `color/alpha/black-40`). Effect style baru `Shadow XS` (bayangan mentah Button, nilai
     sama, 60 varian diikat). Audit: 0 masalah.
+  - **Tambahan 9 Okt (A2 + A3):** screen `13639:199796` (prompt rating iOS) dan `13639:200105` (share sheet iOS, link
+    kelas Tony) di section yang sama. Komponen lokal baru di frame "Components - Invite After 7 Days" (`13639:1692`):
+    `iOS / Review Prompt`, `iOS / Share Sheet` (property Title, Link), `iOS / Contact Avatar` (property Initials). App
+    icon = varian Logo 56/48 px; effect style baru `App Icon / Depth 56/48/80` (nilai sama dengan efek mentah Logo).
+    18 ukuran Logo lain masih efek mentah. Audit 218 node: 0 masalah.
 - [ ] **A5 (nanti) Logo sekolah Austin ISD** kalau batch upload ~70 SD jatuh ke desain: satu gaya logo yang bisa
   di-generate konsisten.
 
