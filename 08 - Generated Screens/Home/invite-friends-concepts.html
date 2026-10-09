@@ -169,6 +169,32 @@
   .beta i { font-size: 26px; color: var(--green); }
   .beta b { display: block; font-family: var(--serif); font-weight: 500; font-size: 17px; color: var(--ink); } .beta small { font-size: 13px; color: var(--muted); }
 
+  /* D · class chat */
+  .ch-head { display: flex; align-items: center; gap: 10px; padding: 4px 16px 10px; border-bottom: 1px solid #e3ddd0; }
+  .ch-head .av { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(160deg, #2f7a4f, #174d2e); color: #fff; display: grid; place-items: center; font-family: var(--serif); font-size: 15px; flex-shrink: 0; }
+  .ch-head .t { flex: 1; min-width: 0; } .ch-head b { display: block; font-family: var(--serif); font-weight: 500; font-size: 17px; color: var(--ink); } .ch-head small { font-size: 12px; color: var(--muted); }
+  .inv-btn { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 13px; border-radius: 99px; border: 1px solid rgb(24 99 56 / .45); color: var(--green); font-family: var(--serif); font-size: 14px; background: #fff; }
+  .tabs { display: flex; justify-content: space-around; padding: 8px 8px 0; border-bottom: 1px solid #e3ddd0; }
+  .tabs span { display: flex; flex-direction: column; align-items: center; gap: 2px; padding-bottom: 8px; font-size: 11.5px; color: var(--muted); width: 70px; }
+  .tabs span i { font-size: 20px; } .tabs span.on { color: var(--ink); box-shadow: inset 0 -2px 0 var(--ink); }
+  .feed { padding: 14px 14px 0; display: flex; flex-direction: column; gap: 10px; }
+  .msg { display: flex; gap: 8px; align-items: flex-end; max-width: 86%; }
+  .msg .ini { width: 30px; height: 30px; font-size: 11px; }
+  .msg div { background: #fff; border-radius: 18px 18px 18px 6px; padding: 9px 12px; font-size: 14px; line-height: 1.4; color: #1e3e2b; box-shadow: 1px 4px 18px rgba(13,13,18,.05); }
+  .msg div small { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 2px; }
+  .msg.me { align-self: flex-end; } .msg.me div { background: var(--green); color: #fff; border-radius: 18px 18px 6px 18px; }
+  .compose { position: absolute; left: 14px; right: 14px; bottom: 40px; height: 48px; border-radius: 99px; background: #fff; box-shadow: 1px 4px 25px 2px rgba(13,13,18,.08); display: flex; align-items: center; padding: 0 6px 0 18px; font-size: 14px; color: #a39a88; }
+  .compose span { flex: 1; } .compose i { width: 36px; height: 36px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; font-size: 17px; }
+  .mem-top { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 16px; background: #fff; }
+  .mem-top .plus { width: 44px; height: 44px; border-radius: 50%; background: var(--gs); border: 1px dashed rgb(24 99 56 / .5); display: grid; place-items: center; color: var(--green); font-size: 20px; flex-shrink: 0; }
+  .mem-top div { flex: 1; } .mem-top b { display: block; font-family: var(--serif); font-weight: 500; font-size: 16px; color: var(--ink); } .mem-top small { font-size: 12.5px; color: var(--muted); }
+  .here { display: flex; align-items: center; gap: 10px; }
+  .here .bar { flex: 1; height: 6px; border-radius: 3px; background: #e6e1d4; overflow: hidden; } .here .bar i { display: block; height: 100%; width: 70%; background: var(--green); }
+  .here small { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .mem { display: flex; align-items: center; gap: 12px; padding: 10px 2px; border-bottom: 1px solid #ece8de; }
+  .mem div { flex: 1; } .mem b { display: block; font-size: 15px; font-weight: 500; color: var(--ink); } .mem small { font-size: 12.5px; color: var(--muted); }
+  .mem em { font-style: normal; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: var(--amber); color: #7f600e; }
+
   .q { margin: 26px 40px 60px; padding: 18px 22px; max-width: 1100px; border-radius: 14px; background: #fff; box-shadow: 0 0 0 1px rgb(30 62 43 / .12); font-size: 14px; line-height: 1.6; color: var(--ink); }
   .q h3 { margin: 0 0 6px; font-family: var(--serif); font-weight: 500; font-size: 19px; }
   .q ol { margin: 0; padding-left: 20px; }
@@ -184,6 +210,7 @@
         <li><b>No limit on invites.</b> Every parent has one personal link and uses it as often as they like (B).</li>
         <li><b>The reward is getting Sprout Assist first:</b> 3 parents who join from your link and you're in the beta (C).</li>
         <li><b>The link drops the friend into the inviter's class.</b> No app yet: the link goes to the store first, and the first time the app opens (after sign-up) it goes straight into that class (B3, B4).</li>
+        <li><b>Invite from the class chat too</b> (D): the class is where a parent notices who's missing, and the link from there already knows the class.</li>
       </ol>
       <p style="margin:8px 0 0">Never in onboarding (Tony: "I don't like the app yet"). Nothing parents already use is ever locked; Sprout stays free for parents, always. Order to build: A ships with the next release (no backend); B and C need Mohit's personal links and the install handoff (see the note at the bottom).</p></div>
   </header>
@@ -419,10 +446,78 @@
     </section>
   </div>
 
+  <!-- D -->
+  <section class="dir">
+    <div class="dir-h"><span class="letter">D</span><h2>From the class chat</h2><span class="src">Ahmad, 9 Oct: the link goes into the inviter's class, so the class is the natural place to invite from</span></div>
+    <p>Inside a class, a parent is already thinking "Noah's mom isn't here yet". An <b>Invite</b> button in the class header and a first row in the member list send the same personal link, but made for this class, so the friend's page skips "Which class is your kid in?". The member list shows how many parents are here as a count, never a list of who isn't (Tony, 1 Oct: no "bad actors" lists).</p>
+    <div class="meta"><span><b>Build:</b> app (class header + members) + the web page</span><span><b>Mohit:</b> the class in the link; the class size from the room parent's list, if we have it</span><span><b>Risk:</b> none new, same link as B</span></div>
+  </section>
+  <div class="row">
+    <section class="panel">
+      <span class="tag">D1 · The class chat</span>
+      <h3>Invite, next to the class name</h3>
+      <p class="ctx">Always in the header of every class chat. Opens the share sheet with the link for <b>this class</b> and a message that names it. Parents and the room parent only: the teacher never chats in Sprout.</p>
+      <div class="phone"><div class="app">
+        <div class="sb"><span>9:41</span><i class="ph-fill ph-cell-signal-full"></i></div>
+        <div class="ch-head"><span class="back"><i class="ph ph-caret-left"></i></span><span class="av">MT</span><span class="t"><b>Miss Taylor's Class</b><small>24 parents</small></span><span class="inv-btn hot"><i class="ph ph-user-plus"></i>Invite</span></div>
+        <div class="tabs"><span class="on"><i class="ph ph-chats-circle"></i>Chat</span><span><i class="ph ph-calendar-blank"></i>Calendar</span><span><i class="ph ph-envelope-simple"></i>Updates</span><span><i class="ph ph-push-pin"></i>Links</span></div>
+        <div class="feed">
+          <div class="msg"><span class="ini" style="background:#8a5a9b">DR</span><div><small>Dana Reyes · room parent</small>Picture Day is Friday! Order forms went home in the blue folders 📸</div></div>
+          <div class="msg"><span class="ini" style="background:#b7791f">SB</span><div><small>Sarah Baker</small>Anyone doing a carpool for the field trip on the 16th?</div></div>
+          <div class="msg me"><div>We are! 2 seats left. Noah's mom asked about it too, she's not on here yet</div></div>
+          <div class="msg"><span class="ini" style="background:#6b6fb3">EC</span><div><small>Emily Centineo</small>Send her the invite 🙌</div></div>
+        </div>
+        <div class="compose"><span>Message Miss Taylor's Class</span><i class="ph ph-paper-plane-right"></i></div>
+        <span class="ind"></span>
+      </div></div>
+    </section>
+    <section class="panel">
+      <span class="tag">D2 · Class members</span>
+      <h3>Invite at the top of the members</h3>
+      <p class="ctx">First row of the member list. Shows <b>how many</b> parents are here (from the room parent's class list, if the class has one), never who is missing. Without a class list it just says "24 parents are here".</p>
+      <div class="phone"><div class="app">
+        <div class="sb"><span>9:41</span><i class="ph-fill ph-cell-signal-full"></i></div>
+        <div class="scr-h"><span class="back"><i class="ph ph-caret-left"></i></span><b>Members</b></div>
+        <div class="body">
+          <div class="mem-top hot"><span class="plus"><i class="ph ph-user-plus"></i></span><div><b>Invite a parent to Miss Taylor's Class</b><small>Your link brings them straight into this class</small></div><i class="ph ph-caret-right" style="color:var(--muted)"></i></div>
+          <div class="here"><span class="bar"><i></i></span><small>24 of 34 parents are here</small></div>
+          <p class="h" style="margin-top:2px">In this class</p>
+          <div>
+            <div class="mem"><span class="ini" style="background:#8a5a9b">DR</span><div><b>Dana Reyes</b><small>Lily's mom</small></div><em>Room parent</em></div>
+            <div class="mem"><span class="ini" style="background:#b7791f">SB</span><div><b>Sarah Baker</b><small>Howard's mom</small></div></div>
+            <div class="mem"><span class="ini" style="background:#6b6fb3">EC</span><div><b>Emily Centineo</b><small>Flore's mom</small></div></div>
+            <div class="mem"><span class="ini" style="background:#a0525c">MJ</span><div><b>Mike Johnson</b><small>Hawkins' dad</small></div></div>
+            <div class="mem"><span class="ini" style="background:#186338">JT</span><div><b>Jake Thompson</b><small>Erick's dad</small></div></div>
+          </div>
+        </div>
+        <span class="ind"></span>
+      </div></div>
+    </section>
+    <section class="panel">
+      <span class="tag webt">D3 · The friend's phone, web</span>
+      <h3>The class is already picked</h3>
+      <p class="ctx">A link sent from a class carries the class, so the page skips the picker in B3: one tap to <b>Join Miss Taylor's Class</b>, then the same store and first-open handoff as B4.</p>
+      <div class="phone"><div class="app" style="background:#f4f1ea">
+        <div class="sb"><span>9:44</span><i class="ph-fill ph-cell-signal-full"></i></div>
+        <div class="web">
+          <span class="brand"><img src="./assets/sprout-logo.png" alt="">Sprout</span>
+          <div class="invited"><img src="./assets/people/marcus.webp" alt=""><span><b>Tony Martin invited you to Miss Taylor's Class</b><small>Presley's dad</small></span></div>
+          <h4 style="font-size:26px">The class group chat, on Sprout</h4>
+          <p>24 parents from the class are already here, with the class calendar and the room parent's updates.</p>
+          <div class="school"><span class="lg">KE</span><div><b>Miss Taylor's Class</b><small>1st Grade · Kiker Elementary</small></div><i class="ph-fill ph-check-circle" style="font-size:22px;color:var(--green)"></i></div>
+          <span class="other">Not your kid's class? Pick another</span>
+          <div class="btn">Join Miss Taylor's Class <i class="ph ph-arrow-right"></i></div>
+          <p style="font-size:12.5px;text-align:center;color:var(--muted)">Free for parents. Always.</p>
+        </div>
+        <div class="urlbar"><i class="ph-fill ph-lock-simple" style="font-size:13px"></i>joinsprout.co</div>
+      </div></div>
+    </section>
+  </div>
+
   <div class="q">
     <h3>For Mohit: what this needs</h3>
     <ol>
-      <li><b>One personal link per parent</b> (<code>joinsprout.co/i/&lt;handle&gt;</code>), and a record of who joined from whose link. That record powers B1's faces, B5's notification and C's "2 of 3".</li>
+      <li><b>One personal link per parent</b> (<code>joinsprout.co/i/&lt;handle&gt;</code>), plus a class-specific version when it's sent from a class chat (D), and a record of who joined from whose link. That record powers B1's faces, B5's notification and C's "2 of 3".</li>
       <li><b>The install handoff (deferred deep link).</b> The friend taps the link, installs from the store, signs up, and the app must still know which class they picked. Android has the Play Install Referrer for this; iOS has nothing built in, so it needs a service such as Branch or AppsFlyer OneLink (Firebase Dynamic Links shut down in August 2025). If the app is already installed, the link opens it directly (universal / app links).</li>
       <li><b>The web page in B3</b> lists the inviter's classes from that link. The same page as today's class join link, plus the inviter's face and the class picker.</li>
       <li><b>Day-7 sheet (A)</b>: a 7-day timer from first use, shown once; "Rate Sprout" calls the system review prompt (SKStoreReviewController / Play In-App Review). No backend.</li>

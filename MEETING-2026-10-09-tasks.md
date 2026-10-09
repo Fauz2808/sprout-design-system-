@@ -95,6 +95,9 @@ Lanjutan dari `MEETING-2026-10-08-tasks.md`.
     kali dibuka langsung di kelas itu. Halaman jadi flow final + catatan untuk Mohit (link pribadi, deferred deep link
     lewat Branch/AppsFlyer karena iOS tidak punya bawaan, halaman web pilih kelas, timer 7 hari). Masih terbuka: teman
     dari sekolah lain tetap dihitung untuk Assist? Assist untuk pengundang saja atau sekeluarga? (usul: ya, sekeluarga).
+  - **Tambahan 9 Okt (D, Ahmad):** invite juga dari class chat: tombol Invite di header chat kelas + baris pertama di daftar
+    member ("Invite a parent to Miss Taylor's Class", jumlah parent sebagai angka, bukan daftar yang belum join). Link dari
+    kelas membawa kelasnya, jadi halaman web teman langsung "Join Miss Taylor's Class" tanpa pilih kelas.
 - [ ] **A5 (nanti) Logo sekolah Austin ISD** kalau batch upload ~70 SD jatuh ke desain: satu gaya logo yang bisa
   di-generate konsisten.
 
