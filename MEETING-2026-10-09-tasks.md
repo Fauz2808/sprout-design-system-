@@ -112,6 +112,12 @@ Lanjutan dari `MEETING-2026-10-08-tasks.md`.
     pesan terisi ("I've been using Sprout for a week: our class chat, the school calendar and our family to-dos in one
     app. It's free, join Miss Taylor's class: joinsprout.co/i/tony"), pakai komponen `iOS / Messages Compose Sheet`
     yang sudah ada. 3 fill putih mentah di komponen itu diikat ke `color/text/stable/white`. Audit: 0 masalah.
+  - **Akhir Daily Brief (9 Okt):** section baru `13644:200138` "Invite Parents · End of the Daily Brief", 200 px di bawah
+    section 7 hari. 3 screen: akhir brief dengan kartu Empty, kartu Joined (Aisha + Sarah sudah join), dan tap "Invite a
+    parent" ke share sheet link kelas. Komponen lokal baru: `DB / Invite Card` (set 13644:1771, State=Empty/Joined, pola
+    kartu To-Do: putih, radius/xl, header 12 px, divider elevation/surface/overlay), `DB / Initials Avatar` 13644:1709.
+    Judul section "👋 Invite parents" = Subhead/2 (judul section brief lain masih Inter Bold mentah, tidak ada style
+    lokal yang cocok). Audit 136 node: 0 masalah.
 - [ ] **A5 (nanti) Logo sekolah Austin ISD** kalau batch upload ~70 SD jatuh ke desain: satu gaya logo yang bisa
   di-generate konsisten.
 
