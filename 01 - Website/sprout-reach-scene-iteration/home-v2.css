@@ -383,6 +383,35 @@ main { padding-top: 0; }
   .tile-ml { width: 50px; height: 50px; }
 }
 @media (prefers-reduced-motion: reduce) { .tile { opacity: 1; transform: rotate(var(--r)); transition: none; } .tile-in { animation: none; } }
+/* "Join your schools" on a computer (Tony, 9 Oct): both stores' QR codes, iOS left, Android right */
+.getapp { width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 34px 32px 30px; border: 0; border-radius: 32px;
+  background: var(--bg); color: var(--text); text-align: center; box-shadow: 0 40px 90px -30px rgb(16 52 32 / 0.5); }
+.getapp::backdrop { background: rgb(20 35 26 / 0.42); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.getapp[open] { animation: getapp-in 0.32s var(--ease); }
+.getapp[open]::backdrop { animation: getapp-fade 0.32s ease; }
+@keyframes getapp-in { from { opacity: 0; transform: translateY(14px) scale(0.98); } }
+@keyframes getapp-fade { from { opacity: 0; } }
+.getapp-x { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border: 0; border-radius: 50%; cursor: pointer;
+  background: var(--panel); box-shadow: 0 0 0 1px var(--line); color: var(--ink); font-size: 18px; display: grid; place-items: center; }
+.getapp-x:hover { background: #fff; }
+.getapp-logo { border-radius: 12px; }
+.getapp h2 { margin-top: 12px; font-size: 30px; line-height: 1.15; }
+.getapp-sub { margin: 8px auto 0; max-width: 380px; font-size: 16px; }
+.getapp-codes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+.getapp-card { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px 16px 16px; border-radius: 24px; background: #fff;
+  box-shadow: 0 0 0 1px var(--line); text-decoration: none; transition: box-shadow 0.2s, transform 0.2s var(--ease); }
+.getapp-card:hover { transform: translateY(-2px); box-shadow: 0 0 0 1.5px rgb(24 99 56 / 0.45), 0 16px 30px -20px rgb(16 52 32 / 0.4); }
+.getapp-qr { position: relative; display: block; width: 180px; height: 180px; }
+.getapp-qr > img:first-child { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+/* the logo over the centre: under 10% of the code's area; the codes use error correction H (make-qr.py) */
+.getapp-mark { position: absolute; left: 50%; top: 50%; width: 40px; height: 40px; translate: -50% -50%; border-radius: 10px; box-shadow: 0 0 0 4px #fff; }
+.getapp-os { display: inline-flex; align-items: center; gap: 6px; font-family: var(--serif); font-size: 18px; color: var(--ink); }
+.getapp-os .ph-fill { font-size: 20px; }
+.getapp-badge { height: 40px; width: auto; }
+@media (prefers-reduced-motion: reduce) { .getapp[open], .getapp[open]::backdrop { animation: none; } }
+/* a narrow desktop window: the two codes stack (a phone never sees the pop-up) */
+@media (max-width: 520px) { .getapp { padding: 30px 18px 22px; } .getapp-codes { grid-template-columns: 1fr; } }
+
 footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 22px clamp(16px, 4vw, 40px) 90px; font-size: 14px; color: var(--muted); }
 footer nav { display: flex; gap: 18px; }
 

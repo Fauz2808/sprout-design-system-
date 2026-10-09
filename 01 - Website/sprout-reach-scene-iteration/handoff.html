@@ -52,7 +52,7 @@
     <li><b>Pinned steps</b> (<code>watchSteps</code> / <code>updateSteps</code> in home-v2.js): section height = <code>100vh + units × 70vh</code>, the inner wrapper is <code>position: sticky</code>. Progress through the section maps to a step by weight (<code>data-w</code>, default 1). All steps sit in one grid cell so the box never changes height. Do not go back to text scrolling past a sticky phone.</li>
     <li><b>Daily Brief scrub</b> (<code>scrubBrief</code>, <code>drawShared</code>, <code>glide</code>): everything is driven by scroll position, eased toward it each frame, so scrolling back up plays it backwards.</li>
     <li><b>Phone screens are code, not images</b>, built at the app's 393 × 852 and scaled with <code>--sa-scale</code>. Keep them as components.</li>
-    <li><b>Store links:</b> every <code>data-join</code> link goes to the App Store; on Android the script swaps in Google Play.</li>
+    <li><b>Store links:</b> on a phone every <code>data-join</code> link goes straight to its store (Android to Google Play, iPhone/iPad to the App Store); on a computer it opens the QR pop-up <code>#getApp</code> (iOS left, Android right). The QR images are generated from the same links: <code>python3 review/make-qr.py</code>.</li>
     <li>Phone width (≤ 900px): headline, phone and step copy fit one screen; only the step copy swaps.</li>
     <li><code>prefers-reduced-motion</code>: no glide, no fades, portal unpinned.</li>
   </ul>

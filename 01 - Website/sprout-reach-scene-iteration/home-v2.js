@@ -341,10 +341,30 @@
     if (st.kids) kidSpans.forEach((k, j) => k.classList.toggle("on", i > 0 || local > 0.08 + j * 0.24));
   };
 
-  /* ── "Join your schools" (Tony, 7 Oct) is the only CTA: straight to the store. Android gets Google Play; iPhone and
-     computers keep the App Store link in the markup. ── */
-  if (/Android/.test(navigator.userAgent))
-    document.querySelectorAll("a[data-join]").forEach((a) => (a.href = "https://play.google.com/store/apps/details?id=com.meetingpoint"));
+  /* ── "Join your schools" (Tony, 7 Oct; 9 Oct for where it goes):
+     - a phone goes straight to its store: Android to Google Play, iPhone and iPad to the App Store;
+     - a computer opens the QR pop-up (#getApp), iOS on the left, Android on the right, so you scan with your phone.
+     iPadOS reports itself as a Mac, so a Mac with a touch screen counts as an iPad. ── */
+  const PLAY = "https://play.google.com/store/apps/details?id=com.meetingpoint";
+  const ua = navigator.userAgent;
+  const isAndroid = /Android/i.test(ua);
+  const isIOS = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  const joinLinks = document.querySelectorAll("a[data-join]");
+  if (isAndroid) joinLinks.forEach((a) => (a.href = PLAY));
+  const getApp = document.getElementById("getApp");
+  if (getApp && !isAndroid && !isIOS) {
+    joinLinks.forEach((a) => a.addEventListener("click", (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; // a new tab still goes to the store
+      e.preventDefault();
+      getApp.showModal();
+    }));
+    getApp.addEventListener("click", (e) => {
+      // the close button, or a click on the backdrop (outside the box)
+      const r = getApp.getBoundingClientRect();
+      const out = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+      if (e.target.closest("[data-close]") || (out && e.target === getApp)) getApp.close();
+    });
+  }
 
   /* ── FAQ: <details> opens and closes with no motion by default ("harsh", Ahmad 8 Oct). Animate the height between the
      question alone and the question with its answer, and fade the answer in. Web Animations, so it works in Safari

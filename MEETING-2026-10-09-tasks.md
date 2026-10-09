@@ -72,9 +72,11 @@ Lanjutan dari `MEETING-2026-10-08-tasks.md`.
   Circle C are already here · Free for parents. Always."; (b) pakai angka nyata dari Tony (kelas pertama 34, target 85).
   Satu tempat: `SCHOOLS` di `home-v2.js`, lalu export + push ke `sprout-website`. **Tanya Tony atau putuskan (a).**
   - **Dikerjakan 9 Okt (a, Ahmad):** angka dibuang, `SCHOOLS` dihapus. Live di link review + `sprout-website`.
-- [ ] **A2 Pop-up QR untuk "Join your schools" di desktop:** iOS kiri, Android kanan, copy baru. Mohit sudah punya desain
-  QR; ambil darinya supaya tidak ada dua versi, pasang di `home-v2` (repo `sprout-website` adalah sumbernya), mobile
-  tetap langsung ke store sesuai OS. Koordinasi dengan Syed/Mohit siapa yang mengerjakan supaya tidak dobel.
+- [x] **A2 Pop-up QR di desktop: dikerjakan kita (9 Okt), bukan Mohit.** QR di-generate dari link store yang sama
+  (`review/make-qr.py`, dicek dengan decoder: dua-duanya terbaca persis sebagai link tombolnya). Desktop: pop-up iOS kiri,
+  Android kanan, tutup lewat Esc / tombol / klik di luar. HP: langsung ke store sesuai OS (iPad ikut App Store). Link App
+  Store diganti ke storefront US (sebelumnya India). Live di link review + `sprout-website` (Syed tinggal deploy).
+  Desain QR Mohit belum dilihat; kalau beda gaya, sesuaikan.
 - [ ] **A3 Screenshot App Store/Play Store untuk rilis ini** (`03 - App Marketplace Screenshots/`): Daily Brief baru,
   spouse, reminder. Harus siap sebelum Mohit push (target besok).
 - [ ] **A4 Invite teman / growth loop: 2–3 arah, belum desain final.** Bahan: pop-up sesudah seminggu (rating + share,
@@ -88,7 +90,7 @@ Lanjutan dari `MEETING-2026-10-08-tasks.md`.
 **Mohit**
 - Reminder suara selesai (besok), lalu rilis iOS.
 - Link Android di halaman join kelas.
-- Join di website: deteksi OS di mobile, pop-up QR di desktop (lihat A2).
+- ~~Join di website: pop-up QR desktop~~: dikerjakan kita (A2). Mohit tidak perlu mengerjakan.
 - Hari libur dari Kiker master list ke Daily Brief (9 dan 12 Okt belum muncul).
 - Sesudah rilis: email scraping ke Daily Brief.
 
