@@ -15,7 +15,7 @@
 
    8 Oct for the React build (Syed): the class and directory sections are pinned too now. The copy no longer scrolls
    past the phone; the scroll swaps one step for the next in the same place (Tony: "flash perfectly in the right
-   spot"). The proof line's family count is SCHOOLS below. */
+   spot"). */
 (function () {
   const A = "./assets/assist/";
   const V = "./assets/v2/";
@@ -345,11 +345,6 @@
      computers keep the App Store link in the markup. ── */
   if (/Android/.test(navigator.userAgent))
     document.querySelectorAll("a[data-join]").forEach((a) => (a.href = "https://play.google.com/store/apps/details?id=com.meetingpoint"));
-
-  /* ── The proof line under the hero ("112 Kiker families are already here", Tony 8 Oct). The number lives here only;
-     in production it comes from the API. ── */
-  const SCHOOLS = [{ name: "Kiker Elementary", place: "Circle C, Austin, TX", families: 112 }];
-  document.querySelectorAll("[data-families]").forEach((b) => (b.textContent = String(SCHOOLS[0].families)));
 
   /* ── FAQ: <details> opens and closes with no motion by default ("harsh", Ahmad 8 Oct). Animate the height between the
      question alone and the question with its answer, and fade the answer in. Web Animations, so it works in Safari
