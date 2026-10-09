@@ -108,6 +108,10 @@ Lanjutan dari `MEETING-2026-10-08-tasks.md`.
     `iOS / Review Prompt`, `iOS / Share Sheet` (property Title, Link), `iOS / Contact Avatar` (property Initials). App
     icon = varian Logo 56/48 px; effect style baru `App Icon / Depth 56/48/80` (nilai sama dengan efek mentah Logo).
     18 ukuran Logo lain masih efek mentah. Audit 218 node: 0 masalah.
+  - **A4 (9 Okt):** screen `13641:17038` "Day 7 · Messages, prefilled invite": iMessage terbuka ke Sarah Baker dengan
+    pesan terisi ("I've been using Sprout for a week: our class chat, the school calendar and our family to-dos in one
+    app. It's free, join Miss Taylor's class: joinsprout.co/i/tony"), pakai komponen `iOS / Messages Compose Sheet`
+    yang sudah ada. 3 fill putih mentah di komponen itu diikat ke `color/text/stable/white`. Audit: 0 masalah.
 - [ ] **A5 (nanti) Logo sekolah Austin ISD** kalau batch upload ~70 SD jatuh ke desain: satu gaya logo yang bisa
   di-generate konsisten.
 
