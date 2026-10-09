@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex,nofollow" />
+<title>Website v2 Handoff</title>
+<style>
+  :root { --bg: #f4f1ea; --ink: #1e3e2b; --text: #3f4650; --green: #186338; --line: rgba(30,62,43,.14); --panel: #fbfaf6; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 Inter, -apple-system, system-ui, sans-serif; }
+  main { max-width: 820px; margin: 0 auto; padding: 48px 16px 80px; }
+  h1, h2 { font-family: "Playfair Display", Georgia, serif; font-weight: 500; color: var(--ink); line-height: 1.2; }
+  h1 { font-size: 36px; margin: 0 0 8px; } h2 { font-size: 24px; margin: 40px 0 10px; }
+  a { color: var(--green); } code { font: 14px ui-monospace, Menlo, monospace; background: #ebe4d4; padding: 1px 5px; border-radius: 5px; }
+  .meta { color: #7d715e; margin: 0 0 24px; }
+  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; } td, th { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--ink); font-weight: 600; } li { margin: 4px 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Website v2: handoff to React</h1>
+  <p class="meta">For Syed. From Ahmad, 8 Oct 2026. Goal: live this weekend (Tony sends the group chat invites after).</p>
+
+  <div class="box">
+    <b>The page:</b> <a href="./home-v2.html">home-v2.html</a> (desktop and phone, scroll top to bottom).<br />
+    <b>Source:</b> it is a static site, every file is served next to the page: <a href="./home-v2.html">home-v2.html</a>,
+    <a href="./home-v2.css">home-v2.css</a>, <a href="./home-v2.js">home-v2.js</a>, <a href="./hero-portal.css">hero-portal.css</a>,
+    <a href="./hero-portal.js">hero-portal.js</a>, <a href="./sections-demo.js">sections-demo.js</a>, <a href="./sections-demo.css">sections-demo.css</a>,
+    <a href="./assist-demo.css">assist-demo.css</a>. Images under <code>./assets/</code>.<br />
+    <b>Pages to add (Mohit: needed for branding verification):</b> <a href="./legal/privacy-policy.html">Privacy Policy</a> and
+    <a href="./legal/terms-and-conditions.html">Terms &amp; Conditions</a>. The copy is final as of 23 Apr 2026; restyle to the site. The footer links to
+    <code>/privacy</code>, <code>/terms</code> and <code>/child-safety</code> on joinsprout.co.
+  </div>
+
+  <h2>Sections, top to bottom</h2>
+  <table>
+    <tr><th>Section</th><th>What it does</th></tr>
+    <tr><td>Hero + portal</td><td>Sky video loop, live mascot in the headline. The "Join your schools" button, then a proof line. Scrolling pins the hero; the mascot's circle grows and 10 notes fly out (<code>hero-portal.js</code>).</td></tr>
+    <tr><td>Daily Brief</td><td>Pinned. The phone lands centred under "Sprout puts them in one place.", moves right, Lydia's to-do notification drops into the list, then the brief scrolls with the page. The phone carries one real morning on its own; desktop has the headline and one supporting line beside it, phone width has no copy and a bigger phone.</td></tr>
+    <tr><td>Class group chats</td><td>Pinned. 5 steps. <b>The copy never moves</b> (Tony, 8 Oct): the scroll picks the step and it fades in place. Each step has a "02 / 05" counter, and one bar under it fills with the scroll. Step 1 has double the scroll so the kids' names (Presley, Jake, Mia) come in one by one.</td></tr>
+        <tr><td>Member directory</td><td>Pinned, 4 steps, same mechanism (counter + bar). Kids' privacy line under the headline.</td></tr>
+    <tr><td>Top bar</td><td>"I'm a room parent" outline button, straight to roomparent.com. Phone width: the logo word hides so both buttons fit.</td></tr>
+    <tr><td>Sprout Assist</td><td>Static three-line teaser with the mascot. Coming soon.</td></tr>
+    <tr><td>FAQ</td><td>6 questions, native <code>&lt;details&gt;</code>.</td></tr>
+    <tr><td>Close</td><td>Headline, "Join your schools" button, "Free for parents. Always.", 3D tiles fly in.</td></tr>
+  </table>
+
+  <h2>Behaviour to keep</h2>
+  <ul>
+    <li><b>Pinned steps</b> (<code>watchSteps</code> / <code>updateSteps</code> in home-v2.js): section height = <code>100vh + units × 70vh</code>, the inner wrapper is <code>position: sticky</code>. Progress through the section maps to a step by weight (<code>data-w</code>, default 1). All steps sit in one grid cell so the box never changes height. Do not go back to text scrolling past a sticky phone.</li>
+    <li><b>Daily Brief scrub</b> (<code>scrubBrief</code>, <code>drawShared</code>, <code>glide</code>): everything is driven by scroll position, eased toward it each frame, so scrolling back up plays it backwards.</li>
+    <li><b>Phone screens are code, not images</b>, built at the app's 393 × 852 and scaled with <code>--sa-scale</code>. Keep them as components.</li>
+    <li><b>Store links:</b> every <code>data-join</code> link goes to the App Store; on Android the script swaps in Google Play.</li>
+    <li>Phone width (≤ 900px): headline, phone and step copy fit one screen; only the step copy swaps.</li>
+    <li><code>prefers-reduced-motion</code>: no glide, no fades, portal unpinned.</li>
+  </ul>
+
+  <h2>Data that should come from the API</h2>
+  <ul>
+    <li><b>Family count</b> ("112 Kiker families in Circle C are already here"): fills from <code>SCHOOLS[0].families</code>. <b>Tony to confirm the real number before launch.</b></li>
+  </ul>
+
+  <h2>Not in this build</h2>
+  <ul>
+    <li><code>noindex</code> is on the review page; remove it for production.</li>
+    <li>The hero video may be swapped later (Tony asked for a parent and kid walking to school). Same file slot, no code change.</li>
+  </ul>
+  <p>Questions to Ahmad.</p>
+</main>
+</body>
+</html>

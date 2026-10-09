@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sprout · The app for parents</title>
-    <meta name="description" content="Sprout puts your kids' classes, the school calendar, the other parents and a Daily Brief you share with your spouse in one app." />
+    <meta name="description" content="The parent community for your school, plus a daily plan that does the remembering. Meet other families, coordinate plans, and never miss what matters." />
     <meta name="theme-color" content="#f4f1ea" />
     <meta name="robots" content="noindex,nofollow" />
     <link rel="icon" href="./assets/logo.png" />
@@ -17,11 +17,10 @@
          and Clubs screens from assist-demo.css, the Assist phones from assist.html (home-v2-gp.css). -->
     <link rel="stylesheet" href="./assist-demo.css?v=20260925-27" />
     <link rel="stylesheet" href="./sections-demo.css?v=20260925-2" />
-    <link rel="stylesheet" href="./home-v2-gp.css?v=20261007-4" />
-    <link rel="stylesheet" href="./hero-portal.css?v=20261007-1" />
-    <link rel="stylesheet" href="./home-v2.css?v=20261007-17" />
+    <link rel="stylesheet" href="./hero-portal.css?v=20261008-1" />
+    <link rel="stylesheet" href="./home-v2.css?v=20261009-2" />
     <script src="./sections-demo.js?v=20260925-2" defer></script>
-    <script src="./home-v2.js?v=20261007-14" defer></script>
+    <script src="./home-v2.js?v=20261008-6" defer></script>
     <script src="./hero-portal.js?v=20261007-3" defer></script>
   </head>
   <body>
@@ -29,8 +28,11 @@
     <header class="top over" id="top">
       <a class="logo" href="#home" aria-label="Sprout home"><img src="./assets/logo.png" alt="" width="30" height="30" />Sprout</a>
       <nav class="top-links" aria-label="Sections">
-        <a href="#brief">Daily Brief</a><a href="#classes">Class chats</a><a href="#directory">Directory</a><a href="#assist">Sprout Assist</a>
+        <a href="#brief">Daily Brief</a><a href="#classes">Class chats</a><a href="#directory">Directory</a><a href="#faq">FAQ</a>
       </nav>
+      <!-- room parents: Tony wanted it in the header (8 Oct); the section below was cut the same day ("confusing if I'm a
+           normal parent"), so the button goes straight to RoomParent -->
+      <a class="top-rp" href="https://roomparent.com" rel="noopener">I’m a room parent</a>
       <a class="top-cta" href="https://apps.apple.com/in/app/sprout-the-app-for-parents/id6739574052" data-join>Join your schools</a>
     </header>
 
@@ -48,9 +50,13 @@
               <div class="sky-focus"></div>
             </div>
             <div class="hero-copy">
-              <h1 id="hero-h">Your village<span class="ml ml-circle h-orb" data-live role="img" aria-label="Sprout"></span>, handled.</h1>
-              <p class="lede">Sprout connects you with the parents at your school and handles the logistics in between.</p>
+              <!-- header and sub: Tony, 9 Oct (replaces "Your village, handled."). The mascot stays in the line: the portal grows
+                   out of it (hero-portal.js) -->
+              <h1 id="hero-h">The parent community for your <span class="nw">school<span class="ml ml-circle h-orb" data-live role="img" aria-label="Sprout"></span>,</span> plus a daily plan that does the remembering.</h1>
+              <p class="lede">Meet other families, coordinate plans, and never miss what matters.</p>
+              <!-- the school search was here (8 Oct); Ahmad removed it the same day. Back to the one button. -->
               <a class="join-btn" href="https://apps.apple.com/in/app/sprout-the-app-for-parents/id6739574052" data-join>Join your schools <i class="ph ph-arrow-right"></i></a>
+              <p class="proof"><span><b data-families>112</b> Kiker families in Circle C are already here</span><span aria-hidden="true">·</span><span>Free for parents. Always.</span></p>
             </div>
             <a class="more glass" href="#brief">See your morning <i class="ph ph-arrow-down"></i></a>
           </div>
@@ -83,37 +89,36 @@
           <p class="brief-intro" aria-hidden="true"><img src="./assets/logo.png" alt="" width="34" height="34" />Sprout puts them in one place.</p>
           <div class="scrolly-copy">
             <p class="eyebrow">Daily Brief</p>
-            <h2 id="brief-h">Your day, in one place. Shared with your spouse.</h2>
-            <p>Every morning Sprout lines up what needs doing across all your kids' classes. Connect your spouse and you both see the same list, and who already did what.</p>
-            <ol class="brief-parts" aria-label="What's in the Daily Brief">
-              <li data-part="todo">Family to-dos, for you, your spouse or both</li>
-              <li data-part="invites">Invitations you still need to answer</li>
-              <li data-part="today">What's happening today</li>
-              <li data-part="upcoming">Upcoming events and No School days</li>
-              <li data-part="lunch">Lunch and birthdays</li>
-              <li data-part="messages">New messages</li>
-            </ol>
+            <h2 id="brief-h">Your whole morning at a glance. Shared with your spouse.</h2>
+            <!-- Tony, 8 Oct evening: the 7:02 AM cards beside the phone read as a second, different list ("not sure what it's
+                 trying to accomplish"). The phone carries the real morning now; one supporting line, as on mobile. -->
+            <p>Every morning, Sprout lines up what needs doing across all your kids' classes. Connect your spouse and you both see the same list, and who already did what.</p>
           </div>
           <div class="scrolly-stage">
-            <div class="phone" id="briefPhone" role="img" aria-label="Sprout Daily Brief: family to-dos, invitations, today's events, upcoming events, lunch, birthdays and new messages"></div>
+            <div class="phone" id="briefPhone" role="img" aria-label="Sprout Daily Brief for Thursday: Pajama Day, $5 for the book fair, Ava's party invitation, morning carpool and Lydia on pickup"></div>
           </div>
         </div>
       </section>
 
-      <!-- 4 · CLASS GROUP CHATS. Sticky phone, steps scroll past it. Step 0 = every class in one list
-           (the kids' names bounce in); steps 1-4 = what each class holds. -->
-      <section class="scrolly steps classes" id="classes" aria-labelledby="classes-h">
+      <!-- 4 · CLASS GROUP CHATS. Pinned like the Daily Brief (Tony, 8 Oct: the text kept sliding up and was hard to read,
+           "I'd rather it just flash perfectly in the right spot"): the copy stays put, the scroll swaps one step for the
+           next in the same place. Step 0 = every class in one list (the kids' names come in, it gets two units of
+           scroll); steps 1-4 = what each class holds. --units = total scroll units, home-v2.js reads data-w. -->
+      <section class="scrolly steps classes" id="classes" aria-labelledby="classes-h" style="--units: 6">
         <div class="scrolly-pin">
           <div class="scrolly-copy">
             <div class="step-head"><p class="eyebrow">Class group chats</p>
-            <h2 id="classes-h">All your kids' classes, in one place.</h2></div>
+            <h2 id="classes-h">Every class. One app. Zero reply-all.</h2></div>
             <div class="step-list">
-              <article class="step" data-step="list"><h3>One list for every class</h3><p>Presley's, Jake's and Mia's classes sit side by side in Chat, each with a group chat of the parents in that class.</p></article>
+              <article class="step" data-step="list" data-w="2"><h3>One list for every class</h3><p>Presley's, Jake's and Mia's classes sit side by side in Chat, each with a group chat of the parents in that class.</p></article>
               <article class="step" data-step="chat"><h3>The class group chat</h3><p>Every parent in the class, in one thread. Ask about the field trip, offer a ride, share the photos.</p></article>
               <article class="step" data-step="calendar"><h3>The class calendar</h3><p>Events, No School days and reminders from your room parent. They show up in your Daily Brief too.</p></article>
-              <article class="step" data-step="updates"><h3>Teacher and room parent emails</h3><p>Class updates pulled from your inbox and kept with the class, so nothing gets buried.</p></article>
+              <article class="step" data-step="updates"><h3>Teacher and room parent emails</h3><p>Class updates pulled from your inbox and kept with the class, so nothing gets buried.</p>
+                <!-- the trust line sits where we ask for the inbox (Tony, 8 Oct, point 4) -->
+                <p class="trust"><i class="ph-fill ph-lock-simple" aria-hidden="true"></i>You choose which senders Sprout reads. Nothing else.</p></article>
               <article class="step" data-step="links"><h3>Important links</h3><p>The school site, the wish list, donations. Pinned, not scrolled for.</p></article>
             </div>
+            <div class="bar" aria-hidden="true"><i></i></div>
           </div>
           <div class="scrolly-stage">
             <div class="phone" id="classPhone" role="img" aria-label="Sprout Chat: every class your kids are in, and inside one class its chat, calendar, updates and links">
@@ -124,8 +129,9 @@
         </div>
       </section>
 
-      <!-- 5 · MEMBER DIRECTORY. Communities, the list, a profile, a message without swapping numbers. -->
-      <section class="scrolly steps directory" id="directory" aria-labelledby="dir-h">
+      <!-- 5 · MEMBER DIRECTORY. Communities, the list, a profile, a message without swapping numbers. Pinned, like the
+           class chats. -->
+      <section class="scrolly steps directory" id="directory" aria-labelledby="dir-h" style="--units: 4">
         <div class="scrolly-pin">
           <div class="scrolly-copy">
             <div class="step-head"><p class="eyebrow">Member directory</p>
@@ -136,6 +142,7 @@
               <article class="step" data-step="profile"><h3>Open a profile</h3><p>Their kids, what they're into, and the events you've been to together.</p></article>
               <article class="step" data-step="message"><h3>Message without swapping numbers</h3><p>Say hi in Sprout. Your phone number and email stay private until you decide to share them.</p></article>
             </div>
+            <div class="bar" aria-hidden="true"><i></i></div>
           </div>
           <div class="scrolly-stage">
             <div class="phone" id="dirPhone" role="img" aria-label="Sprout Clubs: the member directory for each community, a parent's profile, and a private message"></div>
@@ -143,120 +150,40 @@
         </div>
       </section>
 
-      <!-- 6 · SPROUT ASSIST, near the bottom for now (Tony: in beta for a while, not the lead). The six
-           assist.html rows become one carousel. The mascot lives here only: "this little guy is the AI guy". -->
+      <!-- 6 · SPROUT ASSIST, a three-line teaser (Tony, 8 Oct, point 3): it hasn't shipped, so one outcome, not the
+           longest section on the page. The safety details (payments, passwords, what it reads) moved to the FAQ. The
+           mascot lives here only: "this little guy is the AI guy". -->
       <section class="assist" id="assist" aria-labelledby="assist-h">
-        <div class="assist-head">
+        <div class="assist-tease">
           <img class="assist-mascot" src="./assets/mascot/sprout-happy.webp" alt="" width="96" height="96" />
-          <p class="eyebrow">Coming soon</p>
-          <h2 id="assist-h">Sprout Assist. Help that gets it done.</h2>
-          <p>One helper you and your spouse share. It's arriving in stages, starting with reminders you can say out loud.</p>
-          <div class="car-nav">
-            <button type="button" class="car-btn" data-dir="-1" aria-label="Previous"><i class="ph ph-arrow-left"></i></button>
-            <button type="button" class="car-btn" data-dir="1" aria-label="Next"><i class="ph ph-arrow-right"></i></button>
+          <div>
+            <p class="eyebrow">Coming soon · Sprout Assist</p>
+            <h2 id="assist-h">Camp signups done at 7:00 AM sharp, before your coffee.</h2>
+            <p>A helper you and your spouse share. It's arriving in stages, starting with reminders you can say out loud.</p>
           </div>
-        </div>
-        <div class="car" id="assistCar" tabindex="0" aria-label="What Sprout Assist will do, scroll sideways">
-          <article class="card">
-            <div class="art"><div class="gp"><div class="gp-screen">
-              <div class="gp-island"></div>
-              <div class="gp-head"><span class="gp-btn"><i class="ph ph-caret-left"></i></span><span class="gp-pill"><img src="./assets/mascot/sprout-face.webp" alt="" width="192" height="192" />Family</span><span class="gp-btn"><i class="ph ph-users-three"></i></span></div>
-              <div class="gp-feed">
-                <div class="gp-time">Today 1:58 PM</div>
-                <div class="gp-b me"><em>Lydia</em>Can you sign Presley up for Camp Pinecrest week 2? Same as last summer.</div>
-                <div class="gp-b ai">On it. Week 2 is Jun 15–19 and 4 spots are left.</div>
-                <div class="gp-b ai"><b>@Matt</b> 3 PM pickup again, like last summer?</div>
-                <div class="gp-b them"><em>Matt</em>Yep, put me down 👍</div>
-                <div class="gp-meta">Added to Matt's brief <i class="ph ph-clock"></i> <b>3 PM pickup · Jun 15–19</b></div>
-              </div>
-              <div class="gp-foot"><div class="gp-chips"><span><i class="ph ph-clock-counter-clockwise"></i>What did I miss?</span><span><i class="ph ph-bell"></i>Reminder</span><span><i class="ph ph-calendar-blank"></i>Event</span><span><i class="ph ph-van"></i>Carpool</span><span><i class="ph ph-cake"></i>Birthday</span></div><div class="gp-bar"><span class="gp-plus"><i class="ph ph-plus"></i></span><span class="gp-input">Ask Sprout anything…</span><span class="gp-mic"><i class="ph-fill ph-microphone"></i></span><span class="gp-wave"><i class="ph ph-waveform"></i></span></div></div>
-            </div></div></div>
-            <h3>One Sprout for both of you</h3>
-            <p>It lives in a chat you and your spouse share, asks the right parent directly and keeps you both in the loop.</p>
-          </article>
-          <article class="card">
-            <div class="art"><div class="gp"><div class="gp-screen">
-              <div class="gp-island"></div>
-              <div class="gp-head"><span class="gp-btn"><i class="ph ph-caret-left"></i></span><span class="gp-pill"><img src="./assets/mascot/sprout-face.webp" alt="" width="192" height="192" />Family</span><span class="gp-btn"><i class="ph ph-monitor"></i></span></div>
-              <div class="gp-feed">
-                <div class="gp-time">Today 2:03 PM</div>
-                <div class="gp-b ai">Matt's on pickup. Filling in Presley's form now.</div>
-                <div class="gp-card">
-                  <div class="gp-card-h"><b>Browser</b><span class="gp-chip live"><i></i>Live</span></div>
-                  <div class="gp-page">
-                    <div class="gp-url"><i class="ph-fill ph-lock-simple"></i>portal.pinecrest.example</div>
-                    <div class="gp-pg-brand"><span></span>Camp Pinecrest</div>
-                    <div class="gp-pg-h">Camper details</div>
-                    <div class="gp-rows"><div><span>First name</span>Presley</div><div><span>Age</span>7</div><div><span>Allergies</span>None</div><div class="now"><span>T-shirt</span><em>Youth M</em></div></div>
-                  </div>
-                </div>
-                <div class="gp-meta">Step 2 of 5 <i class="ph ph-hand-pointing"></i> <b>Take over any time</b></div>
-              </div>
-              <div class="gp-foot"><div class="gp-chips"><span><i class="ph ph-clock-counter-clockwise"></i>What did I miss?</span><span><i class="ph ph-bell"></i>Reminder</span><span><i class="ph ph-calendar-blank"></i>Event</span><span><i class="ph ph-van"></i>Carpool</span><span><i class="ph ph-cake"></i>Birthday</span></div><div class="gp-bar"><span class="gp-plus"><i class="ph ph-plus"></i></span><span class="gp-input">Ask Sprout anything…</span><span class="gp-mic"><i class="ph-fill ph-microphone"></i></span><span class="gp-wave"><i class="ph ph-waveform"></i></span></div></div>
-            </div></div></div>
-            <h3>It works in a browser you can watch</h3>
-            <p>It fills in the camp portal or the school form from what it already knows. Watch it, pause it, or take over.</p>
-          </article>
-          <article class="card">
-            <div class="art"><div class="gp"><div class="gp-screen">
-              <div class="gp-island"></div>
-              <div class="gp-head"><span class="gp-btn"><i class="ph ph-caret-left"></i></span><span class="gp-pill"><img src="./assets/mascot/sprout-listening.webp" alt="" width="160" height="160" />Family</span><span class="gp-btn"><i class="ph ph-receipt"></i></span></div>
-              <div class="gp-feed">
-                <div class="gp-time">Today 2:13 PM</div>
-                <div class="gp-b ai">Form's done. One last step and the spot is Presley's:</div>
-                <div class="gp-card gp-pay">
-                  <div class="gp-card-h"><b>Payment</b><span class="gp-chip wait"><i></i>Waiting for Lydia</span></div>
-                  <div class="gp-rows"><div><span>To</span>Camp Pinecrest</div><div><span>For</span>Presley · Week 2</div><div><span>Card</span>Visa •••• 4242</div><div class="tot"><span>Total</span>$420.00</div></div>
-                  <div class="gp-acts"><span class="gp-no">Decline</span><span class="gp-ok gp-approve">Approve</span></div>
-                </div>
-                <div class="gp-meta gp-done">Approved by Lydia <i class="ph ph-check-circle"></i> <b>2:14 PM · on Matt's phone too</b></div>
-              </div>
-              <div class="gp-foot"><div class="gp-chips"><span><i class="ph ph-clock-counter-clockwise"></i>What did I miss?</span><span><i class="ph ph-bell"></i>Reminder</span><span><i class="ph ph-calendar-blank"></i>Event</span><span><i class="ph ph-van"></i>Carpool</span><span><i class="ph ph-cake"></i>Birthday</span></div><div class="gp-bar"><span class="gp-plus"><i class="ph ph-plus"></i></span><span class="gp-input">Ask Sprout anything…</span><span class="gp-mic"><i class="ph-fill ph-microphone"></i></span><span class="gp-wave"><i class="ph ph-waveform"></i></span></div></div>
-            </div></div></div>
-            <h3>Nothing is paid or sent without a yes</h3>
-            <p>It stops at checkout and shows what, who for and how much. Your spouse sees who said yes, and when.</p>
-          </article>
-          <article class="card">
-            <div class="art"><div class="gp"><div class="gp-screen">
-              <div class="gp-island"></div>
-              <div class="gp-head"><span class="gp-btn"><i class="ph ph-caret-left"></i></span><span class="gp-pill"><img src="./assets/mascot/sprout-listening.webp" alt="" width="160" height="160" />Family</span><span class="gp-btn"><i class="ph ph-pause"></i></span></div>
-              <div class="gp-feed dim"><div class="gp-time">Today 2:06 PM</div><div class="gp-b ai">Pinecrest wants a parent to sign in. Over to you, Lydia.</div></div>
-              <div class="gp-sheet">
-                <span class="gp-grab"></span><span class="gp-lock"><i class="ph-fill ph-lock-key"></i></span>
-                <b>Sign in to Camp Pinecrest</b>
-                <p>Sprout is paused. It can't see what you type here, and won't save it.</p>
-                <div class="gp-field">lydia@example.com</div><div class="gp-field pw">••••••••••</div>
-                <span class="gp-ok wide">Sign in</span>
-              </div>
-            </div></div></div>
-            <h3>Your logins stay yours</h3>
-            <p>When a site asks you to sign in, Sprout pauses and hands it to you. It never reads your password.</p>
-          </article>
-          <article class="card">
-            <div class="art"><div class="gp"><div class="gp-screen">
-              <div class="gp-island"></div>
-              <div class="gp-head"><span class="gp-btn"><i class="ph ph-caret-left"></i></span><span class="gp-pill"><img src="./assets/mascot/sprout-face.webp" alt="" width="192" height="192" />What Sprout reads</span><span class="gp-btn"><i class="ph ph-plus"></i></span></div>
-              <div class="gp-feed">
-                <div class="gp-time">Pick one at a time</div>
-                <div class="gp-sender"><span class="ic"><i class="ph-fill ph-graduation-cap"></i></span><div><b>Mrs. Taylor's 1st grade</b><span>Calendar, room parent emails</span></div><i class="tog on"></i></div>
-                <div class="gp-sender"><span class="ic y"><i class="ph-fill ph-soccer-ball"></i></span><div><b>Austin Youth Soccer</b><span>Coach Dan</span></div><i class="tog on"></i></div>
-                <div class="gp-sender"><span class="ic b"><i class="ph-fill ph-tent"></i></span><div><b>Camp Pinecrest</b><span>hello@pinecrest</span></div><i class="tog on"></i></div>
-                <div class="gp-sender"><span class="ic r"><i class="ph-fill ph-first-aid"></i></span><div><b>Hill Country Pediatrics</b><span>Not shared</span></div><i class="tog"></i></div>
-                <div class="gp-card note"><div class="gp-card-h"><b>From your class</b><span class="gp-chip">No School</span></div><p>Mon, Oct 12 is a teacher workday. Sprout moved Presley's playdate to the morning.</p></div>
-              </div>
-            </div></div></div>
-            <h3>It starts from your class</h3>
-            <p>Sprout already has your class calendar and your room parent's sign-ups. You choose which senders it may read.</p>
-          </article>
         </div>
       </section>
 
-      <!-- 7 · CLOSE (Ahmad, 7 Oct, after Orbits' close): the tagline, one line, one button, and Sprout's own 3D icons
-           flying in around the mascot. The button goes straight to the store (home-v2.js). -->
+      <!-- FAQ (Tony, 8 Oct): the questions the page raises, answered once. Plain <details>, no script. -->
+      <section class="faq" id="faq" aria-labelledby="faq-h">
+        <h2 id="faq-h">Questions parents ask</h2>
+        <div class="faq-list">
+          <details open><summary>Is Sprout free?</summary><p>Yes. Sprout is free for parents. Always.</p></details>
+          <details><summary>What if my school isn't on Sprout yet?</summary><p>Get Sprout and ask for your school from the app. The fastest way to bring your whole class is your room parent: they can set the class up on <a href="https://roomparent.com" rel="noopener">RoomParent</a> in about 5 minutes, and every parent they invite lands in the same class on Sprout.</p></details>
+          <details><summary>Who can see my kids?</summary><p>No kid profiles. No public posts. Only verified parents at your school can see your class, and your phone number and email stay private until you choose to share them.</p></details>
+          <details><summary>What does Sprout read from my email?</summary><p>Only the senders you choose, like your teacher and your room parent. Nothing else. You can turn a sender off at any time.</p></details>
+          <details><summary>Will Sprout Assist pay for things or see my passwords?</summary><p>Nothing is paid or sent without your yes. Before checkout it shows you what, who it's for and how much, and your spouse sees who approved it. When a site asks you to sign in, Sprout pauses and hands it to you. It never sees or saves your password.</p></details>
+          <details><summary>Can my spouse see the same things?</summary><p>Invite them from your Daily Brief. Once they join, you share one Family To-Do List, the same invitations and the same calendar, and you both see who already did what.</p></details>
+        </div>
+      </section>
+
+      <!-- 7 · CLOSE (Ahmad, 7 Oct, after Orbits' close; headline Tony, 8 Oct, point 6: the hero's punch, not a mission
+           statement): the line, the button, "free", and Sprout's own 3D icons flying in around the mascot. The button
+           goes straight to the store (home-v2.js). -->
       <section class="end" id="download" aria-labelledby="end-h">
-        <h2 id="end-h">Where parents bond, childhoods flourish.</h2>
-        <p class="end-lede">Join your kids' classes and meet the parents around them.</p>
+        <h2 id="end-h">The parents who matter most are already at drop-off.</h2>
         <a class="join-btn" href="https://apps.apple.com/in/app/sprout-the-app-for-parents/id6739574052" data-join>Join your schools <i class="ph ph-arrow-right"></i></a>
+        <p class="end-free">Free for parents. Always.</p>
         <div class="tiles" aria-hidden="true">
           <span class="tile" style="--x:8%;--y:70px;--r:-6deg;--i:0"><span class="tile-in"><img src="./assets/assist/need-what.webp" alt="" width="72" height="72" /></span></span>
           <span class="tile" style="--x:25%;--y:0px;--r:5deg;--i:1"><span class="tile-in"><img src="./assets/assist/bell.webp" alt="" width="72" height="72" /></span></span>

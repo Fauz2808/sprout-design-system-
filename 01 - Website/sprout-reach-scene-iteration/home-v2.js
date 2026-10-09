@@ -8,8 +8,14 @@
    - Member directory: Clubs 12767:108049 (assist-demo.css .sa-clubs), a parent profile
      (15.4 Clubs - User Details 2377:38114) and a private message.
 
-   Demo content: dates moved to the week of Oct 7 so the brief reads as one morning; the Figma
-   host "Patrick Collison" and the "By:" names are swapped for the page's fictional cast. */
+   Demo content: one real morning (Tony, 8 Oct: "Show a real morning instead of describing it"), Thursday Oct 8:
+   Pajama Day, Mia's $5 for the book fair, Ava's party RSVP due Friday, you on carpool and Lydia on pickup. The phone
+   carries it on its own (the cards beside it were cut the same evening). The Figma host "Patrick Collison" and the "By:" names are swapped
+   for the page's fictional cast.
+
+   8 Oct for the React build (Syed): the class and directory sections are pinned too now. The copy no longer scrolls
+   past the phone; the scroll swaps one step for the next in the same place (Tony: "flash perfectly in the right
+   spot"). The proof line's family count is SCHOOLS below. */
 (function () {
   const A = "./assets/assist/";
   const V = "./assets/v2/";
@@ -42,7 +48,7 @@
   /* ── Daily Brief (13266:241031) ── */
   const DAD = `${V}dad.webp`, MOM = `${V}mom.webp`;
   const face = (both) => `<span class="v2-face${both ? " pair" : ""}"><img src="${DAD}" alt="">${both ? `<img src="${MOM}" alt="">` : ""}</span>`;
-  const todo = (title, chip, tone, cls, both) => `<div class="v2-todo"><span class="box"></span>${face(both)}
+  const todo = (title, chip, tone, cls, both, part = "") => `<div class="v2-todo"${part ? ` data-part="${part}"` : ""}><span class="box"></span>${face(both)}
       <span class="tx"><b>${title}</b><span class="m"><i class="chip ${tone}">${chip}</i>${cls}</span></span></div>`;
   const today = (time, title, desc) => `<div class="v2-hap"><span class="t">${time}</span><span class="dot"></span>
       <span class="c"><b>${title}</b><span>${desc}</span></span></div>`;
@@ -54,33 +60,34 @@
     brief = mount(briefBox, "v2-brief");
     brief.innerHTML = `${statusBar}
       <div class="v2-notif"><img class="ic" src="./assets/logo.png" alt=""><span class="tx"><span class="hd"><b>Sprout</b><small>now</small></span>
-        <span class="bd"><img src="${MOM}" alt=""><span><b>Lydia</b> added a to-do for you: Pick up Presley from school, today at 3:00 PM</span></span></span></div>
+        <span class="bd"><img src="${MOM}" alt=""><span><b>Lydia</b> took a to-do: Pick up Presley and Mia, today at 3:00 PM</span></span></span></div>
       <div class="v2-db"><div class="v2-db-in">
-        <header class="v2-db-top"><img class="av" src="${DAD}" alt=""><span class="t"><b>Sprout AI</b><small>Wednesday, October 7</small></span><i class="ph ph-bell"></i></header>
+        <header class="v2-db-top"><img class="av" src="${DAD}" alt=""><span class="t"><b>Sprout AI</b><small>Thursday, October 8</small></span><i class="ph ph-bell"></i></header>
         <div class="v2-db-body">
           <div class="v2-hello"><div><h3>Your day, in order.</h3><em>Full, but manageable.</em></div><span class="wx"><span>☀️</span><small>68–86°</small></span></div>
           <hr>
           <div class="v2-todos" data-part="todo">
             <div class="hd">${face(true)}<b>Family To-Do List</b><span class="add"><i class="ph ph-plus"></i></span></div>
-            <!-- the shared to-do that arrives (Ahmad, 7 Oct): Lydia set it for Matt; it lands here from the notification -->
-            <div class="v2-new"><div class="v2-todo"><span class="box"></span>${face(false)}
-              <span class="tx"><b>Pick up Presley from school</b><span class="m"><i class="chip green">Today 3:00 PM</i><span class="from"><img src="${MOM}" alt="">From Lydia</span></span></span></div></div>
-            ${todo("Sign Jake’s permission slip", "Due today", "red", "4th Grade Class", true)}
-            ${todo("Return library book", "Due tomorrow", "amber", "Miss Taylor Class", false)}
-            ${todo("Bring towels for Water Day", "Due Oct 13th", "green", "Kindergarten", true)}
+            ${todo("Drive the morning carpool", "Today 7:40 AM", "green", "Kiker Elementary", false, "todo-carpool")}
+            <!-- the shared to-do that arrives (Ahmad, 7 Oct; 8 Oct: Lydia takes pickup, "you're on carpool, Lydia's got
+                 pickup"); it lands here from the notification, with her face on it -->
+            <div class="v2-new"><div class="v2-todo"><span class="box"></span><span class="v2-face"><img src="${MOM}" alt=""></span>
+              <span class="tx"><b>Pick up Presley and Mia</b><span class="m"><i class="chip green">Today 3:00 PM</i><span class="from">Lydia’s on it</span></span></span></div></div>
+            ${todo("Send $5 for the book fair", "Due today", "red", "Mrs. Kruszone’s Class", true, "todo-fair")}
+            ${todo("Sign Jake’s permission slip", "Due tomorrow", "amber", "Ms. Jessica’s Class", false)}
           </div>
           <hr>
           <div class="v2-sec" data-part="invites"><p class="v2-h"><span>📆 Your Invitations</span><small>2 Events</small></p>
             <div class="v2-invs">
-              <div class="v2-inv"><div class="r"><img src="${A}inv-zilker.webp" alt=""><span><b>Family Fun Day at Zilker Park</b><small>Sun, Oct 11 · 10:00am CST</small><span class="host"><img src="${A}dm-fatima.webp" alt="">Priya Shah</span></span></div>
+              <div class="v2-inv"><div class="r"><img src="${V}inv-bday.webp" alt=""><span><b>Ava’s Birthday Party!</b><small>Sat, Oct 10 · 2:00pm · <em class="rsvp">RSVP by Fri</em></small><span class="host"><img src="${A}dm-fatima.webp" alt="">Priya Shah</span></span></div>
                 <div class="btns"><span class="sec">Deny</span><span class="pri">Join</span></div></div>
-              <div class="v2-inv going"><div class="r"><img src="${V}inv-bday.webp" alt=""><span><b>Presley’s Birthday Party!</b><small>Sat, Oct 10 · 2:00pm CST</small><span class="host"><img src="${MOM}" alt="">Lydia Martin</span></span></div>
-                <div class="btns"><span class="note"><i class="ph ph-check-circle"></i><b>2 parents and 3 kids</b> are going.</span><span class="sec sm">Change</span></div></div>
+              <div class="v2-inv"><div class="r"><img src="${A}inv-zilker.webp" alt=""><span><b>Family Fun Day at Zilker Park</b><small>Sun, Oct 11 · 10:00am CST</small><span class="host"><img src="${A}dm-raj.webp" alt="">Raj Singh</span></span></div>
+                <div class="btns"><span class="sec">Deny</span><span class="pri">Join</span></div></div>
             </div>
           </div>
           <hr>
           <div class="v2-sec" data-part="today"><p class="v2-h"><span>📅 Happening today</span></p>
-            <div class="v2-haps">${today("8:30 AM", "Talent Show", "Kindergarten · Auditorium")}${today("1:30 PM", "Soccer practice", "Little Shots · Field 2")}${today("6:30 PM", "Parent-teacher night", "1st Grade · Room 102")}</div>
+            <div class="v2-haps">${today("All day", "🧸 Pajama Day", "Kiker Elementary · PJs to school")}${today("1:30 PM", "Soccer practice", "Little Shots · Field 2")}${today("6:30 PM", "Parent-teacher night", "1st Grade · Room 102")}</div>
           </div>
           <hr>
           <div class="v2-sec" data-part="upcoming"><p class="v2-h"><span>📆 Upcoming events</span></p>
@@ -97,7 +104,7 @@
           <hr>
           <div class="v2-sec"><p class="v2-h"><span>🎂 Birthdays</span></p>
             <div class="v2-bday"><span class="cake">🎂</span><span><b>Kennedy turns 4 today!</b><small>Say happy birthday at drop-off 👋</small></span></div>
-            <p class="v2-bl"><b>Presley (6)</b> — <span>Oct 10th</span></p><p class="v2-bl"><b>Rome (1)</b> — <span>Oct 14th</span></p>
+            <p class="v2-bl"><b>Ava (7)</b> — <span>Oct 10th</span></p><p class="v2-bl"><b>Rome (1)</b> — <span>Oct 14th</span></p>
           </div>
           <hr>
           <div class="v2-sec v2-msgs" data-part="messages"><p class="v2-h"><span>💬 New messages</span></p>
@@ -109,23 +116,19 @@
       <span class="sa-home-ind"></span>`;
   }
 
-  /* Pinned Daily Brief: the page scroll moves the brief, and the matching line on the left lights up. */
+  /* Pinned Daily Brief: the page scroll moves the brief. */
   const briefSec = document.getElementById("brief");
-  const parts = [...document.querySelectorAll(".brief-parts [data-part]")];
-  let briefInner, briefMax = 0, partTops = [];
+  let briefInner, briefMax = 0;
   const measureBrief = () => {
     if (!brief) return;
     briefInner = brief.querySelector(".v2-db-in");
     // the brief scrolls until its last line clears the floating tab bar (852 - 120)
     briefMax = Math.max(0, briefInner.scrollHeight - 732);
-    partTops = parts.map((li) => {
-      const el = briefInner.querySelector(`[data-part="${li.dataset.part}"]`);
-      return el ? el.offsetTop : 0;
-    });
   };
   const briefPin = briefSec && briefSec.querySelector(".scrolly-pin");
   const briefStage = briefSec && briefSec.querySelector(".scrolly-stage");
   const clamp01 = (v) => Math.min(1, Math.max(0, v));
+  const narrow = matchMedia("(max-width: 900px)");
   // smootherstep: flat at both ends, no sharp middle (the cubic in-out felt like a jump, Ahmad 7 Oct)
   const soft = (t) => t * t * t * (t * (t * 6 - 15) + 10);
   // what the scroll asks for, and what is on screen; the screen glides toward the scroll each frame
@@ -149,14 +152,12 @@
     const pin = briefPin.getBoundingClientRect(), st = briefStage.getBoundingClientRect();
     const dx = pin.left + pin.width / 2 - (st.left + st.width / 2);
     const t = shown.t;
-    briefBox.style.transform = `translate(${(dx * (1 - t)).toFixed(1)}px, ${((1 - t) * 44).toFixed(1)}px) scale(${(0.86 + 0.14 * t).toFixed(4)})`;
+    // phone width: the phone has no copy beside it (Tony, 8 Oct), so it lands lower, under the intro line, then rises
+    const drop = narrow.matches ? 92 : 44;
+    briefBox.style.transform = `translate(${(dx * (1 - t)).toFixed(1)}px, ${((1 - t) * drop).toFixed(1)}px) scale(${(0.86 + 0.14 * t).toFixed(4)})`;
     briefPin.style.setProperty("--in", t.toFixed(3));
     drawShared(shown.s);
     briefInner.style.transform = `translateY(${(-shown.y).toFixed(1)}px)`;
-    // the part whose top has reached the upper third of the screen
-    let on = 0;
-    partTops.forEach((tp, i) => { if (tp - shown.y < 300) on = i; });
-    parts.forEach((li, i) => li.classList.toggle("on", i === on));
   };
   /* Shared to-do (Ahmad, 7 Oct): Lydia's to-do arrives as a notification and lands in the Family To-Do List, all on
      the scroll (s 0-1), so it runs backwards when you scroll back up:
@@ -201,7 +202,7 @@
   if (classBox) {
     chats = mount(classBox, "v2-chats");
     // the app's own Chat screen (Figma 12398:209125, as in Video 6): the kids' classes are the teachers' faces;
-    // on the scroll each one gets its kid's name and a green ring (updateKids)
+    // on the scroll each one gets its kid's name and a green ring (updateSteps)
     const groups = [["cast-teacher-taylor", "Mrs. Taylor’s", "Presley"], ["cast-aisha", "Ms. Jessica’s", "Jake"], ["cast-teacher-kruszone", "Mrs. Kruszone’s", "Mia"]];
     const dms = [["raj", "Raj Singh", "Raj: See you there!", "8:30 PM", 4], ["joe", "Joe Mravca", "You: Yeah I’ll call you again in a minute", "9:00 PM", 4],
       ["robert", "Robert Hugos", "Robert: my golf score was so good today!", "8:45 PM", 2], ["scott", "Scott Vogelgesang", "Scott: I don’t think so, let me think again", "8:50 PM", 5],
@@ -223,20 +224,6 @@
         <span class="sa-home-ind"></span>
       </section>`;
   }
-  // the kids' names come in one by one as the first class step scrolls up, and go again on the way back.
-  // Ahmad, 7 Oct: all three in one scroll was too fast; now about a third of a screen apart (Presley as the step
-  // becomes active, then Jake, then Mia), over the longer runway the first step has (home-v2.css)
-  const kidSpans = chats ? [...chats.querySelectorAll("[data-kid]")] : [];
-  const listStep = document.querySelector('#classes .step[data-step="list"]');
-  const updateKids = () => {
-    if (!listStep) return;
-    const r = listStep.getBoundingClientRect();
-    // phone width: the steps come up under the pinned phone, so the names start as the card first shows below it
-    const start = matchMedia("(max-width: 900px)").matches ? 0.85 : 0.6;
-    const p = (innerHeight * start - r.top) / (innerHeight * 1.2);
-    kidSpans.forEach((s, i) => s.classList.toggle("on", p > 0.05 + i * 0.29));
-  };
-
   /* The class Calendar tab (Tony, 7 Oct: "just the events showing like we did with the video"): no month grid, the
      coming events as a list, like Video 6 rev 2 and Upcoming events in the Daily Brief. Same dates as the brief. */
   const calView = classBox && classBox.querySelector('.cls-view[data-v="calendar"]');
@@ -321,34 +308,73 @@
     scroller.scrollTo({ top: step === "comms" ? 0 : 150, behavior: reduce.matches ? "auto" : "smooth" });
     dir.classList.toggle("bounce", step === "comms");
   };
-  const watchSteps = (section, onStep) => {
+  /* Pinned steps (Tony, 8 Oct): the section is tall and its inside sticks. The scroll through the section picks the
+     step; the step's copy swaps in place (fade), it never slides. Each step gets data-w units of scroll (default 1),
+     the section is 100vh + --units x 70vh tall (home-v2.css), so every step holds for at least 70vh of scrolling.
+     The class list step gets 2 units: the kids' names come in one by one over its first two thirds. */
+  const kidSpans = chats ? [...chats.querySelectorAll("[data-kid]")] : [];
+  const pinned = [];
+  const watchSteps = (section, onStep, kids) => {
     const steps = [...section.querySelectorAll(".step")];
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        steps.forEach((s) => s.classList.toggle("is-on", s === e.target));
-        onStep(e.target.dataset.step);
-      });
-    }, {
-      // wide: the step crossing the middle; phone width: the step entering the strip under the pinned phone
-      rootMargin: matchMedia("(max-width: 900px)").matches ? "-80% 0px -12% 0px" : "-48% 0px -48% 0px",
-    });
-    steps.forEach((s) => io.observe(s));
-    steps[0].classList.add("is-on");
-    onStep(steps[0].dataset.step);
+    const w = steps.map((s) => Number(s.dataset.w || 1)), total = w.reduce((a, b) => a + b, 0);
+    // B1 (Ahmad, 8 Oct): a "02 / 05" counter on each step, and one bar that fills with the scroll through the section
+    const pad = (n) => String(n).padStart(2, "0");
+    steps.forEach((s, j) => s.insertAdjacentHTML("afterbegin", `<p class="ct" aria-hidden="true"><b>${pad(j + 1)}</b>/ ${pad(steps.length)}</p>`));
+    const bar = section.querySelector(".bar i");
+    const st = { section, steps, w, total, onStep, kids, bar, cur: -1 };
+    pinned.push(st);
+    updateSteps(st);
   };
-
-  /* ── Assist carousel ── */
-  const car = document.getElementById("assistCar");
-  document.querySelectorAll(".car-btn").forEach((b) => b.addEventListener("click", () => {
-    const card = car.querySelector(".card");
-    car.scrollBy({ left: Number(b.dataset.dir) * (card.offsetWidth + 24), behavior: reduce.matches ? "auto" : "smooth" });
-  }));
+  const updateSteps = (st) => {
+    const r = st.section.getBoundingClientRect();
+    const run = Math.max(1, st.section.offsetHeight - innerHeight);
+    const prog = clamp01(-r.top / run);
+    if (st.bar) st.bar.style.transform = `scaleX(${prog.toFixed(4)})`;
+    let x = prog * st.total, i = 0;
+    while (i < st.w.length - 1 && x >= st.w[i]) { x -= st.w[i]; i++; }
+    const local = clamp01(x / st.w[i]);
+    if (i !== st.cur) {
+      st.cur = i;
+      st.steps.forEach((s, j) => { s.classList.toggle("is-on", j === i); s.setAttribute("aria-hidden", String(j !== i)); });
+      st.onStep(st.steps[i].dataset.step);
+    }
+    if (st.kids) kidSpans.forEach((k, j) => k.classList.toggle("on", i > 0 || local > 0.08 + j * 0.24));
+  };
 
   /* ── "Join your schools" (Tony, 7 Oct) is the only CTA: straight to the store. Android gets Google Play; iPhone and
      computers keep the App Store link in the markup. ── */
   if (/Android/.test(navigator.userAgent))
     document.querySelectorAll("a[data-join]").forEach((a) => (a.href = "https://play.google.com/store/apps/details?id=com.meetingpoint"));
+
+  /* ── The proof line under the hero ("112 Kiker families are already here", Tony 8 Oct). The number lives here only;
+     in production it comes from the API. ── */
+  const SCHOOLS = [{ name: "Kiker Elementary", place: "Circle C, Austin, TX", families: 112 }];
+  document.querySelectorAll("[data-families]").forEach((b) => (b.textContent = String(SCHOOLS[0].families)));
+
+  /* ── FAQ: <details> opens and closes with no motion by default ("harsh", Ahmad 8 Oct). Animate the height between the
+     question alone and the question with its answer, and fade the answer in. Web Animations, so it works in Safari
+     too (::details-content and interpolate-size don't yet). .is-open turns the + at once, not after the close. ── */
+  document.querySelectorAll(".faq details").forEach((d) => {
+    const sum = d.querySelector("summary"), ans = d.querySelector("p");
+    let anim = null;
+    d.classList.toggle("is-open", d.open);
+    sum.addEventListener("click", (e) => {
+      e.preventDefault();
+      const opening = !d.classList.contains("is-open");
+      d.classList.toggle("is-open", opening);
+      if (reduce.matches) { d.open = opening; return; }
+      const from = d.offsetHeight;
+      if (anim) anim.cancel();
+      if (opening) d.open = true;
+      const border = d.offsetHeight - d.clientHeight;
+      const to = opening ? d.offsetHeight : sum.offsetHeight + border;
+      d.style.overflow = "hidden";
+      anim = d.animate({ height: [`${from}px`, `${to}px`] }, { duration: opening ? 380 : 300, easing: "cubic-bezier(0.22, 1, 0.36, 1)" });
+      if (ans) ans.animate(opening ? { opacity: [0, 1], transform: ["translateY(-6px)", "none"] } : { opacity: [1, 0] },
+        { duration: opening ? 380 : 180, easing: "ease-out", delay: opening ? 60 : 0, fill: "backwards" });
+      anim.onfinish = () => { if (!opening) d.open = false; d.style.overflow = ""; anim = null; };
+    });
+  });
 
   /* ── the close: Sprout's icons fly in once the section comes up, then bob (CSS) ── */
   const endTiles = document.querySelector(".end .tiles");
@@ -362,16 +388,16 @@
   const start = () => {
     measureBrief();
     scrubBrief();
-    if (classBox) watchSteps(document.getElementById("classes"), setClassStep);
-    if (dirBox) watchSteps(document.getElementById("directory"), setDirStep);
+    if (classBox) watchSteps(document.getElementById("classes"), setClassStep, true);
+    if (dirBox) watchSteps(document.getElementById("directory"), setDirStep, false);
   };
   let ticking = false;
   addEventListener("scroll", () => {
     if (ticking) return;
     ticking = true;
-    requestAnimationFrame(() => { scrubBrief(); updateKids(); ticking = false; });
+    requestAnimationFrame(() => { scrubBrief(); pinned.forEach(updateSteps); ticking = false; });
   }, { passive: true });
-  addEventListener("resize", () => { measureBrief(); scrubBrief(); });
+  addEventListener("resize", () => { measureBrief(); scrubBrief(); pinned.forEach(updateSteps); });
   // fonts change the brief's height, so measure once they're in
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(start);
 })();

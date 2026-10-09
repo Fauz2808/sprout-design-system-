@@ -38,6 +38,10 @@ Numbered top-level folders. The three that matter most:
   private), gitignored by the parent, and the Vercel project deploys from it on
   push to `main`. This is the *handoff* repo: engineering reads it directly, so
   it carries `HANDOFF.md`, `spec/`, and `tools/`. See its own `README.md`.
+- **`01 - Website/sprout-website/`** — the live joinsprout.co home page, **its own nested git repo**
+  (`Fauz2808/sprout-website`, private), gitignored by the parent. Generated, not edited: change
+  `sprout-reach-scene-iteration/home-v2.*`, then `python3 review/export-site.py` there, commit and push here.
+  Mohit deploys it.
 - **`08 - Generated Screens/`** — ~125 self-contained HTML prototypes, the explore
   loop's output.
 

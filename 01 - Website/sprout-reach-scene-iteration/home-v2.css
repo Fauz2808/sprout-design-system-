@@ -23,6 +23,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--
 img { max-width: 100%; }
 a { color: inherit; }
 h1, h2, h3 { font-family: var(--serif); font-weight: 500; color: var(--ink); margin: 0; letter-spacing: -0.01em; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: #fff; padding: 8px 12px; border-radius: 8px; z-index: 99; }
 .skip:focus { left: 8px; }
 .eyebrow { margin: 0 0 12px; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--green); }
@@ -43,7 +44,10 @@ main { padding-top: 0; }
 
 /* 1 · hero: the sky, the live mascot and the portal come from hero-portal.css; v2 only sets its own copy */
 .hero-sky { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 64px 16px 72px; }
-.hero-sky h1 { font-size: clamp(44px, 6.2vw, 88px); line-height: 1.05; color: #14231a; text-shadow: 0 1px 24px rgb(245 249 253 / .55); }
+/* Tony's 9 Oct header is a full sentence, so it runs smaller than "Your village, handled." did and wraps evenly.
+   .nw keeps "school", the mascot and the comma on one line (the comma was wrapping to the start of the next line) */
+.hero-sky h1 .nw { white-space: nowrap; }
+.hero-sky h1 { font-size: clamp(36px, 4.2vw, 60px); line-height: 1.1; max-width: 23ch; margin: 0 auto; text-wrap: balance; color: #14231a; text-shadow: 0 1px 24px rgb(245 249 253 / .55); }
 .hero-sky .lede { max-width: 580px; margin: 20px auto 0; font-size: clamp(17px, 1.6vw, 21px); line-height: 1.5; color: #22362a; font-weight: 500; text-shadow: 0 1px 14px rgb(245 249 253 / .75); }
 .hero-sky .more { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 99px; font-size: 14px; font-weight: 500; text-decoration: none; color: #14231a; }
 .stores { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
@@ -52,19 +56,32 @@ main { padding-top: 0; }
 .join-btn:hover { transform: translateY(-1px); box-shadow: 0 18px 34px -14px rgb(24 99 56 / 0.6); }
 .join-btn.light { background: #fff; color: var(--ink); margin-top: 28px; box-shadow: none; }
 .end .stores { margin-top: 18px; }
+.hero-sky .join-btn { margin-top: 28px; }
+.proof { margin: 16px 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; font-size: 15px; font-weight: 500; color: #22362a; text-shadow: 0 1px 12px rgb(245 249 253 / 0.8); }
+.proof b { font-weight: 700; color: var(--green); }
+@media (max-width: 640px) {
+  .proof { font-size: 14px; padding: 8px 14px; border-radius: 16px; background: rgb(255 255 255 / 0.72); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); text-shadow: none; }
+  .proof > span[aria-hidden] { display: none; }
+  .proof > span:last-child { flex-basis: 100%; }
+}
+
 /* no closing title in the portal (Ahmad, 7 Oct): the next section slides up over the last stretch of the pinned
    scene instead of leaving an empty cream screen once the objects have flown past */
 .portal { z-index: 0; margin-bottom: -58vh; }
 /* the Daily Brief rises over the end of the portal: clear at its top edge so the last notes still show behind it */
 .brief { z-index: 1; background: linear-gradient(to bottom, rgb(244 241 234 / 0) 0, var(--bg) 42vh); }
 @media (max-width: 640px) {
-  .hero-sky { padding: 96px 16px 80px; justify-content: flex-start; }
-  .hero-sky h1 { font-size: 40px; }
+  /* centred in the screen (Ahmad, 8 Oct: it sat against the top bar); the padding clears the 64px bar and the
+     "See your morning" button */
+  .hero-sky { padding: 64px 16px 68px; justify-content: center; }
+  .hero-sky h1 { font-size: clamp(27px, 7.6vw, 34px); max-width: none; }
 }
 
 /* the notes that fly out of the portal (Ahmad, 7 Oct): a 3D icon with what parents juggle today. hero-portal.js
-   moves them; a note is sized by its content and centred with translate (not the bare icons' fixed size) */
-.fly-i.fly-note { width: auto; height: auto; margin: 0; translate: -50% -50%; display: flex; align-items: center; gap: 12px; padding: 10px 24px 10px 10px;
+   moves them; a note is sized by its content and centred with translate (not the bare icons' fixed size).
+   max-content, not auto (8 Oct, iPhone): placed at left 50%, an auto width can only reach half the screen, so on a
+   phone the text ran out of its pill */
+.fly-i.fly-note { width: max-content; height: auto; margin: 0; translate: -50% -50%; display: flex; align-items: center; gap: 12px; padding: 10px 24px 10px 10px;
   border-radius: 24px; background: rgb(255 255 255 / 0.94); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.9); white-space: nowrap;
   font-family: var(--serif); font-size: 24px; color: var(--ink); }
 .fly-note img { width: 56px; height: 56px; object-fit: contain; flex-shrink: 0; }
@@ -85,27 +102,50 @@ main { padding-top: 0; }
 .scrolly-copy h2 { font-size: clamp(32px, 4vw, 50px); line-height: 1.1; }
 .scrolly-copy > p:not(.eyebrow) { margin: 18px 0 0; max-width: 480px; font-size: 18px; }
 .scrolly-stage { display: grid; place-items: center; }
-.steps .scrolly-stage { position: sticky; top: 64px; height: calc(100svh - 64px); align-self: start; }
+/* pinned steps (Tony, 8 Oct): the copy and the phone stick together; the scroll swaps the step in place */
+.scrolly.steps { height: calc(100vh + var(--units, 4) * 70vh); }
+.steps .scrolly-pin { position: sticky; top: 64px; height: calc(100svh - 64px); align-items: center; }
 .phone { position: relative; width: var(--phone-w); aspect-ratio: 393 / 852; border-radius: 14% / 6.46%; overflow: hidden; background: var(--bg);
   box-shadow: 0 0 0 2.5px rgb(24 99 56 / 0.5), 0 28px 56px -22px rgb(16 52 32 / 0.38); isolation: isolate; }
 
-.brief-parts { list-style: none; padding: 0; margin: 30px 0 0; display: grid; gap: 4px; counter-reset: p; }
-.brief-parts li { counter-increment: p; display: flex; gap: 12px; align-items: baseline; padding: 8px 12px; border-radius: 12px; font-size: 16px; color: var(--muted); transition: background 0.3s, color 0.3s; }
-.brief-parts li::before { content: counter(p, decimal-leading-zero); font-size: 12px; font-weight: 600; color: inherit; opacity: 0.7; }
-.brief-parts li.on { background: var(--panel); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+/* Tony, 8 Oct evening: the phone alone carries the morning, a little bigger than the other sections' phones */
+.brief .phone { width: min(380px, 78vw, calc((100svh - 120px) * 393 / 852)); }
 
-.steps .scrolly-copy { padding: 10vh 0 52vh; }
-.step-head { position: sticky; top: 64px; z-index: 2; padding: 28px 0 22px; background: linear-gradient(var(--bg) 84%, rgb(244 241 234 / 0)); }
+.step-head { padding-bottom: 26px; }
 .step-head h2 { font-size: clamp(32px, 4vw, 50px); line-height: 1.1; }
-.step-list { display: grid; gap: 34vh; margin-top: 18vh; }
-.step { max-width: 440px; padding: 22px 24px; border-radius: 20px; background: var(--panel); box-shadow: 0 0 0 1px var(--line); opacity: 0.45; transition: opacity 0.35s, box-shadow 0.35s; }
-.step.is-on { opacity: 1; box-shadow: 0 0 0 1.5px rgb(24 99 56 / 0.45), 0 18px 40px -24px rgb(16 52 32 / 0.35); }
-.step h3 { font-size: 24px; line-height: 1.25; }
-.step p { margin: 8px 0 0; }
+/* every step in the same grid cell: the cell is as tall as the longest step, so nothing below it jumps */
+.step-list { display: grid; }
+/* B1 (Ahmad, 8 Oct): no box, a counter, the title, the line; one bar under them fills with the scroll */
+.step { grid-area: 1 / 1; max-width: 460px;
+  opacity: 0; visibility: hidden; transform: translateY(6px); transition: opacity 0.3s ease, transform 0.4s var(--ease), visibility 0s 0.3s; }
+.step.is-on { opacity: 1; visibility: visible; transform: none; transition: opacity 0.3s ease 0.05s, transform 0.4s var(--ease) 0.05s, visibility 0s; }
+.step .ct { margin: 0 0 10px; font-size: 15px; font-weight: 500; color: var(--muted); letter-spacing: 0.02em; }
+.step .ct b { font-family: var(--serif); font-weight: 500; font-size: 46px; line-height: 1; color: var(--green); margin-right: 4px; }
+.step h3 { font-size: clamp(24px, 2.4vw, 30px); line-height: 1.2; }
+.step p:not(.ct):not(.trust) { margin: 8px 0 0; font-size: 17px; }
+.bar { position: relative; max-width: 460px; height: 2px; margin-top: 24px; background: rgb(30 62 43 / 0.14); overflow: hidden; }
+.bar i { position: absolute; inset: 0; background: var(--green); transform: scaleX(0); transform-origin: 0 50%; }
+/* trust lines: where the page asks for the inbox, and the kids' privacy (Tony, 8 Oct, points 4 and 9) */
+.trust { display: flex; gap: 8px; align-items: flex-start; margin: 14px 0 0; font-size: 15px; font-weight: 500; line-height: 1.45; color: var(--ink); }
+.trust .ph-fill { font-size: 18px; color: var(--green); margin-top: 1px; flex-shrink: 0; }
+.step .trust { margin-top: 14px; padding: 10px 12px; border-radius: 12px; background: var(--green-subtle); font-size: 14px; }
+.step-head .trust { max-width: 440px; }
 .directory { background: var(--sand); }
-/* the first class step holds the phone on the Chat list long enough for the three kids' names to come in */
-.classes .step[data-step="list"] { margin-bottom: 60vh; }
-.directory .step-head { background: linear-gradient(var(--sand) 84%, rgb(235 228 212 / 0)); }
+@media (prefers-reduced-motion: reduce) { .step, .step.is-on { transition: none; transform: none; } }
+
+/* room parents (Tony, 8 Oct), C2 (Ahmad, 8 Oct): a quiet outline button in the top bar, straight to RoomParent (the
+   section it used to open was cut the same day) */
+.top-rp { font-family: var(--serif); font-size: 15px; text-decoration: none; color: var(--green); padding: 8px 16px; border-radius: 99px;
+  box-shadow: inset 0 0 0 1px rgb(24 99 56 / 0.45); white-space: nowrap; }
+.top-rp:hover { background: rgb(24 99 56 / 0.06); }
+.top.over .top-rp { background: rgb(255 255 255 / 0.5); color: #14231a; }
+@media (max-width: 820px) { .top-rp { margin-left: auto; } .top-cta { margin-left: 0; } }
+@media (max-width: 480px) {
+  .top { gap: 8px; }
+  .logo { font-size: 0; gap: 0; }
+  .top-rp, .top-cta { font-size: 14px; padding: 8px 13px; }
+}
+
 
 /* ── app screens (inside .assist-app, 393 x 852) ── */
 .v2-app { font-family: var(--sans); }
@@ -168,6 +208,7 @@ main { padding-top: 0; }
 .v2-inv .r > span { display: flex; flex-direction: column; gap: 5px; }
 .v2-inv b { font-family: var(--sa-serif); font-weight: 500; font-size: 18px; line-height: 1.4; color: #1e3e2b; white-space: nowrap; }
 .v2-inv small { font-size: 12px; color: #7d715e; }
+.v2-inv .rsvp { font-style: normal; font-weight: 600; color: #802929; }
 .v2-inv .host { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #7d715e; }
 .v2-inv .host img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
 .v2-inv .btns { display: flex; gap: 12px; }
@@ -293,36 +334,34 @@ main { padding-top: 0; }
 .v2-dm-compose .in { flex: 1; font-size: 14px; color: #a39a88; }
 .v2-dm-compose .send { width: 40px; height: 40px; border-radius: 50%; background: #186338; color: #fff; display: grid; place-items: center; font-size: 18px; }
 
-/* 6 · Sprout Assist carousel */
-.assist { padding: 110px 0 90px; background: var(--bg); }
-.assist-head { max-width: 1160px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 40px); position: relative; }
-.assist-mascot { width: 84px; height: 84px; margin-bottom: 10px; }
-.assist-head h2 { font-size: clamp(32px, 4vw, 50px); line-height: 1.1; max-width: 16ch; }
-.assist-head > p:not(.eyebrow) { max-width: 520px; margin: 16px 0 0; font-size: 18px; }
-.car-nav { position: absolute; right: clamp(16px, 4vw, 40px); bottom: 0; display: flex; gap: 10px; }
-.car-btn { width: 48px; height: 48px; border-radius: 50%; border: 0; background: var(--panel); box-shadow: 0 0 0 1px var(--line); color: var(--ink); font-size: 20px; display: grid; place-items: center; cursor: pointer; }
-.car-btn:hover { background: #fff; }
-.car { display: flex; gap: 24px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-top: 44px;
-  padding: 8px max(clamp(16px, 4vw, 40px), calc((100vw - 1160px) / 2 + 40px)) 24px; scroll-padding-inline: max(clamp(16px, 4vw, 40px), calc((100vw - 1160px) / 2 + 40px)); }
-.car::-webkit-scrollbar { display: none; }
-.card { flex: 0 0 auto; width: 360px; scroll-snap-align: start; background: var(--panel); border-radius: 28px; padding: 28px 22px 26px; box-shadow: 0 0 0 1px var(--line); }
-.card .art { position: relative; height: 560px; --cx: 158px; overflow: hidden; margin: 0 auto 18px; width: 316px; }
-.card .art .gp { transform: scale(0.82); transform-origin: 50% 0; }
-.card h3 { font-size: 22px; line-height: 1.25; }
-.card p { margin: 8px 0 0; font-size: 15px; }
-@media (max-width: 640px) {
-  .car-nav { position: static; margin-top: 20px; }
-  .card { width: min(320px, 84vw); }
-  .card .art { width: 100%; height: 520px; --cx: 50%; }
-  .card .art .gp { transform: scale(0.76); left: calc(50% - 158px); }
-}
+/* 6 · Sprout Assist, a three-line teaser (Tony, 8 Oct) */
+.assist { padding: 110px clamp(16px, 4vw, 40px) 40px; background: var(--bg); }
+.assist-tease { max-width: 860px; margin: 0 auto; display: flex; gap: 28px; align-items: center; padding: 32px 36px; border-radius: 28px; background: var(--panel); box-shadow: 0 0 0 1px var(--line); }
+.assist-mascot { width: 96px; height: 96px; flex-shrink: 0; }
+.assist-tease h2 { font-size: clamp(26px, 3vw, 38px); line-height: 1.15; }
+.assist-tease p:not(.eyebrow) { margin: 12px 0 0; font-size: 17px; }
+.assist-tease .eyebrow { margin-bottom: 10px; }
+@media (max-width: 640px) { .assist-tease { flex-direction: column; align-items: flex-start; gap: 14px; padding: 26px 22px; } .assist-mascot { width: 72px; height: 72px; } }
+
+/* FAQ (Tony, 8 Oct): Assist's safety details, free, what if my school isn't here, kids' privacy */
+.faq { max-width: 860px; margin: 0 auto; padding: 80px clamp(16px, 4vw, 40px) 40px; }
+.faq h2 { font-size: clamp(30px, 3.6vw, 44px); line-height: 1.1; margin-bottom: 24px; }
+.faq-list { border-top: 1px solid var(--line); }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 0; cursor: pointer; list-style: none;
+  font-family: var(--serif); font-size: clamp(19px, 1.8vw, 22px); color: var(--ink); }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-family: var(--sans); font-size: 26px; font-weight: 300; line-height: 1; color: var(--green); transition: transform 0.25s var(--ease); }
+.faq details.is-open summary::after { transform: rotate(45deg); }
+.faq details p { margin: 0 0 22px; max-width: 680px; font-size: 17px; }
+.faq details a { color: var(--green); }
 
 /* 7 · close (after Orbits' close, 7 Oct): cream, the tagline, one line, one button, and Sprout's own 3D icons on white
    tiles flying in around the live mascot */
 .end { position: relative; text-align: center; padding: 120px 16px 40px; overflow: hidden;
   background: radial-gradient(70% 60% at 50% 30%, #fbfaf6 0%, var(--bg) 70%); }
-.end h2 { font-size: clamp(38px, 5.2vw, 68px); line-height: 1.08; max-width: 14ch; margin: 0 auto; }
-.end-lede { max-width: 520px; margin: 20px auto 0; font-size: 19px; color: var(--text); }
+.end h2 { font-size: clamp(36px, 5vw, 64px); line-height: 1.08; max-width: 17ch; margin: 0 auto; }
+.end-free { margin: 14px 0 0; font-size: 15px; font-weight: 600; color: var(--green); }
 .end .join-btn { margin-top: 30px; }
 .tiles { position: relative; height: 330px; max-width: 1000px; margin: 46px auto 0; }
 .tile { position: absolute; left: var(--x); top: var(--y); width: 100px; height: 100px; margin-left: -50px;
@@ -351,23 +390,36 @@ footer nav { display: flex; gap: 18px; }
 @media (max-width: 900px) {
   :root { --phone-w: min(250px, 62vw, calc((100svh - 120px) * 0.52 * 393 / 852 * 1.9)); }
   .scrolly-pin { grid-template-columns: 1fr; gap: 0; }
-  .brief .scrolly-pin { height: auto; top: 56px; display: block; }
+  .brief .scrolly-pin { top: 64px; height: calc(100svh - 64px); display: block; }
   .scrolly.brief { height: 540vh; }
   .brief-intro { top: 14px; font-size: 24px; gap: 6px; padding: 0 16px; flex-direction: column; text-align: center; }
   .brief-intro img { width: 26px; height: 26px; }
   .brief .scrolly-copy { padding-top: 20px; }
-  .brief .scrolly-copy > p:not(.eyebrow), .brief .brief-parts { display: none; }
-  .brief .scrolly-copy h2 { font-size: 26px; text-align: center; margin-bottom: 16px; }
+  /* phone width (Tony, 8 Oct): no copy at all, just a bigger phone. It lands under "Sprout puts them in one place"
+     (home-v2.js pushes it down while landing), then rises to the top of the pin. */
+  .brief .scrolly-copy { display: none; }
+  .brief .phone { width: min(88vw, calc((100svh - 124px) * 393 / 852)); }
   .brief .scrolly-copy .eyebrow { text-align: center; margin-bottom: 8px; }
-  .brief .scrolly-stage { padding-bottom: 16px; }
-  .steps .scrolly-stage { order: -1; position: sticky; top: 56px; height: auto; padding: 12px 0; z-index: 3; background: inherit; box-shadow: 0 14px 18px -14px rgb(30 62 43 / 0.18); }
-  .steps .scrolly-stage { background: var(--bg); }
-  .directory .scrolly-stage { background: var(--sand); }
-  .steps .scrolly-copy { padding: 0 0 30vh; position: relative; z-index: 1; }
-  .step { opacity: 0.7; }
-  .step-head, .directory .step-head { position: static; background: none; padding: 8px 0 12px; }
-  .step-list { gap: 26vh; margin-top: 4vh; }
+  .brief .scrolly-stage { padding: 16px 0; }
+  /* pinned steps on a phone: headline, the step's copy, then the phone (Tony, 8 Oct: copy above the phone), all in one
+     screen; only the copy swaps. The copy's cell is as tall as the longest step, so the phone never jumps. */
+  .steps .scrolly-pin { display: flex; flex-direction: column; justify-content: center; gap: 10px; padding-top: 10px; padding-bottom: 14px; }
+  .steps .scrolly-copy { display: contents; }
+  .step-head { order: 0; padding: 0; text-align: center; }
+  .step-head .eyebrow { margin-bottom: 4px; }
+  .step-head h2 { font-size: 22px; }
+  .step-head .trust { justify-content: center; margin: 6px auto 0; font-size: 12.5px; }
+  .step-head .trust .ph-fill { font-size: 15px; }
+  .steps .scrolly-stage { order: 3; }
+  .steps .phone { width: min(250px, 62vw, calc((100svh - 64px - 300px) * 393 / 852)); }
+  .step-list { order: 1; }
+  .bar { order: 2; margin: 0 auto 4px; width: 100%; max-width: none; }
   .step { max-width: none; }
+  .step .ct { margin-bottom: 2px; font-size: 13px; }
+  .step .ct b { font-size: 28px; }
+  .step h3 { font-size: 20px; }
+  .step p:not(.ct):not(.trust) { font-size: 15px; line-height: 1.45; margin-top: 4px; }
+  .step .trust { margin-top: 8px; padding: 7px 10px; font-size: 13px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .v2-dir.bounce .cl-comms > span, #dirPhone .v2-dm .b, #dirPhone .v2-prof-cta span { animation: none !important; }

@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /* Photographs home-v2.html (website v2) at each scroll stage a visitor passes: the sky hero, the notes flying out
    of the portal, the Daily Brief landing centred under "Sprout puts them in one place", the brief moved right and
-   scrolling, a class step, a directory step, the Assist carousel and the close. Desktop and phone width.
-   Fails (non-zero exit) on horizontal overflow, console errors, or a landing that doesn't centre then settle.
+   scrolling, a class step, a directory step, the Assist teaser, the FAQ and the close. Desktop and phone width.
+   Fails (non-zero exit) on horizontal overflow, console errors, a landing that doesn't centre then settle, step copy
+   that moves while you scroll (Tony, 8 Oct), a step that doesn't fit its screen, or "in one place" more than once.
    Usage: node review/home-v2-shots.mjs [url] [outDir]
    Default url: http://localhost:4320/home-v2  (the reach-scene-iteration preview) */
 import { createRequire } from "node:module";
@@ -11,6 +12,9 @@ import { join, resolve } from "node:path";
 import { mkdirSync, existsSync, readdirSync } from "node:fs";
 
 function loadPuppeteer() {
+  // PUPPETEER_CORE=/path/to/node_modules/puppeteer-core wins when the npx cache has been cleared (9 Oct)
+  if (process.env.PUPPETEER_CORE) return { lib: createRequire(join(process.env.PUPPETEER_CORE, "noop.js"))(process.env.PUPPETEER_CORE),
+    opts: { executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" } };
   try { return { lib: createRequire(join(homedir(), "node_modules", "noop.js"))("puppeteer"), opts: {} }; } catch {}
   const npx = join(homedir(), ".npm", "_npx");
   for (const d of existsSync(npx) ? readdirSync(npx) : []) {
@@ -89,23 +93,34 @@ async function run(width, height, scale, tag) {
   const s3 = await shared();
   if (s3.row > 2) problems.push(`${tag}: scrolling back up should take the to-do back out (row ${s3.row}px)`);
   await at(p, "brief", 0.75); await shot(p, `${tag}-07-brief-scrolled`, 1500);
-  // the kids' names on the class chats follow the scroll: none before the first class step, all three once it is up
-  const kidsOn = (f) => p.evaluate((f) => {
-    const st = document.querySelector('#classes .step[data-step="list"]');
-    scrollTo(0, st.getBoundingClientRect().top + scrollY - innerHeight * f);
-  }, f).then(() => wait(900)).then(() => p.evaluate(() => document.querySelectorAll("#classPhone [data-kid].on").length));
-  const [f1, f3] = width > 900 ? [0.35, -0.2] : [0.6, 0];
-  const k0 = await kidsOn(1.1), k1 = await kidsOn(f1);
-  await shot(p, `${tag}-07b-class-kids-one`, 100);
-  const k3 = await kidsOn(f3);
+  // the kids' names on the class chats follow the scroll: none at the start of the pinned section, then one by one
+  const kids = () => wait(700).then(() => p.evaluate(() => document.querySelectorAll("#classPhone [data-kid].on").length));
+  await at(p, "classes", 0); const k0 = await kids();
+  await at(p, "classes", 0.12); const k1 = await kids(); await shot(p, `${tag}-07b-class-kids-one`, 100);
+  await at(p, "classes", 0.31); const k3 = await kids();
   const stillList = await p.evaluate(() => document.getElementById("classPhone").dataset.step);
   if (stillList !== "list") problems.push(`${tag}: the phone left the Chat list before all three names were in (${stillList})`);
-  await shot(p, `${tag}-07c-class-kids-all`, 600);
-  if (k0 !== 0 || k3 !== 3 || !(k1 > 0 && k1 < 3)) problems.push(`${tag}: kids' names should come in one by one on the scroll (0/${k1}/${k3}, got ${k0}/${k1}/${k3})`);
-  await step(p, '#classes .step[data-step="calendar"]'); await shot(p, `${tag}-08-class-calendar`, 1200);
-  await step(p, '#directory .step[data-step="profile"]'); await shot(p, `${tag}-09-dir-profile`, 1200);
+  await shot(p, `${tag}-07c-class-kids-all`, 300);
+  if (k0 !== 0 || k3 !== 3 || !(k1 > 0 && k1 < 3)) problems.push(`${tag}: kids' names should come in one by one on the scroll (0/1-2/3, got ${k0}/${k1}/${k3})`);
+  // Tony, 8 Oct: the step copy must stay in one place while you scroll, and fit the screen
+  const stepBox = (id) => p.evaluate((id) => {
+    const s = document.querySelector(`#${id} .step.is-on`), r = s.getBoundingClientRect();
+    return { step: s.dataset.step, top: Math.round(r.top), bottom: Math.round(r.bottom) };
+  }, id);
+  for (const [id, f1, f2, name] of [["classes", 0.55, 0.64, "calendar"], ["directory", 0.53, 0.72, "profile"]]) {
+    await at(p, id, f1); await wait(600); const a1 = await stepBox(id);
+    await at(p, id, f2); await wait(600); const a2 = await stepBox(id);
+    if (a1.step !== name || a2.step !== name) problems.push(`${tag}: #${id} expected step ${name}, got ${a1.step}/${a2.step}`);
+    if (a1.top !== a2.top) problems.push(`${tag}: #${id} step copy moved ${a2.top - a1.top}px while scrolling`);
+    if (a1.bottom > height) problems.push(`${tag}: #${id} step copy runs off the screen (bottom ${a1.bottom} > ${height})`);
+    await shot(p, `${tag}-${id === "classes" ? "08-class-calendar" : "09-dir-profile"}`, 300);
+  }
+  await at(p, "classes", 0.8); await shot(p, `${tag}-08b-class-updates-trust`, 900);
   await p.evaluate(() => document.getElementById("assist").scrollIntoView()); await shot(p, `${tag}-10-assist`);
+  await p.evaluate(() => document.getElementById("faq").scrollIntoView()); await shot(p, `${tag}-10b-faq`);
   await p.evaluate(() => document.getElementById("download").scrollIntoView()); await shot(p, `${tag}-11-close`);
+  const once = await p.evaluate(() => (document.body.innerText.match(/in one place/gi) || []).length);
+  if (once > 1) problems.push(`${tag}: "in one place" shows ${once} times (Tony: once)`);
   const over = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
   if (over > 0) problems.push(`${tag}: page is ${over}px wider than the window`);
 }
@@ -116,4 +131,4 @@ await Promise.race([browser.close(), wait(5000)]);
 browser.process()?.kill("SIGKILL");
 console.log(`Shots in ${out}`);
 if (problems.length) { console.log("PROBLEMS:\n- " + problems.join("\n- ")); process.exit(1); }
-console.log("OK: landing centred then settled, no overflow at 1440 or 390, no console errors.");
+console.log("OK: landing centred then settled, steps hold still and fit, no overflow at 1440 or 390, no console errors.");

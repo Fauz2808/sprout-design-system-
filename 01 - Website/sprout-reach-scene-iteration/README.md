@@ -19,6 +19,12 @@ pill, `?h=N`), then Daily Brief (pinned, scroll drives the brief), Class group c
 a carousel near the bottom, and the close with Share Sprout. No waitlist: the CTA is download. All screens are coded.
 `home-v2-gp.css` is generated: run `review/sync-v2-gp.sh` after editing the `.gp` block in `assist-landing.css`.
 
+**8 Oct (Tony's 9 points + standup), handed to Syed for React:** hero CTA is a school search (`SCHOOLS` in home-v2.js),
+the Daily Brief copy is one real morning, class chats and directory are pinned (step copy swaps in place, never
+slides), room parent strip, kids' privacy and inbox trust lines, Assist cut to a three-line teaser, FAQ, close
+"The parents who matter most are already at drop-off." home-v2 no longer uses `home-v2-gp.css` (assist.html still
+does). Handoff page for Syed: `handoff.html`; legal pages copied to `legal/`. Check: `node review/home-v2-shots.mjs`.
+
 Validation:
 
 ```sh
