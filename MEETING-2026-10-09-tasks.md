@@ -80,7 +80,7 @@ Lanjutan dari `MEETING-2026-10-08-tasks.md`.
 - [x] **A3 Screenshot App Store/Play Store untuk rilis ini** (`03 - App Marketplace Screenshots/`): Daily Brief baru,
   spouse, reminder. Harus siap sebelum Mohit push (target besok).
   - **Selesai 9 Okt:** sudah di-handover Ahmad ke Mohit.
-- [ ] **A4 Invite teman / growth loop: 2–3 arah, belum desain final.** Bahan: pop-up sesudah seminggu (rating + share,
+- [x] **A4 Invite teman / growth loop: 2–3 arah, belum desain final.** Bahan: pop-up sesudah seminggu (rating + share,
   usul Mohit, Tony setuju), tombol invite di Daily Brief, batas 5 undangan ala Instinct, imbalan/fitur terbuka karena
   mengajak. Gabungkan dengan R1 Share Sprout (A + C sudah dipilih 7 Okt). Bukan di onboarding.
   - **Konsep 9 Okt:** `08 - Generated Screens/Home/invite-friends-concepts.html`, review link
@@ -88,7 +88,13 @@ Lanjutan dari `MEETING-2026-10-08-tasks.md`.
     Share + Rate; prompt rating sistem, tanpa hadiah/filter), B "Five personal invites" (link pribadi, halaman web "Tony
     invited you", invite kembali saat teman join), C "Invite to get Sprout Assist first" (3 teman = masuk beta Assist).
     Rekomendasi: A sekarang (tanpa backend), C di atas link pribadi B (butuh Mohit). 4 pertanyaan untuk Tony di bawah
-    halaman. Menunggu pilihan Ahmad / Tony.
+    halaman.
+  - **Diputuskan Ahmad 9 Okt:** (1) share + rating digabung di satu sheet hari ke-7; (2) undangan tidak terbatas, satu
+    link pribadi per parent; (3) hadiah = Sprout Assist duluan, 3 parent join dari link; (4) link masuk ke kelas
+    pengundang: teman pilih kelas (pengundang bisa punya beberapa kelas), belum punya app → store dulu, lalu app pertama
+    kali dibuka langsung di kelas itu. Halaman jadi flow final + catatan untuk Mohit (link pribadi, deferred deep link
+    lewat Branch/AppsFlyer karena iOS tidak punya bawaan, halaman web pilih kelas, timer 7 hari). Masih terbuka: teman
+    dari sekolah lain tetap dihitung untuk Assist? Assist untuk pengundang saja atau sekeluarga? (usul: ya, sekeluarga).
 - [ ] **A5 (nanti) Logo sekolah Austin ISD** kalau batch upload ~70 SD jatuh ke desain: satu gaya logo yang bisa
   di-generate konsisten.
 
