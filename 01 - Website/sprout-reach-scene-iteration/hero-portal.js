@@ -27,11 +27,16 @@
     fit();
     addEventListener("resize", fit);
     loop.addEventListener("playing", () => loop.setAttribute("data-ready", "true"));
-    const start = () => { if (!reduced) { loop.load(); loop.play().catch(() => {}); } };
+    // iOS refuses muted autoplay in Low Power Mode (play() rejects), and the still then stays up for good (Ahmad,
+    // 9 Oct: "the background doesn't move on mobile"). A tap is a user gesture, which iOS does let play
+    const onTap = () => { removeTap(); loop.play().catch(() => {}); };
+    const removeTap = () => ["pointerdown", "touchend", "keydown"].forEach((t) => removeEventListener(t, onTap, true));
+    const tryPlay = () => loop.play().catch((e) => { if (e && e.name === "NotAllowedError") ["pointerdown", "touchend", "keydown"].forEach((t) => addEventListener(t, onTap, { capture: true, passive: true })); });
+    const start = () => { if (!reduced) { loop.load(); tryPlay(); } };
     if (loaded) start(); else addEventListener("load", () => { loaded = true; start(); });
     new IntersectionObserver((es) => es.forEach((e) => {
       if (reduced || !loaded) return;
-      e.isIntersecting ? loop.play().catch(() => {}) : loop.pause();
+      e.isIntersecting ? tryPlay() : loop.pause();
     })).observe(skyBox);
     // with the portal, the portal decides when the bar stops being glass (see 9)
     if (!document.getElementById("portal")) {
