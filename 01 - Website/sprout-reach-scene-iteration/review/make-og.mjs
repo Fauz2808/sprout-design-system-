@@ -77,7 +77,8 @@ await wait(300);
 const problems = await card.evaluate(() => {
   const p = [], copy = document.querySelector(".copy").getBoundingClientRect(), ph = document.querySelector(".phone").getBoundingClientRect();
   if (copy.right > ph.left) p.push("the headline runs into the phone");
-  if (document.querySelector(".plus").getBoundingClientRect().bottom > document.querySelector(".foot").getBoundingClientRect().top - 20) p.push("the copy runs into the footer");
+  if (document.querySelector(".plus").getBoundingClientRect().bottom > 630 - 64) p.push("the copy runs too close to the bottom edge");
+  if (document.querySelector(".copy h1").getBoundingClientRect().top < document.querySelector(".brand").getBoundingClientRect().bottom + 40) p.push("the title runs into the logo");
   for (const img of document.images) if (!img.naturalWidth) p.push("image missing: " + img.src);
   return p;
 });
