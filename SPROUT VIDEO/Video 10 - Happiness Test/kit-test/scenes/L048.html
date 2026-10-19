@@ -1,0 +1,28 @@
+<!-- L048 · half screen on paper · text-centric
+     "I mean, the pursuit of pleasure is not the secret to happiness."
+     Main: "pleasure." in large Playfair italic. Supporting: "The pursuit of" label, "the secret to happiness"
+     struck through on "not". Depth: a paper-shade shape off the left edge, a sage disc behind the main word. -->
+<!-- cue w53 pop pleasure lands -->
+<!-- cue w55 tap strike -->
+<style>
+#L048 .soft{position:absolute;left:-260px;top:-120px;width:620px;height:620px;border-radius:50%;background:#eae6db}
+#L048 .disc{position:absolute;left:520px;top:150px;width:300px;height:300px;border-radius:50%;background:#e2e9e3;opacity:0}
+#L048 .label{position:absolute;left:0;top:96px;font-size:34px;font-weight:500;letter-spacing:-.01em;color:#4d525b;opacity:0}
+#L048 .main{position:absolute;left:-6px;top:150px;font-family:Playfair,serif;font-style:italic;font-weight:400;font-size:196px;line-height:1.05;letter-spacing:-.035em;color:#1e3e2b;opacity:0}
+#L048 .not{position:absolute;left:0;top:520px;display:inline-block;opacity:0}
+#L048 .not span{font-family:Playfair,serif;font-weight:400;font-size:70px;letter-spacing:-.02em;color:#818898;white-space:nowrap}
+#L048 .strike{position:absolute;left:-10px;right:-10px;top:54%;height:6px;border-radius:3px;background:#1e3e2b;transform-origin:left center;transform:scaleX(0)}
+</style>
+<div class="soft" data-layout-allow-overflow></div>
+<div class="disc"></div>
+<div class="label">The pursuit of</div>
+<div class="main">pleasure.</div>
+<div class="not"><span>the secret to happiness</span><div class="strike"></div></div>
+<script type="text/scene">
+tl.fromTo(q('.soft'), {opacity: 0, scale: .94}, {opacity: 1, scale: 1, duration: .45, ease: 'power2.out'}, T0 + .1);
+tl.fromTo(q('.label'), {opacity: 0, x: -14}, {opacity: 1, x: 0, duration: .3, ease: 'power2.out'}, word('w50').start - .1);
+tl.fromTo(q('.disc'), {opacity: 0, scale: .8}, {opacity: 1, scale: 1, duration: .45, ease: 'power3.out'}, word('w53').start - .1);
+tl.fromTo(q('.main'), {opacity: 0, y: 24}, {opacity: 1, y: 0, duration: .38, ease: 'power3.out'}, word('w53').start - .1);
+tl.fromTo(q('.not'), {opacity: 0, y: 12}, {opacity: 1, y: 0, duration: .3, ease: 'power2.out'}, word('w54').start - .08);
+tl.to(q('.strike'), {scaleX: 1, duration: .32, ease: 'power2.inOut'}, word('w55').start);
+</script>

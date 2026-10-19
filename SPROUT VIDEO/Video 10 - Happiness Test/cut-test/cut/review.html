@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cut review · cut-test</title>
+<style>
+@font-face{font-family:Inter;src:url('../assets/fonts/inter-latin-wght-normal.woff2') format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:Playfair;src:url('../assets/fonts/playfair-display-latin-wght-normal.woff2') format('woff2');font-weight:400 900;font-display:swap}
+:root{--paper:#f4f1ea;--shade:#eae6db;--deep:#dbd5c8;--ink:#1e3e2b;--green:#186338;--sage:#e2e9e3;--mint:#d0dacf;--text:#4d525b;--muted:#818898;--white:#fefefd;
+--filler:#e9dbd5;--repeat:#e2e9e3;--retake:#f7dada;--hand:#dbd5c8;--retake-ink:#802929}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--paper)}
+body{font-family:Inter,system-ui,sans-serif;color:var(--text);background:var(--paper);font-size:15px;line-height:1.5}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.display{font-family:Playfair,Georgia,serif;letter-spacing:-.02em;color:var(--ink)}
+header{position:sticky;top:0;z-index:20;background:rgba(244,241,234,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--deep)}
+.bar{max-width:1440px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.bar h1{font-size:26px;font-weight:500}
+.meta{color:var(--muted);font-size:13px}
+.spacer{flex:1}
+.btn{font-family:Playfair,Georgia,serif;font-size:15px;font-weight:500;padding:9px 16px;border-radius:999px;border:1px solid var(--ink);color:var(--ink)}
+.btn:hover{background:var(--shade)}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.primary:hover{background:var(--green)}
+.stats{max-width:1440px;margin:0 auto;padding:0 24px 12px;display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.stats b{color:var(--ink);font-weight:600}
+.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+main{max-width:1440px;margin:0 auto;padding:20px 24px 80px;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:28px;align-items:start}
+.hint{font-size:13px;color:var(--muted);margin-bottom:12px}
+.paras{display:flex;flex-direction:column;gap:10px}
+.para{background:var(--white);border:1px solid var(--mint);border-radius:14px;padding:14px 16px;display:grid;grid-template-columns:56px 1fr;gap:12px}
+.para.playing{border-color:var(--green);box-shadow:0 0 0 1px var(--green)}
+.time{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.play{width:32px;height:32px;border-radius:50%;background:var(--sage);display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.play:hover{background:var(--mint)}
+.play svg{width:13px;height:13px}
+.text{font-size:17px;line-height:1.9;color:var(--ink)}
+.w{padding:1px 2px;border-radius:4px;margin:0 -1px}
+.w:hover{background:var(--shade)}
+.w.low{text-decoration:underline dotted var(--muted);text-underline-offset:4px}
+.w.off{text-decoration:line-through;color:var(--muted)}
+.w.off.filler{background:var(--filler)}.w.off.repeat{background:var(--repeat)}.w.off.retake{background:var(--retake);color:var(--retake-ink)}.w.off.hand{background:var(--hand)}
+.w.now{box-shadow:inset 0 -3px 0 var(--green)}
+.pause{display:inline-block;font-size:11.5px;font-weight:600;letter-spacing:.02em;color:var(--green);background:var(--sage);border-radius:999px;padding:0 8px;margin:0 4px;vertical-align:2px;line-height:20px}
+.group{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--retake-ink);margin-bottom:4px}
+.group button{text-decoration:underline;text-underline-offset:3px}
+aside{position:sticky;top:120px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--white);border:1px solid var(--mint);border-radius:14px;padding:14px}
+video{display:block;height:min(52vh,560px);aspect-ratio:9/16;margin:0 auto;border-radius:10px;background:#101311;object-fit:cover}
+.legend{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+@media (max-width:980px){main{grid-template-columns:1fr}aside{position:static;order:-1}}
+</style>
+</head>
+<body>
+<header>
+ <div class="bar">
+  <h1 class="display">Cut review</h1>
+  <div class="meta" id="meta"></div>
+  <div class="spacer"></div>
+  <button class="btn" id="playcut">Play the cut</button>
+  <button class="btn" id="reset">Back to proposals</button>
+  <button class="btn" id="copy">Copy JSON</button>
+  <button class="btn primary" id="save">Save edl.json</button>
+ </div>
+ <div class="stats" id="stats"></div>
+</header>
+<main>
+ <section>
+  <p class="hint">Struck words are cut. Click any word to keep or cut it. Green chips are pauses and the length they will be shortened to. Dotted words are ones the transcript was unsure of: listen before trusting them.</p>
+  <div class="paras" id="paras"></div>
+ </section>
+ <aside>
+  <div class="card"><video id="video" src="../assets/raw.mp4" preload="auto" playsinline controls></video></div>
+  <div class="card legend">
+   <span><i class="dot" style="background:var(--retake)"></i>Earlier take of a line said again</span>
+   <span><i class="dot" style="background:var(--filler)"></i>Filler (um, uh)</span>
+   <span><i class="dot" style="background:var(--repeat)"></i>Doubled small word</span>
+   <span><i class="dot" style="background:var(--hand)"></i>Cut by hand</span>
+  </div>
+ </aside>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const EDL = {"schema": "sprout-talking-head/edl@1", "raw": "assets/raw.mp4", "transcript": "assets/raw-transcript.json", "duration": 25.9, "fps": "30", "settings": {"pad_in": 0.1, "pad_out": 0.14, "max_pause": 0.45, "retake_window": 25.0}, "levels": {"floor": -69.7, "speech": -17.3, "silence": -52.2}, "words": [{"id": "w0", "text": "There", "start": 0.06, "end": 0.32, "p": 0.748, "keep": false, "reason": "retake", "group": 1}, {"id": "w1", "text": "are", "start": 0.32, "end": 0.54, "p": 0.95, "keep": false, "reason": "retake", "group": 1}, {"id": "w2", "text": "three", "start": 0.54, "end": 0.8, "p": 0.939, "keep": false, "reason": "retake", "group": 1}, {"id": "w3", "text": "macronutrients", "start": 0.8, "end": 1.49, "p": 0.506, "keep": false, "reason": "retake", "group": 1}, {"id": "w4", "text": "to,", "start": 1.5, "end": 1.56, "p": 0.238, "keep": false, "reason": "retake", "group": 1}, {"id": "w5", "text": "there", "start": 2.73, "end": 2.94, "p": 0.723, "keep": true, "reason": null, "group": null}, {"id": "w6", "text": "are", "start": 2.94, "end": 3.2, "p": 0.949, "keep": true, "reason": null, "group": null}, {"id": "w7", "text": "three", "start": 3.2, "end": 3.5, "p": 0.981, "keep": true, "reason": null, "group": null}, {"id": "w8", "text": "macronutrients", "start": 3.5, "end": 4.16, "p": 0.882, "keep": true, "reason": null, "group": null}, {"id": "w9", "text": "to", "start": 4.16, "end": 4.28, "p": 0.957, "keep": true, "reason": null, "group": null}, {"id": "w10", "text": "the", "start": 4.28, "end": 4.48, "p": 0.979, "keep": true, "reason": null, "group": null}, {"id": "w11", "text": "happiest", "start": 4.48, "end": 4.8, "p": 0.906, "keep": true, "reason": null, "group": null}, {"id": "w12", "text": "life.", "start": 4.8, "end": 4.96, "p": 0.875, "keep": true, "reason": null, "group": null}, {"id": "w13", "text": "The", "start": 6.04, "end": 6.64, "p": 0.987, "keep": true, "reason": null, "group": null}, {"id": "w14", "text": "happiest", "start": 6.64, "end": 7.06, "p": 0.994, "keep": true, "reason": null, "group": null}, {"id": "w15", "text": "people", "start": 7.06, "end": 7.56, "p": 0.999, "keep": true, "reason": null, "group": null}, {"id": "w16", "text": "have", "start": 7.56, "end": 8.68, "p": 0.995, "keep": true, "reason": null, "group": null}, {"id": "w17", "text": "enjoyment,", "start": 8.68, "end": 8.84, "p": 0.944, "keep": true, "reason": null, "group": null}, {"id": "w18", "text": "satisfaction,", "start": 8.99, "end": 9.88, "p": 0.611, "keep": true, "reason": null, "group": null}, {"id": "w19", "text": "and", "start": 9.88, "end": 10.2, "p": 0.997, "keep": true, "reason": null, "group": null}, {"id": "w20", "text": "meaning.", "start": 10.2, "end": 10.4, "p": 0.977, "keep": true, "reason": null, "group": null}, {"id": "w21", "text": "Those", "start": 12.51, "end": 12.78, "p": 0.995, "keep": true, "reason": null, "group": null}, {"id": "w22", "text": "are", "start": 12.78, "end": 12.88, "p": 0.999, "keep": true, "reason": null, "group": null}, {"id": "w23", "text": "the", "start": 12.88, "end": 13.2, "p": 0.998, "keep": true, "reason": null, "group": null}, {"id": "w24", "text": "three", "start": 13.2, "end": 13.54, "p": 0.996, "keep": true, "reason": null, "group": null}, {"id": "w25", "text": "macronutrients.", "start": 13.54, "end": 14.76, "p": 0.819, "keep": true, "reason": null, "group": null}, {"id": "w26", "text": "Now,", "start": 14.76, "end": 15.26, "p": 0.598, "keep": true, "reason": null, "group": null}, {"id": "w27", "text": "that's", "start": 15.26, "end": 15.78, "p": 0.941, "keep": true, "reason": null, "group": null}, {"id": "w28", "text": "important", "start": 15.78, "end": 16.0, "p": 0.989, "keep": true, "reason": null, "group": null}, {"id": "w29", "text": "because", "start": 16.0, "end": 16.16, "p": 0.825, "keep": true, "reason": null, "group": null}, {"id": "w30", "text": "it", "start": 16.16, "end": 16.26, "p": 0.982, "keep": true, "reason": null, "group": null}, {"id": "w31", "text": "means", "start": 16.26, "end": 16.4, "p": 0.976, "keep": true, "reason": null, "group": null}, {"id": "w32", "text": "you", "start": 16.4, "end": 16.5, "p": 0.884, "keep": true, "reason": null, "group": null}, {"id": "w33", "text": "need", "start": 16.5, "end": 16.6, "p": 0.729, "keep": true, "reason": null, "group": null}, {"id": "w34", "text": "to", "start": 16.6, "end": 16.92, "p": 0.879, "keep": true, "reason": null, "group": null}, {"id": "w35", "text": "enjoy", "start": 16.92, "end": 17.08, "p": 0.882, "keep": true, "reason": null, "group": null}, {"id": "w36", "text": "your", "start": 17.08, "end": 17.44, "p": 0.99, "keep": true, "reason": null, "group": null}, {"id": "w37", "text": "life", "start": 17.44, "end": 17.64, "p": 1.0, "keep": true, "reason": null, "group": null}, {"id": "w38", "text": "and,", "start": 17.86, "end": 18.34, "p": 0.625, "keep": false, "reason": "repeat", "group": null}, {"id": "w39", "text": "and", "start": 18.34, "end": 18.48, "p": 0.998, "keep": false, "reason": "retake", "group": 2}, {"id": "w40", "text": "you", "start": 18.48, "end": 18.62, "p": 0.957, "keep": false, "reason": "retake", "group": 2}, {"id": "w41", "text": "need", "start": 18.62, "end": 18.72, "p": 0.999, "keep": false, "reason": "retake", "group": 2}, {"id": "w42", "text": "to", "start": 18.72, "end": 18.84, "p": 1.0, "keep": false, "reason": "retake", "group": 2}, {"id": "w43", "text": "know", "start": 18.84, "end": 18.94, "p": 0.999, "keep": false, "reason": "retake", "group": 2}, {"id": "w44", "text": "the", "start": 18.94, "end": 19.14, "p": 0.997, "keep": false, "reason": "retake", "group": 2}, {"id": "w45", "text": "difference", "start": 19.14, "end": 19.21, "p": 0.888, "keep": false, "reason": "retake", "group": 2}, {"id": "w46", "text": "and,", "start": 20.25, "end": 20.74, "p": 0.224, "keep": false, "reason": "retake", "group": 2}, {"id": "w47", "text": "and", "start": 20.74, "end": 20.88, "p": 0.989, "keep": true, "reason": null, "group": null}, {"id": "w48", "text": "you", "start": 20.88, "end": 21.02, "p": 0.965, "keep": true, "reason": null, "group": null}, {"id": "w49", "text": "need", "start": 21.02, "end": 21.1, "p": 0.997, "keep": true, "reason": null, "group": null}, {"id": "w50", "text": "to", "start": 21.1, "end": 21.24, "p": 0.998, "keep": true, "reason": null, "group": null}, {"id": "w51", "text": "know", "start": 21.24, "end": 21.34, "p": 0.997, "keep": true, "reason": null, "group": null}, {"id": "w52", "text": "the", "start": 21.34, "end": 21.54, "p": 0.973, "keep": true, "reason": null, "group": null}, {"id": "w53", "text": "difference", "start": 21.54, "end": 21.82, "p": 0.863, "keep": true, "reason": null, "group": null}, {"id": "w54", "text": "between", "start": 21.82, "end": 22.22, "p": 0.803, "keep": true, "reason": null, "group": null}, {"id": "w55", "text": "enjoyment", "start": 22.22, "end": 22.48, "p": 0.725, "keep": true, "reason": null, "group": null}, {"id": "w56", "text": "and", "start": 22.48, "end": 22.82, "p": 0.992, "keep": true, "reason": null, "group": null}, {"id": "w57", "text": "pleasure,", "start": 22.82, "end": 23.9, "p": 0.811, "keep": true, "reason": null, "group": null}, {"id": "w58", "text": "which", "start": 23.9, "end": 24.12, "p": 0.968, "keep": true, "reason": null, "group": null}, {"id": "w59", "text": "many", "start": 24.12, "end": 24.3, "p": 0.998, "keep": true, "reason": null, "group": null}, {"id": "w60", "text": "people", "start": 24.3, "end": 24.6, "p": 1.0, "keep": true, "reason": null, "group": null}, {"id": "w61", "text": "don't.", "start": 24.6, "end": 24.77, "p": 0.91, "keep": true, "reason": null, "group": null}]};
+const S = EDL.settings;
+const $ = s => document.querySelector(s);
+const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+const KEY = 'sprout-cut:' + EDL.raw + ':' + EDL.words.length;
+const PROPOSED = EDL.words.map(w => ({keep: w.keep, reason: w.reason}));
+let W = EDL.words;
+try { const saved = JSON.parse(localStorage.getItem(KEY)); if (saved && saved.length === W.length) saved.forEach((s, i) => { W[i].keep = s.keep; W[i].reason = s.reason; }); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(W.map(w => ({keep: w.keep, reason: w.reason})))); } catch (e) {} };
+const fmt = t => { const m = Math.floor(t / 60), s = (t - m * 60).toFixed(1); return m + ':' + (s < 10 ? '0' : '') + s; };
+function toast(m){ const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 1800); }
+
+// the same rule as cut.py segments(), without the audio snapping: good enough to preview
+function spans(){
+  const out = []; let cur = null;
+  W.forEach((w, i) => {
+    if (!w.keep){ if (cur){ out.push(cur); cur = null; } return; }
+    if (cur && w.start - W[cur.i1].end > S.max_pause){ out.push(cur); cur = null; }
+    if (!cur) cur = {i0: i, i1: i}; else cur.i1 = i;
+  });
+  if (cur) out.push(cur);
+  return out.map(r => {
+    const prevEnd = r.i0 ? W[r.i0 - 1].end : 0, nextStart = r.i1 + 1 < W.length ? W[r.i1 + 1].start : EDL.duration;
+    return {a: Math.max(prevEnd, W[r.i0].start - S.pad_in), b: Math.min(nextStart, W[r.i1].end + S.pad_out)};
+  });
+}
+function paragraphs(){
+  const out = []; let cur = [];
+  W.forEach((w, i) => {
+    if (cur.length && (w.start - W[i - 1].end > 0.6 || (/[.?!]$/.test(W[i - 1].text) && w.start - W[i - 1].end > 0.3))){ out.push(cur); cur = []; }
+    cur.push(i);
+  });
+  if (cur.length) out.push(cur);
+  return out;
+}
+const PLAY = '<svg viewBox="0 0 16 16"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>';
+function render(){
+  const box = $('#paras'); box.innerHTML = '';
+  paragraphs().forEach(idx => {
+    const div = document.createElement('div'); div.className = 'para';
+    const groups = [...new Set(idx.map(i => W[i].group).filter(g => g))].filter(g => W.findIndex(w => w.group === g) >= idx[0]);
+    let html = groups.map(g => `<div class="group">Earlier take ${g}: cut, the take after it is kept. <button data-g="${g}">${idx.some(i => W[i].group === g && W[i].keep) ? 'Cut this take' : 'Keep this take too'}</button></div>`).join('');
+    html += '<div class="text">';
+    idx.forEach((i, k) => {
+      const w = W[i];
+      if (k){ const gap = w.start - W[i - 1].end; if (gap > S.max_pause && w.keep && W[i - 1].keep) html += `<span class="pause">${gap.toFixed(1)} s → ${(S.pad_in + S.pad_out).toFixed(2)} s</span>`; else html += ' '; }
+      const cls = ['w', w.keep ? '' : 'off ' + (w.reason || 'hand'), w.p < 0.5 ? 'low' : ''].join(' ');
+      html += `<button class="${cls}" data-i="${i}" title="${fmt(w.start)}${w.reason ? ' · ' + w.reason : ''}">${esc(w.text)}</button>`;
+    });
+    html += '</div>';
+    const i0 = idx[0]; let before = '';
+    if (i0 && W[i0].keep){ let j = i0 - 1; while (j >= 0 && !W[j].keep) j--; const gap = j >= 0 ? W[i0].start - W[j].end : 0;
+      if (j >= 0 && gap > S.max_pause && j === i0 - 1) before = `<span class="pause">${gap.toFixed(1)} s → ${(S.pad_in + S.pad_out).toFixed(2)} s</span>`; }
+    div.innerHTML = `<div class="time"><button class="play" aria-label="Play from ${fmt(W[idx[0]].start)}">${PLAY}</button><span>${fmt(W[idx[0]].start)}</span></div><div>${before ? '<div style="margin-bottom:4px">' + before + '</div>' : ''}${html}</div>`;
+    div.querySelector('.play').onclick = () => playRaw(W[idx[0]].start - 0.2, W[idx[idx.length - 1]].end + 0.3, div);
+    div.querySelectorAll('.w').forEach(b => b.onclick = () => { const w = W[+b.dataset.i]; w.keep = !w.keep; w.reason = w.keep ? null : (PROPOSED[+b.dataset.i].reason || 'hand'); commit(); });
+    div.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { const g = +b.dataset.g; const anyKept = W.some(w => w.group === g && w.keep); W.forEach(w => { if (w.group === g){ w.keep = !anyKept; w.reason = anyKept ? 'retake' : null; } }); commit(); });
+    box.appendChild(div);
+  });
+  stats();
+}
+function stats(){
+  const sp = spans(), cut = sp.reduce((s, x) => s + x.b - x.a, 0), counts = {};
+  W.forEach(w => { if (!w.keep){ const r = w.reason || 'hand'; counts[r] = (counts[r] || 0) + 1; } });
+  const names = {retake:'earlier takes', filler:'fillers', repeat:'doubled words', hand:'cut by hand'};
+  $('#meta').textContent = `${EDL.raw} · raw ${fmt(EDL.duration)} → cut about ${fmt(cut)}`;
+  $('#stats').innerHTML = `<span>Keeping <b>${W.filter(w => w.keep).length}</b> of ${W.length} words in <b>${sp.length}</b> pieces</span>` +
+    Object.entries(counts).map(([r, n]) => `<span><i class="dot" style="background:var(--${r})"></i>${names[r] || r} <b>${n}</b> word${n === 1 ? '' : 's'}</span>`).join('') +
+    `<span>Saves <b>${(EDL.duration - cut).toFixed(1)} s</b></span>`;
+}
+function commit(){ save(); const y = scrollY; render(); scrollTo(0, y); }
+
+const video = $('#video'); let mode = null, queue = [], stopAt = null, playingDiv = null;
+function playRaw(a, b, div){ mode = 'raw'; stopAt = b; video.currentTime = Math.max(0, a); video.play(); document.querySelectorAll('.para.playing').forEach(x => x.classList.remove('playing')); playingDiv = div; div.classList.add('playing'); }
+$('#playcut').onclick = () => { queue = spans(); if (!queue.length) return; mode = 'cut'; video.currentTime = queue[0].a; video.play(); toast('Playing the cut: dropped words and long pauses are skipped'); };
+video.addEventListener('timeupdate', () => {
+  const t = video.currentTime;
+  document.querySelectorAll('.w.now').forEach(x => x.classList.remove('now'));
+  const i = W.findIndex(w => w.start <= t && t < w.end); if (i >= 0){ const el = document.querySelector(`.w[data-i="${i}"]`); if (el) el.classList.add('now'); }
+  if (mode === 'raw' && stopAt !== null && t >= stopAt){ video.pause(); mode = null; if (playingDiv) playingDiv.classList.remove('playing'); }
+  if (mode === 'cut'){
+    const k = queue.findIndex(s => t < s.b);
+    if (k < 0){ video.pause(); mode = null; return; }
+    if (t < queue[k].a - 0.02) video.currentTime = queue[k].a;
+  }
+});
+const output = () => JSON.stringify(Object.assign({}, EDL, {words: W, reviewed: new Date().toISOString().slice(0, 19)}), null, 1) + '\n';
+$('#save').onclick = async () => {
+  const text = output();
+  if (window.showSaveFilePicker){ try { const h = await showSaveFilePicker({suggestedName: 'edl.json', types: [{description: 'Edit list', accept: {'application/json': ['.json']}}]}); const f = await h.createWritable(); await f.write(text); await f.close(); toast('Saved ' + h.name + ': now run cut.py apply'); return; } catch (e) { if (e.name === 'AbortError') return; } }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], {type: 'application/json'})); a.download = 'edl.json'; a.click(); toast('Downloaded edl.json: move it into the cut folder');
+};
+$('#copy').onclick = async () => { try { await navigator.clipboard.writeText(output()); toast('Edit list copied'); } catch (e) { toast('Copy blocked by the browser'); } };
+$('#reset').onclick = () => { W.forEach((w, i) => { w.keep = PROPOSED[i].keep; w.reason = PROPOSED[i].reason; }); commit(); toast('Back to the proposals'); };
+render();
+window.__edl = () => JSON.parse(output());
+</script>
+</body>
+</html>

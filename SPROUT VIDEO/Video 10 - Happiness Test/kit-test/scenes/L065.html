@@ -1,0 +1,40 @@
+<!-- L065 · full screen on paper with the speaker circle · graphic-centric
+     "The satisfaction, which is the joy of an accomplishment or an activity after struggle."
+     Main: paper staircase rising to a flag. Supporting: chapter tag, "Joy after / struggle." title, path labels.
+     Depth: paper-shade shape, contact shadow. "struggle." waits at 45% until it is spoken. -->
+<!-- cue w66 whoosh-short staircase rises -->
+<!-- cue w73 pop Accomplishment -->
+<!-- cue w78 tap Struggle -->
+<style>
+#L065 .soft{position:absolute;left:420px;top:420px;width:820px;height:820px;border-radius:50%;background:#eae6db}
+#L065 .tag{position:absolute;left:0;top:-268px}
+#L065 .title{position:absolute;left:0;top:0;font-family:Playfair,serif;font-weight:500;font-size:132px;line-height:1.1;letter-spacing:-.035em;color:#1e3e2b}
+#L065 .title span{display:block;opacity:0}
+#L065 .title .pending{color:#1e3e2b}
+#L065 .stairs{position:absolute;left:120px;top:330px;width:700px;height:640px;opacity:0}
+#L065 .stairs img{width:100%;height:100%;object-fit:contain;transform-origin:50% 80%}
+#L065 .ground{position:absolute;left:230px;top:925px;width:480px;height:40px;border-radius:50%;background:#1e3e2b;filter:blur(20px);opacity:0}
+#L065 .path{position:absolute;font-size:33px;font-weight:500;letter-spacing:-.02em;color:#1e3e2b;opacity:0}
+#L065 .up{left:330px;top:368px;width:262px;text-align:right}
+#L065 .down{left:28px;top:968px}
+</style>
+<div class="soft" data-layout-allow-overflow></div>
+<div class="tag chapter" data-layout-allow-overflow>02 / SATISFACTION</div>
+<div class="title"><span class="joy">Joy after</span><span class="pending">struggle.</span></div>
+<div class="ground"></div>
+<div class="stairs"><img src="assets/satisfaction.png" alt="A paper staircase rising to a green flag"></div>
+<div class="path up">Accomplishment</div>
+<div class="path down">Struggle</div>
+<script type="text/scene">
+tl.fromTo(q('.soft'), {opacity: 0, scale: .92}, {opacity: 1, scale: 1, duration: .5, ease: 'power2.out'}, T0);
+tl.fromTo(q('.tag'), {opacity: 0, x: -14}, {opacity: 1, x: 0, duration: .3, ease: 'power2.out'}, T0 + .2);
+const rise = word('w66').start + .3;
+tl.fromTo(q('.stairs'), {opacity: 0, x: -40, y: 60, scale: .93}, {opacity: 1, x: 0, y: 0, scale: 1, duration: .8, ease: 'power3.out'}, rise);
+tl.fromTo(q('.ground'), {opacity: 0, scaleX: .6}, {opacity: .1, scaleX: 1, duration: .7, ease: 'sine.out'}, rise);
+tl.to(q('.stairs img'), {scale: 1.035, y: -10, duration: 4.4, ease: 'sine.inOut'}, rise + .8);
+tl.fromTo(q('.joy'), {opacity: 0, y: 24}, {opacity: 1, y: 0, duration: .5, ease: 'power3.out'}, word('w70').start - .12);
+tl.fromTo(q('.pending'), {opacity: 0, y: 24}, {opacity: .45, y: 0, duration: .5, ease: 'power3.out'}, word('w70').start - .02);
+tl.to(q('.pending'), {opacity: 1, duration: .12, ease: 'sine.out'}, word('w78').start - .03);
+tl.fromTo(q('.up'), {opacity: 0, y: 12}, {opacity: 1, y: 0, duration: .35, ease: 'power2.out'}, word('w73').start - .08);
+tl.fromTo(q('.down'), {opacity: 0, x: -12}, {opacity: 1, x: 0, duration: .35, ease: 'power2.out'}, word('w78').start - .05);
+</script>

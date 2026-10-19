@@ -1,0 +1,34 @@
+<!-- L079 · half screen on ink · object-centric
+     "And last but not least is meaning."
+     Main: the paper compass, centred. Supporting: chapter tag. Depth: a deeper green disc and a contact shadow.
+     The needle (code-drawn, the dial image has none) swings and settles on "meaning". -->
+<!-- cue +0.30 whoosh-short compass arrives -->
+<!-- cue w85 pop needle settles -->
+<style>
+#L079 .disc{position:absolute;left:198px;top:90px;width:540px;height:540px;border-radius:50%;background:#24493a;opacity:0}
+#L079 .tag{position:absolute;left:0;top:0}
+#L079 .compass{position:absolute;left:178px;top:60px;width:580px;height:580px;opacity:0}
+#L079 .compass img{width:100%;height:100%;object-fit:contain}
+#L079 .compass svg{position:absolute;inset:0;width:100%;height:100%;transform-origin:50.059% 54.2688%}
+#L079 .ground{position:absolute;left:298px;top:620px;width:340px;height:36px;border-radius:50%;background:#05140b;filter:blur(18px);opacity:0}
+</style>
+<div class="disc"></div>
+<div class="tag chapter">03 / MEANING</div>
+<div class="ground"></div>
+<div class="compass">
+  <img src="assets/meaning.png" alt="A sculptural paper compass">
+  <svg class="needle" viewBox="0 0 846 846" aria-label="A compass needle finding direction">
+    <path d="M423.5,272.2 L401.07,477.1 L445.93,477.1Z" fill="#1e3e2b"/>
+    <path d="M423.5,586.2 L401.07,477.1 L445.93,477.1Z" fill="#77b691"/>
+    <circle cx="423.5" cy="459.1" r="15" fill="#f4f1ea" stroke="#1e3e2b" stroke-width="4.5"/>
+  </svg>
+</div>
+<script type="text/scene">
+tl.fromTo(q('.tag'), {opacity: 0, x: -14}, {opacity: 1, x: 0, duration: .3, ease: 'power2.out'}, T0 + .25);
+tl.fromTo(q('.disc'), {opacity: 0, scale: .85}, {opacity: 1, scale: 1, duration: .5, ease: 'power2.out'}, T0 + .2);
+tl.fromTo(q('.compass'), {opacity: 0, y: 50, scale: .93}, {opacity: 1, y: 0, scale: 1, duration: .7, ease: 'power3.out'}, T0 + .3);
+tl.fromTo(q('.ground'), {opacity: 0}, {opacity: .5, duration: .6, ease: 'sine.out'}, T0 + .3);
+const settle = word('w85').start;
+tl.fromTo(q('.needle'), {rotation: -48}, {rotation: 12, duration: settle - T0 - .4, ease: 'power2.inOut'}, T0 + .4);
+tl.to(q('.needle'), {rotation: 0, duration: .45, ease: 'power3.out'}, settle);
+</script>

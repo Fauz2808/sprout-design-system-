@@ -1,0 +1,39 @@
+<!-- L033 · captions + UI · graphic-centric
+     "and you need to know the difference between enjoyment and pleasure,"
+     One card: Enjoyment ≠ Pleasure. Each word lands on its spoken cue, the ≠ draws between them. -->
+<!-- cue +0.10 tap card lands -->
+<!-- cue w41 pop Enjoyment -->
+<!-- cue w43 pop Pleasure -->
+<style>
+#L033 .card{position:absolute;left:18px;top:120px;width:900px;height:273px;background:#f4f1ea;border:1px solid #d0dacf;border-radius:28px;box-shadow:0 10px 30px rgba(0,0,0,.14);padding:30px 40px;display:flex;flex-direction:column;gap:35px;color:#1e3e2b;opacity:0}
+#L033 .back{position:absolute;left:66px;top:96px;width:804px;height:240px;border-radius:26px;background:#dbd5c8;opacity:0}
+#L033 .line{display:flex;align-items:center;gap:26px}
+#L033 .w{font-family:Playfair,serif;font-weight:500;font-size:67.5px;line-height:1.14;letter-spacing:-.04em;white-space:nowrap;padding-bottom:18px;opacity:0}
+#L033 .good{color:#186338;position:relative}
+#L033 .other{color:#4d525b}
+#L033 .under{position:absolute;left:0;bottom:0;width:100%;height:4px;background:#186338;transform-origin:left center;transform:scaleX(0)}
+#L033 .neq{width:78px;height:82px;flex-shrink:0}
+#L033 .neq line{stroke:#1e3e2b;stroke-width:4;stroke-linecap:round}
+</style>
+<div class="back"></div>
+<div class="card">
+  <div class="chapter">01 / ENJOYMENT</div>
+  <div class="line">
+    <span class="w good">Enjoyment<span class="under"></span></span>
+    <svg class="neq" viewBox="0 0 78 82" aria-label="is not equal to">
+      <line class="eq" x1="6" y1="28" x2="72" y2="28" pathLength="1"/><line class="eq" x1="6" y1="52" x2="72" y2="52" pathLength="1"/>
+      <line class="slash" x1="55" y1="8" x2="24" y2="73" pathLength="1"/>
+    </svg>
+    <span class="w other">Pleasure</span>
+  </div>
+</div>
+<script type="text/scene">
+const en = word('w41').start, and = word('w42').start, pl = word('w43').start;
+tl.fromTo(q('.back'), {opacity: 0, y: 16}, {opacity: .6, y: 0, duration: .35, ease: 'power2.out'}, T0 + .1);
+tl.fromTo(q('.card'), {opacity: 0, y: 24}, {opacity: 1, y: 0, duration: .38, ease: 'power3.out'}, T0 + .1);
+tl.fromTo(q('.good'), {opacity: 0, y: 10}, {opacity: 1, y: 0, duration: .28, ease: 'power2.out'}, en - .1);
+tl.fromTo(qa('.eq'), {strokeDasharray: 1, strokeDashoffset: 1}, {strokeDashoffset: 0, duration: .22, ease: 'power2.out', stagger: .06}, and - .05);
+tl.fromTo(q('.slash'), {strokeDasharray: 1, strokeDashoffset: 1}, {strokeDashoffset: 0, duration: .2, ease: 'power2.out'}, and + .12);
+tl.fromTo(q('.other'), {opacity: 0, y: 10}, {opacity: 1, y: 0, duration: .28, ease: 'power2.out'}, pl - .1);
+tl.to(q('.under'), {scaleX: 1, duration: .4, ease: 'power2.inOut'}, word('w43').end + .05);
+</script>

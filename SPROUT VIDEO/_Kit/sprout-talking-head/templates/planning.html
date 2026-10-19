@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Edit plan · __TITLE__</title>
+<style>
+@font-face{font-family:Inter;src:url('assets/fonts/inter-latin-wght-normal.woff2') format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:Playfair;src:url('assets/fonts/playfair-display-latin-wght-normal.woff2') format('woff2');font-weight:400 900;font-display:swap}
+@font-face{font-family:Playfair;src:url('assets/fonts/playfair-display-latin-wght-italic.woff2') format('woff2');font-weight:400 900;font-style:italic;font-display:swap}
+:root{--paper:#f4f1ea;--shade:#eae6db;--deep:#dbd5c8;--ink:#1e3e2b;--green:#186338;--sage:#e2e9e3;--mint:#d0dacf;--lg:#77b691;--text:#4d525b;--muted:#818898;--white:#fefefd;
+--t-captions:#c2b9a6;--t-captions-ui:#77b691;--t-half:#186338;--t-full:#1e3e2b}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--paper)}
+body{font-family:Inter,system-ui,sans-serif;color:var(--text);background:var(--paper);font-size:15px;line-height:1.5}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.display{font-family:Playfair,Georgia,serif;letter-spacing:-.02em;color:var(--ink)}
+header{position:sticky;top:0;z-index:20;background:rgba(244,241,234,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--deep)}
+.bar{max-width:1440px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.bar h1{font-size:26px;font-weight:500}
+.bar .meta{color:var(--muted);font-size:13px}
+.bar .spacer{flex:1}
+.btn{font-family:Playfair,Georgia,serif;font-size:15px;font-weight:500;padding:9px 16px;border-radius:999px;border:1px solid var(--ink);color:var(--ink);background:transparent;transition:background .15s}
+.btn:hover{background:var(--shade)}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.primary:hover{background:var(--green)}
+.strip-wrap{max-width:1440px;margin:0 auto;padding:0 24px 12px}
+.strip{display:flex;height:22px;border-radius:6px;overflow:hidden;background:var(--shade)}
+.strip button{height:100%;border-right:1px solid var(--paper);min-width:2px}
+.strip button:hover{filter:brightness(1.12)}
+.stats{display:flex;gap:18px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.stats b{color:var(--ink);font-weight:600}
+.stats .warn b{color:#802929}
+.dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:0}
+main{max-width:1440px;margin:0 auto;padding:20px 24px 80px;display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;align-items:start}
+.rows{display:flex;flex-direction:column;gap:10px}
+.row{display:grid;grid-template-columns:64px minmax(0,1.25fr) minmax(0,1fr);gap:14px;background:var(--white);border:1px solid var(--mint);border-radius:14px;padding:14px 16px;scroll-margin-top:130px}
+.row.active{border-color:var(--green);box-shadow:0 0 0 1px var(--green)}
+.time{display:flex;flex-direction:column;align-items:flex-start;gap:6px;font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--muted)}
+.play{width:34px;height:34px;border-radius:50%;background:var(--sage);display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.play:hover{background:var(--mint)}
+.play svg{width:14px;height:14px}
+.lid{font-size:11px;letter-spacing:.06em}
+.script{font-size:17px;line-height:1.75;color:var(--ink)}
+.tok{display:inline;padding:1px 2px;border-radius:4px;margin:0 -2px}
+.tok:hover{background:var(--shade)}
+.tok.em{background:var(--ink);color:var(--paper);font-family:Playfair,Georgia,serif;font-style:italic}
+.tok.split-hint:hover{box-shadow:-2px 0 0 var(--green)}
+.rowtools{margin-top:8px;display:flex;gap:12px;font-size:12px;color:var(--muted)}
+.rowtools button{text-decoration:underline;text-underline-offset:3px}
+.rowtools button:hover{color:var(--green)}
+.plan{display:flex;flex-direction:column;gap:8px}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--deep);border-radius:9px;overflow:hidden}
+.seg button{padding:7px 4px;font-size:12.5px;font-weight:500;border-right:1px solid var(--deep);color:var(--text);line-height:1.2}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--shade)}
+.seg button[aria-pressed=true]{color:var(--white)}
+.seg button[data-scene=captions][aria-pressed=true]{color:var(--ink)}
+.opts{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;align-items:center;min-height:22px}
+.opts label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.opts .chip{padding:2px 9px;border-radius:999px;border:1px solid var(--deep)}
+.opts .chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+textarea{width:100%;min-height:62px;max-height:240px;field-sizing:content;resize:vertical;border:1px solid var(--deep);border-radius:9px;padding:9px 11px;font:inherit;font-size:14px;color:var(--ink);background:var(--paper)}
+textarea::placeholder{color:var(--muted)}
+aside{position:sticky;top:130px;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--white);border:1px solid var(--mint);border-radius:14px;padding:16px}
+.card h2{font-size:18px;font-weight:500;margin-bottom:10px}
+.label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--green);margin:12px 0 6px}
+.label:first-of-type{margin-top:0}
+.video{position:relative;height:min(46vh,520px);aspect-ratio:9/16;margin:0 auto;border-radius:10px;overflow:hidden;background:#101311;cursor:crosshair}
+.video video{width:100%;height:100%;object-fit:cover;display:block}
+.face{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border:2px solid var(--paper);border-radius:50%;box-shadow:0 0 0 1px rgba(0,0,0,.4);pointer-events:none}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+input[type=text]{width:100%;border:1px solid var(--deep);border-radius:9px;padding:8px 10px;font:inherit;font-size:14px;color:var(--ink);background:var(--paper)}
+.swatches{display:flex;gap:8px}
+.sw{display:flex;align-items:center;gap:6px;padding:5px 9px 5px 6px;border:1px solid var(--deep);border-radius:999px;font-size:12.5px}
+.sw i{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.12)}
+.sw[aria-pressed=true]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.locked{display:flex;gap:8px;flex-wrap:wrap;font-size:13px}
+.locked span{padding:4px 10px;border-radius:999px;background:var(--shade)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
+.toast.on{opacity:1}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-bottom:12px}
+@media (max-width:1100px){main{grid-template-columns:minmax(0,1fr) 260px;gap:18px}.row{grid-template-columns:52px 1fr}.plan{grid-column:1/-1}.video{height:min(40vh,400px)}}
+@media (max-width:720px){main{grid-template-columns:1fr}aside{position:static;order:-1}}
+</style>
+</head>
+<body>
+<header>
+ <div class="bar">
+  <h1 class="display">Edit plan</h1>
+  <div class="meta" id="meta"></div>
+  <div class="spacer"></div>
+  <button class="btn" id="import">Import plan</button>
+  <button class="btn" id="copy">Copy JSON</button>
+  <button class="btn primary" id="export">Save plan.json</button>
+  <input type="file" id="file" accept="application/json,.json" hidden>
+ </div>
+ <div class="strip-wrap"><div class="strip" id="strip" aria-label="Rhythm of scene types over time"></div><div class="stats" id="stats"></div></div>
+</header>
+
+<main>
+ <section>
+  <div class="legend">
+   <span>Click a word to mark it for a styled phrase. Shift-click a word to start a new line there.</span>
+  </div>
+  <div class="rows" id="rows"></div>
+ </section>
+ <aside>
+  <div class="card">
+   <div class="video" id="videoBox"><video id="video" src="__FOOTAGE__" preload="auto" playsinline></video><div class="face" id="face"></div></div>
+   <p class="hint">Click the speaker's face to set the reframing point for half-screen and the speaker circle.</p>
+  </div>
+  <div class="card">
+   <h2 class="display">Style</h2>
+   <div class="label">Fonts and palette (locked by the brand kit)</div>
+   <div class="locked"><span>Playfair Display</span><span>Inter</span><span>Cream + ink</span></div>
+   <div class="label">Second plate of a styled phrase</div>
+   <div class="swatches" id="plate"></div>
+   <div class="label">Default cutaway background</div>
+   <div class="swatches" id="cutbg"></div>
+   <div class="label">Speaker label</div>
+   <input type="text" id="speaker" placeholder="e.g. ARTHUR BROOKS (empty = none)">
+   <div class="label">Opening</div>
+   <label class="opts"><input type="checkbox" id="zoom"> Opening zoom (100 → 118 → 112%)</label>
+   <div class="label">Notes for Claude</div>
+   <textarea id="notes" placeholder="Overall direction, references, assets you will supply"></textarea>
+  </div>
+ </aside>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA = __DATA__;
+const TYPES = [
+  {id:'captions', name:'Captions', range:[40,60]},
+  {id:'captions-ui', name:'Captions + UI', range:[10,25]},
+  {id:'half', name:'Half', range:[10,25]},
+  {id:'full', name:'Full', range:[15,30]},
+];
+const COLOR = {captions:'var(--t-captions)','captions-ui':'var(--t-captions-ui)',half:'var(--t-half)',full:'var(--t-full)'};
+const W = Object.fromEntries(DATA.words.map(w => [w.id, w]));
+const ORDER = Object.fromEntries(DATA.words.map((w, i) => [w.id, i]));
+const KEY = 'sprout-plan:' + DATA.key;
+const $ = s => document.querySelector(s);
+const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+function lineId(first){ const m = /(\d+)$/.exec(first); return m ? 'L' + String(+m[1]).padStart(3, '0') : 'L-' + first; }
+function makeLine(ids, base){
+  const ws = ids.map(i => W[i]);
+  return Object.assign({scene:'captions', emphasis:[], plan:'', bg:null, pip:false}, base || {},
+    {id: lineId(ids[0]), start: ws[0].start, end: ws[ws.length - 1].end, text: ws.map(w => w.text).join(' '), word_ids: ids.slice()});
+}
+function fresh(){
+  return {schema:'sprout-talking-head/plan@1',
+    source:{footage: DATA.footage, words: DATA.wordsFile, duration: DATA.duration},
+    style:{speaker_label:'', opening_zoom:true, emphasis_plate:'sage', cutaway_bg:'paper', face:{x:.5, y:.35}},
+    notes:'', lines: DATA.lines.map(l => makeLine(l.word_ids))};
+}
+function valid(p){
+  try{
+    const ids = p.lines.flatMap(l => l.word_ids);
+    return p.schema === 'sprout-talking-head/plan@1' && ids.length === DATA.words.length && ids.every((id, i) => id === DATA.words[i].id);
+  }catch(e){ return false; }
+}
+function load(){
+  try{ const p = JSON.parse(localStorage.getItem(KEY)); if (p && valid(p)) return p; }catch(e){}
+  return null;
+}
+let state = load() || (DATA.plan && valid(DATA.plan) ? DATA.plan : fresh());
+state.lines = state.lines.map(l => makeLine(l.word_ids, l));
+state.source = {footage: DATA.footage, words: DATA.wordsFile, duration: DATA.duration};
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+function fmt(t){ const m = Math.floor(t / 60), s = (t - m * 60).toFixed(1); return m + ':' + (s < 10 ? '0' : '') + s; }
+function spans(){
+  // a line's scene holds from its first word until the next line starts
+  return state.lines.map((l, i) => ({l, a: i === 0 ? 0 : l.start, b: i < state.lines.length - 1 ? state.lines[i + 1].start : DATA.duration}));
+}
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 1800); }
+
+const PLAY = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>';
+function renderRows(){
+  const box = $('#rows'); box.innerHTML = '';
+  state.lines.forEach((l, idx) => {
+    const row = document.createElement('article'); row.className = 'row'; row.id = 'row-' + l.id;
+    const em = new Set(l.emphasis);
+    const toks = l.word_ids.map((id, k) => `<button class="tok${em.has(id) ? ' em' : ''}${k ? ' split-hint' : ''}" data-w="${id}">${esc(W[id].text)}</button>`).join(' ');
+    const cut = l.scene === 'half' || l.scene === 'full';
+    const bg = l.bg || state.style.cutaway_bg;
+    row.innerHTML = `
+      <div class="time"><button class="play" title="Play this line" aria-label="Play ${l.id}">${PLAY}</button><span>${fmt(l.start)}</span><span class="lid">${l.id}</span></div>
+      <div><div class="script">${toks}</div>
+        <div class="rowtools">${idx < state.lines.length - 1 ? '<button data-act="merge">Merge with next line</button>' : ''}${l.emphasis.length ? '<button data-act="clear">Clear marked words</button>' : ''}</div></div>
+      <div class="plan">
+        <div class="seg" role="group" aria-label="Scene type">${TYPES.map(t => `<button data-scene="${t.id}" aria-pressed="${l.scene === t.id}" style="${l.scene === t.id ? 'background:' + COLOR[t.id] : ''}">${t.name}</button>`).join('')}</div>
+        <div class="opts">${cut ? `<span>Background</span><button class="chip" data-bg="paper" aria-pressed="${bg === 'paper'}">Paper</button><button class="chip" data-bg="ink" aria-pressed="${bg === 'ink'}">Ink</button>` : ''}
+          ${l.scene === 'full' ? `<label><input type="checkbox" data-pip ${l.pip ? 'checked' : ''}> Speaker circle</label>` : ''}
+          ${l.scene === 'captions' && l.emphasis.length ? '<span>Marked words become a styled phrase</span>' : ''}
+          ${l.scene !== 'captions' && l.emphasis.length ? '<span>Marked words show in Playfair italic inside the caption</span>' : ''}</div>
+        <textarea data-plan placeholder="${esc(placeholder(l.scene))}">${esc(l.plan)}</textarea>
+      </div>`;
+    row.querySelector('.play').onclick = () => playLine(l);
+    row.querySelectorAll('.tok').forEach(b => b.onclick = e => {
+      const id = b.dataset.w;
+      if (e.shiftKey){ split(l, id); return; }
+      const s = new Set(l.emphasis); s.has(id) ? s.delete(id) : s.add(id);
+      l.emphasis = l.word_ids.filter(x => s.has(x)); commit(true);
+    });
+    row.querySelectorAll('[data-scene]').forEach(b => b.onclick = () => { l.scene = b.dataset.scene; if (l.scene !== 'full') l.pip = false; commit(true); });
+    row.querySelectorAll('[data-bg]').forEach(b => b.onclick = () => { l.bg = b.dataset.bg === state.style.cutaway_bg ? null : b.dataset.bg; commit(true); });
+    const pip = row.querySelector('[data-pip]'); if (pip) pip.onchange = () => { l.pip = pip.checked; commit(false); };
+    row.querySelector('[data-plan]').oninput = e => { l.plan = e.target.value; commit(false); };
+    const m = row.querySelector('[data-act=merge]'); if (m) m.onclick = () => merge(idx);
+    const c = row.querySelector('[data-act=clear]'); if (c) c.onclick = () => { l.emphasis = []; commit(true); };
+    box.appendChild(row);
+  });
+}
+function placeholder(scene){
+  return {captions:'What happens on the face? e.g. slow push in, styled phrase on the marked words',
+    'captions-ui':'What small UI appears in the lower half? e.g. three numbered circles, one per mistake',
+    half:'What fills the top half? e.g. paper staircase, card slides in on "struggle"',
+    full:'What takes over the screen? e.g. text-centric: ENJOY / your life. with the paper bloom'}[scene];
+}
+function split(l, id){
+  const k = l.word_ids.indexOf(id); if (k <= 0) return;
+  const i = state.lines.indexOf(l);
+  const a = makeLine(l.word_ids.slice(0, k), l), b = makeLine(l.word_ids.slice(k), {scene: l.scene, bg: l.bg, pip: l.pip, plan: ''});
+  a.emphasis = l.emphasis.filter(x => a.word_ids.includes(x)); b.emphasis = l.emphasis.filter(x => b.word_ids.includes(x));
+  state.lines.splice(i, 1, a, b); commit(true); toast('Split into ' + a.id + ' and ' + b.id);
+}
+function merge(i){
+  const a = state.lines[i], b = state.lines[i + 1];
+  const m = makeLine(a.word_ids.concat(b.word_ids), a);
+  m.emphasis = a.emphasis.concat(b.emphasis);
+  m.plan = [a.plan, b.plan].filter(Boolean).join('\n');
+  state.lines.splice(i, 2, m); commit(true);
+}
+function renderStrip(){
+  const sp = spans(), strip = $('#strip'); strip.innerHTML = '';
+  const total = {captions:0,'captions-ui':0,half:0,full:0};
+  sp.forEach(({l, a, b}) => {
+    total[l.scene] += b - a;
+    const s = document.createElement('button'); s.style.flex = (b - a) + ' 0 0'; s.style.background = COLOR[l.scene];
+    s.title = l.id + ' · ' + fmt(a) + ' · ' + l.text; s.onclick = () => focusRow(l.id);
+    strip.appendChild(s);
+  });
+  $('#stats').innerHTML = TYPES.map(t => {
+    const pct = Math.round(100 * total[t.id] / DATA.duration);
+    const off = pct < t.range[0] || pct > t.range[1];
+    return `<span class="${off ? 'warn' : ''}"><i class="dot" style="background:${COLOR[t.id]}"></i>${t.name} <b>${pct}%</b> (aim ${t.range[0]}–${t.range[1]}%)</span>`;
+  }).join('') + rhythmNotes(sp);
+}
+function rhythmNotes(sp){
+  const notes = [];
+  if (sp.length && sp[0].l.scene !== 'captions') notes.push('Open on the face');
+  if (sp.length && sp[sp.length - 1].l.scene !== 'captions') notes.push('Close on the face');
+  sp.forEach((x, i) => { if (x.l.scene === 'full' && x.b - x.a > 7) notes.push(x.l.id + ' full > 7 s'); });
+  return notes.length ? `<span class="warn"><b>Check:</b> ${notes.join(' · ')}</span>` : '';
+}
+function focusRow(id){
+  const r = document.getElementById('row-' + id); if (!r) return;
+  r.scrollIntoView({behavior:'smooth', block:'center'});
+  document.querySelectorAll('.row.active').forEach(x => x.classList.remove('active')); r.classList.add('active');
+}
+let stopAt = null;
+const video = $('#video');
+function playLine(l){
+  focusRow(l.id); video.currentTime = Math.max(0, l.start - 0.05); stopAt = l.end + 0.15;
+  video.play().catch(() => toast('Footage not found next to this page'));
+}
+video.addEventListener('loadedmetadata', () => { if (video.currentTime === 0) video.currentTime = Math.min(1, video.duration / 2); }, {once:true});
+video.addEventListener('timeupdate', () => { if (stopAt !== null && video.currentTime >= stopAt){ video.pause(); stopAt = null; } });
+
+function renderStyle(){
+  const s = state.style;
+  const sw = (box, opts, key) => {
+    $(box).innerHTML = opts.map(o => `<button class="sw" data-v="${o.v}" aria-pressed="${s[key] === o.v}"><i style="background:${o.c}"></i>${o.n}</button>`).join('');
+    $(box).querySelectorAll('button').forEach(b => b.onclick = () => { s[key] = b.dataset.v; commit(true); });
+  };
+  sw('#plate', [{v:'sage', c:'#e2e9e3', n:'Sage'}, {v:'cream', c:'#f4f1ea', n:'Cream reversed'}, {v:'ink', c:'#1e3e2b', n:'Ink'}], 'emphasis_plate');
+  sw('#cutbg', [{v:'paper', c:'#f4f1ea', n:'Paper'}, {v:'ink', c:'#1e3e2b', n:'Ink'}], 'cutaway_bg');
+  $('#speaker').value = s.speaker_label; $('#zoom').checked = s.opening_zoom; $('#notes').value = state.notes || '';
+  const f = $('#face'); f.style.left = (s.face.x * 100) + '%'; f.style.top = (s.face.y * 100) + '%';
+}
+$('#speaker').oninput = e => { state.style.speaker_label = e.target.value; commit(false); };
+$('#zoom').onchange = e => { state.style.opening_zoom = e.target.checked; commit(false); };
+$('#notes').oninput = e => { state.notes = e.target.value; commit(false); };
+$('#videoBox').onclick = e => {
+  const r = e.currentTarget.getBoundingClientRect();
+  state.style.face = {x: +((e.clientX - r.left) / r.width).toFixed(3), y: +((e.clientY - r.top) / r.height).toFixed(3)};
+  renderStyle(); commit(false); toast('Face point set');
+};
+
+function commit(redraw){ save(); if (redraw){ const y = window.scrollY; renderRows(); renderStyle(); window.scrollTo(0, y); } renderStrip(); }
+function output(){
+  return JSON.stringify(Object.assign({}, state, {saved: new Date().toISOString().slice(0, 19)}, {
+    lines: state.lines.map(l => ({id:l.id, start:l.start, end:l.end, text:l.text, word_ids:l.word_ids, scene:l.scene,
+      emphasis:l.emphasis, bg:(l.scene === 'half' || l.scene === 'full') ? (l.bg || state.style.cutaway_bg) : null,
+      pip:l.scene === 'full' && !!l.pip, plan:l.plan.trim()}))}), null, 2) + '\n';
+}
+$('#export').onclick = async () => {
+  const text = output();
+  if (window.showSaveFilePicker){
+    try{
+      const h = await showSaveFilePicker({suggestedName:'plan.json', types:[{description:'Plan', accept:{'application/json':['.json']}}]});
+      const w = await h.createWritable(); await w.write(text); await w.close(); toast('Saved ' + h.name); return;
+    }catch(e){ if (e.name === 'AbortError') return; }
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], {type:'application/json'})); a.download = 'plan.json'; a.click();
+  toast('Downloaded plan.json: move it into the project folder');
+};
+$('#copy').onclick = async () => { try{ await navigator.clipboard.writeText(output()); toast('Plan copied'); }catch(e){ toast('Copy blocked by the browser'); } };
+$('#import').onclick = () => $('#file').click();
+$('#file').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try{
+    const p = JSON.parse(await f.text());
+    if (!valid(p)) { toast('That plan is for a different transcript'); return; }
+    state = p; state.lines = state.lines.map(l => makeLine(l.word_ids, l)); commit(true); toast('Plan imported');
+  }catch(err){ toast('Not a plan.json file'); }
+  e.target.value = '';
+};
+$('#meta').textContent = DATA.title + ' · ' + fmt(DATA.duration) + ' · ' + DATA.words.length + ' words';
+renderRows(); renderStyle(); renderStrip();
+window.__plan = () => JSON.parse(output());
+</script>
+</body>
+</html>

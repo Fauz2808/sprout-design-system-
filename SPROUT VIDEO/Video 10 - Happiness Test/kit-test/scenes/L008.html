@@ -1,0 +1,26 @@
+<!-- L008 · captions + UI · object-centric
+     "The happiest people have enjoyment, satisfaction, and meaning."
+     Three paper objects in the lower half, each arriving on its own word. -->
+<!-- cue w12 pop bloom arrives -->
+<!-- cue w13 pop staircase arrives -->
+<!-- cue w15 pop compass arrives -->
+<style>
+#L008 .row{position:absolute;inset:0;display:flex;gap:45px;align-items:flex-end;justify-content:center;padding-bottom:30px}
+#L008 .item{width:282px;display:flex;flex-direction:column;align-items:center;gap:22px;opacity:0}
+#L008 .obj{position:relative;width:100%;height:248px;display:flex;align-items:center;justify-content:center}
+#L008 .obj img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 9px rgba(0,0,0,.14))}
+#L008 .shadow{position:absolute;left:18%;right:18%;bottom:-6px;height:22px;border-radius:50%;background:#101311;filter:blur(12px);opacity:.35}
+#L008 .item span{font-size:33px;font-weight:500;letter-spacing:-.02em;color:#f4f1ea}
+</style>
+<div class="row">
+  <div class="item" data-word="w12"><div class="obj"><div class="shadow"></div><img src="assets/enjoyment.png" alt="Paper bloom"></div><span>Enjoyment</span></div>
+  <div class="item" data-word="w13"><div class="obj"><div class="shadow"></div><img src="assets/satisfaction.png" alt="Paper staircase"></div><span>Satisfaction</span></div>
+  <div class="item" data-word="w15"><div class="obj"><div class="shadow"></div><img src="assets/meaning.png" alt="Paper compass"></div><span>Meaning</span></div>
+</div>
+<script type="text/scene">
+qa('.item').forEach(el => {
+  const t = word(el.dataset.word).start - 0.12;
+  tl.fromTo(el, {opacity: 0, y: 28}, {opacity: 1, y: 0, duration: .38, ease: 'power3.out'}, t);
+  tl.fromTo(el.querySelector('img'), {rotate: -3}, {rotate: 0, duration: .5, ease: 'power2.out'}, t);
+});
+</script>

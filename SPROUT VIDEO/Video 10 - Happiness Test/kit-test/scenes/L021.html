@@ -1,0 +1,34 @@
+<!-- L021 · full screen on paper with the speaker circle · text-centric + object
+     "Now, that's important because it means you need to enjoy your life"
+     Main: ENJOY / your life. plates. Supporting: chapter tag. Depth: soft shape, contact shadow under the bloom. -->
+<!-- cue w30 pop ENJOY plate -->
+<!-- cue w32 tap bloom settles -->
+<style>
+#L021 .soft{position:absolute;left:-180px;top:520px;width:760px;height:760px;border-radius:50%;background:#eae6db}
+#L021 .tag{position:absolute;left:0;top:-268px}
+#L021 .title{position:absolute;left:0;top:0;display:flex;flex-direction:column;align-items:flex-start;gap:28px}
+#L021 .plate{display:inline-flex;align-items:baseline;white-space:nowrap;line-height:1.08;opacity:0}
+#L021 .lead{font-family:Inter,sans-serif;font-weight:800;font-size:138px;background:#1e3e2b;color:#f4f1ea;padding:20px 34px;border-radius:2px}
+#L021 .serif{font-family:Playfair,serif;font-style:italic;font-weight:400;font-size:126px;background:#e2e9e3;color:#1e3e2b;padding:12px 32px;margin-left:78px;transform:rotate(-1.5deg);border-radius:2px;gap:.22em}
+#L021 .bloom{position:absolute;left:96px;top:470px;width:744px;height:560px;opacity:0}
+#L021 .bloom img{width:100%;height:100%;object-fit:contain;transform-origin:50% 75%}
+#L021 .ground{position:absolute;left:250px;top:990px;width:440px;height:48px;border-radius:50%;background:#1e3e2b;filter:blur(22px);opacity:0}
+</style>
+<div class="soft" data-layout-allow-overflow></div>
+<div class="tag chapter" data-layout-allow-overflow>01 / ENJOYMENT</div>
+<div class="title">
+  <span class="plate lead">ENJOY</span>
+  <span class="plate serif"><span>your</span><span>life.</span></span>
+</div>
+<div class="ground"></div>
+<div class="bloom"><img src="assets/enjoyment.png" alt="A cream paper flower with green leaves"></div>
+<script type="text/scene">
+const enjoy = word('w30').start, your = word('w31').start;
+tl.fromTo(q('.soft'), {scale: .92, opacity: 0}, {scale: 1, opacity: 1, duration: .5, ease: 'power2.out'}, T0);
+tl.fromTo(q('.tag'), {opacity: 0, y: 10}, {opacity: 1, y: 0, duration: .3, ease: 'power2.out'}, T0 + .2);
+tl.fromTo(q('.lead'), {opacity: 0, y: 18}, {opacity: 1, y: 0, duration: .32, ease: 'power3.out'}, enjoy - .1);
+tl.fromTo(q('.serif'), {opacity: 0, x: -24}, {opacity: 1, x: 0, duration: .34, ease: 'power3.out'}, your - .08);
+tl.fromTo(q('.bloom'), {opacity: 0, y: 40, scale: .96}, {opacity: 1, y: 0, scale: 1, duration: .55, ease: 'power3.out'}, enjoy + .05);
+tl.fromTo(q('.ground'), {opacity: 0}, {opacity: .12, duration: .55, ease: 'sine.out'}, enjoy + .05);
+tl.fromTo(q('.bloom img'), {rotate: -4}, {rotate: 0, duration: .9, ease: 'power2.out'}, enjoy + .05);
+</script>
