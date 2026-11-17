@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Date night live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<style>
+/* B4 (17 Nov): the 30-minute push + the Live Activity for a booked night. Tony, 16 Nov: "push notification thirty
+   minutes before, like when we create an event, with the live activity." Sizes from Apple HIG (our 19 - Live
+   Activities - Apple HIG.html): lock screen 361 × ≤160 pt r44 · island compact 37 pt tall · expanded 361 × 172 r44. */
+:root{--bg:#f4f1ea;--ink:#1d2a22;--sub:#5d675f;--line:#e2ddd2;--brand:#186338;--tint:#e3efe6;--cream:#f6f3ec;
+  --serif:'Playfair Display',Georgia,serif;--sans:Inter,system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans)}
+button{font:inherit;border:0;background:none;cursor:pointer;color:inherit}
+button:focus{outline:none} button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.wrap{max-width:1500px;margin:0 auto;padding:28px 32px 60px}
+h1{font:600 28px var(--serif);margin:0 0 6px}
+.lede{color:var(--sub);max-width:880px;margin:0 0 20px}
+h2{font:600 20px var(--serif);margin:0 0 4px}
+.gsub{color:var(--sub);margin:0 0 14px;font-size:13.5px}
+
+/* ---------- player ---------- */
+.player{display:grid;grid-template-columns:auto auto minmax(260px,1fr);gap:36px;align-items:start}
+@media(max-width:1100px){.player{grid-template-columns:1fr}}
+.ph-wrap .cap{font:600 15px var(--serif);margin:0 0 2px}
+.ph-wrap .cs{font-size:12.5px;color:var(--sub);margin:0 0 10px;max-width:300px}
+.phone{position:relative;width:300px;height:650px;border-radius:46px;overflow:hidden;box-shadow:0 0 0 3px #d9d4c9,0 18px 50px rgba(0,0,0,.12)}
+.lock{position:absolute;inset:0;background:radial-gradient(120% 70% at 30% 18%,#4f8f63 0%,rgba(79,143,99,0) 60%),radial-gradient(90% 60% at 85% 85%,#c98b4a 0%,rgba(201,139,74,0) 55%),linear-gradient(180deg,#123a24,#0d2a1a 70%,#1c1a14);color:#fff;display:flex;flex-direction:column;align-items:center;padding:0 10px}
+.island{position:absolute;top:10px;left:50%;transform:translateX(-50%);height:30px;width:98px;border-radius:15px;background:#000;z-index:3}
+.lock .d{margin-top:58px;font:500 14px var(--sans);opacity:.9}
+.lock .tm{font:600 66px/1 var(--sans);letter-spacing:-2px;margin-top:2px}
+.stack{width:100%;margin-top:22px;display:flex;flex-direction:column;gap:8px}
+/* the Live Activity, lock screen presentation */
+.la{background:rgba(246,243,236,.96);color:var(--ink);border-radius:30px;padding:12px 14px 12px;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.la-top{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--sub)}
+.la-top img{width:20px;height:20px;border-radius:6px}
+.la-top b{color:var(--ink);font-weight:600}
+.la-top .r{margin-left:auto;font:600 12px var(--sans);color:var(--brand)}
+.la-t{font:500 19px/1.2 var(--serif);margin:6px 0 1px}
+.la-s{font-size:12px;color:var(--sub);line-height:1.35}
+.trk{position:relative;height:30px;margin:10px 4px 0}
+.trk .bar{position:absolute;left:0;right:0;top:6px;height:5px;border-radius:3px;background:#e2ddd2}
+.trk .fill{position:absolute;left:0;top:6px;height:5px;border-radius:3px;background:var(--brand);transition:width .4s}
+.trk .stop{position:absolute;top:2px;width:13px;height:13px;margin-left:-6.5px;border-radius:7px;background:#fff;border:2px solid #cfc8b8}
+.trk .stop.on{border-color:var(--brand);background:var(--brand)}
+.trk .lbl{position:absolute;top:17px;transform:translateX(-30%);font-size:9.5px;color:var(--sub);white-space:nowrap}
+.trk .now{position:absolute;top:0;width:17px;height:17px;margin-left:-8.5px;border-radius:9px;background:#fff;border:3px solid var(--brand);box-shadow:0 1px 4px rgba(0,0,0,.25);transition:left .4s}
+.la-acts{display:flex;gap:6px;margin-top:8px}
+.la-acts button{flex:1;padding:7px 0;border-radius:999px;background:var(--tint);color:var(--brand);font:600 12px var(--sans);display:flex;align-items:center;justify-content:center;gap:4px}
+/* push */
+.nt{background:rgba(246,244,238,.94);color:#111;border-radius:20px;padding:10px 12px;display:flex;gap:9px;box-shadow:0 8px 30px rgba(0,0,0,.18);animation:rise .4s both}
+.nt img{width:34px;height:34px;border-radius:8px;flex:none}
+.nt b{display:flex;justify-content:space-between;font-size:13px}
+.nt b small{font-weight:400;color:#6b6b6b;font-size:11.5px}
+.nt p{margin:1px 0 0;font-size:12.5px;line-height:1.35}
+@keyframes rise{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+/* another app open: Dynamic Island */
+.app{position:absolute;inset:0;background:#fbfaf7;padding:62px 16px 0;color:var(--ink)}
+.app .fake{height:14px;border-radius:7px;background:#ece8df;margin-bottom:12px}
+.app .fake.s{width:60%}.app .fake.m{width:80%}
+.app .tile{height:120px;border-radius:18px;background:#ece8df;margin:16px 0}
+.di{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:#000;color:#fff;z-index:4;transition:all .45s cubic-bezier(.2,.9,.25,1);overflow:hidden;cursor:pointer}
+.di.compact{width:220px;height:30px;border-radius:15px}
+.di.expanded{width:284px;height:150px;border-radius:38px}
+.di .cl,.di .cr{position:absolute;top:0;height:30px;display:flex;align-items:center;gap:5px;font:600 12px var(--sans)}
+.di .cl{left:12px}.di .cr{right:12px;color:#9fd3b0}
+.di .cl i{color:#9fd3b0;font-size:15px}
+.di .ex{position:absolute;inset:0;padding:12px 18px;opacity:0;transition:opacity .25s}
+.di.expanded .ex{opacity:1;transition-delay:.15s}
+.di.expanded .cl,.di.expanded .cr{opacity:0}
+.ex .row1{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:#cfd8d2}
+.ex .row1 b{color:#fff;font-weight:600;display:flex;align-items:center;gap:5px}
+.ex .row1 b i{color:#9fd3b0}
+.ex .t{font:500 18px/1.2 var(--serif);margin:8px 0 2px}
+.ex .s{font-size:11.5px;color:#b9c4bd}
+.ex .trk .bar{background:#3a3a3a}.ex .trk .fill{background:#9fd3b0}.ex .trk .now{border-color:#9fd3b0;background:#000}
+.ex .trk .stop{background:#000;border-color:#555}.ex .trk .stop.on{background:#9fd3b0;border-color:#9fd3b0}
+.ex .trk .lbl{color:#9aa39d}
+/* controls */
+.ctrl{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px}
+.clock{font:600 34px var(--serif)}
+.clock small{font:500 13px var(--sans);color:var(--sub);margin-left:8px}
+input[type=range]{width:100%;accent-color:var(--brand);margin:12px 0 4px}
+.ticks{display:flex;justify-content:space-between;font-size:11px;color:var(--sub)}
+.jumps{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.jumps button{border:1px solid var(--line);border-radius:999px;padding:6px 11px;font-size:12.5px;background:#fbfaf7}
+.jumps button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.play{margin-top:14px;width:100%;padding:11px;border-radius:999px;background:var(--brand);color:#fff;font:500 16px var(--serif)}
+.rules{margin-top:16px;font-size:13px;color:var(--ink)}
+.rules li{margin-bottom:6px}
+.rules b{font-weight:600}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:999px;padding:9px 16px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+
+/* ---------- key moments strip ---------- */
+section{margin-top:40px}
+.strip{display:flex;gap:22px;overflow-x:auto;padding-bottom:10px}
+.mo{flex:0 0 240px}
+.mo .k{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--brand)}
+.mo h3{font:600 16px var(--serif);margin:2px 0 2px}
+.mo p{font-size:12.5px;color:var(--sub);margin:0 0 10px;min-height:54px}
+.mo .phone{width:240px;height:520px;border-radius:38px}
+.mo .lock .d{margin-top:44px;font-size:12px}.mo .lock .tm{font-size:52px}
+.mo .la-t{font-size:16px}.mo .trk .lbl{font-size:8.5px}.mo .stack{margin-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Date night, live on the lock screen</h1>
+  <p class="lede">Once a night is booked, Sprout pushes both parents 30 minutes before the sitter arrives and keeps the evening on the lock screen as a Live Activity until you’re home. Drag the time, or press play. Sample night: Olive &amp; Ember at 7:15, Alex 6:45–10:15.</p>
+
+  <div class="player">
+    <div class="ph-wrap"><div class="cap">Lock screen</div><div class="cs">The push at 6:15, then the Live Activity under it, updating through the night.</div>
+      <div class="phone"><div class="lock"><div class="island"></div><div class="d">Saturday, August 1</div><div class="tm" data-clock>6:15</div><div class="stack" data-stack></div></div></div></div>
+    <div class="ph-wrap"><div class="cap">Using another app</div><div class="cs">The Dynamic Island shows the next thing. Tap it to expand.</div>
+      <div class="phone"><div class="app"><div class="fake s"></div><div class="fake m"></div><div class="tile"></div><div class="fake"></div><div class="fake m"></div><div class="tile"></div></div>
+        <div class="di compact" data-di role="button" aria-label="Date night Live Activity"><div class="cl"><i class="ph-fill ph-moon-stars"></i><span data-dil></span></div><div class="cr" data-dir></div><div class="ex" data-dix></div></div></div></div>
+    <div class="ctrl">
+      <div class="clock" data-big>6:15 PM <small>Saturday</small></div>
+      <input type="range" min="1080" max="1350" step="5" value="1095" data-r aria-label="Time of the evening">
+      <div class="ticks"><span>6 PM</span><span>7</span><span>8</span><span>9</span><span>10</span><span>10:30</span></div>
+      <div class="jumps" data-jumps></div>
+      <button class="play" data-play>Play the evening</button>
+      <ul class="rules">
+        <li><b>Both parents</b> get the push and the Live Activity: it’s a family plan (rule 2 on the wiring map).</li>
+        <li><b>Push at 30 minutes before the first thing</b>: the sitter’s arrival, or dinner if you said “we’re covered”.</li>
+        <li><b>The Live Activity starts with that push</b> and ends 15 minutes after the sitter’s end time (Apple caps them at 8 hours, this night is 4).</li>
+        <li><b>Buttons do one thing each</b>: Text Alex opens Messages to Alex, Directions opens Maps. Nothing is sent by itself.</li>
+        <li><b>Running late</b>: from 9:45 the button becomes “Ask Alex for 30 more min”, a prefilled text.</li>
+      </ul>
+    </div>
+  </div>
+
+  <section><h2>The key moments</h2><p class="gsub">Each phone is the lock screen at that time.</p><div class="strip" data-strip></div></section>
+</div>
+<div class="toast" data-toast></div>
+<script>
+const ICON = '/assets/app-icon-180.png';
+const STOPS = [[1125, 'Alex 6:45'], [1155, 'Dinner 7:15'], [1230, 'Bed 8:30'], [1335, 'Home 10:15']];
+const T0 = 1095, T1 = 1350;   // Live Activity: 6:15 PM → 10:30 PM
+const tl = m => { const h = Math.floor(m / 60), mm = m % 60; return `${h % 12 || 12}:${String(mm).padStart(2, '0')}`; };
+/* milestones evenly spaced (a step track, like a delivery Live Activity); "now" moves between them */
+const pct = m => { const xs = [1095, ...STOPS.map(x => x[0])], ps = [0, 6, 33, 58, 96];
+  if (m <= xs[0]) return 0; for (let i = 1; i < xs.length; i++) if (m <= xs[i]) return ps[i - 1] + (m - xs[i - 1]) / (xs[i] - xs[i - 1]) * (ps[i] - ps[i - 1]); return 100; };
+function state(m){
+  if (m < 1125) { const n = 1125 - m; return { t:`Alex arrives in ${n} min`, s:'Dinner at Olive & Ember 7:15 · leave by 6:55', r:`${n}m`, dil:'Alex', acts:[['chat-circle-dots', 'Text Alex'], ['map-trifold', 'Directions']] }; }
+  if (m < 1135) return { t:'Alex is here', s:'Leave by 6:55 · 9 min to Olive & Ember', r:'6:55', dil:'Leave', acts:[['map-trifold', 'Directions'], ['chat-circle-dots', 'Text Alex']] };
+  if (m < 1155) return { t:'On your way to dinner', s:'Table for 2 at 7:15 · 2.1 mi', r:'7:15', dil:'Dinner', acts:[['map-trifold', 'Directions'], ['phone', 'Call Olive & Ember']] };
+  if (m < 1305) return { t:'Enjoy your dinner', s: m < 1230 ? 'Alex has Maya and Jake · bedtime at 8:30' : 'Maya and Jake are in bed · Alex until 10:15', r:'10:15', dil:'Home by', acts:[['chat-circle-dots', 'Text Alex']] };
+  if (m < 1335) return { t:'Home by 10:15', s:'Alex is booked until 10:15', r:`${1335 - m}m`, dil:'Home', acts:[['clock-clockwise', 'Ask Alex for 30 more min'], ['chat-circle-dots', 'Text Alex']] };
+  return { t:'Hope it was lovely', s:'I’ll ask about paying Alex tomorrow morning', r:'Done', dil:'Done', acts:[], end:true };
+}
+const track = m => `<div class="trk"><div class="bar"></div><div class="fill" style="width:${pct(m)}%"></div>${STOPS.map(([x, l], i) => `<span class="stop${m >= x ? ' on' : ''}" style="left:${pct(x)}%"></span><span class="lbl" style="left:${pct(x)}%;${i === STOPS.length - 1 ? 'transform:translateX(-88%)' : ''}">${l}</span>`).join('')}<span class="now" style="left:${pct(m)}%"></span></div>`;
+const laHtml = (m, acts = true) => { const st = state(m); return `<div class="la"><div class="la-top"><img src="${ICON}" alt=""><b>Date night</b>· Sprout<span class="r">${st.end ? 'Ended' : st.r}</span></div>
+  <div class="la-t">${st.t}</div><div class="la-s">${st.s}</div>${track(m)}
+  ${acts && st.acts.length ? `<div class="la-acts">${st.acts.map(([i, l]) => `<button data-act="${l}"><i class="ph-bold ph-${i}"></i>${l}</button>`).join('')}</div>` : ''}</div>`; };
+const pushHtml = (ago) => `<div class="nt"><img src="${ICON}" alt=""><div><b>Sprout<small>${ago}</small></b><p><strong>Alex arrives in 30 minutes</strong><br>Dinner at Olive &amp; Ember is at 7:15. Dana has this too.</p></div></div>`;
+const ago = m => m - 1095 < 1 ? 'now' : m - 1095 < 60 ? `${m - 1095}m ago` : `${Math.floor((m - 1095) / 60)}h ago`;
+const $ = s => document.querySelector(s);
+let cur = 1095, expanded = false;
+function render(m){
+  cur = m;
+  $('[data-clock]').textContent = tl(m);
+  $('[data-big]').innerHTML = `${tl(m)} PM <small>Saturday</small>`;
+  $('[data-r]').value = m;
+  $('[data-stack]').innerHTML = (m < 1110 ? pushHtml(ago(m)) : '') + (m <= T1 ? laHtml(m) : '');
+  const st = state(m), di = $('[data-di]');
+  $('[data-dil]').textContent = st.dil; $('[data-dir]').textContent = st.r;
+  $('[data-dix]').innerHTML = `<div class="row1"><b><i class="ph-fill ph-moon-stars"></i>Date night</b><span>${st.end ? 'Ended' : st.r}</span></div><div class="t">${st.t}</div><div class="s">${st.s}</div>${track(m)}`;
+  di.className = `di ${expanded ? 'expanded' : 'compact'}`;
+  document.querySelectorAll('[data-jumps] button').forEach(b => b.classList.toggle('on', +b.dataset.m === m));
+  document.querySelectorAll('[data-act]').forEach(b => b.onclick = () => toast(b.dataset.act.startsWith('Ask') ? 'Opens Messages: “Hi Alex! Could you stay until 10:45? Same rate.”' : b.dataset.act === 'Directions' ? 'Opens Maps to Olive & Ember' : b.dataset.act.startsWith('Call') ? 'Calls Olive & Ember' : 'Opens Messages to Alex'));
+}
+function toast(t){ const n = $('[data-toast]'); n.textContent = t; n.classList.add('on'); clearTimeout(n._t); n._t = setTimeout(() => n.classList.remove('on'), 1900); }
+const JUMPS = [[1095, '6:15 push'], [1125, '6:45 Alex here'], [1140, '7:00 on the way'], [1170, '7:30 dinner'], [1240, '8:40 bedtime'], [1320, '10:00 home soon'], [1340, '10:20 done']];
+$('[data-jumps]').innerHTML = JUMPS.map(([m, l]) => `<button data-m="${m}">${l}</button>`).join('');
+document.querySelectorAll('[data-jumps] button').forEach(b => b.onclick = () => render(+b.dataset.m));
+$('[data-r]').oninput = e => render(+e.target.value);
+$('[data-di]').onclick = () => { expanded = !expanded; render(cur); };
+let timer = null;
+$('[data-play]').onclick = () => { if (timer) { clearInterval(timer); timer = null; $('[data-play]').textContent = 'Play the evening'; return; }
+  if (cur >= 1345) render(1095); $('[data-play]').textContent = 'Pause';
+  timer = setInterval(() => { if (cur >= 1345) { clearInterval(timer); timer = null; $('[data-play]').textContent = 'Play the evening'; return; } render(cur + 5); }, 260); };
+/* key moments */
+const MOMENTS = [
+  [1095, '6:15 PM', 'The push', '30 minutes before Alex arrives. Both phones. The Live Activity starts here.'],
+  [1125, '6:45 PM', 'Alex is here', 'Leave-by time and directions to dinner.'],
+  [1170, '7:30 PM', 'At dinner', 'Quiet: who has the kids and until when. One button to text Alex.'],
+  [1320, '10:00 PM', 'Home soon', 'Running late? Ask Alex for 30 more minutes with a prefilled text.'],
+  [1340, '10:20 PM', 'It ends', 'Then tomorrow at 9 AM: how was Alex, and pay.'],
+];
+$('[data-strip]').innerHTML = MOMENTS.map(([m, k, h, p]) => `<div class="mo"><div class="k">${k}</div><h3>${h}</h3><p>${p}</p><div class="phone"><div class="lock"><div class="island"></div><div class="d">Saturday, August 1</div><div class="tm">${tl(m)}</div><div class="stack">${m < 1110 ? pushHtml('now') : ''}${laHtml(m, true)}</div></div></div></div>`).join('');
+render(1095);
+</script>
+</body>
+</html>

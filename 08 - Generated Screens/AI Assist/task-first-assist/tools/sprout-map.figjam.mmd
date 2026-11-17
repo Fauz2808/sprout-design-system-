@@ -1,0 +1,226 @@
+flowchart LR
+  subgraph Entry["Entry points"]
+    direction TB
+    eStore["App Store / Google Play"]
+    eReferral["Invite or referral link"]
+    eChatjoin["Class group chat link"]
+    eSpouse["Spouse invite SMS"]
+    ePush["Push notification"]
+    eGroup["In-app group invitation"]
+  end
+  subgraph Onboarding["Onboarding"]
+    direction TB
+    oIntro["Introduction slides"]
+    oAuth["Phone and code"]
+    oGmail["Connect Gmail"]
+    oPerm["App permissions"]
+    oFamily["Parent, kids and school"]
+    oInvites["How many invites?"]
+    oPreview["Profile preview + spouse invite"]
+    oSpouse["Spouse onboarding"]
+    oIntro --> oAuth
+    oAuth --> oGmail
+    oGmail --> oPerm
+    oPerm --> oFamily
+    oFamily --> oInvites
+    oInvites --> oPreview
+  end
+  subgraph Tabs["Tabs (docked navigation)"]
+    direction TB
+    tBrief["Daily Brief"]
+    tEvents["Events"]
+    tAssist["Sprout Assist"]
+    tChat["Chat"]
+    tClubs["Clubs"]
+  end
+  subgraph Around["Around the tabs"]
+    direction TB
+    aProfile["Profile and Settings"]
+    aInbox["Notification inbox"]
+    aLive["Live Activities"]
+    aPush["Push notifications"]
+    aUpdate["App update prompt"]
+  end
+  subgraph Web["Web"]
+    direction TB
+    wChat["Class chat join page"]
+    wReferral["Invited by page"]
+    wPortal["Room Parent Portal"]
+    wCoord["Coordinator portal"]
+    wPublic["Portal public pages"]
+    wJoinsprout["joinsprout.co"]
+    wRoomparent["roomparent.com"]
+  end
+  eStore --> oIntro
+  eReferral --> wReferral
+  eReferral --> oIntro
+  eChatjoin --> wChat
+  eSpouse --> oSpouse
+  ePush --> tBrief
+  ePush --> tAssist
+  ePush --> tChat
+  eGroup --> tChat
+  oPreview --> tBrief
+  wPortal -.->|"Portal shares the class chat link"| wChat
+  wPortal -.->|"Portal links to its public pages"| wPublic
+  wCoord -.->|"Templates pushed into every room parent's Quick Actions"| wPortal
+  wRoomparent -.->|"Log in from roomparent.com (spec/16)"| wPortal
+  wJoinsprout -.->|"Store buttons and QR codes"| eStore
+  wChat -.->|"Next step: download Sprout"| eStore
+  wReferral -.->|"Registered, then download"| eStore
+  wPublic -.->|"Every web confirmation points to the download"| eStore
+  subgraph fOnboarding["Onboarding and family setup"]
+    direction LR
+    pR01INTROCURRENT["Prod: Onboarding · current introduction (6)"]
+    pR02AUTH["Prod: Phone verification (5)"]
+    pR03PERM["Prod: Permissions (2)"]
+    pR04FAMILY["Prod: Family setup (25)"]
+    pR05PREVIEW["Prod: Profile preview (1)"]
+    pR05INVITESPOUSE["Prod: Profile preview and spouse invitation (2)"]
+    pR06SPOUSE["Prod: Spouse onboarding (12)"]
+    x14020105494["Exploration: Exploration · Onboarding (9)"]
+    x14694191295["Exploration: AI Onboarding Flow (30)"]
+    x13569118307["Exploration: Spouse invite · SMS from your phone (4)"]
+  end
+  subgraph fInvites["Invites, referral and rewards"]
+    direction LR
+    pR17PROFILECURRENT["Prod: Settings, invitations and rewards (10)"]
+    x13644200138["Exploration: Invite parents · Daily Brief, Settings, rewards (28)"]
+    x15127154743["Exploration: Referral · Invited by (v1) (5)"]
+    x1513538179["Exploration: Referral · Invited by · v2 (Assist style) (8)"]
+    x1514836942["Exploration: Invite reward · v2 (Assist style) (8)"]
+    x1569452292["Exploration: A4 · Onboarding: how many invites do you want? (5)"]
+  end
+  subgraph fBrief["Daily Brief and to-dos"]
+    direction LR
+    pR07BRIEFCURRENT["Prod: Daily Brief · current (2)"]
+    x1399026015["Exploration: Exploration · Daily Brief (27)"]
+    x1506736659["Exploration: 8 · To-do seen by spouse (read ticks) (3)"]
+    x1427822097["Exploration: 7 · Happening today · To-dos aren’t linked (4)"]
+    x15188155885["Exploration: 7 · Happening today (copy) (4)"]
+    x15694141532["Exploration: A8 · Voice quick-add → calendar event (15)"]
+    x11351103677["Exploration: Update for Note and Daily Brief (2)"]
+    x11688201416["Exploration: 7.1 Home · Daily Briefing · Weather (1)"]
+    x1573660474["Exploration: K15 · Daily Brief · “Sign-ups open” card (5)"]
+  end
+  subgraph fGmail["Gmail and school email"]
+    direction LR
+    pR14EMAIL["Prod: School email updates (14)"]
+    x1427021838["Exploration: 6 · Morning: new to-dos from email (7)"]
+  end
+  subgraph fEvents["Events and discovery"]
+    direction LR
+    pR07PLACES["Prod: Discovery lists and place detail (12)"]
+    pR08EVENTDETAIL["Prod: Reusable event details (4)"]
+    x13757196493["Exploration: Event Detail Page · Rev 1 (4)"]
+  end
+  subgraph fAssistCore["Assist home, voice and reminders"]
+    direction LR
+    pR24ASSISTHOME["Prod: Sprout Assist · Task entry (1)"]
+    x1279818362["Exploration: New Sprout Assist (Revise) (25)"]
+    x1349620641["Exploration: K2 · Sprout Assist coming soon (4)"]
+    x1489233651["Exploration: K4 · Assist motion A · grow from the clover (87)"]
+    x1489238913["Exploration: K5 · Assist motion A+C · slide up (10)"]
+    x15603107["Exploration: Assist · Chip rules"]
+  end
+  subgraph fAssistSports["Assist: sports sign-up (SSC Kids)"]
+    direction LR
+    pR24SSCDEMO["Prod: SSC Kids · Demo sign-up (19)"]
+    pR24SSCREAL["Prod: SSC Kids · Real-flow states (22)"]
+    x1549251581["Exploration: K12 v2 · Sports registration (SSC Kids) (21)"]
+    x1586654549["Exploration: SSC Kids · demo and implementation cases (45)"]
+    x1609959979["Exploration: REFERENCE · Tony signs Cooper up for SSC Kids in Muse (13 Nov) (9)"]
+  end
+  subgraph fAssistSitter["Assist: sitter and date night"]
+    direction LR
+    x16151356321["Exploration: Sitter · your people first (64)"]
+  end
+  subgraph fAssistCamps["Assist: summer camps (parked)"]
+    direction LR
+    x1552443294["Exploration: K10 v3 · Summer camps (36)"]
+    x1551055674["Exploration: A4 · Places with photos (Frida idea) (14)"]
+  end
+  subgraph fChat["Chat and subgroups"]
+    direction LR
+    pR14CHATCURRENT["Prod: Chat · grid, subgroups and members (6)"]
+    pR14CHAT12758106387["Prod: Chat · search states (2)"]
+    pR14CHAT["Prod: Chat and club conversations (20)"]
+    x14694189897["Exploration: Add Sub Group (5)"]
+  end
+  subgraph fClasshub["Class hub: calendar, notes, links"]
+    direction LR
+    pR14CLASSCAL["Prod: Class calendar and notes (19)"]
+    pR14LINKS["Prod: Class pinned links (8)"]
+  end
+  subgraph fJoin["Group invitations and web join"]
+    direction LR
+    pR14JOIN["Prod: Group invitations (6)"]
+    pR15JOIN["Prod: Group invitations (2)"]
+    x1468624947["Exploration: Join Chat · 4 · Registered (1)"]
+  end
+  subgraph fClubs["Clubs, directory and club admin"]
+    direction LR
+    pR15DIRECTORY["Prod: Directory and club sharing (11)"]
+    pR17CLUBADMIN["Prod: Social club administration (18)"]
+    x14403199032["Exploration: Undefined user · parents still joining (11)"]
+    x1446024113["Exploration: A3·1 Directory · incoming parents (1)"]
+  end
+  subgraph fProfile["Profile and children"]
+    direction LR
+    pR17PROFILE["Prod: Profile editing and children (12)"]
+    x10709139743["Exploration: New sign out from school and sub groups (11)"]
+  end
+  subgraph fNotify["Push, Live Activities and inbox"]
+    direction LR
+    pR18PUSHCURRENT["Prod: Push notification treatments (9)"]
+    pR18LIVECURRENT["Prod: Carpool Live Activity (1)"]
+    pR18LIVE["Prod: Live Activity · phone states (4)"]
+    pR23NOTIFICATIONS["Prod: Notification inbox (4)"]
+    x13556117832["Exploration: Notifications · push copy (2)"]
+  end
+  subgraph fNav["Docked navigation"]
+    direction LR
+    pR07NAVCURRENT["Prod: Current navigation · Original component (5)"]
+    x1569152058["Exploration: A3 · Sprout Assist in the tab bar (1)"]
+    x1593858484["Exploration: App icon · Ahmad Assist clover (Tony 12 Nov)"]
+  end
+  subgraph fUpdate["App update prompt"]
+    direction LR
+    pR19APPUPDATE["Prod: App update prompt (1)"]
+  end
+  tBrief --> fBrief
+  tBrief --> fGmail
+  tEvents --> fEvents
+  tAssist --> fAssistCore
+  tAssist --> fAssistSports
+  tAssist --> fAssistSitter
+  tAssist --> fAssistCamps
+  tChat --> fChat
+  tChat --> fClasshub
+  tChat --> fJoin
+  tClubs --> fClubs
+  aProfile --> fProfile
+  aProfile --> fInvites
+  aInbox --> fNotify
+  aLive --> fNotify
+  aPush --> fNotify
+  aUpdate --> fUpdate
+  fBrief ==>|"Sign-ups open banner opens Assist"| fAssistSports
+  fBrief ==>|"Add a reminder CTA opens voice already listening"| fAssistCore
+  fBrief ==>|"Invite parents card at the end of the brief"| fInvites
+  fGmail ==>|"Email to-dos and events feed the brief"| fBrief
+  fNotify ==>|"Morning push opens the Daily Brief"| fBrief
+  fClasshub ==>|"Class to-dos show in each parent's brief"| fBrief
+  fClubs ==>|"A club share lands in Chat"| fChat
+  fJoin ==>|"After the download the class chat is waiting"| fChat
+  fInvites ==>|"Referral opens onboarding in the inviter's class"| fOnboarding
+  fOnboarding ==>|"Onboarding ends on the Daily Brief"| fBrief
+  fNav ==>|"Clover tab opens Assist"| fAssistCore
+  fAssistSitter ==>|"Ask a class group for a sitter"| fChat
+  fAssistCore ==>|"Party invite and club go to the class"| fChat
+  fAssistCore ==>|"A created event belongs in Events"| fEvents
+  fEvents ==>|"Event invitations reach the class"| fChat
+  fAssistCore ==>|"Daily Brief: Happening today row and Morning Brief push"| fBrief
+  fAssistSports ==>|"Daily Brief: sign-ups banner, then the done state"| fBrief
+  fAssistSitter ==>|"Daily Brief: Happening today row and Morning Brief push"| fBrief
+  fAssistCamps ==>|"Daily Brief: sign-ups banner"| fBrief

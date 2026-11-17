@@ -1,0 +1,175 @@
+/* Additions on top of the SSC Kids demo CSS (injected verbatim above this file).
+   Rule: reuse SSC parts first. Everything here is either the Assist home from Figma A·1 (14892:33659)
+   or a thin variant of an SSC part, named after the part it extends. */
+
+/* ---------- sheet body: one view at a time (home, or one plan's chat) ---------- */
+.views{flex:1;min-height:0;position:relative}
+.views>.chat{position:absolute;inset:0}
+.views>.chat[hidden]{display:none}
+
+/* ---------- Assist home · Figma A·1 14892:33659 ---------- */
+.home{padding:20px 0 12px}
+.greet{text-align:center;margin:6px 0 22px}
+.greet b{display:block;font:500 24px/36px var(--serif);color:var(--strong);white-space:nowrap}
+.greet span{display:block;font-size:14px;line-height:19px;color:var(--subtle);margin-top:6px}
+.slabel{font-size:13px;line-height:19px;color:var(--subtle);margin:0 0 8px}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:24px}
+.tile{display:flex;flex-direction:column;align-items:flex-start;text-align:left;height:99px;padding:13px;border-radius:20px;background:var(--white);border:1px solid var(--border-soft);transition:transform .14s}
+.tile:active{transform:scale(.97)}
+.tile .clay{width:28px;height:28px;border-radius:9px;background:var(--raised);display:grid;place-items:center;flex:none}
+.tile .clay img{width:26px;height:26px;display:block}
+.tile b{font:500 16.5px/22px var(--serif);color:var(--strong);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tile small{font-size:11.5px;line-height:15px;color:var(--subtle);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+
+/* ---------- your plans: SSC .status rows, made tappable ---------- */
+.plans{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+.plans .status+.status{margin-top:0}
+button.status{width:100%;text-align:left;transition:transform .14s}
+button.status:active{transform:scale(.985)}
+.status .stxt{flex:1;min-width:0}
+.status .stxt>span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status .stxt small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status .when{margin-left:auto;align-self:flex-end;font-size:12px;color:var(--subtle);white-space:nowrap;flex:none}
+.status .icotile img{width:24px;height:24px;display:block}
+.status.attn{border-color:var(--brand);box-shadow:inset 0 0 0 .5px var(--brand)}
+.status.attn small{color:var(--brand)}
+.manage{display:flex;align-items:center;gap:8px;width:100%;padding:12px 2px;font-size:14px;color:var(--strong);border-top:1px solid var(--border-soft)}
+.manage i{font-size:18px;color:var(--subtle)}
+.manage .ph-caret-right{margin-left:auto;font-size:14px}
+
+/* ---------- overlays: the SSC .waiver sheet, used for every full-screen view ---------- */
+.waiver .wbody.plain{background:var(--bg)}
+.wfoot .two .btn{margin-top:0}
+.wfoot .btn+.btn{margin-top:8px}
+.olabel{font-size:13px;color:var(--subtle);margin:4px 2px 8px}
+.olabel+.status,.status+.status{margin-top:8px}
+.wbody .card+.olabel{margin-top:18px}
+.wbody .status+.olabel{margin-top:18px}
+.empty{font-size:14px;color:var(--subtle);text-align:center;padding:40px 12px}
+
+/* sitter / provider monogram: SSC .logo */
+.logo.mono{font:600 14px var(--sans)}
+.pick .logo{width:26px;height:26px;font-size:11px}
+
+/* pick rows with a second line (weeks, sitters, saved cards) */
+.pick .ptx{flex:1;min-width:0}
+.pick .ptx small{display:block;font-size:12.5px;color:var(--subtle);margin-top:1px}
+.pick .cb.rd{border-radius:11px}
+.pick[aria-disabled=true]{opacity:.5;pointer-events:none}
+.pick .note{margin-left:auto;font-size:12.5px;color:var(--brand);font-weight:500}
+
+/* editable SSC .field (only inside overlays, never in the chat) */
+.field.in{display:block}
+.field.in input{display:block;width:100%;border:0;background:transparent;font:500 15.5px var(--sans);color:var(--strong);padding:0;margin-top:2px;outline:none}
+.field.in:focus-within{box-shadow:0 0 0 1.5px var(--brand) inset}
+.fields .duo{display:flex;gap:8px}.fields .duo .field{flex:1;min-width:0}
+.hint2{font-size:12px;color:var(--subtle);margin:10px 2px 0;line-height:1.45}
+
+/* camp map card · Figma K10 v3 15525:43897 */
+.mapwrap{position:relative;width:100%;aspect-ratio:321/206;border-radius:12px;overflow:hidden;background:url(/assets/camp/map.webp) center/cover;margin-bottom:12px}
+.mpin{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:3px solid #fff;background-size:cover;background-position:center;box-shadow:0 3px 8px rgba(0,0,0,.18)}
+.mpin.big{width:64px;height:64px;margin:-32px 0 0 -32px;border-color:var(--brand)}
+.mpin .lbl{position:absolute;left:50%;top:calc(100% + 4px);transform:translateX(-50%);background:#fff;border-radius:999px;padding:3px 8px;font:500 11.5px var(--sans);color:var(--strong);white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.mhome{position:absolute;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:14px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:15px;box-shadow:0 0 0 3px rgba(255,255,255,.85)}
+.camprow{display:flex;gap:12px;align-items:center}
+.camprow .thumb{width:72px;height:72px;border-radius:12px;background-size:cover;background-position:center;flex:none}
+.camprow>div{min-width:0;flex:1}
+.camprow .faces{margin:6px 0 0}
+.camprow .faces span i{width:24px;height:24px}
+.camprow .faces span i.n{font:600 9.5px/21px var(--sans)}
+.camprow{align-items:flex-start}
+.cprice{display:flex;align-items:baseline;gap:4px;margin-top:8px}
+.cprice b{font:500 19px var(--serif);color:var(--strong)}
+.cprice small{font-size:12.5px;color:var(--subtle)}
+.gallery{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;gap:6px;height:180px;margin-bottom:14px}
+.gallery i{border-radius:12px;background-size:cover;background-position:center}
+.gallery i:first-child{grid-row:1/3}
+
+/* composer: the SSC pill. A draft (what the parent would type, from the Figma keyboard frames) fills it and the
+   send button turns brand green; tapping send posts it. */
+.composer .ctext{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.composer .send{border:0;cursor:default}
+.composer.draft div{height:auto;min-height:52px;padding:10px 9px 10px 16px;align-items:flex-end}
+.composer.draft .ctext{white-space:normal;color:var(--strong);font-size:15.5px;line-height:1.4}
+.composer.draft .send{background:var(--brand);cursor:pointer;animation:nudge 1.6s ease-in-out .4s 2}
+
+/* time jump in a thread (Figma "Thursday · 9:00 AM") */
+.tdiv{text-align:center;font-size:12px;color:var(--subtle);margin:6px 0 14px}
+
+/* object card from Figma "SA card": optional cover, header, fact rows, then the SSC .two buttons */
+.cover{width:100%;aspect-ratio:295/128;border-radius:12px;background-size:cover;background-position:center;margin-bottom:12px}
+.covers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.covers button{aspect-ratio:93/80;border-radius:12px;background-size:cover;background-position:center;box-shadow:0 0 0 1px var(--border-soft);transition:box-shadow .15s,transform .1s}
+.covers button:active{transform:scale(.96)}
+.covers button.on{box-shadow:0 0 0 2.5px var(--brand)}
+.card .two{margin-top:12px}.card .two .btn{margin-top:0}
+.btn .ph{font-size:17px}
+.preview{background:var(--field);border-radius:12px;padding:10px 12px;margin-top:12px}
+.preview small{display:block;font-size:11.5px;color:var(--subtle);margin-bottom:3px}
+.preview p{margin:0;font-size:14.5px;line-height:1.45;color:var(--strong)}
+
+/* confirm sitter: the SSC approval card without a payment row */
+.line.est{font:500 16px var(--sans);color:var(--strong);border-top:1px solid var(--border-soft);padding-top:10px;margin-top:8px}
+
+/* summer weeks grid (Figma K10 P·15) */
+.weeks{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:12px}
+.weeks i{font-style:normal;height:44px;border-radius:10px;border:1.5px dashed var(--border);display:grid;place-items:center;font-size:12px;color:var(--subtle)}
+.weeks i.on{border:0;background:var(--brand);color:#fff;font-weight:600}
+
+/* to-do row (Daily Brief to-do card, as in Figma K12 Q·2 / M·2) */
+.todo{display:flex;align-items:center;gap:10px;background:var(--white);border:1px solid var(--border-soft);border-radius:16px;padding:12px}
+.todo .box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border);flex:none}
+.todo .av{width:32px;height:32px;border-radius:16px;background:url(/assets/tony.webp) center/cover;flex:none}
+.todo b{display:block;font:500 15px/20px var(--serif);color:var(--strong)}
+.todo small{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--subtle);margin-top:3px}
+.todo small em{font-style:normal;font-size:11px;font-weight:600;background:var(--brand-subtle);color:var(--strong);border-radius:6px;padding:1px 6px}
+
+/* bottom sheet (Figma "Sheet ·": grabber, no X, tap outside to go back, CTA in the footer) */
+.bscrim{position:absolute;inset:0;background:rgba(18,26,20,.35);opacity:0;pointer-events:none;transition:opacity .3s;z-index:33}
+.bscrim.on{opacity:1;pointer-events:auto}
+.bsheet{position:absolute;left:0;right:0;bottom:0;max-height:calc(100% - var(--st) - 24px);background:var(--bg);border-radius:24px 24px 0 0;z-index:34;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .38s cubic-bezier(.2,.9,.3,1);box-shadow:0 -8px 30px rgba(0,0,0,.12)}
+.bsheet.on{transform:none}
+.bsheet .grab{width:36px;height:5px;border-radius:3px;background:#cfc8b8;margin:8px auto 4px;flex:none}
+.bsheet .bbody{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 16px 4px}
+.bsheet .bfoot{flex:none;display:flex;align-items:center;gap:12px;padding:10px 16px calc(14px + var(--sb));border-top:1px solid var(--border-soft)}
+.bsheet .bfoot .btn{margin-top:0;flex:1}
+.bsheet .bfoot .bprice{flex:none}
+.bsheet .bfoot .bprice b{display:block;font:500 18px var(--sans);color:var(--strong)}
+.bsheet .bfoot .bprice small{font-size:12px;color:var(--subtle)}
+.bsheet .bfoot.stack{flex-direction:column;align-items:stretch;gap:2px}
+.textbtn{display:block;width:100%;padding:12px 0 2px;text-align:center;font:500 15px var(--serif);color:var(--strong)}
+.bh{display:flex;align-items:center;gap:12px;margin:4px 0 10px}
+.bh .icotile{width:40px;height:40px;border-radius:12px;font-size:20px}
+.bh b{font:500 20px/26px var(--serif);color:var(--strong)}
+.bp{font-size:14.5px;line-height:1.5;color:var(--text);margin:0 0 12px}
+.bhero{width:100%;aspect-ratio:361/226;border-radius:16px;background-size:cover;background-position:center;margin-bottom:12px}
+.bgal{display:grid;grid-template-columns:2.2fr 1fr;grid-template-rows:1fr 1fr;gap:6px;height:168px;margin-bottom:12px}
+.bgal i{border-radius:14px;background-size:cover;background-position:center}
+.bgal i:first-child{grid-row:1/3}
+.btitle{font:500 22px/28px var(--serif);color:var(--strong)}
+.bsub{font-size:13.5px;color:var(--subtle);margin:2px 0 10px}
+.mypick{display:inline-flex;align-items:center;gap:6px;background:var(--brand-subtle);color:var(--strong);font-size:13px;font-weight:500;border-radius:999px;padding:6px 11px;margin:2px 0 12px}
+.bq{font:500 16px var(--serif);color:var(--strong);margin:4px 0 10px}
+
+/* desk review panel (desktop only) */
+@media (min-width:600px){body{gap:72px}}
+.desk ol{list-style:none;padding:0}
+.desk li{margin:0 0 6px}
+
+/* 17 Nov (Ahmad): every avatar fills its circle, wherever it sits (the pay card showed a blank cream square) */
+.uaph{border-radius:50%;background-color:#f2eee6;background-size:cover!important;background-position:center!important;background-repeat:no-repeat;flex:none;display:block}
+/* 17 Nov (Ahmad): Sprout's bubbles hug their text instead of spanning the chat */
+.chat .row .bub{width:fit-content;max-width:calc(100% - 32px)}
+.chat .row.me .bub{max-width:82%}
+
+/* H2 (17 Nov): nothing sits under the home bar or in the bottom corners. Sheets and screens without a footer get
+   the home-bar space plus breathing room; with a footer, the footer already carries it. */
+.bsheet .bbody{padding-bottom:12px}
+.bsheet:not(:has(.bfoot)) .bbody{padding-bottom:calc(28px + var(--sb))}
+.waiver:not(:has(.wfoot)) .wbody{padding-bottom:calc(28px + var(--sb))}
+.bsheet .bfoot{padding-bottom:calc(16px + var(--sb))}
+.wfoot{padding-bottom:calc(14px + var(--sb))}
+
+/* H3 (17 Nov): in a stacked footer the buttons keep their own height (flex:1 squashed them to a sliver) */
+.bsheet .bfoot.stack .btn{flex:none}
+.bsheet .bfoot.stack .textbtn{flex:none;padding:12px 0 2px;text-align:center}

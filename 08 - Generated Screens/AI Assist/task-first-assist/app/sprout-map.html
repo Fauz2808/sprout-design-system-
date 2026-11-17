@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Sprout app map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Whole-app helicopter view. Sibling of assist-map.html: same tokens, chips, panel and wires.
+   All content comes from /sprout-map-data.js, written by tools/build-sprout-map.py. Nothing here is hand-typed data. */
+:root{--bg:#F4F1EA;--card:#fff;--ink:#1E3E2B;--body:#4d525b;--muted:#7D715E;--green:#186338;--light:#E2E9E3;--line:#D9D2C4;
+  --amber:#B5872B;--amber-bg:#FBF1DA;--amber-br:#E6CD96;--blue:#2F6690;--blue-bg:#E3EDF5;--plum:#6B4E71;--plum-bg:#EFE7F0;
+  --serif:'Playfair Display',Georgia,serif;--sans:'Inter',system-ui,sans-serif;--sh:1px 3px 12px rgba(13,13,18,.05)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);font-family:var(--sans);color:var(--body)}
+button{font:inherit}
+.wrap{max-width:1640px;margin:0 auto;padding:28px 26px 120px}
+h1{font:600 28px var(--serif);color:var(--ink);margin:0 0 6px}
+.sub{font-size:14px;line-height:1.6;margin:0 0 14px;max-width:900px}
+h2{font:600 19px var(--serif);color:var(--ink);margin:0 0 4px}
+h2 small{font:500 12px var(--sans);color:var(--muted);margin-left:8px;letter-spacing:.02em}
+.hint{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:0 0 10px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:var(--sh);cursor:default}
+.stat .k{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font:600 17px/1.3 var(--serif);color:var(--ink);margin-top:2px}
+.stat .n{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+.stat.oq{background:var(--amber-bg);border-color:var(--amber-br);cursor:pointer}
+.snap{font-size:12px;color:var(--muted);margin:0 0 16px;line-height:1.5}
+.snap b{color:var(--ink);font-weight:600}
+
+.top{display:grid;grid-template-columns:1fr 1.4fr;gap:14px;margin-bottom:14px}
+.rules{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:var(--sh);font-size:12.5px;line-height:1.5;color:var(--ink)}
+.rules summary{cursor:pointer;font-size:12.5px;color:var(--green);font-weight:600;margin-top:6px}
+.rules details p{margin:6px 0 0}
+.rules p{margin:0 0 6px}
+.key{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:8px 0 0}
+.key span{display:inline-flex;align-items:center;gap:5px}
+.gaps{background:var(--amber-bg);border:1px solid var(--amber-br);border-radius:14px;padding:14px 16px}
+.gaps h2{color:#6d5310}
+.gaps .rs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.gaps .rs span{background:#fff;border:1px solid #efe6cf;border-radius:99px;padding:5px 10px;font-size:12px;color:var(--ink);cursor:pointer}
+.gaps .rs span:hover{border-color:var(--amber)}
+
+/* toolbar */
+.bar{position:sticky;top:0;z-index:30;background:rgba(244,241,234,.96);backdrop-filter:blur(6px);padding:10px 0;margin:0 0 14px;border-bottom:1px solid var(--line);display:flex;gap:10px 16px;flex-wrap:wrap;align-items:center}
+.bar input{width:230px;border:1.5px solid var(--line);border-radius:99px;padding:8px 14px;font:13px var(--sans);background:#fff;color:var(--ink);outline:none}
+.bar input:focus{border-color:var(--green)}
+.fg{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.fg .l{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.fc{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:4px 10px;font-size:12px;color:var(--ink);cursor:pointer}
+.fc.on{border-color:var(--green);background:var(--light);font-weight:600}
+.fc.oqf.on{border-color:var(--amber);background:var(--amber-bg)}
+.mc{font-size:12px;color:var(--muted)}
+.clr{border:0;background:none;color:var(--green);font-size:12px;cursor:pointer;text-decoration:underline}
+
+.main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+.panel{position:sticky;top:70px;max-height:calc(100vh - 86px);overflow:auto;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:16px;z-index:20}
+.panel .x{position:absolute;right:10px;top:10px;width:28px;height:28px;border-radius:14px;border:0;background:var(--bg);cursor:pointer;font-size:15px}
+.panel .pk{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.panel h3{font:600 19px var(--serif);color:var(--ink);margin:2px 0 6px;padding-right:30px}
+.panel p{font-size:13px;line-height:1.55;margin:0 0 10px}
+.panel .empty{color:var(--muted)}
+.panel .empty b{color:var(--ink)}
+.panel .sec{margin:12px 0 0;padding-top:10px;border-top:1px solid #eee8dc}
+.panel dl{display:grid;grid-template-columns:62px 1fr;gap:5px 10px;font-size:12.5px;margin:0 0 8px}
+.panel dt{color:var(--muted)}.panel dd{margin:0;color:var(--ink);line-height:1.45}
+.panel dd small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.panel .lk{display:flex;flex-wrap:wrap;gap:5px}
+.panel .lk span,.panel .lk a{font-size:12px;border:1px solid var(--line);border-radius:99px;padding:3px 9px;cursor:pointer;color:var(--ink);text-decoration:none;background:#fff}
+.panel .lk a{border-color:#bcd3c3;color:var(--green);font-weight:600}
+.panel .lk span.gp{background:var(--amber-bg);border-color:var(--amber-br)}
+.panel .oqb{background:var(--amber-bg);border:1px solid var(--amber-br);border-radius:10px;padding:8px 10px;font-size:12.5px;line-height:1.45;color:#5a4410;margin:0 0 10px}
+.panel .oqb b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px}
+.panel .path{font:11.5px/1.4 ui-monospace,Menlo,monospace;background:var(--bg);border-radius:8px;padding:6px 8px;color:var(--ink);word-break:break-all;margin:0 0 6px;display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
+.panel .path button{flex:none;border:1px solid var(--line);background:#fff;border-radius:99px;font-size:11px;padding:2px 8px;cursor:pointer}
+.panel .ids{font:11px/1.5 ui-monospace,Menlo,monospace;color:var(--muted)}
+.panel ul{margin:0;padding-left:16px;font-size:12.5px;line-height:1.5}
+
+/* tags and status */
+.src{display:inline-block;font:700 10px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;border-radius:5px;padding:3px 5px;vertical-align:1px}
+.s-Prod{background:var(--light);color:var(--green)}
+.s-Exploration{background:var(--blue-bg);color:var(--blue)}
+.s-HTML{background:#F3ECE0;color:#7a5a24}
+.s-Web{background:var(--plum-bg);color:var(--plum)}
+.pill{display:inline-block;font-size:10.5px;font-weight:600;border:1px solid var(--line);border-radius:99px;padding:2px 7px;color:var(--muted);margin-left:4px}
+.sv{display:inline-flex;gap:2px;vertical-align:middle}
+.sv i{width:9px;height:9px;border-radius:3px;background:#d8d3c7;display:block}
+.sv i.l1{background:#7aa3c4}.sv i.l2{background:var(--green)}
+.sb{display:inline-block;font-size:11.5px;font-weight:600;border-radius:99px;padding:2px 8px}
+.sb.l0{background:#EEEAE1;color:#6f6656}.sb.l1{background:var(--blue-bg);color:var(--blue)}.sb.l2{background:var(--light);color:var(--green)}
+.dist{display:flex;flex-direction:column;gap:2px;width:44px}
+.dist div{display:flex;height:4px;border-radius:2px;overflow:hidden;background:#e9e4d9}
+.dist span{display:block;height:100%}
+.dist .l0{background:#d0c9ba}.dist .l1{background:#7aa3c4}.dist .l2{background:var(--green)}
+.oqdot{display:inline-block;width:8px;height:8px;border-radius:4px;background:var(--amber);margin-left:5px;vertical-align:1px}
+
+/* stages */
+.stage{position:relative}
+.wires{position:absolute;inset:0;width:100%;pointer-events:none;z-index:5;overflow:visible}
+.sel{outline:3px solid var(--green);outline-offset:2px}
+.hit{border-color:var(--green)!important;background:var(--light)!important;box-shadow:0 0 0 2px rgba(24,99,56,.18)!important}
+.hit.gap{border-color:var(--amber)!important;background:#fff4d9!important}
+.dim{opacity:.22}
+section.lv{margin-top:6px;margin-bottom:34px}
+
+/* level 1 */
+.l1{display:grid;grid-template-columns:200px 200px minmax(0,1fr);gap:18px 46px;align-items:start;position:relative;z-index:2}
+.col .ch{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.col .stack{display:flex;flex-direction:column;gap:8px}
+.nd{position:relative;display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;cursor:pointer;box-shadow:var(--sh);color:var(--ink)}
+.nd b{display:block;font:600 14px/1.25 var(--serif);color:var(--ink)}
+.nd .s{display:block;font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.3}
+.nd .m{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:4px}
+.nd .tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}
+.nd .to{display:block;font-size:11.5px;color:var(--green);margin-top:4px;line-height:1.3;font-weight:500}
+.nd .m .c{font-size:11px;color:var(--muted)}
+.nd.branch{margin-left:18px;border-style:dashed}
+.down{align-self:center;color:var(--muted);font-size:12px;line-height:1;margin:-3px 0}
+.tabs{display:flex;flex-direction:column;gap:8px}
+.tabs .nd{border-color:#bcd3c3;display:grid;grid-template-columns:170px minmax(0,1fr);gap:4px 14px;align-items:start}
+.tabs .nd .m{margin-top:4px}
+.ft{display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start}
+.ft span{font-size:11.5px;border-radius:99px;padding:3px 9px;background:var(--light);color:var(--ink);border:1px solid #cfe0d4}
+.ft span:hover{border-color:var(--green)}
+.navline{display:flex;align-items:center;gap:8px;margin:8px 0 0;font-size:12px;color:var(--muted)}
+.navline button{border:1px dashed #bcd3c3;background:#fff;border-radius:99px;padding:4px 10px;font-size:12px;color:var(--green);cursor:pointer}
+.around{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:6px}
+.webrow{grid-column:1/-1;margin-top:8px}
+.webs{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.webs .nd{border-color:#d8c9da}
+
+/* level 2 */
+.area{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px 40px}
+.frow{position:relative;z-index:2;display:grid;grid-template-columns:196px minmax(0,1fr) 168px;gap:12px;align-items:start;margin:0 0 10px 40px;padding:8px;border-radius:14px;background:rgba(255,255,255,.45);border:1px solid transparent}
+.frow.hitrow{border-color:#bcd3c3;background:rgba(226,233,227,.55)}
+.fcard{display:flex;gap:9px;align-items:flex-start;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:9px 10px;cursor:pointer;box-shadow:var(--sh);text-align:left;width:100%}
+.fcard img{width:28px;height:28px;flex:none}
+.fcard b{display:block;font:600 14.5px/1.25 var(--serif);color:var(--ink)}
+.fcard .s{display:block;font-size:11px;color:var(--muted);margin-top:3px;line-height:1.35}
+.items{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch}
+.it{display:flex;flex-direction:column;justify-content:space-between;gap:4px;width:136px;min-height:60px;text-align:left;background:#FBFAF7;border:1.5px solid var(--line);border-left-width:4px;border-radius:9px;padding:6px 8px;cursor:pointer;color:var(--ink)}
+.it.src-Prod{border-left-color:var(--green)}.it.src-Exploration{border-left-color:var(--blue)}.it.src-HTML{border-left-color:#b08a4a}.it.src-Web{border-left-color:var(--plum)}
+.it .t{font-size:12px;line-height:1.25;font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.it .f{display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:10.5px;color:var(--muted)}
+.it.af{background:#fff;border-style:dashed;border-left-style:solid;border-left-color:var(--green)}
+.side{display:flex;flex-direction:column;gap:6px}
+.side .h{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.side .tg{display:flex;flex-wrap:wrap;gap:4px}
+.side .tg span{font-size:11px;border-radius:99px;padding:2px 8px;background:var(--light);color:var(--ink);cursor:pointer;border:1px solid transparent}
+.side .tg span.gap{background:var(--amber-bg);color:#6d5310}
+.side .tg span.ho{background:#fff;border-color:var(--line)}
+
+/* level 3 */
+.l3h{margin:26px 0 4px 40px}
+.surfaces{position:relative;z-index:2;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;align-items:start;margin-left:40px}
+.surf{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:10px;box-shadow:var(--sh);cursor:pointer;text-align:left}
+.surf .st{font:600 14px var(--serif);color:var(--ink)}
+.surf .sn{font-size:11px;color:var(--muted);margin:2px 0 8px;line-height:1.35}
+.surf .chips{display:flex;flex-direction:column;gap:4px}
+.c{border:1.5px solid var(--line);border-radius:8px;padding:5px 7px;font-size:11.5px;color:var(--ink);cursor:pointer;background:#FBFAF7;line-height:1.25;text-align:left}
+.c.built{border-color:#bcd3c3}.c.designed{border-color:#b9cfe0}.c.gap{border-color:var(--amber-br);background:var(--amber-bg)}
+.k-built{border:1.5px solid var(--green);background:var(--light)}.k-designed{border:1.5px solid var(--blue);background:var(--blue-bg)}.k-gap{border:1.5px solid var(--amber);background:var(--amber-bg)}
+.key i{display:inline-block;width:12px;height:12px;border-radius:4px}
+
+details.notes{margin-top:30px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+details.notes summary{cursor:pointer;font:600 15px var(--serif);color:var(--ink)}
+details.notes li{font-size:12.5px;line-height:1.5;margin-bottom:4px}
+@media(max-width:1180px){.main{grid-template-columns:1fr}.panel{position:relative;top:0;max-height:none}.stats{grid-template-columns:repeat(2,1fr)}.top{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Sprout: the whole app on one page</h1>
+  <p class="sub">How a parent gets in, where each feature lives, and what every feature writes into. Three levels: the <b>app map</b>, the <b>feature flows</b> with their Figma sections and prototypes, and the <b>shared surfaces</b> features write into. Tap anything for its status, links and connections.</p>
+  <div class="stats" id="stats"></div>
+  <p class="snap" id="snap"></p>
+
+  <div class="top">
+    <div class="rules" id="rules"></div>
+    <div class="gaps"><h2>Open questions <small id="oqn"></small></h2><div class="rs" id="oqStrip"></div></div>
+  </div>
+
+  <div class="bar" id="bar">
+    <input id="q" type="search" placeholder="Search screens, flows, IDs (AUTH-05, 16210:379149)" aria-label="Search">
+    <div class="fg" data-f="source"><span class="l">Source</span></div>
+    <div class="fg" data-f="design"><span class="l">Design</span></div>
+    <div class="fg" data-f="handoff"><span class="l">Handoff</span></div>
+    <div class="fg" data-f="release"><span class="l">Release</span></div>
+    <div class="fg"><button class="fc oqf" id="oqOnly">Open questions only</button></div>
+    <span class="mc" id="mc"></span><button class="clr" id="clr">Clear</button>
+  </div>
+
+  <div class="main"><div>
+    <section class="lv">
+      <h2>1 · App map <small>entry points → onboarding → tabs, plus the web</small></h2>
+      <p class="hint">Each entry point says where it leads. Tap any card to draw its lines and light up its design sources and features.</p>
+      <div class="stage" id="st1"><svg class="wires" id="w1"></svg>
+        <div class="l1">
+          <div class="col"><div class="ch">Entry points</div><div class="stack" id="entries"></div></div>
+          <div class="col"><div class="ch">Onboarding</div><div class="stack ob" id="onb"></div></div>
+          <div class="col"><div class="ch">In the app · five tabs and the features under each</div><div class="tabs" id="tabs"></div>
+            <div class="navline" id="navline"></div>
+            <div class="ch" style="margin-top:14px">Around the tabs</div><div class="around" id="around"></div></div>
+          <div class="col webrow"><div class="ch">Web · no app needed</div><div class="webs" id="webs"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lv">
+      <h2>2 · Feature flows <small>feature → flow sections (screens) → prototypes, left to right</small></h2>
+      <p class="hint">Green edge = Prod section, blue = Exploration, brown = HTML prototype. The number counts phone-size screens. The three squares are Design · Handoff · Release (grey none recorded, blue in progress, green done). Tap a feature to draw its handoffs in the left margin.</p>
+      <div class="stage" id="st2"><svg class="wires" id="w2"></svg>
+        <div id="frows"></div>
+        <h2 class="l3h">3 · Shared surfaces <small>what features write into</small></h2>
+        <p class="hint" style="margin-left:40px">Each card lists the features that write into it; amber means the connection is not designed yet. Assist rows come from assist-map.html, so both pages agree. Tap a surface to light up its features above.</p>
+        <div class="surfaces" id="surfs"></div>
+      </div>
+    </section>
+
+    <details class="notes" id="notes"><summary>Data notes: conflicts between sources and build warnings</summary><div id="notesBody"></div></details>
+  </div>
+  <aside class="panel" id="panel"><button class="x" aria-label="Clear selection">✕</button><div id="pbody"></div></aside></div>
+</div>
+
+<script src="/sprout-map-data.js"></script>
+<script>
+const D = window.SPROUT_MAP, N = D.nodes, A = '/assets/clay/';
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+const LV = { design:{ Unverified:0, 'In review':1, Approved:2 }, handoff:{ 'Not recorded':0, Drafted:1, Sent:2, Received:2 }, release:{ Unverified:0, 'In development':1, Shipped:2 } };
+const VALUES = { source:['Prod','Exploration','HTML prototype','Web'], design:['Unverified','In review','Approved'], handoff:['Not recorded','Drafted','Sent','Received'], release:['Unverified','In development','Shipped'] };
+const srcCls = s => 's-' + String(s).split(' ')[0];
+const srcTag = s => `<span class="src ${srcCls(s)}">${esc(s)}</span>`;
+const sv = n => `<span class="sv" title="Design: ${esc(n.design)} · Handoff: ${esc(n.handoff)} · Release: ${esc(n.release)}">${['design','handoff','release'].map(f => `<i class="l${LV[f][n[f]]}"></i>`).join('')}</span>`;
+const figmaUrl = id => `https://www.figma.com/design/${D.meta.file_key}/?node-id=${id.replace(':','-')}`;
+
+/* lookups */
+const L1 = {}; Object.values(D.level1).flat().forEach(o => L1[o.id] = o);
+const FEAT = {}; D.features.forEach(f => FEAT[f.id] = f);
+const SURF = {}; D.surfaces.forEach(s => SURF[s.id] = s);
+const itemFeature = {}; D.features.forEach(f => f.items.forEach(i => (itemFeature[i] = itemFeature[i] || []).push(f.id)));
+const leafRefs = id => L1[id] ? L1[id].refs : FEAT[id] ? FEAT[id].items : N[id] ? [id] : [];
+const dist = ids => { const ns = ids.map(i => N[i]).filter(Boolean); return ['design','handoff','release'].map(f => { const c=[0,0,0]; ns.forEach(n => c[LV[f][n[f]]]++); return c; }); };
+const distBar = ids => { const d = dist(ids), t = ids.length || 1; return `<span class="dist" title="Design · Handoff · Release across ${ids.length} linked items">${d.map(c => `<div>${c.map((v,i) => v ? `<span class="l${i}" style="width:${v/t*100}%"></span>` : '').join('')}</div>`).join('')}</span>`; };
+const screens = ids => ids.reduce((a,i) => a + (N[i]?.screens || 0), 0);
+const srcSet = ids => [...new Set(ids.map(i => N[i]?.source).filter(Boolean))];
+
+/* header */
+const C = D.counts;
+$('#stats').innerHTML = [
+  ['Prod (Figma 0:1)', `${C.prod.rows} rows · ${C.prod.sections} sections`, `${C.prod.screens} screens, matches the registry (${C.prod.registry_screen_count}) and the label CSV (${C.prod.csv_prod_screens})`],
+  ['Exploration (142:8499)', `${C.exploration.rows} rows · ${C.exploration.items} items`, `${C.exploration.sections} sections + ${C.exploration.items - C.exploration.sections} loose frames · ${C.exploration.screens} phone-size frames`],
+  ['HTML prototypes', `${C.protos} files · ${C.routes} routes`, 'Files in 08 - Generated Screens and the Assist review site'],
+  ['Web', `${C.web} surfaces`, 'Class chat join, portals, public pages, the two sites'],
+].map(([k,v,n]) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${esc(n)}</div></div>`).join('')
+  + `<div class="stat oq" id="oqStat"><div class="k">Open questions</div><div class="v">${C.open} marked</div><div class="n">Unclear placement or undecided direction, never filled in</div></div>`;
+$('#snap').innerHTML = `Labels: <b>${esc(D.meta.labels_csv)}</b> as of <b>${esc(D.meta.labels_date)}</b> (after the 16 Nov CURRENT relabel) · Registry updated <b>${esc(D.meta.registry_date)}</b> · Exploration and About cards read from Figma <b>${esc(D.meta.figma_read)}</b> · ${D.features.length} features · <a href="${D.meta.prod_url}" target="_blank" rel="noopener">Prod design map</a> · <a href="${D.meta.exploration_url}" target="_blank" rel="noopener">Exploration page</a>`;
+$('#rules').innerHTML = `<h2>Reading the page</h2>
+  <div class="key"><span>${srcTag('Prod')} Figma Prod page</span><span>${srcTag('Exploration')} newer Figma work</span><span>${srcTag('HTML prototype')}</span><span>${srcTag('Web')}</span></div>
+  <div class="key"><span><span class="sv"><i></i><i class="l1"></i><i class="l2"></i></span> Design · Handoff · Release: grey none recorded, blue in progress, green done</span>
+  <span><i class="k-built"></i>built in a prototype</span><span><i class="k-designed"></i>designed</span><span><i class="k-gap"></i>gap</span></div>
+  <details><summary>How status is read (never inferred)</summary><p><b>Design</b> ${esc(D.meta.rules.design)}</p><p><b>Handoff</b> ${esc(D.meta.rules.handoff)}</p><p><b>Release</b> ${esc(D.meta.rules.release)}</p></details>`;
+$('#oqn').textContent = D.open_questions.length;
+const oqTarget = o => o.where === 'feature' ? 'f:' + o.id : o.where === 'surface' ? 's:' + o.id : o.id;
+$('#oqStrip').innerHTML = D.open_questions.map(o => `<span data-go="${oqTarget(o)}" title="${esc(o.q)}">${esc(o.label)}</span>`).join('');
+
+/* level 1 */
+const shortSrc = x => srcTag(x).replace('>HTML prototype<', '>HTML<');
+const ndHtml = (o, extra='') => { const r = o.refs || []; const src = o.source ? shortSrc(o.source) : srcSet(r).map(shortSrc).join(' ');
+  const to = (o.to || []).map(t => (L1[t] || {}).label || t);
+  const cnt = screens(r);
+  const head = `<span><b>${esc(o.label)}${o.open ? '<span class="oqdot" title="Open question"></span>' : ''}</b>${o.sub ? `<span class="s">${esc(o.sub)}</span>` : ''}
+    ${to.length ? `<span class="to">→ ${to.map(esc).join(', ')}</span>` : ''}<span class="tags">${src}</span>
+    ${cnt || r.length || o.kind === 'web' ? `<span class="m"><span class="c">${cnt ? `${cnt} screens` : o.kind === 'web' && o.version ? esc(o.version) : ''}</span>${o.kind === 'web' ? sv(o) : distBar(r)}</span>` : ''}</span>`;
+  const ft = o.kind === 'tab' ? `<span class="ft">${o.features.map(f => `<span data-go="f:${f}">${esc(FEAT[f].label)}</span>`).join('')}</span>` : '';
+  return `<button class="nd ${o.branch ? 'branch' : ''} ${extra}" data-id="${o.id}">${head}${ft}</button>`; };
+$('#entries').innerHTML = D.level1.entries.map(o => ndHtml(o)).join('');
+$('#onb').innerHTML = D.level1.onboarding.map((o, i, a) => (i && !o.branch ? '<span class="down">↓</span>' : '') + ndHtml(o)).join('') + `<span class="s" style="font-size:11px;color:var(--muted);line-height:1.4">${esc(D.meta.onboarding_note)}</span>`;
+$('#tabs').innerHTML = D.level1.tabs.map(o => ndHtml(o)).join('');
+$('#navline').innerHTML = `<button data-id="nav">Navigation Bar (Docked) · ${esc(D.nav.component)}</button><span>Five options, always this component (Ahmad, 16 Nov)</span>`;
+$('#around').innerHTML = D.level1.app_other.map(o => ndHtml(o)).join('');
+$('#webs').innerHTML = D.level1.web.map(o => ndHtml(o)).join('');
+
+/* level 2 */
+const itHtml = id => { const n = N[id]; if (!n) return '';
+  const meta = n.screens ? `${n.screens} screens` : n.kind === 'route' ? 'route' : n.source === 'HTML prototype' ? 'file' : n.kind;
+  return `<button class="it src-${n.source.split(' ')[0]}" data-id="${esc(id)}" title="${esc(n.label)}"><span class="t">${esc(n.label)}</span><span class="f"><span>${srcTag(n.source === 'HTML prototype' ? 'HTML' : n.source)} ${meta}</span>${sv(n)}</span></button>`; };
+let lastArea = '';
+$('#frows').innerHTML = D.features.map(f => {
+  const head = f.area !== lastArea ? `<div class="area">${esc(lastArea = f.area)}</div>` : '';
+  const sc = screens(f.items), srcs = srcSet(f.items);
+  const out = D.handoffs.filter(h => h.from === f.id), surf = D.surface_edges.filter(e => e.from === f.id);
+  return head + `<div class="frow" data-row="${f.id}">
+    <button class="fcard" data-id="f:${f.id}"><img src="${A}${f.icon}.png" alt=""><span><b>${esc(f.label)}${f.open ? '<span class="oqdot" title="Open question"></span>' : ''}</b>
+      <span class="s">${f.items.filter(i => N[i].source !== 'HTML prototype').length} sections · ${sc} screens · ${srcs.map(s => s === 'HTML prototype' ? 'HTML' : s).join(', ')}</span>
+      <span class="s" style="margin-top:5px">${distBar(f.items)}</span></span></button>
+    <div class="items">${f.items.map(itHtml).join('')}${f.assist_flows.map(a => `<button class="it af" data-id="f:${f.id}" title="assist-map flow"><span class="t">${esc(a.t)}</span><span class="f"><span>assist-map flow</span></span></button>`).join('')}</div>
+    <div class="side">${out.length ? `<div class="h">Hands off to</div><div class="tg">${out.map(h => `<span class="ho ${h.st === 'gap' ? 'gap' : ''}" data-go="f:${h.to}" title="${esc(h.label)}">${esc(FEAT[h.to]?.label || h.to)}</span>`).join('')}</div>` : ''}
+      ${surf.length ? `<div class="h">Writes to</div><div class="tg">${[...new Map(surf.map(e => [e.to, e])).values()].map(e => `<span class="${e.st === 'gap' ? 'gap' : ''}" data-go="s:${e.to}" title="${esc(e.label)}">${esc(SURF[e.to].t)}</span>`).join('')}</div>` : ''}</div>
+  </div>`; }).join('');
+
+/* level 3 */
+$('#surfs').innerHTML = D.surfaces.map(s => { const es = D.surface_edges.filter(e => e.to === s.id);
+  return `<div class="surf" data-id="s:${s.id}"><div class="st">${esc(s.t)}${s.open ? '<span class="oqdot" title="Open question"></span>' : ''}</div><div class="sn">${esc(s.n)}</div>
+  <div class="chips">${es.map(e => `<button class="c ${e.st}" data-id="se:${s.id}:${e.from}" title="${esc(e.label)}">${esc(FEAT[e.from].label)}</button>`).join('')}</div></div>`; }).join('');
+
+/* notes */
+$('#notesBody').innerHTML = `<p style="font-size:12.5px">Other label snapshots found (older "before" states, not used): ${D.meta.other_label_snapshots.map(esc).join(' · ')}</p>
+  <ul>${D.conflicts.map(c => `<li>${esc(c)}</li>`).join('')}${D.warnings.map(w => `<li>Build warning: ${esc(w)}</li>`).join('')}</ul>`;
+
+/* ---------- details panel ---------- */
+const statusRows = n => ['design','handoff','release'].map(f => `<dt>${f[0].toUpperCase() + f.slice(1)}</dt><dd><span class="sb l${LV[f][n[f]]}">${esc(n[f])}</span>${n[f + '_ev'] && n[f + '_ev'] !== n[f] ? `<small>${esc(n[f + '_ev'])}</small>` : ''}</dd>`).join('');
+const pathBox = p => `<div class="path"><span>~/Sprout/${esc(p)}</span><button data-copy="${esc('~/Sprout/' + p)}">Copy</button></div>`;
+const oq = t => t ? `<div class="oqb"><b>Open question</b>${esc(t)}</div>` : '';
+const goChip = (id, label, gap) => `<span data-go="${esc(id)}" class="${gap ? 'gp' : ''}">${esc(label)}</span>`;
+const labelOf = id => id.startsWith('f:') ? FEAT[id.slice(2)]?.label : id.startsWith('s:') ? SURF[id.slice(2)]?.t : L1[id]?.label || N[id]?.label || id;
+const usedIn = id => Object.values(L1).filter(o => o.refs.includes(id));
+
+function panelFor(id){
+  if (id === 'nav') { const r = D.nav.refs; return `<div class="pk">Navigation</div><h3>Navigation Bar (Docked)</h3><p>Daily Brief, Events, Sprout Assist, Chat, Clubs. Every Prod screen uses instances of component ${esc(D.nav.component)}. Never remove Events or fork the master.</p>
+    <div class="lk"><a href="${D.nav.url}" target="_blank" rel="noopener">Component in Figma</a></div><div class="sec"><div class="pk">Sources</div><div class="lk">${r.map(i => goChip(i, N[i].label)).join('')}</div></div>`; }
+  if (id.startsWith('f:')) { const f = FEAT[id.slice(2)];
+    const out = D.handoffs.filter(h => h.from === f.id), inc = D.handoffs.filter(h => h.to === f.id), se = D.surface_edges.filter(e => e.from === f.id);
+    const by = s => f.items.filter(i => N[i].source === s);
+    const tabs = Object.values(L1).filter(o => (o.features || []).includes(f.id));
+    return `<div class="pk">Feature · ${esc(f.area)}</div><h3>${esc(f.label)}</h3>${f.what ? `<p>${esc(f.what)}</p>` : ''}${oq(f.open)}
+      <p>${by('Prod').length} Prod sections, ${by('Exploration').length} Exploration items, ${by('HTML prototype').length} prototypes · <b>${screens(f.items)}</b> screens. Lives under: ${tabs.map(t => goChip(t.id, t.label)).join(' ') || 'not placed in the app map'}</p>
+      ${['Prod','Exploration','HTML prototype'].map(s => by(s).length ? `<div class="sec"><div class="pk">${s}</div><div class="lk">${by(s).map(i => goChip(i, N[i].label + (N[i].screens ? ` · ${N[i].screens}` : ''))).join('')}</div></div>` : '').join('')}
+      ${f.assist_flows.length ? `<div class="sec"><div class="pk">assist-map flows</div><div class="lk">${f.assist_flows.map(a => `<span>${esc(a.t)}</span>`).join('')}</div></div>` : ''}
+      ${se.length ? `<div class="sec"><div class="pk">Writes to</div><ul>${se.map(e => `<li><b data-go="s:${e.to}" style="cursor:pointer">${esc(SURF[e.to].t)}</b> (${e.st}): ${e.chips.length ? e.chips.map(c => `${esc(c.t)}${c.st === 'gap' ? ' <i>gap</i>' : ''}`).join('; ') : esc(e.label)}${e.ev ? ` <span style="color:var(--muted)">· ${esc(e.ev)}</span>` : ''}</li>`).join('')}</ul></div>` : ''}
+      ${out.length ? `<div class="sec"><div class="pk">Hands off to</div><ul>${out.map(h => `<li><b data-go="f:${h.to}" style="cursor:pointer">${esc(FEAT[h.to].label)}</b>: ${esc(h.label)}${h.st === 'gap' ? ' (gap)' : ''} <span style="color:var(--muted)">· ${esc(h.ev)}</span></li>`).join('')}</ul></div>` : ''}
+      ${inc.length ? `<div class="sec"><div class="pk">Handed off from</div><ul>${inc.map(h => `<li><b data-go="f:${h.from}" style="cursor:pointer">${esc(FEAT[h.from].label)}</b>: ${esc(h.label)}</li>`).join('')}</ul></div>` : ''}`; }
+  if (id.startsWith('s:')) { const s = SURF[id.slice(2)], es = D.surface_edges.filter(e => e.to === s.id);
+    return `<div class="pk">Shared surface</div><h3>${esc(s.t)}</h3><p>${esc(s.n)}</p>${oq(s.open)}
+      <p>Fed by <b>${es.length}</b> features${es.filter(e => e.st === 'gap').length ? `, <b>${es.filter(e => e.st === 'gap').length}</b> of them through something not designed yet` : ''}.</p>
+      <ul>${es.map(e => `<li><b data-go="f:${e.from}" style="cursor:pointer">${esc(FEAT[e.from].label)}</b> (${e.st}): ${esc(e.label)}</li>`).join('')}</ul>`; }
+  if (id.startsWith('se:')) { const [, s, f] = id.split(':'); return panelFor('f:' + f); }
+  if (L1[id]) { const o = L1[id], r = o.refs;
+    const kinds = { entry:'Entry point', step:'Onboarding step', tab:'Tab', place:'Around the tabs', web:'Web' };
+    let h = `<div class="pk">${kinds[o.kind]}</div><h3>${esc(o.label)}</h3>${o.sub ? `<p style="color:var(--muted);margin-top:-4px">${esc(o.sub)}</p>` : ''}${o.what ? `<p>${esc(o.what)}</p>` : ''}${oq(o.open)}`;
+    if (o.kind === 'web') h += `<dl>${statusRows(o)}${o.version ? `<dt>Version</dt><dd>${esc(o.version)} (prototype-version meta)</dd>` : ''}</dl>
+      <div class="lk">${o.url ? `<a href="${esc(o.url)}" target="_blank" rel="noopener">Open live prototype</a>` : ''}</div>${o.path ? `<div class="sec"><div class="pk">File</div>${pathBox(o.path)}${o.spec ? pathBox(o.spec) : ''}</div>` : ''}`;
+    if (r.length) h += `<div class="sec"><div class="pk">Design sources · ${screens(r)} screens</div><div class="lk">${r.map(i => goChip(i, `${N[i].source === 'HTML prototype' ? 'HTML' : N[i].source}: ${N[i].label}`)).join('')}</div></div>`;
+    if (o.features?.length) h += `<div class="sec"><div class="pk">Features</div><div class="lk">${o.features.map(f => goChip('f:' + f, FEAT[f].label)).join('')}</div></div>`;
+    const to = edgesL1().filter(e => e.a === id), from = edgesL1().filter(e => e.b === id);
+    if (to.length) h += `<div class="sec"><div class="pk">Leads to</div><div class="lk">${to.map(e => goChip(e.b, labelOf(e.b))).join('')}</div></div>`;
+    if (from.length) h += `<div class="sec"><div class="pk">Reached from</div><div class="lk">${from.map(e => goChip(e.a, labelOf(e.a))).join('')}</div></div>`;
+    return h; }
+  const n = N[id]; if (!n) return '';
+  const kindLbl = n.source === 'Prod' ? 'Prod flow section' : n.source === 'Exploration' ? 'Exploration ' + n.kind : n.kind === 'route' ? 'Prototype route' : 'HTML prototype';
+  const feats = (itemFeature[id] || []).map(f => goChip('f:' + f, FEAT[f].label)).join('');
+  const places = usedIn(id).map(o => goChip(o.id, o.label)).join('');
+  return `<div class="pk">${kindLbl}</div><h3>${esc(n.label)}</h3><p style="margin-top:-2px">${srcTag(n.source)}${n.pill ? `<span class="pill">${esc(n.pill)}</span>` : ''} <span style="font-size:12px;color:var(--muted)">${esc(n.sub || '')}</span></p>
+    <dl>${statusRows(n)}</dl>
+    ${n.what ? `<p><b>What</b> ${esc(n.what)}</p>` : ''}${n.status_text ? `<p><b>Status</b> ${esc(n.status_text)}</p>` : ''}${n.open_text ? `<p><b>Open</b> ${esc(n.open_text)}</p>` : ''}
+    ${n.screens ? `<p><b>${n.screens}</b> screens${n.codes ? ` · flows ${n.codes.map(esc).join(', ')}` : ''}${n.review ? ` · review action ${Object.entries(n.review).map(([k,v]) => `${esc(k)} ×${v}`).join(', ')}` : ''}</p>` : ''}
+    ${n.screen_ids ? `<p class="ids">${n.screen_ids.map(esc).join(' · ')}</p>` : ''}
+    <div class="lk">${n.url ? `<a href="${esc(n.url)}" target="_blank" rel="noopener">${n.figma ? 'Open in Figma · ' + esc(n.figma) : 'Open route'}</a>` : ''}</div>
+    ${n.path ? `<div class="sec"><div class="pk">File</div>${pathBox(n.path)}</div>` : ''}
+    ${n.protos?.length ? `<div class="sec"><div class="pk">Prototype candidates (label map)</div>${n.protos.map(pathBox).join('')}</div>` : ''}
+    ${feats ? `<div class="sec"><div class="pk">Feature</div><div class="lk">${feats}</div></div>` : ''}${places ? `<div class="sec"><div class="pk">On the app map</div><div class="lk">${places}</div></div>` : ''}`;
+}
+
+/* ---------- edges + wires ---------- */
+let _e1;
+function edgesL1(){ if (_e1) return _e1; const e = [];
+  D.level1.entries.forEach(o => o.to.forEach(t => e.push({ a:o.id, b:t })));
+  const main = D.level1.onboarding.filter(o => !o.branch);
+  main.forEach((o, i) => i && e.push({ a:main[i-1].id, b:o.id, chain:true }));
+  if (main.length) e.push({ a:main[main.length-1].id, b:'t-brief' });
+  D.web_edges.forEach(w => e.push({ a:w.from, b:w.to, label:w.label, web:true }));
+  return _e1 = e; }
+function curve(svgBox, a, b, opts){
+  const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect(), L = svgBox.left, T = svgBox.top;
+  const ov = Math.min(ra.bottom, rb.bottom) - Math.max(ra.top, rb.top);
+  let d;
+  if (opts.side) { const x1 = ra.left - L, y1 = ra.top + ra.height/2 - T, x2 = rb.left - L, y2 = rb.top + rb.height/2 - T, bx = Math.min(x1, x2) - 34;
+    d = `M${x1},${y1} C${bx},${y1} ${bx},${y2} ${x2},${y2}`; }
+  else if (rb.left >= ra.right - 4 || ra.left >= rb.right - 4) { const r2l = rb.left >= ra.right - 4;
+    const x1 = (r2l ? ra.right : ra.left) - L, y1 = ra.top + ra.height/2 - T, x2 = (r2l ? rb.left : rb.right) - L, y2 = rb.top + rb.height/2 - T, mx = (x1 + x2)/2;
+    d = `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`; }
+  else { const down = rb.top > ra.top; const x1 = ra.left + ra.width/2 - L, y1 = (down ? ra.bottom : ra.top) - T, x2 = rb.left + rb.width/2 - L, y2 = (down ? rb.top : rb.bottom) - T, my = (y1 + y2)/2;
+    d = `M${x1},${y1} C${x1},${my} ${x2},${my} ${x2},${y2}`; }
+  const col = opts.gap ? '#B5872B' : opts.web ? '#6B4E71' : '#186338';
+  const end = opts.end ?? true;
+  return `<path d="${d}" fill="none" stroke="#F4F1EA" stroke-width="${opts.faint ? 4 : 6}" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${col}" stroke-width="${opts.faint ? 1.2 : 1.9}" stroke-opacity="${opts.faint ? .28 : .9}" ${opts.gap || opts.web ? 'stroke-dasharray="4 4"' : ''}/>${end ? `<circle cx="${d.split(' ').pop().split(',')[0]}" cy="${d.split(',').pop()}" r="${opts.faint ? 2 : 3}" fill="${col}" fill-opacity="${opts.faint ? .4 : 1}"/>` : ''}`;
+}
+const el = id => document.querySelector(`#st1 [data-id="${CSS.escape(id)}"], #st2 [data-id="${CSS.escape(id)}"]`);
+function sizeSvg(stage, svg){ const b = stage.getBoundingClientRect(); svg.setAttribute('viewBox', `0 0 ${b.width} ${b.height}`); svg.style.height = b.height + 'px'; return b; }
+function drawL1(focus){
+  const st = $('#st1'), svg = $('#w1'), box = sizeSvg(st, svg); let out = '';
+  if (focus) edgesL1().forEach(e => { if (e.chain || (e.a !== focus && e.b !== focus)) return; const a = el(e.a), b = el(e.b); if (!a || !b) return;
+    out += curve(box, a, b, { web: e.web }); });
+  svg.innerHTML = out; }
+function drawL2(focus){
+  const st = $('#st2'), svg = $('#w2'), box = sizeSvg(st, svg); let out = '';
+  if (focus?.startsWith('f:')) { const fid = focus.slice(2), a = el(focus);
+    D.handoffs.filter(h => h.from === fid || h.to === fid).forEach(h => { const x = el('f:' + h.from), y = el('f:' + h.to); if (x && y) out += curve(box, x, y, { side: true, gap: h.st === 'gap' }); }); }
+  svg.innerHTML = out; }
+
+/* ---------- selection ---------- */
+let current = null;
+function select(id){
+  if (id.startsWith('se:')) id = 'f:' + id.split(':')[2];
+  current = id;
+  $$('.sel,.hit').forEach(e => e.classList.remove('sel', 'hit')); $$('.hitrow').forEach(e => e.classList.remove('hitrow'));
+  const node = el(id); node?.classList.add('sel');
+  const hit = x => { const e = el(x); e && e !== node && e.classList.add('hit'); };
+  if (L1[id]) { L1[id].refs.forEach(hit); (L1[id].features || []).forEach(f => { hit('f:' + f); document.querySelector(`[data-row="${f}"]`)?.classList.add('hitrow'); });
+    edgesL1().forEach(e => { if (e.a === id) hit(e.b); if (e.b === id) hit(e.a); }); }
+  else if (id === 'nav') D.nav.refs.forEach(hit);
+  else if (id.startsWith('f:')) { const f = FEAT[id.slice(2)]; document.querySelector(`[data-row="${f.id}"]`)?.classList.add('hitrow');
+    Object.values(L1).forEach(o => (o.features || []).includes(f.id) && hit(o.id));
+    D.surface_edges.filter(e => e.from === f.id).forEach(e => { const c = el('se:' + e.to + ':' + f.id); c?.classList.add('hit'); e.st === 'gap' && c?.classList.add('gap'); }); }
+  else if (id.startsWith('s:')) D.surface_edges.filter(e => e.to === id.slice(2)).forEach(e => hit('f:' + e.from));
+  else if (N[id]) { usedIn(id).forEach(o => hit(o.id)); (itemFeature[id] || []).forEach(f => { hit('f:' + f); document.querySelector(`[data-row="${f}"]`)?.classList.add('hitrow'); }); }
+  $('#pbody').innerHTML = panelFor(id);
+  drawL1(L1[id] ? id : null); drawL2(id.startsWith('f:') || id.startsWith('s:') ? id : null);
+}
+document.addEventListener('click', e => {
+  const cp = e.target.closest('[data-copy]'); if (cp) { try { navigator.clipboard.writeText(cp.dataset.copy).then(() => { cp.textContent = 'Copied'; setTimeout(() => cp.textContent = 'Copy', 1200); }, () => {}); } catch (_) {} return; }
+  const g = e.target.closest('[data-go]'); if (g) { const id = g.dataset.go; select(id); const t = el(id); if (t) { const r = t.getBoundingClientRect(); if (r.top < 70 || r.bottom > innerHeight) { scrollTo({ top: scrollY + r.top - 140, behavior:'smooth' }); setTimeout(() => select(id), 450); } } return; }
+  const t = e.target.closest('[data-id]'); if (t && !e.target.closest('#panel')) select(t.dataset.id);
+});
+const EMPTY = `<div class="pk">Details</div><h3>Tap anything</h3><p class="empty">Tap an <b>entry point</b>, <b>onboarding step</b> or <b>tab</b> to see its design sources and where it leads. Tap a <b>feature</b> to see what it writes to and what it hands off to. Tap any <b>section</b> for its Design, Handoff and Release status with the evidence, and links to Figma or the prototype.</p><p class="empty">Amber dots mark open questions. Dashed amber lines go to things not designed yet.</p>`;
+const clearSel = () => { $$('.sel,.hit').forEach(e => e.classList.remove('sel', 'hit')); $$('.hitrow').forEach(e => e.classList.remove('hitrow')); current = null; $('#pbody').innerHTML = EMPTY; drawL1(null); $('#w2').innerHTML = ''; };
+$('.panel .x').onclick = clearSel;
+
+/* ---------- search + filters ---------- */
+const F = { source:new Set(), design:new Set(), handoff:new Set(), release:new Set() }; let oqOnly = false;
+$$('.fg[data-f]').forEach(g => { const f = g.dataset.f; VALUES[f].forEach(v => { const b = document.createElement('button'); b.className = 'fc'; b.textContent = v; b.onclick = () => { F[f].has(v) ? F[f].delete(v) : F[f].add(v); b.classList.toggle('on'); applyFilter(); }; g.appendChild(b); }); });
+$('#oqOnly').onclick = () => { oqOnly = !oqOnly; $('#oqOnly').classList.toggle('on', oqOnly); applyFilter(); };
+$('#oqStat').onclick = () => { if (!oqOnly) $('#oqOnly').click(); $('#bar').scrollIntoView({ behavior:'smooth' }); };
+$('#clr').onclick = () => { Object.values(F).forEach(s => s.clear()); oqOnly = false; $$('.fc.on').forEach(b => b.classList.remove('on')); $('#q').value = ''; applyFilter(); };
+$('#q').addEventListener('input', applyFilter);
+const leafText = n => [n.label, n.sub, n.what, n.status_text, n.open_text, n.pill, n.figma, n.row_id, n.figma_name, n.path, (n.codes || []).join(' '), (n.screen_ids || []).join(' '), n.id].join(' ').toLowerCase();
+const leafPass = (n, q) => { if (!n) return false;
+  for (const f of ['source','design','handoff','release']) if (F[f].size && !F[f].has(n[f])) return false;
+  return !q || leafText(n).includes(q); };
+function applyFilter(){
+  const q = $('#q').value.trim().toLowerCase(); const any = q || oqOnly || Object.values(F).some(s => s.size);
+  let shown = 0, total = 0;
+  const mark = (e, ok) => { e.classList.toggle('dim', any && !ok); };
+  $$('#frows .it[data-id]').forEach(e => { const id = e.dataset.id; if (id.startsWith('f:')) return; total++;
+    const n = N[id]; const ok = leafPass(n, q) && (!oqOnly || (itemFeature[id] || []).some(f => FEAT[f].open)); if (ok) shown++; mark(e, ok); });
+  $$('#frows .it.af').forEach(e => { const f = FEAT[e.dataset.id.slice(2)]; mark(e, (!q || e.textContent.toLowerCase().includes(q) || f.label.toLowerCase().includes(q)) && (!oqOnly || !!f.open) && !Object.values(F).some(s => s.size)); });
+  $$('#frows .fcard').forEach(e => { const f = FEAT[e.dataset.id.slice(2)]; const own = (f.label + ' ' + f.what + ' ' + f.open).toLowerCase();
+    const ok = (oqOnly ? !!f.open : true) && ((!q && !Object.values(F).some(s => s.size)) || f.items.some(i => leafPass(N[i], q)) || (q && own.includes(q) && !Object.values(F).some(s => s.size)));
+    mark(e, ok); });
+  $$('#st1 .nd').forEach(e => { const o = L1[e.dataset.id]; if (!o) return; total++;
+    const self = o.kind === 'web' ? leafPass({ ...o, source:o.source }, q) : false;
+    const own = (o.label + ' ' + o.sub + ' ' + o.what + ' ' + o.open).toLowerCase();
+    const filt = Object.values(F).some(s => s.size);
+    let ok = o.kind === 'web' ? (self || (!filt && q && own.includes(q))) : (o.refs.some(i => leafPass(N[i], q)) || (!filt && (!q || own.includes(q))) || (o.source && !filt && false));
+    if (o.kind === 'entry' && filt) ok = (F.source.size ? F.source.has(o.source) : true) && (o.refs.some(i => leafPass(N[i], q)) || (!F.design.size && !F.handoff.size && !F.release.size && (!q || own.includes(q))));
+    if (oqOnly) ok = !!o.open && (!q || own.includes(q));
+    if (ok) shown++; mark(e, ok); });
+  { const nb = document.querySelector('#navline button'); mark(nb, !oqOnly && D.nav.refs.some(i => leafPass(N[i], q))); }
+  $$('.surf').forEach(e => { const s = SURF[e.dataset.id.slice(2)]; mark(e, oqOnly ? !!s.open : !q || (s.t + ' ' + s.n).toLowerCase().includes(q) || D.surface_edges.some(x => x.to === s.id && (x.label + ' ' + FEAT[x.from].label).toLowerCase().includes(q))); });
+  $('#mc').textContent = any ? `${shown} of ${total} match` : `${total} nodes`;
+}
+
+const fitPanel = () => { $('#panel').style.top = ($('#bar').offsetHeight + 12) + 'px'; $('#panel').style.maxHeight = `calc(100vh - ${$('#bar').offsetHeight + 28}px)`; };
+clearSel(); applyFilter(); fitPanel(); addEventListener('resize', fitPanel);
+addEventListener('resize', () => current ? select(current) : drawL1(null));
+document.fonts?.ready.then(() => current ? select(current) : drawL1(null));
+</script>
+</body>
+</html>

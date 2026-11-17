@@ -1,0 +1,2255 @@
+{
+  "_about": "Hand-kept inputs for build-sprout-map.py: things no registry holds (entry points, web surfaces, tab placement, which sections belong to which feature, cross-feature handoffs, surface edges, open questions). Paths are relative to ~/Sprout. Statuses use DESIGN-LABELS.md values only (Design: Unverified / In review / Approved; Handoff: Not recorded / Drafted / Sent / Received; Release: Unverified / In development / Shipped) and every non-default value carries its evidence. The figma_snapshot block is written by `build-sprout-map.py import-figma`; do not hand-edit it.",
+  "figma": {
+    "file_key": "EhpRiGZ5eJnBb132X9zewg",
+    "prod_page": "0:1",
+    "exploration_page": "142:8499",
+    "archive_map": "16180:365303",
+    "prod_guide": "16167:363002"
+  },
+  "assist_routes_base": "https://sprout-assist-tasks.vercel.app",
+  "entries": [
+    {
+      "id": "e-store",
+      "label": "App Store / Google Play",
+      "sub": "Install from the store listing",
+      "source": "HTML prototype",
+      "what": "A parent finds Sprout in the store and installs it. The store set (V.11) is the listing they see.",
+      "protos": [
+        "08 - Generated Screens/App Store/screenshots-v11-nine-slides.html"
+      ],
+      "to": [
+        "o-intro"
+      ]
+    },
+    {
+      "id": "e-referral",
+      "label": "Invite or referral link",
+      "sub": "joinsprout.co/i/{code}",
+      "source": "Exploration",
+      "expl": [
+        "15135:38179"
+      ],
+      "what": "A friend's unique link opens the web Invited by page: phone, code, registered, then download. The deferred deep link puts the new parent into the inviter's class.",
+      "to": [
+        "w-referral",
+        "o-intro"
+      ]
+    },
+    {
+      "id": "e-chatjoin",
+      "label": "Class group chat link",
+      "sub": "Shared by the room parent",
+      "source": "Web",
+      "what": "A room parent shares the class chat link. The web page verifies the phone number, registers the parent and makes downloading Sprout the next step.",
+      "open": "Production URL is unsettled: README says roomparent.com/chat/<classId>, spec/24 (14 Oct) says the link stays on joinsprout.co with the new flow on /chat.",
+      "to": [
+        "w-chat"
+      ]
+    },
+    {
+      "id": "e-spouse",
+      "label": "Spouse invite SMS",
+      "sub": "Sent from the parent's own phone",
+      "source": "Prod",
+      "prod": [
+        "R05/INVITE-SPOUSE"
+      ],
+      "what": "The first parent texts their spouse from Messages. The spouse installs Sprout and goes through spouse onboarding. A spouse already on Sprout gets a push and accepts instead (17 Oct).",
+      "to": [
+        "o-spouse"
+      ]
+    },
+    {
+      "id": "e-push",
+      "label": "Push notification",
+      "sub": "Morning Brief, Assist, chat",
+      "source": "Prod",
+      "prod": [
+        "R18/PUSH-CURRENT"
+      ],
+      "what": "A push opens the app at the right place: the morning push opens the Daily Brief, an Assist suggestion opens Assist, a message opens Chat.",
+      "to": [
+        "t-brief",
+        "t-assist",
+        "t-chat"
+      ]
+    },
+    {
+      "id": "e-group",
+      "label": "In-app group invitation",
+      "sub": "Join a school group or club",
+      "source": "Prod",
+      "prod": [
+        "R14/JOIN",
+        "R15/JOIN"
+      ],
+      "what": "An existing Sprout parent opens a group invitation and requests or joins. Kept separate from the web join (the web says Registered + download).",
+      "to": [
+        "t-chat"
+      ]
+    }
+  ],
+  "onboarding": [
+    {
+      "id": "o-intro",
+      "label": "Introduction slides",
+      "prod": [
+        "R01/INTRO-CURRENT"
+      ],
+      "expl": [
+        "14020:105494"
+      ],
+      "protos": [
+        "08 - Generated Screens/Onboarding/get-started-carousel.html"
+      ]
+    },
+    {
+      "id": "o-auth",
+      "label": "Phone and code",
+      "prod": [
+        "R02/AUTH"
+      ],
+      "protos": [
+        "08 - Generated Screens/Onboarding/join-phone-number.html"
+      ]
+    },
+    {
+      "id": "o-gmail",
+      "label": "Connect Gmail",
+      "expl": [
+        "14020:105494"
+      ],
+      "protos": [
+        "08 - Generated Screens/Onboarding/gmail-connect-directions.html"
+      ],
+      "what": "Tony, 17 Oct: Gmail connect is the core of the experience and comes right after phone verification. It feeds To-Do and Events.",
+      "open": "No Prod onboarding section holds the Gmail step. It lives in Exploration onboarding (22 Oct) and AUTH's About card says to insert it after verification."
+    },
+    {
+      "id": "o-perm",
+      "label": "App permissions",
+      "prod": [
+        "R03/PERM"
+      ],
+      "protos": [
+        "08 - Generated Screens/Onboarding/permission-required.html"
+      ],
+      "open": "Where permissions sit in the order is not recorded. Registry numbers are not a verified tap sequence."
+    },
+    {
+      "id": "o-family",
+      "label": "Parent, kids and school",
+      "prod": [
+        "R04/FAMILY"
+      ],
+      "expl": [
+        "14694:191295"
+      ],
+      "protos": [
+        "08 - Generated Screens/Onboarding/family-setup-flow-redesign.html"
+      ]
+    },
+    {
+      "id": "o-invites",
+      "label": "How many invites?",
+      "expl": [
+        "15694:52292"
+      ],
+      "protos": [
+        "08 - Generated Screens/Onboarding/invite-count/index.html"
+      ],
+      "open": "A4 is WAITING: Tony has not decided placement, invite counts or follow-up."
+    },
+    {
+      "id": "o-preview",
+      "label": "Profile preview + spouse invite",
+      "prod": [
+        "R05/PREVIEW",
+        "R05/INVITE-SPOUSE"
+      ],
+      "expl": [
+        "13569:118307"
+      ],
+      "protos": [
+        "13 - Sprout Onboarding/profile-preview.html",
+        "08 - Generated Screens/Add Spouse/add-spouse-v3.html"
+      ]
+    },
+    {
+      "id": "o-spouse",
+      "label": "Spouse onboarding",
+      "branch": true,
+      "prod": [
+        "R06/SPOUSE"
+      ],
+      "protos": [
+        "13 - Sprout Onboarding/spouse-onboarding.html"
+      ],
+      "what": "The second parent's path, reached from the spouse invite SMS. Inherits family data."
+    }
+  ],
+  "onboarding_note": "Order follows Tony's onboarding order (17 and 21 Oct notes) and the Prod row order. Prod stable IDs are catalogue IDs, not a verified tap sequence.",
+  "tabs": [
+    {
+      "id": "t-brief",
+      "label": "Daily Brief",
+      "sub": "Default tab, opens every morning",
+      "features": [
+        "brief",
+        "gmail"
+      ],
+      "prod": [
+        "R07/BRIEF-CURRENT"
+      ]
+    },
+    {
+      "id": "t-events",
+      "label": "Events",
+      "sub": "AI-served events page",
+      "features": [
+        "events"
+      ],
+      "prod": [
+        "R07/PLACES",
+        "R08/EVENT-DETAIL"
+      ],
+      "open": "Events stays in the navbar (Ahmad, 16 Nov) and stays as is (Tony, 16 Nov), but Prod has no Events tab screen: only retained event details and discovery lists. Last built page is events-ai-discovery.html (8 Sep)."
+    },
+    {
+      "id": "t-assist",
+      "label": "Sprout Assist",
+      "sub": "Docked clover, centre of the bar",
+      "features": [
+        "assist-core",
+        "assist-sports",
+        "assist-sitter",
+        "assist-camps"
+      ],
+      "prod": [
+        "R24/ASSIST-HOME"
+      ]
+    },
+    {
+      "id": "t-chat",
+      "label": "Chat",
+      "sub": "Schools, clubs, subgroups, class hub",
+      "features": [
+        "chat",
+        "classhub",
+        "join"
+      ],
+      "prod": [
+        "R14/CHAT-CURRENT"
+      ]
+    },
+    {
+      "id": "t-clubs",
+      "label": "Clubs",
+      "sub": "Directory and club sharing",
+      "features": [
+        "clubs"
+      ],
+      "prod": [
+        "R15/DIRECTORY"
+      ]
+    }
+  ],
+  "nav": {
+    "prod": [
+      "R07/NAV-CURRENT"
+    ],
+    "expl": [
+      "15691:52058"
+    ],
+    "component": "16121:176380"
+  },
+  "app_other": [
+    {
+      "id": "a-profile",
+      "label": "Profile and Settings",
+      "features": [
+        "profile",
+        "invites"
+      ],
+      "prod": [
+        "R17/PROFILE-CURRENT",
+        "R17/PROFILE"
+      ],
+      "open": "The entry point to Profile and Settings is not recorded in the registry."
+    },
+    {
+      "id": "a-inbox",
+      "label": "Notification inbox",
+      "features": [
+        "notify"
+      ],
+      "prod": [
+        "R23/NOTIFICATIONS"
+      ],
+      "open": "The entry point (a bell on the Daily Brief?) is not recorded. daily-brief-collapse-and-bell.html explored a bell."
+    },
+    {
+      "id": "a-live",
+      "label": "Live Activities",
+      "sub": "Lock screen and Dynamic Island",
+      "features": [
+        "notify"
+      ],
+      "prod": [
+        "R18/LIVE",
+        "R18/LIVE-CURRENT"
+      ]
+    },
+    {
+      "id": "a-push",
+      "label": "Push notifications",
+      "features": [
+        "notify"
+      ],
+      "prod": [
+        "R18/PUSH-CURRENT"
+      ]
+    },
+    {
+      "id": "a-update",
+      "label": "App update prompt",
+      "features": [
+        "update"
+      ],
+      "prod": [
+        "R19/APP-UPDATE"
+      ]
+    }
+  ],
+  "web": [
+    {
+      "id": "w-chat",
+      "label": "Class chat join page",
+      "sub": "chat.html · verify, register, download",
+      "source": "Web",
+      "path": "01 - Website/room-parent-portal-redesign/chat.html",
+      "url": "https://room-parent-portal.vercel.app/chat.html?c=taylor",
+      "spec": "01 - Website/room-parent-portal-redesign/spec/24-web-group-chat.md",
+      "expl": [
+        "14686:24947"
+      ],
+      "what": "Phone, code, then 'You're registered' with download Sprout as the next step. Any OTP-verified number joins (28 Sep); no name is asked (29 Sep); a number is scoped to the class in the URL.",
+      "handoff": "Sent",
+      "handoff_ev": "GitHub Releases v2026-09-28.1 to .3 on Fauz2808/roomparent-portal (CLAUDE.md decision log, 28 Sep); spec/24 is in the v2026-10-28.2 handoff pack.",
+      "open": "Production URL: roomparent.com/chat/<classId> (README) or joinsprout.co /chat (spec/24, 14 Oct)?"
+    },
+    {
+      "id": "w-referral",
+      "label": "Invited by page",
+      "sub": "joinsprout.co/i/{code}",
+      "source": "Exploration",
+      "expl": [
+        "15135:38179",
+        "15127:154743"
+      ],
+      "what": "Referral landing: invitation, phone with country code, code, registered. Already on Sprout gets the Registered pattern and download."
+    },
+    {
+      "id": "w-portal",
+      "label": "Room Parent Portal",
+      "sub": "roomparent.com dashboard for room parents",
+      "source": "Web",
+      "path": "01 - Website/room-parent-portal-redesign/index.html",
+      "url": "https://room-parent-portal.vercel.app",
+      "spec": "01 - Website/room-parent-portal-redesign/HANDOFF.md",
+      "version_from": "01 - Website/room-parent-portal-redesign/index.html",
+      "what": "Calendar, compose email, sign-ups, donations, to-do, links. Public pages for families: event, consent form, checklist, donate.",
+      "handoff": "Sent",
+      "handoff_ev": "Handoff is a versioned GitHub Release generated by tools/handoff.mjs; repo HEAD is the 'Handoff v2026-10-28.2' commit. Receipt by Mohit not recorded here.",
+      "release_note": "roomparent.com is Mohit's Cloudflare build; changing this source does not change the live site. Shipped status not confirmed here."
+    },
+    {
+      "id": "w-coord",
+      "label": "Coordinator portal",
+      "sub": "coordinator.html · school-wide view",
+      "source": "Web",
+      "path": "01 - Website/room-parent-portal-redesign/coordinator.html",
+      "url": "https://room-parent-portal.vercel.app/coordinator.html",
+      "spec": "01 - Website/room-parent-portal-redesign/spec/31-coordinator-portal.md",
+      "version_from": "01 - Website/room-parent-portal-redesign/coordinator.html",
+      "what": "For the two or so coordinators per school: Overview, Compose Email, Room Parents, Funds, Templates, Email Log. Spec says 'To be built' (2 Oct).",
+      "handoff": "Sent",
+      "handoff_ev": "Folded into the same versioned handoff pack as the portal (spec/31, v2026-10-28.2). Receipt not recorded here."
+    },
+    {
+      "id": "w-public",
+      "label": "Portal public pages",
+      "sub": "Event, consent, checklist, donate",
+      "source": "Web",
+      "path": "01 - Website/room-parent-portal-redesign/event-preview.html",
+      "url": "https://room-parent-portal.vercel.app/event-preview.html?event=1",
+      "what": "Pages a parent opens from a room parent's link. Every web confirmation says registered and points to the download (28 Oct)."
+    },
+    {
+      "id": "w-joinsprout",
+      "label": "joinsprout.co",
+      "sub": "Sprout marketing site",
+      "source": "Web",
+      "path": "01 - Website/sprout-website/index.html",
+      "repo": "01 - Website/sprout-website",
+      "what": "The live home page. Generated from sprout-reach-scene-iteration/home-v2.*, exported into this repo; Mohit deploys it.",
+      "release_note": "Mohit deploys; the deployed version is not recorded here."
+    },
+    {
+      "id": "w-roomparent",
+      "label": "roomparent.com",
+      "sub": "Room parent landing",
+      "source": "Web",
+      "path": "01 - Website/roomparent-com-landing-v2.html",
+      "what": "The v2 landing is canonical (Core Features, video placeholder). Handoff to Mohit goes through the Fauz2808/roomparent-website repo (13 Oct).",
+      "release_note": "roomparent.com is Mohit's build on Cloudflare, not the Vercel deploy."
+    }
+  ],
+  "features": [
+    {
+      "id": "onboarding",
+      "label": "Onboarding and family setup",
+      "area": "Getting in",
+      "icon": "two-people",
+      "prod": [
+        "R01/INTRO-CURRENT",
+        "R02/AUTH",
+        "R03/PERM",
+        "R04/FAMILY",
+        "R05/PREVIEW",
+        "R05/INVITE-SPOUSE",
+        "R06/SPOUSE"
+      ],
+      "expl": [
+        "14020:105494",
+        "14694:191295",
+        "13569:118307"
+      ],
+      "protos": [
+        "08 - Generated Screens/Onboarding/get-started-carousel.html",
+        "08 - Generated Screens/Onboarding/family-setup-flow-redesign.html",
+        "08 - Generated Screens/Add Spouse/add-spouse-v3.html",
+        "13 - Sprout Onboarding/spouse-onboarding.html"
+      ],
+      "surfaces": [
+        {
+          "s": "spouse",
+          "t": "Spouse invite and spouse onboarding",
+          "st": "designed",
+          "ev": "INVITE-SPOUSE, SPOUSE sections"
+        },
+        {
+          "s": "saved",
+          "t": "Kids' profiles, school and grade",
+          "st": "designed",
+          "ev": "FAMILY section"
+        },
+        {
+          "s": "out",
+          "t": "Spouse SMS from Messages",
+          "st": "designed",
+          "ev": "Spouse invite · SMS from your phone (7 Oct)"
+        },
+        {
+          "s": "class",
+          "t": "Joins the kids' school groups",
+          "st": "designed",
+          "ev": "Exploration onboarding: profile + join schools"
+        }
+      ]
+    },
+    {
+      "id": "invites",
+      "label": "Invites, referral and rewards",
+      "area": "Getting in",
+      "icon": "person-plus",
+      "prod": [
+        "R17/PROFILE-CURRENT"
+      ],
+      "expl": [
+        "13644:200138",
+        "15127:154743",
+        "15135:38179",
+        "15148:36942",
+        "15694:52292"
+      ],
+      "protos": [
+        "08 - Generated Screens/Home/invite-friends-concepts.html",
+        "08 - Generated Screens/Home/share-sprout-concepts.html",
+        "08 - Generated Screens/Onboarding/invite-count/index.html"
+      ],
+      "surfaces": [
+        {
+          "s": "out",
+          "t": "Share sheet and the web Invited by page",
+          "st": "designed",
+          "ev": "Referral v2, approved by Tony 5 Nov"
+        },
+        {
+          "s": "saved",
+          "t": "Shipping address for the reward",
+          "st": "designed",
+          "ev": "A3 claim states in PROFILE-CURRENT"
+        },
+        {
+          "s": "push",
+          "t": "Reward shipped / delivered push",
+          "st": "designed",
+          "ev": "Invite parents rows: request sent, shipped, track, delivered"
+        }
+      ]
+    },
+    {
+      "id": "brief",
+      "label": "Daily Brief and to-dos",
+      "area": "Tabs",
+      "icon": "week",
+      "prod": [
+        "R07/BRIEF-CURRENT"
+      ],
+      "expl": [
+        "13990:26015",
+        "15067:36659",
+        "14278:22097",
+        "15188:155885",
+        "15694:141532",
+        "11351:103677",
+        "11688:201416",
+        "15736:60474"
+      ],
+      "protos": [
+        "08 - Generated Screens/Home/daily-brief-reminder-loop.html",
+        "08 - Generated Screens/Home/daily-brief-spouse-todo.html",
+        "08 - Generated Screens/Home/daily-brief-cards-concepts.html"
+      ],
+      "routes": [
+        "/happening-am/",
+        "/happening-pm/",
+        "/pay-todo/"
+      ],
+      "surfaces": [
+        {
+          "s": "todo",
+          "t": "Shows the family To-Do list",
+          "st": "designed",
+          "ev": "BRIEF-09/10 hold all 8C to-dos"
+        },
+        {
+          "s": "spouse",
+          "t": "Seen ticks when the spouse views the brief",
+          "st": "designed",
+          "ev": "8 · To-do seen by spouse, rule changed 12 Nov"
+        },
+        {
+          "s": "cal",
+          "t": "Happening today and Upcoming events",
+          "st": "designed",
+          "ev": "BRIEF-10 full content"
+        },
+        {
+          "s": "push",
+          "t": "Morning Brief push",
+          "st": "designed",
+          "ev": "PUSH-CURRENT includes Morning Brief"
+        }
+      ]
+    },
+    {
+      "id": "gmail",
+      "label": "Gmail and school email",
+      "area": "Tabs",
+      "icon": "remind",
+      "prod": [
+        "R14/EMAIL"
+      ],
+      "expl": [
+        "14270:21838"
+      ],
+      "protos": [
+        "08 - Generated Screens/Onboarding/gmail-connect-directions.html"
+      ],
+      "surfaces": [
+        {
+          "s": "todo",
+          "t": "Email to-dos (review, then add)",
+          "st": "designed",
+          "ev": "Gmail flow 21–22 Oct; Exploration Daily Brief section 3"
+        },
+        {
+          "s": "cal",
+          "t": "Dated events from email",
+          "st": "designed",
+          "ev": "Section 5 email events (21 Oct)"
+        },
+        {
+          "s": "push",
+          "t": "Morning: N new to-dos push",
+          "st": "designed",
+          "ev": "6 · Morning: new to-dos from email, READY FOR DEV 12 Nov"
+        },
+        {
+          "s": "spouse",
+          "t": "Both parents' Gmail pooled into one review",
+          "st": "designed",
+          "ev": "22 Oct standup"
+        },
+        {
+          "s": "out",
+          "t": "Google sign-in; original email opens inside Sprout",
+          "st": "designed",
+          "ev": "21 Oct: no punch-out to the Gmail app"
+        }
+      ],
+      "open": "Prod EMAIL still carries the old teacher-email entry; the 17–22 Oct direction removes it. Not reconciled in Prod yet."
+    },
+    {
+      "id": "events",
+      "label": "Events and discovery",
+      "area": "Tabs",
+      "icon": "event",
+      "prod": [
+        "R07/PLACES",
+        "R08/EVENT-DETAIL"
+      ],
+      "expl": [
+        "13757:196493"
+      ],
+      "protos": [
+        "08 - Generated Screens/Events/events-ai-discovery.html",
+        "08 - Generated Screens/Events/event-invite-flow.html",
+        "08 - Generated Screens/Parks/top-10-final-and-search.html"
+      ],
+      "surfaces": [
+        {
+          "s": "cal",
+          "t": "Event invites and RSVPs on the family calendar",
+          "st": "gap",
+          "ev": "No family calendar screen exists (assist-map gap c-view)"
+        }
+      ],
+      "open": "Event detail options A–D are unpicked, and there is no current Events tab screen in Prod."
+    },
+    {
+      "id": "assist-core",
+      "label": "Assist home, voice and reminders",
+      "area": "Tabs",
+      "icon": "remind",
+      "prod": [
+        "R24/ASSIST-HOME"
+      ],
+      "expl": [
+        "12798:18362",
+        "13496:20641",
+        "14892:33651",
+        "14892:38913",
+        "15603:107"
+      ],
+      "protos": [
+        "08 - Generated Screens/AI Assist/assist-open-transition/index.html",
+        "08 - Generated Screens/AI Assist/reminder-flow-v2.html",
+        "08 - Generated Screens/AI Assist/family-agent-r2-sprout.html"
+      ],
+      "routes": [
+        "/assist/",
+        "/assist-map/"
+      ],
+      "assist_flows": [
+        "f-event",
+        "f-club",
+        "f-remind"
+      ],
+      "open": "K2 coming soon: show it or hide Assist until beta? K4 grow vs K5 slide up is unpicked."
+    },
+    {
+      "id": "assist-sports",
+      "label": "Assist: sports sign-up (SSC Kids)",
+      "area": "Tabs",
+      "icon": "sports",
+      "prod": [
+        "R24/SSC-DEMO",
+        "R24/SSC-REAL"
+      ],
+      "expl": [
+        "15492:51581",
+        "15866:54549",
+        "16099:59979"
+      ],
+      "protos": [
+        "08 - Generated Screens/AI Assist/ssc-kids-signup-demo/prototype/index.html"
+      ],
+      "assist_flows": [
+        "f-sports"
+      ]
+    },
+    {
+      "id": "assist-sitter",
+      "label": "Assist: sitter and date night",
+      "area": "Tabs",
+      "icon": "calendar-check",
+      "expl": [
+        "16151:356321"
+      ],
+      "protos": [
+        "08 - Generated Screens/AI Assist/sitter-agent/html/index.html"
+      ],
+      "routes": [
+        "/sitter-v3/",
+        "/sitter-v3-class/",
+        "/sitter-v3-share/",
+        "/date-night-v3/",
+        "/date-night-live/",
+        "/sitter-date-night/"
+      ],
+      "assist_flows": [
+        "f-sitter",
+        "f-date"
+      ],
+      "open": "Sitter messages: from a Sprout number or the parent's phone (Tony to decide). Date night v3 follows Tony's 17 Nov order and is review only."
+    },
+    {
+      "id": "assist-camps",
+      "label": "Assist: summer camps (parked)",
+      "area": "Tabs",
+      "icon": "camps",
+      "expl": [
+        "15524:43294",
+        "15510:55674"
+      ],
+      "protos": [
+        "08 - Generated Screens/Summer Camps/summer-camps-weeks-prototype.html"
+      ],
+      "assist_flows": [
+        "f-camps"
+      ],
+      "open": "Parked 16 Nov while Tony researches camp registration. Standalone camp browsing is archived."
+    },
+    {
+      "id": "chat",
+      "label": "Chat and subgroups",
+      "area": "Tabs",
+      "icon": "club",
+      "prod": [
+        "R14/CHAT-CURRENT",
+        "R14/CHAT/12758:106387",
+        "R14/CHAT"
+      ],
+      "expl": [
+        "14694:189897"
+      ],
+      "protos": [
+        "08 - Generated Screens/Chat/manage-subgroups.html",
+        "08 - Generated Screens/Chat/chat-list-community-badges.html"
+      ],
+      "surfaces": [
+        {
+          "s": "class",
+          "t": "School, club and subgroup chats",
+          "st": "designed",
+          "ev": "CHAT-CURRENT, selected 16 Nov"
+        },
+        {
+          "s": "push",
+          "t": "Group and subgroup message pushes",
+          "st": "designed",
+          "ev": "PUSH-CURRENT"
+        }
+      ],
+      "open": "Compose's fate is unresolved; search states and admin requests still need a source decision."
+    },
+    {
+      "id": "classhub",
+      "label": "Class hub: calendar, notes, links",
+      "area": "Tabs",
+      "icon": "week",
+      "prod": [
+        "R14/CLASS-CAL",
+        "R14/LINKS"
+      ],
+      "protos": [
+        "08 - Generated Screens/Chat/class-hub-segments.html",
+        "08 - Generated Screens/Admin/add-note-redesign.html",
+        "08 - Generated Screens/Chat/calendar-daily-briefing-revisions-v2.html"
+      ],
+      "surfaces": [
+        {
+          "s": "todo",
+          "t": "A class to-do lands in every class parent's Daily Brief",
+          "st": "designed",
+          "ev": "Add Note: 'Everyone in this class group will see this to-do in their daily brief'"
+        },
+        {
+          "s": "class",
+          "t": "Class notes and pinned links",
+          "st": "designed",
+          "ev": "CLASS-CAL, LINKS"
+        }
+      ]
+    },
+    {
+      "id": "join",
+      "label": "Group invitations and web join",
+      "area": "Tabs",
+      "icon": "two-people",
+      "prod": [
+        "R14/JOIN",
+        "R15/JOIN"
+      ],
+      "expl": [
+        "14686:24947"
+      ],
+      "protos": [
+        "08 - Generated Screens/Clubs/club-invite-landing.html"
+      ],
+      "surfaces": [
+        {
+          "s": "class",
+          "t": "Joins a class, school group or club",
+          "st": "designed",
+          "ev": "JOIN sections"
+        },
+        {
+          "s": "out",
+          "t": "Web join page, registered, then download",
+          "st": "designed",
+          "ev": "Join Chat · 4 · Registered, final copy approved 29 Oct"
+        }
+      ]
+    },
+    {
+      "id": "clubs",
+      "label": "Clubs, directory and club admin",
+      "area": "Tabs",
+      "icon": "club",
+      "prod": [
+        "R15/DIRECTORY",
+        "R17/CLUB-ADMIN"
+      ],
+      "expl": [
+        "14403:199032",
+        "14460:24113"
+      ],
+      "protos": [
+        "08 - Generated Screens/Clubs/kiker-directory-restructured.html",
+        "08 - Generated Screens/Admin/subgroup-manage-delete-leave.html"
+      ],
+      "surfaces": [
+        {
+          "s": "class",
+          "t": "Club shared into class chat",
+          "st": "designed",
+          "ev": "DIRECTORY: profile or share"
+        }
+      ],
+      "open": "Where Club Admin is entered from is not recorded; social-club admin must stay separate from school subgroup info."
+    },
+    {
+      "id": "profile",
+      "label": "Profile and children",
+      "area": "Around the tabs",
+      "icon": "two-people",
+      "prod": [
+        "R17/PROFILE"
+      ],
+      "expl": [
+        "10709:139743"
+      ],
+      "protos": [
+        "08 - Generated Screens/Profile/parent-profile.html"
+      ],
+      "surfaces": [
+        {
+          "s": "saved",
+          "t": "Parent and kids' profiles",
+          "st": "designed",
+          "ev": "PROFILE section"
+        }
+      ]
+    },
+    {
+      "id": "notify",
+      "label": "Push, Live Activities and inbox",
+      "area": "Around the tabs",
+      "icon": "remind",
+      "prod": [
+        "R18/PUSH-CURRENT",
+        "R18/LIVE-CURRENT",
+        "R18/LIVE",
+        "R23/NOTIFICATIONS"
+      ],
+      "expl": [
+        "13556:117832"
+      ],
+      "protos": [
+        "08 - Generated Screens/Notifications/notifications-v3-segmented-vs-flat.html",
+        "08 - Generated Screens/Live Activities/19 - Live Activities - Apple HIG.html"
+      ],
+      "surfaces": [
+        {
+          "s": "push",
+          "t": "Every push, the carpool Live Activity and the inbox",
+          "st": "designed",
+          "ev": "R18, R23"
+        }
+      ]
+    },
+    {
+      "id": "nav",
+      "label": "Docked navigation",
+      "area": "Around the tabs",
+      "icon": "week",
+      "prod": [
+        "R07/NAV-CURRENT"
+      ],
+      "expl": [
+        "15691:52058",
+        "15938:58484"
+      ],
+      "protos": [
+        "08 - Generated Screens/Home/assist-tab-motion/docked-vs-split.html"
+      ]
+    },
+    {
+      "id": "update",
+      "label": "App update prompt",
+      "area": "Around the tabs",
+      "icon": "remind",
+      "prod": [
+        "R19/APP-UPDATE"
+      ]
+    },
+    {
+      "id": "other",
+      "label": "Not app features",
+      "area": "Elsewhere",
+      "icon": "tutoring",
+      "expl": [
+        "10949:143396",
+        "14244:22580",
+        "14837:30935",
+        "14837:31171"
+      ],
+      "what": "Exploration row 7 (Other): business cards and leftovers. Counted so the Exploration totals add up; not part of the app."
+    }
+  ],
+  "handoffs": [
+    {
+      "from": "brief",
+      "to": "assist-sports",
+      "label": "Sign-ups open banner opens Assist",
+      "st": "designed",
+      "ev": "Prod correction 16 Nov: Daily Brief soccer CTA links to the promoted SSC screens"
+    },
+    {
+      "from": "brief",
+      "to": "assist-core",
+      "label": "Add a reminder CTA opens voice already listening",
+      "st": "designed",
+      "ev": "Decision log 23 Sep"
+    },
+    {
+      "from": "brief",
+      "to": "invites",
+      "label": "Invite parents card at the end of the brief",
+      "st": "designed",
+      "ev": "Invite parents · Daily Brief, Settings, rewards"
+    },
+    {
+      "from": "gmail",
+      "to": "brief",
+      "label": "Email to-dos and events feed the brief",
+      "st": "designed",
+      "ev": "Tony 17 Oct"
+    },
+    {
+      "from": "notify",
+      "to": "brief",
+      "label": "Morning push opens the Daily Brief",
+      "st": "designed",
+      "ev": "6 · Morning: new to-dos from email"
+    },
+    {
+      "from": "classhub",
+      "to": "brief",
+      "label": "Class to-dos show in each parent's brief",
+      "st": "designed",
+      "ev": "Add Note assign step"
+    },
+    {
+      "from": "clubs",
+      "to": "chat",
+      "label": "A club share lands in Chat",
+      "st": "designed",
+      "ev": "DIRECTORY share states"
+    },
+    {
+      "from": "join",
+      "to": "chat",
+      "label": "After the download the class chat is waiting",
+      "st": "designed",
+      "ev": "Join Chat · 4 · Registered"
+    },
+    {
+      "from": "invites",
+      "to": "onboarding",
+      "label": "Referral opens onboarding in the inviter's class",
+      "st": "designed",
+      "ev": "Invite loop 9 Oct: deferred deep link"
+    },
+    {
+      "from": "onboarding",
+      "to": "brief",
+      "label": "Onboarding ends on the Daily Brief",
+      "st": "designed",
+      "ev": "Onboarding order 17 Oct"
+    },
+    {
+      "from": "nav",
+      "to": "assist-core",
+      "label": "Clover tab opens Assist",
+      "st": "designed",
+      "ev": "A3 docked navigation, approved by Tony 14 Nov"
+    },
+    {
+      "from": "assist-sitter",
+      "to": "chat",
+      "label": "Ask a class group for a sitter",
+      "st": "gap",
+      "ev": "assist-map k-chatui: the class chat never shows the request"
+    },
+    {
+      "from": "assist-core",
+      "to": "chat",
+      "label": "Party invite and club go to the class",
+      "st": "designed",
+      "ev": "assist-map k-invite, k-club"
+    },
+    {
+      "from": "assist-core",
+      "to": "events",
+      "label": "A created event belongs in Events",
+      "st": "gap",
+      "ev": "Old Assist event creation archived 16 Nov; SparkSys replacement in development"
+    },
+    {
+      "from": "events",
+      "to": "chat",
+      "label": "Event invitations reach the class",
+      "st": "designed",
+      "ev": "PUSH-CURRENT event invitations"
+    }
+  ],
+  "web_edges": [
+    {
+      "from": "w-portal",
+      "to": "w-chat",
+      "label": "Portal shares the class chat link"
+    },
+    {
+      "from": "w-portal",
+      "to": "w-public",
+      "label": "Portal links to its public pages"
+    },
+    {
+      "from": "w-coord",
+      "to": "w-portal",
+      "label": "Templates pushed into every room parent's Quick Actions"
+    },
+    {
+      "from": "w-roomparent",
+      "to": "w-portal",
+      "label": "Log in from roomparent.com (spec/16)"
+    },
+    {
+      "from": "w-joinsprout",
+      "to": "e-store",
+      "label": "Store buttons and QR codes"
+    },
+    {
+      "from": "w-chat",
+      "to": "e-store",
+      "label": "Next step: download Sprout"
+    },
+    {
+      "from": "w-referral",
+      "to": "e-store",
+      "label": "Registered, then download"
+    },
+    {
+      "from": "w-public",
+      "to": "e-store",
+      "label": "Every web confirmation points to the download"
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "todo",
+      "t": "To-Do",
+      "n": "Family to-do list in the Daily Brief",
+      "assist": [
+        "todo"
+      ]
+    },
+    {
+      "id": "push",
+      "t": "Push + Live Activity",
+      "n": "Lock screen, Dynamic Island, inbox",
+      "assist": [
+        "push"
+      ]
+    },
+    {
+      "id": "cal",
+      "t": "Family calendar",
+      "n": "Dated things both parents see",
+      "assist": [
+        "cal"
+      ],
+      "open": "There is no family calendar screen. Events tab, Daily Brief week view or device calendar sync?"
+    },
+    {
+      "id": "spouse",
+      "t": "Spouse",
+      "n": "The other parent (Dana in the cast)",
+      "assist": [
+        "sp"
+      ]
+    },
+    {
+      "id": "class",
+      "t": "Class + chat",
+      "n": "Class groups and other families",
+      "assist": [
+        "cls"
+      ]
+    },
+    {
+      "id": "saved",
+      "t": "Saved details",
+      "n": "Kids' profiles, accounts, cards, sitters",
+      "assist": [
+        "saved"
+      ]
+    },
+    {
+      "id": "out",
+      "t": "Outside Sprout",
+      "n": "Web pages, Messages, Gmail, providers",
+      "assist": [
+        "out"
+      ]
+    }
+  ],
+  "assist_db_feature": "brief",
+  "figma_snapshot": {
+    "read_date": "2026-11-17",
+    "how": "get_metadata(142:8499) for structure and screen counts; About text read live with the figma-script (read-only use_figma).",
+    "exploration": {
+      "rows": [
+        {
+          "id": "15712:52840",
+          "name": "① Sprout Assist · core, voice capture, motion, tab bar",
+          "items": [
+            {
+              "id": "12798:18362",
+              "name": "New Sprout Assist (Revise)",
+              "kind": "section",
+              "x": 400,
+              "screens": 25,
+              "about_id": "15713:52842"
+            },
+            {
+              "id": "13496:20641",
+              "name": "K2 · Sprout Assist coming soon | 06 Oct 2026",
+              "kind": "section",
+              "x": 8193,
+              "screens": 4,
+              "about_id": "15713:52854"
+            },
+            {
+              "id": "14892:33651",
+              "name": "K4 · Sprout Assist · Motion A, grow from the clover | 30 Oct 2026",
+              "kind": "section",
+              "x": 10925,
+              "screens": 87,
+              "about_id": "15713:52866"
+            },
+            {
+              "id": "14892:38913",
+              "name": "K5 · Sprout Assist · Motion A+C, slide up | 30 Oct 2026",
+              "kind": "section",
+              "x": 17761,
+              "screens": 10,
+              "about_id": "15713:52878"
+            },
+            {
+              "id": "15691:52058",
+              "name": "A3 Sprout Assist tab bar: APPROVED docked (Tony 14 Nov) + app icon. Concepts moved to Archive.",
+              "kind": "section",
+              "x": 21661,
+              "screens": 1,
+              "about_id": "15713:52890"
+            }
+          ]
+        },
+        {
+          "id": "15715:52840",
+          "name": "② Sprout Assist · proactive flows (sports, camps)",
+          "items": [
+            {
+              "id": "15603:107",
+              "name": "Assist · Chip rules · every proactive flow (Tony 10 Nov) | 10 Nov 2026",
+              "kind": "section",
+              "x": 400,
+              "screens": 0,
+              "about_id": "15715:52843"
+            },
+            {
+              "id": "15492:51581",
+              "name": "K12 v2 · Sports registration · form first (Tony 9 Nov, rev 10 Nov) | 10 Nov 2026",
+              "kind": "section",
+              "x": 3000,
+              "screens": 21,
+              "about_id": "15715:52855"
+            },
+            {
+              "id": "15524:43294",
+              "name": "K10 v3 · Summer camps · map → details → pick weeks → sign-up → more weeks (rev 10 Nov) | 10 Nov 2026",
+              "kind": "section",
+              "x": 8300,
+              "screens": 36,
+              "about_id": "15715:52867"
+            },
+            {
+              "id": "15510:55674",
+              "name": "A4 · Places with photos (Frida idea) · 5 layouts for Tony | 9 Nov 2026",
+              "kind": "section",
+              "x": 18750,
+              "screens": 14,
+              "about_id": "15715:52879"
+            },
+            {
+              "id": "15736:60474",
+              "name": "K15 · Daily Brief · “Sign-ups open” card (Tony 11 Nov)",
+              "kind": "section",
+              "x": 22115,
+              "screens": 5,
+              "about_id": "15738:52976"
+            },
+            {
+              "id": "15866:54549",
+              "name": "DEMO · SSC Kids league sign-up · clickable (Tony → Mark, 12 Nov)",
+              "kind": "section",
+              "x": 24400,
+              "screens": 45,
+              "about_id": "15904:175422"
+            },
+            {
+              "id": "16099:59979",
+              "name": "REFERENCE · Tony signs Cooper up for SSC Kids in Muse (13 Nov)",
+              "kind": "section",
+              "x": 29084,
+              "screens": 9,
+              "about_id": null
+            },
+            {
+              "id": "16151:356321",
+              "name": "A8 · Sitter / parents’ night out · Direction A + B fallback",
+              "kind": "section",
+              "x": 35081,
+              "screens": 64,
+              "about_id": "16151:365886"
+            }
+          ]
+        },
+        {
+          "id": "15715:52891",
+          "name": "③ Daily Brief & to-dos",
+          "items": [
+            {
+              "id": "11351:103677",
+              "name": "Update for Note and Daily Brief",
+              "kind": "section",
+              "x": 400,
+              "screens": 2,
+              "about_id": "15715:52894"
+            },
+            {
+              "id": "11688:201416",
+              "name": "7.1 - Home - Daily Briefing - Weather",
+              "kind": "frame",
+              "x": 3000,
+              "screens": 1,
+              "about_id": "15715:52906"
+            },
+            {
+              "id": "13990:26015",
+              "name": "Exploration - Daily Brief",
+              "kind": "section",
+              "x": 5600,
+              "screens": 27,
+              "about_id": "15715:52918"
+            },
+            {
+              "id": "14270:21838",
+              "name": "6 · Morning: new to-dos from email (Tony 22 Oct)",
+              "kind": "section",
+              "x": 11430,
+              "screens": 7,
+              "about_id": "15715:52930"
+            },
+            {
+              "id": "14278:22097",
+              "name": "7 · Happening today (B on top + A rows, one card) / To - Do Aren't Linked",
+              "kind": "section",
+              "x": 15581,
+              "screens": 4,
+              "about_id": "15715:52942"
+            },
+            {
+              "id": "15188:155885",
+              "name": "7 · Happening today (B on top + A rows, one card)",
+              "kind": "section",
+              "x": 18253,
+              "screens": 4,
+              "about_id": "15715:52954"
+            },
+            {
+              "id": "15067:36659",
+              "name": "8 · To-do seen by spouse (parent feedback, 2 Nov)",
+              "kind": "section",
+              "x": 20925,
+              "screens": 3,
+              "about_id": "15715:52966"
+            },
+            {
+              "id": "15694:141532",
+              "name": "A8 · Voice quick-add → calendar event (Tony DM 11 Nov) · 2 directions",
+              "kind": "section",
+              "x": 23525,
+              "screens": 15,
+              "about_id": "15715:52978"
+            }
+          ]
+        },
+        {
+          "id": "15716:52840",
+          "name": "④ Invites, referral & rewards",
+          "items": [
+            {
+              "id": "13569:118307",
+              "name": "Spouse Invite - SMS from your phone | 07 Oct 2027",
+              "kind": "section",
+              "x": 400,
+              "screens": 4,
+              "about_id": "15716:52843"
+            },
+            {
+              "id": "13644:200138",
+              "name": "Invite Parents · End of the Daily Brief",
+              "kind": "section",
+              "x": 3072,
+              "screens": 28,
+              "about_id": "15716:52855"
+            },
+            {
+              "id": "15127:154743",
+              "name": "Referral · Invited by",
+              "kind": "section",
+              "x": 12176,
+              "screens": 5,
+              "about_id": "15716:52867"
+            },
+            {
+              "id": "15135:38179",
+              "name": "Referral · Invited by · v2 Assist style | 3 Nov 2026",
+              "kind": "section",
+              "x": 19256,
+              "screens": 8,
+              "about_id": "15716:52879"
+            },
+            {
+              "id": "15148:36942",
+              "name": "Invite reward · v2 Assist style | 3 Nov 2026",
+              "kind": "section",
+              "x": 29336,
+              "screens": 8,
+              "about_id": "15716:52891"
+            },
+            {
+              "id": "15694:52292",
+              "name": "A4 · Onboarding: how many invites do you want? (Tony 11 Nov, Whoop idea) · exploration",
+              "kind": "section",
+              "x": 32621,
+              "screens": 5,
+              "about_id": "15716:52903"
+            }
+          ]
+        },
+        {
+          "id": "15716:52915",
+          "name": "⑤ Onboarding & joining",
+          "items": [
+            {
+              "id": "14020:105494",
+              "name": "Exploration Onboarding",
+              "kind": "section",
+              "x": 400,
+              "screens": 9,
+              "about_id": "15716:52918"
+            },
+            {
+              "id": "14694:191295",
+              "name": "Ai Onboarding Flow",
+              "kind": "section",
+              "x": 4540,
+              "screens": 30,
+              "about_id": "15716:52930"
+            },
+            {
+              "id": "14686:24947",
+              "name": "Join Chat · 4 · Registered, next step = download (28 Oct options)",
+              "kind": "section",
+              "x": 18551,
+              "screens": 1,
+              "about_id": "15716:52954"
+            },
+            {
+              "id": "14403:199032",
+              "name": "Undifined user",
+              "kind": "section",
+              "x": 21282,
+              "screens": 11,
+              "about_id": "15716:52966"
+            },
+            {
+              "id": "14460:24113",
+              "name": "A3·1 Directory · incoming parents (still joining)",
+              "kind": "frame",
+              "x": 23882,
+              "screens": 1,
+              "about_id": "15716:52978"
+            }
+          ]
+        },
+        {
+          "id": "15716:52990",
+          "name": "⑥ Chat, sub groups, events & notifications",
+          "items": [
+            {
+              "id": "10709:139743",
+              "name": "New Sign out from school and Sub groups",
+              "kind": "section",
+              "x": 400,
+              "screens": 11,
+              "about_id": "15716:52993"
+            },
+            {
+              "id": "14694:189897",
+              "name": "Add Sub Group",
+              "kind": "section",
+              "x": 4551,
+              "screens": 5,
+              "about_id": "15716:53005"
+            },
+            {
+              "id": "13757:196493",
+              "name": "Event Detail Page - Rev.1",
+              "kind": "section",
+              "x": 7716,
+              "screens": 4,
+              "about_id": "15716:53017"
+            },
+            {
+              "id": "13556:117832",
+              "name": "Notification",
+              "kind": "section",
+              "x": 10448,
+              "screens": 2,
+              "about_id": "15716:53029"
+            }
+          ]
+        },
+        {
+          "id": "15716:53041",
+          "name": "⑦ Other",
+          "items": [
+            {
+              "id": "10949:143396",
+              "name": "Business Card Iteration",
+              "kind": "section",
+              "x": 400,
+              "screens": 0,
+              "about_id": "15716:53044"
+            },
+            {
+              "id": "14244:22580",
+              "name": "tmp",
+              "kind": "frame",
+              "x": 3125,
+              "screens": 0,
+              "about_id": "15716:53056"
+            },
+            {
+              "id": "14837:30935",
+              "name": "Indicator",
+              "kind": "instance",
+              "x": 5725,
+              "screens": 0,
+              "about_id": "15716:53068"
+            },
+            {
+              "id": "14837:31171",
+              "name": "Indicator",
+              "kind": "instance",
+              "x": 8325,
+              "screens": 0,
+              "about_id": "15716:53080"
+            }
+          ]
+        }
+      ],
+      "loose": [
+        {
+          "id": "15938:58484",
+          "name": "App icon · Ahmad Assist clover (Tony 12 Nov)",
+          "kind": "frame",
+          "screens": 0
+        }
+      ]
+    },
+    "about": {
+      "15713:52842": {
+        "pill": "REFERENCE",
+        "lines": [
+          "New Sprout Assist (Revise)",
+          "Sep 2026 · voice capture per topic"
+        ],
+        "what": "Assist capture flows for Reminders, Carpool, Event and Club: tap to talk, one check under the orb, editable preview, Myself / Spouse / Both.",
+        "status": "Reminders direction approved 23 Sep (no live transcript, one control). Others are reference.",
+        "open": "Nothing open in the latest notes."
+      },
+      "15713:52854": {
+        "pill": "REFERENCE",
+        "lines": [
+          "K2 · Sprout Assist coming soon",
+          "6 Oct 2026"
+        ],
+        "what": "What parents see before Assist launches: a list of what is coming, optional Notify me, and a preview of the family chat.",
+        "status": "Exploration. Not picked.",
+        "open": "Show a coming-soon state at all, or hide Assist until beta?"
+      },
+      "15713:52866": {
+        "pill": "REFERENCE",
+        "lines": [
+          "K4 · Assist motion A · grow from the clover",
+          "30 Oct 2026 · rev 2 Nov"
+        ],
+        "what": "Assist opens by growing out of the tab clover. One row per menu (Reminder, Event, Club, My week); each tap shows its outcome, then closes back into the clover.",
+        "status": "Exploration, motion rows synced to the v2 layout (2 Nov).",
+        "open": "Pick K4 (grow) or K5 (slide up)."
+      },
+      "15713:52878": {
+        "pill": "REFERENCE",
+        "lines": [
+          "K5 · Assist motion A+C · slide up",
+          "30 Oct 2026"
+        ],
+        "what": "Same screens as K4, but Assist slides up as a sheet instead of growing from the clover.",
+        "status": "Exploration, alternative to K4.",
+        "open": "Pick K4 or K5."
+      },
+      "15713:52890": {
+        "pill": "DESIGN APPROVED · 14 Nov",
+        "lines": [
+          "A3 · Sprout Assist in the tab bar",
+          "14 Nov decision · Labels reconciled 15 Nov 2026"
+        ],
+        "what": "Docked navigation with Ahmad’s knitted clover is selected. Component 16121:176380 has five active states. Earlier floating and split concepts are reference.",
+        "status": "Design: approved by Tony, 14 Nov. Applied to Figma. Handoff: drafted for Syed; receipt unconfirmed. Shipped build: unverified.",
+        "open": "Confirm handoff receipt and restore the prototype links lost when old bars were replaced. Evidence: MEETING-2026-11-14, A3."
+      },
+      "15715:52843": {
+        "pill": "REVISED · 10 Nov",
+        "lines": [
+          "Assist · Chip rules",
+          "10 Nov 2026 · read this first"
+        ],
+        "what": "One rule per chip type for every proactive flow: Yes moves one step and never pays, Details opens a sheet, Other options shows the next picks, Not now asks once then goes quiet, and so on.",
+        "status": "Answer to Tony’s “what does this button do?” comments (10 Nov).",
+        "open": "None."
+      },
+      "15715:52855": {
+        "pill": "REVISED · 12 Nov",
+        "lines": [
+          "K12 v2 · Sports registration (SSC Kids)",
+          "12 Nov 2026 · sports card revision"
+        ],
+        "what": "Current P·1b combines league details in the chat card. Register / Remind me later / Not this season act on the active card. M·1 and M·2 cover reminders. See the separate demo for corrected SSC Kids data.",
+        "status": "12 Nov feedback implemented. Tony review pending; not ready for development.",
+        "open": "LeagueLab API access and provider form validation remain open. Earlier tier prices and division labels are superseded by the demo."
+      },
+      "15715:52867": {
+        "pill": "REVISED · 10 Nov",
+        "lines": [
+          "K10 v3 · Summer camps",
+          "9 Nov 2026 · rev 10 Nov"
+        ],
+        "what": "The live camps flow: map with photo pins inside Assist → short details sheet → pick weeks (multi) → form → approve → “2 of 10 weeks covered” with hot keys for more weeks.",
+        "status": "10 Nov revisions remain current. Tony will review and comment after sports; no new approval recorded on 12 Nov.",
+        "open": "Where camp data comes from: vetted in admin vs the agent searching the web (Tony wants both tried)."
+      },
+      "15715:52879": {
+        "pill": "REFERENCE",
+        "lines": [
+          "A4 · Places with photos (Frida idea)",
+          "9 Nov 2026"
+        ],
+        "what": "The same camps screen in 5 layouts (carousel, mosaic, photo list, hero + list, map with photo pins) plus Other options and Not now branches.",
+        "status": "Ahmad picked E (map with photo pins) → built into K10 v3.",
+        "open": "None."
+      },
+      "15715:52894": {
+        "pill": "REFERENCE",
+        "lines": [
+          "Update for Note and Daily Brief",
+          "Earlier work"
+        ],
+        "what": "A calendar screen and the Daily Brief “after” state.",
+        "status": "Older reference. Nothing open in the latest notes.",
+        "open": "None."
+      },
+      "15715:52906": {
+        "pill": "REFERENCE",
+        "lines": [
+          "7.1 Home · Daily Briefing · Weather",
+          "Loose prod frame"
+        ],
+        "what": "A single prod Daily Brief frame that sat loose on the page.",
+        "status": "Reference.",
+        "open": "None."
+      },
+      "15715:52918": {
+        "pill": "REFERENCE",
+        "lines": [
+          "Exploration · Daily Brief",
+          "Oct 2026 · Ahmad’s working copy"
+        ],
+        "what": "Ahmad’s editable copy of the Daily Brief (sections 1 and 2), plus 3 · School emails to to-dos (Gmail) and 5 · Email to to-do + event.",
+        "status": "Working copy. The dev-ready version is on the Dev Ready page (13266:240565).",
+        "open": "None."
+      },
+      "15715:52930": {
+        "pill": "READY FOR DEV · 12 Nov",
+        "lines": [
+          "6 · Morning: new to-dos from email",
+          "12 Nov 2026 · Tony requested implementation"
+        ],
+        "what": "Morning push: Good morning! You have 4 updates. List to-dos and events, omit zero counts and use singular for one. Tap opens the Daily Brief.",
+        "status": "Existing flow is built. Updated morning push is ready for Mohit; Tony requested its link on 12 Nov.",
+        "open": "Message drafted; sending unconfirmed. Mohit also investigates today’s missing morning push."
+      },
+      "15715:52942": {
+        "pill": "REFERENCE",
+        "lines": [
+          "7 · Happening today · To-dos aren’t linked",
+          "Oct 2026"
+        ],
+        "what": "Happening today as one card (B on top, A rows): quiet day, busy day, event selected.",
+        "status": "Exploration.",
+        "open": "Two copies of this section exist; this one is marked “To-dos aren’t linked”."
+      },
+      "15715:52954": {
+        "pill": "REFERENCE",
+        "lines": [
+          "7 · Happening today (copy)",
+          "Oct 2026"
+        ],
+        "what": "Same frames as the section to the left.",
+        "status": "Duplicate. Safe to delete once Ahmad confirms which one is current.",
+        "open": "Which copy to keep?"
+      },
+      "15715:52966": {
+        "pill": "READY FOR DEV · 12 Nov",
+        "lines": [
+          "8 · To-do seen by spouse (read ticks)",
+          "12 Nov 2026 · Tony + Mohit rule change"
+        ],
+        "what": "Three ways to show the spouse saw a to-do: 8A seen line, 8B badge on the face, 8C ticks at the end of the row.",
+        "status": "8C remains approved. Today’s seen rule replaces opening the sheet: shown to-dos are seen when the spouse views the Daily Brief.",
+        "open": "Use the actual seen timestamp; fix the stale Nov 7 date. One gray tick = creator only. Done rows have no ticks. Send the updated rule to Mohit + Syed."
+      },
+      "15715:52978": {
+        "pill": "WAITING · 12 Nov",
+        "lines": [
+          "A8 · Voice quick-add → calendar event",
+          "12 Nov 2026 · Tony meeting follow-up"
+        ],
+        "what": "Row 1: E·0 voice sheet, A = review sheet in Event mode (picked), B = calendar card (reference). Row 2 (direction A, after confirming): E·1 added + toast + Upcoming events, E·2 tap to edit / skip / stop, E·3 just one or from then on, E·4 Dana’s push, E·5 Dana’s Upcoming events.",
+        "status": "Copy and repeat end date updated. Tony asked to keep this for later while he and his wife test beta. Not a current engineering handoff.",
+        "open": "Wait for beta feedback. Google Calendar permission still needs confirmation with Mohit."
+      },
+      "15716:52843": {
+        "pill": "REFERENCE",
+        "lines": [
+          "Spouse invite · SMS from your phone",
+          "7 Oct 2026"
+        ],
+        "what": "Add your spouse: number entered → Messages opens with the text → invite sent, plus the not-sent case.",
+        "status": "Built.",
+        "open": "None."
+      },
+      "15716:52855": {
+        "pill": "READY FOR DEV · 12 Nov",
+        "lines": [
+          "Invite parents · Daily Brief, Settings, rewards",
+          "9 Oct → 11 Nov 2026"
+        ],
+        "what": "Invite card at the end of the Daily Brief, day-7 sheet, Settings invite card. Bottom rows: claim → address → request sent → shipped → track → delivered, then “find it later” (Daily Brief dot → Settings → Reward history).",
+        "status": "Existing READY FOR DEV status retained. Reward history and read-only progress are the current handoff; Mohit is expected to implement.",
+        "open": "Confirm handoff receipt. Admin controls Requested / Shipped / Delivered and tracking; parents cannot change status."
+      },
+      "15716:52867": {
+        "pill": "REFERENCE",
+        "lines": [
+          "Referral · Invited by (v1)",
+          "23 Oct 2026"
+        ],
+        "what": "The web page a friend lands on from joinsprout.co/i/{code}: invitation → phone → code → registered, already on Sprout, link not recognized. Mobile + desktop.",
+        "status": "Superseded by v2 (next section).",
+        "open": "None."
+      },
+      "15716:52879": {
+        "pill": "IN DEV / SHIPPED · 5 Nov",
+        "lines": [
+          "Referral · Invited by · v2 (Assist style)",
+          "3 Nov 2026 · rev 5 Nov"
+        ],
+        "what": "v2 of the referral page with keyboard steps, country code picker and the Registered pattern for already-on-Sprout.",
+        "status": "APPROVED by Tony 5 Nov.",
+        "open": "None."
+      },
+      "15716:52891": {
+        "pill": "REFERENCE",
+        "lines": [
+          "Invite reward · v2 (Assist style)",
+          "3 Nov 2026"
+        ],
+        "what": "A: hat and tote at 5 parents (menu card, Invite parents page, unlocked, address, sent). B: mystery box option.",
+        "status": "A is the current plan. Parts of it are reused by A4 v2.",
+        "open": "Hat and tote photo is only 256 px; full-size photo needed from Tony."
+      },
+      "15716:52903": {
+        "pill": "WAITING · 12 Nov",
+        "lines": [
+          "A4 · Onboarding: how many invites do you want?",
+          "11 Nov 2026 · Tony (Whoop idea)"
+        ],
+        "what": "Parent picks 1 / 3 / 5 invites in onboarding, sees them ready, finds them later in Settings. Row 2 = v2: header rebuilt from the Invite parents reward card + link row.",
+        "status": "Tony saw the concept on 12 Nov. Held as a visual to think through; no implementation approval recorded.",
+        "open": "Wait for Tony’s decision on placement, invite counts and follow-up behavior."
+      },
+      "15716:52918": {
+        "pill": "REFERENCE",
+        "lines": [
+          "Exploration · Onboarding",
+          "22 Oct 2026 · Tony’s 21 Oct order"
+        ],
+        "what": "Splash screen, 6 slides (school community → set family reminders), then verify phone → connect Gmail → profile while Gmail syncs.",
+        "status": "Splash order from Tony 21 Oct. Gmail step from 17 Oct.",
+        "open": "None."
+      },
+      "15716:52930": {
+        "pill": "REFERENCE",
+        "lines": [
+          "AI Onboarding Flow",
+          "Oct 2026"
+        ],
+        "what": "Account setup: details information, add kids, select kids’ groups and the states around them.",
+        "status": "Reference.",
+        "open": "None in the latest notes."
+      },
+      "15716:52954": {
+        "pill": "IN DEV / SHIPPED · 29 Oct",
+        "lines": [
+          "Join Chat · 4 · Registered",
+          "28–29 Oct 2026"
+        ],
+        "what": "After the code: “You’re registered”, download Sprout is the next step, store buttons above the fold.",
+        "status": "Final copy approved 29 Oct.",
+        "open": "None."
+      },
+      "15716:52966": {
+        "pill": "REFERENCE",
+        "lines": [
+          "Undefined user · parents still joining",
+          "Oct 2026"
+        ],
+        "what": "How parents who haven’t finished joining show in Clubs and the directory, plus grade labels in the directory list.",
+        "status": "Exploration.",
+        "open": "None in the latest notes."
+      },
+      "15716:52978": {
+        "pill": "REFERENCE",
+        "lines": [
+          "A3·1 Directory · incoming parents",
+          "Loose frame"
+        ],
+        "what": "A single frame that sat loose on the page, from the section to the left.",
+        "status": "Reference.",
+        "open": "Move into the section on the left if still needed."
+      },
+      "15716:52993": {
+        "pill": "REFERENCE",
+        "lines": [
+          "New sign out from school and sub groups",
+          "Earlier work"
+        ],
+        "what": "Profile screens for signing out of a school and leaving sub groups.",
+        "status": "Older reference.",
+        "open": "None."
+      },
+      "15716:53005": {
+        "pill": "REFERENCE",
+        "lines": [
+          "Add Sub Group",
+          "28–30 Oct 2026"
+        ],
+        "what": "Chat plus button → pick the group first (no preselect) → Manage sub groups with member avatars and counts → member tags like “Max’s dad”.",
+        "status": "Built from Tony’s 28–30 Oct feedback.",
+        "open": "None."
+      },
+      "15716:53017": {
+        "pill": "REFERENCE",
+        "lines": [
+          "Event Detail Page · Rev 1",
+          "Oct 2026"
+        ],
+        "what": "Four options (A–D) for the event detail page.",
+        "status": "Exploration.",
+        "open": "Which option? Not in the latest notes."
+      },
+      "15716:53029": {
+        "pill": "REFERENCE",
+        "lines": [
+          "Notifications · push copy",
+          "7 Oct 2026"
+        ],
+        "what": "Push copy for spouse SMS invite, event invitation, Morning Brief, sub group invite, class email, spouse reminder, group and sub group messages.",
+        "status": "Built.",
+        "open": "None."
+      },
+      "15716:53044": {
+        "pill": "REFERENCE",
+        "lines": [
+          "Business card iteration",
+          "Earlier work"
+        ],
+        "what": "Sprout business card options: cream editorial, bold solid with QR.",
+        "status": "Reference.",
+        "open": "None."
+      },
+      "15716:53056": {
+        "pill": "REFERENCE",
+        "lines": [
+          "tmp (empty frame)",
+          "Leftover"
+        ],
+        "what": "An empty 100 × 100 frame.",
+        "status": "Unused.",
+        "open": "Delete if nobody needs it."
+      },
+      "15716:53068": {
+        "pill": "REFERENCE",
+        "lines": [
+          "Status bar (loose)",
+          "Leftover"
+        ],
+        "what": "A loose status bar instance.",
+        "status": "Unused.",
+        "open": "Delete if nobody needs it."
+      },
+      "15716:53080": {
+        "pill": "REFERENCE",
+        "lines": [
+          "Status bar (loose)",
+          "Leftover"
+        ],
+        "what": "A second loose status bar instance.",
+        "status": "Unused.",
+        "open": "Delete if nobody needs it."
+      },
+      "15738:52976": {
+        "pill": "REVISED · 12 Nov",
+        "lines": [
+          "K15 · Daily Brief · “Sign-ups open” card",
+          "12 Nov 2026 · Tony meeting + Ahmad banner review"
+        ],
+        "what": "Marketing banner above To-Do List, compact greeting and weather. Soccer uses light brand green, class proof, a white clover pill and a full kid cut-out. Tap opens Assist.",
+        "status": "Soccer banner approved by Ahmad and sent to Tony in HTML + Figma. Tony sign-off for development is not yet recorded.",
+        "open": "MT·2b below shows the revised camps banner at 375 pt. Masters moved to Components. Tony reviews the new banners before engineering handoff."
+      },
+      "15904:175422": {
+        "pill": "REVIEW PACKAGE · 14 Nov",
+        "lines": [
+          "SSC Kids · demo and implementation cases",
+          "14 Nov REAL-flow addition · Labels reconciled 15 Nov 2026"
+        ],
+        "what": "SSC Kids demo plus 22 REAL-flow screens for review, account, address, payment and failures. D-series = demo; R-series = implementation cases. HTML demo is a separate source.",
+        "status": "Design: banner approved by Ahmad; full package still has open questions. Handoff: drafted for Mohit/Syed. Shipped integration: unverified.",
+        "open": "Confirm volunteer buyout and coach meaning, provider/API validation and handoff receipt. Evidence: MEETING-2026-11-14, A1/H1. Demo delivery does not confirm a live registration service."
+      },
+      "16151:365886": {
+        "pill": "NEW · 14 Nov",
+        "lines": [
+          "Sitter · your people first",
+          "14 Nov 2026 · Ahmad chose A, with B as fallback"
+        ],
+        "what": "Ask saved sitters separately, all at once. Collect replies, choose one, request confirmation. Class-family introductions are the fallback.",
+        "status": "Direction approved. Clickable concept for review, not live messaging. Names, rates and replies are fictional examples.",
+        "open": "Tony: Sprout number or parent’s phone? Confirm reply ingestion and cancellation policy. Separate flow starts cover delivery failure, fallback and lock-screen push."
+      },
+      "16174:363664": {
+        "pill": "CURRENT · KEPT 16 NOV",
+        "lines": [
+          "Phone verification",
+          "AUTH · 5 frames · Kept as current by Ahmad · 16 Nov 2026",
+          "Source → Phone verification"
+        ],
+        "what": "Phone number → code → verified. Includes wrong-code state.",
+        "status": "Kept as current by Ahmad in the 16 Nov walkthrough. Tony design approval, handoff and shipped build: unverified.",
+        "open": "Phone verification is reused in the newer onboarding sequence. Preserve input and wrong-code states; insert Gmail after verification."
+      },
+      "16174:363683": {
+        "pill": "COPY FIX · 15 Nov",
+        "lines": [
+          "Permissions",
+          "PERM · 2 frames · Baseline reviewed 15 Nov 2026"
+        ],
+        "what": "Explain permissions → request access → granted state.",
+        "status": "Whole-flow design approval: unverified. Handoff and shipped build: unverified.",
+        "open": "Two things heading versus three permissions. Review actual permission behavior and decline/retry states before updating."
+      },
+      "16174:363700": {
+        "pill": "CURRENT · KEPT 16 NOV",
+        "lines": [
+          "Family setup",
+          "FAMILY · 25 frames · Kept as current by Ahmad · 16 Nov 2026",
+          "Source → Family setup"
+        ],
+        "what": "Parent profile → interests → children → school and grade.",
+        "status": "Kept as current by Ahmad in the 16 Nov walkthrough. Tony design approval, handoff and shipped build: unverified.",
+        "open": "Compare newer account/kid/school states, including school not found and request-school. Newer section is reference, not blanket approval."
+      },
+      "16174:363719": {
+        "pill": "CURRENT · KEPT 16 NOV",
+        "lines": [
+          "Profile preview",
+          "PREVIEW · 1 frame · Kept as current by Ahmad · 16 Nov 2026"
+        ],
+        "what": "Review profile and children → continue.",
+        "status": "Kept as current by Ahmad in the 16 Nov walkthrough. Tony design approval, handoff and shipped build: unverified.",
+        "open": "Keep profile preview unless a newer approved replacement is identified; spouse SMS change is not a reason to redesign this screen."
+      },
+      "16174:363734": {
+        "pill": "CURRENT · KEPT 16 NOV",
+        "lines": [
+          "Profile preview and spouse invitation",
+          "INVITE-SPOUSE · 2 frames · Kept as current by Ahmad · 16 Nov 2026",
+          "Source → Profile preview and spouse invitation"
+        ],
+        "what": "Enter spouse number → invite → sent. Compare the newer Messages flow.",
+        "status": "Kept as current by Ahmad in the 16 Nov walkthrough. Tony design approval, handoff and shipped build: unverified.",
+        "open": "Spouse invite now opens Messages from the parent phone; preserve profile preview and map sent/not-sent states separately."
+      },
+      "16174:363753": {
+        "pill": "CURRENT · KEPT 16 NOV",
+        "lines": [
+          "Spouse onboarding",
+          "SPOUSE · 12 frames · Kept as current by Ahmad · 16 Nov 2026",
+          "Source → Spouse onboarding"
+        ],
+        "what": "Accept family invitation → personal profile → photo and interests.",
+        "status": "Kept as current by Ahmad in the 16 Nov walkthrough. Tony design approval, handoff and shipped build: unverified.",
+        "open": "Preserve spouse profile and inherited family data. Reconcile with connected/disconnected family states; no newer full replacement approval found."
+      },
+      "16174:363788": {
+        "pill": "BASELINE · 15 Nov",
+        "lines": [
+          "Discovery lists and place detail",
+          "PLACES · 12 frames · Baseline reviewed 15 Nov 2026"
+        ],
+        "what": "Category → ranked places → search → results or no results.",
+        "status": "Whole-flow design approval: unverified. Handoff and shipped build: unverified.",
+        "open": "Preserve category/search/results/no-results states. Local final filename is a comparison candidate, not approval. Correct mismatched sample geography where rendered."
+      },
+      "16174:363852": {
+        "pill": "RETAINED · WALKTHROUGH 16 NOV",
+        "lines": [
+          "Reusable event details",
+          "4 existing frames · Ahmad walkthrough"
+        ],
+        "what": "Event/place detail screens kept as reusable references.",
+        "status": "Retained by Ahmad. My Events listing and manual event creation have been archived.",
+        "open": "This retention does not restore a standalone Events tab or My Events destination."
+      },
+      "16174:363962": {
+        "pill": "REVIEW SOURCE · SEARCH",
+        "lines": [
+          "Chat · search states",
+          "CHAT-05–06 · 16 Nov 2026",
+          "Open → Current Chat grid"
+        ],
+        "what": "Existing empty-query and search-result screens. Retained as distinct interaction states alongside the selected grid.",
+        "status": "The default grid and matching round unread-badge state are current. Search behavior and final source are not resolved by the layout decision alone.",
+        "open": "Compare these two search states against the intended current interaction before replacing them."
+      },
+      "16174:363978": {
+        "pill": "CURRENT · KEPT 16 NOV",
+        "lines": [
+          "Chat and club conversations",
+          "CHAT · 21 frames · Kept as current by Ahmad · 16 Nov 2026",
+          "Source → Chat and club conversations"
+        ],
+        "what": "Chat list → school/group → subgroup info → create, manage or add parents.",
+        "status": "Kept as current by Ahmad in the 16 Nov walkthrough. Tony design approval, handoff and shipped build: unverified. Admin requests, member actions and create/edit forms still need a source decision.",
+        "open": "Use Oct 28–30 group-first entry, avatars/counts and own member tag. Do not restore removed first-open tag sheet or assume compose was retired."
+      },
+      "16174:363994": {
+        "pill": "COMPARE SOURCE · 15 Nov",
+        "lines": [
+          "Group invitations",
+          "JOIN · 6 frames · Baseline reviewed 15 Nov 2026",
+          "Compare source → Group invitations"
+        ],
+        "what": "Open group invitation → request or join → confirmation. Keep native and web separate.",
+        "status": "Whole-flow design approval: unverified. Handoff and shipped build: unverified.",
+        "open": "Distinguish in-app group invitation from web join/referral. Web uses Registered + download; do not force that copy onto an already-in-app success. Fix Your in where rendered."
+      },
+      "16174:364010": {
+        "pill": "COMPARE SOURCE · 15 Nov",
+        "lines": [
+          "Class calendar and notes",
+          "CLASS-CAL · 19 frames · Baseline reviewed 15 Nov 2026",
+          "Compare source → Class calendar and notes"
+        ],
+        "what": "Class calendar → date → add/edit note → assign → save.",
+        "status": "Whole-flow design approval: unverified. Handoff and shipped build: unverified.",
+        "open": "Compare Dev Ready Note and Calendar and class-note changes. Keep class notes separate from family reminders and parked voice calendar work."
+      },
+      "16174:364026": {
+        "pill": "COMPARE SOURCE · 15 Nov",
+        "lines": [
+          "School email updates",
+          "EMAIL · 14 frames · Baseline reviewed 15 Nov 2026",
+          "Compare source → School email updates"
+        ],
+        "what": "Connect inbox → updates list → newsletter. Old teacher-email entry needs comparison.",
+        "status": "Whole-flow design approval: unverified. Handoff and shipped build: unverified.",
+        "open": "Oct 17–22 direction removes teacher-email input, pools review, and opens original email in Sprout. Preserve relevant class Updates states; shared Gmail behavior does not automatically replace the whole class hub."
+      },
+      "16174:364042": {
+        "pill": "BASELINE · 15 Nov",
+        "lines": [
+          "Class pinned links",
+          "LINKS · 8 frames · Baseline reviewed 15 Nov 2026"
+        ],
+        "what": "Pinned links → add/edit link → save or remove; respect admin permissions.",
+        "status": "Whole-flow design approval: unverified. Handoff and shipped build: unverified.",
+        "open": "Preserve empty/list/add/edit/delete states and admin boundaries. No newer approved whole-screen replacement established."
+      },
+      "16174:364060": {
+        "pill": "CURRENT · KEPT 16 NOV",
+        "lines": [
+          "Directory and club sharing",
+          "DIRECTORY · 11 frames · Kept as current by Ahmad · 16 Nov 2026",
+          "Source → Directory and club sharing"
+        ],
+        "what": "Community → grade/class filter → directory → profile or share.",
+        "status": "Kept as current by Ahmad in the 16 Nov walkthrough. Tony design approval, handoff and shipped build: unverified.",
+        "open": "Preserve directory/search/share states. Reconcile incoming parents and community labels; exploration alone does not approve every new directory state."
+      },
+      "16174:364076": {
+        "pill": "COMPARE SOURCE · 15 Nov",
+        "lines": [
+          "Group invitations",
+          "JOIN · 2 frames · Baseline reviewed 15 Nov 2026",
+          "Compare source → Group invitations"
+        ],
+        "what": "Open group invitation → request or join → confirmation. Keep native and web separate.",
+        "status": "Whole-flow design approval: unverified. Handoff and shipped build: unverified.",
+        "open": "Distinguish in-app group invitation from web join/referral. Web uses Registered + download; do not force that copy onto an already-in-app success. Fix Your in where rendered."
+      },
+      "16174:364114": {
+        "pill": "CURRENT · KEPT 16 NOV",
+        "lines": [
+          "Profile editing and children",
+          "12 existing frames · Settings replaced separately",
+          "Current → Settings"
+        ],
+        "what": "Profile details, parent editing, child profiles and removal states.",
+        "status": "Retained. The old Settings entry is archived and the new invitation and reward flow sits first in this row.",
+        "open": "Retained profile states have not been redesigned in this walkthrough."
+      },
+      "16174:364130": {
+        "pill": "CURRENT · KEPT 16 NOV",
+        "lines": [
+          "Social club administration",
+          "CLUB-ADMIN · 18 frames · Kept as current by Ahmad · 16 Nov 2026",
+          "Source → Social club administration"
+        ],
+        "what": "Club list → details → members/settings → edit, remove or leave.",
+        "status": "Kept as current by Ahmad in the 16 Nov walkthrough. Tony design approval, handoff and shipped build: unverified.",
+        "open": "Separate social-club admin from school subgroup info. Old member screens are explicitly not subgroup handoff sources; repair venture-capital sample content."
+      },
+      "16174:364149": {
+        "pill": "CURRENT · KEPT 16 NOV",
+        "lines": [
+          "Live Activity · phone states",
+          "LIVE · 4 frames · Kept as current by Ahmad · 16 Nov 2026",
+          "Source → Live Activity · phone states"
+        ],
+        "what": "Dynamic Island and notification treatments. These are UI fragments.",
+        "status": "Kept as current by Ahmad in the 16 Nov walkthrough. Tony design approval, handoff and shipped build: unverified. Current carpool activity and push treatments are in adjacent sections.",
+        "open": "These compact baseline fragments are retained references. They do not imply new compact/expanded variants beyond the selected carpool source."
+      },
+      "16174:364198": {
+        "pill": "CURRENT · KEPT 16 NOV",
+        "lines": [
+          "App update prompt",
+          "APP-UPDATE · 1 frame · Kept as current by Ahmad · 16 Nov 2026"
+        ],
+        "what": "Update available → update, skip version or skip for now.",
+        "status": "Kept as current by Ahmad in the 16 Nov walkthrough. Tony design approval, handoff and shipped build: unverified.",
+        "open": "Canvas says Need Update. Verify actual supported update behavior and release copy with engineering; no approved successor found."
+      },
+      "16174:364317": {
+        "pill": "CURRENT · KEPT 16 NOV",
+        "lines": [
+          "Notification inbox",
+          "NOTIFICATIONS · 4 frames · Kept as current by Ahmad · 16 Nov 2026",
+          "Source → Notification inbox"
+        ],
+        "what": "Notification inbox → filters → item, loading/empty states.",
+        "status": "Kept as current by Ahmad in the 16 Nov walkthrough. Tony design approval, handoff and shipped build: unverified.",
+        "open": "Preserve inbox populated/empty states. Reconcile approved push copy and morning push 14270:21863 separately; list variant selection is unverified."
+      },
+      "16182:366245": {
+        "pill": "CURRENT · COMBINED 16 NOV",
+        "lines": [
+          "Daily Brief · current",
+          "BRIEF-09–10 · Source choice confirmed by Ahmad · 16 Nov 2026",
+          "Source → D·01 header and banner",
+          "Source → 8C content and read ticks"
+        ],
+        "what": "D·01 compact greeting and SSC banner, with all 8C to-dos, spouse/read ticks, Happening Today and lower content. Original component links are retained.",
+        "status": "Ahmad confirmed this source combination. Visual integration checked. Implementation and release remain unverified.",
+        "open": "BRIEF-09 is the scrollable phone view; BRIEF-10 exposes the full content. Detail and registration prototype routes need mapping to current Prod flows."
+      },
+      "16190:366445": {
+        "pill": "CURRENT · SOURCES SELECTED",
+        "lines": [
+          "Chat · grid, subgroups and members",
+          "CHAT-01, 04, 28–31 · Ahmad confirmed 16 Nov 2026",
+          "Source → Chat grid",
+          "Current → Matching round badge state",
+          "Source → Picker and Manage",
+          "Source → Standalone Members",
+          "Source → Existing Edit tag sheet"
+        ],
+        "what": "Default grid + unread example → pick a school or club → Manage with member avatars/counts → standalone Members → edit your own per-group tag.",
+        "status": "Grid and Members selected by Ahmad. CHAT-04 already contains the 28px round light-green badges matching the confirmed 30 Oct direction. No white border; same token on photo and letter icons. Manage count matches the eight-member example.",
+        "open": "Use these six frames for the current visual flow. Search and admin controls remain separate. Existing badge text/effect styles are retained; prototype routing and shipped implementation are unverified."
+      },
+      "16196:374797": {
+        "pill": "CURRENT · EXPLORATION SOURCE",
+        "lines": [
+          "Onboarding · current introduction",
+          "INTRO-07–12 · Selected in walkthrough · 16 Nov 2026",
+          "Source → Exploration onboarding"
+        ],
+        "what": "School community → class details → parents → Daily Brief → school emails → family reminders. Six-slide Exploration sequence.",
+        "status": "Ahmad requested this updated onboarding sequence. Phone verification, app permissions and family setup stay as retained existing flows.",
+        "open": "Read left to right. Internal slide navigation is remapped to these Prod copies. Existing phone verification is kept as a separate section."
+      },
+      "16196:376067": {
+        "pill": "CURRENT · WALKTHROUGH 16 NOV",
+        "lines": [
+          "Settings, invitations and rewards",
+          "A1 settings + A3 claim states · 10 screens",
+          "Source → A1 Settings",
+          "Source → Claim states"
+        ],
+        "what": "Invite parents from Settings, view reward history, claim a reward, and track delivery. Latest A1 history row is also present in the claim-ready state.",
+        "status": "Selected Exploration sources promoted. Fixed offscreen home indicators and remapped reward routes into Prod. Existing profile-edit and Club Admin flows stay beside this section.",
+        "open": "Rewards are source demo states. SparkSys and address creation are separate deferred work. Review the claim-ready composition and shipping copy before implementation."
+      },
+      "16197:376155": {
+        "pill": "SELECTED SOURCE · WALKTHROUGH 16 NOV",
+        "lines": [
+          "Carpool Live Activity",
+          "1 source frames · selected by Ahmad",
+          "Source → Selected package"
+        ],
+        "what": "Dev Ready carpool activity card, promoted from the exact source selected in this walkthrough.",
+        "status": "Replaces the old variant set. Basic Live Activity baseline fragments remain alongside.",
+        "open": "This source supplies one carpool card, not new compact/expanded states for every activity."
+      },
+      "16197:376320": {
+        "pill": "SELECTED SOURCE · WALKTHROUGH 16 NOV",
+        "lines": [
+          "Push notification treatments",
+          "9 source frames · selected by Ahmad",
+          "Source → Selected package"
+        ],
+        "what": "Group and direct pushes, spouse invitations, event invitations, Morning Brief, subgroup invitations, class email, and spouse-reminder rules.",
+        "status": "Entire selected notification package is preserved, including annotations and A/B/C examples. These examples are not presented as a single winning variant.",
+        "open": "Source options remain visible for implementation review. Notifications for retained event details do not restore My Events or manual creation."
+      },
+      "16197:376950": {
+        "pill": "CURRENT · ORIGINAL FIVE OPTIONS",
+        "lines": [
+          "Current navigation · Original component",
+          "16 Nov 2026 · Events restored by Ahmad",
+          "Original master → Navigation Bar (Docked)"
+        ],
+        "what": "Daily Brief, Events, Sprout Assist, Chat and Clubs. Every example below is an instance of the original Navigation Bar (Docked) component.",
+        "status": "The previous four-option masters were incorrect. Prod screens are reconnected to the existing five-state component at 16121:176380.",
+        "open": "Use the existing component and its active variants. No replacement component or new navigation design is introduced."
+      },
+      "16210:379153": {
+        "pill": "CURRENT SOURCE · EXISTING DESIGN",
+        "lines": [
+          "Sprout Assist · Task entry",
+          "16 Nov 2026 · Promoted to Prod at Ahmad’s request",
+          "Exploration source → Assist home"
+        ],
+        "what": "Existing approved task-selection screen from 14892:33659. Reused here as the entry reference for focused family tasks.",
+        "status": "Source selected by Ahmad. This promotion preserves the existing design, without adding a new UI or component.",
+        "open": "Other task-creation concepts remain in the HTML experiment. Only SSC sign-up is promoted as a full package here."
+      },
+      "16210:379169": {
+        "pill": "CURRENT SOURCE · EXISTING DESIGN",
+        "lines": [
+          "SSC Kids · Demo sign-up",
+          "16 Nov 2026 · Promoted to Prod at Ahmad’s request",
+          "Exploration source → SSC Kids package"
+        ],
+        "what": "Current D-series sign-up screens, including Full details, shared registration questions, waiver, team choice, payment and result.",
+        "status": "Existing clickable demo promoted from 15866:54549. Replaced 13 November screens are excluded. Examples and provider details remain as in the source.",
+        "open": "This is a design prototype, not a live registration or payment integration."
+      },
+      "16210:379185": {
+        "pill": "CURRENT SOURCE · EXISTING DESIGN",
+        "lines": [
+          "SSC Kids · Real-flow states",
+          "16 Nov 2026 · Promoted to Prod at Ahmad’s request",
+          "Exploration source → SSC Kids package"
+        ],
+        "what": "22 R-series screens covering profile review, corrections, address, volunteering, account setup, agent progress, checkout approval, no card, timeout and decline.",
+        "status": "Existing 14 November package promoted unchanged. Shared D-series steps are retained beside it.",
+        "open": "Provider questions remain: volunteer buyout and coach meaning. Engineering/release verification is separate from this design promotion."
+      }
+    }
+  }
+}

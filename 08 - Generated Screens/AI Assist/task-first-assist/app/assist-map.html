@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Assist wiring map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* D6 (17 Nov): how every Sprout Assist flow writes into the rest of the app.
+   Rules from Ahmad's feature map: a tree across the full width, chips not cards, the answer before any click,
+   tap a node to see its connections, lines drawn in front with a halo. Data lives in FLOWS / STATES / SURF. */
+:root{--bg:#F4F1EA;--card:#fff;--ink:#1E3E2B;--body:#4d525b;--muted:#7D715E;--green:#186338;--light:#E2E9E3;--line:#D9D2C4;
+  --amber:#B5872B;--amber-bg:#FBF1DA;--amber-br:#E6CD96;--blue:#2F6690;--blue-bg:#E3EDF5;
+  --serif:'Playfair Display',Georgia,serif;--sans:'Inter',system-ui,sans-serif;--sh:1px 3px 12px rgba(13,13,18,.05)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);font-family:var(--sans);color:var(--body)}
+.wrap{max-width:1640px;margin:0 auto;padding:28px 26px 120px}
+h1{font:600 28px var(--serif);color:var(--ink);margin:0 0 6px}
+.sub{font-size:14px;line-height:1.6;margin:0 0 16px;max-width:860px}
+h2{font:600 19px var(--serif);color:var(--ink);margin:0 0 10px}
+.top{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin-bottom:22px}
+@media(max-width:1100px){.top{grid-template-columns:1fr}}
+.rules{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--sh)}
+.rules ol{margin:0;padding-left:20px;font-size:13.5px;line-height:1.55;color:var(--ink)}
+.rules li{margin-bottom:5px}
+.rules li b{font-weight:600}
+.gaps{background:var(--amber-bg);border:1px solid var(--amber-br);border-radius:14px;padding:14px 16px}
+.gaps h2{color:#6d5310}
+.gaps .rs{display:flex;gap:6px;flex-wrap:wrap}
+.gaps .rs span{background:#fff;border:1px solid #efe6cf;border-radius:99px;padding:6px 11px;font-size:12.5px;color:var(--ink);cursor:pointer}
+.gaps .rs span:hover{border-color:var(--amber)}
+.key{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:10px 0 0}
+.key i{display:inline-block;width:12px;height:12px;border-radius:4px;vertical-align:-2px;margin-right:5px;border:1.5px solid}
+.k-built{border-color:var(--green)!important;background:var(--light)}
+.k-designed{border-color:var(--blue)!important;background:var(--blue-bg)}
+.k-gap{border-color:var(--amber)!important;background:var(--amber-bg)}
+
+.stage{position:relative}
+#wires{position:absolute;inset:0;width:100%;pointer-events:none;z-index:5;overflow:visible}
+.tier{position:relative;z-index:2;display:flex;align-items:flex-start;gap:14px;margin-bottom:26px}
+.tier .tl{flex:none;width:96px;padding-top:7px;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.tier .row{flex:1;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.flow{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;font:600 14px var(--serif);color:var(--ink);cursor:pointer;box-shadow:var(--sh)}
+.flow img{width:24px;height:24px}
+.state{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid var(--line);border-radius:99px;padding:7px 12px;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer}
+.state small{font-weight:400;color:var(--muted)}
+.arrow{color:var(--muted);font-size:14px}
+.surfaces{position:relative;z-index:2;display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;align-items:start}
+.surf{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;box-shadow:var(--sh)}
+.surf .st{font:600 14px var(--serif);color:var(--ink);margin-bottom:2px}
+.surf .sn{font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.35}
+.chips{display:flex;flex-direction:column;gap:5px}
+.c{border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;font-size:12px;color:var(--ink);cursor:pointer;background:#FBFAF7;line-height:1.25;text-align:left}
+.c.built{border-color:#bcd3c3}.c.designed{border-color:#b9cfe0}.c.gap{border-color:var(--amber-br);background:var(--amber-bg)}
+.sel{outline:3px solid var(--green);outline-offset:2px}
+.hit{border-color:var(--green)!important;background:var(--light)!important;box-shadow:0 0 0 2px rgba(24,99,56,.18)}
+.hit.gap{border-color:var(--amber)!important;background:#fff4d9!important;box-shadow:0 0 0 2px rgba(181,135,43,.25)}
+.flow.hit,.state.hit{border-color:var(--green)}
+
+.main{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;align-items:start}
+@media(max-width:1100px){.main{grid-template-columns:1fr}}
+.panel{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:16px;z-index:20}
+.panel .empty{font-size:13.5px;line-height:1.55;color:var(--muted)}
+.panel .empty b{color:var(--ink)}
+.panel .x{position:absolute;right:10px;top:10px;width:28px;height:28px;border-radius:14px;border:0;background:var(--bg);cursor:pointer;font-size:15px}
+.panel .pk{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.panel h3{font:600 19px var(--serif);color:var(--ink);margin:2px 0 8px;padding-right:30px}
+.panel p{font-size:13.5px;line-height:1.55;margin:0 0 10px}
+.panel dl{display:grid;grid-template-columns:72px 1fr;gap:4px 10px;font-size:13px;margin:0 0 10px}
+.panel dt{color:var(--muted)}.panel dd{margin:0;color:var(--ink)}
+.panel .badge{display:inline-block;font-size:11.5px;font-weight:600;border-radius:99px;padding:3px 9px;margin-bottom:8px}
+.panel .lk{display:flex;flex-wrap:wrap;gap:5px}
+.panel .lk span{font-size:12px;border:1px solid var(--line);border-radius:99px;padding:3px 9px;cursor:pointer;color:var(--ink)}
+.hint{font-size:12.5px;color:var(--muted);margin:-12px 0 16px}
+
+.tline{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 12px}
+.ev{flex:0 0 210px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:var(--sh)}
+.ev .t{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--green)}
+.ev b{display:block;font:600 15px/1.25 var(--serif);color:var(--ink);margin:4px 0 6px}
+.ev p{font-size:12.5px;line-height:1.45;margin:0 0 8px}
+.ev .tags{display:flex;flex-wrap:wrap;gap:4px}
+.ev .tags span{font-size:11px;border-radius:99px;padding:2px 8px;background:var(--light);color:var(--ink)}
+.ev .tags span.g{background:var(--amber-bg);color:#6d5310}
+section{margin-top:34px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Sprout Assist: how it wires into the app</h1>
+  <p class="sub">Every Assist request becomes one <b>plan</b>. The plan moves through states, and each state writes to the same places: Daily Brief, to-dos, pushes, the family calendar, the spouse, class chat, saved details, and pages outside Sprout. Tap a flow, a state or any chip to see its connections.</p>
+
+  <div class="top">
+    <div class="rules"><h2>The rules I suggest</h2><ol>
+      <li><b>One plan, many views.</b> A plan is the single source. The Daily Brief, Your plans, the calendar and to-dos only read from it, so they can never disagree.</li>
+      <li><b>One push per state change, to whoever has to act.</b> Needs your OK → you (and Dana if either can approve). Booked → both. Nothing to do → no push.</li>
+      <li><b>Anything with a time goes on the family calendar</b>, gets the 30-minute push, and an evening out also gets a Live Activity.</li>
+      <li><b>Anything the parent must do later becomes a to-do</b> with origin “Sprout Assist”, and is ticked off by Sprout when it’s done (pay Alex, pack for camp week 2).</li>
+      <li><b>When a plan ends it updates saved details</b> (sitter sat count, provider accounts, kids’ sizes), so the next plan asks less.</li>
+    </ol>
+    <div class="key"><span><i class="k-built"></i>Built in the prototype</span><span><i class="k-designed"></i>Designed or promised in copy</span><span><i class="k-gap"></i>Gap: not designed yet</span></div></div>
+    <div class="gaps"><h2>Gaps to design next</h2><div class="rs" id="gapStrip"></div></div>
+  </div>
+
+  <p class="hint">Tap anything. Lines show what it connects to; the panel says what appears, when, and for whom.</p>
+  <div class="main"><div class="stage" id="stage">
+    <svg id="wires"></svg>
+    <div class="tier"><div class="tl">Assist flows</div><div class="row" id="flows"></div></div>
+    <div class="tier"><div class="tl">Plan states</div><div class="row" id="states"></div></div>
+    <div class="surfaces" id="surfaces"></div>
+  </div>
+  <aside class="panel" id="panel"><button class="x" aria-label="Clear">✕</button><div id="pbody"></div></aside></div>
+
+  <section>
+    <h2>One plan end to end: date night</h2>
+    <div class="tline" id="tline"></div>
+  </section>
+</div>
+
+
+<script>
+const A = '/assets/clay/';
+/* status: built (in the prototype) · designed (in Figma or promised in the prototype's copy) · gap (not designed) */
+const SURF = [
+  { id:'db', t:'Daily Brief', n:'Home tab, every morning', c:[
+    ['db-banner','Suggestion banner on top','built','The SSC Kids banner: proactive card that opens the plan. Same slot for camps, date night ideas.','Proactive flows','Until acted on'],
+    ['db-today','Happening today: plan line','built','17 Nov: on the day the plan is a time row in the existing Happening today card (6:45 PM · Date night · Sprout Assist · You and Dana · Alex + table). From the 30-min push it becomes the featured item with the live line, track and Text Alex / Directions. /happening-am/ · /happening-pm/ Live in /assist/ (I1, 17 Nov): follows what you booked, stepped with the demo clock beside the phone.','Both parents','Day of'],
+    ['db-done','Done state on the banner','built','Banner flips to “Jake is registered · See receipt”.','Both parents','After booking'],
+    ['db-morning','Morning Brief push mentions it','built','Morning Brief copy (7 Oct) can list “tonight: date night, Alex at 6:45”. Live in /assist/ (I1, 17 Nov): 7:30 AM on the day, both parents, with the plan line.','Both parents','Morning of'] ]},
+  { id:'todo', t:'To-Do', n:'Family to-do list', c:[
+    ['td-pay','Pay Alex $88','built','17 Nov: at 9 AM the morning after, “Pay Alex $88 · Due today · From Sprout Assist” lands in the Daily Brief To-Do list. Tap it = the plan opens at the pay card. Tick it = “How did you pay?” and the plan logs it. Pay from the card = Sprout ticks it. /pay-todo/ Live in /assist/ (I1, 17 Nov): follows what you booked, stepped with the demo clock beside the phone.','Whoever booked','Morning after'],
+    ['td-pack','Packing list per camp week','gap','Camps copy promises “I’ll add each packing list to your to-dos”. Not designed.','Both parents','Week before'],
+    ['td-team','Team email → to-do','designed','SSC copy: “I’ll watch for SSC Kids’ team email and add it to your to-dos”. Needs the Gmail scraper.','Both parents','Early September'],
+    ['td-rsvp','RSVP headcount Thursday','built','Birthday flow: headcount message on Thursday, reminder Friday.','Host parent','Before the party'],
+    ['td-origin','Origin label “Sprout Assist”','built','17 Nov: Assist to-dos say “From Sprout Assist” with the clover badge where Gmail ones have the Gmail badge. Still open: don’t duplicate a Gmail to-do for the same thing.','Both parents','Always'] ]},
+  { id:'push', t:'Push + Live Activity', n:'Lock screen and the clover peek', c:[
+    ['p-suggest','Suggestion: “Saturday night is free”','built','Thursday 4:12 PM lock-screen push, opens the date night plan.','The parent with free time','Weekday afternoon'],
+    ['p-reply','Did any sitter text you back?','built','17 Nov: sitters reply by text, which Sprout can’t read. An hour after sending (or when you say no one replied yet) Sprout asks; you mark each sitter Free / Can’t.','Whoever asked','An hour after asking'],
+    ['p-confirm','Needs your OK','built','Confirm a sitter, approve a payment, a new form question.','You, or Dana if either can approve','When blocked'],
+    ['p-booked','Booked / confirmed','built','“Alex confirmed”, “Jake is registered”. Live in /assist/ (I1, 17 Nov): follows what you booked, stepped with the demo clock beside the phone.','Both parents','On confirm'],
+    ['p-30','30 minutes before','built','B4 (17 Nov): “Alex arrives in 30 minutes · dinner at 7:15, Dana has this too”. Both parents. /date-night-live/ Live in /assist/ (I1, 17 Nov): follows what you booked, stepped with the demo clock beside the phone.','Both parents','30 min before'],
+    ['p-live','Live Activity on the night','built','B4 (17 Nov): 6:15 → 10:30 on the lock screen + Dynamic Island: Alex arrives → leave by → dinner → bedtime → home by 10:15. Buttons: Text Alex, Directions, Ask for 30 more min. /date-night-live/ Live in /assist/ (I1, 17 Nov): follows what you booked, stepped with the demo clock beside the phone.','Both parents','During the evening'],
+    ['p-after','Morning after: how was it','built','Rating + pay. Live in /assist/ (I1, 17 Nov): follows what you booked, stepped with the demo clock beside the phone.','Whoever booked','Next morning 9 AM'],
+    ['p-signup','Sign-ups open','built','Camps and sports: “Sign-ups open, 4 classmates going”.','Both parents','When registration opens'] ]},
+  { id:'cal', t:'Family calendar', n:'Events tab and both phones', c:[
+    ['c-dinner','Dinner reservation','built','Said in chat (“on the family calendar”). The calendar view itself isn’t drawn.','Both parents','On booking'],
+    ['c-sitter','Sitter hours','built','Sitter 6:45–10:15 PM as its own entry.','Both parents','On confirm'],
+    ['c-games','Game Saturdays + practice','designed','SSC Kids: 8 Saturdays + practice night once teams form.','Both parents','After registration'],
+    ['c-camp','Camp weeks','designed','Each booked week, both kids.','Both parents','After payment'],
+    ['c-party','Party + RSVPs','built','Saved in Events with the invite.','Host parent','On send'],
+    ['c-view','Where the calendar is','gap','There is no family calendar screen. Decide: Events tab, Daily Brief week view, or device calendar sync.','—','—'] ]},
+  { id:'sp', t:'Spouse (Dana)', n:'The other parent', c:[
+    ['s-free','Both-free check','built','The Thursday suggestion checks both calendars.','—','Before suggesting'],
+    ['s-approve','Either parent approves','built','“Waiting for you or Dana” on payment cards.','Both parents','When blocked'],
+    ['s-text','Text Dana the plan','built','Chip at the end of every plan.','Dana','On booking'],
+    ['s-sees','Dana sees the plan','gap','Does Dana see Tony’s plans in her Your plans list? Can she take over a half-done plan?','Dana','Always'],
+    ['s-push','Dana gets the pushes?','gap','Which pushes go to both (booked, 30-min) and which only to the one who started it (sitter answered). 17 Nov: the demo clock lists every push with who gets it (Tony, Dana, both). Dana’s phone is still not drawn.','Dana','Per state'] ]},
+  { id:'cls', t:'Class + chat', n:'Class groups and other families', c:[
+    ['k-ask','Ask a class group for a sitter','built','Message to Miss Taylor’s / Miss Poole’s class with a Share a sitter button.','Class parents','No sitters found'],
+    ['k-share','A parent shares a sitter','built','Priya’s side: push → Share a sitter form → saved to Tony’s sitters.','Class parent','When asked'],
+    ['k-proof','Classmates going','built','“2 from Jake’s class”, Priya and Aisha loved Olive & Ember.','—','On suggestions'],
+    ['k-invite','Party invite to the class','built','Birthday flow sends to 22 families.','Class parents','On send'],
+    ['k-club','Club shared in class chat','built','Start a club → share.','Class parents','On create'],
+    ['k-chatui','How the request looks in Chat','gap','The class chat screen never shows the sitter request or the Share a sitter button.','Class parents','—'] ]},
+  { id:'saved', t:'Saved details', n:'Accounts and cards, profiles', c:[
+    ['v-sitters','Sitters: channel, Venmo, times sat','built','Updated after every night: “Alex has sat for you 5 times”.','Family','After the night'],
+    ['v-accts','Provider accounts','built','SSC Kids, Pinecrest. Login in the password manager.','Family','First sign-up'],
+    ['v-cards','Cards (Link)','built','Picked on the approval card.','Family','Payments'],
+    ['v-kids','Kids’ profiles','built','Shirt size, allergies, birthday, pickup, reused by every form.','Family','Every form'],
+    ['v-taste','Date night likes','gap','Cuisine, distance, budget from last time, so Thursday’s suggestion can be a real pick.','Couple','After each night'] ]},
+  { id:'out', t:'Outside Sprout', n:'People and sites without the app', c:[
+    ['o-reply','Sitter reply page (parked)','designed','Parked 17 Nov (Ahmad): sitters will just text back, so the parent tells Sprout who’s free. The page stays at /sitter-reply/ in case we come back to it.','Sitter','—'],
+    ['o-compose','Messages / WhatsApp','built','Sent from the parent’s own number, one sitter at a time.','Parent → sitter','When asking'],
+    ['o-venmo','Venmo, prefilled','built','Amount + note filled; parent finishes in Venmo.','Parent','Morning after'],
+    ['o-resy','Restaurant booking','gap','Which system books the table (OpenTable / Resy / a call)? Changes what “Booked” can promise.','—','On booking'],
+    ['o-form','League / camp site','designed','The agent fills the provider’s form (Mohit MVP).','—','On sign-up'],
+    ['o-email','Confirmation emails','gap','Provider and restaurant emails land in Gmail. The scraper must match them to the plan, not create a second to-do.','—','After booking'] ]},
+];
+const FLOWS = [
+  { id:'f-sitter', t:'Book a sitter', icon:'person-plus', touch:['p-reply','p-confirm','p-booked','p-30','p-live','p-after','td-pay','c-sitter','s-text','s-push','s-sees','k-ask','k-share','k-chatui','v-sitters','o-reply','o-compose','o-venmo','db-today'] },
+  { id:'f-date', t:'Plan a date night', icon:'calendar-check', touch:['p-suggest','s-free','c-dinner','c-sitter','o-resy','v-taste','db-today','db-morning','p-30','p-live','s-text','o-email','k-proof','td-pay'] },
+  { id:'f-sports', t:'Sports (SSC Kids)', icon:'sports', touch:['db-banner','db-done','p-signup','p-confirm','s-approve','v-accts','v-cards','v-kids','k-proof','c-games','td-team','o-form','o-email'] },
+  { id:'f-camps', t:'Summer camps', icon:'camps', touch:['p-signup','db-banner','s-approve','v-accts','v-cards','v-kids','k-proof','c-camp','td-pack','o-form','o-email'] },
+  { id:'f-event', t:'Birthday / event', icon:'event', touch:['c-party','k-invite','td-rsvp','p-booked','db-today'] },
+  { id:'f-club', t:'Start a club', icon:'club', touch:['k-club','k-chatui'] },
+  { id:'f-remind', t:'Reminders', icon:'remind', touch:['p-30','s-push','db-today','db-morning','td-origin'] },
+];
+const STATES = [
+  { id:'st-start', t:'Started', s:'you answered a few things', touch:['s-sees'] },
+  { id:'st-wait', t:'Waiting', s:'on sitters, a site, a reply', touch:['o-reply','o-compose','k-ask','o-form'] },
+  { id:'st-you', t:'Needs you', s:'confirm or pay', touch:['p-confirm','s-approve','db-banner','p-reply'] },
+  { id:'st-booked', t:'Booked', s:'confirmed', touch:['p-booked','c-dinner','c-sitter','c-games','c-camp','c-party','s-text','db-done','o-email'] },
+  { id:'st-day', t:'Day of', s:'it’s happening', touch:['p-30','p-live','db-today','db-morning'] },
+  { id:'st-after', t:'After', s:'settle up', touch:['p-after','td-pay','o-venmo','td-pack','td-team'] },
+  { id:'st-done', t:'Done', s:'into history', touch:['v-sitters','v-accts','v-kids','v-taste','td-origin'] },
+];
+const TIMELINE = [
+  ['Thu 4:12 PM','Suggestion push','Both calendars free Saturday after 6; last night out 5 weeks ago.',['Push','Spouse'],[]],
+  ['Thu 4:13 PM','Date, distance, food, budget','Four taps, then 3 places on the map.',['Assist'],['Saved likes']],
+  ['Thu 4:15 PM','Table booked','Olive & Ember 7:15, free to cancel until Friday evening.',['Calendar','Outside: restaurant'],['Which system books it?','Confirmation email match']],
+  ['Thu 4:16 PM','Sitter suggestion → asked 3','Sent from Tony’s phone, each with a reply link.',['Outside: Messages / WhatsApp'],[]],
+  ['Thu 6:40 PM','Alex and Sam texted back','Tony marks them Free in Sprout (or Sprout asks an hour later).',['Push','Assist'],['Does Dana get it?']],
+  ['Thu 6:42 PM','Alex booked','Tony sends the booking (with the address) from his phone; a thank-you to Sam. Dinner + sitter on the family calendar.',['Outside: Messages / WhatsApp','Calendar','Spouse'],['Calendar screen']],
+  ['Sat 7:30 AM','Morning Brief + Happening today','“Tonight: date night, Alex at 6:45” in the push; a 6:45 PM row in Happening today.',['Daily Brief'],[]],
+  ['Sat 6:15 PM','30 minutes before','“Alex arrives in 30 minutes · dinner at 7:15.”',['Push','Spouse'],[]],
+  ['Sat 6:15–10:30 PM','Live Activity','Alex here → dinner → bedtime → home by 10:15.',['Lock screen','Dynamic Island'],[]],
+  ['Sun 9:00 AM','How was Alex? + Pay','Push + “Pay Alex $88” on the To-Do list. Venmo prefilled or cash, either place ticks both.',['Push','To-Do','Outside: Venmo','Saved sitters'],[]],
+];
+
+const byId = {}; const allChips = [];
+SURF.forEach(s => s.c.forEach(([id, t, st, note, who, when]) => { const o = { id, t, st, note, who, when, surf:s.t }; byId[id] = o; allChips.push(o); }));
+const $ = s => document.querySelector(s);
+$('#flows').innerHTML = FLOWS.map(f => `<button class="flow" data-id="${f.id}"><img src="${A}${f.icon}.png" alt="">${f.t}</button>`).join('');
+$('#states').innerHTML = STATES.map((s, i) => `${i ? '<span class="arrow">→</span>' : ''}<button class="state" data-id="${s.id}">${s.t} <small>${s.s}</small></button>`).join('');
+$('#surfaces').innerHTML = SURF.map(s => `<div class="surf" data-s="${s.id}"><div class="st">${s.t}</div><div class="sn">${s.n}</div><div class="chips">${s.c.map(([id, t, st]) => `<button class="c ${st}" data-id="${id}">${t}</button>`).join('')}</div></div>`).join('');
+$('#gapStrip').innerHTML = allChips.filter(c => c.st === 'gap').map(c => `<span data-id="${c.id}">${c.t}</span>`).join('');
+$('#tline').innerHTML = TIMELINE.map(([t, b, p, tags, gaps]) => `<div class="ev"><div class="t">${t}</div><b>${b}</b><p>${p}</p><div class="tags">${tags.map(x => `<span>${x}</span>`).join('')}${gaps.map(x => `<span class="g">Gap: ${x}</span>`).join('')}</div></div>`).join('');
+
+const sources = id => [...FLOWS, ...STATES].filter(x => x.touch.includes(id));
+const STATUS = { built:['Built in the prototype','var(--light)','var(--green)'], designed:['Designed / promised','var(--blue-bg)','var(--blue)'], gap:['Gap: not designed','var(--amber-bg)','#6d5310'] };
+let current = null;
+function select(id){
+  current = id;
+  document.querySelectorAll('.sel,.hit').forEach(e => e.classList.remove('sel', 'hit'));
+  const node = document.querySelector(`[data-id="${id}"]:not(#gapStrip span)`); if (!node) return;
+  node.classList.add('sel');
+  const src = [...FLOWS, ...STATES].find(x => x.id === id);
+  let targets = [], body;
+  if (src) {
+    targets = src.touch; targets.forEach(t => document.querySelector(`.c[data-id="${t}"]`)?.classList.add('hit'));
+    const gaps = src.touch.filter(t => byId[t].st === 'gap');
+    body = `<div class="pk">${FLOWS.includes(src) ? 'Assist flow' : 'Plan state'}</div><h3>${src.t}</h3>
+      <p>Touches <b>${src.touch.length}</b> places across <b>${new Set(src.touch.map(t => byId[t].surf)).size}</b> surfaces${gaps.length ? `, <b>${gaps.length}</b> of them not designed yet` : ''}.</p>
+      <div class="lk">${src.touch.map(t => `<span data-go="${t}" style="${byId[t].st === 'gap' ? 'background:var(--amber-bg)' : ''}">${byId[t].surf}: ${byId[t].t}</span>`).join('')}</div>`;
+  } else {
+    const c = byId[id]; const from = sources(id);
+    from.forEach(f => document.querySelector(`[data-id="${f.id}"]`)?.classList.add('hit'));
+    targets = from.map(f => f.id);
+    const [lbl, bg, fg] = STATUS[c.st];
+    body = `<div class="pk">${c.surf}</div><h3>${c.t}</h3><span class="badge" style="background:${bg};color:${fg}">${lbl}</span><p>${c.note}</p>
+      <dl><dt>Who sees it</dt><dd>${c.who}</dd><dt>When</dt><dd>${c.when}</dd></dl>
+      <div class="pk" style="margin-bottom:5px">Fed by</div><div class="lk">${from.map(f => `<span data-go="${f.id}">${f.t}</span>`).join('') || '<span>—</span>'}</div>`;
+  }
+  $('#pbody').innerHTML = body;
+  $('#pbody').querySelectorAll('[data-go]').forEach(b => b.onclick = () => select(b.dataset.go));
+  draw(id, targets);
+}
+function draw(id, targets){
+  const stage = $('#stage'), svg = $('#wires'), box = stage.getBoundingClientRect();
+  svg.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`); svg.style.height = box.height + 'px';
+  const a = document.querySelector(`.flow[data-id="${id}"],.state[data-id="${id}"],.c[data-id="${id}"]`);
+  if (!a) { svg.innerHTML = ''; return; }
+  const pt = (el, bottom) => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2 - box.left, (bottom ? r.bottom : r.top) - box.top]; };
+  let out = '';
+  targets.forEach(t => {
+    const b = document.querySelector(`[data-id="${t}"]:not(#gapStrip span)`); if (!b) return;
+    const up = b.getBoundingClientRect().top < a.getBoundingClientRect().top;
+    const [x1, y1] = pt(a, !up), [x2, y2] = pt(b, up), my = (y1 + y2) / 2;
+    const d = `M${x1},${y1} C${x1},${my} ${x2},${my} ${x2},${y2}`, gap = byId[t]?.st === 'gap';
+    out += `<path d="${d}" fill="none" stroke="#F4F1EA" stroke-width="6" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${gap ? '#B5872B' : '#186338'}" stroke-width="1.8" stroke-opacity=".85" ${gap ? 'stroke-dasharray="4 4"' : ''}/><circle cx="${x2}" cy="${y2}" r="3" fill="${gap ? '#B5872B' : '#186338'}"/>`;
+  });
+  svg.innerHTML = out;
+}
+document.addEventListener('click', e => { const t = e.target.closest('[data-id]'); if (t && !e.target.closest('#panel')) select(t.dataset.id); });
+const EMPTY = `<div class="pk">Details</div><h3>Tap anything</h3><p class="empty">Tap a <b>flow</b> to see every place it writes to, a <b>state</b> to see what happens at that step, or a <b>chip</b> to see what it says, when, for whom, and which flows feed it.</p><p class="empty">Dashed amber lines go to things that aren’t designed yet.</p>`;
+const clear = () => { document.querySelectorAll('.sel,.hit').forEach(e => e.classList.remove('sel', 'hit')); $('#wires').innerHTML = ''; current = null; $('#pbody').innerHTML = EMPTY; };
+$('.panel .x').onclick = clear; clear();
+addEventListener('resize', () => current && select(current));
+</script>
+</body>
+</html>

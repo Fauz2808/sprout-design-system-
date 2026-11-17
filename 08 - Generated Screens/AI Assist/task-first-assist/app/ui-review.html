@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Sitter UI directions</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f4f1ea;--ink:#1d2a22;--sub:#5d675f;--line:#e2ddd2;--brand:#186338;--tint:#e3efe6;--k:.8;--w:314px}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif}
+  .wrap{max-width:1400px;margin:0 auto;padding:28px 32px 40px}
+  h1{font:600 28px 'Playfair Display',serif;margin:0 0 6px}
+  .lede{margin:0 0 18px;color:var(--sub);max-width:900px}
+  .grid{display:grid;grid-template-columns:repeat(3,var(--w));gap:12px 40px;justify-content:start}
+  .head{padding-bottom:6px}
+  .tag{display:inline-block;font:600 12px Inter;letter-spacing:.04em;color:var(--brand);background:var(--tint);border-radius:999px;padding:3px 10px;margin-bottom:6px}
+  h2{font:600 19px 'Playfair Display',serif;margin:0 0 4px}
+  .head p{margin:0;color:var(--sub);font-size:13px}
+  .rowlabel{grid-column:1/-1;font:600 15px 'Playfair Display',serif;margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
+  .frame{width:var(--w);height:calc(852px * var(--k));border-radius:calc(54px * var(--k));overflow:hidden;box-shadow:0 0 0 3px #d9d4c9,0 18px 50px rgba(0,0,0,.10);background:#fff}
+  iframe{width:393px;height:852px;border:0;transform:scale(var(--k));transform-origin:0 0;display:block}
+  .bar{display:flex;justify-content:space-between;margin-top:6px}
+  .bar a,.bar button{font:500 13px Inter;color:var(--brand);background:none;border:0;padding:2px 0;cursor:pointer;text-decoration:none}
+</style>
+</head>
+<body><div class="wrap">
+  <h1>Book a sitter: three looks</h1>
+  <p class="lede">The same two steps, “when” and “who to ask”, in three directions. All brand: cream, Sprout green, Playfair Display for titles and button labels, Inter, clay icons. Every tap works on the card itself; the flow doesn’t continue.</p>
+  <div class="grid">
+    <div class="head"><span class="tag">A · Polish in place</span><h2>Same chat, refined cards</h2><p>Full-width week strip, − / + time steppers, light tint selection, sitter photos.</p></div>
+    <div class="head"><span class="tag">B · Answers in a sheet</span><h2>Questions in a stepped sheet</h2><p>Calendar and fields in a sheet with steps; the chat keeps short answers.</p></div>
+    <div class="head"><span class="tag">C · Warm and photo-led</span><h2>Evening timeline, sitter cards</h2><p>Big date headline, a day-to-night bar for the hours, swipeable sitter photo cards.</p></div>
+    <div class="rowlabel">Step 1 · When do you need a sitter?</div>
+    <div><div class="frame"><iframe src="/ui-a/?s=date" title="A date"></iframe></div><div class="bar"><button data-r>Restart</button><a href="/ui-a/?s=date" target="_blank">Open alone</a></div></div>
+    <div><div class="frame"><iframe src="/ui-b/?s=date" title="B date"></iframe></div><div class="bar"><button data-r>Restart</button><a href="/ui-b/?s=date" target="_blank">Open alone</a></div></div>
+    <div><div class="frame"><iframe src="/ui-c/?s=date" title="C date"></iframe></div><div class="bar"><button data-r>Restart</button><a href="/ui-c/?s=date" target="_blank">Open alone</a></div></div>
+    <div class="rowlabel">Step 4 · Who should I ask?</div>
+    <div><div class="frame"><iframe src="/ui-a/?s=who" title="A who"></iframe></div><div class="bar"><button data-r>Restart</button><a href="/ui-a/?s=who" target="_blank">Open alone</a></div></div>
+    <div><div class="frame"><iframe src="/ui-b/?s=who" title="B who"></iframe></div><div class="bar"><button data-r>Restart</button><a href="/ui-b/?s=who" target="_blank">Open alone</a></div></div>
+    <div><div class="frame"><iframe src="/ui-c/?s=who" title="C who"></iframe></div><div class="bar"><button data-r>Restart</button><a href="/ui-c/?s=who" target="_blank">Open alone</a></div></div>
+  </div>
+</div>
+<script>
+  const root = document.documentElement;
+  const fit = () => { const k = Math.max(.55, Math.min(.85, (Math.min(innerWidth, 1400) - 64 - 80) / 3 / 393, (innerHeight - 120) / 852)); root.style.setProperty('--k', k); root.style.setProperty('--w', 393 * k + 'px'); };
+  addEventListener('resize', fit); fit();
+  document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { const f = b.closest('div').parentElement.querySelector('iframe'); f.src = f.src; });
+</script>
+</body></html>

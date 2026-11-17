@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Date night · A B C</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f4f1ea;--ink:#1d2a22;--sub:#5d675f;--line:#e2ddd2;--brand:#186338;--tint:#e3efe6}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif}
+  header{padding:28px 32px 8px;max-width:1500px;margin:0 auto}
+  h1{font:600 28px 'Playfair Display',serif;margin:0 0 6px}
+  header p{margin:0;color:var(--sub);max-width:900px}
+  .row{display:flex;gap:28px;padding:20px 32px 40px;max-width:1500px;margin:0 auto;overflow-x:auto}
+  .col{flex:0 0 auto;width:max(var(--w), 380px);display:flex;flex-direction:column;align-items:center}
+  .col > *{width:100%}
+  .col .frame{width:var(--w)}
+  .ctx{display:flex;flex-direction:column;margin-bottom:14px}
+  .tag{display:inline-block;font:600 12px Inter;letter-spacing:.04em;color:var(--brand);background:var(--tint);border-radius:999px;padding:3px 10px;margin-bottom:8px}
+  h2{font:600 20px 'Playfair Display',serif;margin:0 0 6px}
+  .ctx p{margin:0 0 6px;color:var(--sub);font-size:13.5px}
+  .ctx b{color:var(--ink);font-weight:600}
+  .try{font-size:12.5px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:10px;width:var(--w)!important}
+  .frame{width:var(--w);height:calc(852px * var(--k));border-radius:calc(54px * var(--k));overflow:hidden;box-shadow:0 0 0 3px #d9d4c9,0 18px 50px rgba(0,0,0,.10);background:#fff}
+  iframe{width:393px;height:852px;border:0;transform:scale(var(--k));transform-origin:0 0;display:block}
+  .bar{display:flex;justify-content:space-between;align-items:center;margin-top:8px;width:var(--w)!important}
+  .bar a,.bar button{font:500 13px Inter;color:var(--brand);background:none;border:0;padding:4px 0;cursor:pointer;text-decoration:none}
+</style>
+</head>
+<body>
+<header>
+  <h1>Date night: three directions</h1>
+  <p>Tony, 16 Nov: find the restaurant, get the reservation, then book a sitter for that time. Each phone starts on the Daily Brief like the real app and is built from the SSC Kids demo parts. Places and replies are made up; nothing is booked or sent. The 30-minute reminder and live activity (B4) come after you pick one.</p>
+</header>
+<div class="row">
+  <section class="col">
+    <div class="ctx">
+      <span class="tag">A · Step by step</span>
+      <h2>One question at a time</h2>
+      <p><b>Tap the clover, then “Plan a date night”.</b> Night, then mood, then tables with time chips. <b>Books the table first</b> (free to cancel), then asks sitters for the time worked out from the reservation.</p>
+      <p>Most taps, easiest to follow. Matches Tony’s words exactly.</p>
+    </div>
+    <div class="frame"><iframe src="/date-night-a/?v=0" title="Direction A"></iframe></div>
+    <div class="bar"><button data-r="0">Restart</button><a href="/date-night-a/" target="_blank">Open alone</a></div>
+  <div class="try">Try: deselect Alex and Sam, ask only Riley. Riley can’t, and the table stays booked while you choose.</div>
+  </section>
+  <section class="col">
+    <div class="ctx">
+      <span class="tag">B · One plan card</span>
+      <h2>A card that fills in</h2>
+      <p><b>Tap the clover, then “Plan a date night”.</b> Four taps inside one card (night, home by, dinner, sitter). Sprout then books dinner and asks sitters, and <b>the same card updates</b> line by line. One confirm at the end.</p>
+      <p>Same story as SSC vs Muse. The card could become the live activity (B4).</p>
+    </div>
+    <div class="frame"><iframe src="/date-night-b/?v=0" title="Direction B"></iframe></div>
+    <div class="bar"><button data-r="1">Restart</button><a href="/date-night-b/" target="_blank">Open alone</a></div>
+  <div class="try">Try: “Just Riley”. The card shows Riley can’t, and asks what to do inside the card.</div>
+  </section>
+  <section class="col">
+    <div class="ctx">
+      <span class="tag">C · Sprout suggests it</span>
+      <h2>A ready-made night</h2>
+      <p>Starts on the Daily Brief: the clover peeks “Free Saturday night?”. <b>Tap the clover.</b> Sprout has a whole night ready: Book it / Other options / Not this week.</p>
+      <p>Fewest taps. Needs taste data we don’t have yet.</p>
+    </div>
+    <div class="frame"><iframe src="/date-night-c/?v=0" title="Direction C"></iframe></div>
+    <div class="bar"><button data-r="2">Restart</button><a href="/date-night-c/" target="_blank">Open alone</a></div>
+  <div class="try">Try: “Book it”. Alex turns out to be busy, so Sprout offers Sam and Riley while the table stays booked.</div>
+  </section>
+</div>
+<script>
+  const root = document.documentElement, set = k => { root.style.setProperty('--k', k); root.style.setProperty('--w', 393 * k + 'px'); };
+  const fit = () => {
+    /* same height for every context block, then size the phones to what's left of the window */
+    const ctx = [...document.querySelectorAll('.ctx')]; ctx.forEach(c => c.style.minHeight = '');
+    let k = .8; for (let i = 0; i < 3; i++) { set(k); ctx.forEach(c => c.style.minHeight = '');
+      const h = Math.max(...ctx.map(c => c.offsetHeight)); ctx.forEach(c => c.style.minHeight = h + 'px');
+      const top = document.querySelector('.frame').getBoundingClientRect().top + scrollY;
+      k = Math.max(.6, Math.min(1, (innerHeight - top - 40) / 852)); }
+    set(k);
+  };
+  addEventListener('resize', fit); fit();
+  const frames = [...document.querySelectorAll('iframe')];
+  document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { const f = frames[+b.dataset.r]; f.src = f.src.split('#')[0]; });
+</script>
+</body>
+</html>

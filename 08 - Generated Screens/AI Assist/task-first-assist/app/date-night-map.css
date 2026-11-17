@@ -1,0 +1,55 @@
+/* Date night v2 (B3, 17 Nov): camp map parts (K10 v3 P·1/P·2) + Frida time chips + lock-screen push.
+   One new motion, approved by Ahmad 17 Nov: the map glides to the selected place (SSC sheet curve). */
+.dnmap{position:relative;width:100%;aspect-ratio:321/206;border-radius:12px;overflow:hidden;margin-bottom:12px;background:#efe9dc}
+.dnlayer{position:absolute;left:0;top:0;width:180%;aspect-ratio:4/3;background:url(/assets/camp/map.webp) center/cover;transform-origin:0 0;transition:transform .45s cubic-bezier(.2,.9,.25,1)}
+.dnpin{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:3px solid #fff;background-color:#d9cfbd;background-size:cover;background-position:center;box-shadow:0 3px 8px rgba(0,0,0,.18);padding:0;transition:width .35s cubic-bezier(.2,.9,.25,1),height .35s cubic-bezier(.2,.9,.25,1),margin .35s cubic-bezier(.2,.9,.25,1),border-color .2s;z-index:1}
+.dnpin.on{width:60px;height:60px;margin:-30px 0 0 -30px;border-color:var(--brand);z-index:3}
+.dnpin .lbl{position:absolute;left:50%;top:calc(100% + 4px);transform:translateX(-50%);background:#fff;border-radius:999px;padding:3px 8px;font:500 11.5px var(--sans);color:var(--strong);white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.12);transition:background .2s,color .2s}
+.dnpin.on .lbl{background:var(--brand);color:#fff}
+.dnhome{position:absolute;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:14px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:15px;box-shadow:0 0 0 3px rgba(255,255,255,.85);z-index:2}
+
+/* the selected place under the map (camp row + time chips) */
+.dnrow{display:flex;gap:12px;align-items:flex-start}
+.dnrow .thumb{width:76px;height:76px;border-radius:12px;background-color:#d9cfbd;background-size:cover;background-position:center;flex:none;transition:opacity .25s}
+.dnrow>div{min-width:0;flex:1}
+.dnrow .faces{margin:6px 0 0}
+.dnrow .faces span i{width:22px;height:22px}
+.swap{animation:rise .32s both}
+.dntimes{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.dntimes .chip{padding:7px 12px;font-size:13.5px}
+.dntimes .chip.sel,.dntimes .chip.sel:active{background:var(--brand);border-color:var(--brand);color:#fff}
+.dnmeta{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+.dnmeta small{font-size:12px;color:var(--subtle)}
+
+/* every place, swipe sideways; the map follows */
+.dncar{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:2px 16px 4px;scrollbar-width:none}
+.dncar::-webkit-scrollbar{display:none}
+.dncar .card{flex:0 0 86%;scroll-snap-align:center;margin:0;transition:border-color .2s}
+.dncar .card.on{border-color:var(--brand)}
+.dncar .ph:not(i){width:100%;aspect-ratio:3/1;border-radius:12px;background-color:#d9cfbd;background-size:cover;background-position:center;margin-bottom:10px}
+.dnbook{margin-top:12px}
+
+/* lock screen push (first screen) */
+.lock{position:absolute;inset:0;z-index:60;background:radial-gradient(120% 70% at 30% 18%,#4f8f63 0%,rgba(79,143,99,0) 60%),radial-gradient(90% 60% at 85% 85%,#c98b4a 0%,rgba(201,139,74,0) 55%),linear-gradient(180deg,#123a24,#0d2a1a 70%,#1c1a14);color:#fff;display:flex;flex-direction:column;align-items:center;transition:transform .5s cubic-bezier(.2,.9,.25,1),opacity .4s}
+.lock>*{position:relative}
+.lock .ldate{margin-top:86px;font:500 17px var(--sans);opacity:.9}
+.lock .ltime{font:600 84px/1 var(--sans);letter-spacing:-2px;margin-top:2px}
+.lock .lnote{margin-top:40px;cursor:pointer;width:calc(100% - 24px);background:rgba(246,244,238,.92);border-radius:22px;padding:12px 14px;display:flex;gap:10px;color:#111;text-align:left;box-shadow:0 8px 30px rgba(0,0,0,.18);animation:rise .5s .6s both}
+.lock .lnote img{width:38px;height:38px;border-radius:9px;flex:none}
+.lock .lnote b{display:flex;justify-content:space-between;font-size:14.5px}
+.lock .lnote b small{font-weight:400;color:#6b6b6b;font-size:12.5px}
+.lock .lnote p{margin:2px 0 0;font-size:14px;line-height:1.35}
+.lock .lhint{position:absolute;bottom:40px;font-size:13px;opacity:.85}
+.lock.gone{transform:translateY(-100%);opacity:0;pointer-events:none}
+.dnmap.wide{aspect-ratio:321/172;margin:0}
+.dncar .card{padding:12px 14px}
+.dncar .dntimes{margin-top:10px}
+.dncar .dnmeta{margin-top:6px}
+/* D2: draggable map */
+.dnmap{touch-action:none;cursor:grab}
+.dnmap.dragging{cursor:grabbing}
+.dnmap.dragging .dnpin{pointer-events:none}
+.dnpin.dim{width:30px;height:30px;margin:-15px 0 0 -15px;border-width:2px;border-color:#fff;opacity:.8;filter:saturate(.7)}
+.dnrecenter{position:absolute;right:8px;bottom:8px;width:34px;height:34px;border-radius:17px;background:#fff;color:var(--brand);display:grid;place-items:center;font-size:17px;box-shadow:0 2px 6px rgba(0,0,0,.15);z-index:4}
+.dnhint{position:absolute;left:8px;bottom:8px;z-index:4;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.92);border-radius:999px;padding:5px 10px;font-size:12px;color:var(--strong);box-shadow:0 1px 4px rgba(0,0,0,.12);transition:opacity .4s}
+.dnhint.gone{opacity:0;pointer-events:none}
