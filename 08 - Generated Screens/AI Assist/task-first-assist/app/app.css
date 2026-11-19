@@ -21,6 +21,50 @@
 .tile b{font:500 16.5px/22px var(--serif);color:var(--strong);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .tile small{font-size:11.5px;line-height:15px;color:var(--subtle);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 
+/* ---------- Assist home · Uber-style services grid (Tony 18 Nov), ?home=a / ?home=b ----------
+   Uber anatomy: bold section head, tiles with a big object illustration and a short label, 4 / 3 / 2 across,
+   a pill badge sitting on the top edge. Sprout skin: white card on cream, Playfair heads, clay illustrations. */
+.uhome{padding:14px 0 12px}
+.ugreet{margin:4px 2px 4px}
+.ugreet b{display:block;font:600 26px/32px var(--serif);color:var(--strong);letter-spacing:-.2px}
+.ugreet span{display:block;font-size:14px;line-height:19px;color:var(--subtle);margin-top:6px}
+.uhead{font:600 19px/24px var(--serif);color:var(--strong);margin:26px 2px 12px}
+.ugrid{display:grid;gap:8px}
+.ug-s{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ug-m{grid-template-columns:repeat(3,minmax(0,1fr))}
+.ug-w{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ut{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;background:var(--white);border:1px solid var(--border-soft);border-radius:18px;transition:transform .14s;text-align:center}
+.ut:active{transform:scale(.96)}
+.ut img{display:block;filter:drop-shadow(0 4px 5px rgba(70,58,34,.13))}
+.ut>b{font:600 12px/16px var(--sans);letter-spacing:-.15px;color:var(--strong);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;padding:0 4px}
+.ut-s{height:96px;padding:0 0 10px}
+.ut-s img{width:58px;height:58px;margin-bottom:5px}
+.ut-m{height:132px;padding:0 0 12px}
+.ut-m img{width:82px;height:82px;margin-bottom:7px}
+.ut-m>b{font-size:13.5px;line-height:17px}
+.ut-w{height:150px;align-items:flex-start;justify-content:flex-end;padding:0 12px 12px;overflow:hidden;text-align:left}
+.ut-w img{position:absolute;top:8px;right:8px;width:86px;height:86px}
+.ut-w .utx{position:relative;display:block;max-width:100%}
+.ut-w .utx b{display:block;font:500 17px/22px var(--serif);color:var(--strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ut-w .utx small{display:block;font-size:11.5px;line-height:15px;color:var(--subtle);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ubadge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);z-index:1;font:600 11px/18px var(--sans);font-style:normal;color:#fff;background:var(--brand);border-radius:999px;padding:0 9px;white-space:nowrap}
+.ut-w .ubadge{top:10px;left:12px;transform:none}
+.ug-m .ut,.ug-w .ut{overflow:visible}
+.uhome .ugrid:has(.ubadge){padding-top:4px}
+/* L1 (19 Nov): the four plan tiles, two across. Label bottom-left in Playfair, the illustration large top-right. */
+.ug-p{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ut-p{height:116px;align-items:flex-start;justify-content:flex-end;padding:0 14px 13px;overflow:hidden;text-align:left}
+.ut-p img{position:absolute;top:6px;right:6px;width:80px;height:80px}
+.ut-p>b{font:500 18px/22px var(--serif);letter-spacing:-.1px;padding:0;position:relative}
+.going{display:flex;flex-direction:column;gap:8px}
+.going .status+.status{margin-top:0}
+.grow .stxt{min-width:0}
+.grow .stxt small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gpill{flex:none;margin-left:auto;font:600 11px/20px var(--sans);font-style:normal;color:var(--brand);background:var(--tint,#e3efe6);border-radius:999px;padding:0 9px}
+.grow.attn .gpill{color:#fff;background:var(--brand)}
+.uill{background:var(--raised)}
+.uill img{width:28px;height:28px;display:block}
+
 /* ---------- your plans: SSC .status rows, made tappable ---------- */
 .plans{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
 .plans .status+.status{margin-top:0}
@@ -173,3 +217,15 @@ button.status:active{transform:scale(.985)}
 /* H3 (17 Nov): in a stacked footer the buttons keep their own height (flex:1 squashed them to a sliver) */
 .bsheet .bfoot.stack .btn{flex:none}
 .bsheet .bfoot.stack .textbtn{flex:none;padding:12px 0 2px;text-align:center}
+.covers button.ai{position:relative}
+.covers button.ai em{position:absolute;top:6px;left:6px;font:600 10px/16px var(--sans);font-style:normal;color:#fff;background:var(--brand);border-radius:8px;padding:0 6px}
+.covers .aitile{aspect-ratio:93/80;border-radius:12px;border:1.5px dashed var(--brand);background:var(--brand-subtle,#e3efe6);color:var(--brand);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:600 11.5px/14px var(--sans);text-align:center}
+.covers .aitile i{font-size:20px}
+.covers .aitile .spinner{width:18px;height:18px}
+/* After school + Tutoring (19 Nov): ranked list rows, my pick on top */
+.kprog{align-items:flex-start;text-align:left}
+.kprog .av{flex:none}
+.kp-n{display:block;font:600 14.5px/1.3 var(--sans);color:var(--strong)}
+.kp-pick{font:600 10.5px/16px var(--sans);font-style:normal;color:var(--brand);background:var(--brand-subtle,#e3efe6);border-radius:8px;padding:0 6px;margin-left:4px;vertical-align:1px}
+.kprog .kp-why{color:var(--brand)}
+.kprog .cb{margin-top:12px}

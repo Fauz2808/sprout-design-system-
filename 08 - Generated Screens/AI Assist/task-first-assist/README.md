@@ -2,6 +2,133 @@
 
 Live: https://sprout-assist-tasks.vercel.app/assist/ · local: `python3 build.py`, then serve `site/` (preview config `assist-tasks`, port 4330).
 
+## 19 Nov · Tony's review (MEETING-2026-11-19-tasks.md, L1–L8)
+
+**One link for Tony: `/review/`** (`app/review.html`). Nine phones, each starting its flow from the beginning, with
+one line on what changed. The desk links beside the phone (`LINKS` in `app/flows.js`) also start every flow fresh.
+
+- **L1 Assist home** (`renderEight()` in `app/app.js`, default `/assist/`; old homes at `?home=old|a|b`). Plan something:
+  Playdate, Book a sitter, Date night, Birthday (2×2). Register my kids: Sports, After school, Camps, Tutoring.
+  Anything still running sits above as "Pick up where you left off" (`activePlans()`); review state `/assist-ongoing/`.
+  Playdate uses the treehouse illustration (`club`), Birthday the balloons (`event`).
+- **L3 Book a sitter**: `sproutAsks()` replaces the compose/Send step: after "Ask …" Sprout texts each sitter in their
+  thread. The booking is "Casey's babysitting" with address and times (`recTitle`, `recLine`). Live Activity
+  (`laState`): "should be there in", then "2h left with Casey" countdown + Text, last 30 min, then Pay + Text at the end.
+  `payTonight()` replaces the morning-after card: stars + a note for the next family (`rateCard()`), then the Approve card,
+  paid through Stripe; "Paid another way" covers cash. `/pay-todo/` opens on that lock screen.
+- **L4 Share sitters**: `shareSheet()` (multi-select, a note per sitter, add someone new, saved to Priya's sitters) on
+  `/sitter-class-chat/` and `/sitter-v3-share/`.
+- **L5 Playdate**: one kid, "We can pick up and drop off", parent rows ("Leo's mom"), Message → `playdateDM()`.
+- **L6 Birthday**: From / Until, place before cover, class chosen after Send invites. `PARTY_STYLES` = Birthday-friendly
+  venues, Parks and playgrounds, Restaurants; search starts near home, "Another area" re-searches (`otherArea()`).
+  Casa Verde and Rosie's are the made-up date-night places reused as family restaurants. Nine cover tiles: eight covers
+  + "Make one with AI" (`coverCard()` in `flows.js`); covers 4–9 are Figma AI, scratch file `H5GZYtSTT9TOR8qc5ieuV7` 6:2–6:7.
+- **L7 Date night**: the time card has Table around + Home by; the sitter stays until Home by.
+- **After school** (`X.flows.afterschool`, `/after-school/`) and **Tutoring** (`X.flows.tutoring`, `/tutoring/`), so
+  every Register my kids tile opens a real flow. Camps pattern: `setupCard()` (one kid + chip groups) → work row →
+  `optionsCard()` (ranked, my pick on top) → form from the kid's profile with one new question → Approve → calendar.
+  Tutoring books a free 15-minute call first, then lessons. Programs and tutors (`AFTER`, `TUTORS`) are made-up samples.
+- **L8 Sitter profile**: name and number come from the thread (number shown, Change to edit), photo required, home ZIP
+  only. Re-entry without login is a proposal on the done page (text "profile" in a thread), not decided.
+
+## Report links
+
+- `/book-a-sitter-saved/` opens the sitter time card. Add `?review=conversation` for Alex's request or `?review=dana` for Dana's message sheet.
+- `/plan-a-date-night/?review=restaurants` opens all five recommendations using sample dinner preferences.
+- `/playdate/?review=playdate`, `/birthdays/?review=birthday`, and `/create-event/?review=class-event` open the named event directly.
+- `/sitter-class-chat/` and `/sitter-profile/?s=done` open the class chat and the editable sitter profile.
+
+## K1 · Assist home as a services grid (18 Nov)
+
+Tony asked for a custom illustration on each tile and a layout closer to Uber's services page. `renderUber()` in
+`app/app.js` has two directions: `/assist/?home=a` keeps today's three groups, and `/assist/?home=b` puts Popular first
+(sitter, date night, sports). Compare them with the current home at `/assist-home/`. Without `?home`, the current home shows.
+The 11 illustrations were generated in Figma file `HlWjGHq9JNgKSHXvI8RFeD`. `python3 tools/cut-illustrations.py`
+removes their backgrounds (rembg u2net) and writes `app/assets/illus/*.webp` plus 1024 px transparent masters in
+`research/illustrations-2026-11-18/cut/`.
+
+## Class event
+
+Open `/create-event/` and choose **Class event**. Pick a class and time, then choose from three
+venue recommendations on the birthday flow’s shared map and photo carousel. The demo uses curated
+Austin and Jakarta venues. Google Maps opens on the selected place. Pick a suggested title or choose
+**Write my own**. The venue photo is the default cover. Class and birthday invitations share the same
+compact layout. The class card’s pencils open the title, time, location, class, and cover editors.
+Saving updates that card in place before the organizer sends a simulated invitation.
+
+Zilker Park’s [venue details](https://www.austintexas.gov/parks/locations/zilker-metropolitan-park)
+come from Austin Parks and Recreation. The [Zilker Park photo](https://commons.wikimedia.org/wiki/File:Downtown_from_Zilker_Park.JPG)
+is by Airainix, converted to WebP, under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
+
+## J8 · Plan a birthday
+
+`X.flows.birthday` uses a start-only calendar and quick times, defaulting to Saturday at 2 PM.
+`birthdayPlace()` ranks sourced South Austin and Jakarta venues by party preference and straight-line distance.
+Choose Near home for South Austin, or use device location. If location is unavailable or fewer
+than three venues are in range, choose a demo area. The Sprout map uses OpenStreetMap streets
+with the date-night photo pins. Tap a pin or swipe a card to change the selected venue.
+The Google Maps toggle opens the live embed focused on that venue and keeps the photo cards visible.
+The first three photo cards lead to a full-screen venue detail sheet. Availability links to the
+venue's own site, with facilities and food in separate sections. Show more expands the shortlist.
+
+Local review photo sources: [Chuck E. Cheese South Austin](https://www.mapquest.com/us/texas/chuck-e-cheeses-370412268),
+[The Little Gym Austin South](https://www.familyaction.com/activity/the-little-gym-of-austin-south),
+[Westgate](https://boulderingproject.com/location/westgate/), [Thinkery](https://www.austintexas.org/listings/thinkery/1430/)
+and [Austin Zoo](https://austinzoo.org/parties/).
+Jakarta photos: [McDonald’s Lenteng Agung](https://kfmap.asia/stand-alone-retail/mcdonalds-lenteng-agung-26538),
+[kidzooona AEON Mall Tanjung Barat](https://www.aeonfantasy.co.id/en/store/),
+[PlayParq Kemang](https://playparq.com/kemang/) and [Habitat Park SCBD](https://habitat.id/areas/).
+
+`birthdayInviteBody()` shares one compact card across the host confirmation, invite preview, and
+copied guest link. A 5:4 cover sits above the title and the date, start time, and venue details.
+Covers remain prototype assets. Open `/birthdays/` or compare the host and guest in the
+[public Vercel preview](https://sprout-assist-tasks.vercel.app/sitter-date-night/#birthday).
+
+## J7 · Google ratings on dinner choices (18 Nov)
+
+At `/date-night-v3/`, `X.flows.dateE` ranks all five places and shows which filters they miss.
+`results()` and `menuSheet()` display the sample Google ratings and review counts from `EXTRA`.
+
+## J5 · Sitter profile (18 Nov)
+
+`app/sitter-profile.html` uses the sitter reply page and Messages compose styles. `show()` walks Jordan
+through name, photo, phone number, messaging preference, service area and optional simulated Stripe setup. Open `/sitter-profile/` from
+the invitation, or use the five review phones at `/sitter-date-night/`.
+On the live profile, `startEdit()` opens the existing profile or service area form with the saved fields filled in.
+Save updates the profile and stores it in the current browser. Cancel discards the draft. Try `/sitter-profile/?s=done`.
+
+## J6 · Plan a playdate (18 Nov)
+
+Plan an event → Playdate combines day, time, children and place. Select one or both children, then
+choose one classmate from their classes. `X.flows.playdate`
+previews the Sprout DM and records the accepted time in `CLOCK`. Try `/playdate/`, `/playdate-new-time/`
+or `/playdate-cant/`. The clock shows the shared reminder at 30 minutes before and the activity until
+15 minutes after the end. `playdateInbox()` at `/playdate-invite/` adapts the class chat header for Tony’s
+DM and lets Ana confirm, suggest a time, or reply.
+
+## J4 · Share a sitter from class chat (18 Nov)
+
+`/sitter-class-chat/` shows Priya’s view of Tony’s request. `classChat()` and `classMessage()` use the
+CHAT-10 chrome with prototype messages. `shareClassSitter()` shares Taylor or opens the same
+`sitterFields()` form as manual Add a sitter. The builder crops the two chrome images from the supplied PNG using Pillow.
+
+## J2 · Sprout in sitter texts (18 Nov)
+
+`compose()` and `sendEach()` show one thread per sitter. `sendAndBook()` simulates replies, lets you
+use `markSheet()` for an outside reply, and simulates Sprout texting the booking and follow-up in those
+threads. Try `/sitter-v3/`, `/sitter-v3-none/` or the sitter step on `/date-night-v3/`.
+
+## J3 · Text Dana the plan (18 Nov)
+
+`sendAndBook()` and the We're covered branch of `X.flows.dateE` open `compose()` with the booked
+plan addressed to Dana. See `/sitter-v3/` after booking a sitter and `/date-night-v3/` after booking the table.
+
+## J1 · Sitter time card (18 Nov)
+
+Ahmad picked B. `whenCard()` uses From / Until chips for Book a sitter and the shared playdate time control.
+The first free day is preselected. Other time opens `timeWheel()` for starts outside the preset range.
+Try `/sitter-v3/` or the B example on `/sitter-date-night/`.
+
 ## D6 · Assist wiring map (17 Nov)
 
 `app/assist-map.html` → `/assist-map/`. How every Assist flow writes into the Daily Brief, to-dos, pushes, the family
@@ -75,6 +202,7 @@ whose parts are the approved SSC Kids demo (`../ssc-kids-signup-demo/prototype/i
 | Parent answers | dark green bubble | right; always the exact label they tapped |
 | Pick one option | chips | directly under the card or message they answer, left-aligned with the card |
 | A question about a card | `.q` box inside the card with chips | inside the card, one question at a time; the answer becomes a "Just now" field row |
+| Edit a field on a card | field pencil and its editor | open the field editor directly and update the original card in place |
 | Pick several | pick rows with checkboxes + one full-width green button that says what happens ("Ask Maria and Sam", "Sign up for 2 weeks · $990") | button at the bottom of the card; skip/alternative as a chip under it |
 | Sprout working | status row: spinner → icon + check | under the last message |
 | Money | Approve payment card: lines, total, tappable card row, "Waiting for you or Dana", Decline (ghost) + Approve $X (green) side by side, then Face ID | inside the card |
@@ -112,7 +240,7 @@ Everything is sample data. Nothing is sent, booked or charged.
 | Soccer | SSC demo (Tony-approved), copy unchanged | Branches from K12 v2 `15492:51581`: Remind me later (M·1/M·2), Not this season (Q·1–Q·3), password sheet R·1/R·2 |
 | Summer camps | K10 v3 `15524:43294` | Map entry P·1, details sheet D·1, week picker P·4, form P·5–P·8 + waiver sheet X·3, profile P·9, account A·1–A·3, sign-up day P·10–P·12, Jake P·13–P·14, more weeks P·15/P·16/X·5/X·7, others P·2/P·3/X·1, not now Q·2 |
 | Ask my sitters / class families | A8 `16151:356321` (Ahmad chose A with B fallback, 14 Nov) | Rebuilt with SSC parts, not A8's full-width rows; confirm card = SSC approval card without payment |
-| Plan an event | K4 row F `14892:33651` | Birthday F·1–F·11 (draft in the composer, 3 covers, details, invite, Thursday headcount), playdate F·12–F·16 |
+| Plan an event | K4 row F `14892:33651` | Birthday F·1–F·11 (J8 tap-through, covers, event card, invite link, class headcount), playdate F·12–F·16 |
 | Start a club | K4 row G | G·1–G·11 |
 | Night out | none in Figma (A8 has no dinner frames) | Same parts; dinner step is a placeholder until a design exists |
 

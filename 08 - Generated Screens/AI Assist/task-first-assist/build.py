@@ -9,6 +9,7 @@ Assist home (Figma A·1 14892:33659) and thin variants of SSC parts.
 """
 from pathlib import Path
 import json, re, shutil
+from PIL import Image
 
 HERE = Path(__file__).resolve().parent
 APP = HERE / 'app'
@@ -16,10 +17,14 @@ SSC = HERE.parent / 'ssc-kids-signup-demo/prototype/index.html'
 SITE = HERE / 'site'
 
 ROUTES = ['assist', 'sports', 'summer-camps', 'own-sitters', 'class-families', 'night-out',
-          'birthdays', 'create-event', 'create-club', 'accounts-payments',
+          'birthdays', 'birthday-invite', 'create-event', 'create-club', 'accounts-payments',
           'date-night-a', 'date-night-b', 'date-night-c', 'date-night-v2',
           'sitter-v3', 'sitter-v3-class', 'sitter-v3-none', 'sitter-v3-share', 'date-night-v3',
-          'ui-a', 'ui-b', 'ui-c', 'pay-todo', 'happening-am', 'happening-pm']
+          'sitter-when-a', 'sitter-when-b', 'sitter-class-chat',
+          'sitter-profile',
+          'playdate', 'playdate-new-time', 'playdate-cant', 'playdate-invite',
+          'ui-a', 'ui-b', 'ui-c', 'pay-todo', 'happening-am', 'happening-pm',
+          'book-a-sitter', 'book-a-sitter-saved', 'plan-a-date-night', 'booked-evening', 'chat-history', 'add-account', 'assist-ongoing', 'after-school', 'tutoring']
 
 ssc = SSC.read_text()
 css = re.search(r'<style>(.*?)</style>', ssc, re.S).group(1)
@@ -41,6 +46,10 @@ SITE.mkdir(exist_ok=True)
 for r in ROUTES:
     (SITE / r).mkdir(exist_ok=True)
     (SITE / r / 'index.html').write_text(page)
+# J4: publish only the class chat chrome, without the conversation in the reference.
+with Image.open(HERE / 'research/ref-2026-11-18/class-chat-CHAT-10-8728-99165.png') as chat:
+    chat.crop((0, 0, 393, 265)).save(SITE / 'sitter-class-chat/header.png')
+    chat.crop((0, 750, 393, 852)).save(SITE / 'sitter-class-chat/composer.png')
 for f in ['app.css', 'app.js', 'flows.js', 'date-night.js', 'date-night-map.js', 'date-night-map.css', 'sitter-v3.js', 'sitter-v3.css', 'ui-directions.js', 'ui-directions.css']:
     shutil.copy2(APP / f, SITE / f)
 # B3 review: the three date night directions side by side
@@ -55,8 +64,15 @@ if (APP / 'sprout-map.html').exists():   # I1 (17 Nov): whole-Sprout map; data i
     if (APP / 'sprout-map-data.js').exists(): shutil.copy2(APP / 'sprout-map-data.js', SITE / 'sprout-map-data.js')
 (SITE / 'sitter-reply').mkdir(exist_ok=True)
 (SITE / 'sitter-reply' / 'index.html').write_text((APP / 'sitter-reply.html').read_text())
+(SITE / 'sitter-profile' / 'index.html').write_text((APP / 'sitter-profile.html').read_text())
 (SITE / 'ui-directions').mkdir(exist_ok=True)
 (SITE / 'ui-directions' / 'index.html').write_text((APP / 'ui-review.html').read_text())
+# K1 (18 Nov): Assist home, Uber-style services grid, current vs A vs B
+(SITE / 'assist-home').mkdir(exist_ok=True)
+(SITE / 'assist-home' / 'index.html').write_text((APP / 'home-review.html').read_text())
+# L2 (19 Nov): the one link for Tony, every flow from its start
+(SITE / 'review').mkdir(exist_ok=True)
+(SITE / 'review' / 'index.html').write_text((APP / 'review.html').read_text())
 (SITE / 'sitter-date-night').mkdir(exist_ok=True)
 (SITE / 'sitter-date-night' / 'index.html').write_text((APP / 'sitter-review.html').read_text())
 (SITE / 'date-night' / 'index.html').write_text((APP / 'date-night-review.html').read_text().replace('?v=0', '?v=' + v))

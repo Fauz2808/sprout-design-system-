@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sprout hero C · Class page</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="icon" href="../assets/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<!-- Hero direction C, 19 Nov 2026. Review scaffolding: hero + top bar only.
+     Idea: the class page of a yearbook, for the parents. One class, every parent by name and by kid, and one empty
+     spot saved for you. It is the member directory turned into the first thing you see. The faces are the app's
+     existing fictional cast (assets/assist/mem-*, dm-*, cls-*, v2/cast-aisha; dana + elena copied from the Assist
+     prototype); no real parents, no counts. -->
+<style>
+:root {
+  --bg: #f4f1ea; --sand: #ebe4d4; --paper: #fbfaf6; --ink: #1e3e2b; --text: #4d525b; --muted: #7d715e;
+  --green: #186338; --green-subtle: #e2e9e3; --line: rgb(30 62 43 / 0.14);
+  --serif: "Playfair Display", Georgia, serif; --sans: "Inter", -apple-system, system-ui, sans-serif;
+  --gx: clamp(16px, 5.5vw, 80px); --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; overflow-x: clip; }
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+a:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; border-radius: 4px; }
+.top { position: relative; z-index: 5; display: flex; align-items: center; gap: 28px; height: 72px; padding: 0 var(--gx); }
+.logo { display: inline-flex; align-items: center; gap: 9px; font: 600 22px/1 var(--serif); color: var(--ink); text-decoration: none; }
+.top-links { display: flex; gap: 26px; margin-left: auto; font-size: 15px; }
+.top-links a { color: var(--ink); opacity: 0.78; text-decoration: none; }
+.top-links a:hover { opacity: 1; }
+.top-rp, .top-cta { font: 500 15px/1 var(--serif); text-decoration: none; padding: 12px 16px; border-radius: 99px; white-space: nowrap; }
+.top-rp { color: var(--green); }
+.top-rp:hover { background: var(--green-subtle); }
+.top-cta { color: #fff; background: var(--green); padding-inline: 20px; }
+.top-rp .sm { display: none; }
+
+/* ── C · class page ── */
+.hero { position: relative; overflow: hidden; height: calc(max(760px, 100svh) - 72px); max-height: 1000px;
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: clamp(36px, 5vw, 88px); align-items: center; padding: 0 0 0 var(--gx); }
+.copy { padding-bottom: 4vh; }
+h1 { margin: 0; font: 500 clamp(42px, 4.9vw, 74px)/1.02 var(--serif); letter-spacing: -0.022em; color: var(--ink); }
+h1 em { display: block; margin-top: 0.12em; font-style: italic; font-weight: 400; color: var(--green); }
+.lede { margin: 26px 0 0; max-width: 38ch; font-size: 18px; color: var(--text); }
+.proof { margin: 24px 0 0; padding-top: 12px; border-top: 1px solid var(--line); max-width: 38ch; font-size: 13px; line-height: 1.6; color: var(--muted); }
+.proof span { display: block; }
+.proof span:first-child { color: var(--ink); font-weight: 500; }
+
+/* the page: flush to the right edge, like a page of the yearbook coming in */
+.page { position: relative; background: var(--paper); border: 1px solid var(--line); border-right: 0; border-radius: 6px 0 0 6px;
+  padding: clamp(26px, 4vh, 40px) clamp(28px, 4vw, 60px) clamp(28px, 4.4vh, 44px); box-shadow: 0 30px 60px -40px rgb(40 50 30 / 0.35); }
+.page-meta { display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.page h2 { margin: 10px 0 0; padding-bottom: 18px; border-bottom: 1px solid var(--line); font: 500 clamp(26px, 2.3vw, 34px)/1.15 var(--serif); color: var(--ink); }
+.page h2 em { font-style: italic; font-weight: 400; color: var(--muted); }
+.roster { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(16px, 2.6vh, 26px) clamp(14px, 1.6vw, 26px); margin-top: clamp(20px, 3vh, 30px); }
+.p { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 0; --av: clamp(78px, 6.8vw, 100px); }
+.p img, .p .spot { width: var(--av); aspect-ratio: 1; border-radius: 50%; object-fit: cover; background: var(--sand); }
+/* one yearbook treatment over photos from different shoots */
+.p img { filter: saturate(0.8) sepia(0.06) contrast(1.02); }
+.p b { margin-top: 10px; font: 500 16px/1.25 var(--serif); color: var(--ink); white-space: nowrap; }
+.p small { margin-top: 2px; font-size: 12.5px; line-height: 1.35; color: var(--muted); }
+.p .rp { position: absolute; top: calc(var(--av) - 14px); left: 50%; translate: -50% 0; white-space: nowrap; box-shadow: 0 0 0 2px var(--paper); font-size: 10px; font-weight: 600; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 99px; background: var(--green-subtle); color: var(--green); }
+.p.you { text-decoration: none; }
+.p .spot { display: grid; place-items: center; background: transparent; border: 1.5px dashed rgb(24 99 56 / 0.55); color: var(--green); font-size: 26px; transition: background 0.2s; }
+.p.you b { color: var(--green); }
+.p.you:hover .spot { background: var(--green-subtle); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .page { animation: slide 1s var(--ease) both; }
+  .p { animation: fade 0.7s ease both; animation-delay: calc(0.35s + var(--i) * 0.05s); }
+  @keyframes slide { from { opacity: 0; transform: translateX(40px); } }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } }
+}
+@media (max-width: 1100px) { .roster { grid-template-columns: repeat(3, minmax(0, 1fr)); } .p.d-hide { display: none; } }
+@media (max-width: 820px) {
+  .top-links { display: none; } .top-rp { margin-left: auto; }
+  .hero { height: auto; max-height: none; display: block; padding: 20px 0 0; }
+  .copy { padding: 0 var(--gx) 28px; }
+  .page { margin-left: var(--gx); }
+}
+@media (max-width: 640px) {
+  .top { gap: 2px; height: 64px; }
+  .logo { font-size: 20px; gap: 7px; }
+  .logo img { width: 26px; height: 26px; }
+  .top-rp, .top-cta { font-size: 13.5px; padding: 10px 11px; }
+  .top-rp .lg { display: none; }
+  .top-rp .sm { display: inline; }
+  .hero { padding-top: 14px; }
+  h1 { font-size: 10.4vw; }
+  .lede { margin-top: 14px; font-size: 16px; }
+  .proof { margin-top: 14px; padding-top: 10px; font-size: 12.5px; max-width: none; }
+  .copy { padding-bottom: 24px; }
+  .page { margin-left: 16px; padding: 20px 16px 24px 18px; }
+  .page-meta { font-size: 10px; }
+  .page h2 { font-size: 22px; padding-bottom: 12px; }
+  .roster { gap: 16px 8px; margin-top: 18px; }
+  .p { --av: 74px; }
+  .p b { font-size: 14px; margin-top: 8px; }
+  .p small { font-size: 11.5px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="#" aria-label="Sprout home"><img src="../assets/logo.png" alt="" width="30" height="30" />Sprout</a>
+  <nav class="top-links" aria-label="Sections"><a href="#">Daily Brief</a><a href="#">Class chats</a><a href="#">Directory</a><a href="#">FAQ</a></nav>
+  <a class="top-rp" href="https://roomparent.com" rel="noopener"><span class="lg">I’m a room parent</span><span class="sm">Room parent</span></a>
+  <a class="top-cta" href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052">Join your schools</a>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="hero-h">
+    <div class="copy">
+      <h1 id="hero-h">Your kid knows everyone in class. <em>Now you can too.</em></h1>
+      <p class="lede">Sprout is your school’s parent community: every parent in every class, by name and by kid, without swapping phone numbers. Plus a daily plan that does the remembering.</p>
+      <p class="proof"><span>Kiker families in Circle C are already here</span><span>Free for parents. Always.</span></p>
+    </div>
+
+    <div class="page" aria-label="Example: the parents of Ms. Taylor’s first grade class at Kiker Elementary">
+      <p class="page-meta" style="margin:0"><span>Kiker Elementary · First grade</span><span>2026–27</span></p>
+      <h2>The parents of <em>Ms. Taylor’s Class</em></h2>
+      <ul class="roster">
+        <li class="p" style="--i:0"><img src="../assets/assist/mem-sarah.webp" alt="" /><b>Sarah Becker</b><small>Howard’s mom</small></li>
+        <li class="p" style="--i:1"><img src="../assets/assist/dm-raj.webp" alt="" /><b>Raj Singh</b><small>Anaya’s dad</small></li>
+        <li class="p" style="--i:2"><img src="assets/elena.webp" alt="" /><b>Elena Ruiz</b><small>Mateo’s mom</small></li>
+        <li class="p" style="--i:3"><img src="../assets/assist/cls-albert.webp" alt="" /><b>Albert Flores</b><small>Nora’s grandpa</small></li>
+        <li class="p" style="--i:4"><img src="../assets/v2/cast-aisha.webp" alt="" /><b>Aisha Khan</b><small>Zara’s mom</small></li>
+        <li class="p" style="--i:5"><img src="../assets/assist/mem-jake.webp" alt="" /><b>Jake Thompson</b><small>Erick’s dad</small></li>
+        <li class="p" style="--i:6"><img src="assets/dana.webp" alt="" /><b>Dana Reyes</b><small>Lily’s mom</small><span class="rp">Room parent</span></li>
+        <li class="p d-hide" style="--i:7"><img src="../assets/assist/cls-floyd.webp" alt="" /><b>Floyd Miles</b><small>Ava’s dad</small></li>
+        <li class="p d-hide" style="--i:8"><img src="../assets/assist/mem-jessica.webp" alt="" /><b>Jessica LaRonde</b><small>Robert’s mom</small></li>
+        <li class="p" style="--i:9"><img src="../assets/assist/mem-mike.webp" alt="" /><b>Mike Johnson</b><small>Hawkins’ dad</small></li>
+        <li class="p d-hide" style="--i:10"><img src="../assets/assist/mem-emily.webp" alt="" /><b>Emily Centineo</b><small>Flore’s mom</small></li>
+        <li style="--i:11" class="p-wrap"><a class="p you" href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052"><span class="spot"><i class="ph ph-plus"></i></span><b>Your spot</b><small>Saved for you</small></a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+</body>
+</html>

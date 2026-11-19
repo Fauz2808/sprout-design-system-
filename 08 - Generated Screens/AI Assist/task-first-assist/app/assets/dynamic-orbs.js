@@ -36,9 +36,13 @@
     if (!reduced.matches) frame = requestAnimationFrame(draw);
   }
   function refresh() { mount(); if (!frame) draw(); }
-  new MutationObserver(refresh).observe(document.body, { childList: true, subtree: true });
   document.addEventListener('visibilitychange', () => { cancelAnimationFrame(frame); frame = 0; refresh(); });
   reduced.addEventListener('change', () => { cancelAnimationFrame(frame); frame = 0; refresh(); });
   document.addEventListener('transitionend', refresh);
-  refresh();
+  function watchBody() {
+    new MutationObserver(refresh).observe(document.body, { childList: true, subtree: true });
+    refresh();
+  }
+  if (document.body) watchBody();
+  else document.addEventListener('DOMContentLoaded', watchBody, { once: true });
 })();

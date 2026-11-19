@@ -12,8 +12,9 @@ const { later, joinNames, sub } = D;
 const $ = s => document.querySelector(s);
 const A = X.A;
 const route = location.pathname.split('/').filter(Boolean)[0] || '';
+const review = new URLSearchParams(location.search).get('review');
 /* review routes fake a family state; the real app (every other route) starts with no sitters and fills MY as you go */
-const STATE = { 'sitter-v3':'saved', 'sitter-v3-class':'class', 'sitter-v3-none':'none' }[route] || 'app';
+const STATE = { 'sitter-v3':'saved', 'sitter-v3-class':'class', 'sitter-v3-none':'none', 'book-a-sitter-saved':'saved' }[route] || 'app';
 
 /* ---------- family + calendar (today is Monday, July 27) ---------- */
 const KIDS = [{ n:'Maya', age:7, cls:'Miss Taylor’s class', img:A + 'maya.webp' }, { n:'Jake', age:5, cls:'Miss Poole’s class', img:A + 'jake.webp' }];
@@ -49,8 +50,7 @@ const range = (a, b) => (Math.floor(a / 720) % 2 === Math.floor(b / 720) % 2 && 
 const hrs = h => `${h % 1 ? h.toFixed(1) : h} hour${h === 1 ? '' : 's'}`;
 const parseT = t => { const [h, m] = t.split(':').map(Number); return (h + 12) * 60 + (m || 0); };
 
-/* ---------- when (E1, 17 Nov): week strip, then quick picks + Starts / Ends fields that open a time wheel.
-   Any time of day works (10 AM, 1 PM, overnight); the common evenings are one tap. ---------- */
+/* ---------- when: week strip, quick picks, and the chosen From / Until chips ---------- */
 function timeWheel({ title, value, min = 0 }){
   /* hour · minute · AM/PM columns that snap; value and result are minutes since midnight */
   return new Promise(res => {
@@ -72,53 +72,114 @@ function timeWheel({ title, value, min = 0 }){
       const m = (H[idx.h] % 12) * 60 + MI[idx.m] + (idx.a ? 720 : 0); v.close(); res(m); };
   });
 }
-function whenCard(p, { mode = 'sitter', preset } = {}){
+function whenCard(p, { mode = 'sitter', preset, canContinue } = {}){
   return new Promise(res => {
-    const dinner = mode === 'dinner';
-    let day = preset ? DAYS.find(d => d.w === preset.w) : null, from = preset?.from ?? (dinner ? 1140 : 1080), to = preset?.to ?? 1320;
-    const QUICK = dinner ? [[1080], [1110], [1140], [1170], [1200]] : [[540, 720, 'Morning'], [780, 1020, 'Afternoon'], [1080, 1320, 'Evening']];
-    const c = p.block(`<div class="card"><div class="ctop">${clay('calendar-check')}<div><div class="eyebrow">${dinner ? 'Date night' : 'Sitter'}</div><div class="ttl">${dinner ? 'When are you going out?' : 'When do you need a sitter?'}</div></div></div>
+    const dinner = mode === 'dinner', birthday = mode === 'birthday', classEvent = mode === 'class-event';
+    /* L6/L7 (Tony, 19 Nov): every plan has an end. Birthdays get From / Until ("they kinda wanna time box it"),
+       date night gets Home by next to the table time. */
+    const startOnly = false;
+    const variant = mode === 'sitter' && route === 'sitter-when-a' ? 'a' : (mode === 'sitter' || mode === 'playdate' || classEvent || birthday) && 'b';
+    let day = preset ? DAYS.find(d => d.w === preset.w) : DAYS.find(d => d.free), from = preset?.from ?? (dinner ? 1140 : 1080), to = preset?.to ?? (dinner ? (preset?.from ?? 1140) + 210 : birthday ? (preset?.from ?? 840) + 120 : 1320);
+    const QUICK = dinner ? [[1080], [1110], [1140], [1170], [1200]]
+      : birthday ? [[600, 720], [780, 900], [840, 960]] : [[540, 720, 'Morning'], [780, 1020, 'Afternoon'], [1080, 1320, 'Evening']];
+    const step = variant === 'a' ? 60 : 30;
+    const strip = 'display:flex;flex-wrap:nowrap;overflow-x:auto';
+    const timeChips = (name, first, last, extra) => {
+      const times = [];
+      for (let m = first; m <= last; m += step) times.push(m);
+      if (extra != null && !times.includes(extra)) { times.push(extra); times.sort((a, b) => a - b); }
+      return times.map(m => `<button class="chip" style="flex:none" data-${name}="${m}">${tl(m)}${m >= 1440 ? ' · next day' : ''}</button>`).join('');
+    };
+    const chipFields = variant ? `<div class="dlabel" style="margin-top:16px">${variant === 'a' ? 'Starts' : 'From'}</div>
+      <div class="qk" style="${strip}">${timeChips('start', 480, 1260)}<button class="chip" style="flex:none" data-f>Other time</button></div>
+      <div class="dlabel" style="margin-top:16px">${variant === 'a' ? 'How long' : 'Until'}</div>
+      <div class="qk" style="${strip}" data-end-row>${variant === 'a' ? [2, 3, 4, 5, 6].map(h => `<button class="chip" style="flex:none" data-length="${h}">${h} hrs</button>`).join('') : ''}</div>` : '';
+    const c = p.block(`<div class="card"><div class="ctop">${clay('calendar-check')}<div><div class="eyebrow">${dinner ? 'Date night' : birthday ? 'Birthday party' : classEvent ? 'Class event' : 'Sitter'}</div><div class="ttl">${dinner ? 'When are you going out?' : birthday ? 'When is the party?' : classEvent ? 'When is the event?' : 'When do you need a sitter?'}</div></div></div>
       <div class="ua-days">${DAYS.map((d, i) => `<button class="ua-day${d.free ? ' free' : ''}" data-i="${i}"><small>${d.w}</small><b>${d.d}</b><i></i></button>`).join('')}</div>
       <div class="ua-legend"><i></i>You and Dana are both free</div>
       <div class="dlabel" style="margin-top:16px">Quick options</div>
       <div class="qk">${QUICK.map(([a, b], i) => `<button class="chip" data-q="${i}">${dinner ? tl(a) : range(a, b)}</button>`).join('')}</div>
-      <div class="tf">${dinner ? `<button class="tf-f" data-f><small>Table around</small><b data-fv></b><i class="ph ph-caret-down"></i></button>`
-        : `<button class="tf-f" data-f><small>Starts</small><b data-fv></b><i class="ph ph-caret-down"></i></button><button class="tf-f" data-t><small>Ends</small><b data-tv></b><i class="ph ph-caret-down"></i></button>`}</div>
-      <div class="ua-dur"><i class="ph-fill ph-${dinner ? 'fork-knife' : 'moon-stars'}"></i><span data-d></span></div>
+      ${variant ? chipFields : `<div class="tf">${dinner ? `<button class="tf-f" data-f><small>Table around</small><b data-fv></b><i class="ph ph-caret-down"></i></button><button class="tf-f" data-t><small>Home by</small><b data-tv></b><i class="ph ph-caret-down"></i></button>`
+        : `<button class="tf-f" data-f><small>Starts</small><b data-fv></b><i class="ph ph-caret-down"></i></button><button class="tf-f" data-t><small>Ends</small><b data-tv></b><i class="ph ph-caret-down"></i></button>`}</div>`}
+      <div class="ua-dur"><i class="ph-fill ph-${dinner ? 'fork-knife' : birthday || classEvent ? 'calendar-blank' : 'moon-stars'}"></i><span data-d></span></div>
       <button class="btn" style="margin-top:14px">Next</button></div>`).querySelector('.card');
     const btn = c.querySelector('.btn');
     const paint = () => {
       c.querySelectorAll('.ua-day').forEach(b => b.classList.toggle('on', DAYS[+b.dataset.i] === day));
-      c.querySelector('[data-fv]').textContent = tl(from);
-      if (!dinner) c.querySelector('[data-tv]').innerHTML = tl(to) + (to >= 1440 ? ' <em>next day</em>' : '');
+      if (variant) {
+        const other = c.querySelector('[data-f]');
+        const custom = from < 480 || from > 1260 || from % step !== 0;
+        other.textContent = custom ? `Other time · ${tl(from)}` : 'Other time';
+        other.classList.toggle('sel', custom);
+        c.querySelectorAll('[data-start]').forEach(b => b.classList.toggle('sel', +b.dataset.start === from));
+        if (variant === 'a') c.querySelectorAll('[data-length]').forEach(b => b.classList.toggle('sel', +b.dataset.length * 60 === to - from));
+        else {
+          const row = c.querySelector('[data-end-row]');
+          if (row.dataset.from !== String(from)) {
+            const last = from + 960;
+            row.innerHTML = timeChips('end', (Math.floor(from / 30) + 1) * 30, last, to > from && to <= last ? to : null);
+            row.dataset.from = from;
+            row.querySelectorAll('[data-end]').forEach(b => b.onclick = () => { to = +b.dataset.end; paint(); });
+          }
+          row.querySelectorAll('[data-end]').forEach(b => b.classList.toggle('sel', +b.dataset.end === to));
+        }
+      } else {
+        c.querySelector('[data-fv]').textContent = tl(from);
+        c.querySelector('[data-tv]').innerHTML = tl(to) + (to >= 1440 ? ' <em>next day</em>' : '');
+      }
       c.querySelectorAll('[data-q]').forEach(b => { const [a, z] = QUICK[+b.dataset.q]; b.classList.toggle('sel', dinner ? a === from : a === from && z === to); });
-      c.querySelector('[data-d]').textContent = !day ? 'Pick a day' : dinner ? `${day.day} · table for 2 around ${tl(from)}` : `${day.day} · ${range(from, to)} · ${hrs((to - from) / 60)}`;
-      btn.disabled = !day;
+      c.querySelector('[data-d]').textContent = !day ? 'Pick a day' : dinner ? `${day.day} · table around ${tl(from)} · home by ${tl(to)}${to >= 1440 ? ' next day' : ''}` : `${day.day} · ${range(from, to)}${variant && to >= 1440 ? ' next day' : ''} · ${hrs((to - from) / 60)}`;
+      btn.disabled = !day || (canContinue ? !canContinue() : false);
     };
     c.querySelectorAll('.ua-day').forEach(b => b.onclick = () => { day = DAYS[+b.dataset.i]; paint(); });
-    c.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { const [a, z] = QUICK[+b.dataset.q]; from = a; if (!dinner) to = z; paint(); });
-    c.querySelector('[data-f]').onclick = async () => { const m = await timeWheel({ title: dinner ? 'Dinner time' : 'Start time', value:from }); if (m == null) return;
-      from = m % 1440; if (!dinner && to <= from) to = Math.min(from + 240, from + 1439); paint(); };
+    c.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { const [a, z] = QUICK[+b.dataset.q]; if (dinner) { const d = to - from; from = a; to = a + d; } else { from = a; to = z; } paint(); });
+    const setStart = m => {
+      const duration = to - from;
+      from = m;
+      if (variant === 'a') to = from + duration;
+      else if (variant === 'b' && (to <= from || to > from + 960)) to = Math.round((from + duration) / 30) * 30;
+      else if (!startOnly && to <= from) to = from + 240;
+      paint();
+    };
+    c.querySelectorAll('[data-start]').forEach(b => b.onclick = () => setStart(+b.dataset.start));
+    c.querySelectorAll('[data-length]').forEach(b => b.onclick = () => { to = from + +b.dataset.length * 60; paint(); });
+    c.querySelector('[data-f]').onclick = async () => { const m = await timeWheel({ title: dinner ? 'Dinner time' : 'Start time', value:from }); if (m != null) setStart(m % 1440); };
     /* an end before the start only makes sense overnight (an AM end); an earlier PM end is a mistake, so say so */
-    if (!dinner) c.querySelector('[data-t]').onclick = async () => { const m = await timeWheel({ title:'End time', value:to }); if (m == null) return;
+    if (!startOnly && !variant) c.querySelector('[data-t]').onclick = async () => { const m = await timeWheel({ title:'End time', value:to }); if (m == null) return;
       let e = m % 1440; if (e <= from) { if (e < 720 && e + 1440 - from <= 16 * 60) e += 1440; else return toast(`Ends before it starts. Pick a time after ${tl(from)}.`); }
       to = e; paint(); };
-    btn.onclick = () => { if (!day) return; c.querySelectorAll('button').forEach(b => b.style.pointerEvents = 'none'); btn.remove(); p.me(dinner ? `${day.day}, around ${tl(from)}` : `${day.day}, ${range(from, to)}`); res({ day, from, to }); };
+    btn.onclick = () => { if (btn.disabled) return; c.querySelectorAll('button').forEach(b => b.style.pointerEvents = 'none'); btn.remove(); p.me(dinner ? `${day.day}, table around ${tl(from)}, home by ${tl(to)}` : `${day.day}, ${range(from, to)}`); res({ day, from, to }); };
     paint(); p.scroll();
   });
 }
 
 /* ---------- which kids (A): photo rows, tint when on, all on ---------- */
-function kidsCard(p, cur){
+function kidsCard(p, cur, { birthday = false } = {}){
   return new Promise(res => {
-    const c = p.block(`<div class="card"><div class="ctop">${clay('two-people')}<div><div class="eyebrow">Sitter</div><div class="ttl">Who is the sitter for?</div></div></div>
+    const c = p.block(`<div class="card"><div class="ctop">${clay('two-people')}<div><div class="eyebrow">${birthday ? 'Birthday party' : 'Sitter'}</div><div class="ttl">${birthday ? 'Whose birthday is it?' : 'Who is the sitter for?'}</div></div></div>
       <div class="ua-rows">${KIDS.map(k => `<button class="ua-row${!cur || cur.some(c => c.n === k.n) ? ' on' : ''}" data-n="${k.n}"><span class="uaph" style="background-image:url(${k.img})"></span><span class="tx"><b>${k.n}</b><small>${k.age} · ${k.cls}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button>`).join('')}</div>
       <button class="btn" style="margin-top:14px">Next · Maya and Jake</button></div>`).querySelector('.card');
-    if (cur) c.querySelector('.btn').textContent = `Next · ${joinNames(cur.map(k => k.n))}`;
     const btn = c.querySelector('.btn'), picks = [...c.querySelectorAll('.ua-row')];
     const names = () => picks.filter(x => x.classList.contains('on')).map(x => x.dataset.n);
-    picks.forEach(x => x.onclick = () => { x.classList.toggle('on'); const n = names(); btn.disabled = !n.length; btn.textContent = n.length ? `Next · ${joinNames(n)}` : 'Pick at least one'; });
-    btn.onclick = () => { const n = names(); picks.forEach(x => x.style.pointerEvents = 'none'); btn.remove(); p.me(`For ${joinNames(n)}`); res(KIDS.filter(k => n.includes(k.n))); };
+    const paint = () => {
+      const n = names();
+      picks.forEach(x => x.setAttribute('aria-pressed', x.classList.contains('on')));
+      btn.disabled = !n.length;
+      btn.textContent = n.length ? `Next · ${joinNames(n)}` : birthday ? 'Pick a child' : 'Pick at least one';
+    };
+    picks.forEach(x => x.onclick = () => {
+      if (birthday) picks.forEach(row => row.classList.toggle('on', row === x));
+      else x.classList.toggle('on');
+      paint();
+    });
+    btn.onclick = () => {
+      const n = names();
+      picks.forEach(row => { if (birthday) row.disabled = true; else row.style.pointerEvents = 'none'; });
+      p.me(birthday ? btn.textContent : `For ${joinNames(n)}`);
+      btn.remove();
+      res(KIDS.filter(k => n.includes(k.n)));
+    };
+    paint();
     p.scroll();
   });
 }
@@ -131,12 +192,21 @@ function editText(title, value, { rows = 5, label = '' } = {}){
     v.foot.querySelector('[data-go]').onclick = () => { const t = v.body.querySelector('textarea').value.trim(); v.close(); res(t || null); };
   });
 }
-function editFields(title, fields){
+function editFields(title, fields, { requiredMessage } = {}){
   return new Promise(res => {
     const v = bsheet({ onBack:() => res(null), body:`<div class="bh"><span class="icotile"><i class="ph ph-pencil-simple"></i></span><b>${title}</b></div>
       <div class="fields" style="margin-top:0">${fields.map(([l, val, type]) => type === 'area' ? `<label class="field in"><div style="width:100%"><div class="l">${l}</div><textarea class="edt" rows="3">${val}</textarea></div></label>` : `<label class="field in"><div style="width:100%"><div class="l">${l}</div><input value="${val}" ${type === 'num' ? 'inputmode="decimal"' : ''} autocomplete="off"></div></label>`).join('')}</div>`,
       foot:`<button type="button" class="btn" data-go>Save</button>` });
-    v.foot.querySelector('[data-go]').onclick = () => { const vals = [...v.body.querySelectorAll('input, textarea')].map(x => x.value.trim()); v.close(); res(vals); };
+    v.foot.querySelector('[data-go]').onclick = () => {
+      const inputs = [...v.body.querySelectorAll('input, textarea')];
+      const values = inputs.map(input => input.value.trim());
+      const empty = values.indexOf('');
+      if (requiredMessage && empty !== -1) {
+        inputs[empty].focus();
+        return toast(requiredMessage);
+      }
+      v.close(); res(values);
+    };
   });
 }
 
@@ -185,22 +255,45 @@ async function requestCard(p, w, kids, dinner){
 }
 
 /* ---------- add a sitter you know (sheet, saved to your account) ---------- */
+function sitterFields({ name = '', phone = '', rate = '' } = {}){
+  const fields = el(`<div><div class="fields" style="margin-top:0">
+      <label class="field in"><div style="width:100%"><div class="l">Name</div><input autocomplete="off"></div></label>
+      <label class="field in"><div style="width:100%"><div class="l">Phone</div><input inputmode="tel" autocomplete="off"></div></label>
+      <label class="field in"><div style="width:100%"><div class="l">Rate per hour (optional)</div><input inputmode="numeric" autocomplete="off"></div></label></div>
+    <div class="dlabel">Show as</div><div class="fchips" style="margin-top:6px"><button type="button" class="chip sel" data-g="f" aria-pressed="true">She</button><button type="button" class="chip" data-g="m" aria-pressed="false">He</button></div>
+    <div class="dlabel">Text them on</div><div class="fchips" style="margin-top:6px"><button type="button" class="chip sel" data-c="Messages" aria-pressed="true">Messages</button><button type="button" class="chip" data-c="WhatsApp" aria-pressed="false">WhatsApp</button></div></div>`);
+  const [nameInput, phoneInput, rateInput] = fields.querySelectorAll('input');
+  nameInput.value = name; phoneInput.value = phone; rateInput.value = rate;
+  fields.querySelectorAll('.fchips').forEach(group => {
+    const chips = [...group.querySelectorAll('button')];
+    chips.forEach(button => button.onclick = () => chips.forEach(chip => {
+      chip.classList.toggle('sel', chip === button);
+      chip.setAttribute('aria-pressed', chip === button);
+    }));
+  });
+  return {
+    fields,
+    read:() => ({
+      full:nameInput.value.trim(), phone:phoneInput.value.trim(),
+      rate:parseInt(rateInput.value.replace(/\D/g, '')) || 24,
+      photo:AV(fields.querySelector('[data-g].sel').dataset.g),
+      ch:fields.querySelector('[data-c].sel').dataset.c
+    })
+  };
+}
 function addSitter(){
   return new Promise(res => {
     const v = bsheet({ onBack:() => res(null),
       body:`<div class="bh"><span class="icotile"><i class="ph ph-user-plus"></i></span><b>Add a sitter</b></div>
-        <p class="bp">Saved to your family’s sitters, so I can ask them next time too. Only you and Dana see their number.</p>
-        <div class="fields" style="margin-top:0">
-          <label class="field in"><div style="width:100%"><div class="l">Name</div><input value="Casey Nguyen" autocomplete="off"></div></label>
-          <label class="field in"><div style="width:100%"><div class="l">Phone</div><input inputmode="tel" value="(512) 555-0161" autocomplete="off"></div></label>
-          <label class="field in"><div style="width:100%"><div class="l">Rate per hour (optional)</div><input inputmode="numeric" value="$24" autocomplete="off"></div></label></div>
-        <div class="dlabel">Show as</div><div class="fchips" style="margin-top:6px"><button type="button" class="chip sel" data-g="f">She</button><button type="button" class="chip" data-g="m">He</button></div>
-        <div class="dlabel">Text them on</div><div class="fchips" style="margin-top:6px"><button type="button" class="chip sel" data-c="Messages">Messages</button><button type="button" class="chip" data-c="WhatsApp">WhatsApp</button></div>`,
+        <p class="bp">Saved to your family’s sitters, so I can ask them next time too. Only you and Dana see their number.</p>`,
       foot:`<button type="button" class="btn" data-go>Save sitter</button>` });
-    let ch = 'Messages'; v.body.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { ch = b.dataset.c; v.body.querySelectorAll('[data-c]').forEach(x => x.classList.toggle('sel', x === b)); });
-    let g = 'f'; v.body.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { g = b.dataset.g; v.body.querySelectorAll('[data-g]').forEach(x => x.classList.toggle('sel', x === b)); });
-    v.foot.querySelector('[data-go]').onclick = () => { const [n, ph, r] = [...v.body.querySelectorAll('input')].map(i => i.value); v.close(); toast('Saved to your sitters');
-      res(remember({ n:n.split(' ')[0] || 'Casey', full:n, phone:ph, rate:parseInt(r.replace(/\D/g, '')) || 24, by:'Added by you', times:'New to your family', photo:AV(g), ch })); };
+    const form = sitterFields({ name:'Casey Nguyen', phone:'(512) 555-0161', rate:'$24' });
+    v.body.append(form.fields);
+    v.foot.querySelector('[data-go]').onclick = () => {
+      const sitter = form.read();
+      v.close(); toast('Saved to your sitters');
+      res(remember({ ...sitter, n:sitter.full.split(' ')[0] || 'Casey', by:'Added by you', times:'New to your family' }));
+    };
   });
 }
 
@@ -248,49 +341,29 @@ function compose(s, w, kids, text, hint, step){
     const wa = s.ch === 'WhatsApp';
     const v = bsheet({ onBack:() => res(false),
       body:`<div class="cmp-head"><span class="cmp-app${wa ? ' wa' : ''}"><i class="ph-fill ph-${wa ? 'whatsapp-logo' : 'chat-circle-dots'}"></i>${wa ? 'WhatsApp' : 'Messages'}</span><small>${step || 'Opens on your phone'}</small></div>
-        <div class="cmp-to"><span>To:</span>${face(s, 28)}<b>${s.n}</b><small>${s.phone || ''}</small></div>
+        <div class="cmp-to"><span>To:</span>${face(s, 28)}<b>${s.n}</b>${hint ? '' : '<span class="chip" style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px"><span class="orb sm"></span><b>Sprout</b></span>'}<small>${s.phone || ''}</small></div>
         <div class="cmp-thread"><div class="cmp-bub${wa ? ' wa' : ''}" data-bub>${text || shortMsg(s, w, kids)}</div></div>
         <button class="textbtn cmp-edit" data-edit><i class="ph ph-pencil-simple"></i> Edit message</button>
-        <p class="hint2">${hint || `Sent from your number, so ${s.n} knows it’s you. When ${s.n} texts back, tell Sprout who’s free.`}</p>`,
+        <p class="hint2">${hint || "Sprout is in this text so it can see who's free. Each sitter gets their own text."}</p>`,
       foot:`<button type="button" class="btn" data-go><i class="ph-fill ph-paper-plane-tilt"></i>&nbsp;Send</button>` });
     v.body.querySelector('[data-edit]').onclick = async () => { const b = v.body.querySelector('[data-bub]'); const t = await editText(`Message to ${s.n}`, b.textContent); if (t) b.textContent = t; };
     v.foot.querySelector('[data-go]').onclick = () => { v.close(); res(true); };
   });
 }
-/* E8 (17 Nov): each sitter row has its own Send (tap, tap, tap), and "Send to all" opens the compose sheets one after
-   another. Apple doesn't let any app text from your number without you tapping Send, so "all" = one Send per sitter,
-   with no stops in between. Skip = "I'll text them myself". */
-async function sendEach(p, asked, w, kids){
-  await p.say(asked.length > 1 ? `Send each one from your phone, or send them all in a row. Numbers stay private either way.` : `Send it from your phone, so ${asked[0].n} knows it’s you.`, 900);
-  const icon = s => `ph-fill ph-${s.ch === 'WhatsApp' ? 'whatsapp-logo' : 'chat-circle-dots'}`;
-  const c = p.block(`<div class="card"><div class="ctop">${clay('two-people')}<div><div class="eyebrow">From your phone</div><div class="ttl">Send the request</div></div></div>
-    <div class="sl">${asked.map(s => `<div class="sl-row snd-row" data-n="${s.n}">${face(s, 36)}<span class="sl-tx"><span class="sl-n">${s.n}</span><small data-st>${s.ch || 'Messages'}</small></span>
-      <button class="snd" data-send><i class="${icon(s)}"></i>Send</button></div>`).join('')}</div>
-    <details class="msgpv"><summary>See the message</summary><p>${shortMsg({ n:'[name]' }, w, kids).replace('[name]', asked.length > 1 ? 'Alex' : asked[0].n)}</p></details>
-    ${asked.length > 1 ? `<button class="btn" data-all style="margin-top:12px"></button>` : ''}
-    <button class="textbtn skip" data-skip>Skip, I’ll text them myself</button></div>`).querySelector('.card');
-  c.querySelector('.msgpv p').textContent = shortMsg(asked[0], w, kids) + (asked.length > 1 ? ' (each sitter gets their own name)' : '');
-  const sent = new Set(), allBtn = c.querySelector('[data-all]');
-  const markSent = s => { sent.add(s.n); const r = c.querySelector(`[data-n="${s.n}"]`); r.classList.add('on');
-    r.querySelector('[data-st]').textContent = `Sent on ${s.ch || 'Messages'} · just now`; const b = r.querySelector('[data-send]'); b.classList.add('done'); b.innerHTML = '<i class="ph-bold ph-check"></i>Sent'; };
-  const paint = () => { const left = asked.filter(s => !sent.has(s.n)); if (allBtn) { allBtn.style.display = left.length > 1 ? '' : 'none'; allBtn.innerHTML = `<i class="ph-fill ph-paper-plane-tilt"></i>&nbsp;Send to ${left.length === asked.length ? 'all ' + left.length : 'the other ' + left.length}`; } };
-  paint(); p.scroll();
-  await new Promise(done => {
-    let busy = false;
-    const check = () => { paint(); if (sent.size === asked.length) done(); };
-    c.querySelectorAll('[data-send]').forEach(b => b.onclick = async () => { if (busy) return; const s = asked.find(x => x.n === b.closest('[data-n]').dataset.n); if (sent.has(s.n)) return;
-      busy = true; if (await compose(s, w, kids)) markSent(s); busy = false; check(); });
-    if (allBtn) allBtn.onclick = async () => { if (busy) return; busy = true; const left = asked.filter(s => !sent.has(s.n));
-      for (let i = 0; i < left.length; i++) { if (!await compose(left[i], w, kids, null, null, `${i + 1} of ${left.length}`)) break; markSent(left[i]); await sleep(250); }
-      busy = false; check(); };
-    c.querySelector('[data-skip]').onclick = () => { if (busy) return; asked.filter(s => !sent.has(s.n)).forEach(s => { const r = c.querySelector(`[data-n="${s.n}"]`); r.querySelector('[data-st]').textContent = `${s.ch || 'Messages'} · you’ll text them`; }); p.me('I’ll text them myself'); done('skip'); };
-  });
-  c.querySelectorAll('button').forEach(b => b.style.pointerEvents = 'none'); allBtn?.remove(); c.querySelector('[data-skip]').remove(); c.querySelector('.msgpv').remove();
-  if (sent.size) p.note(joinNames([...sent]), `${sent.size} message${sent.size > 1 ? 's' : ''} sent from your phone`, 'ph-paper-plane-tilt');
-  return sent.size;
+/* L3 (Tony, 19 Nov): "Once I say ask Casey, Taylor, Jordan, it should just be here." Sprout is in each sitter's
+   text (18 Nov), so it sends the request itself in each thread: no compose sheets, no "Send to all" step. */
+const askMsg = (s, w, kids) => `Hi ${s.n}, it’s Sprout, texting for Tony Martin. Are you free to watch ${kidsShort(kids)} on ${w.day.day}, ${range(w.from, w.to)}? Just reply here.`;
+async function sproutAsks(p, asked, w, kids){
+  const names = joinNames(asked.map(s => s.n)), many = asked.length > 1;
+  const job = p.work(`Texting ${names}`, many ? 'Each sitter gets their own text with you and Sprout' : `In your text with ${asked[0].n} and Sprout`);
+  await sleep(1300);
+  job.done(`Asked ${names}`, `${asked.length} text${many ? 's' : ''} sent · ${w.day.short} ${range(w.from, w.to)}`, 'ph-paper-plane-tilt');
+  const pv = p.block(`<div class="preview"><small>${many ? 'In each sitter’s text · from Sprout' : `In your text with ${asked[0].n} · from Sprout`}</small><p></p>${many ? '<small style="display:block;margin:6px 0 0">Each sitter sees their own name</small>' : ''}</div>`);
+  pv.querySelector('p').textContent = askMsg(asked[0], w, kids);
+  return new Set(asked.map(s => s.n));
 }
-/* E7 (17 Nov): sitters don't have Sprout and reply by text, which Sprout can't read. So the parent tells Sprout:
-   one row per sitter, Free / Can't, then Continue. "No one has replied yet" = Sprout checks back in an hour. */
+/* E7 (18 Nov): Sprout is in each sitter's text thread. Use Mark it for replies outside the thread.
+   The old manual reply card below is kept for reference. */
 function whoFree(p, asked, w){
   return new Promise(res => {
     const st = {};
@@ -322,29 +395,61 @@ function markSheet(asked, onSave){
   v.foot.querySelector('[data-go]').onclick = () => { v.close(); onSave(st); };
 }
 const reqMsg = (w, kids) => `Hi! Are you free to watch ${joinNames(kids.map(k => `${k.n} (${k.age})`))} on ${w.day.day}, ${range(w.from, w.to)}? Let us know your rate. We’ll confirm with one sitter after hearing back.`;
+async function textDana(p, w, kids, who, pick){
+  const sitter = `${who.n} is with ${joinNames(kids.map(k => k.n))}`;
+  const plan = pick ? `Date night ${w.day.day}: ${pick.place.n} at ${pick.time}. ${sitter} ${range(w.from, w.to)}.`
+    : `${sitter} ${w.day.day}, ${range(w.from, w.to)}.`;
+  const sent = await compose({ n:'Dana', ch:'Messages', photo:A + 'dana.webp' }, w, kids, `${plan} It's on our calendar.`, 'From your phone.');
+  await p.say(sent ? 'Sent to Dana.' : `Okay. Dana still gets the reminder at ${ampm(w.from - 30)}.`, 700);
+}
 async function sendAndBook(p, asked, w, kids, { pick } = {}){
-  const nSent = await sendEach(p, asked, w, kids);
-  p.set('Waiting for replies', { when:w.day.short });
-  await p.say(`${nSent ? 'Sent.' : 'Okay, text them when you’re ready.'} When they text you back, tell me here who’s free. If I don’t hear from you, I’ll check in an hour.`, 1000);
+  const sent = await sproutAsks(p, asked, w, kids);
+  const replied = new Map();
   const H = (w.to - w.from) / 60;
   let ans;
   for (;;) {
-    ans = await whoFree(p, asked, w);
-    if (ans.none) {
-      await p.say('Okay. I’ll check back in an hour. You can close Sprout.', 800);
-      await later(p, { status:'Waiting for replies', small:`${joinNames(asked.map(s => s.n))} · ${w.day.day}`, ms:3500, title:'Did any sitter text you back?', body:`Tell me who can sit ${w.day.short} ${range(w.from, w.to)}` });
-      await p.say(`Did ${joinNames(asked.map(s => s.n)).replace(/ and ([^ ]+)$/, ' or $1')} text you back?`, 800);
-      continue;
+    p.set('Waiting for replies', { when:w.day.short });
+    const fallback = p.block('<button class="textbtn skip">Someone replied outside this text? Mark it</button>');
+    let marking;
+    fallback.firstElementChild.onclick = () => {
+      markSheet(asked, states => Object.entries(states).forEach(([name, status]) => replied.set(name, status)));
+      const sheet = $('#overlays').lastElementChild;
+      marking = new Promise(resolve => {
+        const observer = new MutationObserver(() => {
+          if (!sheet.classList.contains('on')) { observer.disconnect(); resolve(); }
+        });
+        observer.observe(sheet, { attributes:true, attributeFilter:['class'] });
+      });
+    };
+    const wait = (ms, title, body) => {
+      const waiting = later(p, { status:'Waiting for replies', small:`${joinNames(asked.map(s => s.n))} · ${w.day.day}`, ms, title, body });
+      p.chat.append(fallback); p.scroll();
+      return waiting;
+    };
+    const expected = asked.filter(s => sent.has(s.n) && !replied.has(s.n));
+    if (!expected.length) await wait(3500, 'Did any sitter text you back?', `Sitter for ${w.day.day}`);
+    for (const [i, s] of expected.entries()) {
+      if (replied.has(s.n)) continue;
+      const response = s.cant ? 'can’t' : 'free';
+      await wait(i === 0 ? 2500 : 1500, `${s.n} replied: ${response}`, `In your text with ${s.n} and Sprout`);
+      if (!replied.has(s.n)) replied.set(s.n, s.cant ? 'no' : 'free');
     }
+    await marking;
+    fallback.remove();
+    ans = {
+      free:asked.filter(s => replied.get(s.n) === 'free'),
+      cant:asked.filter(s => replied.get(s.n) === 'no'),
+      wait:asked.filter(s => !replied.has(s.n)),
+    };
     if (ans.free.length) break;
     const waiting = ans.wait;
-    await p.say(`${joinNames(ans.cant.map(s => s.n))} can’t make it${waiting.length ? `, and ${joinNames(waiting.map(s => s.n))} ${waiting.length > 1 ? 'haven’t' : 'hasn’t'} replied yet` : ''}.`, 900);
+    const declined = joinNames(ans.cant.map(s => s.n));
+    const noReply = `${joinNames(waiting.map(s => s.n))} ${waiting.length > 1 ? 'haven’t' : 'hasn’t'} replied yet`;
+    await p.say(`${declined ? declined + ' can’t make it' + (waiting.length ? ', and ' + noReply : '') : noReply}.`, 900);
     const opts = [waiting.length ? `Wait for ${joinNames(waiting.map(s => s.n))}` : null, 'Ask a class group', 'Change the time'].filter(Boolean);
     const k = await p.chips(opts, { stub:[opts.length - 1] });
     if (waiting.length && k === 0) {
       asked = waiting;
-      await later(p, { status:'Waiting for replies', small:joinNames(waiting.map(s => s.n)), ms:3000, title:`Did ${joinNames(waiting.map(s => s.n))} text you back?`, body:`Sitter for ${w.day.day}` });
-      await p.say(`Did ${joinNames(waiting.map(s => s.n)).replace(/ and ([^ ]+)$/, ' or $1')} text you back?`, 700);
       continue;
     }
     return classGroup(p, w, kids, { pick });
@@ -352,7 +457,7 @@ async function sendAndBook(p, asked, w, kids, { pick } = {}){
   const yes = ans.free;
   let who = yes[0];
   if (yes.length > 1) { await p.say(`${joinNames(yes.map(s => s.n))} can both do it. Who should you book?`, 800); who = yes[await p.chips(yes.map(s => `Book ${s.n} · about $${Math.round(s.rate * H)}`))]; }
-  else await p.say(`${who.n} can do it. Check the details, then send ${who.n} the booking.`, 800);
+  else await p.say(`${who.n} can do it. Check the details, then I’ll text ${who.n} the booking.`, 800);
   for (;;) {
     const ok = await new Promise(r => {
       const c = p.block(`<div class="card pay">
@@ -361,7 +466,7 @@ async function sendAndBook(p, asked, w, kids, { pick } = {}){
         ${pick ? `<div class="line"><span>Dinner</span><span>${pick.place.n} · ${pick.time}</span></div>` : ''}
         <div class="line"><span>Rate</span><button class="ln-ed" data-rate>$${who.rate}/hour <i class="ph ph-pencil-simple"></i></button></div><div class="line"><span>Time</span><span>${hrs(H)}</span></div>
         <div class="line est"><span>Estimate</span><span>$${Math.round(who.rate * H)}</span></div>
-        <div class="wait"><i class="ph ph-paper-plane-tilt"></i>Next: send ${who.n} the details from your phone · you pay ${who.n} directly</div>
+        <div class="wait"><i class="ph ph-paper-plane-tilt"></i>Next: Sprout texts ${who.n} the details in your thread · you pay ${who.n} in Sprout when they’re done</div>
         <div class="two"><button class="btn ghost" data-k="back">Back</button><button class="btn" data-k="ok">Book ${who.n}</button></div></div>`).querySelector('.card');
       c.querySelector('[data-k=back]').onclick = () => { c.parentElement.remove(); r(false); };
       c.querySelector('[data-rate]').onclick = async () => { const v = await editFields(`${who.n}’s rate`, [['Per hour, what ' + who.n + ' told you', '$' + who.rate, 'num']]);
@@ -372,31 +477,38 @@ async function sendAndBook(p, asked, w, kids, { pick } = {}){
     await p.say('Okay. Nothing is booked yet.', 600);
     await p.chips([`Book ${who.n}`], { echo:false });
   }
-  /* the booking goes from the parent's phone too: the address only now, only to the sitter they picked */
-  const bookMsg = `Great, you’re booked! ${w.day.day}, ${range(w.from, w.to)} for ${kidsShort(kids)}. We’re at ${FAMILY.address}. ${FAMILY.notes} See you then! Tony`;
-  for (;;) { if (await compose(who, w, kids, bookMsg, `Your address goes only to ${who.n}. Sprout doesn’t send anything on its own.`)) break; await p.say('Send it when you’re ready.', 500); await p.chips([`Send ${who.n} the details`]); }
-  p.note(`${who.n} · booked`, `Details sent from your phone · ${w.day.day} ${range(w.from, w.to)}`, 'ph-calendar-check');
-  const others = yes.filter(s => s !== who);
+  const bookMsg = `Great, you’re booked! ${w.day.day}, ${range(w.from, w.to)} for ${kidsShort(kids)}. We’re at ${FAMILY.address}. ${FAMILY.notes} See you then! Sprout, for Tony`;
+  const booking = p.work(`Texting ${who.n} the booking`, `In your text with ${who.n} and Sprout`);
+  await sleep(1200);
+  booking.done(`${who.n} · booked`, `Details sent · ${w.day.day} ${range(w.from, w.to)}`, 'ph-calendar-check');
+  p.block(`<div class="preview"><small>In your text with ${who.n} · from Sprout</small><p></p></div>`).querySelector('p').textContent = bookMsg;
+  const others = [...sent].filter(name => name !== who.n);
   if (others.length) {
-    await p.say(`Want to let ${joinNames(others.map(s => s.n))} know you’re covered?`, 700);
-    if (await p.chips([`Tell ${joinNames(others.map(s => s.n))}`, 'Skip']) === 0)
-      for (const o of others) await compose(o, w, kids, `Thanks ${o.n}! We found someone for ${w.day.long.split(',')[0]}. We’ll ask you again soon. Tony`, 'A quick thank-you, from your phone.');
+    const names = joinNames(others);
+    await p.say(`Want to let ${names} know you’re covered?`, 700);
+    if (await p.chips([`Tell ${names}`, 'Skip']) === 0) {
+      const covered = p.work(`Texting ${names} that you’re covered`, 'Sprout sends in each sitter’s thread');
+      for (const name of others) await sleep(600);
+      covered.done(`Told ${names} you’re covered`, 'Sent in each sitter’s thread', 'ph-paper-plane-tilt');
+    }
   }
-  await p.say(`${who.n} is booked.${who.parent ? ` ${who.n} is saved to your sitters now.` : ''} You pay ${who.n} directly.`, 900);
+  await p.say(`${who.n} is booked.${who.parent ? ` ${who.n} is saved to your sitters now.` : ''} It’s an event in your Daily Brief for ${w.day.day}. When ${who.n} is done, you pay and rate right here.`, 900);
   p.block(`<div class="card">${pick ? `<div class="cover" style="${M.ph(pick.k, 3)}"></div>` : ''}
     <div class="ctop">${clay('calendar-check')}<div><div class="eyebrow">${pick ? 'Date night' : 'Sitter'} · ${w.day.day}</div><div class="ttl">${pick ? 'Your evening' : `${who.n} is booked`}</div></div></div>
-    <div class="ua-row on" style="margin-top:12px">${face(who)}<span class="tx"><b>${who.n}</b><small>${range(w.from, w.to)} · about $${Math.round(who.rate * H)} · you pay ${who.n}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></div>
+    <div class="ua-row on" style="margin-top:12px">${face(who)}<span class="tx"><b>${who.n}</b><small>${range(w.from, w.to)} · about $${Math.round(who.rate * H)} · pay in Sprout after</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></div>
     ${pick ? `<div class="fact" style="margin-top:10px"><i class="ph ph-fork-knife"></i>${pick.place.n} · ${pick.time} · table for 2</div>` : ''}
     <div class="fact"><i class="ph ph-users"></i>${joinNames(kids.map(k => k.n))}</div>
-    <div class="fact"><i class="ph ph-calendar-check"></i>On the family calendar · Dana has it too</div>
+    <div class="fact"><i class="ph ph-map-pin"></i>${FAMILY.address}</div>
+    <div class="fact"><i class="ph ph-calendar-check"></i>${pick ? 'On the family calendar' : `“${who.n}’s babysitting” on the family calendar`} · Dana has it too</div>
     <div class="fact"><i class="ph ph-bell-ringing"></i>Reminder for you both at ${tl(w.from - 30)}, then the evening on your lock screens</div></div>`);
   p.set(`Booked · ${pick ? pick.place.n + ' ' + pick.time + ' · ' : ''}${who.n} ${range(w.from, w.to)}`, { when:w.day.short, done:false });
   const d = await p.chips(['Text Dana the plan', 'Done']);
-  await p.say(d === 0 ? 'Sent Dana the plan from you.' : 'All set.', 700);
+  if (d === 0) await textDana(p, w, kids, who, pick);
+  else await p.say('All set.', 700);
   if (d === 1) X.closeSheet();
   /* I1: the rest happens on the family's clock (review panel): morning of, 30 min before, the evening, the morning after */
   await CLOCK.book({ p, i:DAYS.indexOf(w.day), S:w.from, E:w.to, D:pick ? pick.mins : null, place:pick ? pick.place : null, k:pick ? pick.k : null, who, kids, amt:Math.round(who.rate * H) });
-  await morningAfter(p, who, w, kids, H, { clock:true });
+  await payTonight(p, who, w, kids, H, { clock:true });
 }
 /* ---------- the Daily Brief To-Do list (17 Nov): Assist to-dos live in the real list, origin "Sprout Assist" ----------
    The existing rows stay pixel-exact: the Daily Brief image is cut at the header (y139), the rows (y546) and the card
@@ -459,62 +571,56 @@ function addTodo({ title, due, onOpen, onTick }){
   return { done(how){ const box = row.querySelector('.tdx-box'); box.classList.add('on'); box.innerHTML = '<i class="ph-bold ph-check"></i>'; row.classList.add('ticked');
     setTimeout(() => { row.classList.add('out'); setTimeout(() => { row.remove(); TD.done.unshift({ t:title, how }); paintDone(); }, 380); }, 900); } };
 }
-function howSheet(who, amt){
+/* L3 (Tony, 19 Nov): pay and rate the moment the sitter is done, not the next morning ("They're gonna wanna get
+   paid right after"). Rating + a note first (it helps the next family who books this sitter), then pay through
+   Sprout: Stripe sends it to the sitter's bank (18 Nov decision). "Paid another way" stays for cash nights.
+   The same moment puts "Pay Casey $72" on the To-Do list; tapping it opens this card. */
+function rateCard(p, who){
   return new Promise(res => {
-    const v = bsheet({ onBack:() => res(null), body:`<div class="bh"><span class="icotile"><i class="ph ph-check-circle"></i></span><b>How did you pay ${who.n}?</b></div>
-      <p class="bp">I’ll log it so ${who.n}’s history stays right. About $${amt}.</p>
-      <div class="ua-rows" style="margin-top:0">${[['venmo', 'currency-dollar', 'Venmo'], ['cash', 'money', 'Cash'], ['other', 'device-mobile', 'Zelle, Apple Cash or another app']].map(([k, i, l]) => `<button class="ua-row" data-k="${k}"><span class="uaph uamono" style="width:40px;height:40px"><i class="ph ph-${i}"></i></span><span class="tx"><b>${l}</b></span><span class="ck"><i class="ph-bold ph-check"></i></span></button>`).join('')}</div>`,
-      foot:`<button type="button" class="btn" data-go disabled>Mark as paid</button>` });
-    let k = null; const go = v.foot.querySelector('[data-go]');
-    v.body.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { k = b.dataset.k; v.body.querySelectorAll('[data-k]').forEach(x => x.classList.toggle('on', x === b)); go.disabled = false; });
-    go.onclick = () => { v.close(); res(k === 'venmo' ? 'venmo:' + (who.venmo || '@' + who.n.toLowerCase()) : k); };
+    let stars = 0;
+    const c = p.block(`<div class="card"><div class="ctop">${face(who, 44)}<div><div class="eyebrow">Rate ${who.n}</div><div class="ttl">How did it go?</div></div></div>
+      <div class="stars" role="radiogroup" aria-label="Rating">${[1, 2, 3, 4, 5].map(n => `<button type="button" class="star" data-s="${n}" role="radio" aria-checked="false" aria-label="${n} star${n > 1 ? 's' : ''}"><i class="ph-fill ph-star"></i></button>`).join('')}</div>
+      <label class="field in" style="margin-top:12px"><div style="width:100%"><div class="l">A note for the next family (optional)</div><textarea class="edt" rows="2" placeholder="Great with bedtime. Jake loved the board games."></textarea></div></label>
+      <div class="foot"><i class="ph ph-users-three"></i>Parents in your classes see your stars and note when they look at ${who.n}</div>
+      <button class="btn" data-go style="margin-top:12px" disabled>Tap a star</button></div>`).querySelector('.card');
+    const go = c.querySelector('[data-go]'), all = [...c.querySelectorAll('.star')];
+    all.forEach(b => b.onclick = () => { stars = +b.dataset.s; all.forEach(x => { const on = +x.dataset.s <= stars; x.classList.toggle('on', on); x.setAttribute('aria-checked', +x.dataset.s === stars); });
+      go.disabled = false; go.textContent = 'Save rating'; });
+    go.onclick = () => {
+      const note = c.querySelector('textarea').value.trim();
+      c.querySelectorAll('button, textarea').forEach(x => x.disabled = true); go.remove();
+      p.me(`${'★'.repeat(stars)}${note ? ` · “${playdateEscape(note)}”` : ''}`); res({ stars, note });
+    };
+    p.scroll();
   });
 }
-
-/* D5: the morning after. Parents pay sitters directly (cash, Venmo, Zelle); Sprout prefills Venmo and logs it.
-   The same 9 AM moment puts "Pay Alex $100" on the To-Do list; paying from the card ticks it, ticking it pays the card. */
-async function morningAfter(p, who, w, kids, H, opt = {}){
-  const amt = Math.round(who.rate * H);
-  if (!opt.clock) await later(p, { status:`${who.n} is booked`, small:`${w.day.day} · ${range(w.from, w.to)}`, ms:3500, title:`How was ${who.n} last night?`, body:`Pay ${who.n} when you’re ready · it’s on your to-dos` });
-  let resolveHow = null;
-  const goToCard = () => { X.showPlan(p); X.openSheet(); setTimeout(() => { const c = p.chat.querySelector('[data-paycard]'); if (c) p.chat.scrollTo({ top: c.closest('.row').offsetTop - p.chat.offsetTop - 60, behavior:'smooth' }); }, 450); };
-  const todo = addTodo({ title:`Pay ${who.n} $${amt}`, due:'Due today', onOpen:goToCard, onTick: async () => { const h = await howSheet(who, amt); if (h && resolveHow) resolveHow({ how:h, from:'todo' }); } });
-  p.divider(`${w.day.w === 'Sat' ? 'Sunday' : 'Next morning'} · 9:00 AM`);
-  await p.say(`Morning! How was ${who.n} last night?`, 800);
-  const fb = new Promise(r => p.chips(['Great', 'Fine', 'Not great']).then(f => r(f)));
-  const early = new Promise(r => { resolveHow = v => r(v); });
-  const first = await Promise.race([fb.then(f => ({ f })), early]);
-  let f = first.f ?? 1, how = first.how ? first : null;
-  if (how) p.chat.querySelectorAll('.chips:not(.done)').forEach(c => { c.classList.add('done'); c.querySelectorAll('.chip').forEach(b => b.style.pointerEvents = 'none'); });
-  if (!how) {
-    if (f === 2) await p.say(`Sorry to hear that. I won’t suggest ${who.n} first next time.`, 800);
-    await p.say(`${f === 2 ? 'When you’re ready, pay' : 'Pay'} ${who.n} the way you usually do. I can open Venmo with it filled in. It’s on your to-do list too.`, 900);
+async function payTonight(p, who, w, kids, H, opt = {}){
+  const amt = Math.round(who.rate * H), late = w.to >= 17 * 60;
+  if (!opt.clock) await later(p, { status:`${who.n} is booked`, small:`${w.day.day} · ${range(w.from, w.to)}`, ms:3500, title:`${who.n} is done`, body:`Pay ${who.n} $${amt} and say how it went` });
+  const goToCard = () => { X.showPlan(p); X.openSheet(); setTimeout(() => { const c = p.chat.querySelector('[data-paycard]') || p.chat.querySelector('.stars'); if (c) p.chat.scrollTo({ top: c.closest('.row').offsetTop - p.chat.offsetTop - 60, behavior:'smooth' }); }, 450); };
+  const todo = addTodo({ title:`Pay ${who.n} $${amt}`, due:late ? 'Tonight' : 'Today', onOpen:goToCard, onTick:goToCard });
+  p.divider(`${w.day.short} · ${ampm(w.to)}`);
+  await p.say(`${who.n} is done for ${late ? 'the night' : 'today'}. How did it go?`, 800);
+  const r = await rateCard(p, who);
+  if (r.stars <= 2) await p.say(`Sorry to hear that. I won’t suggest ${who.n} first next time.`, 800);
+  await p.say(`Thanks${r.note ? ', that note helps the next family' : ''}. Ready to pay ${who.n}?`, 800);
+  const paid = await X.approval(p, { sub:`${who.n} · ${w.day.day}`,
+    forHtml:`${face(who, 26)}${who.n} · ${range(w.from, w.to)} · ${joinNames(kids.map(k => k.n))}`,
+    lines:[[`${hrs(H)} × $${who.rate}`, `$${(who.rate * H).toFixed(2)}`]], total:`$${amt}.00`, label:`Pay ${who.n} $${amt}`,
+    wait:`Goes to ${who.n}’s bank through Stripe`, code:'SP-' + (2200 + amt), time:ampm(w.to + 4) });
+  let via = 'Through Sprout · Stripe, in their bank in 1–2 days';
+  if (paid.ok) paid.el.setAttribute('data-paycard', '');
+  else {
+    await p.say(`No problem. Did you pay ${who.n} another way?`, 700);
+    const k = await p.chips(['Paid in cash', 'Venmo or another app', 'I’ll pay later']);
+    if (k === 2) { await p.say(`Okay. It stays on your to-do list until you do.`, 700); p.set(`Pay ${who.n} $${amt}`, { when:w.day.short, attn:false }); return; }
+    via = k === 0 ? 'Cash' : 'Venmo or another app';
   }
-  const c = p.block(`<div class="card" data-paycard><div class="ctop">${face(who, 44)}<div><div class="eyebrow">${w.day.day} · ${range(w.from, w.to)}</div><div class="ttl">Pay ${who.n}</div></div></div>
-    <div class="line" style="margin-top:12px"><span>${hrs(H)} × $${who.rate}</span><span>$${(who.rate * H).toFixed(2)}</span></div>
-    <div class="total"><span>About</span><span>$${amt}</span></div>
-    <div class="foot"><i class="ph ph-info"></i>You pay ${who.n} directly. Sprout never holds the money.</div>
-    <div data-acts><button class="btn" data-v style="margin-top:12px">Pay with Venmo</button>
-    <div class="two" style="margin-top:8px"><button class="btn ghost" data-c>Paid in cash</button><button class="btn ghost" data-o>Another way</button></div></div></div>`).querySelector('.card');
-  if (!how) how = await new Promise(r => { resolveHow = v => r(v);
-    c.querySelector('[data-c]').onclick = () => r({ how:'cash' }); c.querySelector('[data-o]').onclick = () => r({ how:'other' });
-    c.querySelector('[data-v]').onclick = () => { const v = bsheet({ body:`<div class="bh"><span class="icotile"><i class="ph ph-currency-dollar"></i></span><b>Pay ${who.n} on Venmo</b></div>
-        <p class="bp">Venmo opens with this filled in. You finish the payment there.</p>
-        <div class="fields" style="margin-top:0"><label class="field in"><div style="width:100%"><div class="l">To</div><input value="${who.venmo || ''}" placeholder="@${who.n.toLowerCase()}" autocomplete="off"></div></label>
-          <label class="field in"><div style="width:100%"><div class="l">Amount</div><input inputmode="decimal" value="$${amt}.00" autocomplete="off"></div></label>
-          <label class="field in"><div style="width:100%"><div class="l">Note</div><input value="Babysitting ${w.day.day} · ${joinNames(kids.map(k => k.n))}" autocomplete="off"></div></label></div>
-        ${who.venmo ? '' : `<p class="hint2">I’ll save ${who.n}’s Venmo for next time.</p>`}`,
-      foot:`<button type="button" class="btn" data-go>Open Venmo</button>` });
-      v.foot.querySelector('[data-go]').onclick = () => { const to = v.body.querySelector('input').value || '@' + who.n.toLowerCase(); v.close(); toast('Opens Venmo (not part of this demo)'); r({ how:'venmo:' + to }); }; }; });
-  c.querySelector('[data-acts]').remove();
-  const h = how.how, label = h === 'cash' ? 'Paid in cash' : h === 'other' ? 'Paid another way' : 'Paid with Venmo';
-  if (how.from === 'todo') p.note('Ticked on your to-do list', label, 'ph-check-square'); else p.me(label);
-  const via = h.startsWith('venmo') ? `Venmo · ${h.slice(6)}` : h === 'cash' ? 'Cash' : 'Zelle, Apple Cash or another app';
   p.note(`Paid ${who.n} $${amt}`, via, 'ph-check-circle');
-  todo.done(`${label} · ${how.from === 'todo' ? 'ticked by you' : 'ticked by Sprout'}`);
+  todo.done(`Paid ${who.n} · ${via.split(' · ')[0]}`);
   const n = (who.times5 || (MY.find(m => m.n === who.n)?.count ?? (who.parent || who.by === 'Added by you' ? 0 : 1))) + 1;
-  remember({ ...who, count:n, times5:n, times: n === 1 ? 'Sat for you once' : n === 2 ? 'Sat for you twice' : `Sat for you ${n} times` });
-  await p.say(`Logged, and ticked off your to-do list. ${who.n} has sat for you ${n === 1 ? 'once' : n === 2 ? 'twice' : n + ' times'} now${f === 0 ? ', and I’ll suggest ' + who.n + ' first next time' : ''}.`, 900);
+  remember({ ...who, count:n, times5:n, stars:r.stars, note:r.note, times: n === 1 ? 'Sat for you once' : n === 2 ? 'Sat for you twice' : `Sat for you ${n} times` });
+  await p.say(`Done, and ticked off your to-do list. ${who.n} has sat for you ${n === 1 ? 'once' : n === 2 ? 'twice' : n + ' times'} now${r.stars >= 4 ? `, and I’ll suggest ${who.n} first next time` : ''}.`, 900);
   p.set(`${who.n} · paid $${amt}`, { when:w.day.short, done:true, attn:false }); X.renderHome();
 }
 
@@ -622,7 +728,12 @@ async function chooseAndSend(p, w, kids, opt = {}){
 }
 
 /* ======================= C1 · Book a sitter ======================= */
-X.flows.sitterC1 = async p => {
+X.flows.sitterC1 = async (p, opt = {}) => {
+  if (opt.review === 'conversation' || opt.review === 'dana') {
+    const w = { day:DAYS.find(d => d.w === 'Sat'), from:18 * 60, to:22 * 60 };
+    if (opt.review === 'conversation') return sendAndBook(p, [{ ...SAVED[0] }], w, KIDS);
+    return textDana(p, w, KIDS, SAVED[0]);
+  }
   await p.say('Happy to. When do you need someone?', 800);
   const w = await whenCard(p);
   sub(p, `Sitter · ${w.day.day}`); p.title = `Sitter · ${w.day.day}`; p.set('Just started', { when:w.day.short });
@@ -635,21 +746,22 @@ X.flows.sitterC1 = async p => {
 
 /* ======================= C2 · Plan a date night ======================= */
 const EXTRA = {
-  olive:  { two:'$110', tags:['Italian'], tier:['high', 'mid'], why:'Hand-made pasta and a quiet patio. Priya and Aisha from Maya’s class loved it.', slots:['5:45', '6:30', '6:45', '7:15', '8:15', '8:45'],
+  olive:{ rating:4.7, reviews:1312, two:'$110', tags:['Italian'], tier:['high', 'mid'], why:'Hand-made pasta and a quiet patio. Priya and Aisha from Maya’s class loved it.', slots:['5:45', '6:30', '6:45', '7:15', '8:15', '8:45'],
             menu:[['To start', [['Burrata, peaches, basil', '$16'], ['Wood-fired focaccia', '$9']]], ['Pasta', [['Pappardelle, slow-cooked ragù', '$27'], ['Cacio e pepe', '$22']]], ['Dessert', [['Olive oil cake', '$11']]]] },
-  casa:   { two:'$60', tags:['Mexican'], tier:['mid', 'budget'], why:'Garden patio with live music on Saturdays. Easy, lively, great margaritas.', slots:['6:00', '6:45', '7:00', '7:30', '8:00'],
+  casa:{ rating:4.5, reviews:2048, two:'$60', tags:['Mexican'], tier:['mid', 'budget'], why:'Garden patio with live music on Saturdays. Easy, lively, great margaritas.', slots:['6:00', '6:45', '7:00', '7:30', '8:00'],
             menu:[['Tacos', [['Carne asada, wood-grilled', '$16'], ['Mushroom al pastor', '$14']]], ['Plates', [['Whole grilled fish', '$32']]], ['Drinks', [['Mezcal margarita', '$13']]]] },
-  kumo:   { two:'$320', tags:['Japanese'], tier:['high'], why:'A 12-course tasting at an 8-seat counter. Feels like a special occasion.', slots:['6:00', '8:30'],
+  kumo:{ rating:4.8, reviews:386, two:'$320', tags:['Japanese'], tier:['high'], why:'A 12-course tasting at an 8-seat counter. Feels like a special occasion.', slots:['6:00', '8:30'],
             menu:[['Omakase', [['12-course tasting', '$145']]], ['Add on', [['Sake pairing', '$65']]]] },
-  juniper:{ two:'$75', tags:['Small plates', 'Wine bar'], tier:['mid'], why:'Closest to home, candlelit and small. Easy to get back for the sitter.', slots:['6:15', '6:45', '7:15', '7:45', '8:00'],
+  juniper:{ rating:4.6, reviews:741, two:'$75', tags:['Small plates', 'Wine bar'], tier:['mid'], why:'Closest to home, candlelit and small. Easy to get back for the sitter.', slots:['6:15', '6:45', '7:15', '7:45', '8:00'],
             menu:[['Small plates', [['Burrata and tomatoes', '$15'], ['Cheese and charcuterie', '$24'], ['Grilled bread, olives', '$9']]], ['Wine', [['Natural orange, by the glass', '$14']]]] },
-  rosie:  { two:'$55', tags:['BBQ'], tier:['mid', 'budget'], why:'Relaxed string-lit patio and the best brisket nearby. No dressing up.', slots:['6:30', '7:00', '7:45', '8:15'],
+  rosie:{ rating:4.4, reviews:1987, two:'$55', tags:['BBQ'], tier:['mid', 'budget'], why:'Relaxed string-lit patio and the best brisket nearby. No dressing up.', slots:['6:30', '7:00', '7:45', '8:15'],
             menu:[['Smoked', [['Brisket, by the half pound', '$18'], ['Smoked half chicken', '$16']]], ['Sides', [['Mac and cheese', '$6']]], ['Sweet', [['Banana pudding', '$7']]]] },
 };
 const FOODS = ['Italian', 'Mexican', 'Japanese', 'Small plates', 'BBQ', 'Anything good'];
+const googleRating = ({ rating, reviews }) => `<i class="ph-fill ph-star" aria-hidden="true"></i> ${rating.toFixed(1)} · ${reviews.toLocaleString('en-US')} Google reviews`;
 function menuSheet(k){
   const pl = M.PLACES[k], x = EXTRA[k];
-  bsheet({ body:`<div class="bhero" style="${M.ph(k, 2)}"></div><div class="btitle">${pl.n} · menu</div><div class="bsub">${M.sub1(pl)}</div>
+  bsheet({ body:`<div class="bhero" style="${M.ph(k, 2)}"></div><div class="btitle">${pl.n} · menu</div><div class="bsub"><div class="dn3sub">${googleRating(x)}</div>${M.sub1(pl)}</div>
     <div class="menu">${x.menu.map(([h, items]) => `<h5>${h}</h5>${items.map(([a, b]) => `<div class="mi"><span>${a}</span><span>${b}</span></div>`).join('')}`).join('')}</div>
     <button class="link" style="margin-top:12px" data-site>Full menu on their website <i class="ph ph-caret-right"></i></button>`,
     foot:`<button type="button" class="btn ghost" onclick="this.closest('.bsheet').classList.remove('on');document.getElementById('bscrim').classList.remove('on')">Close</button>` })
@@ -678,11 +790,14 @@ function results(p, keys, others = []){
   return new Promise(res => {
     let k = keys[0];
     Object.keys(M.PLACES).forEach(x => M.PLACES[x].pick = x === k);   // "my pick" on the map = the top-ranked place
-    const c = p.block(`<div class="card" style="padding:6px">${M.mapHtml(keys, k, true, others)}</div>`).querySelector('.card'); c.querySelector('.dnmap').classList.add('wide');
+    const reasons = new Map(others.map(({ k, why }) => [k, why]));
+    const c = p.block(`<div class="card" style="padding:6px">${M.mapHtml(keys, k, true, others.filter(o => !keys.includes(o.k)))}</div>`).querySelector('.card'); c.querySelector('.dnmap').classList.add('wide');
     /* D1c (17 Nov): photo full-bleed at the top, two plain lines on why, small Menu / Website links, one Choose */
     const car = p.block(`<div class="dncar">${keys.map((key, i) => { const pl = M.PLACES[key], x = EXTRA[key]; return `<div class="card dn3" data-k="${key}">
       <div class="dn3img" style="${M.ph(key)}">${i === 0 ? '<span class="dn3pick">My pick</span>' : ''}</div>
-      <div class="dn3bd"><div class="dn3top"><b>${pl.n}</b><span class="dn3price"><strong>~${x.two}</strong> for two</span></div><div class="dn3sub">${pl.kind} · ${pl.mi} mi</div>
+      <div class="dn3bd"><div class="dn3top"><b>${pl.n}</b><span class="dn3price"><strong>~${x.two}</strong> for two</span></div>
+        <div class="dn3sub">${googleRating(x)}</div>${reasons.has(key) ? `<div class="dn3sub">${reasons.get(key)}</div>` : ''}
+        <div class="dn3sub">${pl.kind} · ${pl.mi} mi</div>
         <p class="dn3why">${x.why}</p>
         <div class="dn3cta"><button class="dn3link" data-menu><i class="ph ph-book-open-text"></i>Menu</button><button class="dn3link" data-site><i class="ph ph-globe-simple"></i>Website</button><button class="btn dn3go" data-go>Choose</button></div></div></div>`; }).join('')}</div>`).querySelector('.dncar');
     const map = c.querySelector('.dnmap'), cards = [...car.querySelectorAll('.card')]; let lock = false;
@@ -704,32 +819,39 @@ function results(p, keys, others = []){
 }
 X.flows.dateE = async (p, opt = {}) => {
   const sat = DAYS.find(d => d.w === 'Sat');
-  await p.say(opt.fromPush ? 'Let’s plan it. You and Dana are both free Saturday after 6, so I started there. Change anything.' : 'Let’s plan it. When are you going out?', 1000);
-  const w0 = await whenCard(p, { mode:'dinner', preset: opt.fromPush ? { w:'Sat', from:19 * 60 } : null });
+  let w0 = { day:sat, from:19 * 60, to:22 * 60 + 30 };
+  if (!opt.restaurantReview) {
+    await p.say(opt.fromPush ? 'Let’s plan it. You and Dana are both free Saturday after 6, so I started there. Change anything.' : 'Let’s plan it. When are you going out?', 1000);
+    w0 = await whenCard(p, { mode:'dinner', preset: opt.fromPush ? { w:'Sat', from:19 * 60, to:22 * 60 + 30 } : null });
+  }
   const night = w0.day; sub(p, `Date night · ${night.day}`); p.title = `Date night · ${night.day}`; p.set('Just started', { when:night.short });
-  await p.say('How far are you happy to go?', 600);
-  const dist = await p.chips(['3 miles or less', '10 miles or less', 'Doesn’t matter']);
-  await p.say('What kind of food?', 500);
-  const food = await foodCard(p);
-  await p.say('And the budget for dinner for two?', 500);
-  /* F2 (17 Nov): dinner for two in Austin, before drinks and tip, instead of $ signs */
-  const bi = await p.chips(['Under $60', '$60–$130', '$130 and up', 'Set my own'], { echo:false });
-  let tier, budgetLabel, cap = null;
-  if (bi < 3) { tier = ['budget', 'mid', 'high'][bi]; budgetLabel = ['Under $60 for two', '$60–$130 for two', '$130 and up for two'][bi]; }
-  else { const v = await editFields('Your budget', [['Up to, for the two of you', '$100', 'num']]); const n = v ? parseFloat(v[0].replace(/[^\d.]/g, '')) || 100 : 100;
-    tier = n < 60 ? 'budget' : n <= 130 ? 'mid' : 'high'; cap = n; budgetLabel = `Up to $${n} for two`; }
-  p.me(budgetLabel);
-  /* match: food 3, budget 2, distance 2; show 3–5, best first */
+  let dist = 1, food = ['Italian'], tier = 'mid', cap = null;
+  if (!opt.restaurantReview) {
+    await p.say('How far are you happy to go?', 600);
+    dist = await p.chips(['3 miles or less', '10 miles or less', 'Doesn’t matter']);
+    await p.say('What kind of food?', 500);
+    food = await foodCard(p);
+    await p.say('And the budget for dinner for two?', 500);
+    /* F2 (17 Nov): dinner for two in Austin, before drinks and tip, instead of $ signs */
+    const bi = await p.chips(['Under $60', '$60–$130', '$130 and up', 'Set my own'], { echo:false });
+    let budgetLabel;
+    if (bi < 3) { tier = ['budget', 'mid', 'high'][bi]; budgetLabel = ['Under $60 for two', '$60–$130 for two', '$130 and up for two'][bi]; }
+    else { const v = await editFields('Your budget', [['Up to, for the two of you', '$100', 'num']]); const n = v ? parseFloat(v[0].replace(/[^\d.]/g, '')) || 100 : 100;
+      tier = n < 60 ? 'budget' : n <= 130 ? 'mid' : 'high'; cap = n; budgetLabel = `Up to $${n} for two`; }
+    p.me(budgetLabel);
+  }
+  /* match: food 3, budget 2, distance 2; show all five, best first */
   const any = food.includes('Anything good');
   const scored = Object.keys(M.PLACES).map(k => { const pl = M.PLACES[k], x = EXTRA[k];
     const f = any || x.tags.some(t => food.includes(t)), b = cap ? parseInt(String(x.two).replace(/\D/g, '')) <= cap : x.tier.includes(tier), d = dist === 2 || pl.mi <= [3, 10][dist];
     return { k, f, b, d, s:(f ? 3 : 0) + (b ? 2 : 0) + (d ? 2 : 0), all:f && b && d, mi:pl.mi }; }).sort((a, b) => b.s - a.s || a.mi - b.mi);
-  const fit = scored.filter(x => x.all).length, keys = scored.slice(0, Math.min(5, Math.max(3, fit))).map(x => x.k);
-  const w = p.work('Checking places near home', `${night.day} · around ${tl(w0.from)} · table for 2`); await sleep(1600);
-  w.done(`${fit || 'No'} place${fit === 1 ? '' : 's'} fit everything`, fit < keys.length ? `Plus ${keys.length - fit} close match${keys.length - fit > 1 ? 'es' : ''}` : 'Distance, food and budget', 'ph-fork-knife');
+  const fit = scored.filter(x => x.all).length, keys = scored.map(x => x.k);
+  const w = p.work('Checking places near home', `${night.day} · around ${tl(w0.from)} · table for 2`);
+  if (!opt.restaurantReview) await sleep(1600);
+  w.done(`${fit} fit everything`, fit < keys.length ? `Plus ${keys.length - fit} close` : 'Distance, food and budget', 'ph-fork-knife');
   await p.say(`Here ${keys.length > 1 ? 'are' : 'is'} ${keys.length}. Swipe the cards or drag the map to look around.`, 900);
   p.set('Pick a place', { when:night.short });
-  const others = scored.filter(x => !keys.includes(x.k)).map(x => ({ k:x.k, why: !x.f ? 'not the food you picked' : !x.b ? 'outside your budget' : 'farther than you wanted' }));
+  const others = scored.filter(x => !x.all).map(x => ({ k:x.k, why:!x.f ? 'Not the food you picked' : !x.b ? 'Outside your budget' : 'Farther than you wanted' }));
   const k = await results(p, keys, others);
   const pl = M.PLACES[k], x = EXTRA[k];
   const ck = p.work(`Checking tables at ${pl.n}`, `${night.day} · around ${tl(w0.from)}`); await sleep(1500);
@@ -745,7 +867,7 @@ X.flows.dateE = async (p, opt = {}) => {
   bw.done(`Table booked · ${pl.n}`, `${night.day} · ${time} · confirmation OE-4471`, 'ph-fork-knife');
   p.set(`${pl.n} · ${time}`, { when:night.short });
   /* D3 (17 Nov): the sitter is Sprout's suggestion, not a step the parent has to do */
-  const sw = { day:night, from:slots[ti] - 30, to:Math.min(1440, Math.max(22 * 60, slots[ti] + 180)) };
+  const sw = { day:night, from:slots[ti] - 30, to:Math.max(w0.to, slots[ti] + 90) };   /* L7: the sitter stays until you said you'd be home */
   await p.say(`You’re booked at ${pl.n}. Want me to find a sitter while you’re out?`, 900);
   const sc = p.block(`<div class="card"><div class="ctop">${clay('person-plus')}<div><div class="eyebrow">Suggestion</div><div class="ttl">A sitter for Maya and Jake</div></div></div>
     <hr><div class="fact"><i class="ph ph-clock"></i>${range(sw.from, sw.to)}, from 30 minutes before dinner</div>
@@ -755,12 +877,15 @@ X.flows.dateE = async (p, opt = {}) => {
   if (want === 1) {
     await p.say('Got it. Your table is on the family calendar, so Dana has it too.', 800);
     p.block(`<div class="card"><div class="cover" style="${M.ph(k, 3)}"></div><div class="ctop">${clay('calendar-check')}<div><div class="eyebrow">Date night · ${night.day}</div><div class="ttl">Your evening</div></div></div>
-      <hr><div class="fact"><i class="ph ph-fork-knife"></i>${pl.n} · ${time} · table for 2</div><div class="fact"><i class="ph ph-calendar-check"></i>On the family calendar · Dana has it too</div><div class="fact"><i class="ph ph-bell-ringing"></i>Reminder for you both at ${tl(slots[ti] - 30)}, 30 minutes before dinner</div></div>`);
+      <hr><div class="fact"><i class="ph ph-fork-knife"></i>${pl.n} · ${time} · table for 2</div><div class="fact"><i class="ph ph-clock"></i>${range(slots[ti], w0.to)} · home by ${tl(w0.to)}</div><div class="fact"><i class="ph ph-calendar-check"></i>On the family calendar · Dana has it too</div><div class="fact"><i class="ph ph-bell-ringing"></i>Reminder for you both at ${tl(slots[ti] - 30)}, 30 minutes before dinner</div></div>`);
     p.set(`Booked · ${pl.n} ${time}`, { when:night.short, done:false });
     const d = await p.chips(['Text Dana the plan', 'Done']);
-    await p.say(d === 0 ? 'Sent Dana the plan from you. Have a lovely night.' : 'Have a lovely night.', 700);
+    if (d === 0) {
+      const sent = await compose({ n:'Dana', ch:'Messages', photo:A + 'dana.webp' }, w0, [], `Date night ${night.day}: ${pl.n} at ${time}. It's on our calendar.`, 'From your phone.');
+      await p.say(sent ? 'Sent to Dana.' : `Okay. Dana still gets the reminder at ${ampm(slots[ti] - 30)}.`, 700);
+    } else await p.say('Have a lovely night.', 700);
     if (d === 1) X.closeSheet();
-    await CLOCK.book({ p, i:DAYS.indexOf(night), S:null, E:null, D:slots[ti], place:pl, k, who:null, kids:[], amt:0 });
+    await CLOCK.book({ p, i:DAYS.indexOf(night), S:null, E:w0.to, D:slots[ti], place:pl, k, who:null, kids:[], amt:0 });
     p.set(`${pl.n} · ${night.day}`, { when:night.short, done:true }); X.renderHome();
     return;
   }
@@ -777,25 +902,15 @@ X.flows.shareSitter = async p => {
   const m = p.block(`<div class="card"><div class="preview"><small>Miss Taylor’s class · Tony Martin</small><p>Hi everyone! We’re looking for a sitter for Sat, Aug 1, 6–10 PM, for Maya (7) and Jake (5). If you have one you trust, tap “Share a sitter” and add their name and number. Thank you!</p></div></div>`);
   const i = await p.chips(['Share a sitter', 'I don’t know one'], { into:m });
   if (i === 1) { await p.say('No problem. Nothing is sent to Tony.', 700); p.set('Skipped', { done:true }); return; }
-  await p.say('You have Taylor saved. Share Taylor, or someone else?', 800);
-  const j = await p.chips(['Share Taylor', 'Someone else']);
-  const shared = await new Promise(res => {
-    const v = bsheet({ onBack:() => res(null),
-      body:`<div class="bh"><span class="icotile"><i class="ph ph-hand-heart"></i></span><b>Share a sitter with Tony</b></div>
-        <p class="bp">Tony sees the name, number and your note. It’s also saved to his family’s sitters.</p>
-        <div class="fields" style="margin-top:0">
-          <label class="field in"><div style="width:100%"><div class="l">Sitter’s name</div><input value="${j === 0 ? 'Taylor Brooks' : ''}" placeholder="Name" autocomplete="off"></div></label>
-          <label class="field in"><div style="width:100%"><div class="l">Phone</div><input inputmode="tel" value="${j === 0 ? '(512) 555-0193' : ''}" placeholder="(512) 555-0100" autocomplete="off"></div></label>
-          <label class="field in"><div style="width:100%"><div class="l">A note for Tony (optional)</div><input value="${j === 0 ? 'Sits for us most Fridays. Great with little ones.' : ''}" autocomplete="off"></div></label></div>
-        <p class="hint2">Only share someone who’s happy to be contacted.</p>`,
-      foot:`<button type="button" class="btn" data-go>Share with Tony</button>` });
-    v.foot.querySelector('[data-go]').onclick = () => { const [n, ph] = [...v.body.querySelectorAll('input')].map(x => x.value.trim()); if (!n || !ph) return toast('Add a name and a phone number'); v.close(); res({ n, ph }); };
-  });
+  await p.say('Pick any of your sitters, or add someone new. Add a note to each if you like.', 800);
+  const shared = await shareSheet('Tony');
   if (!shared) { await p.say('Okay. Nothing was shared.', 600); return; }
+  const names = joinNames(shared.map(s => s.n)), fresh = shared.filter(s => s.isNew);
+  p.me(`Share ${names}`);
   const w = p.work('Sharing with Tony', 'Miss Taylor’s class'); await sleep(1200);
-  w.done(`Shared ${shared.n.split(' ')[0]} with Tony`, `${shared.ph} · saved to the Martins’ sitters`, 'ph-hand-heart');
-  p.set(`Shared ${shared.n.split(' ')[0]}`, { done:true });
-  await p.say('Thanks! Tony can ask them directly now. I’ll let you know if they book.', 800);
+  w.done(`Shared ${names} with Tony`, `Saved to the Martins’ sitters${fresh.length ? ` · ${joinNames(fresh.map(s => s.n))} saved to yours too` : ''}`, 'ph-hand-heart');
+  p.set(`Shared ${names}`, { done:true });
+  await p.say(`Thanks! Tony can ask ${shared.length > 1 ? 'them' : shared[0].n} now. I’ll let you know if they book.`, 800);
 };
 
 /* ======================= entries by route ======================= */
@@ -827,21 +942,978 @@ if (route === 'happening-am' || route === 'happening-pm') {   /* Saturday Daily 
   happening({ evening:pm, onOpen:() => { X.showPlan(p); X.openSheet(); } });
   setTimeout(() => { const b = $('#brief'), hp = $('.hpx'); if (b && hp) b.scrollTo({ top: hp.offsetTop - 70, behavior:'smooth' }); }, 900);
 }
-if (route === 'pay-todo') {   /* review shortcut: the night is over, it's Sunday 9 AM */
-  setTiles(); const h = $('.dbhead .mid span'); if (h) h.textContent = 'Sunday, August 2';
+if (route === 'pay-todo') {   /* review shortcut: Alex just finished, Saturday 10:15 PM (L3: pay + rate that night) */
+  setTiles(); const h = $('.dbhead .mid span'); if (h) h.textContent = 'Saturday, August 1';
   installTodo();
   const p = X.makePlan('sitterC1', { title:'Sitter · Sat, Aug 1', sub:'Sitter · Sat, Aug 1', icon:'person-plus' });
   const who = SAVED[0], w = { day:DAYS.find(d => d.w === 'Sat'), from:1125, to:1335 };
   p.block(`<div class="card"><div class="ctop">${clay('calendar-check')}<div><div class="eyebrow">Sitter · ${w.day.day}</div><div class="ttl">${who.n} is booked</div></div></div>
-    <div class="ua-row on" style="margin-top:12px">${face(who)}<span class="tx"><b>${who.n}</b><small>${range(w.from, w.to)} · about $${Math.round(who.rate * 3.5)} · you pay ${who.n}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></div></div>`);
+    <div class="ua-row on" style="margin-top:12px">${face(who)}<span class="tx"><b>${who.n}</b><small>${range(w.from, w.to)} · about $${Math.round(who.rate * 3.5)} · pay in Sprout after</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></div></div>`);
   p.set(`${who.n} · ${range(w.from, w.to)}`, { when:'Sat' });
-  setTimeout(() => morningAfter(p, who, w, KIDS, 3.5), 600);
+  /* opens on the lock screen at 10:15 PM: the Live Activity's last state, Pay Alex + Text Alex */
+  setTimeout(() => {
+    const r = { p, who, S:w.from, E:w.to, kids:KIDS, amt:Math.round(who.rate * 3.5), i:DAYS.indexOf(w.day) };
+    famLock({ i:r.i, m:w.to, la:laHtml(r, w.to), notes:[{ title:`${who.n} is done`, body:`Pay ${who.n} $${r.amt} and say how it went. It’s on your to-dos too.`, open:openPlan(p) }], onPay:openPlan(p) });
+    payTonight(p, who, w, KIDS, 3.5, { clock:true });
+  }, 600);
 }
 if (route === 'sitter-v3-share') {
   const g = $('.day .hi'); if (g) g.textContent = 'Afternoon, Priya';
   const fam = $('#sheet .fam'); if (fam) fam.innerHTML = `<i style="background-image:url(${A}priya.webp)"></i>`;
   lockScreen({ date:'Tuesday, July 28', time:'12:40', title:'Tony is looking for a sitter', body:'Maya’s dad asked Miss Taylor’s class. Know someone you trust?', onOpen:() => X.start('shareSitter') });
 }
+/* ======================= J4 · Class chat, Priya’s phone ======================= */
+function classChat(label){
+  const screen = el(`<section class="jc-screen" aria-label="${label}">
+    <div class="jc-head" role="img" aria-label="Miss Taylor Class chat header"></div>
+    <div class="jc-log" role="log"></div>
+    <div class="jc-composer" role="img" aria-label="Message composer"></div></section>`);
+  $('#phone').append(screen);
+  return screen;
+}
+function classMessage(who, text, own = false){
+  const msg = el(`<div class="jc-msg${own ? ' own' : ''}">
+    ${own ? '' : face(who, 40)}<div class="jc-content">${own ? '' : `<small>${who.n}</small>`}
+    <p class="jc-bubble"></p></div></div>`);
+  msg.querySelector('.jc-bubble').textContent = text;
+  return msg;
+}
+/* L4 (Tony, 19 Nov): "it's only letting me share one sitter." Priya picks any of her sitters, adds a note to each,
+   and can add someone new; a new sitter is saved to Priya's own sitters too. Only Tony sees numbers, never the chat. */
+const PRIYA_SITTERS = [
+  { ...CLASS_SITTERS[0], by:'Saved by you', times:'Sits for you most Fridays', note:'Sits for us most Fridays. Great with little ones.' },
+  { n:'Jamie', ch:'Messages', phone:'(512) 555-0185', rate:23, by:'Saved by Raj', times:'Sat for you twice', photo:AV('m'), note:'' },
+];
+function shareSheet(to = 'Tony'){
+  return new Promise(res => {
+    const list = PRIYA_SITTERS.map(s => ({ ...s, on:s === PRIYA_SITTERS[0] }));
+    const v = bsheet({ onBack:() => res(null), body:`<div class="bh"><span class="icotile"><i class="ph ph-hand-heart"></i></span><b>Share sitters with ${to}</b></div>
+      <p class="bp">Pick as many as you like. Add a note so ${to} knows why you trust them.</p>
+      <div class="sl" data-list></div>
+      <button type="button" class="sl-add" data-add><i class="ph ph-plus"></i>Add someone else</button>
+      <div data-form hidden><div class="dlabel" style="margin-top:14px">New sitter</div><div data-f></div><button type="button" class="btn ghost" data-save style="margin-top:10px">Add to the list</button></div>
+      <p class="hint2">Only ${to} sees the numbers. Nothing is posted in the class chat. New sitters are saved to your sitters too.</p>`,
+      foot:`<button type="button" class="btn" data-go></button>` });
+    const host = v.body.querySelector('[data-list]'), go = v.foot.querySelector('[data-go]'), formBox = v.body.querySelector('[data-form]');
+    let form = null;
+    const paint = () => {
+      host.innerHTML = list.map((s, i) => `<div class="shr${s.on ? ' on' : ''}"><button type="button" class="sl-row${s.on ? ' on' : ''}" data-i="${i}" aria-pressed="${s.on}">${face(s, 36)}
+          <span class="sl-tx"><span class="sl-n">${s.n}${s.isNew ? ' <span class="sl-tag">New</span>' : ''}</span><small>${s.isNew ? s.phone + ' · saved to your sitters' : s.times + ' · ' + s.phone}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button>
+        ${s.on ? `<label class="field in shr-note"><div style="width:100%"><div class="l">Note for ${to} (optional)</div><input data-note="${i}" value="${playdateEscape(s.note || '')}" placeholder="How you know ${s.n}" autocomplete="off"></div></label>` : ''}</div>`).join('');
+      host.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { const s = list[+b.dataset.i]; s.on = !s.on; paint(); });
+      host.querySelectorAll('[data-note]').forEach(x => x.oninput = () => { list[+x.dataset.note].note = x.value; });
+      const n = list.filter(s => s.on).length;
+      go.disabled = !n; go.textContent = n ? `Share ${n === 1 ? list.find(s => s.on).n : n + ' sitters'} with ${to}` : 'Pick at least one';
+    };
+    v.body.querySelector('[data-add]').onclick = () => {
+      formBox.hidden = false; v.body.querySelector('[data-add]').hidden = true;
+      form = sitterFields(); const f = formBox.querySelector('[data-f]'); f.innerHTML = ''; f.append(form.fields);
+      form.fields.querySelector('input').focus();
+    };
+    formBox.querySelector('[data-save]').onclick = () => {
+      const s = form.read();
+      if (!s.full || !s.phone) return toast('Add a name and a phone number');
+      list.push({ ...s, n:s.full.split(' ')[0], isNew:true, on:true, note:'' });
+      formBox.hidden = true; v.body.querySelector('[data-add]').hidden = false; paint();
+    };
+    go.onclick = () => { const picked = list.filter(s => s.on); if (!picked.length) return; v.close(); res(picked); };
+    paint();
+  });
+}
+function shareClassSitter(chip){
+  shareSheet('Tony').then(picked => {
+    if (!picked) return;
+    const names = joinNames(picked.map(s => s.n)), fresh = picked.filter(s => s.isNew);
+    const confirmation = el('<p class="jc-shared" role="status"></p>');
+    confirmation.textContent = `You shared ${names} with Tony${fresh.length ? `. ${joinNames(fresh.map(s => s.n))} saved to your sitters` : ''}`;
+    chip.replaceWith(confirmation); toast(`Shared ${picked.length === 1 ? names : picked.length + ' sitters'} with Tony`);
+  });
+}
+
+if (route === 'sitter-class-chat') {
+  const screen = classChat('Priya’s class chat');
+  const log = screen.querySelector('.jc-log');
+  const tony = classMessage({ n:'Tony', photo:A + 'tony.webp' }, 'Hi everyone! We’re looking for a sitter for Sat, Aug 1, 6–10 PM, for Maya (7) and Jake (5). If you have one you trust, tap “Share a sitter” and add their name and number. Thank you!');
+  const action = el('<div class="jc-action"><button type="button" class="chip">Share a sitter</button></div>');
+  const share = action.firstElementChild; share.onclick = () => shareClassSitter(share);
+  log.append(classMessage({ n:'Aisha', photo:A + 'aisha.webp' }, 'Are the kids bringing water bottles on Friday?'),
+    classMessage({ n:'Priya' }, 'Yes, we’re packing one.', true), tony, action);
+}
+/* ======================= J6 · Playdate ======================= */
+const PLAYDATE_FAMILIES = {
+  /* L5 (Tony, 19 Nov): we rarely have the kid's photo, and you message the parent anyway: parent first, kid as the line under */
+  Maya:[
+    { kid:'Lily', n:'Ana and Ben Ortiz', ask:'Ana and Ben', reply:'Ana', rel:'Lily’s parents' },
+    { kid:'Leo', n:'Priya Shah', ask:'Priya', reply:'Priya', rel:'Leo’s mom', photo:A + 'priya.webp' },
+    { kid:'Ava', n:'Aisha Khan', ask:'Aisha', reply:'Aisha', rel:'Ava’s mom', photo:A + 'aisha.webp' },
+  ],
+  Jake:[{ kid:'Noah', n:'Elena Ruiz', ask:'Elena', reply:'Elena', rel:'Noah’s mom', photo:A + 'elena.webp' }],
+};
+const playdateEscape = text => text.replace(/[&<>"]/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[ch]));
+const playdateWhen = w => `${w.day.day} · ${range(w.from, w.to)}`;
+const playdateInvite = (w, kidNames, family, place, pickup) => `Hi ${family.ask}! Would ${family.kid} like to play with ${kidNames} on ${w.day.day}, ${range(w.from, w.to)}? We can meet at ${place}.${pickup ? ` We’re happy to do pickup and drop-off for ${family.kid}.` : ''} Let us know what works!`;
+function playdateTime(p, { w, addFields, canContinue, title = 'Plan a playdate' } = {}){
+  return whenCard({ ...p, block:html => {
+    const host = p.block(html), card = host.querySelector('.card');
+    card.querySelector('.eyebrow').textContent = 'Playdate';
+    card.querySelector('.ttl').textContent = title;
+    if (addFields) addFields(card.querySelector('.btn'));
+    return host;
+  } }, { mode:'playdate', preset:w ? { w:w.day.w, from:w.from, to:w.to } : { w:'Sat', from:840, to:960 }, canContinue });
+}
+function suggestPlaydateTime(w){
+  return new Promise(resolve => {
+    const v = bsheet({ onBack:() => resolve(null), body:'', foot:'<button type="button" class="btn">Save</button>' });
+    const sp = { block:html => { v.body.innerHTML = `<div class="insheet">${html}</div>`; return v.body; }, me(){}, scroll(){} };
+    const choice = playdateTime(sp, { w, title:'Suggest another time' });
+    const next = v.body.querySelector('.card > .btn');
+    next.style.display = 'none';
+    v.foot.firstElementChild.onclick = () => next.click();
+    choice.then(slot => { v.close(); resolve(slot); });
+  });
+}
+function classmatesCard(p, kids, { withoutLily = false, multiple = false } = {}){
+  return new Promise(resolve => {
+    const groups = kids.map(kid => ({ label:`Kids in ${kid.cls}`, families:PLAYDATE_FAMILIES[kid.n].filter(f => !withoutLily || f.kid !== 'Lily') }));
+    const families = groups.flatMap(group => group.families);
+    const byClass = groups.length > 1;
+    const rowsFor = group => group.families.map(f => `<button type="button" class="sl-row" data-pick aria-pressed="false"><span aria-hidden="true">${face(f, 36)}</span><span class="sl-tx"><span class="sl-n">${f.n}</span><small>${f.rel}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button>`).join('');
+    const card = p.block(`<div class="card"><div class="ctop">${clay('two-people')}<div>${byClass ? '' : `<div class="eyebrow">${groups[0].label}</div>`}<div class="ttl">${byClass ? 'Who should I invite?' : 'Which parent should I message?'}</div></div></div>
+      ${groups.map(group => `${byClass ? `<div class="dlabel" style="margin-top:12px">${group.label}</div>` : ''}<div class="sl">${rowsFor(group)}</div>`).join('')}
+      <button type="button" class="btn" style="margin-top:14px" disabled>${multiple ? 'Next' : 'Pick a parent'}</button></div>`).querySelector('.card');
+    const rows = [...card.querySelectorAll('[data-pick]')], ask = card.querySelector('.btn');
+    const selected = () => families.filter((_, i) => rows[i].classList.contains('on'));
+    rows.forEach(row => row.onclick = () => {
+      if (multiple) row.classList.toggle('on');
+      else rows.forEach(b => b.classList.toggle('on', b === row));
+      rows.forEach(b => b.setAttribute('aria-pressed', b.classList.contains('on')));
+      const picks = selected();
+      ask.disabled = !picks.length;
+      if (!picks.length) ask.textContent = 'Next';
+      else if (multiple) ask.textContent = `Next · ${picks.length} classmate${picks.length === 1 ? '' : 's'}`;
+      else ask.textContent = `Message ${picks[0].ask}`;
+    });
+    ask.onclick = () => {
+      rows.forEach(b => b.disabled = true);
+      p.me(ask.textContent); ask.remove(); resolve(multiple ? selected() : selected()[0]);
+    };
+  });
+}
+async function sendPlaydateInvite(p, w, kidNames, family, place, pickup){
+  const card = p.block(`<div class="card"><div class="preview"><small>To ${family.n} · in Sprout</small><p></p></div></div>`).querySelector('.card');
+  const text = card.querySelector('p');
+  text.textContent = playdateInvite(w, kidNames, family, place, pickup);
+  for (;;) {
+    const choice = await p.chips(['Send', 'Edit message'], { into:card, echo:false });
+    if (choice === 0) { p.me('Send'); return; }
+    card.querySelector('.chips').remove();
+    const edited = await editText('Edit the message', playdateEscape(text.textContent));
+    if (edited) text.textContent = edited;
+  }
+}
+/* L5 (Tony, 19 Nov): the DM with the other parent, opened straight from the confirmed playdate.
+   "At this point I kinda just DM'd her... I might wanna just get straight into the DM." Reply = keyboard open. */
+function playdateDM(family, w, kidNames, place, pickup, { confirmed = true } = {}){
+  return new Promise(done => {
+    const who = { n:family.reply, photo:family.photo };
+    const screen = el(`<section class="jc-screen dm" aria-label="Messages with ${family.reply}">
+      <div class="dm-head"><button type="button" class="dm-back" aria-label="Back"><i class="ph ph-caret-left"></i></button>${face(who, 36)}
+        <div class="dm-who"><b>${family.n}</b><small>${family.rel} · ${family.kid === 'Noah' ? 'Miss Poole’s class' : 'Miss Taylor’s class'}</small></div></div>
+      <div class="jc-log" role="log"></div>
+      <form class="dm-comp"><input aria-label="Message ${family.reply}" placeholder="Message ${family.reply}" autocomplete="off"><button type="submit" aria-label="Send"><i class="ph-fill ph-paper-plane-tilt"></i></button></form></section>`);
+    $('#phone').append(screen);
+    const log = screen.querySelector('.jc-log'), input = screen.querySelector('input');
+    log.append(classMessage({ n:'Tony' }, playdateInvite(w, kidNames, family, place, pickup), true));
+    if (confirmed) {
+      log.append(el(`<div class="dm-sys"><i class="ph ph-calendar-check"></i>${family.reply} confirmed · ${playdateWhen(w)}</div>`));
+      log.append(classMessage(who, `Yes! ${family.kid} is so excited. See you ${w.day.w === 'Sat' ? 'Saturday' : w.day.day}!`));
+    }
+    screen.querySelector('form').onsubmit = e => { e.preventDefault(); const t = input.value.trim(); if (!t) return; log.append(classMessage({ n:'Tony' }, t, true)); input.value = ''; log.scrollTop = log.scrollHeight; };
+    screen.querySelector('.dm-back').onclick = () => { screen.classList.add('gone'); setTimeout(() => { screen.remove(); done(); }, 250); };
+    setTimeout(() => input.focus(), 300);
+  });
+}
+X.flows.playdate = async p => {
+  /* L5: one child per playdate (Tony: "I would just do it for one kid") */
+  let kid = KIDS[0], pickup = false;
+  let place = FAMILY.address, where = 0;
+  const options = ['Our place', 'A park', 'Out for lunch', 'Somewhere else'];
+  await p.say('Fun. Pick the time, which kid, and where. Then I’ll message the other parent for you.', 800);
+  const w = await playdateTime(p, { addFields:next => {
+    const fields = el(`<div><div class="dlabel" style="margin-top:16px">For</div><div class="ua-rows" role="radiogroup">${KIDS.map(k => `<button type="button" class="ua-row${k === kid ? ' on' : ''}" data-kid="${k.n}" role="radio" aria-checked="${k === kid}"><span class="uaph" style="background-image:url(${k.img})"></span><span class="tx"><b>${k.n}</b><small>${k.age} · ${k.cls}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button>`).join('')}</div>
+      <div class="dlabel" style="margin-top:16px">Where</div><div class="qk">${options.map((label, i) => `<button type="button" class="chip${i === where ? ' sel' : ''}" aria-pressed="${i === where}" data-where="${i}">${label}</button>`).join('')}</div>
+      <button type="button" class="ua-row pk" data-pickup aria-pressed="false" style="margin-top:12px"><span class="uaph uamono" style="width:40px;height:40px"><i class="ph ph-car-profile"></i></span><span class="tx"><b>We can pick up and drop off</b><small>Said in the invite, so the other parent knows</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button></div>`);
+    next.before(fields);
+    const kids = [...fields.querySelectorAll('[data-kid]')], places = [...fields.querySelectorAll('[data-where]')], pk = fields.querySelector('[data-pickup]');
+    kids.forEach(b => b.onclick = () => {
+      kid = KIDS.find(k => k.n === b.dataset.kid);
+      kids.forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-checked', x === b); });
+    });
+    pk.onclick = () => { pickup = !pickup; pk.classList.toggle('on', pickup); pk.setAttribute('aria-pressed', pickup); };
+    places.forEach(b => b.onclick = async () => {
+      const i = +b.dataset.where;
+      const picked = i === 0 ? FAMILY.address : await editText('Place name', i === where ? playdateEscape(place) : '', { rows:2 });
+      if (!picked) return;
+      place = picked; where = i;
+      places.forEach((row, n) => {
+        row.classList.toggle('sel', row === b); row.setAttribute('aria-pressed', row === b);
+        row.textContent = n && n === where ? `${options[n]} · ${place}` : options[n];
+      });
+    });
+  } });
+  const kids = [kid];
+  const kidNames = kid.n;
+  sub(p, `Playdate · ${w.day.day}`);
+  p.title = `Playdate · ${kidNames}`;
+  let family, withoutLily = false;
+  for (;;) {
+    family = await classmatesCard(p, kids, { withoutLily });
+    await sendPlaydateInvite(p, w, kidNames, family, place, pickup);
+    const status = `Waiting for ${family.ask}`;
+    p.set(status, { when:w.day.short });
+    const declined = family.kid === 'Lily' && route === 'playdate-cant';
+    const proposed = family.kid === 'Lily' && route === 'playdate-new-time';
+    const reply = declined ? 'Ana can’t make it this time' : proposed ? 'Ana suggested a new time' : `${family.reply} confirmed the playdate`;
+    await later(p, { status, small:playdateWhen(w), ms:2500, title:reply, body:joinNames([kid.n, family.kid]) });
+    if (declined) {
+      withoutLily = true;
+      await p.say('Ana can’t make it this time. Ask another family?', 700);
+      continue;
+    }
+    if (proposed) {
+      const suggested = { day:DAYS.find(d => d.w === 'Sun'), from:900, to:1020 };
+      const proposal = p.block(`<div class="card"><div class="ctop">${clay('calendar-check')}<div><div class="ttl">Ana suggested a new time</div></div></div>
+        <div class="fact"><i class="ph ph-clock"></i>${playdateWhen(suggested)}</div></div>`).querySelector('.card');
+      for (;;) {
+        proposal.querySelector('.chips')?.remove();
+        const choice = await p.chips(['Accept', 'Suggest another time', 'Message Ana'], { into:proposal });
+        if (choice === 0) { Object.assign(w, suggested); break; }
+        if (choice === 1) {
+          const revised = await suggestPlaydateTime(suggested);
+          if (!revised) continue;
+          Object.assign(w, revised);
+          await sendPlaydateInvite(p, w, kidNames, family, place, pickup);
+          await later(p, { status, small:playdateWhen(w), ms:2500, title:'Ana confirmed the playdate', body:playdateWhen(w) });
+          break;
+        }
+        await playdateDM(family, w, kidNames, place, pickup, { confirmed:false });
+      }
+    }
+    break;
+  }
+  await p.say(`${family.reply} confirmed the playdate.`, 700);
+  const title = where === 0 ? `${family.kid} is coming over` : `Playdate at ${playdateEscape(place)}`;
+  const participants = joinNames([kid.n, family.kid]);
+  const done = p.block(`<div class="card"><div class="ctop">${clay('calendar-check')}<div><div class="eyebrow">Playdate · ${w.day.day}</div><div class="ttl">${title}</div></div></div>
+    <div class="fact"><i class="ph ph-users"></i>${participants}</div>
+    <div class="fact"><i class="ph ph-clock"></i>${range(w.from, w.to)}</div>
+    <div class="fact"><i class="ph ph-map-pin"></i>${playdateEscape(place)}</div>
+    ${pickup ? `<div class="fact"><i class="ph ph-car-profile"></i>You do pickup and drop-off for ${family.kid}</div>` : ''}
+    <div class="fact"><i class="ph ph-calendar-check"></i>On the family calendar · Dana has it too</div>
+    <div class="fact"><i class="ph ph-bell-ringing"></i>Reminder for you both at ${ampm(w.from - 30)}, then the playdate on your lock screens</div></div>`).querySelector('.card');
+  sub(p, `Playdate · ${w.day.day}`);
+  p.set(`Confirmed · ${family.kid} · ${playdateWhen(w)}`, { when:w.day.short, done:true });
+  const booked = CLOCK.book({ p, i:DAYS.indexOf(w.day), S:w.from, E:w.to, playdate:{ place, kids:participants } });
+  /* L5: straight into the DM with the other parent */
+  for (;;) {
+    done.querySelector('.chips')?.remove();
+    const k = await p.chips([`Message ${family.reply}`, 'Done'], { into:done, echo:false });
+    if (k === 1) { p.me('Done'); break; }
+    await playdateDM(family, w, kidNames, place, pickup);
+  }
+  await booked;
+};
+
+
+function playdateInbox(){
+  const tony = { n:'Tony', photo:A + 'tony.webp' };
+  const w = { day:DAYS.find(d => d.w === 'Sat'), from:840, to:960 };
+  const screen = classChat('Ana’s messages with Tony');
+  const head = screen.querySelector('.jc-head'), log = screen.querySelector('.jc-log'), composer = screen.querySelector('.jc-composer');
+  const header = '/sitter-class-chat/header.png';
+  head.setAttribute('aria-label', 'Chat with Tony');
+  head.style.cssText = 'aspect-ratio:auto;background:none';
+  head.innerHTML = `<div style="aspect-ratio:393/48;overflow:hidden"><img src="${header}" alt="" style="width:100%;display:block"></div>
+    <div style="position:relative;display:flex;align-items:center;gap:8px;height:60px;padding-left:60px">
+      <span style="position:absolute;inset:0 auto 0 0;width:60px;background:url(${header}) 0 -48px/393px auto no-repeat"></span>
+      ${face(tony, 36)}<div class="htitle"><b>Tony</b></div></div>`;
+  composer.removeAttribute('role'); composer.removeAttribute('aria-label');
+  const form = el(`<form><input aria-label="Type message" autocomplete="off" style="position:absolute;left:15.3%;top:15.7%;width:69.5%;height:34.3%;padding:0 10px;border:0;border-radius:12px;background:transparent;color:var(--strong);font:13px var(--sans)">
+    <button type="submit" aria-label="Send message" style="position:absolute;left:86.5%;top:15.7%;width:10%;height:36%;border-radius:50%"></button></form>`);
+  composer.append(form);
+  const message = form.querySelector('input');
+  const paintComposer = () => { message.style.background = message.value || document.activeElement === message ? 'var(--field)' : 'transparent'; };
+  message.onfocus = message.onblur = paintComposer;
+  const addReply = text => { log.append(classMessage({ n:'Ana' }, text, true)); log.scrollTop = log.scrollHeight; };
+  form.onsubmit = e => {
+    e.preventDefault();
+    const text = message.value.trim();
+    if (text) { addReply(text); message.value = ''; message.blur(); }
+  };
+  const invitation = el(`<div class="card" style="margin:0 0 16px 48px"><div class="ctop">${clay('calendar-check')}<div>
+    <div class="eyebrow">Playdate</div><div class="ttl">Maya and Lily</div></div></div>
+    <div class="fact"><i class="ph ph-clock"></i>${playdateWhen(w)}</div>
+    <div class="fact"><i class="ph ph-map-pin"></i>${playdateEscape(FAMILY.address)}</div>
+    <div class="chips"><button type="button" class="chip" data-confirm>Confirm</button><button type="button" class="chip" data-suggest>Suggest another time</button><button type="button" class="chip" data-reply>Reply</button></div></div>`);
+  const actions = invitation.querySelector('.chips');
+  invitation.querySelector('[data-confirm]').onclick = () => {
+    actions.replaceWith(el('<div class="foot ok"><i class="ph ph-check-circle"></i>You confirmed · on your calendar</div>'));
+  };
+  invitation.querySelector('[data-suggest]').onclick = async () => {
+    const suggested = await suggestPlaydateTime(w);
+    if (!suggested) return;
+    actions.remove();
+    addReply(`Could we do ${suggested.day.day}, ${range(suggested.from, suggested.to)} instead?`);
+  };
+  invitation.querySelector('[data-reply]').onclick = () => message.focus();
+  log.append(classMessage(tony, playdateInvite(w, KIDS[0].n, PLAYDATE_FAMILIES.Maya[0], FAMILY.address)), invitation);
+}
+if (route === 'playdate-invite') playdateInbox();
+
+/* ======================= Class event ======================= */
+function classEventTitles(place){
+  const venue = {
+    'mcdonalds-lenteng-agung':'McDonald’s',
+    'habitat-park-scbd':'Habitat Park'
+  }[place.key] || place.name.split(' · ')[0];
+  const activities = {
+    'zilker-park':['Class Picnic', 'Class Games'],
+    'austin-zoo':['Class Zoo Day', 'Class Picnic'],
+    'habitat-park-scbd':['Class Nature Day', 'Class Animal Adventure']
+  }[place.key] || [
+    [], ['Class Lunch', 'Class Snack Break'], ['Class Play Day', 'Class Activity Day'],
+    ['Class Discovery Day', 'Class Field Trip'], ['Class Play Day', 'Outdoor Class Meetup']
+  ][place.types[0]];
+  return [...activities, 'Class Meetup'].map(activity => `${activity} at ${venue}`);
+}
+
+X.flows.classEvent = async (p, { covers, coverCard }) => {
+  sub(p, 'Class event');
+  p.title = 'Class event';
+  const classes = KIDS.map(kid => kid.cls);
+  const chooseClass = async () => {
+    await p.say('Which class should I invite?', 700);
+    return classes[await p.chips(classes)];
+  };
+  const chooseTitle = async place => {
+    const titles = classEventTitles(place);
+    await p.say('Which title should I use?', 650);
+    for (;;) {
+      const choice = await p.chips([...titles.map(playdateEscape), 'Write my own'], { echo:false });
+      if (choice < titles.length) {
+        p.me(playdateEscape(titles[choice]));
+        return titles[choice];
+      }
+      const custom = await editFields('Event title', [['Title', '']], {
+        requiredMessage:'Enter an event title'
+      });
+      if (custom) {
+        p.me(playdateEscape(custom[0]));
+        return custom[0];
+      }
+    }
+  };
+
+  let audience = await chooseClass();
+  let when = await whenCard(p, { mode:'class-event', preset:{ w:'Fri', from:900, to:960 } });
+  let venue = await findPartyVenue(p, when, 1, { classEvent:true });
+  if (!venue) {
+    await p.say('Draft canceled.', 600);
+    p.set('Draft canceled', { done:true });
+    return;
+  }
+
+  let name = await chooseTitle(venue.place);
+  let cover = partyPhoto(venue.place);
+  const renderInvite = () => {
+    const { place } = venue;
+    return eventInviteBody({
+      cover, title:playdateEscape(name), coverLabel:'Class event cover', place, editable:true,
+      date:when.day.long, time:`${range(when.from, when.to)}${when.to >= 1440 ? ' next day' : ''}`,
+      locationUrl:mapSearch(venueMapQuery(place)), rows:[['ph-users', audience, 'class']],
+      footer:'<button type="button" class="btn" data-send-invites>Send invite</button>'
+    });
+  };
+  const updatePlan = () => {
+    const title = playdateEscape(name);
+    sub(p, name);
+    p.title = title;
+    p.set('Ready to invite', { when:when.day.short });
+  };
+  updatePlan();
+  const card = p.block(renderInvite()).querySelector('.event-invite');
+  const editors = {
+    async title(){
+      const result = await editFields('Event title', [['Title', playdateEscape(name)]], { requiredMessage:'Enter an event title' });
+      if (result) name = result[0];
+    },
+    async location(){
+      const revised = await editClassVenue(when, venue);
+      if (!revised) return;
+      if (cover === partyPhoto(venue.place)) cover = partyPhoto(revised.place);
+      venue = revised;
+    },
+    async cover(){
+      cover = await inSheet(sp => coverCard(sp, {
+        eyebrow:'Event cover', title:playdateEscape(name), set:[partyPhoto(venue.place), ...covers], current:cover
+      }), 'Change cover') || cover;
+    },
+    async time(){
+      when = await inSheet(sp => whenCard(sp, {
+        mode:'class-event', preset:{ w:when.day.w, from:when.from, to:when.to }
+      }), 'Change the time') || when;
+    },
+    async class(){
+      audience = await editEventClass(classes, audience) || audience;
+    }
+  };
+  await new Promise(resolve => {
+    let editing = false;
+    card.onclick = async event => {
+      if (editing) return;
+      const button = event.target.closest('button');
+      if (!button) return;
+      if (button.hasAttribute('data-send-invites')) {
+        card.onclick = null;
+        card.querySelectorAll('button').forEach(control => control.remove());
+        p.me(button.textContent);
+        resolve();
+        return;
+      }
+      const field = button.dataset.editEvent;
+      if (!field) return;
+      editing = true;
+      try {
+        await editors[field]();
+        card.replaceChildren(...el(renderInvite()).childNodes);
+        updatePlan();
+        card.querySelector(`[data-edit-event="${field}"]`).focus({ preventScroll:true });
+      } finally {
+        editing = false;
+      }
+    };
+  });
+
+  p.receipt(`Invited ${audience}`);
+  p.set('Waiting for RSVPs', { when:when.day.short });
+  await p.chips(['Done']);
+  X.closeSheet();
+};
+
+function editEventClass(classes, current){
+  return new Promise(resolve => {
+    const sheet = bsheet({
+      onBack:() => resolve(null),
+      body:`<div class="bh"><span class="icotile"><i class="ph ph-users"></i></span><b>Change class</b></div>
+        <div class="chips">${classes.map((name, i) => `<button type="button" class="chip${name === current ? ' sel' : ''}" data-class="${i}" aria-pressed="${name === current}">${name}</button>`).join('')}</div>`
+    });
+    sheet.body.querySelectorAll('[data-class]').forEach(button => button.onclick = () => {
+      sheet.close();
+      resolve(classes[+button.dataset.class]);
+    });
+  });
+}
+
+/* ======================= J8 · Plan a birthday ======================= */
+const BIRTHDAY_PLACES = [{ key:'park', name:'Zilker Park', detail:'Zilker Park, Austin' }, { key:'home', name:'Our place', detail:'Our place' }];
+/* L6 (Tony, 19 Nov): three kinds of place, not five. "Birthday friendly venues, parks and playgrounds, or restaurant."
+   Hands-on fun and active play fold into venues, outdoors into parks. types[] below index into this list. */
+const PARTY_STYLES = [
+  { label:'Birthday-friendly venues', one:'Party venue', search:'kids birthday party venues', icon:'confetti' },
+  { label:'Parks and playgrounds', one:'Park', search:'parks and playgrounds for kids birthday parties', icon:'tree' },
+  { label:'Restaurants', one:'Restaurant', search:'family friendly restaurants for kids birthday', icon:'fork-knife' },
+];
+const PARTY_VENUES = [
+  { key:'chuck-e-cheese', name:'Chuck E. Cheese · South Austin', detail:'9811 S I-35, Austin, TX', coords:[30.16267,-97.78759], types:[0,2],
+    facilities:'Arcade games, prize counter and birthday show.', food:'Pizza and soft drinks. Food inclusions depend on the party package.',
+    menu:'https://www.chuckecheese.com/austin-south/food/menu/', website:'https://www.chuckecheese.com/austin-south/birthday-parties/?locselect=true' },
+  { key:'little-gym', name:'The Little Gym · Austin South', detail:'2716 W William Cannon Dr, Austin, TX', coords:[30.20745,-97.81564], types:[0],
+    facilities:'Private gym with instructor-led games. Setup and cleanup are included.',
+    food:'Ask the venue about food and available add-ons.',
+    website:'https://www.thelittlegym.com/texas-austin-south/kids-birthday-parties/' },
+  { key:'westgate', name:'Bouldering Project · Westgate', detail:'4477 S Lamar Blvd, Suite 600, Austin, TX', coords:[30.231,-97.796], types:[0],
+    facilities:'Private climbing parties with staff support. The Boulder package includes instructor-led games.',
+    food:'Cake and pizza are outside the packages.', schedule:'Published party starts: Sat and Sun at 10 AM, 1 PM and 4 PM. Book at least 21 days ahead.',
+    website:'https://boulderingproject.com/birthday-parties-atx/' },
+  { key:'thinkery', name:'Thinkery', detail:'1830 Simond Ave, Austin, TX', coords:[30.29777,-97.70554], types:[0],
+    facilities:'Hands-on museum exhibits and indoor or outdoor party spaces.',
+    food:'Bring snacks and cake or arrange delivery. There is no venue food service.',
+    website:'https://thinkeryaustin.org/birthday-parties-at-thinkery/' },
+  { key:'austin-zoo', name:'Austin Zoo', detail:'10808 Rawhide Trail, Austin, TX', coords:[30.25782,-97.93688], types:[1],
+    facilities:'Outdoor picnic tables and private party spaces on zoo grounds.',
+    food:'Bring your own food. Check the venue’s rules for the space you choose.',
+    website:'https://austinzoo.org/parties/' },
+  { key:'mcdonalds-lenteng-agung', name:'McDonald’s Lenteng Agung', detail:'Jl. Raya Lenteng Agung No. 12, Jakarta Selatan', coords:[-6.331542,106.835842], types:[2,0],
+    facilities:'Dedicated party room with birthday packages.',
+    food:'Happy Meals, burgers and fried chicken. Ask the branch which meals are included in the party package.',
+    menu:'https://www.mcdonalds.co.id/menu/', website:'https://www.mcdonalds.co.id/locations' },
+  { key:'kidzooona-tanjung-barat', name:'kidzooona · AEON Mall Tanjung Barat', detail:'Jl. Raya Tanjung Barat No. 163, Jakarta Selatan', coords:[-6.305636,106.840534], types:[0],
+    facilities:'Indoor pretend-play areas, slides and a ball pit.',
+    food:'Ask the branch about food and cake for parties.',
+    schedule:'Contact the branch to confirm group and birthday options.',
+    website:'https://www.aeonfantasy.co.id/en/store/' },
+  { key:'playparq-kemang', name:'PlayParq Kemang', detail:'Jl. Kemang Timur Raya No. 72, Jakarta Selatan', coords:[-6.263011,106.823777], types:[1,0],
+    facilities:'Outdoor playground with a treehouse, trampolines and water play.',
+    food:'Birthday packages include a buffet. The café serves Indonesian, Chinese and Western dishes.',
+    schedule:'The venue lists a party minimum of 30 children and 20 adults.',
+    website:'https://playparq.com/kemang/' },
+  { key:'habitat-park-scbd', name:'Habitat Park SCBD', detail:'SCBD Park Lot 6, Jl. Jend. Sudirman, Jakarta Selatan', coords:[-6.226215,106.809350], types:[1],
+    facilities:'Outdoor animal park and hands-on activities for birthday groups.',
+    food:'Saola Restaurant and Kori Dessert House are on site. Ask what is included in the party package.',
+    website:'https://habitat.id/event-activities/birthday/' },
+  /* L6: parks and family restaurants near South Austin. Zilker uses the class-event photo; Casa Verde and Rosie's are
+     the prototype's made-up date-night places (AI photos), standing in for family restaurants. */
+  { key:'zilker-park', name:'Zilker Park', detail:'2100 Barton Springs Rd, Austin, TX', coords:[30.26768,-97.76661], types:[1],
+    facilities:'Open lawns, a playground and picnic tables. Big groups can reserve a picnic area with the city.',
+    food:'Bring your own. Food trucks park along Barton Springs Rd.', website:'https://www.austintexas.gov/parks/locations/zilker-metropolitan-park' },
+  { key:'casa-verde', name:'Casa Verde', detail:'Sample place · South Austin', coords:[30.2135,-97.8292], types:[2], photo:'dn/casa-1.jpg',
+    facilities:'Garden patio with long tables for groups and a small play corner.', food:'Tacos, quesadillas and kids plates. Call ahead for 10 or more.' },
+  { key:'rosies', name:'Rosie’s', detail:'Sample place · South Austin', coords:[30.1992,-97.8611], types:[2], photo:'dn/rosie-1.jpg',
+    facilities:'Big shaded patio, picnic tables and lawn games.', food:'Smokehouse plates and kids meals. Group trays for parties.' },
+];
+const CLASS_EVENT_VENUES = PARTY_VENUES;   /* L6: Zilker Park now lives in PARTY_VENUES (Parks and playgrounds) */
+const PARTY_HOME = { coords:[30.20,-97.83], area:'South Austin, TX', label:'South Austin' };
+const PARTY_JAKARTA = { coords:[-6.31,106.85], area:'South Jakarta, Indonesia', label:'Jakarta' };
+const birthdayTitle = kid => `${kid.n}’s ${kid.age + 1}th birthday party`;
+const mapSearch = query => 'https://www.google.com/maps/search/?' + new URLSearchParams({ api:'1', query });
+const mapDirections = destination => 'https://www.google.com/maps/dir/?' + new URLSearchParams({ api:'1', destination });
+const external = (url, text, cls = 'link') => `<a class="${cls}" href="${playdateEscape(url)}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+const venueMapQuery = place => `${place.name.replace(' · ', ' ')} ${place.detail}`;
+
+function partyLocation(){
+  return new Promise(resolve => {
+    if (!navigator.geolocation) { resolve(null); return; }
+    navigator.geolocation.getCurrentPosition(({ coords }) => {
+      const coarseArea = [coords.latitude, coords.longitude].map(n => n.toFixed(2)).join(', ');
+      resolve({ coords:[coords.latitude, coords.longitude], area:coarseArea, label:'your location' });
+    }, () => resolve(null), { timeout:4500, maximumAge:60000 });
+  });
+}
+
+function partyDistance([lat, lng], [venueLat, venueLng]){
+  const rad = n => n * Math.PI / 180;
+  const a = Math.sin(rad(venueLat - lat) / 2) ** 2
+    + Math.cos(rad(lat)) * Math.cos(rad(venueLat)) * Math.sin(rad(venueLng - lng) / 2) ** 2;
+  return 7917.5 * Math.asin(Math.min(1, Math.sqrt(a)));
+}
+
+function partyRanked(origin, styleIndex, places = PARTY_VENUES){
+  return places.map(place => ({
+    place, miles:partyDistance(origin.coords, place.coords), matches:place.types.includes(styleIndex)
+  })).filter(v => v.miles <= 30)
+    .sort((a, b) => Number(b.matches) - Number(a.matches) || a.miles - b.miles);
+}
+
+const partyPhoto = place => place.photo ? A + place.photo : `${A}party-venues/${place.key}.webp`;
+const partyPhotoStyle = place => `background-image:url(${partyPhoto(place)})`;
+
+function partyDetails(place, w, miles){
+  return new Promise(resolve => {
+    const sections = `<section class="party-detail-section"><h3 class="bq">Availability</h3>
+        <div class="fact"><i class="ph ph-calendar-blank"></i>${w.day.day} · Starts at ${tl(w.from)}</div>
+        ${place.schedule ? `<p class="bp">${place.schedule}</p>` : ''}
+        ${external(place.website, 'Check availability', 'link')}</section>
+      <section class="party-detail-section"><h3 class="bq">Facilities</h3><p class="bp">${place.facilities}</p></section>
+      <section class="party-detail-section"><h3 class="bq">Food &amp; drinks</h3><p class="bp">${place.food}</p>
+        ${place.menu ? external(place.menu, 'See the menu', 'link') : ''}</section>`;
+    const sheet = X.overlay({ title:'Venue details', body:`<article class="party-detail">
+        <img class="bhero party-detail-photo" src="${partyPhoto(place)}" alt="${place.name}">
+        <h2 class="btitle">${place.name}</h2>
+        <div class="bsub">${PARTY_STYLES[place.types[0]].label} · ${miles.toFixed(1)} mi away</div>
+        ${external(mapDirections(place.detail), `<i class="ph ph-map-pin" aria-hidden="true"></i> ${place.detail}`)}
+        ${sections}</article>`,
+      foot:'<button type="button" class="btn" data-choose>Choose this place</button>' });
+    sheet.o.querySelector('.wclose').onclick = () => { sheet.close(); resolve(null); };
+    sheet.foot.querySelector('[data-choose]').onclick = () => { sheet.close(); resolve(place); };
+  });
+}
+
+// The Sprout map uses the same draggable layer and photo pins as date night. Tile
+// coordinates and venue pins share a Web Mercator projection.
+function partyMap(map, origin, ranked, pick){
+  const tileSize = 256, zoom = 12, world = tileSize * 2 ** zoom;
+  const project = ([lat, lng]) => {
+    const sin = Math.sin(lat * Math.PI / 180);
+    return { x:world * (lng + 180) / 360, y:world * (.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) };
+  };
+  const home = project(origin.coords.map(n => Number(n.toFixed(2))));
+  const pins = ranked.map(({ place }) => ({ place, xy:project(place.coords) }));
+  const pts = [home, ...pins.map(pin => pin.xy)];
+  const originTile = axis => Math.floor(Math.min(...pts.map(point => point[axis])) / tileSize) - 1;
+  const left = originTile('x'), top = originTile('y');
+  const extent = (axis, offset) => (Math.floor(Math.max(...pts.map(point => point[axis])) / tileSize) - offset + 2) * tileSize;
+  const width = extent('x', left), height = extent('y', top);
+  const layer = map.querySelector('.dnlayer'), tileHost = layer.querySelector('.party-map-tiles');
+  const markers = new Map(), tiles = new Map();
+  let camera = [0, 0];
+  layer.style.width = width + 'px'; layer.style.height = height + 'px';
+  const geoStyle = ({ x, y }) => `left:${x - left * tileSize}px;top:${y - top * tileSize}px`;
+  layer.append(el(`<span class="dnhome" aria-label="Search center" style="${geoStyle(home)}"><i class="ph-fill ph-house"></i></span>`));
+  pins.forEach(({ place, xy }) => {
+    const pin = el(`<button type="button" class="dnpin" data-k="${place.key}" style="${geoStyle(xy)};${partyPhotoStyle(place)}" aria-label="${place.name}" aria-pressed="false" hidden></button>`);
+    pin.onclick = () => pick(place.key);
+    markers.set(place.key, pin); layer.append(pin);
+  });
+  function paintTiles(x, y){
+    if (map.hidden || !map.clientWidth) return;
+    camera = [x, y];
+    const tx1 = Math.floor(-x / tileSize), tx2 = Math.ceil((-x + map.clientWidth) / tileSize);
+    const ty1 = Math.floor(-y / tileSize), ty2 = Math.ceil((-y + map.clientHeight) / tileSize);
+    for (let tx = tx1; tx < tx2; tx++) for (let ty = ty1; ty < ty2; ty++) {
+      const key = `${tx}/${ty}`;
+      if (tiles.has(key)) continue;
+      const tile = document.createElement('img');
+      tile.alt = '';
+      tile.style.cssText = `left:${tx * tileSize}px;top:${ty * tileSize}px`;
+      tile.src = `https://tile.openstreetmap.org/${zoom}/${tx + left}/${ty + top}.png`;
+      tileHost.append(tile); tiles.set(key, tile);
+    }
+  }
+  function move(x, y, instant = false){
+    if (map.hidden || !map.clientWidth) return;
+    x = Math.min(0, Math.max(map.clientWidth - width, x));
+    y = Math.min(0, Math.max(map.clientHeight - height, y));
+    paintTiles(x, y);
+    layer.style.transition = instant ? 'none' : '';
+    layer.style.transform = `translate(${x}px,${y}px)`;
+  }
+  const focus = (xy, instant = false) => move(map.clientWidth / 2 - xy.x + left * tileSize,
+    map.clientHeight / 2 - xy.y + top * tileSize, instant);
+  M.drag(map, { recenter:() => focus(home), onPan:paintTiles });
+  map.onkeydown = e => {
+    if (e.target !== map) return;
+    const step = { ArrowLeft:[48, 0], ArrowRight:[-48, 0], ArrowUp:[0, 48], ArrowDown:[0, -48] }[e.key];
+    if (!step) return;
+    e.preventDefault();
+    move(camera[0] + step[0], camera[1] + step[1]);
+  };
+  return {
+    reveal(key){ markers.get(key).hidden = false; },
+    select(key, instant = false){
+      markers.forEach((pin, k) => {
+        pin.classList.toggle('on', key === k);
+        pin.setAttribute('aria-pressed', key === k);
+        pin.querySelector('.lbl')?.remove();
+        if (key === k) pin.append(el(`<span class="lbl">${pin.getAttribute('aria-label').split(' · ')[0]}</span>`));
+      });
+      const chosen = pins.find(pin => pin.place.key === key).xy;
+      const dx = Math.abs(chosen.x - home.x), dy = Math.abs(chosen.y - home.y);
+      focus(dx < map.clientWidth * .45 && dy < map.clientHeight * .45
+        ? { x:(chosen.x + home.x) / 2, y:(chosen.y + home.y) / 2 } : chosen, instant);
+    },
+    resume(){ move(camera[0], camera[1], true); }
+  };
+}
+
+function partyResults(p, w, origin, ranked, { heading, search, currentKey, styleIndex = 0, areaSearch = false }){
+  const query = `${search} near ${origin.area}`;
+  const venues = new Map(ranked.map(({ place }) => [place.key, place]));
+  const visibleCount = ranked.findIndex(({ place }) => place.key === currentKey) >= 3 ? ranked.length : 3;
+  return new Promise(resolve => {
+    const card = p.block(`<div class="card party-results">
+      <div class="ctop"><span class="icotile"><i class="ph ph-map-pin"></i></span><div><div class="eyebrow">${origin.label === 'your location' ? 'Near you' : origin.label}</div><div class="ttl">${heading}</div></div>
+        <button type="button" class="chip" data-map>Google Maps</button></div>
+      <div class="dnmap wide party-map" role="region" aria-label="Sprout map of ${heading.toLowerCase()}" tabindex="0">
+        <div class="dnlayer"><div class="party-map-tiles" aria-hidden="true"></div></div>
+        <button type="button" class="dnrecenter" aria-label="Recenter map"><i class="ph-bold ph-crosshair"></i></button>
+        ${external('https://www.openstreetmap.org/copyright', '© OpenStreetMap', 'party-map-credit')}</div>
+      <iframe class="dnmap wide" title="Google Maps" loading="lazy" referrerpolicy="no-referrer" hidden></iframe>
+      <div class="dncar" data-party-places role="region" aria-label="Venue recommendations"></div>
+      <div class="chips">
+        ${ranked.length > visibleCount ? '<button type="button" class="chip" data-more>Show more places</button>' : ''}
+        ${areaSearch ? '<button type="button" class="chip" data-area><i class="ph ph-magnifying-glass"></i> Another area</button>' : ''}
+        ${external(mapSearch(query), 'Search Google Maps', 'chip')}
+        <button type="button" class="chip" data-back>Back</button>
+      </div></div>`).querySelector('.party-results');
+    const list = card.querySelector('[data-party-places]'), map = card.querySelector('.party-map');
+    const google = card.querySelector('iframe'), mapButton = card.querySelector('[data-map]');
+    let active = true, selected = venues.has(currentKey) ? currentKey : ranked[0].place.key, mapKey, scrollTimer;
+    const mapUI = partyMap(map, origin, ranked, key => select(key, true));
+    const syncGoogle = key => {
+      const place = venues.get(key);
+      const params = new URLSearchParams({
+        q:venueMapQuery(place), ll:place.coords.join(','), z:'15', output:'embed'
+      });
+      const src = 'https://www.google.com/maps?' + params;
+      if (google.getAttribute('src') === src) return;
+      google.title = `Google Maps · ${place.name}`;
+      google.src = src;
+    };
+    const select = (key, scroll = false, instant = false) => {
+      selected = key;
+      const tiles = [...list.children];
+      tiles.forEach(tile => tile.classList.toggle('on', tile.dataset.k === key));
+      if (!map.hidden) { mapUI.select(key, instant); mapKey = key; }
+      else syncGoogle(key);
+      if (!scroll) return;
+      const tile = tiles.find(t => t.dataset.k === key), box = tile.getBoundingClientRect(), view = list.getBoundingClientRect();
+      list.scrollTo({ left:list.scrollLeft + box.left - view.left + (box.width - view.width) / 2, behavior:'smooth' });
+    };
+    list.onscroll = () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        if (!active || !list.children.length) return;
+        const view = list.getBoundingClientRect(), middle = view.left + view.width / 2;
+        const distance = tile => { const box = tile.getBoundingClientRect(); return Math.abs(box.left + box.width / 2 - middle); };
+        const nearest = [...list.children].reduce((a, b) => distance(a) < distance(b) ? a : b);
+        if (nearest.dataset.k !== selected) select(nearest.dataset.k);
+      }, 120);
+    };
+    const finish = place => {
+      if (!active) return;
+      active = false;
+      list.querySelectorAll('button').forEach(b => b.disabled = true);
+      card.querySelectorAll('[data-more],[data-back],.dnpin').forEach(b => { if (b.matches('.dnpin')) b.disabled = true; else b.remove(); });
+      p.me(place ? `Choose ${place.name}` : 'Back'); resolve(place);
+    };
+    const append = venues => venues.forEach(({ place, miles }, i) => {
+      const style = PARTY_STYLES[place.types.includes(styleIndex) ? styleIndex : place.types[0]] || PARTY_STYLES[0];
+      const tile = el(`<div class="card dn3" data-k="${place.key}">
+        <div class="dn3img" role="img" aria-label="${place.name}" style="${partyPhotoStyle(place)}">${!list.children.length && i === 0 ? '<span class="dn3pick">My pick</span>' : ''}</div>
+        <div class="dn3bd"><div class="dn3top"><b>${place.name}</b></div>
+        <div class="dn3sub">${style.one} · ${miles.toFixed(1)} mi away</div>
+        <p class="dn3why">${place.facilities}</p>
+        <div class="dn3cta"><button class="dn3link" data-details><i class="ph ph-info"></i>Details</button><button class="btn dn3go" data-choose>Choose</button></div>
+        </div></div>`);
+      tile.querySelector('[data-details]').onclick = async () => {
+        select(place.key, true);
+        const picked = await partyDetails(place, w, miles);
+        if (picked) finish(picked);
+      };
+      tile.querySelector('[data-choose]').onclick = () => finish(place);
+      list.append(tile);
+      mapUI.reveal(place.key);
+    });
+    append(ranked.slice(0, visibleCount));
+    requestAnimationFrame(() => { if (card.isConnected) select(selected, Boolean(currentKey), true); });
+    mapButton.onclick = () => {
+      const openGoogle = !map.hidden;
+      map.hidden = openGoogle; google.hidden = !openGoogle;
+      mapButton.textContent = openGoogle ? 'Sprout map' : 'Google Maps';
+      if (openGoogle) syncGoogle(selected);
+      else if (mapKey !== selected) select(selected, false, true);
+      else mapUI.resume();
+    };
+    const more = card.querySelector('[data-more]');
+    if (more) more.onclick = () => { append(ranked.slice(3)); select(ranked[3].place.key, true); more.remove(); p.scroll(); };
+    card.querySelector('[data-back]').onclick = () => finish(null);
+    const areaBtn = card.querySelector('[data-area]');
+    if (areaBtn) areaBtn.onclick = async () => { const a = await otherArea(); if (!a || !active) return; active = false; list.querySelectorAll('button').forEach(b => b.disabled = true); card.querySelectorAll('[data-more],[data-back],[data-area]').forEach(b => b.remove()); p.me(`Look around ${a.label}`); resolve({ area:a }); };
+    if (p.chat) setTimeout(() => p.chat.scrollTo({ top:card.closest('.row').offsetTop - p.chat.offsetTop - 8, behavior:'smooth' }), 500);
+  });
+}
+
+function editClassVenue(when, current){
+  const areas = [PARTY_HOME, PARTY_JAKARTA];
+  return new Promise(resolve => {
+    const sheet = X.overlay({ title:'Edit location', body:`<div class="chips">
+      ${areas.map((area, i) => `<button type="button" class="chip" data-area="${i}">${area.label}</button>`).join('')}
+      <button type="button" class="chip" data-device>Use my location</button></div><div data-results></div>` });
+    const results = sheet.body.querySelector('[data-results]');
+    const areaButtons = [...sheet.body.querySelectorAll('[data-area], [data-device]')];
+    const deviceButton = sheet.body.querySelector('[data-device]');
+    let open = true;
+    let version = 0;
+    const finish = result => {
+      if (!open) return;
+      open = false;
+      sheet.close();
+      resolve(result);
+    };
+    sheet.o.querySelector('.wclose').onclick = () => finish(null);
+    const show = (origin, ranked = partyRanked(origin, 1, CLASS_EVENT_VENUES)) => {
+      const revision = ++version;
+      const areaIndex = areas.indexOf(origin);
+      areaButtons.forEach((button, i) => {
+        const selected = i === areaIndex || (button === deviceButton && areaIndex === -1);
+        button.classList.toggle('sel', selected);
+        button.setAttribute('aria-pressed', selected);
+      });
+      const panel = { block:html => { results.innerHTML = html; return results; }, me(){}, scroll(){} };
+      partyResults(panel, when, origin, ranked, {
+        heading:'Event places', search:'family group event venues', currentKey:current.place.key, styleIndex:1
+      }).then(place => {
+        if (revision === version) finish(place ? { place, origin } : null);
+      });
+    };
+    areaButtons.slice(0, areas.length).forEach((button, i) => button.onclick = () => show(areas[i]));
+    deviceButton.onclick = async () => {
+      const revision = version;
+      deviceButton.disabled = true;
+      const origin = await partyLocation();
+      deviceButton.disabled = false;
+      if (!open || revision !== version) return;
+      const ranked = origin ? partyRanked(origin, 1, CLASS_EVENT_VENUES) : [];
+      if (ranked.length >= 3) show(origin, ranked);
+      else toast(origin ? 'Choose a demo area to see venues' : 'Couldn’t get your location');
+    };
+    show(current.origin);
+  });
+}
+
+/* L6 (Tony, 19 Nov): no "Where should I look?". Parties are booked weeks ahead, so "use my location" is the wrong
+   question: start near home, closest first, swipe for farther. Ahmad's add: type an area to look somewhere else. */
+const PARTY_AREAS = [[/jakarta|jkt|indonesia/i, PARTY_JAKARTA], [/austin|texas|tx|home|78\d{3}/i, PARTY_HOME]];
+async function otherArea(){
+  const v = await editText('Look in another area', '', { rows:1, label:'A city, neighborhood or ZIP' });
+  if (!v) return null;
+  const hit = PARTY_AREAS.find(([re]) => re.test(v));
+  if (!hit) { toast('This demo has places around Austin and Jakarta'); return null; }
+  return hit[1];
+}
+async function findPartyVenue(p, w, styleIndex, { classEvent = false } = {}){
+  const places = classEvent ? CLASS_EVENT_VENUES : PARTY_VENUES;
+  const heading = classEvent ? 'Event places' : PARTY_STYLES[styleIndex].label;
+  const search = classEvent ? 'family group event venues' : PARTY_STYLES[styleIndex].search;
+  let origin = PARTY_HOME;
+  for (;;) {
+    const ranked = partyRanked(origin, styleIndex, places);
+    const work = p.work(`Looking ${origin === PARTY_HOME ? 'near home' : 'around ' + origin.label}`, `${heading} · closest first`);
+    await sleep(650);
+    work.done(`${ranked.length} places near ${origin === PARTY_HOME ? 'home' : origin.label}`, ranked.length > 3 ? 'Closest 3 first · swipe for more' : 'Closest first', 'ph-map-pin');
+    const place = await partyResults(p, w, origin, ranked, { heading, search, styleIndex, areaSearch:true });
+    if (place && place.area) { origin = place.area; continue; }
+    if (place) return { place, origin };
+    return null;
+  }
+}
+
+async function birthdayPlace(p, w){
+  for (;;) {
+    await p.say('Where’s the party?', 700);
+    const choice = await p.chips([...BIRTHDAY_PLACES.map(place => place.name), 'Help me find a place']);
+    if (choice < BIRTHDAY_PLACES.length) return BIRTHDAY_PLACES[choice];
+    await p.say('What kind of place?', 700);
+    const styleIndex = await p.chips(PARTY_STYLES.map(style => style.label));
+    const venue = await findPartyVenue(p, w, styleIndex);
+    if (venue) return venue.place;
+  }
+}
+
+
+function eventInviteBody({ cover, coverLabel, title, date, time, place, locationUrl, rows = [], footer = '', editable = false }){
+  const venue = playdateEscape(place.name);
+  const pencil = (field, label = field) => editable
+    ? `<button type="button" class="s ed" data-edit-event="${field}" aria-label="Edit ${label}"><i class="ph ph-pencil-simple" aria-hidden="true"></i></button>`
+    : '';
+  const photo = `<div class="cover" role="img" aria-label="${coverLabel}" style="background-image:url(${cover})"></div>`;
+  const heading = `<h2 class="ttl event-invite-title">${title}</h2>`;
+  return `<article class="card event-invite">
+    ${editable ? `<div class="event-invite-photo">${photo}${pencil('cover')}</div><div class="event-invite-heading">${heading}${pencil('title')}</div>` : photo + heading}
+    <div class="fact"><i class="ph ph-calendar-blank" aria-hidden="true"></i><div>
+      <strong>${date}</strong><span class="event-invite-secondary"> · ${time}</span>
+    </div>${pencil('time', 'date and time')}</div>
+    <div class="fact"><i class="ph ph-map-pin" aria-hidden="true"></i><div>
+      <strong>${locationUrl ? external(locationUrl, venue) : venue}</strong>
+      ${place.detail !== place.name ? `<div class="event-invite-secondary">${playdateEscape(place.detail)}</div>` : ''}
+    </div>${pencil('location')}</div>
+    ${rows.length ? `<div class="event-invite-meta">${rows.map(([icon, text, field]) => `<div class="fact"><i class="ph ${icon}" aria-hidden="true"></i>${text}${field ? pencil(field) : ''}</div>`).join('')}</div>` : ''}
+    ${footer}</article>`;
+}
+
+function birthdayInviteBody(cover, title, w, place, { guest = false, rows, footer = '' } = {}){
+  const directions = guest && place.key !== 'home' ? external(mapDirections(place.detail), 'Directions on Google Maps') : '';
+  return eventInviteBody({
+    cover, coverLabel:'Birthday invitation cover', title, place, rows,
+    date:dLong(DAYS.indexOf(w.day)), time:w.to ? range(w.from, w.to) : `Starts at ${tl(w.from)}`, footer:directions + footer
+  });
+}
+
+async function copyBirthdayInvite(link){
+  try {
+    await navigator.clipboard.writeText(link);
+    toast('Link copied');
+  } catch {
+    const sheet = bsheet({ body:`<div class="bh"><span class="icotile"><i class="ph ph-link"></i></span><b>Copy link</b></div>
+      <label class="field in"><div style="width:100%"><div class="l">Invitation link</div><input readonly aria-label="Invitation link"></div></label>`,
+      foot:'<button type="button" class="btn">Close</button>' });
+    const field = sheet.body.querySelector('input');
+    field.value = link;
+    field.onfocus = () => field.select();
+    sheet.foot.firstElementChild.onclick = sheet.close;
+    field.focus();
+  }
+}
+
+/* L6 (Tony, 19 Nov): finish the event first, then ask who gets it. Kid → when (start and end) → where → cover →
+   the invitation → Send invites → which class, classmates, or a link only. */
+X.flows.birthday = async (p, { covers, coverCard }) => {
+  sub(p, 'Birthday party');
+  await p.say('Let’s plan it. Whose birthday?', 700);
+  const [kid] = await kidsCard(p, [], { birthday:true });
+  const title = birthdayTitle(kid);
+  p.title = title; sub(p, title);
+  const w = await whenCard(p, { mode:'birthday', preset:{ w:'Sat', from:840, to:960 } });
+  const place = await birthdayPlace(p, w);
+
+  const work = p.work('Picking covers', title);
+  await sleep(1000);
+  work.done(`${covers.length} covers to pick from`, 'Or make one with AI', 'ph-image');
+  const cover = await coverCard(p, { eyebrow:'Cover', title, set:covers });
+
+  p.set('Ready to send', { when:w.day.short });
+  await p.say('Here’s the invitation. Check it, then send it.', 700);
+  await new Promise(resolve => {
+    const footer = '<button type="button" class="btn" data-send-invites>Send invites</button>';
+    const card = p.block(birthdayInviteBody(cover, title, w, place, { footer }));
+    const submit = card.querySelector('[data-send-invites]');
+    submit.onclick = () => { submit.remove(); p.me('Send invites'); resolve(); };
+  });
+
+  await p.say('Who should get it?', 600);
+  const audience = await p.chips([kid.cls, 'Pick classmates', 'Just a link']);
+  const families = audience === 1 ? await classmatesCard(p, [kid], { multiple:true }) : [];
+  const guests = [kid.cls, joinNames(families.map(f => f.kid)), 'Link only'][audience];
+  const dayIndex = DAYS.indexOf(w.day);
+  const classRsvp = audience === 0 && kid.n === 'Maya';
+  const rsvpDay = classRsvp ? dShort(dayIndex - 2) : null;
+  p.receipt(`Saved in Events · ${w.day.day} · ${range(w.from, w.to)}`);
+  if (audience !== 2) p.receipt(audience === 0 ? `Invited ${guests} · 22 families${rsvpDay ? ` · RSVPs by ${rsvpDay}` : ''}` : `Invited ${guests}’s families`);
+  p.set(audience === 2 ? 'Event saved' : 'Invites sent', { when:w.day.short, done:!classRsvp });
+
+  const link = new URL('/birthday-invite/', location.origin);
+  link.search = new URLSearchParams({ kid:kid.n, day:dayIndex, from:w.from, to:w.to, place:place.key, cover:covers.indexOf(cover) });
+  await new Promise(resolve => {
+    const actions = p.block(`<div class="chips">
+      <button type="button" class="chip" data-copy>Copy link</button>
+      <button type="button" class="chip" data-preview>See the invite</button>
+      <button type="button" class="chip" data-done>Done</button></div>`);
+    actions.querySelector('[data-copy]').onclick = () => copyBirthdayInvite(link.href);
+    actions.querySelector('[data-preview]').onclick = () => {
+      const sheet = bsheet({ body:birthdayInviteBody(cover, title, w, place, { guest:true }),
+        foot:'<button type="button" class="btn ghost">Close</button>' });
+      sheet.foot.firstElementChild.onclick = sheet.close;
+    };
+    const done = actions.querySelector('[data-done]');
+    done.onclick = () => { p.me('Done'); done.remove(); X.closeSheet(); resolve(); };
+  });
+
+  if (classRsvp) {
+    await later(p, { status:'Collecting RSVPs', small:guests, ms:4500, title:`${kid.n}’s party · 16 coming`, body:`Headcount for ${w.day.long}` });
+    sub(p, `${kid.n}’s party · 16 coming`);
+    p.divider(`${rsvpDay.split(',')[0]} · 9:00 AM`);
+    await p.say('Headcount for the party: 16 families are coming, 3 can’t make it. I’ll send one last reminder the day before.', 900);
+    p.set('16 coming · reminder the day before', { when:w.day.short, done:true });
+  }
+};
+
+X.flows.birthdayInvite = covers => {
+  const q = new URLSearchParams(location.search);
+  const index = key => /^\d{1,4}$/.test(q.get(key) || '') ? Number(q.get(key)) : -1;
+  const kid = KIDS.find(k => k.n === q.get('kid'));
+  const day = DAYS[index('day')], from = index('from'), to = index('to'), cover = covers[index('cover')];
+  const place = [...BIRTHDAY_PLACES, ...PARTY_VENUES].find(place => place.key === q.get('place'));
+  const valid = kid && day && place && cover && from >= 0 && from < 1440;
+  const body = valid ? birthdayInviteBody(cover, birthdayTitle(kid), { day, from, to:to > from ? to : null }, place, { guest:true })
+    : '<p class="bp">This invitation link is incomplete.</p>';
+
+  const view = X.overlay({ title:'Birthday invitation', body, instant:true });
+  view.o.classList.add('birthday-invite-page');
+  view.o.querySelector('.whead').remove();
+  [...$('#phone').children].forEach(child => { if (child.id !== 'overlays') child.inert = true; });
+  $('.desk').style.display = 'none';
+};
+
 /* ======================= I1 (17 Nov): the family's plans drive the app, on a demo clock =======================
    Every finished flow books a record; each record has moments (booked, morning of, 30 min before, the evening,
    the morning after). The clock lives in the review panel beside the phone, not in the app: it only stands in for
@@ -852,15 +1924,19 @@ const dLong = i => dayOf(i).toLocaleDateString('en-US', { weekday:'long', month:
 const dShort = i => dayOf(i).toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
 const ampm = m => tl(((m % 1440) + 1440) % 1440);
 const lockTime = m => { m = ((m % 1440) + 1440) % 1440; return `${Math.floor(m / 60) % 12 || 12}:${String(m % 60).padStart(2, '0')}`; };
-const tonight = r => r.place && r.who ? 'date night' : r.place ? `dinner at ${r.place.n}` : `${r.who.n} is sitting`;
+const tonight = r => r.place && r.who ? 'date night' : r.place ? `dinner at ${r.place.n}` : `${r.who.n}’s babysitting`;
+const todayWord = r => (r.who ? r.S : r.D) >= 17 * 60 ? 'Tonight' : 'Today';
+/* L3: "2h 15m left" for the sitter countdown */
+const left = n => n >= 60 ? `${Math.floor(n / 60)}h${n % 60 ? ' ' + (n % 60) + 'm' : ''}` : `${n} min`;
 function restoreHappening(){
   const wrap = $('.tdx'), hp = wrap && wrap.querySelector('.hpx'); if (!hp) return;
   const c1 = wrap.querySelector('[data-c1]'), c2 = wrap.querySelector('[data-c2]'), c = el('<div class="tdx-sl" data-c></div>');
   c1.replaceWith(c); hp.remove(); c2.remove(); wrap._size();
 }
-function recTitle(r){ return r.place && r.who ? 'Date night' : r.place ? `Dinner at ${r.place.n}` : `${r.who.n} is sitting`; }
-function recLine(r){ return [r.who ? `${r.who.n} ${range(r.S, r.E)}` : '', r.place ? `${r.place.n} at ${ampm(r.D)}` : ''].filter(Boolean).join(' · '); }
-function stops(r){ const a = []; if (r.who) a.push([r.S, `${r.who.n} ${ampm(r.S)}`]); if (r.place) a.push([r.D, `Dinner ${ampm(r.D)}`]); if (r.who) a.push([r.E, `Home ${ampm(r.E)}`]); else if (r.place) a.push([r.D + 120, 'Home']); return a.sort((x, y) => x[0] - y[0]); }
+/* L3 (Tony, 19 Nov): a sitter-only booking is an event, "Casey's babysitting", with the times and the place */
+function recTitle(r){ return r.playdate ? 'Playdate' : r.place && r.who ? 'Date night' : r.place ? `Dinner at ${r.place.n}` : `${r.who.n}’s babysitting`; }
+function recLine(r){ return r.playdate ? `${r.playdate.kids} · ${range(r.S, r.E)} · ${playdateEscape(r.playdate.place)}` : [r.who ? `${r.who.n} ${range(r.S, r.E)}` : '', r.place ? `${r.place.n} at ${ampm(r.D)}` : FAMILY.address.split(',')[0]].filter(Boolean).join(' · '); }
+function stops(r){ if (r.playdate) return [[r.S, `Starts ${ampm(r.S)}`], [r.E, `Ends ${ampm(r.E)}`]]; const a = []; if (r.who) a.push([r.S, `${r.who.n} ${ampm(r.S)}`]); if (r.place) a.push([r.D, `Dinner ${ampm(r.D)}`]); if (r.who) a.push([r.E, `Home ${ampm(r.E)}`]); else if (r.place) a.push([r.E || r.D + 120, `Home ${r.E ? ampm(r.E) : ''}`.trim()]); return a.sort((x, y) => x[0] - y[0]); }
 function happeningFor(r, evening, onOpen){
   const hp = installHappening(), first = r.who ? r.S : r.D, sat = DAYS[r.i] && DAYS[r.i].w === 'Sat';
   const plan = `<span class="hp-chip as"><img src="${A}assist-clover-knit.png" alt="">Sprout Assist</span><span class="hp-chip">You and Dana</span>`;
@@ -868,7 +1944,7 @@ function happeningFor(r, evening, onOpen){
   const st = stops(r), x0 = first - 30, x1 = st[st.length - 1][0], pc = m => Math.max(4, Math.min(96, (m - x0) / (x1 - x0) * 100));
   const track = `<div class="hp-trk"><div class="bar"></div><div class="fill" style="width:4%"></div>${st.map(([m, l], i) => `<span class="stop" style="left:${pc(m)}%"></span><span class="lbl" style="left:${pc(m)}%;${i === st.length - 1 ? 'transform:translateX(-88%)' : i === 0 ? 'transform:translateX(-12%)' : ''}">${l}</span>`).join('')}</div>`;
   const bash = sat ? `<button class="hp-row${evening ? ' past' : ''}" data-bash><span class="hp-when">10:00 AM</span><span class="hp-body"><b>Back to School Bash</b><span class="hp-chips"><span class="hp-chip"><i class="ph ph-users-three"></i>Family · Zilker Park</span>${evening ? '<span class="hp-chip done"><i class="ph-bold ph-check"></i>Earlier today</span>' : ''}</span></span><i class="ph ph-caret-right"></i></button>` : '';
-  const desc = r.who ? `${r.who.n} arrives at ${ampm(r.S)}.${r.place ? ` Your table at ${r.place.n} is at ${ampm(r.D)}.` : ` ${joinNames(r.kids.map(k => k.n))} until ${ampm(r.E)}.`}` : `Your table at ${r.place.n} is at ${ampm(r.D)}.`;
+  const desc = r.who ? `${r.who.n} comes at ${ampm(r.S)}.${r.place ? ` Your table at ${r.place.n} is at ${ampm(r.D)}.` : ` With ${joinNames(r.kids.map(k => k.n))} at ${FAMILY.address.split(',')[0]} until ${ampm(r.E)}.`}` : `Your table at ${r.place.n} is at ${ampm(r.D)}.`;
   hp.innerHTML = `<div class="hp-head"><span>📅 Happening today</span><small>${sat ? 2 : 1} thing${sat ? 's' : ''}</small></div><div class="hp-card">
     ${evening ? `<button class="hp-feat" data-open><span class="clayico" style="background-image:url(${A}clay/calendar-check.png)"></span>
         <span class="hp-ft"><span class="hp-time">${ampm(first)} <em>· in 30 min</em></span><span class="hp-chips" style="margin:0">${plan}</span></span></button>
@@ -883,22 +1959,32 @@ function happeningFor(r, evening, onOpen){
 }
 /* the Live Activity for this plan, at minute m (same states as /date-night-live/) */
 function laState(r, m){
+  if (r.playdate) {
+    if (m < r.S) return { t:`Playdate in ${r.S - m} min`, s:playdateEscape(r.playdate.place), r:`${r.S - m}m` };
+    if (m < r.E) return { t:`${r.playdate.kids} are playing`, s:`Until ${ampm(r.E)}`, r:ampm(r.E) };
+    return { t:'Playdate finished', s:'On the family calendar', r:'Done' };
+  }
+  /* L3 (Tony, 19 Nov): no tracking of the sitter (no location). Before: "should be there in". During: a countdown to
+     when you need to be home, with Text. At the end: Pay and Text, so paying is one tap from the lock screen. */
   const w = r.who, pl = r.place, first = w ? r.S : r.D;
-  if (m < first) { const n = first - m; return w ? { t:`${w.n} arrives in ${n} min`, s: pl ? `Dinner at ${pl.n} ${ampm(r.D)}` : `Until ${ampm(r.E)}`, r:`${n}m` } : { t:`Dinner in ${n} min`, s:`Table for 2 at ${pl.n}`, r:`${n}m` }; }
+  if (m < first) { const n = first - m; return w ? { t:`${w.n} should be there in ${n} min`, s: pl ? `Dinner at ${pl.n} ${ampm(r.D)}` : `With ${joinNames(r.kids.map(k => k.n))} until ${ampm(r.E)}`, r:`${n}m` } : { t:`Dinner in ${n} min`, s:`Table for 2 at ${pl.n}`, r:`${n}m` }; }
   if (pl && m < r.D) return { t:'On your way to dinner', s:`Table for 2 at ${ampm(r.D)} · ${pl.n}`, r:ampm(r.D) };
-  if (w && m < r.E - 30) return { t: pl ? 'Enjoy your dinner' : `${w.n} has ${joinNames(r.kids.map(k => k.n))}`, s:`${w.n} is booked until ${ampm(r.E)}`, r:ampm(r.E) };
-  if (w && m < r.E) return { t:`Home by ${ampm(r.E)}`, s:`${w.n} is booked until ${ampm(r.E)}`, r:`${r.E - m}m` };
-  return { t:'Hope it was lovely', s: w ? `I’ll ask about paying ${w.n} tomorrow morning` : 'See you tomorrow', r:'Done', end:true };
+  if (w && m < r.E - 30) return { t:`${left(r.E - m)} left with ${w.n}`, s: pl ? `Enjoy your dinner · home by ${ampm(r.E)}` : `Home by ${ampm(r.E)} · ${joinNames(r.kids.map(k => k.n))}`, r:left(r.E - m) };
+  if (w && m < r.E) return { t:`${r.E - m} min left · head home`, s:`${w.n} is booked until ${ampm(r.E)}`, r:`${r.E - m}m`, soon:true };
+  if (w) return { t:`${w.n} is done`, s:`Pay $${r.amt} and say how it went`, r:'Now', pay:true };
+  return { t:'Hope it was lovely', s:'See you tomorrow', r:'Done', end:true };
 }
 function laHtml(r, m){
-  const st = laState(r, m), sp = stops(r), x0 = (r.who ? r.S : r.D) - 30, x1 = sp[sp.length - 1][0], pc = v => Math.max(0, Math.min(100, (v - x0) / (x1 - x0) * 100));
+  const st = laState(r, m), sp = stops(r), x0 = (r.who || r.playdate ? r.S : r.D) - 30, x1 = sp[sp.length - 1][0], pc = v => Math.max(0, Math.min(100, (v - x0) / (x1 - x0) * 100));
   return `<div class="la"><div class="la-top"><img src="/assets/app-icon-180.png" alt=""><b>${recTitle(r)}</b>· Sprout<span class="r">${st.r}</span></div>
     <div class="la-t">${st.t}</div><div class="la-s">${st.s}</div>
     <div class="trk"><div class="bar"></div><div class="fill" style="width:${pc(m)}%"></div>${sp.map(([v, l], i) => `<span class="stop${m >= v ? ' on' : ''}" style="left:${pc(v)}%"></span><span class="lbl" style="left:${pc(v)}%;${i === sp.length - 1 ? 'transform:translateX(-85%)' : ''}">${l}</span>`).join('')}</div>
-    ${st.end ? '' : `<div class="la-acts">${r.who ? `<button data-t="Opens Messages to ${r.who.n}"><i class="ph-bold ph-chat-circle-dots"></i>Text ${r.who.n}</button>` : ''}${r.place ? `<button data-t="Opens Maps to ${r.place.n}"><i class="ph-bold ph-map-trifold"></i>Directions</button>` : ''}</div>`}</div>`;
+    ${r.playdate ? '<div class="la-acts"><button type="button" data-playdate><i class="ph ph-calendar-check"></i>View playdate</button></div>' : st.end ? ''
+      : st.pay ? `<div class="la-acts"><button type="button" class="la-pay" data-pay><i class="ph-bold ph-currency-dollar"></i>Pay ${r.who.n} $${r.amt}</button><button data-t="Opens Messages to ${r.who.n}"><i class="ph-bold ph-chat-circle-dots"></i>Text ${r.who.n}</button></div>`
+      : `<div class="la-acts">${r.who ? `<button data-t="Opens Messages to ${r.who.n}"><i class="ph-bold ph-chat-circle-dots"></i>Text ${r.who.n}</button>` : ''}${r.place && !st.soon ? `<button data-t="Opens Maps to ${r.place.n}"><i class="ph-bold ph-map-trifold"></i>Directions</button>` : ''}${r.place && st.soon ? `<button data-t="Opens Maps home"><i class="ph-bold ph-house-line"></i>Directions home</button>` : ''}</div>`}</div>`;
 }
 /* lock screen: notifications (newest first) and an optional Live Activity; tap a notification to open its target */
-function famLock({ i, m, notes = [], la = '' }){
+function famLock({ i, m, notes = [], la = '', onPay }){
   $('#phone .lock')?.remove();
   const lock = el(`<div class="lock fam"><div class="ldate">${dLong(i)}</div><div class="ltime">${lockTime(m)}</div>
     <div class="lstack">${la}${notes.map((n, k) => `<button type="button" class="lnote" data-k="${k}"><img src="/assets/app-icon-180.png" alt=""><div><b>Sprout<small>now</small></b><p><strong>${n.title}</strong><br>${n.body}</p></div></button>`).join('')}</div>
@@ -907,6 +1993,7 @@ function famLock({ i, m, notes = [], la = '' }){
   const close = then => { lock.classList.add('gone'); setTimeout(() => { lock.remove(); then && then(); }, 380); };
   lock.querySelectorAll('.lnote').forEach(b => b.onclick = e => { e.stopPropagation(); close(notes[+b.dataset.k].open); });
   lock.querySelectorAll('.la [data-t]').forEach(b => b.onclick = e => { e.stopPropagation(); toast(b.dataset.t); });
+  lock.querySelectorAll('.la [data-pay]').forEach(b => b.onclick = e => { e.stopPropagation(); close(onPay); });
   if (!notes.length) lock.onclick = () => close();
 }
 const setBriefDay = i => { const h = $('.dbhead .mid span'); if (h) h.textContent = dLong(i); };
@@ -926,38 +2013,61 @@ const CLOCK = (() => {
   const push = (to, title, body) => log.unshift({ t:now, to, title, body });
   function moments(r){
     const base = r.i * 1440, first = r.who ? r.S : r.D, m = [];
-    m.push({ t:base + 450, k:'morning', l:'Morning of · Morning Brief' });
-    m.push({ t:base + first - 30, k:'soon', l:`30 min before · ${r.who ? r.who.n + ' arrives' : 'dinner'}` });
-    m.push({ t:base + (r.place ? r.D + 25 : r.S + 60), k:'during', l:'During the evening' });
-    m.push({ t:base + 1440 + 540, k:'after', l:'Next morning · 9:00 AM' });
+    if (r.playdate) return [[r.S - 30, 'soon', '30 min before · Playdate'], [r.S, 'during', 'Playdate starts'],
+      [r.E, 'end', 'Playdate ends'], [r.E + 15, 'finish', 'Live Activity ends']]
+      .map(([m, k, l]) => ({ t:base + m, k, l, r, done:false }));
+    m.push({ t:base + Math.min(450, first - 60), k:'morning', l:'Morning of · Morning Brief' });
+    m.push({ t:base + first - 30, k:'soon', l:`30 min before · ${r.who ? r.who.n + ' comes' : 'dinner'}` });
+    m.push({ t:base + (r.place ? r.D + 25 : r.S + 60), k:'during', l:r.place ? 'During dinner' : `During · countdown with ${r.who.n}` });
+    /* L3: the last 30 minutes, then pay + rate the moment the sitter is done (not the next morning) */
+    if (r.who) {
+      m.push({ t:base + r.E - 25, k:'last', l:'Last 30 minutes · head home' });
+      m.push({ t:base + r.E, k:'end', l:`${r.who.n} is done · pay and rate` });
+    } else m.push({ t:base + (r.E || r.D + 150), k:'end', l:'Evening ends' });
     return m.map(x => ({ ...x, r, done:false }));
   }
   const pending = () => recs.flatMap(r => r.ms).filter(x => !x.done).sort((a, b) => a.t - b.t);
   function run(x){
     const r = x.r, p = r.p; now = Math.max(now, x.t); x.done = true; sbar();
     const title = recTitle(r), line = recLine(r);
+    if (r.playdate) {
+      const i = Math.floor(x.t / 1440), m = x.t - r.i * 1440;
+      const note = { title:'Playdate in 30 minutes', body:line, open:openPlan(p) };
+      if (x.k === 'soon') push('Tony and Dana', note.title, note.body + ' · Live Activity starts');
+      if (x.k === 'finish') r.resolve();
+      setBriefDay(i);
+      famLock({ i, m:x.t - i * 1440, la:x.k === 'finish' ? '' : laHtml(r, m), notes:x.k === 'soon' ? [note] : [] });
+      const lock = $('#phone .lock'), button = lock.querySelector('[data-playdate]');
+      if (button) button.onclick = e => {
+        e.stopPropagation();
+        const reminder = lock.querySelector('.lnote');
+        if (reminder) reminder.click(); else { lock.click(); openPlan(p)(); }
+      };
+      paint(); return;
+    }
     if (x.k === 'morning') {
       setBriefDay(r.i); restoreHappening(); happeningFor(r, false, openPlan(p));
       const body = `${line}. ${r.who ? 'Dana has this too.' : 'On the family calendar.'}`;
-      push('Tony and Dana', `Tonight: ${tonight(r)}`, body);
+      push('Tony and Dana', `${todayWord(r)}: ${tonight(r)}`, body);
       p.set(`Today · ${line}`, { when:'Today' });
-      famLock({ i:r.i, m:x.t % 1440, notes:[{ title:`Tonight: ${tonight(r)}`, body, open:openBrief }] });
+      famLock({ i:r.i, m:x.t % 1440, notes:[{ title:`${todayWord(r)}: ${tonight(r)}`, body, open:openBrief }] });
     }
     if (x.k === 'soon') {
       setBriefDay(r.i); happeningFor(r, true, openPlan(p));
-      const n = r.who ? { title:`${r.who.n} arrives in 30 minutes`, body:`${r.place ? `Dinner at ${r.place.n} is at ${ampm(r.D)}. ` : ''}Dana has this too.` } : { title:'Dinner in 30 minutes', body:`Your table at ${r.place.n} is at ${ampm(r.D)}.` };
+      const n = r.who ? { title:`${r.who.n} should be there in 30 minutes`, body:`${r.place ? `Dinner at ${r.place.n} is at ${ampm(r.D)}. ` : ''}Dana has this too.` } : { title:'Dinner in 30 minutes', body:`Your table at ${r.place.n} is at ${ampm(r.D)}.` };
       push('Tony and Dana', n.title, n.body + ' Live Activity starts.');
       p.set(`Happening now · ${line}`, { when:'Today' });
       famLock({ i:r.i, m:x.t % 1440, la:laHtml(r, x.t % 1440), notes:[{ ...n, open:openBrief }] });
     }
     if (x.k === 'during') { famLock({ i:r.i, m:x.t % 1440, la:laHtml(r, x.t % 1440) }); log.unshift({ t:now, to:'Lock screens', title:'Live Activity updates', body:laState(r, x.t % 1440).t }); }
-    if (x.k === 'after') {
-      setBriefDay(r.i + 1); restoreHappening();
+    if (x.k === 'last') { famLock({ i:r.i, m:x.t % 1440, la:laHtml(r, x.t % 1440) }); log.unshift({ t:now, to:'Lock screens', title:'Live Activity updates', body:laState(r, x.t % 1440).t }); }
+    if (x.k === 'end') {
+      restoreHappening();
       if (r.who) {
-        const n = { title:`How was ${r.who.n} last night?`, body:`Pay ${r.who.n} when you’re ready · it’s on your to-dos` };
-        push('Tony', n.title, n.body); p.set(`Pay ${r.who.n} $${r.amt}`, { when:dShort(r.i + 1).split(',')[0], attn:true });
-        famLock({ i:r.i + 1, m:540, notes:[{ ...n, open:openPlan(p) }] });
-      } else famLock({ i:r.i + 1, m:540 });
+        const n = { title:`${r.who.n} is done`, body:`Pay ${r.who.n} $${r.amt} and say how it went. It’s on your to-dos too.` };
+        push('Tony', n.title, n.body); p.set(`Pay ${r.who.n} $${r.amt}`, { when:'Now', attn:true });
+        famLock({ i:r.i, m:x.t % 1440, la:laHtml(r, x.t % 1440), notes:[{ ...n, open:openPlan(p) }], onPay:openPlan(p) });
+      } else famLock({ i:r.i, m:x.t % 1440 });
       r.resolve();
     }
     paint();
@@ -978,10 +2088,51 @@ const CLOCK = (() => {
   return {
     book(r){ return new Promise(resolve => {
       r.resolve = resolve; r.ms = moments(r); recs.push(r);
-      push('Dana', r.who ? `Tony booked ${r.who.n}` : `Tony booked ${r.place.n}`, `${dShort(r.i)} · ${recLine(r)}`);
+      push('Dana', r.playdate ? 'Playdate confirmed' : r.who ? `Tony booked ${r.who.n}` : `Tony booked ${r.place.n}`, `${dShort(r.i)} · ${recLine(r)}`);
       toast('Use the demo clock beside the phone to move through the day');
       paint(); panel.classList.add('ping'); setTimeout(() => panel.classList.remove('ping'), 2400);
     }); },
   };
 })();
+/* ======================= direct links (17 Nov report): each report point opens on its own screen ======================= */
+function bookedEvening(){   /* a date night already booked for Sat, Aug 1: Olive & Ember 7:15, Alex 6:45 to 10:15 PM */
+  const who = SAVED[0], w = { day:DAYS.find(d => d.w === 'Sat'), from:1125, to:1335 }, H = 3.5, pl = M.PLACES.olive;
+  const p = X.makePlan('dateE', { title:'Date night · Sat, Aug 1', sub:'Date night · Sat, Aug 1', icon:'calendar-check' });
+  p.block(`<div class="card"><div class="cover" style="${M.ph('olive', 3)}"></div><div class="ctop">${clay('calendar-check')}<div><div class="eyebrow">Date night · ${w.day.day}</div><div class="ttl">Your evening</div></div></div>
+    <div class="ua-row on" style="margin-top:12px">${face(who)}<span class="tx"><b>${who.n}</b><small>${range(w.from, w.to)} · about $${Math.round(who.rate * H)} · you pay ${who.n}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></div>
+    <div class="fact" style="margin-top:10px"><i class="ph ph-fork-knife"></i>${pl.n} · 7:15 PM · table for 2</div>
+    <div class="fact"><i class="ph ph-users"></i>${joinNames(KIDS.map(k => k.n))}</div>
+    <div class="fact"><i class="ph ph-bell-ringing"></i>Reminder for you both at ${tl(w.from - 30)}, then the evening on your lock screens</div></div>`);
+  p.set(`Booked · ${pl.n} 7:15 PM · ${who.n} ${range(w.from, w.to)}`, { when:w.day.short, done:false });
+  CLOCK.book({ p, i:DAYS.indexOf(w.day), S:w.from, E:w.to, D:1155, place:pl, k:'olive', who, kids:KIDS, amt:Math.round(who.rate * H) })
+    .then(() => payTonight(p, who, w, KIDS, H, { clock:true }));
+  return p;
+}
+/* L1 review state: Tony left two things running (a sitter request waiting on replies, a playdate Priya answered),
+   so the Assist home shows "Pick up where you left off" above the tiles. Tap one to get back into that chat. */
+function ongoing(){
+  const w = { day:DAYS.find(d => d.w === 'Fri'), from:1080, to:1320 }, asked = [SAVED[0], SAVED[1], SAVED[2]];
+  const s = X.makePlan('sitterC1', { title:`Sitter · ${w.day.day}`, sub:`Sitter · ${w.day.day}`, icon:'person-plus' });
+  s.me('Book a sitter');
+  s.add(el(`<div class="row"><div class="from"><span class="orb sm"></span>Sprout</div><div class="bub">I texted ${joinNames(asked.map(x => x.n))} for ${w.day.day}, ${range(w.from, w.to)}. I’ll tell you who’s free.</div></div>`));
+  s.note(`Asked ${joinNames(asked.map(x => x.n))}`, `3 texts sent · ${w.day.short} ${range(w.from, w.to)}`, 'ph-paper-plane-tilt');
+  s.set(`Waiting on ${joinNames(asked.map(x => x.n))}`, { when:'Fri' });
+  const fam = PLAYDATE_FAMILIES.Maya[1], pw = { day:DAYS.find(d => d.w === 'Sat'), from:840, to:960 };
+  const pd = X.makePlan('playdate', { title:'Playdate · Maya', sub:`Playdate · ${pw.day.day}`, icon:'calendar-check' });
+  pd.me('Plan a playdate');
+  pd.add(el(`<div class="row"><div class="from"><span class="orb sm"></span>Sprout</div><div class="bub">Priya replied: Leo can come ${pw.day.day}, ${range(pw.from, pw.to)}. Want me to put it on the calendar?</div></div>`));
+  pd.chips(['Yes, add it', `Message ${fam.reply}`]).then(k => k === 1 ? playdateDM(fam, pw, 'Maya', FAMILY.address, false, { confirmed:false }) : pd.say('Added. Dana has it too.', 600));
+  pd.set('Priya replied · Leo can come', { when:'Sat', attn:true });
+  X.showHome(); X.openSheet();
+}
+const DIRECT = {
+  'assist-ongoing': ongoing,
+  'book-a-sitter': () => X.start('sitterC1', { echo:'Book a sitter' }),
+  'book-a-sitter-saved': () => X.start('sitterC1', { echo:'Book a sitter', review }),
+  'plan-a-date-night': () => X.start('dateE', { echo:'Plan a date night', restaurantReview:review === 'restaurants' }),
+  'booked-evening': () => { const p = bookedEvening(); X.showPlan(p); X.openSheet(); },
+  'chat-history': () => { bookedEvening(); X.showHome(); X.openSheet(); setTimeout(() => { const b = $('#historyBtn'); if (b) b.click(); }, 500); },
+  'add-account': () => { X.showHome(); X.openSheet(); setTimeout(() => { X.openWallet(true); setTimeout(() => { const b = document.querySelector('[data-addacc]'); if (b) b.click(); }, 350); }, 450); },
+};
+if (DIRECT[route]) setTimeout(DIRECT[route], 500);
 })();

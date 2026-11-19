@@ -232,7 +232,7 @@
 .dn3link i{font-size:15px;line-height:1;display:block}
 .dn3go{margin-left:auto;height:36px;padding:0 20px!important}
 /* F4: edit affordances */
-.field .ed{margin-left:auto;align-self:center;width:32px;height:32px;border-radius:16px;display:grid;place-items:center;color:var(--brand);background:var(--brand-subtle);flex:none}
+.field .ed,.event-invite .ed{margin-left:auto;align-self:center;width:32px;height:32px;border-radius:16px;display:grid;place-items:center;color:var(--brand);background:var(--brand-subtle);flex:none}
 .edt{width:100%;border:0;background:var(--field);border-radius:12px;padding:10px 12px;font:15px/1.45 var(--sans);color:var(--strong);resize:none;outline:none}
 .cmp-edit{display:block;width:auto;margin:0 0 6px auto;font-size:13px;color:var(--brand)}
 .ln-ed{display:inline-flex;align-items:center;gap:5px;font:inherit;color:var(--brand);font-weight:600}
@@ -407,3 +407,91 @@
 .lock.fam .trk .lbl{position:absolute;top:17px;transform:translateX(-30%);font-size:9.5px;color:var(--subtle);white-space:nowrap}
 .lock.fam .la-acts{display:flex;gap:6px;margin-top:8px}
 .lock.fam .la-acts button{flex:1;padding:7px 0;border-radius:999px;background:var(--brand-subtle);color:var(--brand);font:600 12px var(--sans);display:flex;align-items:center;justify-content:center;gap:4px}
+.lock.fam .la-acts button{height:34px;min-height:0;padding:0 10px;margin:0}
+.lock.fam .la-acts button i{margin:0;font-size:15px;line-height:1}
+.lock.fam .la-acts .la-pay{flex:1.3;background:var(--brand);color:#fff}
+
+/* L3 rate the sitter: five stars, tap to set */
+.stars{display:flex;gap:6px;margin-top:14px}
+.star{width:44px;height:44px;border-radius:12px;background:var(--raised,#f6f3ec);display:flex;align-items:center;justify-content:center;font-size:24px;color:#d9d2c3;transition:transform .12s,color .12s}
+.star.on{color:#f0a91a}
+.star:active{transform:scale(.9)}
+
+/* J4 class chat */
+.jc-screen{position:absolute;inset:0;z-index:31;display:flex;flex-direction:column;background:var(--bg);color:var(--strong)}
+#phone:has(>.jc-screen)>:is(.sbar,.island,.brief,.nav,.hero,.sprout-nav-peek,.sheet,.faceid,.homebar){visibility:hidden}
+.jc-head,.jc-composer{flex:none;width:100%;background-size:100% 100%;background-repeat:no-repeat}
+.jc-head{aspect-ratio:393/265;background-image:url(/sitter-class-chat/header.png)}
+.jc-composer{position:relative;aspect-ratio:393/102;background-image:url(/sitter-class-chat/composer.png)}
+.jc-log{flex:1;min-height:0;overflow:auto;padding:8px 16px}
+.jc-msg{display:flex;align-items:flex-end;gap:8px;margin:0 0 16px}
+.jc-msg.own{justify-content:flex-end}
+.jc-content{min-width:0}
+.jc-content>small{display:block;font-size:12px;margin-bottom:5px}
+.jc-bubble{width:fit-content;margin:0;padding:8px 12px;border-radius:12px;background:var(--field);font:15px/1.4 var(--sans);overflow-wrap:anywhere}
+.jc-msg.own .jc-bubble{background:var(--brand-subtle)}
+.jc-action{margin:-8px 0 0 48px}
+.jc-shared{color:var(--subtle);font-size:13px}
+
+
+/* J8: the party search reuses the dinner carousel. The invitation follows Sprout's public share layout. */
+.party-results [data-map]{margin-left:auto;white-space:nowrap}
+.party-results>iframe.dnmap{display:block;width:100%;height:230px;border:0;margin:12px 0}
+.party-results .party-map{height:230px;margin:12px 0}
+.party-results [hidden]{display:none!important}
+.party-map .dnlayer{aspect-ratio:auto;background:none}
+.party-map .party-map-tiles{position:absolute;inset:0;pointer-events:none;filter:saturate(.43) sepia(.16)}
+.party-map-tiles img{display:block;position:absolute;width:256px;height:256px;max-width:none}
+.party-map-credit{position:absolute;bottom:3px;left:5px;z-index:4;padding:2px 4px;border-radius:4px;background:var(--bg);color:var(--strong);font-size:10px}
+.party-detail-photo{display:block;width:100%;height:184px;object-fit:cover;margin:0 0 14px}
+.party-detail .btitle{margin:0}
+.party-detail-section{margin-top:17px;padding-top:14px;border-top:1px solid var(--border-soft)}
+.party-detail-section .bq{margin:0 0 6px}
+.party-detail-section .bp{margin:4px 0 8px}
+.party-detail-section .link{display:inline-flex;margin:3px 0 0}
+
+.party-results .dncar{margin:0 -12px;padding:2px 12px 8px}
+.party-results .dn3{overflow:hidden}
+.party-results a.chip{text-decoration:none}
+.event-invite .cover{aspect-ratio:5/4;margin:0 0 12px}
+.event-invite .event-invite-title{font-size:20px;line-height:1.2;margin:0 0 9px}
+.event-invite-photo{position:relative}
+.event-invite-photo .ed{position:absolute;top:8px;right:8px}
+.event-invite-heading{display:flex;align-items:flex-start;gap:8px}
+.event-invite-heading .ed{align-self:flex-start}
+.event-invite-heading .event-invite-title{min-width:0;overflow-wrap:anywhere}
+.event-invite .fact{align-items:flex-start;line-height:1.4}
+.event-invite .fact>i{margin-top:1px}
+.event-invite .fact strong{color:var(--strong);font-weight:600}
+.event-invite .fact strong .link{color:inherit}
+.event-invite .event-invite-secondary,.event-invite-meta .fact{color:var(--subtle);font-size:12.5px}
+.event-invite-meta{margin-top:8px}
+.event-invite [data-send-invites]{margin-top:12px}
+.event-invite>.link{display:inline-flex;margin:4px 0 0 24px;font-size:12.5px}
+.birthday-invite-page .wbody{padding:calc(var(--st) + 16px) 16px 24px}
+
+/* L4 share several sitters: each picked row opens its own note field */
+.shr+.shr{margin-top:0}
+.shr.on{background:var(--brand-subtle);border-radius:14px;padding-bottom:10px;margin:4px 0}
+.shr.on .sl-row{background:transparent}
+.shr-note{margin:0 10px;background:#fff}
+
+/* L5 playdate DM: Sprout's 1:1 chat, opened from the confirmed playdate. Plain header (back, parent, kid), real input. */
+.jc-screen.dm{transition:opacity .25s,transform .25s}
+.jc-screen.dm.gone{opacity:0;transform:translateX(30px)}
+.dm-head{flex:none;display:flex;align-items:center;gap:10px;padding:54px 14px 12px;border-bottom:1px solid var(--border-soft,#e6e1d6);background:var(--bg)}
+.dm-back{width:36px;height:36px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--strong)}
+.dm-who b{display:block;font:600 15px/1.2 var(--sans);color:var(--strong)}
+.dm-who small{display:block;font-size:12px;color:var(--subtle)}
+.jc-screen.dm .jc-log{padding-top:16px}
+.dm-sys{display:flex;align-items:center;justify-content:center;gap:6px;margin:0 0 16px;font-size:12px;color:var(--subtle)}
+.dm-sys i{color:var(--brand);font-size:15px}
+.dm-comp{flex:none;display:flex;align-items:center;gap:8px;padding:10px 14px 34px;border-top:1px solid var(--border-soft,#e6e1d6);background:var(--bg)}
+.dm-comp input{flex:1;height:40px;border:0;border-radius:20px;background:#fff;padding:0 16px;font:15px var(--sans);color:var(--strong)}
+.dm-comp input:focus{outline:2px solid var(--brand);outline-offset:0}
+.dm-comp button{width:40px;height:40px;border-radius:20px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px}
+.ua-row.pk .uamono i{font-size:20px}
+.jc-screen.dm .jc-content{max-width:80%}
+.jc-screen.dm .jc-msg.own .jc-bubble{background:var(--brand);color:#fff}
+.lock.fam .la-acts button i{width:auto;height:auto;border:0;border-radius:0;background:none;box-shadow:none}
+.shr-note input::placeholder{color:#9aa19c;opacity:1}

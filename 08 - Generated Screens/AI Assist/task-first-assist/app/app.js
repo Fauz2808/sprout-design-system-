@@ -294,8 +294,84 @@ window.Sprout = (() => {
   const clay = n => `${A}clay/${n}.png`;
   const tile = t => `<button class="tile" data-k="${t.k}"><span class="clay"><img src="${clay(t.icon)}" alt=""></span><b>${t.t}</b><small>${t.s}</small></button>`;
   const planRow = p => `<button class="status${p.attn ? ' attn' : ''}" data-plan="${p.id}"><span class="icotile"><img src="${clay(p.icon)}" alt=""></span><div class="stxt"><span>${p.title}</span><small>${p.line}</small></div><span class="when">${p.when}</span></button>`;
+  /* ---------- Assist home · Uber-style services grid (Tony, 18 Nov: "custom illustrations for each,
+     more like the Uber services layout"). Two directions behind ?home=a / ?home=b, compared at /assist-home/.
+     Illustrations: Figma HlWjGHq9JNgKSHXvI8RFeD, cut by tools/cut-illustrations.py into assets/illus/. */
+  const HOME = new URLSearchParams(location.search).get('home');
+  const ILL = { remind:'remind', event:'event', club:'club', week:'week', sitterC1:'sitter', ownSitters:'sitter', classSitters:'sitter',
+    dateE:'date-night', dateD:'date-night', nightOut:'date-night', sports:'sports', afterschool:'afterschool', camps:'camps', tutoring:'tutoring' };
+  const SHORT = { remind:'Reminder', event:'Plan event', club:'Start club', week:'This week', sitterC1:'Book a sitter', ownSitters:'My sitters',
+    classSitters:'Class sitters', dateE:'Date night', dateD:'Date night', nightOut:'Night out', sports:'Sports', afterschool:'After-school', camps:'Camps', tutoring:'Tutoring' };
+  const BADGE = { dateE:'New', dateD:'New' };
+  const ill = n => `${A}illus/${n}.webp`;
+  const allTiles = () => [...TILES.everyday, ...TILES.nights, ...TILES.kids];
+  /* size: s = 4 across (Uber's small row), m = 3 across (Uber's first row), w = 2 across with the subtitle (Uber's Grocery / Food) */
+  const uTile = (t, size) => `<button class="ut ut-${size}" data-k="${t.k}" data-echo="${t.t}" aria-label="${t.t}. ${t.s}">
+      ${BADGE[t.k] ? `<em class="ubadge">${BADGE[t.k]}</em>` : ''}<img src="${ill(ILL[t.k] || 'event')}" alt="">
+      ${size === 'w' ? `<span class="utx"><b>${t.t}</b><small>${t.s}</small></span>` : `<b>${SHORT[t.k] || t.t}</b>`}</button>`;
+  const uGrid = (list, size) => `<div class="ugrid ug-${size}">${list.map(t => uTile(t, size)).join('')}</div>`;
+  const uHead = t => `<h3 class="uhead">${t}</h3>`;
+  function renderUber(){
+    const T = TILES, pick = ks => ks.map(k => allTiles().find(t => t.k === k)).filter(Boolean);
+    const body = HOME === 'b'
+      /* B · popular first: the three that book something sit up top, then the rest by group */
+      ? uHead('Popular') + uGrid(pick([T.nights[0] && T.nights[0].k, T.nights[1] && T.nights[1].k, 'sports']), 'm')
+        + uHead('Everyday') + uGrid(T.everyday, 's')
+        + uHead('Find for your kids') + uGrid(T.kids.filter(t => t.k !== 'sports'), 'm')
+      /* A · today's three groups, Uber tile anatomy: small 4-across rows, the nights pair as wide tiles */
+      : uHead('Everyday') + uGrid(T.everyday, 's')
+        + uHead('Sitters and nights out') + uGrid(T.nights, 'w')
+        + uHead('Find for your kids') + uGrid(T.kids, 's');
+    homeView.innerHTML = `<div class="home uhome">
+      <div class="ugreet"><b>What can I take off your plate?</b><span>Tell me like you’d text Dana. I’ll sort it out.</span></div>
+      ${body}
+      ${uHead('Saved details')}
+      <button class="status" data-wallet><span class="icotile uill"><img src="${ill('wallet')}" alt=""></span><div class="stxt"><span>Accounts and cards</span><small>${wallet.accounts.length} account${wallet.accounts.length === 1 ? '' : 's'} · ${wallet.cards.length} cards</small></div><i class="ph ph-caret-right" style="margin-left:auto;color:var(--subtle)"></i></button>
+    </div>`;
+    homeView.querySelectorAll('.ut').forEach(b => b.onclick = () => start(b.dataset.k, { echo: b.dataset.echo }));
+    homeView.querySelector('[data-wallet]').onclick = openWallet;
+  }
+  /* ---------- L1 (Tony, 19 Nov): eight tiles in two groups, short labels, the clay illustrations.
+     "If I saw those eight things, I'm like, holy shit." Order is Tony's: playdate is the most common, then sitter,
+     date night, birthday. Reminder, Plan event, This week and Start club are out for now. Anything still running
+     sits above the tiles, so a parent who left Book a sitter waiting on replies can get back into that chat. ---------- */
+  const EIGHT = {
+    plan: [
+      { k:'playdate', t:'Playdate', e:'Plan a playdate', ill:'club' },
+      { k:'sitterC1', t:'Book a sitter', e:'Book a sitter', ill:'sitter' },
+      { k:'dateE', t:'Date night', e:'Plan a date night', ill:'date-night' },
+      { k:'party', t:'Birthday', e:'Plan a birthday party', ill:'event' },
+    ],
+    kids: [
+      { k:'sports', t:'Sports', e:'Sign Jake up for sports', ill:'sports' },
+      { k:'afterschool', t:'After school', e:'Find an after-school program', ill:'afterschool' },
+      { k:'camps', t:'Camps', e:'Find a summer camp', ill:'camps' },
+      { k:'tutoring', t:'Tutoring', e:'Find a tutor', ill:'tutoring' },
+    ],
+  };
+  const KIND_ILL = { playdate:'club', sitterC1:'sitter', ownSitters:'sitter', classSitters:'sitter', shareSitter:'sitter',
+    dateE:'date-night', dateD:'date-night', nightOut:'date-night', party:'event', event:'event', sports:'sports', camps:'camps' };
+  const eTile = (t, big) => `<button class="ut ${big ? 'ut-p' : 'ut-s'}" data-k="${t.k}" data-echo="${t.e}" aria-label="${t.t}"><img src="${ill(t.ill)}" alt=""><b>${t.t}</b></button>`;
+  const goRow = p => `<button class="status grow${p.attn ? ' attn' : ''}" data-plan="${p.id}"><span class="icotile uill"><img src="${ill(KIND_ILL[p.kind] || 'event')}" alt=""></span>
+    <div class="stxt"><span>${p.title}</span><small>${p.line}</small></div><em class="gpill">${p.attn ? 'Needs you' : 'In progress'}</em></button>`;
+  function renderEight(){
+    const going = activePlans().sort((a, b) => (b.attn - a.attn) || (b.started - a.started));
+    homeView.innerHTML = `<div class="home uhome">
+      <div class="ugreet"><b>What can I take off your plate?</b><span>Tell me like you’d text Dana. I’ll sort it out.</span></div>
+      ${going.length ? uHead('Pick up where you left off') + `<div class="going">${going.map(goRow).join('')}</div>` : ''}
+      ${uHead('Plan something')}<div class="ugrid ug-p">${EIGHT.plan.map(t => eTile(t, true)).join('')}</div>
+      ${uHead('Register my kids')}<div class="ugrid ug-s">${EIGHT.kids.map(t => eTile(t)).join('')}</div>
+      ${uHead('Saved details')}
+      <button class="status" data-wallet><span class="icotile uill"><img src="${ill('wallet')}" alt=""></span><div class="stxt"><span>Accounts and cards</span><small>${wallet.accounts.length} account${wallet.accounts.length === 1 ? '' : 's'} · ${wallet.cards.length} cards</small></div><i class="ph ph-caret-right" style="margin-left:auto;color:var(--subtle)"></i></button>
+    </div>`;
+    homeView.querySelectorAll('.ut').forEach(b => b.onclick = () => start(b.dataset.k, { echo: b.dataset.echo }));
+    homeView.querySelectorAll('[data-plan]').forEach(b => b.onclick = () => showPlan(plans.find(p => p.id === +b.dataset.plan)));
+    homeView.querySelector('[data-wallet]').onclick = openWallet;
+  }
   function renderHome(){
     paintHistoryBadge();
+    if (HOME === 'a' || HOME === 'b') return renderUber();
+    if (HOME !== 'old') return renderEight();
     homeView.innerHTML = `<div class="home">
       <div class="greet"><b>What can I take off your plate?</b><span>Tell me like you’d text Dana. I’ll sort it out.</span></div>
       <div class="slabel">Everyday</div><div class="tiles">${TILES.everyday.map(tile).join('')}</div>
@@ -601,6 +677,10 @@ window.Sprout = (() => {
     dateE: { title:'Date night', sub:'Plan a date night', icon:'calendar-check' },
     shareSitter: { title:'Help Tony find a sitter', sub:'Tony is looking for a sitter', icon:'two-people' },
     event: { title:'New event', sub:'Plan an event', icon:'event' },
+    playdate: { title:'Playdate', sub:'Plan a playdate', icon:'calendar-check' },
+    party: { title:'Birthday party', sub:'Plan a birthday', icon:'event' },
+    afterschool: { title:'After school', sub:'After school', icon:'afterschool' },
+    tutoring: { title:'Tutoring', sub:'Tutoring', icon:'tutoring' },
     club: { title:'New club', sub:'Start a club', icon:'club' },
   };
   async function start(kind, opt = {}){

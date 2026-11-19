@@ -31,18 +31,18 @@ function mapHtml(keys, sel, labels, others = []){
   </div><button class="dnrecenter" aria-label="Back to home"><i class="ph-bold ph-crosshair"></i></button><span class="dnhint"><i class="ph ph-hand-grabbing"></i>Drag to look around</span></div>`;
 }
 /* D2 (17 Nov): drag the map to look around. A move over 6 px is a drag, so pins only take real taps. */
-function drag(map){
+function drag(map, { recenter, onPan } = {}){
   const layer = map.querySelector('.dnlayer'); let st = null, moved = false;
   const cur = () => { const m = /translate\((-?[\d.]+)px,\s*(-?[\d.]+)px\)/.exec(layer.style.transform || ''); return m ? [+m[1], +m[2]] : [0, 0]; };
-  const clamp = (x, y) => { const W = map.clientWidth, H = map.clientHeight, LW = W * 1.8, LH = LW * .75; return [Math.min(0, Math.max(W - LW, x)), Math.min(0, Math.max(H - LH, y))]; };
-  map.addEventListener('pointerdown', e => { if (e.target.closest('.dnrecenter')) return; const [x, y] = cur(); st = { x, y, px:e.clientX, py:e.clientY, id:e.pointerId }; moved = false; layer.style.transition = 'none'; });
+  const clamp = (x, y) => [Math.min(0, Math.max(map.clientWidth - layer.offsetWidth, x)), Math.min(0, Math.max(map.clientHeight - layer.offsetHeight, y))];
+  map.addEventListener('pointerdown', e => { if (e.target.closest('.dnrecenter, a')) return; const [x, y] = cur(); st = { x, y, px:e.clientX, py:e.clientY, id:e.pointerId }; moved = false; layer.style.transition = 'none'; });
   map.addEventListener('pointermove', e => { if (!st || e.pointerId !== st.id) return; const dx = e.clientX - st.px, dy = e.clientY - st.py;
     if (!moved && Math.hypot(dx, dy) > 6) { moved = true; map.setPointerCapture(e.pointerId); map.classList.add('dragging'); map.querySelector('.dnhint')?.remove(); }
     if (moved) { const [x, y] = clamp(st.x + dx, st.y + dy); layer.style.transform = `translate(${x}px,${y}px)`; } });
   const end = () => { if (!st) return; st = null; layer.style.transition = ''; map.classList.remove('dragging'); };
   map.addEventListener('pointerup', end); map.addEventListener('pointercancel', end);
   map.addEventListener('click', e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
-  map.querySelector('.dnrecenter').onclick = () => { const on = map.querySelector('.dnpin.on'); if (on) glide(map, on.dataset.k); };
+  map.querySelector('.dnrecenter').onclick = recenter || (() => { const on = map.querySelector('.dnpin.on'); if (on) glide(map, on.dataset.k); });
   setTimeout(() => map.querySelector('.dnhint')?.classList.add('gone'), 3500);
 }
 function glide(map, k, instant){

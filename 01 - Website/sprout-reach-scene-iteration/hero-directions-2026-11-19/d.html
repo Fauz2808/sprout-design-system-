@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sprout hero D · The plate</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="icon" href="../assets/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<!-- Hero direction D, 19 Nov 2026. Review scaffolding: hero + top bar only.
+     Idea: a still life. One enamel plate on a table, piled with the week: the clay objects from the Sprout Assist
+     prototype (08 …/task-first-assist/app/assets/illus, copied to ./assets/clay-*.webp). The joke is the headline;
+     the copy says what Sprout does today (the Daily Brief) and labels Assist as coming soon, per Tony's 7 Oct rule
+     that the site does not lead with what has not shipped. Hover an object to see what it stands for. -->
+<style>
+:root {
+  --bg: #f4f1ea; --sand: #ebe4d4; --paper: #fbfaf6; --ink: #1e3e2b; --text: #4d525b; --muted: #7d715e;
+  --green: #186338; --green-subtle: #e2e9e3; --line: rgb(30 62 43 / 0.14);
+  --serif: "Playfair Display", Georgia, serif; --sans: "Inter", -apple-system, system-ui, sans-serif;
+  --gx: clamp(16px, 5.5vw, 80px); --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; overflow-x: clip; }
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+a:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; border-radius: 4px; }
+.top { position: relative; z-index: 5; display: flex; align-items: center; gap: 28px; height: 72px; padding: 0 var(--gx); }
+.logo { display: inline-flex; align-items: center; gap: 9px; font: 600 22px/1 var(--serif); color: var(--ink); text-decoration: none; }
+.top-links { display: flex; gap: 26px; margin-left: auto; font-size: 15px; }
+.top-links a { color: var(--ink); opacity: 0.78; text-decoration: none; }
+.top-links a:hover { opacity: 1; }
+.top-rp, .top-cta { font: 500 15px/1 var(--serif); text-decoration: none; padding: 12px 16px; border-radius: 99px; white-space: nowrap; }
+.top-rp { color: var(--green); }
+.top-rp:hover { background: var(--green-subtle); }
+.top-cta { color: #fff; background: var(--green); padding-inline: 20px; }
+.top-rp .sm { display: none; }
+
+/* ── D · the plate ── */
+.hero { position: relative; overflow: hidden; height: calc(max(760px, 100svh) - 72px); max-height: 1000px;
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: clamp(24px, 3vw, 48px); padding: 0 var(--gx); }
+/* the table: the lower part of the hero is the tabletop, the plate sits on it */
+.hero::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 34%; background: var(--sand);
+  border-top: 1px solid rgb(125 113 94 / 0.22); }
+.copy { position: relative; z-index: 1; align-self: start; padding-top: clamp(40px, 9vh, 96px); }
+.eyebrow { margin: 0 0 18px; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+h1 { margin: 0; font: 500 clamp(44px, 5.6vw, 84px)/1 var(--serif); letter-spacing: -0.025em; color: var(--ink); }
+h1 em { font-style: italic; font-weight: 400; color: var(--green); white-space: nowrap; }
+.lede { margin: 24px 0 0; max-width: 40ch; font-size: 18px; color: var(--text); }
+.lede b { font-weight: 500; color: var(--ink); }
+.soon { display: flex; gap: 12px; align-items: flex-start; margin: 22px 0 0; max-width: 42ch; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.soon img { width: 26px; height: 26px; flex-shrink: 0; margin-top: -2px; }
+.soon b { color: var(--ink); font-weight: 600; }
+.proof { position: absolute; z-index: 1; left: var(--gx); bottom: clamp(22px, 4vh, 40px); margin: 0; font-size: 13px; color: var(--muted); }
+.proof span + span::before { content: "·"; margin: 0 10px; }
+.proof span:first-child { color: var(--ink); font-weight: 500; }
+
+.still { position: relative; z-index: 1; align-self: end; justify-self: end; width: min(100%, 800px, calc((100svh - 120px) * 1.18)); aspect-ratio: 660 / 600; margin: 0 -1vw 2vh 0; }
+.plate { position: absolute; left: 3%; right: 3%; bottom: 3%; height: 30%; border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 46%, #fffefa 0 46%, #f1ece1 54%, #fbf8f1 63%, #fffdf8 74%, #e7dfcf 100%);
+  box-shadow: 0 30px 34px -18px rgb(70 52 25 / 0.38), 0 6px 0 #ddd3c0, inset 0 -5px 10px rgb(120 100 60 / 0.10), inset 0 2px 1px #fff; }
+/* enamelware: a thin green line on the rim */
+.plate::after { content: ""; position: absolute; inset: 3.5% 2.4%; border-radius: 50%; border: 2px solid rgb(24 99 56 / 0.6); }
+.plate::before { content: ""; position: absolute; inset: 17% 15%; border-radius: 50%; box-shadow: inset 0 3px 8px rgb(120 100 60 / 0.10); }
+.o { position: absolute; width: var(--w); left: var(--x); bottom: var(--y); z-index: var(--z, 1); margin: 0; }
+.o img { width: 100%; filter: drop-shadow(0 14px 12px rgb(70 52 25 / 0.22)); transform: rotate(var(--r, 0deg)); transition: transform 0.35s var(--ease); }
+.o figcaption { position: absolute; left: 50%; top: -6px; translate: -50% -100%; white-space: nowrap; padding: 5px 10px; border-radius: 8px; background: var(--ink); color: #fff;
+  font-size: 12.5px; line-height: 1.3; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+.o:hover img { transform: translateY(-14px) rotate(var(--r, 0deg)); }
+.o:hover figcaption { opacity: 1; }
+.o:hover { z-index: 20; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .plate { animation: fade 0.6s ease both; }
+  .o { animation: drop 0.75s var(--ease) both; animation-delay: calc(0.25s + var(--i) * 0.09s); }
+  @keyframes fade { from { opacity: 0; } }
+  @keyframes drop { from { opacity: 0; transform: translateY(-60px); } }
+}
+@media (max-width: 1100px) { .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+@media (max-width: 820px) {
+  .top-links { display: none; } .top-rp { margin-left: auto; }
+  .hero { height: auto; max-height: none; display: block; padding-bottom: 72px; }
+  .hero::before { height: 300px; }
+  .still { width: min(100%, 520px); margin: 18px auto 0; justify-self: auto; }
+}
+@media (max-width: 640px) {
+  .top { gap: 2px; height: 64px; }
+  .logo { font-size: 20px; gap: 7px; }
+  .logo img { width: 26px; height: 26px; }
+  .top-rp, .top-cta { font-size: 13.5px; padding: 10px 11px; }
+  .top-rp .lg { display: none; }
+  .top-rp .sm { display: inline; }
+  .copy { padding-top: 22px; }
+  .eyebrow { font-size: 10.5px; margin-bottom: 12px; }
+  h1 { font-size: 11vw; }
+  .lede { margin-top: 14px; font-size: 16px; }
+  .soon { margin-top: 14px; font-size: 13px; }
+  .hero { padding-bottom: 56px; }
+  .hero::before { height: 230px; }
+  .still { margin-top: 0; }
+  .proof { bottom: 20px; font-size: 12.5px; }
+  .proof { position: static; margin-top: 4px; }
+  .proof span { display: block; }
+  .proof span + span::before { content: none; }
+  .hero { padding-bottom: 26px; display: flex; flex-direction: column; min-height: calc(100svh - 64px); }
+  .copy { flex: 1 0 auto; }
+  .still { width: calc(100% + 20px); margin: -18% -10px 0; }
+  .hero::before { height: 170px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="#" aria-label="Sprout home"><img src="../assets/logo.png" alt="" width="30" height="30" />Sprout</a>
+  <nav class="top-links" aria-label="Sections"><a href="#">Daily Brief</a><a href="#">Class chats</a><a href="#">Directory</a><a href="#">FAQ</a></nav>
+  <a class="top-rp" href="https://roomparent.com" rel="noopener"><span class="lg">I’m a room parent</span><span class="sm">Room parent</span></a>
+  <a class="top-cta" href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052">Join your schools</a>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="hero-h">
+    <div class="copy">
+      <p class="eyebrow">This week at Kiker Elementary</p>
+      <h1 id="hero-h">That’s a lot on <em>one plate.</em></h1>
+      <p class="lede">Pajama Day. Ava’s party. Your turn on carpool. Soccer signups close Friday. <b>Sprout puts the week in order every morning,</b> shared with your spouse and the parents in your class.</p>
+      <p class="soon"><img src="../assets/assist/clover.webp" alt="" width="26" height="26" /><span><b>Coming soon, Sprout Assist.</b> It takes things off the plate for you: books the sitter, signs up for soccer, sends the RSVP.</span></p>
+    </div>
+
+    <div class="still" role="img" aria-label="An enamel plate piled with the week: a teddy bear for Pajama Day, a gift for Ava’s party, an alarm clock for carpool, a soccer ball and trophy for signups, a backpack, a calendar, a tent and a table for two.">
+      <div class="plate"></div>
+      <!-- back row first (lower z), front row last -->
+      <figure class="o" style="--i:0; --w:24%; --x:9%;  --y:30%; --z:1; --r:-6deg"><img src="assets/clay-camps.webp" alt="" /><figcaption>Winter camp signups</figcaption></figure>
+      <figure class="o" style="--i:1; --w:25%; --x:34%; --y:35%; --z:1; --r:3deg"><img src="assets/clay-week.webp" alt="" /><figcaption>Parent-teacher night, 6:30</figcaption></figure>
+      <figure class="o" style="--i:2; --w:24%; --x:62%; --y:31%; --z:1; --r:5deg"><img src="assets/clay-date-night.webp" alt="" /><figcaption>Date night, Saturday</figcaption></figure>
+      <figure class="o" style="--i:3; --w:27%; --x:0%;  --y:12%; --z:2; --r:-4deg"><img src="assets/clay-sitter.webp" alt="" /><figcaption>Pajama Day, today</figcaption></figure>
+      <figure class="o" style="--i:4; --w:28%; --x:23%; --y:15%; --z:3; --r:2deg"><img src="assets/clay-event.webp" alt="" /><figcaption>Ava’s party, Sat 2:00</figcaption></figure>
+      <figure class="o" style="--i:5; --w:24%; --x:50%; --y:16%; --z:2; --r:-3deg"><img src="assets/clay-afterschool.webp" alt="" /><figcaption>Jake’s permission slip</figcaption></figure>
+      <figure class="o" style="--i:6; --w:26%; --x:72%; --y:11%; --z:3; --r:6deg"><img src="assets/clay-sports.webp" alt="" /><figcaption>Soccer signups close Friday</figcaption></figure>
+      <figure class="o" style="--i:7; --w:22%; --x:38%; --y:3%;  --z:4; --r:-5deg"><img src="assets/clay-remind.webp" alt="" /><figcaption>Carpool, 7:40 AM</figcaption></figure>
+    </div>
+
+    <p class="proof"><span>Kiker families in Circle C are already here</span><span>Free for parents. Always.</span></p>
+  </section>
+</main>
+</body>
+</html>

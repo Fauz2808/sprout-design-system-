@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Assist home · services grid</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f4f1ea;--ink:#1d2a22;--sub:#5d675f;--line:#e2ddd2;--brand:#186338;--tint:#e3efe6;--k:.8;--w:314px}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif}
+  .wrap{max-width:1400px;margin:0 auto;padding:28px 32px 48px}
+  h1{font:600 28px 'Playfair Display',serif;margin:0 0 6px}
+  .lede{margin:0 0 20px;color:var(--sub);max-width:900px}
+  .grid{display:grid;grid-template-columns:repeat(3,var(--w));gap:12px 40px;justify-content:start;align-items:end}
+  .tag{display:inline-block;font:600 12px Inter;letter-spacing:.04em;color:var(--brand);background:var(--tint);border-radius:999px;padding:3px 10px;margin-bottom:6px}
+  .tag.old{color:#7d715e;background:#eae6db}
+  h2{font:600 19px 'Playfair Display',serif;margin:0 0 4px}
+  .head p{margin:0;color:var(--sub);font-size:13px}
+  .frame{width:var(--w);height:calc(852px * var(--k));border-radius:calc(54px * var(--k));overflow:hidden;box-shadow:0 0 0 3px #d9d4c9,0 18px 50px rgba(0,0,0,.10);background:#fff}
+  iframe{width:393px;height:852px;border:0;transform:scale(var(--k));transform-origin:0 0;display:block}
+  .bar{display:flex;justify-content:space-between;margin-top:6px}
+  .bar a,.bar button{font:500 13px Inter;color:var(--brand);background:none;border:0;padding:2px 0;cursor:pointer;text-decoration:none}
+  h3{font:600 19px 'Playfair Display',serif;margin:40px 0 4px;border-top:1px solid var(--line);padding-top:18px}
+  .set{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:14px}
+  .set figure{margin:0;background:#fff;border:1px solid #e6e7ea;border-radius:16px;padding:10px 8px 8px;text-align:center}
+  .set img{width:96px;height:96px;display:block;margin:0 auto 4px;filter:drop-shadow(0 4px 5px rgba(70,58,34,.13))}
+  .set figcaption{font-size:12px;color:var(--sub)}
+</style>
+</head>
+<body><div class="wrap">
+  <h1>Assist home: services grid</h1>
+  <p class="lede">Tony, 18 Nov: “I want to use custom illustrations for each and make it more like an Uber services layout.” Each tile now has its own clay illustration, drawn in the same palette as the existing clay set. Both directions use Uber’s tile anatomy: a big object, a short label, and a badge on the top edge. They differ in what sits on top. Every tile opens its real flow.</p>
+  <div class="grid">
+    <div class="head"><span class="tag old">Now</span><h2>Current home</h2><p>Two across, small clay icon, title and subtitle on every tile.</p></div>
+    <div class="head"><span class="tag">A · Same groups</span><h2>Uber tiles, today’s three groups</h2><p>Everyday and kids as 4-across rows; sitter and date night as two wide tiles with a subtitle.</p></div>
+    <div class="head"><span class="tag">B · Popular first</span><h2>Uber rhythm, bookings up top</h2><p>Sitter, date night and sports (the flows that book and pay) as one big row, then the rest by group.</p></div>
+    <div><div class="frame"><iframe src="/assist/" title="Current home"></iframe></div><div class="bar"><button data-r>Restart</button><a href="/assist/" target="_blank">Open alone</a></div></div>
+    <div><div class="frame"><iframe src="/assist/?home=a" title="Direction A"></iframe></div><div class="bar"><button data-r>Restart</button><a href="/assist/?home=a" target="_blank">Open alone</a></div></div>
+    <div><div class="frame"><iframe src="/assist/?home=b" title="Direction B"></iframe></div><div class="bar"><button data-r>Restart</button><a href="/assist/?home=b" target="_blank">Open alone</a></div></div>
+  </div>
+  <h3>The illustration set</h3>
+  <p class="lede">Eleven new clay illustrations, one per tile plus the saved-details row. Masters (1024 px, transparent) are in <code>research/illustrations-2026-11-18/cut/</code>; Figma file “Sprout Assist · tile illustrations (18 Nov)”.</p>
+  <div class="set" id="set"></div>
+</div>
+<script>
+  const root = document.documentElement;
+  const fit = () => { const k = Math.max(.55, Math.min(.85, (Math.min(innerWidth, 1400) - 64 - 80) / 3 / 393, (innerHeight - 140) / 852)); root.style.setProperty('--k', k); root.style.setProperty('--w', 393 * k + 'px'); };
+  addEventListener('resize', fit); fit();
+  document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { const f = b.closest('div').parentElement.querySelector('iframe'); f.src = f.src; });
+  const SET = [['remind','Reminder'],['event','Plan an event'],['club','Start a club'],['week','This week'],['sitter','Book a sitter'],['date-night','Date night'],
+    ['sports','Sports leagues'],['afterschool','After-school'],['camps','Summer camps'],['tutoring','Tutoring'],['wallet','Accounts and cards']];
+  document.getElementById('set').innerHTML = SET.map(([f, t]) => `<figure><img src="/assets/illus/${f}.webp" alt=""><figcaption>${t}</figcaption></figure>`).join('');
+</script>
+</body></html>
