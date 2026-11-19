@@ -14,7 +14,7 @@ const A = X.A;
 const route = location.pathname.split('/').filter(Boolean)[0] || '';
 const review = new URLSearchParams(location.search).get('review');
 /* review routes fake a family state; the real app (every other route) starts with no sitters and fills MY as you go */
-const STATE = { 'sitter-v3':'saved', 'sitter-v3-class':'class', 'sitter-v3-none':'none', 'book-a-sitter-saved':'saved' }[route] || 'app';
+const STATE = { 'sitter-v3':'saved', 'sitter-v3-class':'class', 'sitter-v3-none':'none', 'book-a-sitter-saved':'saved', 'assist-ongoing':'saved' }[route] || 'app';
 
 /* ---------- family + calendar (today is Monday, July 27) ---------- */
 const KIDS = [{ n:'Maya', age:7, cls:'Miss Taylor’s class', img:A + 'maya.webp' }, { n:'Jake', age:5, cls:'Miss Poole’s class', img:A + 'jake.webp' }];
@@ -455,6 +455,7 @@ async function sendAndBook(p, asked, w, kids, { pick } = {}){
     return classGroup(p, w, kids, { pick });
   }
   const yes = ans.free;
+  p.set(`${joinNames(yes.map(s => s.n))} can do it · pick one`, { when:w.day.short });
   let who = yes[0];
   if (yes.length > 1) { await p.say(`${joinNames(yes.map(s => s.n))} can both do it. Who should you book?`, 800); who = yes[await p.chips(yes.map(s => `Book ${s.n} · about $${Math.round(s.rate * H)}`))]; }
   else await p.say(`${who.n} can do it. Check the details, then I’ll text ${who.n} the booking.`, 800);
@@ -1128,7 +1129,7 @@ function playdateDM(family, w, kidNames, place, pickup, { confirmed = true } = {
     setTimeout(() => input.focus(), 300);
   });
 }
-X.flows.playdate = async p => {
+X.flows.playdate = async (p, opt = {}) => {
   /* L5: one child per playdate (Tony: "I would just do it for one kid") */
   let kid = KIDS[0], pickup = false;
   let place = FAMILY.address, where = 0;
@@ -1167,7 +1168,7 @@ X.flows.playdate = async p => {
     const status = `Waiting for ${family.ask}`;
     p.set(status, { when:w.day.short });
     const declined = family.kid === 'Lily' && route === 'playdate-cant';
-    const proposed = family.kid === 'Lily' && route === 'playdate-new-time';
+    const proposed = family.kid === 'Lily' && (route === 'playdate-new-time' || opt.newTime);
     const reply = declined ? 'Ana can’t make it this time' : proposed ? 'Ana suggested a new time' : `${family.reply} confirmed the playdate`;
     await later(p, { status, small:playdateWhen(w), ms:2500, title:reply, body:joinNames([kid.n, family.kid]) });
     if (declined) {
@@ -1177,6 +1178,7 @@ X.flows.playdate = async p => {
     }
     if (proposed) {
       const suggested = { day:DAYS.find(d => d.w === 'Sun'), from:900, to:1020 };
+      p.set(`Ana suggested ${playdateWhen(suggested)}`, { when:suggested.day.short, attn:true });
       const proposal = p.block(`<div class="card"><div class="ctop">${clay('calendar-check')}<div><div class="ttl">Ana suggested a new time</div></div></div>
         <div class="fact"><i class="ph ph-clock"></i>${playdateWhen(suggested)}</div></div>`).querySelector('.card');
       for (;;) {
@@ -1610,7 +1612,7 @@ function partyResults(p, w, origin, ranked, { heading, search, currentKey, style
   return new Promise(resolve => {
     const card = p.block(`<div class="card party-results">
       <div class="ctop pr-head"><span class="icotile"><i class="ph ph-map-pin"></i></span><div class="pr-tx"><div class="eyebrow">${origin.label === 'your location' ? 'Near you' : origin.label}</div><div class="ttl">${heading}</div></div>
-        <button type="button" class="pr-gmap" data-map aria-label="Show on Google Maps" title="Show on Google Maps"><i class="ph ph-google-logo"></i></button></div>
+        <button type="button" class="pr-gmap" data-map aria-label="Open in Google Maps" title="Open in Google Maps"><i class="ph ph-arrow-up-right"></i></button></div>
       <div class="dnmap wide party-map" role="region" aria-label="Sprout map of ${heading.toLowerCase()}" tabindex="0">
         <div class="dnlayer"><div class="party-map-tiles" aria-hidden="true"></div></div>
         <button type="button" class="dnrecenter" aria-label="Recenter map"><i class="ph-bold ph-crosshair"></i></button>
@@ -1692,9 +1694,9 @@ function partyResults(p, w, origin, ranked, { heading, search, currentKey, style
     mapButton.onclick = () => {
       const openGoogle = !map.hidden;
       map.hidden = openGoogle; google.hidden = !openGoogle;
-      mapButton.innerHTML = `<i class="ph ${openGoogle ? 'ph-map-trifold' : 'ph-google-logo'}"></i>`;
+      mapButton.innerHTML = `<i class="ph ${openGoogle ? 'ph-map-trifold' : 'ph-arrow-up-right'}"></i>`;
       mapButton.classList.toggle('on', openGoogle);
-      mapButton.setAttribute('aria-label', openGoogle ? 'Back to the Sprout map' : 'Show on Google Maps'); mapButton.title = mapButton.getAttribute('aria-label');
+      mapButton.setAttribute('aria-label', openGoogle ? 'Back to the Sprout map' : 'Open in Google Maps'); mapButton.title = mapButton.getAttribute('aria-label');
       if (openGoogle) syncGoogle(selected);
       else if (mapKey !== selected) select(selected, false, true);
       else mapUI.resume();
@@ -2113,23 +2115,32 @@ function bookedEvening(){   /* a date night already booked for Sat, Aug 1: Olive
     .then(() => payTonight(p, who, w, KIDS, H, { clock:true }));
   return p;
 }
-/* L1 review state: Tony left two things running (a sitter request waiting on replies, a playdate Priya answered),
-   so the Assist home shows "Pick up where you left off" above the tiles. Tap one to get back into that chat. */
-function ongoing(){
-  const w = { day:DAYS.find(d => d.w === 'Fri'), from:1080, to:1320 }, asked = [SAVED[0], SAVED[1], SAVED[2]];
-  const s = X.makePlan('sitterC1', { title:`Sitter · ${w.day.day}`, sub:`Sitter · ${w.day.day}`, icon:'person-plus' });
-  s.me('Book a sitter');
-  s.add(el(`<div class="row"><div class="from"><span class="orb sm"></span>Sprout</div><div class="bub">I texted ${joinNames(asked.map(x => x.n))} for ${w.day.day}, ${range(w.from, w.to)}. I’ll tell you who’s free.</div></div>`));
-  s.note(`Asked ${joinNames(asked.map(x => x.n))}`, `3 texts sent · ${w.day.short} ${range(w.from, w.to)}`, 'ph-paper-plane-tilt');
-  s.set(`Waiting on ${joinNames(asked.map(x => x.n))}`, { when:'Fri' });
-  const fam = PLAYDATE_FAMILIES.Maya[1], pw = { day:DAYS.find(d => d.w === 'Sat'), from:840, to:960 };
-  const pd = X.makePlan('playdate', { title:'Playdate · Maya', sub:`Playdate · ${pw.day.day}`, icon:'calendar-check' });
-  pd.me('Plan a playdate');
-  pd.add(el(`<div class="row"><div class="from"><span class="orb sm"></span>Sprout</div><div class="bub">Priya replied: Leo can come ${pw.day.day}, ${range(pw.from, pw.to)}. Want me to put it on the calendar?</div></div>`));
-  pd.chips(['Yes, add it', `Message ${fam.reply}`]).then(k => k === 1 ? playdateDM(fam, pw, 'Maya', FAMILY.address, false, { confirmed:false }) : pd.say('Added. Dana has it too.', 600));
-  pd.set('Priya replied · Leo can come', { when:'Sat', attn:true });
+/* L1 review state (/assist-ongoing/): Tony left two things running. Ahmad, 19 Nov: going back into a session must show
+   the whole conversation, not just the last line. So both are the real flows, replayed fast in the background by tapping
+   the same buttons a parent would: a playdate where Ana suggested a new time (needs you), and a sitter request that
+   was just sent. The sitter replies then arrive in real time, a few seconds after the home opens. */
+async function autoplay(p, steps){
+  for (const step of steps) {
+    for (let i = 0; ; i++) {
+      const live = [...p.chat.querySelectorAll(step.sel || 'button')].filter(b => !b.disabled && b.style.pointerEvents !== 'none' && !b.closest('.done'));
+      const b = step.sel ? live[0] : live.filter(x => x.textContent.trim().startsWith(step)).pop();
+      if (b) { b.click(); break; }
+      if (i > 400) { console.warn('autoplay stopped at', step); return; }
+      await new Promise(r => setTimeout(r, 25));
+    }
+  }
+}
+async function ongoing(){
+  X.pace(.03);
+  const pd = X.startQuiet('playdate', { echo:'Plan a playdate', newTime:true });
+  await autoplay(pd, ['Next', { sel:'[data-pick]' }, 'Message Ana', 'Send']);
+  await new Promise(r => setTimeout(r, 400));   // Ana's new time comes back (fast), the card waits for you
+  const s = X.startQuiet('sitterC1', { echo:'Book a sitter' });
+  await autoplay(s, ['Next', 'Next', 'Looks right', 'Ask Alex']);
+  X.pace(1);
   X.showHome(); X.openSheet();
 }
+
 const DIRECT = {
   'assist-ongoing': ongoing,
   'book-a-sitter': () => X.start('sitterC1', { echo:'Book a sitter' }),

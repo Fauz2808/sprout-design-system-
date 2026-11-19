@@ -6,7 +6,9 @@
 window.SPROUT_NAV_TEXTURE = '/assets/assist-clover-ahmad-700.png';
 window.Sprout = (() => {
   const $ = s => document.querySelector(s);
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  /* PACE < 1 replays a flow fast in the background (review state for ongoing sessions); 1 = real time */
+  let PACE = 1;
+  const sleep = ms => new Promise(r => setTimeout(r, ms * PACE));
   const el = html => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
   const sheet = $('#sheet'), scrim = $('#scrim'), views = $('#views'), hsub = $('#hsub'), headOrb = $('#headOrb');
   const A = '/assets/';
@@ -683,6 +685,13 @@ window.Sprout = (() => {
     tutoring: { title:'Tutoring', sub:'Tutoring', icon:'tutoring' },
     club: { title:'New club', sub:'Start a club', icon:'club' },
   };
+  /* start a flow without opening Assist: the plan's chat fills in the background (ongoing sessions review state) */
+  function startQuiet(kind, opt = {}){
+    const m = META[kind], p = makePlan(kind, { title: m.title, sub: m.sub, icon: m.icon });
+    if (opt.echo) p.me(opt.echo);
+    flows[kind](p, opt);
+    return p;
+  }
   async function start(kind, opt = {}){
     if (!flows[kind]) return notInDemo();
     const m = META[kind];
@@ -715,7 +724,7 @@ window.Sprout = (() => {
   document.addEventListener('gesturestart', e => e.preventDefault());
   $('#restartBtn').onclick = () => location.reload();
 
-  return { TILES, $, sleep, el, toast, notInDemo, makePlan, start, flows, ask, addField, fieldRow, editHint, overlay, bsheet, faceId, approval, confirmSitter, closeSheet, providerAccount, wallet, notify, renderHome, renderPromo, renderDay, S, A, showPlan, showHome, openSheet, pickCard, openWallet, isOpen: () => sheet.classList.contains('on') };
+  return { pace: v => { PACE = v; }, startQuiet, TILES, $, sleep, el, toast, notInDemo, makePlan, start, flows, ask, addField, fieldRow, editHint, overlay, bsheet, faceId, approval, confirmSitter, closeSheet, providerAccount, wallet, notify, renderHome, renderPromo, renderDay, S, A, showPlan, showHome, openSheet, pickCard, openWallet, isOpen: () => sheet.classList.contains('on') };
 })();
 
 /* notched bar edge (SSC, same geometry), redrawn on resize */
