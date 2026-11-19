@@ -786,37 +786,32 @@ function foodCard(p){
     p.scroll();
   });
 }
+/* 19 Nov (Ahmad): date night uses the same map as the party search (street map, area label, Google Maps button).
+   The made-up restaurants get coordinates from their spot on the old map (direction from home) and their distance. */
+function restaurantPlace(k){
+  const pl = M.PLACES[k], dx = pl.x - 44, dy = pl.y - 52, d = Math.hypot(dx, dy) || 1, [lat, lng] = PARTY_HOME.coords;
+  return { key:k, name:pl.n, detail:'South Austin, TX', coords:[lat - dy / d * pl.mi / 69, lng + dx / d * pl.mi / 59.6], photo:`dn/${k}-2.jpg` };
+}
 function results(p, keys, others = []){
-  return new Promise(res => {
-    let k = keys[0];
-    Object.keys(M.PLACES).forEach(x => M.PLACES[x].pick = x === k);   // "my pick" on the map = the top-ranked place
-    const reasons = new Map(others.map(({ k, why }) => [k, why]));
-    const c = p.block(`<div class="card" style="padding:6px">${M.mapHtml(keys, k, true, others.filter(o => !keys.includes(o.k)))}</div>`).querySelector('.card'); c.querySelector('.dnmap').classList.add('wide');
-    /* D1c (17 Nov): photo full-bleed at the top, two plain lines on why, small Menu / Website links, one Choose */
-    const car = p.block(`<div class="dncar">${keys.map((key, i) => { const pl = M.PLACES[key], x = EXTRA[key]; return `<div class="card dn3" data-k="${key}">
-      <div class="dn3img" style="${M.ph(key)}">${i === 0 ? '<span class="dn3pick">My pick</span>' : ''}</div>
+  const reasons = new Map(others.map(({ k, why }) => [k, why]));
+  const ranked = keys.map(k => ({ place:restaurantPlace(k), miles:M.PLACES[k].mi }));
+  /* D1c (17 Nov): photo full-bleed at the top, two plain lines on why, small Menu / Website links, one Choose */
+  const cardHtml = (place, miles, first) => { const key = place.key, pl = M.PLACES[key], x = EXTRA[key]; return `<div class="card dn3" data-k="${key}">
+      <div class="dn3img" style="${M.ph(key)}">${first ? '<span class="dn3pick">My pick</span>' : ''}</div>
       <div class="dn3bd"><div class="dn3top"><b>${pl.n}</b><span class="dn3price"><strong>~${x.two}</strong> for two</span></div>
         <div class="dn3sub">${googleRating(x)}</div>${reasons.has(key) ? `<div class="dn3sub">${reasons.get(key)}</div>` : ''}
         <div class="dn3sub">${pl.kind} · ${pl.mi} mi</div>
         <p class="dn3why">${x.why}</p>
-        <div class="dn3cta"><button class="dn3link" data-menu><i class="ph ph-book-open-text"></i>Menu</button><button class="dn3link" data-site><i class="ph ph-globe-simple"></i>Website</button><button class="btn dn3go" data-go>Choose</button></div></div></div>`; }).join('')}</div>`).querySelector('.dncar');
-    const map = c.querySelector('.dnmap'), cards = [...car.querySelectorAll('.card')]; let lock = false;
-    const select = (key, from) => { k = key; M.glide(map, k); cards.forEach(x => x.classList.toggle('on', x.dataset.k === k));
-      if (from !== 'swipe') { const cd = cards.find(x => x.dataset.k === k); lock = true; car.scrollTo({ left: cd.offsetLeft - (car.clientWidth - cd.clientWidth) / 2, behavior:'smooth' }); setTimeout(() => lock = false, 500); } };
-    map.querySelectorAll('.dnpin[data-k]').forEach(b => b.onclick = () => select(b.dataset.k, 'pin'));
-    map.querySelectorAll('.dnpin[data-o]').forEach(b => b.onclick = () => { const o = others.find(x => x.k === b.dataset.o); toast(`${M.PLACES[o.k].n} · ${o.why}`); });
-    M.drag(map);
-    let st; car.addEventListener('scroll', () => { if (lock) return; clearTimeout(st); st = setTimeout(() => { const mid = car.scrollLeft + car.clientWidth / 2;
-      const near = cards.reduce((a, x) => Math.abs(x.offsetLeft + x.clientWidth / 2 - mid) < Math.abs(a.offsetLeft + a.clientWidth / 2 - mid) ? x : a); if (near.dataset.k !== k) select(near.dataset.k, 'swipe'); }, 120); });
-    cards.forEach(x => {
-      x.querySelector('[data-menu]').onclick = () => { select(x.dataset.k, 'pin'); menuSheet(x.dataset.k); };
-      x.querySelector('[data-site]').onclick = () => toast('Opens the restaurant’s website (not part of this demo)');
-      x.querySelector('[data-go]').onclick = () => { cards.forEach(y => y.querySelectorAll('button').forEach(b => b.style.pointerEvents = 'none')); map.querySelectorAll('.dnpin').forEach(b => b.style.pointerEvents = 'none'); select(x.dataset.k, 'pin'); p.me(`Choose ${M.PLACES[x.dataset.k].n}`); res(x.dataset.k); };
-    });
-    requestAnimationFrame(() => { M.glide(map, k, true); select(k, 'pin'); });
-    setTimeout(() => p.chat.scrollTo({ top: c.closest('.row').offsetTop - p.chat.offsetTop - 8, behavior:'smooth' }), 600);
-  });
+        <div class="dn3cta"><button class="dn3link dn3ico" data-menu aria-label="Menu" title="Menu"><i class="ph ph-book-open-text"></i></button><button class="dn3link dn3ico" data-site aria-label="Website" title="Website"><i class="ph ph-globe-simple"></i></button><button class="btn dn3go" data-go>Choose</button></div></div></div>`; };
+  const wire = (tile, place, { select, finish }) => {
+    tile.querySelector('[data-menu]').onclick = () => { select(); menuSheet(place.key); };
+    tile.querySelector('[data-site]').onclick = () => toast('Opens the restaurant’s website (not part of this demo)');
+    tile.querySelector('[data-go]').onclick = () => finish(place);
+  };
+  return partyResults(p, null, PARTY_HOME, ranked, { heading:'Dinner for two', search:'restaurants', showAll:true, back:false, cardHtml, wire })
+    .then(place => place.key);
 }
+
 X.flows.dateE = async (p, opt = {}) => {
   const sat = DAYS.find(d => d.w === 'Sat');
   let w0 = { day:sat, from:19 * 60, to:22 * 60 + 30 };
@@ -1419,9 +1414,9 @@ const BIRTHDAY_PLACES = [{ key:'park', name:'Zilker Park', detail:'Zilker Park, 
 /* L6 (Tony, 19 Nov): three kinds of place, not five. "Birthday friendly venues, parks and playgrounds, or restaurant."
    Hands-on fun and active play fold into venues, outdoors into parks. types[] below index into this list. */
 const PARTY_STYLES = [
-  { label:'Birthday-friendly venues', one:'Party venue', search:'kids birthday party venues', icon:'confetti' },
-  { label:'Parks and playgrounds', one:'Park', search:'parks and playgrounds for kids birthday parties', icon:'tree' },
-  { label:'Restaurants', one:'Restaurant', search:'family friendly restaurants for kids birthday', icon:'fork-knife' },
+  { label:'Birthday-friendly venues', short:'Party venues', one:'Party venue', search:'kids birthday party venues', icon:'confetti' },
+  { label:'Parks and playgrounds', short:'Parks', one:'Park', search:'parks and playgrounds for kids birthday parties', icon:'tree' },
+  { label:'Restaurants', short:'Restaurants', one:'Restaurant', search:'family friendly restaurants for kids birthday', icon:'fork-knife' },
 ];
 const PARTY_VENUES = [
   { key:'chuck-e-cheese', name:'Chuck E. Cheese · South Austin', detail:'9811 S I-35, Austin, TX', coords:[30.16267,-97.78759], types:[0,2],
@@ -1605,14 +1600,17 @@ function partyMap(map, origin, ranked, pick){
   };
 }
 
-function partyResults(p, w, origin, ranked, { heading, search, currentKey, styleIndex = 0, areaSearch = false }){
+/* 19 Nov (Ahmad): the one map for every place search (party venues, class events, date night restaurants).
+   Compact header: area + one-line title, and a Google Maps icon button that swaps the map. cardHtml / wire let a flow
+   draw its own cards (date night: price, rating, Menu, Website) on the same map. */
+function partyResults(p, w, origin, ranked, { heading, search, currentKey, styleIndex = 0, areaSearch = false, cardHtml, wire, showAll = false, back = true }){
   const query = `${search} near ${origin.area}`;
   const venues = new Map(ranked.map(({ place }) => [place.key, place]));
-  const visibleCount = ranked.findIndex(({ place }) => place.key === currentKey) >= 3 ? ranked.length : 3;
+  const visibleCount = showAll || ranked.findIndex(({ place }) => place.key === currentKey) >= 3 ? ranked.length : 3;
   return new Promise(resolve => {
     const card = p.block(`<div class="card party-results">
-      <div class="ctop"><span class="icotile"><i class="ph ph-map-pin"></i></span><div><div class="eyebrow">${origin.label === 'your location' ? 'Near you' : origin.label}</div><div class="ttl">${heading}</div></div>
-        <button type="button" class="chip" data-map>Google Maps</button></div>
+      <div class="ctop pr-head"><span class="icotile"><i class="ph ph-map-pin"></i></span><div class="pr-tx"><div class="eyebrow">${origin.label === 'your location' ? 'Near you' : origin.label}</div><div class="ttl">${heading}</div></div>
+        <button type="button" class="pr-gmap" data-map aria-label="Show on Google Maps" title="Show on Google Maps"><i class="ph ph-google-logo"></i></button></div>
       <div class="dnmap wide party-map" role="region" aria-label="Sprout map of ${heading.toLowerCase()}" tabindex="0">
         <div class="dnlayer"><div class="party-map-tiles" aria-hidden="true"></div></div>
         <button type="button" class="dnrecenter" aria-label="Recenter map"><i class="ph-bold ph-crosshair"></i></button>
@@ -1623,7 +1621,7 @@ function partyResults(p, w, origin, ranked, { heading, search, currentKey, style
         ${ranked.length > visibleCount ? '<button type="button" class="chip" data-more>Show more places</button>' : ''}
         ${areaSearch ? '<button type="button" class="chip" data-area><i class="ph ph-magnifying-glass"></i> Another area</button>' : ''}
         ${external(mapSearch(query), 'Search Google Maps', 'chip')}
-        <button type="button" class="chip" data-back>Back</button>
+        ${back ? '<button type="button" class="chip" data-back>Back</button>' : ''}
       </div></div>`).querySelector('.party-results');
     const list = card.querySelector('[data-party-places]'), map = card.querySelector('.party-map');
     const google = card.querySelector('iframe'), mapButton = card.querySelector('[data-map]');
@@ -1667,6 +1665,11 @@ function partyResults(p, w, origin, ranked, { heading, search, currentKey, style
       p.me(place ? `Choose ${place.name}` : 'Back'); resolve(place);
     };
     const append = venues => venues.forEach(({ place, miles }, i) => {
+      if (cardHtml) {
+        const tile = el(cardHtml(place, miles, !list.children.length && i === 0));
+        wire(tile, place, { select:() => select(place.key, true), finish });
+        list.append(tile); mapUI.reveal(place.key); return;
+      }
       const style = PARTY_STYLES[place.types.includes(styleIndex) ? styleIndex : place.types[0]] || PARTY_STYLES[0];
       const tile = el(`<div class="card dn3" data-k="${place.key}">
         <div class="dn3img" role="img" aria-label="${place.name}" style="${partyPhotoStyle(place)}">${!list.children.length && i === 0 ? '<span class="dn3pick">My pick</span>' : ''}</div>
@@ -1689,14 +1692,16 @@ function partyResults(p, w, origin, ranked, { heading, search, currentKey, style
     mapButton.onclick = () => {
       const openGoogle = !map.hidden;
       map.hidden = openGoogle; google.hidden = !openGoogle;
-      mapButton.textContent = openGoogle ? 'Sprout map' : 'Google Maps';
+      mapButton.innerHTML = `<i class="ph ${openGoogle ? 'ph-map-trifold' : 'ph-google-logo'}"></i>`;
+      mapButton.classList.toggle('on', openGoogle);
+      mapButton.setAttribute('aria-label', openGoogle ? 'Back to the Sprout map' : 'Show on Google Maps'); mapButton.title = mapButton.getAttribute('aria-label');
       if (openGoogle) syncGoogle(selected);
       else if (mapKey !== selected) select(selected, false, true);
       else mapUI.resume();
     };
     const more = card.querySelector('[data-more]');
     if (more) more.onclick = () => { append(ranked.slice(3)); select(ranked[3].place.key, true); more.remove(); p.scroll(); };
-    card.querySelector('[data-back]').onclick = () => finish(null);
+    card.querySelector('[data-back]')?.addEventListener('click', () => finish(null));
     const areaBtn = card.querySelector('[data-area]');
     if (areaBtn) areaBtn.onclick = async () => { const a = await otherArea(); if (!a || !active) return; active = false; list.querySelectorAll('button').forEach(b => b.disabled = true); card.querySelectorAll('[data-more],[data-back],[data-area]').forEach(b => b.remove()); p.me(`Look around ${a.label}`); resolve({ area:a }); };
     if (p.chat) setTimeout(() => p.chat.scrollTo({ top:card.closest('.row').offsetTop - p.chat.offsetTop - 8, behavior:'smooth' }), 500);
@@ -1763,7 +1768,7 @@ async function otherArea(){
 }
 async function findPartyVenue(p, w, styleIndex, { classEvent = false } = {}){
   const places = classEvent ? CLASS_EVENT_VENUES : PARTY_VENUES;
-  const heading = classEvent ? 'Event places' : PARTY_STYLES[styleIndex].label;
+  const heading = classEvent ? 'Event places' : PARTY_STYLES[styleIndex].short;
   const search = classEvent ? 'family group event venues' : PARTY_STYLES[styleIndex].search;
   let origin = PARTY_HOME;
   for (;;) {

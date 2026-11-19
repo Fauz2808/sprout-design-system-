@@ -23,6 +23,11 @@ one line on what changed. The desk links beside the phone (`LINKS` in `app/flows
   venues, Parks and playgrounds, Restaurants; search starts near home, "Another area" re-searches (`otherArea()`).
   Casa Verde and Rosie's are the made-up date-night places reused as family restaurants. Nine cover tiles: eight covers
   + "Make one with AI" (`coverCard()` in `flows.js`); covers 4–9 are Figma AI, scratch file `H5GZYtSTT9TOR8qc5ieuV7` 6:2–6:7.
+- **One place-search UI** (Ahmad, 19 Nov): date night restaurants now use the party search's `partyResults()` (street
+  map, area label, Google Maps toggle, Search Google Maps). `results()` passes `cardHtml` / `wire` for the restaurant
+  cards; `restaurantPlace()` turns each made-up place's old map spot + distance into coordinates around South Austin.
+  Header is compact for every search: area over a one-line title (`PARTY_STYLES[].short`), Google Maps as an icon button.
+  Menu and Website on restaurant cards are icon buttons so Choose fits the narrower card.
 - **L7 Date night**: the time card has Table around + Home by; the sitter stays until Home by.
 - **After school** (`X.flows.afterschool`, `/after-school/`) and **Tutoring** (`X.flows.tutoring`, `/tutoring/`), so
   every Register my kids tile opens a real flow. Camps pattern: `setupCard()` (one kid + chip groups) → work row →
