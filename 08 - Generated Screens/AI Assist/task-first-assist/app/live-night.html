@@ -150,7 +150,7 @@ const tl = m => { const h = Math.floor(m / 60), mm = m % 60; return `${h % 12 ||
 const pct = m => { const xs = [1095, ...STOPS.map(x => x[0])], ps = [0, 6, 33, 58, 96];
   if (m <= xs[0]) return 0; for (let i = 1; i < xs.length; i++) if (m <= xs[i]) return ps[i - 1] + (m - xs[i - 1]) / (xs[i] - xs[i - 1]) * (ps[i] - ps[i - 1]); return 100; };
 function state(m){
-  if (m < 1125) { const n = 1125 - m; return { t:`Alex arrives in ${n} min`, s:'Dinner at Olive & Ember 7:15 · leave by 6:55', r:`${n}m`, dil:'Alex', acts:[['chat-circle-dots', 'Text Alex'], ['map-trifold', 'Directions']] }; }
+  if (m < 1125) { const n = 1125 - m; return { t:`Babysitter Alex arrives in ${n} min`, s:'Dinner at Olive & Ember 7:15 · leave by 6:55', r:`${n}m`, dil:'Alex', acts:[['chat-circle-dots', 'Text Alex'], ['map-trifold', 'Directions']] }; }
   if (m < 1135) return { t:'Alex is here', s:'Leave by 6:55 · 9 min to Olive & Ember', r:'6:55', dil:'Leave', acts:[['map-trifold', 'Directions'], ['chat-circle-dots', 'Text Alex']] };
   if (m < 1155) return { t:'On your way to dinner', s:'Table for 2 at 7:15 · 2.1 mi', r:'7:15', dil:'Dinner', acts:[['map-trifold', 'Directions'], ['phone', 'Call Olive & Ember']] };
   if (m < 1305) return { t:'Enjoy your dinner', s: m < 1230 ? 'Alex has Maya and Jake · bedtime at 8:30' : 'Maya and Jake are in bed · Alex until 10:15', r:'10:15', dil:'Home by', acts:[['chat-circle-dots', 'Text Alex']] };
@@ -161,7 +161,7 @@ const track = m => `<div class="trk"><div class="bar"></div><div class="fill" st
 const laHtml = (m, acts = true) => { const st = state(m); return `<div class="la"><div class="la-top"><img src="${ICON}" alt=""><b>Date night</b>· Sprout<span class="r">${st.end ? 'Ended' : st.r}</span></div>
   <div class="la-t">${st.t}</div><div class="la-s">${st.s}</div>${track(m)}
   ${acts && st.acts.length ? `<div class="la-acts">${st.acts.map(([i, l]) => `<button data-act="${l}"><i class="ph-bold ph-${i}"></i>${l}</button>`).join('')}</div>` : ''}</div>`; };
-const pushHtml = (ago) => `<div class="nt"><img src="${ICON}" alt=""><div><b>Sprout<small>${ago}</small></b><p><strong>Alex arrives in 30 minutes</strong><br>Dinner at Olive &amp; Ember is at 7:15. Dana has this too.</p></div></div>`;
+const pushHtml = (ago) => `<div class="nt"><img src="${ICON}" alt=""><div><b>Sprout<small>${ago}</small></b><p><strong>Babysitter Alex arrives in 30 minutes</strong><br>Dinner at Olive &amp; Ember is at 7:15. Dana has this too.</p></div></div>`;
 const ago = m => m - 1095 < 1 ? 'now' : m - 1095 < 60 ? `${m - 1095}m ago` : `${Math.floor((m - 1095) / 60)}h ago`;
 const $ = s => document.querySelector(s);
 let cur = 1095, expanded = false;

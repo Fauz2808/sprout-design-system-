@@ -36,7 +36,7 @@ window.Sprout = (() => {
 
   function syncOrb(){ headOrb.classList.toggle('work', !!(current && current.typing)); }
   function makePlan(kind, o){
-    const p = { id: ++seq, kind, title: o.title, sub: o.sub, icon: o.icon, line: o.line || 'Just started', when: 'Now', attn: false, done: false, typing: false, started: Date.now() };
+    const p = { id: ++seq, kind, title: o.title, sub: o.sub, icon: o.icon, line: o.line || 'Just started', when: 'Now', attn: false, done: false, typing: false, started: Date.now(), touched: Date.now() };
     p.chat = el('<div class="chat" hidden></div>'); views.appendChild(p.chat);
     p.scroll = () => requestAnimationFrame(() => p.chat.scrollTo({ top: p.chat.scrollHeight, behavior: 'smooth' }));
     p.add = n => { p.chat.appendChild(n); p.scroll(); return n; };
@@ -48,7 +48,7 @@ window.Sprout = (() => {
     };
     p.me = text => p.add(el(`<div class="row me"><div class="bub">${text}</div></div>`));
     p.block = html => p.add(el(`<div class="row indent">${html}</div>`));
-    p.set = (line, extra = {}) => { Object.assign(p, { line }, extra); renderHome(); };
+    p.set = (line, extra = {}) => { Object.assign(p, { line, touched: Date.now() }, extra); renderHome(); };
     /* chips under a message or card. The tapped chip turns green, the rest fade; the parent's answer
        appears as their bubble (same as SSC). stub = chips that only show "Not part of this demo". */
     p.chips = (opts, { echo = true, stub = [], into = null } = {}) => new Promise(res => {
@@ -127,7 +127,9 @@ window.Sprout = (() => {
   }
 
   /* ---------- the in-card question (SSC registration card) ---------- */
-  const fieldRow = (f, tag = '') => `<div class="field${tag === 'Just now' ? ' new' : ''}"><div><div class="l">${f.l}</div><div class="v">${f.v}</div>${f.s ? `<div class="fs">${f.s}</div>` : ''}</div><span class="s">${tag} <i class="ph ph-pencil-simple"></i></span></div>`;
+  /* a field row. f.opts = fixed choices (one), f.multi = several of f.opts, f.ro = read only (no pencil) */
+  const attr = v => String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  const fieldRow = (f, tag = '') => `<div class="field${tag === 'Just now' ? ' new' : ''}"${f.opts ? ` data-opts="${attr(JSON.stringify(f.opts))}"` : ''}${f.multi ? ' data-multi="1"' : ''}${f.ro ? ' data-ro="1"' : ''}><div><div class="l">${f.l}</div><div class="v">${f.v}</div>${f.s ? `<div class="fs">${f.s}</div>` : ''}</div><span class="s">${tag}${f.ro ? '' : ' <i class="ph ph-pencil-simple"></i>'}</span></div>`;
   function ask(p, card, q, opts, stub = {}){
     return new Promise(res => {
       const wrap = card.querySelector('.qwrap'); wrap.innerHTML = '';
@@ -139,12 +141,39 @@ window.Sprout = (() => {
       });
     });
   }
+  /* the field editor (bottom sheet, Save in the footer): choices as pick rows, otherwise a text box. Saving updates the
+     row in place, tags it Edited, and fires 'edited' on the row so a flow can react (new weeks change the price). */
+  function editField(row){
+    if (row.dataset.ro) return;
+    const label = row.querySelector('.l').textContent, vEl = row.querySelector('.v'), cur = vEl.textContent;
+    const opts = row.dataset.opts ? JSON.parse(row.dataset.opts) : null, multi = !!row.dataset.multi;
+    const now = new Set(multi ? cur.replace(' and ', ', ').split(', ').map(x => x.trim()) : [cur]);
+    const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+    const v = bsheet({ body:`<div class="bh"><span class="icotile"><i class="ph ph-pencil-simple"></i></span><b>${esc(label)}</b></div>
+      ${opts ? `<div class="list">${opts.map((o, i) => `<button type="button" class="pick${now.has(o) ? ' on' : ''}" data-i="${i}"><span class="ptx">${esc(o)}</span><span class="cb${multi ? '' : ' rd'}"><i class="ph-bold ph-check"></i></span></button>`).join('')}</div>`
+        : cur.length > 40 ? `<textarea class="edt" rows="3">${esc(cur)}</textarea>` : `<label class="field in" style="margin:0"><div style="width:100%"><input value="${esc(cur)}" autocomplete="off"></div></label>`}`,
+      foot:'<button type="button" class="btn" data-save>Save</button>' });
+    const picks = [...v.o.querySelectorAll('.list .pick')];
+    picks.forEach(b => b.onclick = () => { if (multi) b.classList.toggle('on'); else picks.forEach(x => x.classList.toggle('on', x === b)); });
+    const input = v.o.querySelector('input, textarea'); if (input) setTimeout(() => input.focus(), 350);
+    v.o.querySelector('[data-save]').onclick = () => {
+      let val;
+      if (opts) { const on = picks.filter(b => b.classList.contains('on')).map(b => opts[+b.dataset.i]); if (!on.length) return toast('Pick at least one');
+        val = multi ? (on.length > 1 ? on.slice(0, -1).join(', ') + ' and ' + on[on.length - 1] : on[0]) : on[0]; }
+      else { val = input.value.trim(); if (!val) return toast(`${label} can’t be empty`); }
+      v.close();
+      if (val === cur) return;
+      vEl.textContent = val;
+      const tag = row.querySelector('.s'); tag.innerHTML = 'Edited <i class="ph ph-pencil-simple"></i>';
+      row.dispatchEvent(new CustomEvent('edited', { bubbles:true, detail:{ label, value:val, picks: opts ? picks.filter(b => b.classList.contains('on')).map(b => opts[+b.dataset.i]) : null } }));
+    };
+  }
   function addField(card, f){
     card.querySelectorAll('.field.new').forEach(x => x.classList.remove('new'));
     const r = card.querySelector('.fields').appendChild(el(fieldRow(f, 'Just now')));
-    r.querySelector('.s').onclick = () => toast('Editing is not part of this demo');
+    r.querySelector('.s').onclick = () => editField(r);
   }
-  function editHint(card){ card.querySelectorAll('.field .s').forEach(x => x.onclick = () => toast('Editing is not part of this demo')); }
+  function editHint(card){ card.querySelectorAll('.field .s').forEach(x => x.onclick = () => editField(x.closest('.field'))); }
 
   /* ---------- overlays: the SSC waiver / Full details sheet ---------- */
   function overlay({ title, sub = '', body = '', foot = '', plain = true, label, id = '', instant = false }){
@@ -325,7 +354,7 @@ window.Sprout = (() => {
         + uHead('Sitters and nights out') + uGrid(T.nights, 'w')
         + uHead('Find for your kids') + uGrid(T.kids, 's');
     homeView.innerHTML = `<div class="home uhome">
-      <div class="ugreet"><b>What can I take off your plate?</b><span>Tell me like you’d text Dana. I’ll sort it out.</span></div>
+      <div class="ugreet"><b>What can I take off your plate?</b><span>I can get these done for you in a few taps.</span></div>
       ${body}
       ${uHead('Saved details')}
       <button class="status" data-wallet><span class="icotile uill"><img src="${ill('wallet')}" alt=""></span><div class="stxt"><span>Accounts and cards</span><small>${wallet.accounts.length} account${wallet.accounts.length === 1 ? '' : 's'} · ${wallet.cards.length} cards</small></div><i class="ph ph-caret-right" style="margin-left:auto;color:var(--subtle)"></i></button>
@@ -340,7 +369,8 @@ window.Sprout = (() => {
   const EIGHT = {
     plan: [
       { k:'playdate', t:'Playdate', e:'Plan a playdate', ill:'club' },
-      { k:'sitterC1', t:'Book a sitter', e:'Book a sitter', ill:'sitter' },
+      { k:'sitterC1', t:'Babysitter', e:'Book a sitter', ill:'sitter' },   // N2 (Tony, 20 Nov): "babysitter, not book a sitter"
+      { k:'carpool', t:'Carpool', e:'Set up a carpool', ill:'carpool' },
       { k:'dateE', t:'Date night', e:'Plan a date night', ill:'date-night' },
       { k:'party', t:'Birthday', e:'Plan a birthday party', ill:'event' },
     ],
@@ -352,16 +382,27 @@ window.Sprout = (() => {
     ],
   };
   const KIND_ILL = { playdate:'club', sitterC1:'sitter', ownSitters:'sitter', classSitters:'sitter', shareSitter:'sitter',
-    dateE:'date-night', dateD:'date-night', nightOut:'date-night', party:'event', event:'event', sports:'sports', camps:'camps' };
+    dateE:'date-night', dateD:'date-night', nightOut:'date-night', party:'event', event:'event', sports:'sports', camps:'camps',
+    carpool:'carpool' };
   const eTile = (t, big) => `<button class="ut ${big ? 'ut-p' : 'ut-s'}" data-k="${t.k}" data-echo="${t.e}" aria-label="${t.t}"><img src="${ill(t.ill)}" alt=""><b>${t.t}</b></button>`;
-  const goRow = p => `<button class="status grow${p.attn ? ' attn' : ''}" data-plan="${p.id}"><span class="icotile uill"><img src="${ill(KIND_ILL[p.kind] || 'event')}" alt=""></span>
-    <div class="stxt"><span>${p.title}</span><small>${p.line}</small></div><em class="gpill">${p.attn ? 'Needs you' : 'In progress'}</em></button>`;
+  /* N3 (Tony, 20 Nov): "If it's been a while, is it still gonna say just started?" The line under the title is the
+     plan's latest status plus how long ago it moved; a plan with a deadline (camps, sports) says when it closes. */
+  const ago = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)}h ago` : m < 2880 ? 'yesterday' : `${Math.round(m / 1440)} days ago`; };
+  const goLine = p => p.line === 'Just started' ? (Date.now() - p.started < 60000 ? 'Just started' : `Started ${ago(p.started)}`) : `${p.line} · ${ago(p.touched || p.started)}`;
+  const goPill = p => p.attn ? 'Needs you' : p.closes ? `Closes ${p.closes}` : 'In progress';
+  const goRow = p => `<button class="status grow${p.attn ? ' attn' : ''}${p.closes && !p.attn ? ' soon' : ''}" data-plan="${p.id}"><span class="icotile uill"><img src="${ill(KIND_ILL[p.kind] || 'event')}" alt=""></span>
+    <div class="stxt"><span>${p.title}</span><small>${goLine(p)}</small></div><em class="gpill">${goPill(p)}</em></button>`;
+  /* N14 (Tony, 20 Nov, Uber Services as the reference): Plan something is three tiles, then two wide ones.
+     "You could do playdate, babysitter, carpool. Then Date Night, Birthday." Replaces the 2 × 2 / all-small versions
+     and the separate Carpool row (N13). Register my kids stays four small tiles. */
+  const wTile = t => `<button class="ut ut-p uw" data-k="${t.k}" data-echo="${t.e}" aria-label="${t.t}"><img src="${ill(t.ill)}" alt=""><b>${t.t}</b></button>`;
   function renderEight(){
     const going = activePlans().sort((a, b) => (b.attn - a.attn) || (b.started - a.started));
     homeView.innerHTML = `<div class="home uhome">
-      <div class="ugreet"><b>What can I take off your plate?</b><span>Tell me like you’d text Dana. I’ll sort it out.</span></div>
+      <div class="ugreet"><b>What can I take off your plate?</b><span>I can get these done for you in a few taps.</span></div>
       ${going.length ? uHead('Pick up where you left off') + `<div class="going">${going.map(goRow).join('')}</div>` : ''}
-      ${uHead('Plan something')}<div class="ugrid ug-p">${EIGHT.plan.map(t => eTile(t, true)).join('')}</div>
+      ${uHead('Plan something')}<div class="ugrid ug-m">${EIGHT.plan.slice(0, 3).map(t => `<button class="ut ut-m" data-k="${t.k}" data-echo="${t.e}" aria-label="${t.t}"><img src="${ill(t.ill)}" alt=""><b>${t.t}</b></button>`).join('')}</div>
+      <div class="ugrid ug-p" style="margin-top:8px">${EIGHT.plan.slice(3).map(wTile).join('')}</div>
       ${uHead('Register my kids')}<div class="ugrid ug-s">${EIGHT.kids.map(t => eTile(t)).join('')}</div>
       ${uHead('Saved details')}
       <button class="status" data-wallet><span class="icotile uill"><img src="${ill('wallet')}" alt=""></span><div class="stxt"><span>Accounts and cards</span><small>${wallet.accounts.length} account${wallet.accounts.length === 1 ? '' : 's'} · ${wallet.cards.length} cards</small></div><i class="ph ph-caret-right" style="margin-left:auto;color:var(--subtle)"></i></button>
@@ -375,7 +416,7 @@ window.Sprout = (() => {
     if (HOME === 'a' || HOME === 'b') return renderUber();
     if (HOME !== 'old') return renderEight();
     homeView.innerHTML = `<div class="home">
-      <div class="greet"><b>What can I take off your plate?</b><span>Tell me like you’d text Dana. I’ll sort it out.</span></div>
+      <div class="greet"><b>What can I take off your plate?</b><span>I can get these done for you in a few taps.</span></div>
       <div class="slabel">Everyday</div><div class="tiles">${TILES.everyday.map(tile).join('')}</div>
       <div class="slabel">Sitters and nights out</div><div class="tiles">${TILES.nights.map(tile).join('')}</div>
       <div class="slabel">Find for your kids</div><div class="tiles">${TILES.kids.map(tile).join('')}</div>
@@ -645,8 +686,9 @@ window.Sprout = (() => {
 
   /* ---------- sheet + views ---------- */
   function hideAll(){ homeView.hidden = true; plans.forEach(p => p.chat.hidden = true); }
-  function showHome(){ hideAll(); current = null; homeView.hidden = false; homeView.scrollTop = 0; hsub.textContent = 'Here for you and Dana'; renderHome(); syncOrb(); applyComposer(); }
-  function showPlan(p){ if (!p) return showHome(); hideAll(); current = p; p.chat.hidden = false; hsub.textContent = p.sub; p.attnSeen = true; if (p.attn) { p.attn = false; renderHome(); } syncOrb(); applyComposer(); p.scroll(); }
+  /* N12 (Tony, 20 Nov): "remove the ask Sprout anything bar on this. I don't want people to type from this page." */
+  function showHome(){ hideAll(); current = null; homeView.hidden = false; $('#composer').hidden = true; homeView.scrollTop = 0; hsub.textContent = 'Here for you and Dana'; renderHome(); syncOrb(); applyComposer(); }
+  function showPlan(p){ if (!p) return showHome(); hideAll(); current = p; p.chat.hidden = false; $('#composer').hidden = false; hsub.textContent = p.sub; p.attnSeen = true; if (p.attn) { p.attn = false; renderHome(); } syncOrb(); applyComposer(); p.scroll(); }
   function openSheet(){ sheet.classList.add('on'); scrim.classList.add('on'); }
   function closeSheet(){
     sheet.classList.remove('on'); scrim.classList.remove('on');
@@ -668,7 +710,7 @@ window.Sprout = (() => {
   const flows = {};
   const META = {
     sports: { title:'Fall soccer · Jake', sub:'Fall soccer · Jake', icon:'sports' },
-    camps: { title:'Summer camp · Maya', sub:'Summer camps · Maya', icon:'camps' },
+    camps: { title:'Summer camps', sub:'Summer camps', icon:'camps' },
     ownSitters: { title:'Sitter for Saturday', sub:'Sitter · Sat, Aug 1', icon:'person-plus' },
     classSitters: { title:'Sitter from class families', sub:'Sitter · Sat, Aug 1', icon:'two-people' },
     nightOut: { title:'Night out · Sat, Aug 1', sub:'Night out · Sat, Aug 1', icon:'calendar-check' },
@@ -684,6 +726,7 @@ window.Sprout = (() => {
     afterschool: { title:'After school', sub:'After school', icon:'afterschool' },
     tutoring: { title:'Tutoring', sub:'Tutoring', icon:'tutoring' },
     club: { title:'New club', sub:'Start a club', icon:'club' },
+    carpool: { title:'Carpool', sub:'Carpool', icon:'two-people' },
   };
   /* start a flow without opening Assist: the plan's chat fills in the background (ongoing sessions review state) */
   function startQuiet(kind, opt = {}){
@@ -724,7 +767,7 @@ window.Sprout = (() => {
   document.addEventListener('gesturestart', e => e.preventDefault());
   $('#restartBtn').onclick = () => location.reload();
 
-  return { pace: v => { PACE = v; }, startQuiet, TILES, $, sleep, el, toast, notInDemo, makePlan, start, flows, ask, addField, fieldRow, editHint, overlay, bsheet, faceId, approval, confirmSitter, closeSheet, providerAccount, wallet, notify, renderHome, renderPromo, renderDay, S, A, showPlan, showHome, openSheet, pickCard, openWallet, isOpen: () => sheet.classList.contains('on') };
+  return { pace: v => { PACE = v; }, startQuiet, TILES, $, sleep, el, toast, notInDemo, makePlan, start, flows, ask, addField, fieldRow, editHint, editField, overlay, bsheet, faceId, approval, confirmSitter, closeSheet, providerAccount, wallet, notify, renderHome, renderPromo, renderDay, S, A, showPlan, showHome, openSheet, pickCard, openWallet, isOpen: () => sheet.classList.contains('on') };
 })();
 
 /* notched bar edge (SSC, same geometry), redrawn on resize */

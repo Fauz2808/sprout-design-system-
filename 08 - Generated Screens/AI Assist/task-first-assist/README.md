@@ -1,6 +1,66 @@
-# Sprout Assist prototype (rebuilt 16 Nov 2026)
+# Sprout Assist prototype (rebuilt 16 Nov 2026, last review 20 Nov US)
 
 Live: https://sprout-assist-tasks.vercel.app/assist/ · local: `python3 build.py`, then serve `site/` (preview config `assist-tasks`, port 4330).
+
+## 20 Nov US · babysitter, for Mohit's build (MEETING-2026-11-21-tasks.md, S1–S7)
+
+All in `app/sitter-v3.js`. Try `/book-a-sitter/` (no sitters yet) and `/book-a-sitter-saved/?review=conversation`
+(Alex, then the demo clock to the payment).
+
+- **S1 Time** (`whenCard`, `dayAt`, `earliestToday`): the sitter day strip starts **today** (Mon Jul 27, the demo
+  clock's day, labelled "Today") and defaults to it. Today's earliest start is **now + 30 min, on the next half hour**;
+  earlier times and quick options are greyed out, with one line saying why. Other days are unchanged.
+- **S2 Where + notes** (`requestCard`): no re-confirming the time and kids just picked. First time: an empty Address
+  field (one autofill-style suggestion while typing) and optional Notes, real inputs, not pencils. After that
+  (`FAMILY.known`): the same fields filled from last time, "Looks right".
+- **S3 Add a sitter** (`pickContact`, `sitterFields`): "Choose from Contacts" (iOS picker look, made-up contacts) fills
+  name and number; rate optional; She / He kept; WhatsApp removed everywhere (Sam, Morgan now Messages).
+- **S4 Replies** (`smsIn`): each sitter's own words show in the group text with "Sprout read this". A sitter added
+  without a rate gives it in the reply. After a yes: **Book Casey**, **I'll reply to Casey myself** (Messages sheet
+  from your phone, Sprout on the To line; Sprout reads it and confirms), or Not yet.
+- **S5 Live Activity** (`laHtml`, `stops`, `laState`): "Babysitter Alex arrives in 30 min"; labels "Alex at 6 PM" /
+  "Home by 10 PM"; the bar runs first stop to last, inset the same on both sides, every label centred on its dot.
+  Same copy on `/date-night-live/`.
+- **S6 Pay, then rate** (`payCard`, `payTonight`): Pay Alex opens the pay card first: hours stepper (stayed late, in
+  half hours), tip No tip / 10 / 15 / 20%, total, card on file, **Pay Alex $X** or **Already paid (cash or Venmo)**
+  (replaces Decline). Paying texts the sitter the amount and tip. The rating comes after.
+- **S7 Payout link** (`payoutLink`): right after the booking text, Sprout texts the sitter a one-time link to add
+  their bank (Stripe, opens `/sitter-profile/`), only if they haven't yet.
+
+## 20 Nov · meeting + Tony's carpool order (MEETING-2026-11-20-tasks.md, N1–N8)
+
+`/review/` now has 12 phones: the home in both tile sizes, Plan something (with the other parent's side of a playdate),
+Register my kids, and Carpool.
+
+- **N1 Carpool** (`X.flows.carpool` in `app/sitter-v3.js`, `/plan-carpool/`, review page `/carpool/`). Tony's order, one
+  flow: `cpKind()` one time or regular → `cpWhen()` kid + date (regular: weekdays + until) + ONE pickup time, never a
+  range → `cpPlace()` pick up from, then drop off at (Home, School, Soccer, Summer camp, or an address; filtered by the
+  kid's registrations) → `cpWay()` one way or both ways (both asks the ride-back time) → families nearby whose kid does
+  the same activity (`cpGroup()`) → `cpSend()` the whole group chat or parents you pick (the parent grid). One time: the
+  first yes drives, others are told, no second confirm. Regular: everyone who says yes gets `rotaCard()` turns. The 19 Nov
+  A/B flows are gone; `/carpool-a/` and `/carpool-b/` open the new flow. Not on the home yet.
+- **N2 Home tile sizes**: `?home=small` puts Plan something in the same 4-across small tiles as Register my kids.
+  `/assist-home/` compares both, each with three plans in progress. "Book a sitter" is labelled "Babysitter".
+- **N3 Session labels** (`goLine()` / `goPill()` in `app/app.js`): the latest status plus how long ago it moved
+  ("· 2h ago", "· yesterday"), "Started 3 days ago" instead of a stale "Just started", and a plan with a deadline
+  (`p.closes`) shows an amber "Closes Fri" pill. `/assist-ongoing/` seeds a sitter (2h), a playdate (2 days) and a camp
+  sign-up that closes Friday.
+- **N4 Playdate**: quick times are 1.5–2 hours and the end stops at 4 hours (`whenCard` mode `playdate`).
+  `parentGrid()` shows the class as parent tiles, two per row, first 8 then Show all, with a search over parents and kids
+  (Maya's class 20, Jake's 14, made-up names). Birthday classmates and carpool use it too. `/playdate-invite/` (Ana's side)
+  gained "Can't make it" next to Confirm / Suggest another time / Reply.
+- **N5 Book a sitter**: "Book Alex · $25/hr" is the booking. The estimate card with its second Book button is gone; the
+  booked card shows the rate and "pay in Sprout when they're done".
+- **N6 Texts from the parent's phone** (`parentSends()`): reverses L3's `sproutAsks()`. Each sitter's Messages sheet
+  (`compose()`, sitter + Sprout on the To line, "1 of 3 · from your phone") opens in turn; Send opens the next. The
+  booking text and "we found someone" still come from Sprout in those threads.
+- **N7 Camps** (`app/flows.js`): `campListCard()` uses the shared map (`X.sv.partyResults`, exported from sitter-v3.js)
+  with camp cards (price, distance, weeks open, friends). Friends per week (`CAMPS[k].pals`) show on the weeks card, in
+  `campWeekSheet()` rows and in Remaining weeks open. Camp websites open `inAppBrowser()` over the chat, X returns.
+  Forms open with the kid's photo + "Maya's registration". New camp accounts ask the password (`campAccount()` →
+  `passwordPick()`). After Approve, `inCard()` says who's in plus one Gmail line; `openWeeksCard()` "Remaining weeks open"
+  lists only open weeks, preselected, booked weeks on one line.
+- **N8 After school**: programs on the same map (`afterMap()`), each card shows the friends signed up (`AFTER[].pals`).
 
 ## 19 Nov · Tony's review (MEETING-2026-11-19-tasks.md, L1–L8)
 
@@ -35,6 +95,40 @@ one line on what changed. The desk links beside the phone (`LINKS` in `app/flows
   Tutoring books a free 15-minute call first, then lessons. Programs and tutors (`AFTER`, `TUTORS`) are made-up samples.
 - **L8 Sitter profile**: name and number come from the thread (number shown, Change to edit), photo required, home ZIP
   only. Re-entry without login is a proposal on the done page (text "profile" in a thread), not decided.
+
+## M4 · Summer camps in Tony's order (19 Nov)
+
+Tony, 19 Nov chat: weeks first, then which kids, then camps kids from their school go to (details, pictures, pricing),
+register one kid and show the weeks, prefill the form + ask what's new, sign up, tell them which emails Sprout watches,
+then show the weeks still needed and repeat. `X.flows.camps` in `app/flows.js` (`/summer-camps/`, the Camps tile):
+`campWeeksCard()` (the K10 weeks strip, tappable, the family trip week blocked from the calendar) → `campKidsCard()` →
+`campListCard()` (ranked by classmates, Details opens `campSheet()` with photos) → `campWeekSheet()` for the kids
+already picked (Ahmad, 19 Nov: no second "who's going" question; For toggles leave a kid out; only weeks each kid still
+needs; full = Waitlist) → one message saying what each kid still needs → one form per kid showing every value Sprout
+has as its own editable field (Weeks re-prices the sign-up) → `campForm()` (asks only what `PROFILE`
+doesn't have; each kid signs each camp's waiver once; pickup is shared by the family) → `providerAccount()` (created
+once per camp, then reused) → Approve → `emailCard()` (real Gmail logo, two lines: forms and packing lists become to-dos, drop-off times go on the calendar) →
+`openWeeksCard()` (per week, who is covered where; tap weeks → the next round, or We're done for now).
+`CAMPS` and `SUMMER` are samples; Pinecrest, Barton Swim, Muddy Hands and Lakeside Art use the K10 Figma photos.
+
+## M3 · Carpool, one ride + weekly (19 Nov)
+
+Ahmad, 19 Nov: keep both kinds and take them to the meeting. Live at `/carpool/`, also on the private `/review-all/`.
+
+Tony, 19 Nov chat: "Also let's do a carpool flow today." Review page `/carpool/` (`app/carpool-review.html`), each
+direction alone at `/carpool-a/` and `/carpool-b/`. Flows in `app/sitter-v3.js` next to Playdate, built only from
+existing parts (Ahmad rejected a standalone mock board the same day: "follow the current design").
+- **A · one ride** (`X.flows.carpoolA`): Playdate's time card (+ For, Going to, Help with) → parent rows
+  (`familiesCard()`) → Sprout asks in each DM, first yes wins, the rest are told (M1) → Book a sitter's confirm card →
+  ride card on both calendars → Message opens `carpoolDM()`.
+- **B · weekly carpool** (`X.flows.carpoolB`): which run (`runCard()`, After school's options card, `RUNS` = SSC Saturday
+  soccer, school drop-off) → families → `rotaCard()` (one field row per turn, tap a turn → bottom sheet to change the
+  driver) → each family confirms in their DM → carpool card → the night before your turn: Got it / I can't drive
+  (the next driver after you takes it and you take theirs).
+- Families are Jake's SSC team (Priya, Aisha, Elena; the soccer card shows Priya and Aisha). Aisha says no in A.
+- Art: `assets/illus/carpool.webp`, generated 19 Nov in Figma `HlWjGHq9JNgKSHXvI8RFeD` (node 2:2, gpt-image-2.5) and cut
+  with the same rembg settings as the other 11 (`research/illustrations-2026-11-18/raw|cut/carpool.png`).
+- Not on the Assist home yet: where it starts is still open (a 9th tile breaks the 2 × 4 grid).
 
 ## Report links
 
@@ -123,6 +217,10 @@ CHAT-10 chrome with prototype messages. `shareClassSitter()` shares Taylor or op
 use `markSheet()` for an outside reply, and simulates Sprout texting the booking and follow-up in those
 threads. Try `/sitter-v3/`, `/sitter-v3-none/` or the sitter step on `/date-night-v3/`.
 
+M1 (Tony, 19 Nov chat): once a sitter is booked, Sprout texts every other sitter it asked, except those who
+already said no, that the family found someone. The parent is not asked first; a status row and the message
+preview tell them it was sent. Tony: "we don't want to create confusion for the sitter".
+
 ## J3 · Text Dana the plan (18 Nov)
 
 `sendAndBook()` and the We're covered branch of `X.flows.dateE` open `compose()` with the booked
@@ -207,7 +305,7 @@ whose parts are the approved SSC Kids demo (`../ssc-kids-signup-demo/prototype/i
 | Parent answers | dark green bubble | right; always the exact label they tapped |
 | Pick one option | chips | directly under the card or message they answer, left-aligned with the card |
 | A question about a card | `.q` box inside the card with chips | inside the card, one question at a time; the answer becomes a "Just now" field row |
-| Edit a field on a card | field pencil and its editor | open the field editor directly and update the original card in place |
+| Edit a field on a card | field pencil and its editor | `editField()` in `app/app.js` (19 Nov): choices (`f.opts`, `f.multi`) as pick rows, otherwise a text box; Save updates the card in place, tags it Edited and fires `edited` so the flow can react. `f.ro` = no pencil. Never the "Editing is not part of this demo" toast |
 | Pick several | pick rows with checkboxes + one full-width green button that says what happens ("Ask Maria and Sam", "Sign up for 2 weeks · $990") | button at the bottom of the card; skip/alternative as a chip under it |
 | Sprout working | status row: spinner → icon + check | under the last message |
 | Money | Approve payment card: lines, total, tappable card row, "Waiting for you or Dana", Decline (ghost) + Approve $X (green) side by side, then Face ID | inside the card |
@@ -243,7 +341,7 @@ Everything is sample data. Nothing is sent, booked or charged.
 | Flow | Source | Notes |
 |---|---|---|
 | Soccer | SSC demo (Tony-approved), copy unchanged | Branches from K12 v2 `15492:51581`: Remind me later (M·1/M·2), Not this season (Q·1–Q·3), password sheet R·1/R·2 |
-| Summer camps | K10 v3 `15524:43294` | Map entry P·1, details sheet D·1, week picker P·4, form P·5–P·8 + waiver sheet X·3, profile P·9, account A·1–A·3, sign-up day P·10–P·12, Jake P·13–P·14, more weeks P·15/P·16/X·5/X·7, others P·2/P·3/X·1, not now Q·2 |
+| Summer camps | Tony's order (19 Nov chat, M4) on K10 v3 `15524:43294` parts | Weeks strip P·15 (now step 1) → which kids → camp rows with classmates + details sheet D·1 → one kid → week sheet P·4 → form P·5–P·8 + waiver X·3 → account A·1–A·3 → Approve → emails Sprout watches → open weeks → loop. The Friday sign-up-day hold (P·10–P·12) is gone |
 | Ask my sitters / class families | A8 `16151:356321` (Ahmad chose A with B fallback, 14 Nov) | Rebuilt with SSC parts, not A8's full-width rows; confirm card = SSC approval card without payment |
 | Plan an event | K4 row F `14892:33651` | Birthday F·1–F·11 (J8 tap-through, covers, event card, invite link, class headcount), playdate F·12–F·16 |
 | Start a club | K4 row G | G·1–G·11 |

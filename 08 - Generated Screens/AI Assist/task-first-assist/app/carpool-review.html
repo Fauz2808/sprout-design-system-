@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Carpool</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  /* N1 (Tony, 20 Nov chat): one carpool flow in his order. Replaced M3's A/B (19 Nov).
+     Both phones run the real flows in the Assist engine (X.flows.carpoolA / carpoolB in app/sitter-v3.js),
+     built only from parts the approved flows use. Same page style as /review/. */
+  :root{--bg:#f4f1ea;--ink:#1d2a22;--sub:#5d675f;--line:#e2ddd2;--brand:#186338;--tint:#e3efe6;--k:.72;--w:283px}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif}
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 32px 56px}
+  .tag{display:inline-block;font:600 12px Inter;letter-spacing:.04em;color:var(--brand);background:var(--tint);border-radius:999px;padding:3px 10px}
+  h1{font:600 30px 'Playfair Display',serif;margin:10px 0 6px}
+  .lede{margin:0 0 22px;color:var(--sub);max-width:780px}
+  h3{font:600 13px Inter;letter-spacing:.04em;text-transform:uppercase;color:var(--sub);margin:0 0 12px}
+  .art{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin:0 0 30px}
+  .art figure{margin:0;text-align:center;font-size:12px;color:var(--sub)}
+  .art img{width:72px;height:72px;display:block;margin:0 auto 4px;background:#fff;border-radius:16px;padding:8px;box-shadow:0 0 0 1px var(--line)}
+  .art figure.new img{box-shadow:0 0 0 2px var(--brand)}
+  .art figure.new{color:var(--brand);font-weight:600}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,var(--w));gap:34px 44px;justify-content:start}
+  .item{display:flex;flex-direction:column}
+  .n{font:600 12px Inter;color:var(--brand)}
+  h2{font:600 19px/1.25 'Playfair Display',serif;margin:2px 0 4px}
+  .item p{margin:0 0 10px;color:var(--sub);font-size:13px;min-height:118px}
+  .item ul{margin:0 0 12px;padding-left:18px;color:var(--sub);font-size:12.5px;min-height:96px}
+  .frame{width:var(--w);height:calc(852px * var(--k));border-radius:calc(54px * var(--k));overflow:hidden;box-shadow:0 0 0 3px #d9d4c9,0 18px 50px rgba(0,0,0,.10);background:#fff}
+  iframe{width:393px;height:852px;border:0;transform:scale(var(--k));transform-origin:0 0;display:block}
+  .bar{display:flex;justify-content:space-between;margin-top:8px}
+  .bar a,.bar button{font:500 13px Inter;color:var(--brand);background:none;border:0;padding:2px 0;cursor:pointer;text-decoration:none}
+  .decide{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);max-width:860px}
+  .decide h2{margin:0 0 8px}
+  .decide ol{margin:0;padding-left:20px;color:var(--ink)}
+  .decide li{margin:7px 0}
+  .decide li span{color:var(--sub)}
+  .rec{margin-top:16px;padding:12px 14px;background:var(--tint);border-radius:12px}
+  .note{margin-top:18px;color:var(--sub);font-size:13px}
+  @media (max-width:640px){ .wrap{padding:20px 16px 40px} :root{--k:.82;--w:322px} .grid{justify-content:center} .item p,.item ul{min-height:0} }
+</style>
+</head>
+<body><div class="wrap">
+  <span class="tag">Review page · not part of the app</span>
+  <h1>Carpool</h1>
+  <p class="lede">Tony wrote out the order on 20 Nov. One flow covers a single ride and a regular carpool, built from the parts the other flows use.</p>
+
+  <h3>Tile art · new carpool illustration in the same set</h3>
+  <div class="art">
+    <figure><img src="/assets/illus/club.webp" alt="">Playdate</figure>
+    <figure><img src="/assets/illus/sitter.webp" alt="">Book a sitter</figure>
+    <figure><img src="/assets/illus/date-night.webp" alt="">Date night</figure>
+    <figure><img src="/assets/illus/event.webp" alt="">Birthday</figure>
+    <figure><img src="/assets/illus/sports.webp" alt="">Sports</figure>
+    <figure><img src="/assets/illus/afterschool.webp" alt="">After school</figure>
+    <figure><img src="/assets/illus/camps.webp" alt="">Camps</figure>
+    <figure><img src="/assets/illus/tutoring.webp" alt="">Tutoring</figure>
+    <figure class="new"><img src="/assets/illus/carpool.webp" alt="">Carpool · new</figure>
+  </div>
+
+  <div class="grid">
+    <div class="item"><span class="n">20 Nov</span><h2>Carpool, in Tony’s order</h2>
+      <p>One time or regular, then the date (regular: the days and until when) and one pickup time, never a range. Pick up from and drop off at come from what Sprout registered (Home, School, Soccer, Summer camp, or an address). One way or both ways. Then the families nearby whose kids do the same activity, and the whole group chat or parents you pick.</p>
+      <ul><li>One time: the first yes drives, the others are told, nobody confirms twice</li><li>Regular: everyone who says yes gets turns; tap a turn to change who drives</li><li>Parent tiles are the same as Playdate’s</li></ul>
+      <div class="frame"><iframe src="/plan-carpool/" title="Carpool"></iframe></div>
+      <div class="bar"><button data-r>Start over</button><a href="/plan-carpool/" target="_blank">Open full screen</a></div></div>
+  </div>
+
+  <div class="decide">
+    <h2>Still open</h2>
+    <ol>
+      <li><b>Where it starts.</b> <span>Not one of the eight home tiles yet. A 9th tile, part of Register my kids, or from an activity in the Daily Brief?</span></li>
+      <li><b>Families not on Sprout.</b> <span>The group chat reaches the families who are; others would need a text from your phone, like sitters.</span></li>
+    </ol>
+    <p class="note">Families, distances and replies are samples; nothing is sent. The 19 Nov one ride / weekly links (/carpool-a/, /carpool-b/) open this flow now.</p>
+  </div>
+</div>
+<script>
+  document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { const f = b.closest('.item').querySelector('iframe'); f.src = f.getAttribute('src'); });
+</script>
+</body></html>

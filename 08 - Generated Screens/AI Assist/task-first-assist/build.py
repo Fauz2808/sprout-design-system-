@@ -24,7 +24,8 @@ ROUTES = ['assist', 'sports', 'summer-camps', 'own-sitters', 'class-families', '
           'sitter-profile',
           'playdate', 'playdate-new-time', 'playdate-cant', 'playdate-invite',
           'ui-a', 'ui-b', 'ui-c', 'pay-todo', 'happening-am', 'happening-pm',
-          'book-a-sitter', 'book-a-sitter-saved', 'plan-a-date-night', 'booked-evening', 'chat-history', 'add-account', 'assist-ongoing', 'after-school', 'tutoring']
+          'book-a-sitter', 'book-a-sitter-saved', 'plan-a-date-night', 'booked-evening', 'chat-history', 'add-account', 'assist-ongoing', 'after-school', 'tutoring',
+          'carpool-a', 'carpool-b', 'plan-carpool']
 
 ssc = SSC.read_text()
 css = re.search(r'<style>(.*?)</style>', ssc, re.S).group(1)
@@ -62,6 +63,11 @@ if (APP / 'sprout-map.html').exists():   # I1 (17 Nov): whole-Sprout map; data i
     (SITE / 'sprout-map').mkdir(exist_ok=True)
     (SITE / 'sprout-map' / 'index.html').write_text((APP / 'sprout-map.html').read_text())
     if (APP / 'sprout-map-data.js').exists(): shutil.copy2(APP / 'sprout-map-data.js', SITE / 'sprout-map-data.js')
+# 20 Nov (Ahmad): both sides of a request, for presenting; /receiver/?v=... is the other parent's (or sitter's) phone
+(SITE / 'other-side').mkdir(exist_ok=True)
+(SITE / 'other-side' / 'index.html').write_text((APP / 'other-side.html').read_text())
+(SITE / 'receiver').mkdir(exist_ok=True)
+(SITE / 'receiver' / 'index.html').write_text((APP / 'receiver.html').read_text())
 (SITE / 'sitter-reply').mkdir(exist_ok=True)
 (SITE / 'sitter-reply' / 'index.html').write_text((APP / 'sitter-reply.html').read_text())
 (SITE / 'sitter-profile' / 'index.html').write_text((APP / 'sitter-profile.html').read_text())
@@ -73,6 +79,12 @@ if (APP / 'sprout-map.html').exists():   # I1 (17 Nov): whole-Sprout map; data i
 # L2 (19 Nov): the one link for Tony, every flow from its start
 (SITE / 'review').mkdir(exist_ok=True)
 (SITE / 'review' / 'index.html').write_text((APP / 'review.html').read_text())
+# M3 (19 Nov): carpool directions A + B side by side, review only until Ahmad picks one
+(SITE / 'carpool').mkdir(exist_ok=True)
+(SITE / 'carpool' / 'index.html').write_text((APP / 'carpool-review.html').read_text())
+# Ahmad (19 Nov): the pre-M2 page with every review state, private, not linked from /review/
+(SITE / 'review-all').mkdir(exist_ok=True)
+(SITE / 'review-all' / 'index.html').write_text((APP / 'review-all.html').read_text())
 (SITE / 'sitter-date-night').mkdir(exist_ok=True)
 (SITE / 'sitter-date-night' / 'index.html').write_text((APP / 'sitter-review.html').read_text())
 (SITE / 'date-night' / 'index.html').write_text((APP / 'date-night-review.html').read_text().replace('?v=0', '?v=' + v))

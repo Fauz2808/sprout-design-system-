@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Assist home · services grid</title>
+<title>Assist home · tile sizes</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#f4f1ea;--ink:#1d2a22;--sub:#5d675f;--line:#e2ddd2;--brand:#186338;--tint:#e3efe6;--k:.8;--w:314px}
@@ -30,15 +30,10 @@
 </style>
 </head>
 <body><div class="wrap">
-  <h1>Assist home: services grid</h1>
-  <p class="lede">Tony, 18 Nov: “I want to use custom illustrations for each and make it more like an Uber services layout.” Each tile now has its own clay illustration, drawn in the same palette as the existing clay set. Both directions use Uber’s tile anatomy: a big object, a short label, and a badge on the top edge. They differ in what sits on top. Every tile opens its real flow.</p>
-  <div class="grid">
-    <div class="head"><span class="tag old">Now</span><h2>Current home</h2><p>Two across, small clay icon, title and subtitle on every tile.</p></div>
-    <div class="head"><span class="tag">A · Same groups</span><h2>Uber tiles, today’s three groups</h2><p>Everyday and kids as 4-across rows; sitter and date night as two wide tiles with a subtitle.</p></div>
-    <div class="head"><span class="tag">B · Popular first</span><h2>Uber rhythm, bookings up top</h2><p>Sitter, date night and sports (the flows that book and pay) as one big row, then the rest by group.</p></div>
-    <div><div class="frame"><iframe src="/assist/" title="Current home"></iframe></div><div class="bar"><button data-r>Restart</button><a href="/assist/" target="_blank">Open alone</a></div></div>
-    <div><div class="frame"><iframe src="/assist/?home=a" title="Direction A"></iframe></div><div class="bar"><button data-r>Restart</button><a href="/assist/?home=a" target="_blank">Open alone</a></div></div>
-    <div><div class="frame"><iframe src="/assist/?home=b" title="Direction B"></iframe></div><div class="bar"><button data-r>Restart</button><a href="/assist/?home=b" target="_blank">Open alone</a></div></div>
+  <h1>Assist home</h1>
+  <p class="lede">Tony, 20 Nov, with Uber Services as the reference: “Maybe you do 3 things on the first row, then 2 on the next row... playdate, babysitter, carpool. Then Date Night, Birthday.” One plan in progress on top, so the rest of the page shows.</p>
+  <div class="grid" style="grid-template-columns:var(--w)">
+    <div><div class="frame"><iframe src="/assist-ongoing/" title="Assist home"></iframe></div><div class="bar"><button data-r>Restart</button><a href="/assist-ongoing/" target="_blank">Open alone</a></div></div>
   </div>
   <h3>The illustration set</h3>
   <p class="lede">Eleven new clay illustrations, one per tile plus the saved-details row. Masters (1024 px, transparent) are in <code>research/illustrations-2026-11-18/cut/</code>; Figma file “Sprout Assist · tile illustrations (18 Nov)”.</p>
@@ -46,7 +41,7 @@
 </div>
 <script>
   const root = document.documentElement;
-  const fit = () => { const k = Math.max(.55, Math.min(.85, (Math.min(innerWidth, 1400) - 64 - 80) / 3 / 393, (innerHeight - 140) / 852)); root.style.setProperty('--k', k); root.style.setProperty('--w', 393 * k + 'px'); };
+  const fit = () => { const k = Math.max(.55, Math.min(.85, (Math.min(innerWidth, 1400) - 64 - 40) / 2 / 393, (innerHeight - 140) / 852)); root.style.setProperty('--k', k); root.style.setProperty('--w', 393 * k + 'px'); };
   addEventListener('resize', fit); fit();
   document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { const f = b.closest('div').parentElement.querySelector('iframe'); f.src = f.src; });
   const SET = [['remind','Reminder'],['event','Plan an event'],['club','Start a club'],['week','This week'],['sitter','Book a sitter'],['date-night','Date night'],

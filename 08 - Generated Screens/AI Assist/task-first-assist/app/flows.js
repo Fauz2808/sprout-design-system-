@@ -153,211 +153,436 @@ X.flows.sports = async p => {
   if (d === 0) await p.say("Anytime. I'll tell you when the team and schedule email comes in.", 800);
 };
 
-/* ======================= Summer camps · K10 v3 ======================= */
+/* ======================= Summer camps · M4 (Tony, 19 Nov chat, 4:26 AM) =======================
+   Tony's order: "display the various weeks and ask them to select the ones they need camps for. Then ask for which kids.
+   Then show some summer camps kids from their school are going to. Show details, pictures, pricing. Give them the option
+   to register a specific kid to the summer camp, then display the weeks. Pre-populate the form details we already have
+   + ask the questions. Sign them up. Once signup is complete, tell them about emails we will follow for them. Then it
+   should display other weeks needed to complete. Let the user click the next weeks they want to book for and follow a
+   similar flow to the original flow."
+   Parts are K10 v3's (camp rows with classmates, details sheet with photos, week sheet, form + waiver, Approve card,
+   the weeks strip), card headers use the clay tile art. Camps, spots and classmates are samples. */
+const illIco = n => `<span class="clayico" style="background-image:url(${A}illus/${n}.webp)"></span>`;
+const SUMMER = [
+  { id:'jun7', d:'June 7–11', s:'Jun 7' }, { id:'jun14', d:'June 14–18', s:'Jun 14' }, { id:'jun21', d:'June 21–25', s:'Jun 21' },
+  { id:'jun28', d:'June 28 – July 2', s:'Jun 28' }, { id:'jul5', d:'July 5–9', s:'Jul 5', away:'Family trip' },
+  { id:'jul12', d:'July 12–16', s:'Jul 12' }, { id:'jul19', d:'July 19–23', s:'Jul 19' }, { id:'jul26', d:'July 26–30', s:'Jul 26' }, { id:'aug2', d:'Aug 2–6', s:'Aug 2' },
+];
+const WK = id => SUMMER.find(w => w.id === id);
+const noFriends = { faces:[], plus:0, who:'' };
 const CAMPS = {
-  pinecrest: { n:'Pinecrest Day Camp', short:'Pinecrest', img:A + 'camp/pinecrest.webp', hero:F + 'pinecrest-hero.jpg', gal:[F + 'pinecrest-hero.jpg', F + 'pinecrest-2.jpg', F + 'pinecrest-3.jpg'], price:420, where:'2 mi from home', kind:'Outdoors', site:'pinecrestcamp.org',
-    who:'Priya, Aisha + 2', faces:['priya.webp', 'aisha.webp'], plus:2,
-    weeks:[['June 7–11', '4 from Maya’s class · 4 spots left', 'on'], ['June 14–18', '9 spots left', 'on'], ['June 21–25', 'Full', 'full'], ['June 28 – July 2', '12 spots left', '']] },
-  barton: { n:'Barton Swim Camp', short:'Barton Swim', img:F + 'barton-swim.jpg', hero:F + 'barton-swim.jpg', gal:[F + 'barton-swim.jpg', F + 'pinecrest-2.jpg', F + 'pinecrest-3.jpg'], price:310, where:'1.5 mi from home', kind:'Swim', site:'bartonswim.org',
-    who:'Marcus (Eli’s dad)', faces:['elena.webp'], plus:0, spots:'6 spots left',
-    weeks:[['June 7–11', 'Eli from Maya’s class · 6 spots left', 'on'], ['June 14–18', '8 spots left', ''], ['June 21–25', '10 spots left', '']] },
+  pinecrest: { n:'Pinecrest Day Camp', short:'Pinecrest', img:A + 'camp/pinecrest.webp', gal:[F + 'pinecrest-hero.jpg', F + 'pinecrest-2.jpg', F + 'pinecrest-3.jpg'], price:420, mi:'2 mi from home', miles:2, ll:[30.2205,-97.8063], pals:{ jun7:['Leo', 'Ava', 'Noah'], jun14:['Leo', 'Lily', 'Zoe'], jun28:['Zoe'] },
+    kind:'Outdoor day camp', what:'Hiking, creek days, crafts · swim on Fridays', ages:[5, 10], site:'pinecrestcamp.org', swim:true,
+    friends:{ Maya:{ faces:['priya.webp', 'aisha.webp'], plus:2, who:'4 from Maya’s class' }, Jake:{ faces:['elena.webp'], plus:0, who:'Noah from Jake’s class' } },
+    weeks:{ jun7:'4 spots left', jun14:'9 spots left', jun21:'full', jun28:'12 spots left', jul12:'10 spots left', jul19:'full', jul26:'8 spots left', aug2:'14 spots left' },
+    hot:{ Maya:['jun7', 'jun14'], Jake:['jun7'] } },
+  barton: { n:'Barton Swim Camp', short:'Barton Swim', img:F + 'barton-swim.jpg', gal:[F + 'barton-swim.jpg'], price:310, mi:'1.5 mi from home', miles:1.5, ll:[30.2196,-97.8186], pals:{ jun21:['Leo'] },
+    kind:'Swim day camp', what:'Swim lessons every morning · games after lunch', ages:[5, 9], site:'bartonswim.org', swim:true,
+    friends:{ Maya:{ faces:['priya.webp'], plus:0, who:'Leo from Maya’s class' }, Jake:noFriends },
+    weeks:{ jun7:'6 spots left', jun14:'8 spots left', jun21:'10 spots left', jun28:'5 spots left', jul12:'7 spots left' },
+    hot:{ Maya:['jun21'], Jake:[] } },
+  muddy: { n:'Muddy Hands Clay Camp', short:'Muddy Hands', img:F + 'muddy-hands.jpg', gal:[F + 'muddy-hands.jpg'], price:380, mi:'2.8 mi from home', miles:2.8, ll:[30.1962,-97.8762], pals:{ jun21:['Noah', 'Max'], jul12:['Noah'] },
+    kind:'Clay and garden camp', what:'Clay, garden and a mud kitchen · 9 AM–1 PM', ages:[4, 8], site:'muddyhandsatx.org',
+    friends:{ Maya:noFriends, Jake:{ faces:['elena.webp'], plus:1, who:'2 from Jake’s class' } },
+    weeks:{ jun14:'5 spots left', jun21:'7 spots left', jun28:'3 spots left', jul12:'6 spots left', jul19:'4 spots left', aug2:'9 spots left' },
+    hot:{ Maya:[], Jake:['jun21', 'jul12'] } },
+  lakeside: { n:'Lakeside Art Camp', short:'Lakeside Art', img:F + 'lakeside-art.jpg', gal:[F + 'lakeside-art.jpg'], price:530, mi:'3.4 mi from home', miles:3.4, ll:[30.1652,-97.7897], pals:{ jun28:['Ava', 'Mia'], jul26:['Ava'] },
+    kind:'Art day camp', what:'Painting, clay and a show for parents on Friday', ages:[6, 12], site:'lakesideart.org',
+    friends:{ Maya:{ faces:['aisha.webp'], plus:1, who:'2 from Maya’s class' }, Jake:noFriends },
+    weeks:{ jun14:'3 spots left', jun28:'6 spots left', jul19:'9 spots left', jul26:'4 spots left' },
+    hot:{ Maya:['jun28', 'jul26'], Jake:[] } },
 };
-const facesHtml = c => `<div class="faces"><span>${c.faces.map(f => `<i style="background-image:url(${A}${f})"></i>`).join('')}${c.plus ? `<i class="n">+${c.plus}</i>` : ''}</span>${c.who}</div>`;
-const mapCard = (pins, row) => `<div class="card"><div class="mapwrap">${pins}<span class="mhome" style="left:40%;top:63%"><i class="ph-fill ph-house"></i></span></div>${row}</div>`;
-const pin = (img, x, y, label, big) => `<span class="mpin${big ? ' big' : ''}" style="left:${x}%;top:${y}%;background-image:url(${img})">${label ? `<span class="lbl">${label}</span>` : ''}</span>`;
-const campRow = (k, wk) => { const c = CAMPS[k]; return `<div class="camprow" data-camp="${k}"><span class="thumb" style="background-image:url(${c.img})"></span><div><div class="ttl">${c.n}</div><div class="sub">${wk || 'June 7–11'} · ${c.where}</div>${facesHtml(c)}<div class="cprice"><b>$${c.price}</b><small>/ week</small><button class="link" data-details="${k}">Details <i class="ph ph-caret-right"></i></button></div></div></div>`; };
-/* K10 D·1: camp details, bottom sheet, "Choose weeks" in the footer */
-function campDetails(k){
+const fits = (c, kid) => kid.age >= c.ages[0] && kid.age <= c.ages[1];
+const facesHtml = f => f.who ? `<div class="faces"><span>${f.faces.map(x => `<i style="background-image:url(${A}${x})"></i>`).join('')}${f.plus ? `<i class="n">+${f.plus}</i>` : ''}</span>${f.who}</div>` : '';
+const weekList = ids => joinNames(SUMMER.filter(w => ids.includes(w.id)).map(w => w.s));
+/* N7 (Tony, 20 Nov meeting): "I kinda wanna see by week which parents or kids I know ... the weeks that they're gonna
+   be there." Friends' kids per camp week (CAMPS[k].pals, samples). Leo, Ava and Noah have their parent's photo. */
+const PAL_PHOTO = { Leo:'priya.webp', Ava:'aisha.webp', Noah:'elena.webp' };
+const palFaces = names => `<span class="palf">${names.filter(n => PAL_PHOTO[n]).slice(0, 3).map(n => `<i style="background-image:url(${A}${PAL_PHOTO[n]})"></i>`).join('')}</span>`;
+/* "Leo and Ava at Pinecrest, Noah at Muddy Hands" for one week; one camp only when k is given */
+const palsLine = (w, k) => {
+  const per = Object.keys(CAMPS).filter(c => (!k || c === k) && CAMPS[c].pals[w]).map(c => [c, CAMPS[c].pals[w]]);
+  if (!per.length) return '';
+  return k ? `${joinNames(per[0][1])} ${per[0][1].length > 1 ? 'go' : 'goes'}` : per.map(([c, n]) => `${joinNames(n)} at ${CAMPS[c].short}`).join(', ');
+};
+const palsOf = (w, k) => Object.keys(CAMPS).filter(c => (!k || c === k)).flatMap(c => CAMPS[c].pals[w] || []);
+/* N7 (Tony, 20 Nov): "Can we keep them in the app when we do that?" Like Instagram's in-app browser: the camp's site
+   opens over the chat, X brings you back exactly where you were. The page is a sample built from the camp's data. */
+function inAppBrowser(k){
+  const c = CAMPS[k];
+  const v = el(`<section class="iab" role="dialog" aria-label="${c.site}">
+    <div class="iab-bar"><button type="button" class="iab-x" aria-label="Close"><i class="ph ph-x"></i></button>
+      <div class="iab-url"><i class="ph-fill ph-lock-simple"></i>${c.site}</div><button type="button" class="iab-x" aria-label="Share" data-share><i class="ph ph-export"></i></button></div>
+    <div class="iab-page">
+      <div class="iab-hero" style="background-image:url(${c.gal[0]})"></div>
+      <div class="iab-body"><div class="iab-name">${c.n}</div><p>${c.kind} for ages ${c.ages[0]} to ${c.ages[1]}. ${c.what}.</p>
+        <h4>Summer weeks</h4>${SUMMER.filter(w => c.weeks[w.id]).map(w => `<div class="iab-row"><span>${w.d}</span><span>${c.weeks[w.id] === 'full' ? 'Full' : c.weeks[w.id]}</span></div>`).join('')}
+        <h4>Price</h4><p>$${c.price} per week · 9 AM to 3 PM, Monday to Friday</p>
+        <p class="iab-note">Sample page for this prototype</p></div></div></section>`);
+  document.querySelector('#phone').append(v);
+  requestAnimationFrame(() => v.classList.add('on'));
+  v.querySelector('[data-share]').onclick = () => toast('Share sheet (not part of this demo)');
+  v.querySelector('.iab-x').onclick = () => { v.classList.remove('on'); setTimeout(() => v.remove(), 300); };
+}
+
+/* 1 · which weeks (K10 P·15's weeks strip, now the first question) */
+function campWeeksCard(p){
+  return new Promise(res => {
+    const on = new Set(['jun7', 'jun14', 'jun21', 'jun28']);
+    const c = p.block(`<div class="card"><div class="ctop">${illIco('camps')}<div><div class="eyebrow">Summer camps · 9 weeks</div><div class="ttl">Which weeks need camp?</div></div></div>
+      <div class="weeks">${SUMMER.map(w => `<button type="button" class="wkb" data-w="${w.id}"${w.away ? ' disabled' : ''} aria-pressed="false">${w.away ? 'Trip' : w.s}</button>`).join('')}</div>
+      <div class="fact" style="margin-top:10px"><i class="ph ph-airplane-tilt"></i>July 5–9 is your family trip, from your calendar</div>
+      <div class="dlabel" style="margin-top:14px">Friends at camp</div>
+      <div class="palweeks">${SUMMER.filter(w => palsLine(w.id)).map(w => `<div class="palwk">${palFaces(palsOf(w.id))}<span><b>${w.s}</b> · ${palsLine(w.id)}</span></div>`).join('')}</div>
+      <button class="btn" style="margin-top:14px"></button></div>`).querySelector('.card');
+    const btn = c.querySelector('.btn'), all = [...c.querySelectorAll('[data-w]:not([disabled])')];
+    const paint = () => { all.forEach(b => { const s = on.has(b.dataset.w); b.classList.toggle('on', s); b.setAttribute('aria-pressed', s); });
+      btn.disabled = !on.size; btn.textContent = on.size ? `Next · ${on.size} week${on.size === 1 ? '' : 's'}` : 'Pick at least one week'; };
+    all.forEach(b => b.onclick = () => { const w = b.dataset.w; on.has(w) ? on.delete(w) : on.add(w); paint(); });
+    btn.onclick = () => { if (btn.disabled) return; const ids = SUMMER.filter(w => on.has(w.id)).map(w => w.id); all.forEach(b => b.disabled = true); btn.remove(); p.me(weekList(ids)); res(ids); };
+    paint(); p.scroll();
+  });
+}
+/* 2 · which kids (Book a sitter's photo rows, both on) */
+function campKidsCard(p){
+  return new Promise(res => {
+    const c = p.block(`<div class="card"><div class="ctop">${clayIco('two-people')}<div><div class="eyebrow">Summer camps</div><div class="ttl">Who needs camp?</div></div></div>
+      <div class="ua-rows">${KIDS2.map(k => `<button type="button" class="ua-row on" data-n="${k.n}" aria-pressed="true"><span class="uaph" style="background-image:url(${k.img})"></span><span class="tx"><b>${k.n}</b><small>${k.age} · ${k.cls}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button>`).join('')}</div>
+      <button class="btn" style="margin-top:14px"></button></div>`).querySelector('.card');
+    const btn = c.querySelector('.btn'), rows = [...c.querySelectorAll('.ua-row')];
+    const picked = () => KIDS2.filter(k => rows.find(r => r.dataset.n === k.n).classList.contains('on'));
+    const paint = () => { const n = picked(); rows.forEach(r => r.setAttribute('aria-pressed', r.classList.contains('on'))); btn.disabled = !n.length; btn.textContent = n.length ? `Next · ${joinNames(n.map(k => k.n))}` : 'Pick at least one'; };
+    rows.forEach(r => r.onclick = () => { r.classList.toggle('on'); paint(); });
+    btn.onclick = () => { if (btn.disabled) return; const n = picked(); rows.forEach(r => r.disabled = true); btn.remove(); p.me(joinNames(n.map(k => k.n))); res(n); };
+    paint(); p.scroll();
+  });
+}
+const clayIco = n => `<span class="clayico" style="background-image:url(${A}clay/${n}.png)"></span>`;
+/* K10 D·1: details sheet with photos; the footer CTA picks this camp */
+function campSheet(k, kids){
   const c = CAMPS[k];
   return new Promise(res => {
     const v = bsheet({ onBack:() => res(false),
-      body:`<div class="bhero" style="background-image:url(${c.hero})"></div><div class="btitle">${c.n}</div><div class="bsub">Ages 6–10 · ${c.kind === 'Swim' ? 'Swim day camp' : 'Outdoor day camp'}</div>
-        <div class="fact"><i class="ph ph-clock"></i>9 AM–3 PM, Mon–Fri · before-care from 7:30 AM</div>
-        <div class="fact"><i class="ph ph-sparkle"></i>${c.kind === 'Swim' ? 'Swim lessons every morning · games after lunch' : 'Hiking, creek days, crafts · swim on Fridays'}</div>
-        <div class="fact"><i class="ph ph-map-pin"></i>${c.where}</div>${facesHtml(c)}
+      body:`${c.gal.length > 2 ? `<div class="bgal">${c.gal.map(g => `<i style="background-image:url(${g})"></i>`).join('')}</div>` : `<div class="bhero" style="background-image:url(${c.gal[0]})"></div>`}
+        <div class="btitle">${c.n}</div><div class="bsub">Ages ${c.ages[0]}–${c.ages[1]} · ${c.kind}</div>
+        <div class="fact"><i class="ph ph-clock"></i>${c.what.includes('9 AM') ? 'Mon–Fri' : '9 AM–3 PM, Mon–Fri · before-care from 7:30 AM'}</div>
+        <div class="fact"><i class="ph ph-sparkle"></i>${c.what}</div>
+        <div class="fact"><i class="ph ph-map-pin"></i>${c.mi}</div>
+        ${kids.map(kid => facesHtml(c.friends[kid.n])).join('')}
         <button class="link" style="margin:4px 0 6px" data-site>Full details on ${c.site} <i class="ph ph-caret-right"></i></button>`,
-      foot:`<div class="bprice"><b>$${c.price}</b><small>/ week</small></div><button type="button" class="btn" data-go>Choose weeks</button>` });
-    v.body.querySelector('[data-site]').onclick = () => toast(`Opens ${c.site} (not part of this demo)`);
+      foot:`<div class="bprice"><b>$${c.price}</b><small>/ week</small></div><button type="button" class="btn" data-go>Sign up for ${c.short}</button>` });
+    v.body.querySelector('[data-site]').onclick = () => inAppBrowser(k);
     v.foot.querySelector('[data-go]').onclick = () => { v.close(); res(true); };
   });
 }
-/* K10 P·4: pick weeks, bottom sheet; Sprout preselects the week her class goes */
-function pickWeeks(k, kid = 'Maya'){
+/* 3 · camps kids from Lincoln go to. N7 (Tony, 20 Nov meeting): "I think we should use the previous UI that we had, the
+   map with ... be able to slide it over. Because this gets really long." Same map + swipe cards as birthday and date
+   night (X.sv.partyResults); each card: photo, price, distance, weeks open, friends; Details opens the sheet, the globe
+   opens the camp's site in the in-app browser. */
+function campListCard(p, keys, kids, target){
+  const { partyResults, PARTY_HOME } = X.sv;
+  const open = k => target.filter(w => CAMPS[k].weeks[w] && CAMPS[k].weeks[w] !== 'full').length;
+  const ranked = keys.map(k => ({ place:{ key:k, name:CAMPS[k].n, detail:'South Austin, TX', coords:CAMPS[k].ll, photo:CAMPS[k].img.slice(A.length) }, miles:CAMPS[k].miles }));
+  const cardHtml = (place, miles, first) => { const k = place.key, cp = CAMPS[k]; return `<div class="card dn3 campc" data-k="${k}">
+      <div class="dn3img" style="background-image:url(${cp.img})">${first ? '<span class="dn3pick">My pick</span>' : ''}</div>
+      <div class="dn3bd"><div class="dn3top"><b>${cp.n}</b><span class="dn3price"><strong>$${cp.price}</strong> / week</span></div>
+        <div class="dn3sub">${cp.kind} · ${miles} mi · open ${open(k)} of your ${target.length} week${target.length === 1 ? '' : 's'}</div>
+        ${kids.map(kid => fits(cp, kid) ? facesHtml(cp.friends[kid.n]) : `<div class="dn3sub">Ages ${cp.ages[0]}–${cp.ages[1]} · not for ${kid.n}</div>`).join('')}
+        <div class="dn3cta"><button class="dn3link dn3ico" data-details aria-label="Details" title="Details"><i class="ph ph-info"></i></button><button class="dn3link dn3ico" data-site aria-label="Website" title="Website"><i class="ph ph-globe-simple"></i></button><button class="btn dn3go" data-go>Choose</button></div></div></div>`; };
+  const wire = (tile, place, { select, finish }) => {
+    tile.querySelector('[data-details]').onclick = async () => { select(); if (await campSheet(place.key, kids)) finish(place); };
+    tile.querySelector('[data-site]').onclick = () => { select(); inAppBrowser(place.key); };
+    tile.querySelector('[data-go]').onclick = () => finish(place);
+  };
+  return partyResults(p, null, { ...PARTY_HOME, label:`${target.length} week${target.length === 1 ? '' : 's'} · ${joinNames(kids.map(k => k.n))}` }, ranked,
+    { heading:'Lincoln kids’ camps', search:'summer day camps', showAll:true, back:false, cardHtml, wire }).then(place => place.key);
+}
+/* 4 · the camp's weeks (K10 P·4 week sheet) for the kids you already picked. Ahmad, 19 Nov: asking "who's going"
+   again made no sense, so every kid who fits is on; the For toggles are how you leave one out (Tony's "a specific kid"). */
+function campWeekSheet(k, can, target, need){
   const c = CAMPS[k];
   return new Promise(res => {
+    const on = new Set(can.map(x => x.n));
+    const isOpen = w => c.weeks[w] && c.weeks[w] !== 'full';
+    const weeks = target.filter(w => can.some(kid => need[kid.n].has(w)));
+    const firstHot = weeks.filter(w => isOpen(w) && can.some(kid => c.hot[kid.n].includes(w)));
     const v = bsheet({ onBack:() => res(null),
-      body:`<div class="bgal">${c.gal.map(g => `<i style="background-image:url(${g})"></i>`).join('')}</div>
-        <div class="btitle">${c.n}</div><div class="bsub">Ages 6–10 · 9 AM–3 PM · ${c.kind} · from ${c.site}</div>
-        <span class="mypick"><i class="ph ph-sparkle"></i>My pick: June 7–11, the week her class goes</span>
-        <div class="bq">Which weeks should ${kid} go?</div>
-        <div class="fields" style="margin-top:0">${c.weeks.map(([d, s, st], i) => `<button class="pick${st === 'on' ? ' on' : ''}" data-i="${i}"${st === 'full' ? ' aria-disabled="true"' : ''}><span class="ptx">${d}<small>${s}</small></span>${st === 'full' ? '<span class="note">Waitlist</span>' : '<span class="cb"><i class="ph-bold ph-check"></i></span>'}</button>`).join('')}</div>`,
+      body:`${c.gal.length > 2 ? `<div class="bgal">${c.gal.map(g => `<i style="background-image:url(${g})"></i>`).join('')}</div>` : `<div class="bhero" style="background-image:url(${c.gal[0]})"></div>`}
+        <div class="btitle">${c.n}</div><div class="bsub">${c.kind} · from ${c.site}</div>
+        ${can.length > 1 ? `<div class="bq">For</div><div class="qk" data-kids>${can.map(kid => `<button type="button" class="chip sel" data-kid="${kid.n}" aria-pressed="true">${kid.n}</button>`).join('')}</div>` : ''}
+        ${firstHot.length ? `<span class="mypick" style="margin-top:12px"><i class="ph ph-sparkle"></i>Classmates go ${weekList(firstHot)}</span>` : ''}
+        <div class="bq">Which weeks?</div>
+        <div class="fields" style="margin-top:0">${weeks.map(w => { const st = c.weeks[w], off = !isOpen(w);
+          /* N7 (Tony, 20 Nov): "let's just have the remaining weeks preselected ... if they don't wanna do all of them,
+             they'll unclick one." Every open week you still need starts on; friends that week sit under it. */
+          return `<button class="pick${!off ? ' on' : ''}" data-w="${w}"${off ? ' aria-disabled="true"' : ''}><span class="ptx">${WK(w).d}<small data-s="${w}"></small>${palsLine(w, k) ? `<small class="palsm">${palFaces(c.pals[w])}${palsLine(w, k)}</small>` : ''}</span>${off ? `<span class="note">${st === 'full' ? 'Waitlist' : 'Closed'}</span>` : '<span class="cb"><i class="ph-bold ph-check"></i></span>'}</button>`; }).join('')}</div>`,
       foot:`<div class="bprice"><b></b><small></small></div><button type="button" class="btn" data-go></button>` });
     const rows = [...v.body.querySelectorAll('.pick:not([aria-disabled])')], go = v.foot.querySelector('[data-go]');
-    const sel = () => rows.filter(r => r.classList.contains('on')).map(r => c.weeks[+r.dataset.i][0]);
-    const paint = () => { const n = sel().length; v.foot.querySelector('b').textContent = '$' + (n * c.price).toLocaleString(); v.foot.querySelector('small').textContent = `${n} week${n === 1 ? '' : 's'}`; go.disabled = !n; go.textContent = n ? `Sign up for ${n} week${n === 1 ? '' : 's'}` : 'Pick a week'; };
+    v.body.querySelectorAll('.pick[aria-disabled]').forEach(r => r.onclick = () => toast(r.querySelector('.note').textContent === 'Waitlist' ? 'Waitlists are not part of this demo' : `${c.short} isn’t running that week`));
+    const plan = () => { const ws = rows.filter(r => r.classList.contains('on')).map(r => r.dataset.w);
+      return can.filter(kid => on.has(kid.n)).map(kid => ({ kid, weeks:ws.filter(w => need[kid.n].has(w)) })).filter(x => x.weeks.length); };
+    const paint = () => {
+      v.body.querySelectorAll('[data-kid]').forEach(b => { const sel = on.has(b.dataset.kid); b.classList.toggle('sel', sel); b.setAttribute('aria-pressed', sel); });
+      weeks.forEach(w => { const st = c.weeks[w], line = v.body.querySelector(`[data-s="${w}"]`), who = can.filter(kid => on.has(kid.n) && need[kid.n].has(w));
+        line.textContent = !st ? `${c.short} isn’t running this week` : st === 'full' ? 'Full' : `${who.length ? joinNames(who.map(x => x.n)) : 'Nobody picked'} · ${st}`; });
+      const pl = plan(), slots = pl.reduce((a2, x) => a2 + x.weeks.length, 0);
+      v.foot.querySelector('b').textContent = '$' + (slots * c.price).toLocaleString();
+      v.foot.querySelector('small').textContent = `${slots} camp week${slots === 1 ? '' : 's'}`;
+      go.disabled = !slots; go.textContent = slots ? `Sign up ${joinNames(pl.map(x => x.kid.n))}` : 'Pick a kid and a week';
+    };
+    v.body.querySelectorAll('[data-kid]').forEach(b => b.onclick = () => { const n = b.dataset.kid; if (on.has(n)) on.delete(n); else on.add(n); paint(); });
     rows.forEach(r => r.onclick = () => { r.classList.toggle('on'); paint(); }); paint();
-    go.onclick = () => { v.close(); res(sel()); };
+    go.onclick = () => { if (go.disabled) return; const pl = plan(); v.close(); res({ plan:pl, label:go.textContent }); };
   });
 }
-async function campForm(p, k, weeks){
-  const c = CAMPS[k], wk = weeks.join(', '), sum = weeks.length * c.price;
-  await p.say(`Good pick. ${c.short} opens Friday at 9 AM and fills the same day. Let's get Maya's form ready now, so I can hold her spot the moment it opens.`, 1100);
-  const TOTAL = 7;
+/* 5 · the form (K10 P·5–P·9). Every value Sprout has is its own field and each pencil edits it in place (Weeks
+   re-prices the sign-up); only what's missing is asked, one in-card question at a time, waiver last. Ahmad, 19 Nov:
+   each kid's real values sit on their own card, so Jake's shirt size from soccer is visible, not hidden in a summary. */
+const SIZES = ['Youth XS', 'Youth S', 'Youth M', 'Youth L', 'Youth XL'];
+const PICKUPS = ['Dana Martin, Tony Martin', 'Tony Martin', 'Dana Martin'];
+const PROFILE = {
+  Maya:{ birthday:'Mar 3, 2019', emergency:'Dana Martin', emergencyFrom:'From Jake’s form' },
+  Jake:{ birthday:'Sep 14, 2020', emergency:'Dana Martin', emergencyFrom:'From soccer', shirt:'Youth S', shirtFrom:'From soccer', medical:'None', medicalFrom:'From soccer' },
+};
+let PICKUP = null;
+const campQs = (k, kid, pickupKnown = !!PICKUP) => { const c = CAMPS[k], prof = PROFILE[kid.n], qs = [];
+  if (!prof.shirt) qs.push('shirt'); if (!prof.medical) qs.push('medical'); if (!pickupKnown) qs.push('pickup');
+  if (c.swim && kid.age < 7 && !prof.swim) qs.push('swim'); if (!(prof.waivers || []).includes(k)) qs.push('waiver'); return qs; };
+const QWORD = { shirt:'shirt size', medical:'medical notes', pickup:'who can pick up', swim:'swim level' };
+/* one line per kid for the message before the forms: what's already known, what's still needed */
+function needLine(k, kid, pickupKnown){
+  const prof = PROFILE[kid.n], qs = campQs(k, kid, pickupKnown), n = qs.filter(q => q !== 'waiver').map(q => QWORD[q]), w = qs.includes('waiver');
+  const known = [prof.shirtFrom === 'From soccer' && 'shirt size', prof.medicalFrom === 'From soccer' && 'medical notes'].filter(Boolean);
+  const pre = known.length ? `${kid.n}’s ${joinNames(known)} come from ${kid.n === 'Jake' ? 'his' : 'her'} soccer form, so ${kid.n === 'Jake' ? 'he' : 'she'} ` : `${kid.n} `;
+  return !qs.length ? `${kid.n}’s form is all set` : !n.length ? `${pre}just needs ${CAMPS[k].short}’s waiver` : `${pre}needs ${joinNames(n)}${w ? ', then the waiver' : ''}`;
+}
+function textSheet(title, value = '', hint = ''){
+  return new Promise(res => {
+    const v = bsheet({ onBack:() => res(null), body:`<div class="bh"><span class="icotile"><i class="ph ph-pencil-simple"></i></span><b>${title}</b></div>${hint ? `<p class="bp" style="margin:0 0 8px">${hint}</p>` : ''}<textarea class="edt" rows="3">${value}</textarea>`,
+      foot:'<button type="button" class="btn" data-save>Save</button>' });
+    setTimeout(() => v.o.querySelector('textarea').focus(), 350);
+    v.o.querySelector('[data-save]').onclick = () => { const t = v.o.querySelector('textarea').value.trim(); if (!t) return toast('Type something first'); v.close(); res(t); };
+  });
+}
+async function campForm(p, k, kid, weeks, { open }){
+  const c = CAMPS[k], prof = PROFILE[kid.n], her = kid.n === 'Jake' ? 'his' : 'her';
+  const qs = campQs(k, kid);
+  const wkTxt = () => `${weeks.length} week${weeks.length > 1 ? 's' : ''}`;
+  const fields = [
+    [{ l:'Weeks', v:weekList(weeks), opts:open.map(w => WK(w).s), multi:true }, 'Your pick'],
+    [{ l:'Camper', v:`${kid.n} Martin, age ${kid.age}` }, 'From Sprout'],
+    [{ l:'Birthday', v:prof.birthday }, 'From Sprout'],
+    [{ l:'Emergency contact', v:prof.emergency }, prof.emergencyFrom],
+  ];
+  if (prof.shirt) fields.push([{ l:'Shirt size', v:prof.shirt, opts:SIZES }, prof.shirtFrom]);
+  if (prof.medical) fields.push([{ l:'Allergies and medical notes', v:prof.medical }, prof.medicalFrom]);
+  if (PICKUP) fields.push([{ l:'Pickup', v:PICKUP, opts:PICKUPS.includes(PICKUP) ? PICKUPS : [PICKUP, ...PICKUPS] }, 'Whole family']);
+  if (c.swim && kid.age < 7 && prof.swim) fields.push([{ l:`Swims on ${her} own`, v:prof.swim, opts:['Yes', 'Not yet'] }, 'Saved']);
+  if (!qs.includes('waiver')) fields.push([{ l:'Waiver', v:'Signed by you', ro:true }, 'Signed']);
+  const TOTAL = fields.length + qs.length;
   const card = p.block(`<div class="card">
-    <div class="ctop"><span class="icotile"><i class="ph ph-clipboard-text"></i></span><div><div class="eyebrow">Maya's registration · <b class="cnt">3</b> of ${TOTAL} ready</div><div class="ttl">${c.n} · ${weeks.length} week${weeks.length > 1 ? 's' : ''}</div></div></div>
-    <div class="progress"><i style="width:${3 / TOTAL * 100}%"></i></div>
-    <div class="fields">${[
-      [{ l:'Weeks', v:wk }, 'Your pick'], [{ l:'Camper', v:'Maya Martin, age 7' }, 'From Sprout'],
-      [{ l:'Birthday', v:'Mar 3, 2019' }, 'From Sprout'], [{ l:'Emergency contact', v:'Dana Martin' }, 'From Jake’s form'],
-    ].map(([f, t]) => fieldRow(f, t)).join('')}</div>
-    <div class="qwrap"></div><div class="foot">Still to go: shirt size, pickup people, allergies, waiver</div>
-  </div>`).querySelector('.card');
+    <!-- N7 (Tony, 20 Nov): "this should be more clear that it's for Maya ... Maya's picture ... Maya's registration bigger,
+         Pinecrest could be smaller." -->
+    <div class="ctop regh"><span class="uaph" style="width:48px;height:48px;background-image:url(${kid.img})"></span><div><div class="ttl">${kid.n}’s registration</div><div class="eyebrow">${c.n} · <span data-wk>${wkTxt()}</span> · <b class="cnt">${fields.length}</b> of ${TOTAL} ready</div></div></div>
+    <div class="progress"><i style="width:${fields.length / TOTAL * 100}%"></i></div>
+    <div class="fields">${fields.map(([f, t]) => fieldRow(f, t)).join('')}</div>
+    <div class="qwrap"></div><div class="foot"></div></div>`).querySelector('.card');
+  card.addEventListener('edited', e => {
+    const { label, value, picks } = e.detail;
+    if (label === 'Weeks') { weeks.splice(0, weeks.length, ...open.filter(w => picks.includes(WK(w).s))); card.querySelector('[data-wk]').textContent = wkTxt(); }
+    else if (label === 'Shirt size') prof.shirt = value;
+    else if (label.startsWith('Allergies')) prof.medical = value;
+    else if (label === 'Pickup') PICKUP = value;
+    else if (label.startsWith('Swims')) prof.swim = value;
+    else if (label === 'Emergency contact') prof.emergency = value;
+    else if (label === 'Birthday') prof.birthday = value;
+  });
   editHint(card);
-  const step = (n, l, v, left) => { addField(card, { l, v }); card.querySelector('.cnt').textContent = n; card.querySelector('.progress i').style.width = (n / TOTAL * 100) + '%'; card.querySelector('.foot').textContent = left; };
-  const sizes = ['Youth S', 'Youth M', 'Youth L', 'Youth XL'];
-  const s = await ask(p, card, 'What’s Maya’s shirt size?', sizes); step(4, 'Shirt size', sizes[s], 'Still to go: pickup people, allergies, waiver');
-  const pk = await ask(p, card, `Who’s allowed to pick Maya up? ${c.short} checks this list at the gate.`, ['Dana and me', 'Just me', 'Add someone'], { 2:'Adding someone is not part of this demo' });
-  const pickup = pk === 0 ? 'Dana Martin, Tony Martin' : 'Tony Martin';
-  step(5, 'Pickup', pickup, 'Still to go: allergies, waiver');
-  await ask(p, card, `Any allergies, medicines or medical notes for ${c.short}? Nothing is on Maya’s profile yet.`, ['Nothing to add', 'Add a note'], { 1:'Adding a note is not part of this demo' });
-  step(6, 'Allergies', 'None', 'Still to go: waiver');
-  // K10 P·8 waiver summary + X·3 full waiver sheet
-  const wrap = card.querySelector('.qwrap'); wrap.innerHTML = '';
-  const q = el(`<div class="q"><p>Last one: ${c.short}’s waiver. In short:</p>
-    <div class="preview" style="background:#fff;margin-top:8px"><p>· Release for camp activities, swim and field trips<br>· Staff can give first aid and call 911<br>· Camp photos can be shared with camp families</p><button class="link" style="margin:6px 0 0" data-read>Read the full waiver · 2 pages <i class="ph ph-caret-right"></i></button></div>
-    <div class="chips"><button class="chip" data-k="agree">I agree to the waiver</button><button class="chip" data-k="read">Read it first</button></div></div>`);
-  wrap.appendChild(q); card.querySelector('.foot').textContent = `You sign as Tony Martin. ${c.short} gets a dated copy, and it's saved here.`; p.scroll();
-  await new Promise(res => {
-    const read = () => { const v = bsheet({ body:`<div class="bh"><span class="icotile"><i class="ph ph-clipboard-text"></i></span><b>${c.short} waiver · 2 pages</b></div>
-      <p class="bp">1. Activities. Maya can join hiking, creek days, crafts and supervised swimming on Fridays.</p><p class="bp">2. Medical. If staff can't reach you, they can give first aid and call 911. They use the allergy notes on her form.</p><p class="bp">3. Photos. Camp photos may be shared with ${c.short} families. Ask the office to opt out.</p><p class="bp">4. Pickup. Only people on her pickup list can sign her out, with a photo ID.</p><p class="bp">5. Refunds. Full refund until May 1, then half until June 1.</p>`,
-      stack:true, foot:`<button type="button" class="btn" data-go>I agree to the waiver</button><button type="button" class="textbtn" data-x>Close</button>` });
-      v.foot.querySelector('[data-go]').onclick = () => { v.close(); res(); }; v.foot.querySelector('[data-x]').onclick = () => v.close(); };
-    q.querySelector('[data-read]').onclick = read; q.querySelector('[data-k=read]').onclick = read;
-    q.querySelector('[data-k=agree]').onclick = res;
-  });
-  q.querySelector('.chips').classList.add('done'); q.querySelector('[data-k=agree]').classList.add('sel');
-  await sleep(260); step(7, 'Waiver', 'Signed by you', ''); wrap.innerHTML = '';
-  const f = card.querySelector('.foot'); f.className = 'foot ok'; f.innerHTML = `<i class="ph-bold ph-check"></i> All ${TOTAL} ready`;
-  await sleep(400);
-  // K10 P·9: saved to Maya's profile
-  await p.say('Saved to Maya’s profile. Pickup people are saved for the whole family, so Jake’s forms use them too.', 1000);
-  p.block(`<div class="card"><div class="ctop"><span class="icotile"><i class="ph ph-user-circle"></i></span><div><div class="eyebrow">Maya’s profile · 3 saved today</div><div class="ttl">Ready for next time</div></div></div>
-    <div class="fields">${[[{ l:'Shirt size', v:sizes[s] }, 'Saved today'], [{ l:'Birthday', v:'Mar 3, 2019' }, 'From Sprout'], [{ l:'Allergies', v:'None' }, 'Saved today'], [{ l:'Pickup', v:pickup }, 'Whole family']].map(([x, t]) => fieldRow(x, t)).join('')}</div></div>`);
-  await sleep(400);
-  // K10 A·1 – A·3
-  await providerAccount(p, { provider:c.short, site:c.site, kid:'Maya', opts:['Yes, create it', 'I already have one'], ask:`${c.short} needs a parent account. Want me to make one with tony@martinfam.com?`,
-    after: async signed => { p.receipt(`Watching ${c.short} · opens Friday at 9 AM`); await p.say(signed ? `Signed in. Sprout never sees your password. I’ll hold Maya’s spot Friday at 9.` : `Done. The login is saved in your password manager, so you never type it. I’ll hold Maya’s spot Friday at 9.`, 1000); } });
-  p.set(`Holding Maya’s spot Friday at 9`, { when:'Fri' });
-  // K10 P·10 / P·11: sign-up day
-  await later(p, { status:`Watching ${c.short}`, small:'Opens Friday at 9 AM', ms:4200, title:`${c.short} is open`, body:`Maya’s spot is held for 10 minutes. Approve $${sum} to register her.` });
-  p.divider('Friday · 9:01 AM');
-  await p.say(`${c.short} just opened and Maya’s spot is held. Her form is complete. Approve $${sum} for ${weeks.length > 1 ? 'both weeks' : 'her week'}?`, 1000);
-  p.set(`Approve $${sum} · spot held until 9:11`, { when:'Fri', attn:!X.isOpen() });
-  return { c, sum, wk, weeks };
-}
-X.flows.camps = async (p, opt = {}) => {
-  await p.say('Camp sign-ups start this week. I mapped 6 camps near home for Maya. My pick is Pinecrest: 2 mi away, and 4 families from her class are going.', 1100);
-  await sleep(250);
-  p.note('Checked 18 camps', 'June–July · age 7 · under 20 min');
-  await sleep(250);
-  const entry = p.block(mapCard(`${pin(A + 'camp/lakeside.webp', 22, 22)}${pin(A + 'camp/pinecrest.webp', 55, 33, 'Pinecrest', true)}${pin(A + 'camp/creekside.webp', 80, 52)}`, campRow('pinecrest')));
-  p.set('Pinecrest Day Camp · June 7–11', { when:'Now' });
-  const detailHook = host => host.querySelectorAll('[data-details]').forEach(b => b.onclick = async e => { e.stopPropagation(); if (await campDetails(b.dataset.details)) host.dispatchEvent(new CustomEvent('choose', { detail:b.dataset.details })); });
-  // choose a camp: chips, or "Choose weeks" from the details sheet
-  const choose = (host, opts, keys, stub = []) => new Promise(res => {
-    detailHook(host);
-    host.addEventListener('choose', e => { const c = host.querySelector('.chips:not(.done)'); c && c.classList.add('done'); p.me('Choose weeks'); res({ k:e.detail }); }, { once:true });
-    p.chips(opts, { into:host, stub }).then(i => res({ i, k:keys[i] }));
-  });
-  let pick = await choose(entry, ['Yes, Pinecrest', 'Show me others', 'Not now'], ['pinecrest', null, null]);
-  if (pick.i === 2) {   // K10 Q·2
-    await p.say('Okay. Pinecrest still opens Friday at 9. Want a reminder Thursday night so you don’t miss it?', 900);
-    const r = await p.chips(['Yes, remind me', 'No thanks']);
-    if (r === 0) { await p.say('Done. I’ll remind you Thursday at 8 PM.', 700); todo(p, 'Pinecrest sign-ups open Friday 9 AM', 'Thu', 'From Sprout · summer camps'); p.set('Reminder Thursday night', { when:'Thu', done:true }); }
-    else { await p.say('Okay. I won’t bring it up again.', 700); p.set('Not now', { done:true }); }
-    return;
-  }
-  if (pick.i === 1) {   // K10 P·2 → P·3 / X·1
-    await p.say('Here are all 6, closest first. Pinecrest and Barton Swim have families from her class.', 1000);
-    const all = p.block(mapCard(`${pin(F + 'lakeside-art.jpg', 18, 20, 'Lakeside Art')}${pin(A + 'camp/creekside.webp', 30, 78, 'Creekside')}${pin(A + 'camp/pinecrest.webp', 55, 33, 'Pinecrest · my pick', true)}${pin(F + 'barton-swim.jpg', 70, 72, 'Barton Swim')}${pin(F + 'muddy-hands.jpg', 84, 30, 'Muddy Hands')}`,
-      `<div class="camprow"><span class="thumb" style="background-image:url(${F}barton-swim.jpg)"></span><div><div class="ttl">Barton Swim Camp</div><div class="sub">June 7–11 · 1.5 mi · Swim</div>${facesHtml(CAMPS.barton)}<div class="cprice"><b>$310</b><small>/ week</small><span class="pill" style="margin-left:6px">6 spots left</span><button class="link" data-details="barton">Details <i class="ph ph-caret-right"></i></button></div></div></div>`));
-    pick = await choose(all, ['Only where her class goes', 'Closer to home', 'Back to Pinecrest'], [null, null, 'pinecrest']);
-    if (pick.i === 0 || pick.i === 1) {
-      await p.say(pick.i === 0 ? 'Two camps have families from Maya’s class. Pinecrest has four, Barton Swim has one.' : 'Two are within 2 miles of home: Barton Swim at 1.5 mi and Pinecrest at 2 mi. Both have families from Maya’s class.', 1000);
-      const two = p.block(mapCard(`${pin(A + 'camp/pinecrest.webp', 55, 33, 'Pinecrest · my pick', true)}${pin(F + 'barton-swim.jpg', 70, 72, 'Barton Swim')}`, campRow('pinecrest')));
-      pick = await choose(two, ['Yes, Pinecrest', 'Yes, Barton Swim'], ['pinecrest', 'barton']);
+  let n = fields.length;
+  const step = f => { addField(card, f); n++; card.querySelector('.cnt').textContent = n; card.querySelector('.progress i').style.width = (n / TOTAL * 100) + '%'; };
+  const left = q => { const rest = qs.slice(qs.indexOf(q) + 1).map(x => x === 'waiver' ? 'waiver' : QWORD[x]); card.querySelector('.foot').textContent = rest.length ? `Still to go: ${rest.join(', ')}` : ''; };
+  for (const q of qs) {
+    left(q);
+    if (q === 'shirt') { const sz = SIZES.slice(1), i = await ask(p, card, `What’s ${kid.n}’s shirt size?`, sz); prof.shirt = sz[i]; prof.shirtFrom = 'Saved'; step({ l:'Shirt size', v:sz[i], opts:SIZES }); }
+    if (q === 'medical') {
+      let note = null;
+      while (!note) {
+        const i = await ask(p, card, `Any allergies, medicines or medical notes for ${c.short}? Nothing is on ${kid.n}’s profile yet.`, ['Nothing to add', 'Add a note']);
+        note = i === 0 ? 'None' : await textSheet(`${kid.n}’s medical notes`, '', `${c.short} staff see this. It’s saved to ${kid.n}’s profile.`);
+      }
+      prof.medical = note; prof.medicalFrom = 'Saved'; step({ l:'Allergies and medical notes', v:note });
+    }
+    if (q === 'pickup') {
+      let who = null;
+      while (!who) {
+        const i = await ask(p, card, `Who’s allowed to pick ${kid.n} up? ${c.short} checks this list at the gate.`, ['Dana and me', 'Just me', 'Add someone']);
+        if (i < 2) who = PICKUPS[i];
+        else { const extra = await textSheet('Add someone to the pickup list', '', 'Name, and how they know the kids. They’ll show a photo ID at the gate.'); if (extra) who = `Dana Martin, Tony Martin, ${extra}`; }
+      }
+      PICKUP = who; step({ l:'Pickup', v:who, opts:PICKUPS.includes(who) ? PICKUPS : [who, ...PICKUPS] });
+    }
+    if (q === 'swim') { const sw = ['Yes', 'Not yet'], i = await ask(p, card, `${c.short} asks swim level for campers under 7. Can ${kid.n} swim on ${her} own?`, sw); prof.swim = sw[i]; step({ l:`Swims on ${her} own`, v:sw[i], opts:sw }); }
+    if (q === 'waiver') {
+      const wrap = card.querySelector('.qwrap'); wrap.innerHTML = '';
+      const qq = el(`<div class="q"><p>Last one: ${c.short}’s waiver for ${kid.n}. In short:</p>
+        <div class="preview" style="background:#fff;margin-top:8px"><p>· Release for camp activities${c.swim ? ', swim' : ''} and field trips<br>· Staff can give first aid and call 911<br>· Camp photos can be shared with camp families</p><button class="link" style="margin:6px 0 0" data-read>Read the full waiver · 2 pages <i class="ph ph-caret-right"></i></button></div>
+        <div class="chips"><button class="chip" data-k="agree">I agree to the waiver</button><button class="chip" data-k="read">Read it first</button></div></div>`);
+      wrap.appendChild(qq); card.querySelector('.foot').textContent = `You sign as Tony Martin. ${c.short} gets a dated copy, and it's saved here.`; p.scroll();
+      await new Promise(done => {
+        const read = () => { const v = bsheet({ body:`<div class="bh"><span class="icotile"><i class="ph ph-clipboard-text"></i></span><b>${c.short} waiver · 2 pages</b></div>
+          <p class="bp">1. Activities. ${kid.n} can join everything on the camp schedule: ${c.what.split(' ·')[0].toLowerCase()}.</p><p class="bp">2. Medical. If staff can't reach you, they can give first aid and call 911. They use the medical notes on ${her} form.</p><p class="bp">3. Photos. Camp photos may be shared with ${c.short} families. Ask the office to opt out.</p><p class="bp">4. Pickup. Only people on ${her} pickup list can sign ${kid.n === 'Jake' ? 'him' : 'her'} out, with a photo ID.</p><p class="bp">5. Refunds. Full refund until May 1, then half until June 1.</p>`,
+          stack:true, foot:`<button type="button" class="btn" data-go>I agree to the waiver</button><button type="button" class="textbtn" data-x>Close</button>` });
+          v.foot.querySelector('[data-go]').onclick = () => { v.close(); done(); }; v.foot.querySelector('[data-x]').onclick = () => v.close(); };
+        qq.querySelector('[data-read]').onclick = read; qq.querySelector('[data-k=read]').onclick = read;
+        qq.querySelector('[data-k=agree]').onclick = done;
+      });
+      qq.querySelector('.chips').classList.add('done'); qq.querySelector('[data-k=agree]').classList.add('sel');
+      await sleep(260); wrap.innerHTML = ''; step({ l:'Waiver', v:'Signed by you', ro:true });
+      prof.waivers = [...(prof.waivers || []), k];
     }
   }
-  const k = pick.k || 'pinecrest';
-  let weeks = null;
-  while (!weeks) { weeks = await pickWeeks(k); if (!weeks) { await sleep(200); const r = await p.chips(['Choose weeks', 'Not now'], { echo:false }); if (r === 1) { p.me('Not now'); await p.say('Okay. I’ll keep the map here if you change your mind.', 700); return; } } }
-  p.me(`Sign up for ${weeks.length} week${weeks.length > 1 ? 's' : ''}`); await sleep(300);
-  const { c, sum, wk } = await campForm(p, k, weeks);
-  const r = await approval(p, { sub:c.n, forHtml:`<i class="s">M</i>For Maya · ${wk} · 9 AM–3 PM`, lines:[[`${weeks.length} week${weeks.length > 1 ? 's' : ''} · ${weeks.map(w => w.split('–')[0]).join(' and ')}`, `$${sum}.00`]], total:`$${sum}.00`, wait:'Waiting for you or Dana · held until 9:11 AM', code:'PC-90215', time:'9:03 AM' });
-  if (!r.ok) { await sleep(300); await p.say('No problem. Nothing was paid and Maya’s spot is released.', 900); p.set('Not registered', { done:true }); return; }
-  await sleep(400); p.receipt(`Registered · Maya, ${c.short} ${wk}`);
-  p.set(`Maya registered · ${wk}`, { when:'June', done:true });
-  await sleep(300);
-  // K10 P·12 – P·14: Jake too
-  await p.say(`Maya’s in. Jake is 6, so ${c.short} fits him the same ${weeks.length > 1 ? 'two weeks' : 'week'}. I already have most of his form from soccer. Sign him up too?`, 1100);
-  const j = await p.chips(['Yes, sign up Jake', 'Not now']);
-  if (j === 1) { await p.say('Okay, just Maya. Jake’s forms stay saved, so adding him later takes one tap.', 900); return; }
-  sub(p, 'Summer camps · Maya, Jake'); p.title = 'Summer camps · Maya and Jake';
-  await p.say('I filled Jake’s form from his profile. Only one new question this time.', 900);
-  const jc = p.block(`<div class="card">
-    <div class="ctop"><span class="icotile"><i class="ph ph-clipboard-text"></i></span><div><div class="eyebrow">Jake's registration · <b class="cnt">6</b> of 7 ready</div><div class="ttl">${c.n} · ${weeks.length} week${weeks.length > 1 ? 's' : ''}</div></div></div>
-    <div class="progress"><i style="width:${6 / 7 * 100}%"></i></div>
-    <div class="fields">${[[{ l:'From Jake’s profile', v:'Shirt, birthday, emergency contact, medical notes' }, 'Soccer'], [{ l:'Pickup', v:'Dana Martin, Tony Martin' }, 'From Maya’s form'], [{ l:'Waiver and account', v:'Same as Maya' }, c.short]].map(([x, t]) => fieldRow(x, t)).join('')}</div>
-    <div class="qwrap"></div></div>`).querySelector('.card');
-  editHint(jc);
-  const sw = ['Yes', 'Not yet'];
-  const a = await ask(p, jc, `${c.short} asks swim level for campers under 7. Can Jake swim on his own?`, sw);
-  addField(jc, { l:'Swims on his own', v:sw[a] }); jc.querySelector('.cnt').textContent = 7; jc.querySelector('.progress i').style.width = '100%'; jc.querySelector('.qwrap').innerHTML = '';
-  await sleep(300);
-  await p.say(`Saved to Jake’s profile. His form is complete. Approve $${sum} for Jake?`, 900);
-  const r2 = await approval(p, { sub:c.n, forHtml:`<img class="s" src="${A}jake.webp" alt="">For Jake · ${wk} · 9 AM–3 PM`, lines:[[`${weeks.length} week${weeks.length > 1 ? 's' : ''} · ${weeks.map(w => w.split('–')[0]).join(' and ')}`, `$${sum}.00`]], total:`$${sum}.00`, wait:'Waiting for you or Dana · held until 9:11 AM', code:'PC-90231', time:'9:06 AM' });
-  if (!r2.ok) { await p.say('Okay. Nothing was paid for Jake. Maya is still registered.', 800); return; }
-  await sleep(400); p.receipt(`Registered · Jake, ${c.short} ${wk}`);
-  p.set(`Both kids registered · ${wk}`, { when:'June', done:true });
-  await p.say(`Both kids are in, same ${weeks.length > 1 ? 'two weeks' : 'week'}. ${c.short} emails packing lists in May. I’ll watch for them and add them to your to-dos.`, 1000);
-  await p.chips(['Thanks']);
-  // K10 P·15 – P·16, X·5, X·7
-  await p.say('That’s 2 of their 10 summer weeks. Want me to line up camps for the open ones too?', 1000);
-  const W10 = ['Jun 1', 'Jun 7', 'Jun 14', 'Jun 21', 'Jun 28', 'Jul 5', 'Jul 12', 'Jul 19', 'Jul 26', 'Aug 2'];
-  const covered = weeks.map(w => 'Jun ' + w.match(/\d+/)[0]);
-  p.block(`<div class="card"><div class="ctop"><span class="icotile"><i class="ph ph-calendar-blank"></i></span><div><div class="eyebrow">Maya and Jake · summer camps</div><div class="ttl">${covered.length} of 10 weeks covered</div></div></div>
-    <div class="weeks">${W10.map(w => `<i class="${covered.includes(w) ? 'on' : ''}">${covered.includes(w) ? '<i class="ph-bold ph-check" style="font-size:12px"></i>&nbsp;' : ''}${w}</i>`).join('')}</div>
-    <div class="foot">${c.short} ${wk} · ${10 - covered.length} weeks open</div></div>`);
-  const m = await p.chips(['Same camp, more weeks', 'Fill July', 'Something different', 'We’re covered'], { stub:[2] });
-  if (m === 3) { await p.say(`Got it. I’ll stop suggesting camps for this summer. Both kids’ June weeks are on the family calendar.`, 900); return; }
-  let lines, total, label;
-  if (m === 0) {
-    await p.say(`${c.short} has room June 28 – July 2 and July 5–9. June 21–25 is full. Add both weeks for both kids?`, 1000);
-    await p.chips(['Add both weeks']);
-    total = 4 * c.price; lines = [['Maya · June 28 and July 5', `$${2 * c.price}.00`], ['Jake · June 28 and July 5', `$${2 * c.price}.00`]];
-  } else {
-    await p.say('One camp a week, close to home. Their forms are saved, so tap the weeks you want and I’ll book both kids.', 1000);
-    const JUL = [['July 5–9', 'Barton Swim Camp · Leo goes', F + 'barton-swim.jpg', 310, true], ['July 12–16', 'Pinecrest, same as June', A + 'camp/pinecrest.webp', 420, true], ['July 19–23', 'Muddy Hands Clay Camp', F + 'muddy-hands.jpg', 380, false], ['July 26–30', 'Lakeside Art Camp · Ava goes', F + 'lakeside-art.jpg', 530, true]];
-    const jcard = p.block(`<div class="card"><div class="ctop"><span class="icotile"><i class="ph ph-sun"></i></span><div><div class="eyebrow">July · both kids</div><div class="ttl">One camp a week</div></div></div>
-      <div class="fields">${JUL.map(([d, s, img, pr, on], i) => `<button class="pick${on ? ' on' : ''}" data-i="${i}"><span class="av" style="width:40px;height:40px;border-radius:10px;background-image:url(${img})"></span><span class="ptx">${d}<small>${s} · $${pr}</small></span><span class="cb"><i class="ph-bold ph-check"></i></span></button>`).join('')}</div>
-      <button class="btn"></button></div>`);
-    let both = true; const rows = [...jcard.querySelectorAll('.pick')], bb = jcard.querySelector('.btn');
-    const sel = () => rows.filter(r => r.classList.contains('on')).map(r => JUL[+r.dataset.i]);
-    const paint = () => { const s2 = sel(), t2 = s2.reduce((a2, x) => a2 + x[3], 0) * (both ? 2 : 1); bb.disabled = !s2.length; bb.textContent = s2.length ? `Book ${s2.length} week${s2.length > 1 ? 's' : ''}${both ? ' for both' : ''} · $${t2.toLocaleString()}` : 'Pick a week'; };
-    rows.forEach(r => r.onclick = () => { r.classList.toggle('on'); paint(); }); paint();
-    p.chips(['Show other camps', 'Just Maya'], { into:jcard, stub:[0], echo:false }).then(() => { both = false; p.me('Just Maya'); paint(); });
-    await new Promise(res => bb.onclick = res);
-    const s2 = sel(); rows.forEach(r => r.style.pointerEvents = 'none'); bb.remove(); jcard.querySelector('.chips')?.remove();
-    p.me(`Book ${s2.length} weeks${both ? ' for both' : ''}`);
-    total = s2.reduce((a2, x) => a2 + x[3], 0) * (both ? 2 : 1);
-    lines = s2.map(x => [`${x[0]} · ${x[1].split(' ·')[0]}${both ? ' × 2' : ''}`, `$${(x[3] * (both ? 2 : 1)).toLocaleString()}.00`]);
+  card.querySelector('.qwrap').innerHTML = '';
+  const f = card.querySelector('.foot'); f.className = 'foot ok'; f.innerHTML = `<i class="ph-bold ph-check"></i> ${kid.n}’s form is ready · tap a pencil to change anything`;
+  await sleep(400);
+}
+/* 6 · after sign-up: the camp emails Sprout watches (real Gmail logo, never the clay envelope) */
+/* N7 (Tony, 20 Nov): the old header "I'll watch Pinecrest's emails / From your email" read like an email had arrived
+   ("do I need to click it or not?"). Now: who's in first, then ONE line on the emails Sprout watches (small Gmail logo). */
+const WATCHED = {};
+function inCard(p, k, plan){
+  const c = CAMPS[k], again = WATCHED[k];
+  WATCHED[k] = true;
+  const names = joinNames(plan.map(x => x.kid.n));
+  p.block(`<div class="card"><div class="ctop"><span class="faces regf"><span>${plan.map(x => `<i style="background-image:url(${x.kid.img})"></i>`).join('')}</span></span><div><div class="eyebrow">${c.n}</div><div class="ttl">${names} ${plan.length > 1 ? 'are' : 'is'} in</div></div></div>
+    ${plan.map(x => `<div class="fact"><i class="ph ph-check-circle"></i>${x.kid.n} · ${weekList(x.weeks)}</div>`).join('')}
+    <div class="fact"><img class="gml" src="${A}gmail.svg" alt="Gmail">${again ? `Still watching ${c.short} emails` : `I’ll watch ${c.short} emails`}: forms become to-dos, drop-offs go on the calendar</div></div>`);
+}
+/* N7 (Tony, 20 Nov): "The one thing again you're gonna need to ask is their password ... what they want the password to
+   be." The shared providerAccount() (app.js) stays as is; a thin plan wrapper asks for the password right after
+   "Yes, create it" and before the account is made. It is saved to the password manager; Sprout never shows it again. */
+function passwordPick(provider, site){
+  return new Promise(res => {
+    const v = bsheet({ onBack:() => res(null),
+      body:`<div class="bh"><span class="icotile"><i class="ph ph-key"></i></span><b>Choose a password for ${provider}</b></div>
+        <p class="bp" style="margin:0 0 8px">Your login on ${site} is tony@martinfam.com. Pick the password you want; it goes to your password manager, so you can sign in yourself too.</p>
+        <div class="fields" style="margin-top:0"><label class="field in"><div style="width:100%"><div class="l">Password</div><input type="password" autocomplete="new-password" placeholder="At least 8 characters"></div><button type="button" class="s" data-eye aria-label="Show password"><i class="ph ph-eye"></i></button></label></div>`,
+      foot:'<button type="button" class="btn" data-save>Create the account</button>' });
+    const input = v.o.querySelector('input');
+    setTimeout(() => input.focus(), 350);
+    v.o.querySelector('[data-eye]').onclick = () => { input.type = input.type === 'password' ? 'text' : 'password'; };
+    v.o.querySelector('[data-save]').onclick = () => { if (input.value.length < 8) return toast('Use at least 8 characters'); v.close(); res(true); };
+  });
+}
+async function campAccount(p, c, kid){
+  const opts = ['Yes, create it', 'I already have one'];
+  const wrapped = Object.create(p);
+  wrapped.chips = async (o, x) => {
+    for (;;) {
+      const i = await p.chips(o, x);
+      if (o !== opts || i !== 0) return i;
+      await sleep(250);
+      if (await passwordPick(c.short, c.site)) return 0;
+      await p.say('No problem. Pick one when you’re ready.', 600);
+    }
+  };
+  await providerAccount(wrapped, { provider:c.short, site:c.site, kid, opts, ask:`${c.short} needs a parent account. Want me to make one with tony@martinfam.com? You pick the password.` });
+}
+/* 7 · N7 (Tony, 20 Nov): "this should be, like, remaining weeks open ... it should just show the weeks that we actually
+   have to book." Only open weeks, all preselected (untick to drop one); booked weeks collapse into one line below. */
+function openWeeksCard(p, need, kids, weeks, booked){
+  return new Promise(res => {
+    const total = weeks.length * kids.length, done = total - kids.reduce((a, k) => a + need[k.n].size, 0);
+    const openW = weeks.filter(w => kids.some(k => need[k.n].has(w)));
+    const line = w => { const open = kids.filter(k => need[k.n].has(w)); return open.length === kids.length && kids.length > 1 ? `${joinNames(kids.map(k => k.n))} need camp`
+      : kids.map(k => need[k.n].has(w) ? `${k.n} needs camp` : `${k.n} at ${CAMPS[booked[k.n + w]].short}`).join(' · '); };
+    const bookedBy = {};
+    kids.forEach(kd => weeks.forEach(w => { const b = booked[kd.n + w]; if (b) (bookedBy[b] = bookedBy[b] || new Set()).add(w); }));
+    const bookedLine = Object.entries(bookedBy).map(([b, ws]) => `${weekList([...ws])} at ${CAMPS[b].short}`).join(' · ');
+    const c = p.block(`<div class="card"><div class="ctop">${illIco('week')}<div><div class="eyebrow">${joinNames(kids.map(k => k.n))} · ${done} of ${total} camp weeks booked</div><div class="ttl">Remaining weeks open</div></div></div>
+      <div class="fields">${openW.map(w => `<button type="button" class="pick on" data-w="${w}" aria-pressed="true"><span class="ptx">${WK(w).d}<small>${line(w)}</small>${palsLine(w) ? `<small class="palsm">${palFaces(palsOf(w))}${palsLine(w)}</small>` : ''}</span><span class="cb"><i class="ph-bold ph-check"></i></span></button>`).join('')}</div>
+      ${bookedLine ? `<div class="fact" style="margin-top:10px"><i class="ph-bold ph-check-circle" style="color:var(--brand)"></i>Booked: ${bookedLine}</div>` : ''}
+      <button class="btn" style="margin-top:12px"></button></div>`).querySelector('.card');
+    const btn = c.querySelector('.btn'), rows = [...c.querySelectorAll('.pick:not([aria-disabled])')];
+    const sel = () => rows.filter(r => r.classList.contains('on')).map(r => r.dataset.w);
+    const paint = () => { const s = sel(); rows.forEach(r => r.setAttribute('aria-pressed', r.classList.contains('on'))); btn.disabled = !s.length; btn.textContent = s.length ? `Find camps for ${s.length} week${s.length === 1 ? '' : 's'}` : 'Tick the weeks to book next'; };
+    rows.forEach(r => r.onclick = () => { r.classList.toggle('on'); paint(); });
+    const end = v => { rows.forEach(r => r.style.pointerEvents = 'none'); btn.remove(); c.querySelector('.chips')?.classList.add('done'); res(v); };
+    btn.onclick = () => { if (btn.disabled) return; const s = sel(); p.me(`Find camps for ${weekList(s)}`); end(s); };
+    p.chips(['We’re done for now'], { into:c, echo:false }).then(() => { p.me('We’re done for now'); end(null); });
+    paint(); p.scroll();
+  });
+}
+X.flows.camps = async (p, opt = {}) => {
+  await p.say('Camp sign-ups are opening. First, which summer weeks do you need camp for?', 900);
+  const weeks = await campWeeksCard(p);
+  await p.say('And who needs camp those weeks?', 700);
+  const kids = await campKidsCard(p);
+  const names = joinNames(kids.map(k => k.n));
+  sub(p, 'Summer camps'); p.title = `Summer camps · ${names}`;
+  const need = {}, booked = {};
+  kids.forEach(k => need[k.n] = new Set(weeks));
+  let target = weeks, round = 0;
+  for (;;) {
+    round++;
+    const who = kids.filter(k => target.some(w => need[k.n].has(w)));
+    p.set('Checking camps', { when:'Now' });
+    const look = p.work(round === 1 ? 'Checking camps Lincoln families booked' : `Checking camps for ${weekList(target)}`, `${weekList(target)} · ${joinNames(who.map(k => `${k.n}, ${k.age}`))} · near home`);
+    await sleep(1400);
+    const score = k => who.reduce((a, kid) => a + (fits(CAMPS[k], kid) ? CAMPS[k].friends[kid.n].faces.length + CAMPS[k].friends[kid.n].plus + CAMPS[k].hot[kid.n].filter(w => target.includes(w)).length : 0), 0);
+    const keys = Object.keys(CAMPS).filter(k => who.some(kid => fits(CAMPS[k], kid)) && target.some(w => CAMPS[k].weeks[w] && CAMPS[k].weeks[w] !== 'full')).sort((a, b) => score(b) - score(a));
+    look.done(`${keys.length} camps with Lincoln families`, 'Most classmates first, then closest', 'ph-tent');
+    const top = CAMPS[keys[0]], topFriends = who.map(kid => top.friends[kid.n].who).filter(Boolean)[0];
+    await p.say(`My pick is ${top.short}${topFriends ? `: ${topFriends.replace(/^(\d+) from/, '$1 kids from')} ${/^\d|and/.test(topFriends) ? 'go' : 'goes'}` : ''}. Tap Details for photos and the full day.`, 1000);
+    const k = await campListCard(p, keys, who, target);
+    const c = CAMPS[k];
+    const can = who.filter(kid => fits(c, kid) && target.some(w => need[kid.n].has(w) && c.weeks[w] && c.weeks[w] !== 'full'));
+    if (!can.length) { await p.say(`${c.short} has no open spots for those weeks. Pick another camp?`, 800); continue; }
+    let pick = null;
+    while (!pick) {
+      pick = await campWeekSheet(k, can, target, need);
+      if (!pick) { await sleep(200); const r = await p.chips(['Choose weeks', 'Pick another camp'], { echo:false }); if (r === 1) { p.me('Pick another camp'); break; } }
+    }
+    if (!pick) continue;
+    const plan = pick.plan, who2 = joinNames(plan.map(x => x.kid.n));
+    p.me(pick.label); await sleep(300);
+    let pk = !!PICKUP;
+    const lines = plan.map(x => { const l = needLine(k, x.kid, pk); pk = true; return l; });
+    await p.say(`I filled ${plan.length > 1 ? 'both forms' : `${who2}’s form`} with what I already know. ${lines.join('. ')}.`, 1100);
+    for (const [i, { kid, weeks:wk }] of plan.entries()) {
+      if (i) await p.say(`Now ${kid.n}’s form.`, 600);
+      p.set(`${kid.n} · ${c.short} form`, { when:'Now' });
+      await campForm(p, k, kid, wk, { open:target.filter(w => need[kid.n].has(w) && c.weeks[w] && c.weeks[w] !== 'full') });
+    }
+    await campAccount(p, c, plan[0].kid.n);
+    const slots = plan.reduce((a2, x) => a2 + x.weeks.length, 0), sum = slots * c.price, all = [...new Set(plan.flatMap(x => x.weeks))];
+    await p.say(`${plan.length > 1 ? 'Both forms are' : `${who2}’s form is`} complete. That’s $${sum.toLocaleString()} for ${slots} camp week${slots === 1 ? '' : 's'}. Approve it?`, 900);
+    const r = await approval(p, { sub:c.n, forHtml:`<img class="s" src="${plan[0].kid.img}" alt="">For ${who2} · ${weekList(all)}`,
+      lines:plan.map(x => [`${x.kid.n} · ${x.weeks.length} week${x.weeks.length > 1 ? 's' : ''} × $${c.price}`, `$${(x.weeks.length * c.price).toLocaleString()}.00`]), total:`$${sum.toLocaleString()}.00`, code:'PC-9' + (210 + round * 7), time:'9:0' + Math.min(9, 2 + round) + ' AM' });
+    if (!r.ok) { await p.say('No problem. Nothing was paid, and those weeks stay open.', 800); }
+    else {
+      await sleep(400); p.receipt(`Registered · ${who2}, ${c.short}`);
+      plan.forEach(({ kid, weeks:wk }) => wk.forEach(w => { need[kid.n].delete(w); booked[kid.n + w] = k; }));
+      await sleep(300);
+      inCard(p, k, plan);
+    }
+    const left = kids.reduce((a, x) => a + need[x.n].size, 0);
+    if (!left) {
+      await p.say(`Every week you picked is covered${kids.length > 1 ? ' for both kids' : ''}. It’s all on the family calendar, and I’ll keep watching the camp emails.`, 1000);
+      p.set(`Summer covered · ${weekList(weeks)}`, { when:'June', done:true });
+      await p.chips(['Thanks']);
+      return;
+    }
+    p.set(`${left} camp week${left === 1 ? '' : 's'} still open`, { when:'June' });
+    const openN = weeks.filter(w => kids.some(x => need[x.n].has(w))).length;
+    await p.say(openN > 1 ? `These ${openN} weeks still need camp. They’re all ticked; untick any you want to skip, and I’ll find camps the same way.` : 'One week still needs camp. I’ll find camps for it the same way.', 900);
+    const next = await openWeeksCard(p, need, kids, weeks, booked);
+    if (!next) {
+      await p.say('Okay. The open weeks stay here, and I’ll remind you before the camps fill up.', 800);
+      p.set(`${left} camp week${left === 1 ? '' : 's'} still open`, { when:'June', done:true });
+      return;
+    }
+    target = next;
   }
-  await sleep(300); await p.say(`Their forms are saved, so it’s just the payment. Approve $${total.toLocaleString()}?`, 900);
-  const r3 = await approval(p, { sub:'Summer camps · July', forHtml:`<i class="s">M</i>For Maya${m === 0 || lines[0][0].includes('× 2') ? ' and Jake' : ''}`, lines, total:`$${total.toLocaleString()}.00`, code:'PC-90287', time:'9:08 AM' });
-  if (!r3.ok) { await p.say('Okay. Nothing booked for July.', 600); return; }
-  await sleep(400); p.receipt('Registered · July weeks');
-  p.set('June and July covered', { when:'June', done:true });
-  await p.say('Done. Everything is on the family calendar, and I’ll add each packing list to your to-dos.', 900);
 };
 
 /* ======================= After school + Tutoring (19 Nov, Register my kids tiles) =======================
@@ -413,12 +638,33 @@ function optionsCard(p, { eyebrow, title, rows, cta }){
     paint(); p.scroll();
   });
 }
+/* N8 (Tony, 20 Nov): "I would use the same UI that we had before ... It should also show the kids that are signed up."
+   ll / miles put each sample program on the shared map; pals = friends' kids signed up, per kid's class. */
 const AFTER = [
-  { n:'Lincoln Kids Club', img:A + 'illus/afterschool.webp', tags:['Anything', 'Sports', 'Art'], price:95, unit:'week', pickup:'On campus, no pickup needed', why:'6 kids from her class go · homework hour first', key:'lkc' },
-  { n:'Little Coders Lab', img:A + 'illus/tutoring.webp', tags:['STEM'], price:165, unit:'month', pickup:'Van pickup from Lincoln at 3:05', why:'Small groups of 6 · 2 kids from her class', key:'lcl' },
-  { n:'Clay & Color Studio', img:A + 'illus/camps.webp', tags:['Art'], price:140, unit:'month', pickup:'Walking pickup with staff', why:'Ava goes on Wednesdays', key:'ccs' },
-  { n:'Circle C Tumbling', img:A + 'illus/sports.webp', tags:['Sports'], price:120, unit:'month', pickup:'Van pickup from Lincoln at 3:10', why:'1.4 mi from home · Leo goes', key:'cct' },
+  { n:'Lincoln Kids Club', img:A + 'illus/afterschool.webp', tags:['Anything', 'Sports', 'Art'], price:95, unit:'week', pickup:'On campus, no pickup needed', why:'6 kids from her class go · homework hour first', key:'lkc', ll:[30.2071,-97.8236], miles:0.6,
+    pals:{ Maya:{ faces:['priya.webp', 'aisha.webp'], plus:4, who:'Leo, Ava and 4 more from Maya’s class' }, Jake:{ faces:['elena.webp'], plus:3, who:'Noah and 3 more from Jake’s class' } } },
+  { n:'Little Coders Lab', img:A + 'illus/tutoring.webp', tags:['STEM'], price:165, unit:'month', pickup:'Van pickup from Lincoln at 3:05', why:'Small groups of 6 · 2 kids from her class', key:'lcl', ll:[30.2128,-97.8429], miles:1.1,
+    pals:{ Maya:{ faces:[], plus:0, who:'Lily and Zoe from Maya’s class' }, Jake:{ faces:[], plus:0, who:'Max from Jake’s class' } } },
+  { n:'Clay & Color Studio', img:A + 'illus/camps.webp', tags:['Art'], price:140, unit:'month', pickup:'Walking pickup with staff', why:'Ava goes on Wednesdays', key:'ccs', ll:[30.1931,-97.8178], miles:0.9,
+    pals:{ Maya:{ faces:['aisha.webp'], plus:0, who:'Ava, on Wednesdays' }, Jake:noFriends } },
+  { n:'Circle C Tumbling', img:A + 'illus/sports.webp', tags:['Sports'], price:120, unit:'month', pickup:'Van pickup from Lincoln at 3:10', why:'1.4 mi from home · Leo goes', key:'cct', ll:[30.1855,-97.8508], miles:1.4,
+    pals:{ Maya:{ faces:['priya.webp'], plus:0, who:'Leo, Mon and Wed' }, Jake:{ faces:['elena.webp'], plus:0, who:'Noah, on Thursdays' } } },
 ];
+/* the program cards on the shared map (X.sv.partyResults), clay art in the photo slot */
+function afterMap(p, kid, days, ranked){
+  const { partyResults, PARTY_HOME } = X.sv;
+  const byKey = new Map(ranked.map(r => [r.key, r]));
+  const places = ranked.map(r => ({ place:{ key:r.key, name:r.n, detail:'South Austin, TX', coords:r.ll, photo:r.img.slice(A.length) }, miles:r.miles }));
+  const cardHtml = (place, miles, first) => { const r = byKey.get(place.key); return `<div class="card dn3 campc" data-k="${r.key}">
+      <div class="dn3img ill" style="background-image:url(${r.img})">${first ? '<span class="dn3pick">My pick</span>' : ''}</div>
+      <div class="dn3bd"><div class="dn3top"><b>${r.n}</b><span class="dn3price"><strong>$${r.price}</strong> / ${r.unit}</span></div>
+        <div class="dn3sub">${r.pickup} · ${miles} mi</div>
+        ${facesHtml(r.pals[kid.n]) || `<div class="dn3sub">No one from ${kid.n}’s class yet</div>`}
+        <div class="dn3cta"><button class="btn dn3go" data-go>Choose</button></div></div></div>`; };
+  const wire = (tile, place, { finish }) => { tile.querySelector('[data-go]').onclick = () => finish(place); };
+  return partyResults(p, null, { ...PARTY_HOME, label:`${kid.n} · ${days.join(', ')}` }, places,
+    { heading:'After-school programs', search:'after school programs', showAll:true, back:false, cardHtml, wire }).then(place => byKey.get(place.key));
+}
 X.flows.afterschool = async p => {
   await p.say('Happy to. After school runs 3 to 6 PM. Pick the kid, the days, and what they’d enjoy.', 900);
   const INTEREST = ['Anything', 'Sports', 'Art', 'STEM'];
@@ -429,12 +675,11 @@ X.flows.afterschool = async p => {
   await sleep(1400);
   const ranked = [...AFTER].sort((a, b) => b.tags.includes(interest) - a.tags.includes(interest));
   w.done(`${ranked.length} with pickup from Lincoln`, 'Closest and most classmates first', 'ph-student');
-  await p.say(`My pick is ${ranked[0].n}: ${ranked[0].why.split(' · ')[0].toLowerCase()}. Here are the others too.`, 900);
-  const prog = await optionsCard(p, { eyebrow:`${kid.n} · ${days.join(', ')}`, title:'After-school programs', cta:r => `Sign ${kid.n} up for ${r.n}`,
-    rows:ranked.map(r => ({ ...r, why:r.why.replace('her class', `${kid.n}’s class`), line:`${r.pickup} · $${r.price}/${r.unit}` })) });
+  await p.say(`My pick is ${ranked[0].n}${ranked[0].pals[kid.n].who ? `: ${ranked[0].pals[kid.n].who} go there` : ''}. Swipe for the others.`, 900);
+  const prog = await afterMap(p, kid, days, ranked);
   const her = kid.n === 'Jake' ? 'his' : 'her';
   await p.say(`I filled ${kid.n}’s form from ${her} profile. One new question from ${prog.n}.`, 900);
-  const c = p.block(`<div class="card"><div class="ctop"><span class="icotile"><i class="ph ph-clipboard-text"></i></span><div><div class="eyebrow">${kid.n}’s form · <b class="cnt">5</b> of 6 ready</div><div class="ttl">${prog.n}</div></div></div>
+  const c = p.block(`<div class="card"><div class="ctop regh"><span class="uaph" style="width:48px;height:48px;background-image:url(${kid.img})"></span><div><div class="ttl">${kid.n}’s registration</div><div class="eyebrow">${prog.n} · <b class="cnt">5</b> of 6 ready</div></div></div>
     <div class="progress"><i style="width:${5 / 6 * 100}%"></i></div>
     <div class="fields">${[[{ l:`From ${her} profile`, v:'Birthday, allergies, emergency contacts' }, 'Camps'], [{ l:'Days', v:`${days.join(', ')} · 3–6 PM` }, 'You picked'], [{ l:'School pickup', v:prog.pickup }, prog.n]].map(([x, t]) => fieldRow(x, t)).join('')}</div>
     <div class="qwrap"></div></div>`).querySelector('.card');
@@ -749,10 +994,10 @@ X.flows.club = async p => {
 
 /* ======================= review links + deep links ======================= */
 /* L2 (Tony, 19 Nov: "what's the point of all these links?"): every link starts its flow from the beginning */
+/* M2 (Tony, 19 Nov chat): only the 8 home flows. The other review states stay reachable by their URL. */
 const LINKS = [['/assist/', 'Sprout Assist home'], ['/playdate/', 'Playdate'], ['/book-a-sitter-saved/', 'Book a sitter'],
   ['/plan-a-date-night/', 'Date night'], ['/birthdays/', 'Birthday'], ['/sports/', 'Sports · SSC Kids'], ['/after-school/', 'After school'], ['/summer-camps/', 'Camps'], ['/tutoring/', 'Tutoring'],
-  ['/assist-ongoing/', 'Pick up where you left off'], ['/pay-todo/', 'Sitter is done: rate and pay'],
-  ['/sitter-class-chat/', 'Share sitters (Priya’s phone)'], ['/sitter-profile/?s=thread', 'Sitter profile (sitter’s phone)'], ['/review/', 'All flows on one page']];
+  ['/review/', 'All 8 flows on one page']];
 const route = location.pathname.split('/').filter(Boolean)[0] || '';
 const review = new URLSearchParams(location.search).get('review');
 $('#deskLinks').innerHTML = LINKS.map(([h, t]) => `<li><a href="${h}"${('/' + route + '/').replace('//', '/') === h ? ' aria-current="page"' : ''}>${t}</a></li>`).join('');
@@ -768,6 +1013,8 @@ const ROUTE = {
   'create-club': () => X.start('club', { echo:'Start a club' }),
   'birthday-invite': () => X.flows.birthdayInvite(COVERS.bday),
   'accounts-payments': () => { X.showHome(); X.openSheet(); setTimeout(X.openWallet, 500); },
+  /* N1 carpool in Tony's order (20 Nov), flow in sitter-v3.js; the 19 Nov A/B links open it too */
+  'plan-carpool': () => X.start('carpool', { echo:'Set up a carpool' }), 'carpool-a': () => X.start('carpool', { echo:'Set up a carpool' }), 'carpool-b': () => X.start('carpool', { echo:'Set up a carpool' }),
 };
 if (ROUTE[route]) setTimeout(ROUTE[route], 500);
 })();

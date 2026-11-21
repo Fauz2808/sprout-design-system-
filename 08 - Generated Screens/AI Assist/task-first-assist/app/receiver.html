@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>The other side · Sprout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<!-- 20 Nov (Ahmad): the other parent's side of a request, for the presentation (/other-side/). One phone, three moments,
+     tap to move on: 1 the notification on their lock screen, 2 the request, 3 their answer and what comes back.
+     ?v=carpool-chat   Priya, in Jake's team chat in Sprout (Tony picked "Post in Jake's team chat")
+     ?v=carpool-text   Priya, a group text with Tony and Sprout (Tony picked "Parents I pick"; works without Sprout, N10)
+     ?v=sitter-text    Alex the sitter, a group text with Tony and Sprout (N9: Sprout texts, the parent is on the text)
+     Playdate is the existing /playdate-invite/ (Ana, in Sprout). Names and times match the sender flows. -->
+<style>
+:root{--bg:#f4f1ea;--white:#fff;--strong:#1d2a22;--ink:#1e3e2b;--text:#333d36;--subtle:#6b746d;--soft:#ebe7de;--field:#f1eee7;--brand:#186338;--tint:#e3efe6;
+  --serif:'Playfair Display',Georgia,serif;--sans:Inter,-apple-system,system-ui,sans-serif;--ios:-apple-system,"SF Pro Text",Inter,system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#d9d4c9;font:15px/1.4 var(--sans);-webkit-font-smoothing:antialiased}
+button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inherit}
+#phone{position:relative;width:393px;height:852px;margin:0 auto;overflow:hidden;background:var(--bg)}
+@media (min-width:500px){body{display:grid;place-items:center;padding:20px 0}#phone{border-radius:48px;box-shadow:0 0 0 10px #1d241f,0 30px 60px rgb(0 0 0 / .3)}}
+.sb{position:absolute;z-index:30;top:0;left:0;right:0;height:50px;padding:16px 30px 0 44px;display:flex;justify-content:space-between;font:600 16px var(--ios);color:#111}
+.sb.light{color:#fff}
+.sb i{font-size:15px;margin-left:4px}
+.home{position:absolute;z-index:40;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:#111}
+.home.light{background:#fff}
+.view{position:absolute;inset:0;transition:opacity .45s,transform .45s}
+.view[hidden]{display:block!important;opacity:0;pointer-events:none;transform:scale(1.03)}
+
+/* 1 · lock screen */
+.lock{background:linear-gradient(170deg,#4d6b57 0%,#2f4a39 45%,#1d2e24 100%);color:#fff;text-align:center}
+.lock .date{margin-top:86px;font:500 20px var(--ios);opacity:.9}
+.lock .time{font:200 92px/1 var(--ios);letter-spacing:-2px}
+.note{position:absolute;left:12px;right:12px;top:330px;display:flex;gap:11px;padding:13px 14px;border-radius:22px;background:rgb(245 245 245 / .82);
+  -webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);color:#111;text-align:left;font-family:var(--ios);animation:drop .7s cubic-bezier(.2,1,.3,1) .5s both}
+@keyframes drop{from{opacity:0;transform:translateY(-30px)}}
+.note .ic{width:38px;height:38px;border-radius:9px;flex:none;background:center/cover}
+.note .ic.msg{display:grid;place-items:center;background:linear-gradient(180deg,#5af77a,#24c43f);color:#fff;font-size:24px}
+.note .hd{display:flex;justify-content:space-between;font-size:14px;font-weight:600}
+.note .hd small{font-weight:400;color:#6b6b70}
+.note p{margin:2px 0 0;font-size:14px;line-height:1.35}
+.tapto{position:absolute;left:0;right:0;bottom:120px;font:500 14px var(--ios);opacity:.75;animation:pulse 2s ease-in-out 1.6s infinite}
+@keyframes pulse{50%{opacity:.35}}
+
+/* Sprout team chat */
+.chat{display:flex;flex-direction:column;background:var(--bg)}
+.chat .top{flex:none;padding:56px 14px 10px;display:flex;align-items:center;gap:10px;background:#fbfaf6;border-bottom:1px solid var(--soft)}
+.chat .top .bk{width:36px;height:36px;border-radius:50%;background:var(--tint);display:grid;place-items:center;color:var(--brand);font-size:18px}
+.chat .top .lg{width:40px;height:40px;border-radius:50%;background:center/cover #fff}
+.chat .top b{display:block;font:500 17px var(--serif);color:var(--ink)}
+.chat .top small{font-size:12px;color:var(--subtle)}
+.log{flex:1;overflow:hidden;padding:14px 14px 0;display:flex;flex-direction:column;gap:10px;justify-content:flex-end}
+.m{display:flex;gap:8px;align-items:flex-end}
+.m .av{width:30px;height:30px;border-radius:50%;background:center/cover #ddd;flex:none}
+.m .b{max-width:78%;padding:9px 12px;border-radius:16px 16px 16px 4px;background:#fff;font-size:14.5px;line-height:1.38;color:#283329}
+.m .b small{display:block;margin-bottom:2px;font-size:11px;font-weight:600;color:var(--brand)}
+.m.me{justify-content:flex-end}.m.me .b{background:var(--brand);color:#fff;border-radius:16px 16px 4px 16px}
+.sys{align-self:center;display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:#e8e3d8;font-size:12px;color:#4d525b}
+.ride{margin-left:38px;padding:13px;border-radius:18px;background:#fff;border:1px solid #dfe9e1;box-shadow:0 6px 18px -10px rgb(30 50 30 / .3)}
+.ride .h{display:flex;align-items:center;gap:10px}
+.ride .h img{width:40px;height:40px}
+.ride .h b{display:block;font:500 17px var(--serif);color:var(--ink)}
+.ride .h small{font-size:12.5px;color:var(--subtle)}
+.ride .f{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13.5px;color:var(--strong)}
+.ride .f i{color:var(--brand);font-size:17px}
+.ride .two{display:flex;gap:8px;margin-top:12px}
+.ride .two button{flex:1;height:42px;border-radius:999px;font:500 15px var(--serif);background:var(--field);color:var(--ink)}
+.ride .two button.go{background:var(--brand);color:#fff}
+.ride.done{border-color:var(--brand);background:#f3f8f4}
+.comp{flex:none;margin:10px 12px 30px;height:44px;border-radius:999px;background:#fff;border:1px solid #e6e1d6;display:flex;align-items:center;padding:0 16px;font-size:14px;color:#a49a88}
+
+/* iOS Messages, group text */
+.sms{display:flex;flex-direction:column;background:#fff;font-family:var(--ios)}
+.sms .top{flex:none;padding:52px 12px 8px;text-align:center;border-bottom:1px solid #e5e5ea;background:rgb(249 249 249 / .94);position:relative}
+.sms .top .bk{position:absolute;left:12px;top:64px;color:#0a84ff;font-size:24px}
+.sms .avs{display:flex;justify-content:center}
+.sms .avs i{width:44px;height:44px;border-radius:50%;border:2px solid #fff;margin-left:-10px;background:center/cover #ccc}
+.sms .avs i:first-child{margin-left:0}
+.sms .top b{display:block;margin-top:3px;font-size:12px;font-weight:500;color:#111}
+.sms .top small{font-size:11px;color:#8e8e93}
+.sms .log{gap:3px;padding:12px 12px 0}
+.sms .stamp{align-self:center;margin:8px 0 6px;font-size:11px;color:#8e8e93}
+.sms .who{margin:6px 0 1px 44px;font-size:11px;color:#8e8e93}
+.sms .row{display:flex;gap:8px;align-items:flex-end}
+.sms .row .av{width:30px;height:30px;border-radius:50%;background:center/cover #ccc;flex:none}
+.sms .row .av.blank{visibility:hidden}
+.sms .bb{max-width:74%;padding:8px 12px;border-radius:18px;background:#e9e9eb;color:#000;font-size:15.5px;line-height:1.3}
+.sms .row.me{justify-content:flex-end}.sms .row.me .bb{background:#34c759;color:#fff}
+.sms .bb a{color:inherit;text-decoration:underline}
+.sms .kind{align-self:center;margin:2px 0 8px;font-size:11px;color:#8e8e93}
+.quick{flex:none;display:flex;gap:8px;padding:10px 12px 0;overflow-x:auto}
+.quick button{flex:none;padding:9px 14px;border-radius:18px;border:1px solid #c7c7cc;font-size:14.5px;color:#0a84ff;background:#fff}
+.sms .comp{border-radius:20px;border:1px solid #c7c7cc;margin:10px 12px 30px;height:38px;color:#8e8e93;font-family:var(--ios)}
+
+.in{animation:inn .45s cubic-bezier(.2,1,.3,1) both}
+@keyframes inn{from{opacity:0;transform:translateY(12px)}}
+.nudge{animation:ring 1.6s ease-out infinite}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgb(24 99 56 / .45)}70%,100%{box-shadow:0 0 0 10px rgb(24 99 56 / 0)}}
+.quick .nudge{animation-name:ringb}
+@keyframes ringb{0%{box-shadow:0 0 0 0 rgb(10 132 255 / .45)}70%,100%{box-shadow:0 0 0 10px rgb(10 132 255 / 0)}}
+</style>
+</head>
+<body>
+<div id="phone" aria-live="polite"></div>
+<script>
+(() => {
+  const A = '/assets/';
+  const v = new URLSearchParams(location.search).get('v') || 'carpool-chat';
+  const phone = document.getElementById('phone');
+  const sb = light => `<div class="sb${light ? ' light' : ''}"><span>${light ? '' : '9:41'}</span><span><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>`;
+  const el = h => { const t = document.createElement('template'); t.innerHTML = h.trim(); return t.content.firstElementChild; };
+  /* the answer to tap pulses (a floating hint covered the buttons) */
+  const hint = on => phone.querySelectorAll('[data-yes]').forEach(b => b.classList.toggle('nudge', !!on));
+  const TONY = A + 'tony.webp', PRIYA = A + 'priya.webp', SPROUT = A + 'app-icon-180.png', ALEX = A + 'sitters/woman.webp', CLOVER = A + 'assist-clover.webp';
+
+  const S = {
+    'carpool-chat': {
+      who: 'Priya Shah, Leo’s mom, on Jake’s SSC team',
+      push: { app: 'Sprout', icon: SPROUT, when: 'now', text: '<b>Jake’s team</b><br>Tony needs a ride for Jake on Saturday at 9:30 AM. Can you help?' },
+      thread() {
+        return el(`<section class="view chat">${sb()}
+          <div class="top"><span class="bk"><i class="ph ph-caret-left"></i></span><span class="lg" style="background-image:url(${A}ssc-logo.webp)"></span><div><b>Jake’s team</b><small>SSC Kids · U6 Blue · 12 families</small></div></div>
+          <div class="log">
+            <div class="m"><span class="av" style="background-image:url(${A}aisha.webp)"></span><div class="b"><small>Aisha · Ava’s mom</small>Great game last week, kids!</div></div>
+            <div class="m in"><span class="av" style="background-image:url(${TONY})"></span><div class="b"><small>Tony · Jake’s dad</small>Hi everyone! Could anyone near us take Jake from home to soccer at Lakeline Park on Sat, Aug 1 at 9:30 AM? We’re on Banks Court. Happy to return the favor!</div></div>
+            <div class="ride in" style="animation-delay:.25s"><div class="h"><img src="${A}illus/carpool.webp" alt=""><div><b>Ride for Jake</b><small>Sat, Aug 1 · 9:30 AM</small></div></div>
+              <div class="f"><i class="ph ph-map-pin"></i>Banks Court to Lakeline Park, one way</div>
+              <div class="f"><i class="ph ph-navigation-arrow"></i>0.8 mi from you · Leo plays too</div>
+              <div class="two"><button data-no>Can’t this time</button><button class="go" data-yes>I can drive</button></div></div>
+          </div><div class="comp">Message Jake’s team</div></section>`);
+      },
+      yes(view) {
+        const card = view.querySelector('.ride');
+        card.classList.add('done');
+        card.querySelector('.two').replaceWith(el(`<div class="f in" style="margin-top:12px;font-weight:600;color:var(--brand)"><i class="ph-fill ph-check-circle"></i>You’re driving Jake. It’s on your calendar.</div>`));
+        const log = view.querySelector('.log');
+        log.append(el(`<div class="m me in"><div class="b">I can take him! Leo’s going anyway.</div></div>`));
+        setTimeout(() => { log.append(el(`<div class="sys in"><i class="ph-fill ph-car-profile"></i>Priya is driving Jake · Tony was told</div>`));
+          log.append(el(`<div class="m in"><span class="av" style="background-image:url(${TONY})"></span><div class="b"><small>Tony · Jake’s dad</small>Thank you Priya! He’ll be ready at 9:30.</div></div>`)); }, 900);
+      },
+      no(view) { view.querySelector('.ride .two').replaceWith(el(`<div class="f in" style="margin-top:12px;color:var(--subtle)"><i class="ph ph-x-circle"></i>You said you can’t. Only Tony sees it.</div>`)); },
+    },
+    'carpool-text': {
+      who: 'Priya Shah. A group text, so it works even without Sprout',
+      push: { app: 'Messages', icon: 'messages', when: 'now', text: '<b>Tony Martin & Sprout</b><br>Hi Priya! It’s Sprout, texting with Tony Martin. Could you take Jake to soccer on Saturday…' },
+      thread() {
+        return el(`<section class="view sms">${sb()}
+          <div class="top"><i class="ph ph-caret-left bk"></i><div class="avs"><i style="background-image:url(${TONY})"></i><i style="background-image:url(${SPROUT})"></i></div><b>Tony Martin, Sprout ›</b><small>Group text · 3 people</small></div>
+          <div class="log"><span class="kind">Text Message · Today 7:52 AM</span>
+            <span class="who">Sprout</span>
+            <div class="row in"><span class="av" style="background-image:url(${SPROUT})"></span><div class="bb">Hi Priya! It’s Sprout, texting with Tony Martin (he’s on this text too). Could you take Jake from home to soccer at Lakeline Park on Sat, Aug 1 at 9:30 AM? It’s one way. Just reply here.</div></div>
+          </div>
+          <div class="quick"><button data-yes>Yes, I can take him</button><button data-no>Sorry, not this time</button></div>
+          <div class="comp">Text Message</div></section>`);
+      },
+      yes(view) {
+        view.querySelector('.quick').remove();
+        const log = view.querySelector('.log');
+        log.append(el(`<div class="row me in"><div class="bb">Yes, I can take him! Leo’s going anyway.</div></div>`));
+        setTimeout(() => {
+          log.append(el(`<span class="who in">Sprout</span>`));
+          log.append(el(`<div class="row in"><span class="av" style="background-image:url(${SPROUT})"></span><div class="bb">Thanks Priya! You’re driving Jake on Sat, Aug 1 at 9:30 AM. Pickup at 10212 Banks Court, Austin. Add it to your calendar: <a>sprout.link/r/8KQ2</a></div></div>`));
+        }, 900);
+        setTimeout(() => {
+          log.append(el(`<span class="who in">Tony Martin</span>`));
+          log.append(el(`<div class="row in"><span class="av" style="background-image:url(${TONY})"></span><div class="bb">Thank you so much! He’ll be ready at 9:30.</div></div>`));
+        }, 1900);
+      },
+      no(view) {
+        view.querySelector('.quick').remove();
+        const log = view.querySelector('.log');
+        log.append(el(`<div class="row me in"><div class="bb">Sorry, not this time!</div></div>`));
+        setTimeout(() => { log.append(el(`<span class="who in">Sprout</span>`)); log.append(el(`<div class="row in"><span class="av" style="background-image:url(${SPROUT})"></span><div class="bb">No problem, thanks for letting us know! I’ll ask another family.</div></div>`)); }, 900);
+      },
+    },
+    'sitter-text': {
+      who: 'Alex, the sitter. A group text, no app needed',
+      push: { app: 'Messages', icon: 'messages', when: 'now', text: '<b>Tony Martin & Sprout</b><br>Hi Alex! It’s Sprout, texting with Tony Martin. Are you free to watch Maya and Jake on Friday…' },
+      thread() {
+        return el(`<section class="view sms">${sb()}
+          <div class="top"><i class="ph ph-caret-left bk"></i><div class="avs"><i style="background-image:url(${TONY})"></i><i style="background-image:url(${SPROUT})"></i></div><b>Tony Martin, Sprout ›</b><small>Group text · 3 people</small></div>
+          <div class="log"><span class="kind">Text Message · Today 4:10 PM</span>
+            <span class="who">Sprout</span>
+            <div class="row in"><span class="av" style="background-image:url(${SPROUT})"></span><div class="bb">Hi Alex! It’s Sprout, texting with Tony Martin (he’s on this text too). Are you free to watch Maya (7) and Jake (5) on Fri, Jul 31, 6–10 PM? Just reply here.</div></div>
+          </div>
+          <div class="quick"><button data-yes>Yes, I’m free! $25/hr</button><button data-no>Sorry, I can’t that night</button></div>
+          <div class="comp">Text Message</div></section>`);
+      },
+      yes(view) {
+        view.querySelector('.quick').remove();
+        const log = view.querySelector('.log');
+        log.append(el(`<div class="row me in"><div class="bb">Yes, I’m free! $25/hr</div></div>`));
+        setTimeout(() => { log.append(el(`<span class="stamp in">Tony booked you · 4:18 PM</span>`)); log.append(el(`<span class="who in">Sprout</span>`));
+          log.append(el(`<div class="row in"><span class="av" style="background-image:url(${SPROUT})"></span><div class="bb">Great, you’re booked! Fri, Jul 31, 6–10 PM for Maya (7) and Jake (5). We’re at 10212 Banks Court, Austin. Bedtime 8:30. Maya reads first; Jake sleeps with the hall light on.</div></div>`)); }, 1000);
+        setTimeout(() => { log.append(el(`<div class="row in"><span class="av blank"></span><div class="bb">When you’re done, Tony pays you right here in Sprout. See you Friday!</div></div>`)); }, 1900);
+        setTimeout(() => { log.append(el(`<span class="who in">Tony Martin</span>`)); log.append(el(`<div class="row in"><span class="av" style="background-image:url(${TONY})"></span><div class="bb">Thanks Alex, the kids are excited!</div></div>`)); }, 2700);
+      },
+      no(view) {
+        view.querySelector('.quick').remove();
+        const log = view.querySelector('.log');
+        log.append(el(`<div class="row me in"><div class="bb">Sorry, I can’t that night!</div></div>`));
+        setTimeout(() => { log.append(el(`<span class="who in">Sprout</span>`)); log.append(el(`<div class="row in"><span class="av" style="background-image:url(${SPROUT})"></span><div class="bb">No worries, thanks Alex! I’ll let Tony know.</div></div>`)); }, 900);
+      },
+    },
+  };
+  const s = S[v] || S['carpool-chat'];
+  /* 1 · the lock screen with the notification */
+  const lock = el(`<section class="view lock">${sb(true)}<div class="date">Monday, July 27</div><div class="time">7:52</div>
+    <button class="note" aria-label="Open the notification">${s.push.icon === 'messages' ? '<span class="ic msg"><i class="ph-fill ph-chat-circle"></i></span>' : `<span class="ic" style="background-image:url(${s.push.icon})"></span>`}<div style="flex:1"><div class="hd"><span>${s.push.app}</span><small>${s.push.when}</small></div><p>${s.push.text}</p></div></button>
+    <div class="tapto">Tap the notification</div></section>`);
+  const thread = s.thread(); thread.hidden = true;
+  phone.append(lock, thread, el('<span class="home"></span>'));
+  phone.querySelector('.home').classList.add('light');
+  const open = () => { lock.hidden = true; thread.hidden = false; phone.querySelector('.home').classList.remove('light'); hint(true); };
+  lock.querySelector('.note').onclick = open;
+  thread.querySelectorAll('[data-yes]').forEach(b => b.onclick = () => { hint(false); s.yes(thread); });
+  thread.querySelectorAll('[data-no]').forEach(b => b.onclick = () => { hint(false); s.no(thread); });
+  /* in the presentation page the phones play on their own if nobody taps: open after 3 s */
+  if (new URLSearchParams(location.search).get('auto') !== '0') setTimeout(() => { if (!lock.hidden) open(); }, 3200);
+})();
+</script>
+</body>
+</html>
