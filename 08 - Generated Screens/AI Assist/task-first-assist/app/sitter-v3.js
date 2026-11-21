@@ -684,12 +684,12 @@ function rateCard(p, who){
 function payCard(p, who, w, H){
   return new Promise(res => {
     const wallet = X.wallet, TIPS = [0, 10, 15, 20];
-    let card = wallet.cards.find(c => c.def) || wallet.cards[0], h = H, tip = 0;
+    let card = wallet.cards.find(c => c.def) || wallet.cards[0], h = H, tip = 0, tipAmt = null;   // tipAmt: a typed dollar tip (S8)
     const c = p.block(`<div class="card pay pc" data-paycard>
       <div class="ctop">${face(who, 44)}<div><div class="eyebrow">Pay ${who.n}</div><div class="ttl">${w.day.long.split(',')[0]} · ${range(w.from, w.to)}</div></div></div>
       <div class="pc-row"><div><b>Hours</b><small data-hs></small></div><div class="pc-step"><button type="button" data-h="-1" aria-label="Fewer hours"><i class="ph-bold ph-minus"></i></button><b data-hv></b><button type="button" data-h="1" aria-label="More hours"><i class="ph-bold ph-plus"></i></button></div></div>
       <div class="dlabel" style="margin-top:12px">Add a tip</div>
-      <div class="fchips" style="margin-top:6px" data-tips>${TIPS.map(t => `<button type="button" class="chip" data-t="${t}">${t ? t + '%' : 'No tip'}</button>`).join('')}</div>
+      <div class="fchips" style="margin-top:6px" data-tips>${TIPS.map(t => `<button type="button" class="chip" data-t="${t}">${t ? t + '%' : 'No tip'}</button>`).join('')}<button type="button" class="chip" data-custom>Other</button></div>
       <div class="line" style="margin-top:12px"><span data-l1></span><span data-v1></span></div>
       <div class="line" data-tl><span>Tip</span><span data-v2></span></div>
       <div class="total"><span>Total</span><span data-tot></span></div>
@@ -699,20 +699,33 @@ function payCard(p, who, w, H){
       <button class="textbtn" data-other style="display:block;margin:10px auto 0">Already paid (cash or Venmo)</button></div>`).querySelector('.card');
     const money = n => '$' + (Math.round(n * 100) / 100).toFixed(2);
     const dur = x => x % 1 === 0 ? hrs(x) : x < 1 ? '30 min' : `${Math.floor(x)}½ hours`;
-    const sum = () => { const sub = who.rate * h, t = Math.round(sub * tip) / 100; return { sub, t, total:sub + t }; };
+    const sum = () => { const sub = who.rate * h, t = tipAmt != null ? tipAmt : Math.round(sub * tip) / 100; return { sub, t, total:sub + t }; };
     const paint = () => {
       const { sub, t, total } = sum(), extra = h - H;
       c.querySelector('[data-hv]').textContent = dur(h);
       c.querySelector('[data-hs]').textContent = extra ? `Booked ${dur(H)} · ${extra > 0 ? dur(extra) + ' extra' : dur(-extra) + ' less'}` : `Booked ${range(w.from, w.to)}`;
       c.querySelector('[data-h="-1"]').disabled = h <= .5;
-      c.querySelectorAll('[data-t]').forEach(b => b.classList.toggle('sel', +b.dataset.t === tip));
+      c.querySelectorAll('[data-t]').forEach(b => b.classList.toggle('sel', tipAmt == null && +b.dataset.t === tip));
+      const cu = c.querySelector('[data-custom]'); cu.classList.toggle('sel', tipAmt != null); cu.textContent = tipAmt != null ? money(tipAmt).replace(/\.00$/, '') : 'Other';
       c.querySelector('[data-l1]').textContent = `${dur(h)} × $${who.rate}`; c.querySelector('[data-v1]').textContent = money(sub);
-      c.querySelector('[data-tl]').hidden = !tip; c.querySelector('[data-v2]').textContent = money(t);
+      c.querySelector('[data-tl]').hidden = !t; c.querySelector('[data-v2]').textContent = money(t);
       c.querySelector('[data-tot]').textContent = money(total);
       c.querySelector('[data-pay]').textContent = `Pay ${who.n} ${money(total).replace(/\.00$/, '')}`;
     };
     c.querySelectorAll('[data-h]').forEach(b => b.onclick = () => { h = Math.max(.5, Math.min(H + 4, h + .5 * +b.dataset.h)); paint(); });
-    c.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { tip = +b.dataset.t; paint(); });
+    c.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { tip = +b.dataset.t; tipAmt = null; paint(); });
+    /* S8 (Tony, 20 Nov US: "a little option to add a tip"): any amount, typed in dollars, next to the percents */
+    c.querySelector('[data-custom]').onclick = () => {
+      const sub = who.rate * h, v = bsheet({ body:`<div class="bh"><span class="icotile"><i class="ph ph-hand-coins"></i></span><b>Tip ${who.n}</b></div>
+          <p class="bp">Any amount. 15% of ${money(sub).replace(/\.00$/, '')} would be ${money(Math.round(sub * 15) / 100)}.</p>
+          <label class="tip-in"><span>$</span><input inputmode="decimal" autocomplete="off" placeholder="0" value="${tipAmt != null ? tipAmt : ''}" aria-label="Tip amount in dollars"></label>`,
+        foot:'<button type="button" class="btn" data-go>Add tip</button>' });
+      const input = v.body.querySelector('input'), go = v.foot.querySelector('[data-go]');
+      const val = () => { const n = parseFloat(input.value.replace(/[^0-9.]/g, '')); return isFinite(n) ? Math.round(n * 100) / 100 : 0; };
+      const label = () => { const n = val(); go.textContent = n ? `Add ${money(n).replace(/\.00$/, '')} tip` : 'No tip'; };
+      input.oninput = label; label(); setTimeout(() => input.focus({ preventScroll:true }), 250);   // no page jump on the review desk
+      go.onclick = () => { const n = val(); tipAmt = n > 0 ? n : null; if (!n) tip = 0; v.close(); paint(); };
+    };
     const cr = c.querySelector('[data-card]');
     cr.onclick = () => X.pickCard(k => { card = k; cr.querySelector('.cl').textContent = k.label; cr.querySelector('.cs').textContent = k.sub; }, card.id);
     const lock = () => { c.querySelectorAll('button').forEach(b => b.disabled = true); c.querySelector('[data-other]').remove(); c.querySelector('[data-pay]').remove(); c.querySelector('.fchips').remove(); c.querySelector('.dlabel').remove(); };

@@ -73,6 +73,8 @@ All in `app/sitter-v3.js`. Try `/book-a-sitter/` (no sitters yet) and `/book-a-s
 - **S6 Pay, then rate** (`payCard`, `payTonight`): Pay Alex opens the pay card first: hours stepper (stayed late, in
   half hours), tip No tip / 10 / 15 / 20%, total, card on file, **Pay Alex $X** or **Already paid (cash or Venmo)**
   (replaces Decline). Paying texts the sitter the amount and tip. The rating comes after.
+  **S8** (21 Nov): an **Other** chip after the percents opens "Tip Alex", a dollar field (with what 15% would be);
+  the chip then shows the amount ($12) and the tip line and total use it. Tip chips are five equal columns.
 - **S7 Payout link** (`payoutLink`): right after the booking text, Sprout texts the sitter a one-time link to add
   their bank (Stripe, opens `/sitter-profile/`), only if they haven't yet.
 

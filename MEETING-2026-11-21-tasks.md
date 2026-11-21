@@ -115,7 +115,7 @@ Jangan tampilkan: tile Birthday + Date night, baris "Register my kids", "Saved d
 - [x] **S5** Live Activity: "babysitter", kartu lebih sempit, titik di tengah, indent "Home by / Casey by" sama
 - [x] **S6** Bayar: Pay Casey → layar bayar (ubah jam/jumlah, tip 10/15/20% (custom tip belum), Already paid / Pay through Sprout) → rating; SMS konfirmasi ke Casey
 - [x] **S7** Payout: SMS ke sitter setelah booking terkonfirmasi, link profil + rekening bank (Stripe), hanya kalau belum ada
-- [ ] **S8** (sisa dari S6) Tip custom: ketik jumlah sendiri, selain 10/15/20%
+- [x] **S8** (sisa dari S6) Tip custom: chip **Other** → sheet "Tip Alex" (ketik dolar, ada contoh 15%); chip jadi "$12", total ikut; chip tip 44px (Ahmad, 21 Nov)
 
 S1–S7: commit `67cf2be`, deploy https://sprout-assist-tasks.vercel.app (`/book-a-sitter/`, `/book-a-sitter-saved/?review=conversation`).
 
