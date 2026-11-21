@@ -191,6 +191,7 @@ S1–S7: commit `67cf2be`, deploy https://sprout-assist-tasks.vercel.app (`/book
 > - The sitter's reply shows in the group text. You can tap Book, or just reply to her yourself and Sprout picks it up.
 > - The Live Activity says "babysitter" and the layout is cleaner.
 > - Pay first, then rate. Change the hours if she stayed late, add a tip, or mark "Already paid" for cash or Venmo.
+> - Tip by percent or any amount with "Other". The tip buttons are bigger, so they're easy to tap.
 > - Right after booking, Sprout texts the sitter a link to add her bank details, only once.
 >
 > **2. Playdate**
