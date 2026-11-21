@@ -15,10 +15,10 @@ Website: `01 - Website/sprout-reach-scene-iteration/` (hero kerja: `home-v3.html
 | 2 | **W1** Website hero | Permintaan eksplisit penutup meeting: "update that image at the top, header and subheader, see how that looks" | Hero baru dengan foto parent di depan sekolah + copy dari doc Tony, dikirim ke Tony | **Selesai**: commit `f6b3e56`, live di sprout-reach-scene-iteration.vercel.app/home-v3.html. Belum dikirim ke Tony |
 | 3 | **P1–P3** Playdate | Tony review paling panjang; layout + sinkron dua sisi | Anak di atas, satu baris; widget sama di dua sisi; balasan "Suggest another time" punya opsi | **Selesai**: commit `60c6472`, live di sprout-assist-tasks.vercel.app (`/playdate/`, `/playdate-new-time/`, `/playdate-invite/`) |
 | 4 | **C1** Carpool sekali | "The one I wanna focus on, obviously, is the one-time carpool" | Anak satu baris, header baru, sisi Priya + widget konfirmasi | **Selesai**: commit `632f348`, live (`/plan-carpool/`, `/receiver/?v=carpool-chat`) + tawaran jam dari parent lain |
-| 5 | **C2** Carpool rutin | Dirombak: dua keluarga, tanya satu per satu | Demo: keluarga 1 tidak bisa, keluarga 2 bisa, jadwal bisa diubah, Share | **Selesai** lokal (belum commit, belum deploy) |
+| 5 | **C2** Carpool rutin | Dirombak: dua keluarga, tanya satu per satu | Demo: keluarga 1 tidak bisa, keluarga 2 bisa, jadwal bisa diubah, Share | **Selesai**: commit `458288a`, live (`/plan-carpool/`, `/receiver/?v=carpool-regular`) |
 | 6 | **W2** Website bagian 2–6 | Doc Tony bilang "all copy below is final", tapi di meeting dia bilang hero dulu | Lima bagian sesuai doc, setelah Tony oke hero | Tunggu Tony oke hero |
 
-Commit `67cf2be` dan `f6b3e56` ada di branch `assist/sitter-date-night-map`, **belum di-push**.
+Semua commit hari ini ada di branch `assist/sitter-date-night-map`, **sudah di-push** (21 Nov).
 
 ## Yang terjadi
 
@@ -128,7 +128,7 @@ S1–S7: commit `67cf2be`, deploy https://sprout-assist-tasks.vercel.app (`/book
       Dibangun di `home-v3.html` (section `.hero2.village`), frame inset 2b tetap; hero 2b lama di
       `hero-photo-2026-11-20/v3-before-village/`. Tombol = arrow handoff (`.btn-hand`) + badge App Store/Google Play; HP = foto di atas, copy di panel hijau. Live: https://sprout-reach-scene-iteration.vercel.app/home-v3.html (21 Nov). Commit `f6b3e56`. Belum dikirim ke Tony.
 - [x] **W1b** Riset tombol (7 situs) + 3 arah di `button-directions-2026-11-21/`; Ahmad pilih tombol B + badge A
-- [ ] **W1c** Kirim link hero ke Tony (Ahmad); sebut copy ikut doc ("It takes a village…"), bukan kalimat di meeting
+- [ ] **W1c** Kirim link hero ke Tony (Ahmad); sebut copy ikut doc ("It takes a village…"), bukan kalimat di meeting: ada di draf update (pertanyaan 1)
 - [ ] **W2** Bagian 2–6 sesuai doc; hapus bagian yang mengulang Daily Brief; Assist hanya 3 tile
 - [ ] **W3** Setelah Tony oke: `python3 review/export-site.py`, commit + push `sprout-website`, kabari Mohit
 
@@ -145,9 +145,9 @@ S1–S7: commit `67cf2be`, deploy https://sprout-assist-tasks.vercel.app (`/book
 ### Lainnya
 - [ ] Kirim jawaban sitter ke Mohit (draf di bawah)
 - [x] Build + deploy prototype Assist (sitter baru ada di `/review/`), dicek di browser
-- [ ] Kirim link `/review/` ke Tony (Ahmad)
-- [ ] Push commit `67cf2be` + `f6b3e56` (Ahmad)
-- [ ] Update ke Tony ≥15 menit sebelum standup
+- [ ] Kirim link `/review/` + `/other-side/` ke Tony (Ahmad): ada di draf update
+- [x] Push branch `assist/sitter-date-night-map` ke GitHub (Ahmad, 21 Nov; HEAD `458288a`, 10 commit)
+- [ ] Update ke Tony ≥15 menit sebelum standup: **draf siap** (bagian "Draf update ke Tony" di bawah), tinggal kirim
 
 ## Task orang lain
 
@@ -170,12 +170,54 @@ S1–S7: commit `67cf2be`, deploy https://sprout-assist-tasks.vercel.app (`/book
 
 1. **Hero copy**: di meeting Tony bilang "Meet Sprout, the parent community for your school"; doc bilang "It takes a
    village to raise a family. Sprout brings yours together." Ikuti doc (ditulis sesudah, ditandai final)?
-2. **Hero visual**: meeting bilang tanpa app; doc bilang HP Daily Brief di pojok. Ikuti doc?
+2. ~~**Hero visual**~~: terjawab (Ahmad, 21 Nov): HP di pojok dihapus, badge App Store/Google Play di bawah tombol yang bilang ini app.
 3. **Bagian 3 "Connect your email"**: Google verification belum disetujui. Kalau belum live saat launch, bagian ini
    melanggar aturan doc sendiri ("only show features that are live at launch").
 4. ~~**She/he di Add a sitter**~~: terjawab di transcript [37:13]. Kalimat akhir Tony: "just say if it's a she or a
    he". Tetap She / He (dipakai Sprout untuk "she said so", "send her the address").
 5. **Carpool rutin**: kalau keluarga pertama tidak menjawab (bukan "no"), berapa lama sebelum tanya keluarga berikutnya?
+
+## Draf update ke Tony (Ahmad kirim, ≥15 menit sebelum standup)
+
+> Hi Tony, here's where everything from Friday's call stands.
+>
+> **Review link** (every flow starts from the beginning): https://sprout-assist-tasks.vercel.app/review/
+> **Both sides** (your phone next to the other parent's or sitter's): https://sprout-assist-tasks.vercel.app/other-side/
+>
+> **1. Babysitter** (Mohit is building this now)
+> - Defaults to today. The earliest start is 30 minutes from now.
+> - First time, it only asks for the address and notes.
+> - Add a sitter straight from your contacts. Rate is optional. WhatsApp is gone.
+> - The sitter's reply shows in the group text. You can tap Book, or just reply to her yourself and Sprout picks it up.
+> - The Live Activity says "babysitter" and the layout is cleaner.
+> - Pay first, then rate. Change the hours if she stayed late, add a tip, or mark "Already paid" for cash or Venmo.
+> - Right after booking, Sprout texts the sitter a link to add her bank details, only once.
+>
+> **2. Playdate**
+> - Kids first, on one line, no class names. Date and place are one line each, so it stays short.
+> - You see the same invite card the other parent gets: "Waiting on Ana", then "Confirmed".
+> - If she suggests another time, the card shows both times with Accept, Suggest another time, or Reply.
+>
+> **3. Carpool, one time**
+> - Kids first ("Plan a ride"). The first yes drives, and the others get "we're all set, thanks".
+> - The other parent can tap I can drive, Can't at 9:30, or Reply. Can't at 9:30 lets her pick times she could
+>   drive, and you can move the pickup to one of them.
+>
+> **4. Carpool, regular**
+> - Two families only. You rank who to ask, and Sprout asks one at a time in Sprout. It only asks the next if the
+>   first can't.
+> - In the demo Priya can't and Aisha says yes. You get a fair split, change any turn, then share it. Aisha gets the
+>   schedule on her calendar.
+>
+> **5. Website hero** (from your copy doc): https://sprout-reach-scene-iteration.vercel.app/home-v3.html
+> - The photo is the parents at drop-off from our carousel, widened for desktop.
+> - The phone in the corner is gone. The App Store and Google Play badges under the button show it's an app.
+> - Next: sections 2 to 6 from your doc, once you're happy with the hero.
+>
+> **Two questions**
+> 1. Hero line: your doc says "It takes a village to raise a family. Sprout brings yours together." On the call you
+>    said "Meet Sprout, the parent community for your school." I used the doc. Keep it?
+> 2. Section 3 of the doc says "Connect your email". If Gmail isn't approved by launch, should we hold that section?
 
 ## Draf pesan ke Mohit (Ahmad kirim)
 
