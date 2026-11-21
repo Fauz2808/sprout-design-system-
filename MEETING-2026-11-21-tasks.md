@@ -18,7 +18,42 @@ Website: `01 - Website/sprout-reach-scene-iteration/` (hero kerja: `home-v3.html
 | 5 | **C2** Carpool rutin | Dirombak: dua keluarga, tanya satu per satu | Demo: keluarga 1 tidak bisa, keluarga 2 bisa, jadwal bisa diubah, Share | **Selesai**: commit `458288a`, live (`/plan-carpool/`, `/receiver/?v=carpool-regular`) |
 | 6 | **W2** Website bagian 2–6 | Doc Tony bilang "all copy below is final", tapi di meeting dia bilang hero dulu | Lima bagian sesuai doc, setelah Tony oke hero | Tunggu Tony oke hero |
 
-Semua commit hari ini ada di branch `assist/sitter-date-night-map`, **sudah di-push** (21 Nov).
+Semua commit hari ini ada di branch `assist/sitter-date-night-map`, **sudah di-push** (21 Nov, HEAD `4335d98`).
+
+## Status akhir 21 Nov
+
+**Diperbarui** (task dari meeting, sekarang selesai dan live)
+
+| Task | Status | Commit | Link |
+|---|---|---|---|
+| S1–S7 Babysitter | Selesai | `67cf2be` | sprout-assist-tasks.vercel.app/review/ |
+| W0–W1 Website hero | Selesai (belum dikirim ke Tony) | `f6b3e56` | sprout-reach-scene-iteration.vercel.app/home-v3.html |
+| P1–P3 Playdate | Selesai | `60c6472` | `/playdate/`, `/playdate-new-time/`, `/playdate-invite/` |
+| C1 Carpool sekali | Selesai | `632f348` | `/plan-carpool/`, `/receiver/?v=carpool-chat` |
+| C2 Carpool rutin | Selesai | `458288a` | `/plan-carpool/`, `/receiver/?v=carpool-regular` |
+| Pertanyaan she/he, visual hero | Terjawab | - | lihat Pertanyaan terbuka |
+
+**Baru** (muncul selama hari ini, tidak ada di list awal)
+
+| Task | Asal | Status | Commit |
+|---|---|---|---|
+| W1b Riset tombol + arrow handoff `.btn-hand` + badge store; copy di garis tengah; HP di pojok dihapus; layout HP/tablet portrait | Ahmad review hero | Selesai | `f6b3e56` |
+| C1b "Can't at 9:30" buka sheet jam ("Pick all that work", "I can drive at these times"); Tony pindah pickup | Ahmad review carpool | Selesai | `632f348` |
+| S8 Tip custom (chip Other → ketik dolar) + chip tip 44px | Sisa S6 + Ahmad | Selesai | `57f5a46` |
+| Halaman dua sisi: pasangan carpool rutin (Tony + Aisha) | Untuk update Tony | Selesai | `ee06784` |
+| Draf update ke Tony (+ baris tip custom) | Ahmad | Siap kirim | `ee06784`, `4335d98` |
+| Push branch ke GitHub | Ahmad | Selesai (HEAD `4335d98`) | - |
+
+**Masih terbuka**
+
+| Task | Siapa | Menunggu |
+|---|---|---|
+| Kirim update ke Tony (≥15 menit sebelum standup) + link `/review/`, `/other-side/`, hero | Ahmad | - |
+| Kirim jawaban sitter ke Mohit | Ahmad | - |
+| W2 Website bagian 2–6 | Ahmad | Tony oke hero |
+| W3 Export ke joinsprout.co + kabari Mohit | Ahmad | W2 selesai |
+| Pertanyaan: kalimat hero, bagian "Connect your email" | Tony | Dijawab lewat update |
+| Pertanyaan: carpool rutin, berapa lama tunggu sebelum tanya keluarga berikutnya | Tony | Belum ditanyakan |
 
 ## Yang terjadi
 
@@ -110,12 +145,12 @@ Jangan tampilkan: tile Birthday + Date night, baris "Register my kids", "Saved d
 ### Babysitter (`sitter-v3.js`, `sitter-profile.html`, `live-night.html`)
 - [x] **S1** Waktu: default hari ini; slot paling awal = sekarang + 30 menit (dibulatkan ke 30 menit berikutnya)
 - [x] **S2** Detail pemakaian pertama: hanya Location (field alamat kosong, placeholder rumah) + Notes, field input bukan pensil; tanpa ulang anak/waktu
-- [x] **S3** Add a sitter: tombol "Choose from Contacts" (sheet kontak native), rate/hr opsional, hapus WhatsApp; she/he: lihat pertanyaan terbuka
+- [x] **S3** Add a sitter: tombol "Choose from Contacts" (sheet kontak native), rate/hr opsional, hapus WhatsApp; She/He tetap (terjawab di transcript)
 - [x] **S4** Thread SMS: Sprout + parent + sitter; sitter "yes" → hot key Book Casey; parent balas sendiri → "Looks like you're confirmed"
 - [x] **S5** Live Activity: "babysitter", kartu lebih sempit, titik di tengah, indent "Home by / Casey by" sama
-- [x] **S6** Bayar: Pay Casey → layar bayar (ubah jam/jumlah, tip 10/15/20% (custom tip belum), Already paid / Pay through Sprout) → rating; SMS konfirmasi ke Casey
+- [x] **S6** Bayar: Pay Casey → layar bayar (ubah jam/jumlah, tip 10/15/20% (tip custom: lihat S8), Already paid / Pay through Sprout) → rating; SMS konfirmasi ke Casey
 - [x] **S7** Payout: SMS ke sitter setelah booking terkonfirmasi, link profil + rekening bank (Stripe), hanya kalau belum ada
-- [x] **S8** (sisa dari S6) Tip custom: chip **Other** → sheet "Tip Alex" (ketik dolar, ada contoh 15%); chip jadi "$12", total ikut; chip tip 44px (Ahmad, 21 Nov)
+- [x] **S8** (sisa dari S6) Tip custom: chip **Other** → sheet "Tip Alex" (ketik dolar, ada contoh 15%); chip jadi "$12", total ikut; chip tip 44px (Ahmad, 21 Nov). Commit `57f5a46`, live
 
 S1–S7: commit `67cf2be`, deploy https://sprout-assist-tasks.vercel.app (`/book-a-sitter/`, `/book-a-sitter-saved/?review=conversation`).
 
@@ -146,7 +181,7 @@ S1–S7: commit `67cf2be`, deploy https://sprout-assist-tasks.vercel.app (`/book
 - [ ] Kirim jawaban sitter ke Mohit (draf di bawah)
 - [x] Build + deploy prototype Assist (sitter baru ada di `/review/`), dicek di browser
 - [ ] Kirim link `/review/` + `/other-side/` ke Tony (Ahmad): ada di draf update
-- [x] Push branch `assist/sitter-date-night-map` ke GitHub (Ahmad, 21 Nov; HEAD `458288a`, 10 commit)
+- [x] Push branch `assist/sitter-date-night-map` ke GitHub (Ahmad, 21 Nov; HEAD sekarang `4335d98`)
 - [ ] Update ke Tony ≥15 menit sebelum standup: **draf siap** (bagian "Draf update ke Tony" di bawah), tinggal kirim
 
 ## Task orang lain
