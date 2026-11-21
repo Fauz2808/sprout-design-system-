@@ -9,14 +9,16 @@ Website: `01 - Website/sprout-reach-scene-iteration/` (hero kerja: `home-v3.html
 
 ## Prioritas (usulan)
 
-| # | Task | Kenapa urutan ini | Selesai kalau |
-|---|---|---|---|
-| 1 | **S1–S7** Babysitter | Mohit **sedang membangun flow ini hari ini** dan punya banyak pertanyaan; tiap jam desain belum beres = Mohit nebak | Flow sitter di prototype sesuai semua poin di bawah + satu pesan jawaban ke Mohit |
-| 2 | **W1** Website hero | Permintaan eksplisit penutup meeting: "update that image at the top, header and subheader, see how that looks" | Hero baru dengan foto parent di depan sekolah + copy dari doc Tony, dikirim ke Tony |
-| 3 | **P1–P3** Playdate | Tony review paling panjang; layout + sinkron dua sisi | Anak di atas, satu baris; widget sama di dua sisi; balasan "Suggest another time" punya opsi |
-| 4 | **C1** Carpool sekali | "The one I wanna focus on, obviously, is the one-time carpool" | Anak satu baris, header baru, sisi Priya + widget konfirmasi |
-| 5 | **C2** Carpool rutin | Dirombak: dua keluarga, tanya satu per satu | Demo: keluarga 1 tidak bisa, keluarga 2 bisa, jadwal bisa diubah, Share |
-| 6 | **W2** Website bagian 2–6 | Doc Tony bilang "all copy below is final", tapi di meeting dia bilang hero dulu | Lima bagian sesuai doc, setelah Tony oke hero |
+| # | Task | Kenapa urutan ini | Selesai kalau | Status (21 Nov) |
+|---|---|---|---|---|
+| 1 | **S1–S7** Babysitter | Mohit **sedang membangun flow ini hari ini** dan punya banyak pertanyaan; tiap jam desain belum beres = Mohit nebak | Flow sitter di prototype sesuai semua poin di bawah + satu pesan jawaban ke Mohit | **Selesai**: commit `67cf2be`, live di sprout-assist-tasks.vercel.app. Pesan ke Mohit belum dikirim |
+| 2 | **W1** Website hero | Permintaan eksplisit penutup meeting: "update that image at the top, header and subheader, see how that looks" | Hero baru dengan foto parent di depan sekolah + copy dari doc Tony, dikirim ke Tony | **Selesai**: commit `f6b3e56`, live di sprout-reach-scene-iteration.vercel.app/home-v3.html. Belum dikirim ke Tony |
+| 3 | **P1–P3** Playdate | Tony review paling panjang; layout + sinkron dua sisi | Anak di atas, satu baris; widget sama di dua sisi; balasan "Suggest another time" punya opsi | **Selesai** lokal (belum commit, belum deploy) |
+| 4 | **C1** Carpool sekali | "The one I wanna focus on, obviously, is the one-time carpool" | Anak satu baris, header baru, sisi Priya + widget konfirmasi | Belum mulai |
+| 5 | **C2** Carpool rutin | Dirombak: dua keluarga, tanya satu per satu | Demo: keluarga 1 tidak bisa, keluarga 2 bisa, jadwal bisa diubah, Share | Belum mulai |
+| 6 | **W2** Website bagian 2–6 | Doc Tony bilang "all copy below is final", tapi di meeting dia bilang hero dulu | Lima bagian sesuai doc, setelah Tony oke hero | Tunggu Tony oke hero |
+
+Commit `67cf2be` dan `f6b3e56` ada di branch `assist/sitter-date-night-map`, **belum di-push**.
 
 ## Yang terjadi
 
@@ -113,6 +115,9 @@ Jangan tampilkan: tile Birthday + Date night, baris "Register my kids", "Saved d
 - [x] **S5** Live Activity: "babysitter", kartu lebih sempit, titik di tengah, indent "Home by / Casey by" sama
 - [x] **S6** Bayar: Pay Casey → layar bayar (ubah jam/jumlah, tip 10/15/20% (custom tip belum), Already paid / Pay through Sprout) → rating; SMS konfirmasi ke Casey
 - [x] **S7** Payout: SMS ke sitter setelah booking terkonfirmasi, link profil + rekening bank (Stripe), hanya kalau belum ada
+- [ ] **S8** (sisa dari S6) Tip custom: ketik jumlah sendiri, selain 10/15/20%
+
+S1–S7: commit `67cf2be`, deploy https://sprout-assist-tasks.vercel.app (`/book-a-sitter/`, `/book-a-sitter-saved/?review=conversation`).
 
 ### Website (`sprout-reach-scene-iteration/`)
 - [x] **W0** Ambil foto carousel "Your people are here to help" (parent di depan sekolah) dari link yang Tony kirim di meeting; regenerate HD kalau resolusinya kurang
@@ -121,14 +126,16 @@ Jangan tampilkan: tile Birthday + Date night, baris "Register my kids", "Saved d
       orang yang sama (Seedream 5.5, flow ElevenLabs "Sprout website hero: parents at drop-off (wide)").
 - [x] **W1** Hero baru: foto itu, copy dari doc, HP Daily Brief di pojok, CTA Join Sprout; kirim ke Tony
       Dibangun di `home-v3.html` (section `.hero2.village`), frame inset 2b tetap; hero 2b lama di
-      `hero-photo-2026-11-20/v3-before-village/`. Tombol = arrow handoff (`.btn-hand`) + badge App Store/Google Play; HP = foto di atas, copy di panel hijau. Live: https://sprout-reach-scene-iteration.vercel.app/home-v3.html (21 Nov). Belum dikirim ke Tony, belum di-commit.
+      `hero-photo-2026-11-20/v3-before-village/`. Tombol = arrow handoff (`.btn-hand`) + badge App Store/Google Play; HP = foto di atas, copy di panel hijau. Live: https://sprout-reach-scene-iteration.vercel.app/home-v3.html (21 Nov). Commit `f6b3e56`. Belum dikirim ke Tony.
+- [x] **W1b** Riset tombol (7 situs) + 3 arah di `button-directions-2026-11-21/`; Ahmad pilih tombol B + badge A
+- [ ] **W1c** Kirim link hero ke Tony (Ahmad); sebut copy ikut doc ("It takes a village…"), bukan kalimat di meeting
 - [ ] **W2** Bagian 2–6 sesuai doc; hapus bagian yang mengulang Daily Brief; Assist hanya 3 tile
 - [ ] **W3** Setelah Tony oke: `python3 review/export-site.py`, commit + push `sprout-website`, kabari Mohit
 
 ### Playdate (`flows.js`, `other-side.html`, `receiver.html`)
-- [ ] **P1** Urutan baru: anak paling atas (chip satu baris, tanpa nama kelas) → tanggal (quick options satu baris) → tempat → antar-jemput
-- [ ] **P2** Widget yang sama di sisi organizer: "Waiting on Megan" tanpa tombol → Confirmed + kalender; pesan Megan tampil di dua sisi; tanpa pesan template
-- [ ] **P3** Suggest another time: organizer dapat kartu agent dengan jam usulan + Accept / Suggest a different time / Reply
+- [x] **P1** Urutan baru: anak paling atas (chip satu baris, tanpa nama kelas) → tanggal (quick options satu baris) → tempat → antar-jemput
+- [x] **P2** Widget yang sama di sisi organizer: "Waiting on Megan" tanpa tombol → Confirmed + kalender; pesan Megan tampil di dua sisi; tanpa pesan template
+- [x] **P3** Suggest another time: organizer dapat kartu agent dengan jam usulan + Accept / Suggest a different time / Reply
 
 ### Carpool (`flows.js`, `carpool-review.html`)
 - [ ] **C1** Sekali: anak satu baris, header baru, "Home"; first-confirm-wins + pesan "all set" ke sisanya; sisi Priya (Confirm / Can't / Reply → widget kalender)
@@ -136,7 +143,9 @@ Jangan tampilkan: tile Birthday + Date night, baris "Register my kids", "Saved d
 
 ### Lainnya
 - [ ] Kirim jawaban sitter ke Mohit (draf di bawah)
-- [ ] Update `/review/` + build, cek di browser, kirim satu link `/review/` ke Tony
+- [x] Build + deploy prototype Assist (sitter baru ada di `/review/`), dicek di browser
+- [ ] Kirim link `/review/` ke Tony (Ahmad)
+- [ ] Push commit `67cf2be` + `f6b3e56` (Ahmad)
 - [ ] Update ke Tony ≥15 menit sebelum standup
 
 ## Task orang lain
@@ -151,6 +160,7 @@ Jangan tampilkan: tile Birthday + Date night, baris "Register my kids", "Saved d
 - Sitter balas lewat **SMS group thread** dengan Sprout di dalamnya; agent watcher membaca thread.
 - Pembayaran: **bayar dulu, baru rating**; jumlah bisa diubah, ada tip; "Already paid" untuk cash/Venmo.
 - Info bank sitter diminta **setelah booking terkonfirmasi**, bukan setelah selesai.
+- Hero website (Ahmad, 21 Nov): copy di **garis tengah** frame, **HP di pojok dihapus**; tombol = **arrow handoff** (`.btn-hand`) + "or get the app" + **badge resmi** App Store/Google Play; di HP dan tablet portrait: foto di atas, copy di panel hijau.
 - Playdate: pilih **anak dulu**; organizer dan penerima lihat **widget yang sama**.
 - Carpool sekali: **yang pertama konfirmasi** dapat. Carpool rutin: **dua keluarga, tanya berurutan**, pesan **di dalam Sprout**.
 - Website: copy di doc Tony = final; hero pakai **foto parent di depan sekolah**.

@@ -2,6 +2,23 @@
 
 Live: https://sprout-assist-tasks.vercel.app/assist/ · local: `python3 build.py`, then serve `site/` (preview config `assist-tasks`, port 4330).
 
+## 20 Nov US · playdate (MEETING-2026-11-21-tasks.md, P1–P3)
+
+All in `X.flows.playdate` (`app/sitter-v3.js`). Try `/playdate/`, `/playdate-new-time/`, `/playdate-cant/`, and the other
+parent's side at `/playdate-invite/`.
+
+- **P1 Kids first, short card**: "For" is the first row, one line of photo chips (Maya, Jake, both), no class names.
+  Quick times and Where (Our place, A park, Lunch spot, Somewhere else) are one-line strips. Both kids → both classes in
+  the parent grid, each tile says whose class. Message Ana sends at once; the sent text shows on the card (no Send /
+  Edit step: "we could easily just say we messaged them this").
+- **P2 Same card on both sides** (`playdateWidget`): the organizer's chat shows the invite card the other parent gets
+  (`playdateInbox`), with a status line instead of buttons: Waiting on Ana → "Ana confirmed · on your calendar". Her own
+  words show under it as her message; Sprout writes no template reply. The separate "done" card is gone: the same card
+  solidifies, then Message Ana / Done.
+- **P3 Suggested time**: the card shows the old time crossed out over the new one, an amber "suggested a new time" line,
+  and Accept / Suggest another time / Reply on the card. Accept → "You accepted Ana's time". Ana's side shows the same
+  change with "waiting on Tony".
+
 ## 20 Nov US · babysitter, for Mohit's build (MEETING-2026-11-21-tasks.md, S1–S7)
 
 All in `app/sitter-v3.js`. Try `/book-a-sitter/` (no sitters yet) and `/book-a-sitter-saved/?review=conversation`

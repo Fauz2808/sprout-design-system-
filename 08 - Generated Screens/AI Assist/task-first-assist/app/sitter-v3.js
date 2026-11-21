@@ -1250,13 +1250,15 @@ function suggestPlaydateTime(w){
   });
 }
 function classmatesCard(p, kids, { withoutLily = false, multiple = false } = {}){
-  /* N4: one kid per playdate (L5), the whole class as parent tiles, two per row, with search */
+  /* N4: the whole class as parent tiles, two per row, with search. P1 (20 Nov US): a playdate can be for both kids, so
+     both classes are listed; each tile then says whose class it's from. Own kids are never labelled by class. */
   return new Promise(resolve => {
-    const kid = kids[0], families = PLAYDATE_FAMILIES[kid.n].filter(f => !withoutLily || f.kid !== 'Lily');
-    const card = p.block(`<div class="card"><div class="ctop">${clay('two-people')}<div><div class="eyebrow">Kids in ${kid.cls}</div><div class="ttl">${multiple ? 'Who should I invite?' : 'Which parent should I message?'}</div></div></div>
+    const both = kids.length > 1;
+    const families = kids.flatMap(k => PLAYDATE_FAMILIES[k.n].map(f => ({ ...f, of:`${k.n}’s class` }))).filter(f => !withoutLily || f.kid !== 'Lily');
+    const card = p.block(`<div class="card"><div class="ctop">${clay('two-people')}<div><div class="eyebrow">Kids in ${joinNames(kids.map(k => k.n + '’s'))} class${both ? 'es' : ''}</div><div class="ttl">${multiple ? 'Who should I invite?' : 'Which parent should I message?'}</div></div></div>
       <div data-pg></div><button type="button" class="btn" style="margin-top:14px" disabled>${multiple ? 'Pick classmates' : 'Pick a parent'}</button></div>`).querySelector('.card');
     const ask = card.querySelector('.btn');
-    const grid = parentGrid(families, { multi:multiple, onChange:() => {
+    const grid = parentGrid(families, { multi:multiple, extra:both ? f => f.of : null, onChange:() => {
       const picks = grid.picked();
       ask.disabled = !picks.length;
       ask.textContent = !picks.length ? (multiple ? 'Pick classmates' : 'Pick a parent') : multiple ? `Next · ${picks.length} classmate${picks.length === 1 ? '' : 's'}` : `Message ${picks[0].ask}`;
@@ -1266,18 +1268,37 @@ function classmatesCard(p, kids, { withoutLily = false, multiple = false } = {})
     p.scroll();
   });
 }
-async function sendPlaydateInvite(p, w, kidNames, family, place, pickup){
-  const card = p.block(`<div class="card"><div class="preview"><small>To ${family.n} · in Sprout</small><p></p></div></div>`).querySelector('.card');
-  const text = card.querySelector('p');
-  text.textContent = playdateInvite(w, kidNames, family, place, pickup);
-  for (;;) {
-    const choice = await p.chips(['Send', 'Edit message'], { into:card, echo:false });
-    if (choice === 0) { p.me('Send'); return; }
-    card.querySelector('.chips').remove();
-    const edited = await editText('Edit the message', playdateEscape(text.textContent));
-    if (edited) text.textContent = edited;
-  }
+/* P2 (Tony, 20 Nov US): "This type of UI, if it lives here, it should live there, but... it doesn't have the options to
+   click when I'm the one that made the request." The organizer's chat shows the SAME invite card the other parent gets
+   (playdateInbox), with a status line instead of buttons: Waiting on Ana → Ana confirmed · on your calendar. Her own
+   words, if she writes any, show under it; Sprout never writes a template reply for her.
+   Sending is one step: "We could easily just say we messaged them this" (no Send / Edit gate). */
+function playdateWidget(p, { w, kidNames, family, place, pickup }){
+  const host = p.block(`<div class="card pd-w">
+      <div class="pd-sent"><small>${face(TONY, 18)}You to ${family.n} · in Sprout</small><p data-msg></p></div>
+      <div class="ctop">${clay('calendar-check')}<div><div class="eyebrow">Playdate</div><div class="ttl">${joinNames([...kidNames.split(/, | and /), family.kid])}</div></div></div>
+      <div class="fact" data-when></div>
+      <div class="fact"><i class="ph ph-map-pin"></i>${playdateEscape(place)}</div>
+      ${pickup ? `<div class="fact"><i class="ph ph-car-profile"></i>You do pickup and drop-off for ${family.kid}</div>` : ''}
+      <div data-state></div></div>`);
+  const card = host.querySelector('.card'), state = card.querySelector('[data-state]'), when = card.querySelector('[data-when]');
+  const api = {
+    card,
+    message(text){ card.querySelector('[data-msg]').textContent = text; },
+    time(now, was){ when.innerHTML = `<i class="ph ph-clock"></i><span>${was ? `<s>${playdateWhen(was)}</s><br>` : ''}${playdateWhen(now)}</span>`; },
+    wait(){ state.className = 'pd-state wait'; state.innerHTML = `<span class="spinner"></span>Waiting on ${family.ask}`; },
+    proposed(by){ state.className = 'pd-state ask'; state.innerHTML = `<i class="ph ph-clock-clockwise"></i>${by} suggested a new time`; },
+    confirmed(text){ state.className = 'foot ok'; state.innerHTML = `<i class="ph ph-check-circle"></i>${text}`; },
+    declined(){ state.className = 'foot'; state.innerHTML = `<i class="ph ph-x-circle"></i>${family.ask} can’t make it this time`; },
+  };
+  api.message(playdateInvite(w, kidNames, family, place, pickup));
+  api.time(w);
+  api.wait();
+  p.scroll();
+  return api;
 }
+/* the other parent's own words in the chat (in-app message, not SMS) */
+const playdateReply = (p, family, text) => p.block(`<div class="preview gtx sms-in"><small>${face({ n:family.reply, photo:family.photo }, 18)}${family.n} · in Sprout</small><p></p></div>`).querySelector('p').textContent = text;
 /* L5 (Tony, 19 Nov): the DM with the other parent, opened straight from the confirmed playdate.
    "At this point I kinda just DM'd her... I might wanna just get straight into the DM." Reply = keyboard open. */
 function playdateDM(family, w, kidNames, place, pickup, { confirmed = true } = {}){
@@ -1285,7 +1306,7 @@ function playdateDM(family, w, kidNames, place, pickup, { confirmed = true } = {
     const who = { n:family.reply, photo:family.photo };
     const screen = el(`<section class="jc-screen dm" aria-label="Messages with ${family.reply}">
       <div class="dm-head"><button type="button" class="dm-back" aria-label="Back"><i class="ph ph-caret-left"></i></button>${face(who, 36)}
-        <div class="dm-who"><b>${family.n}</b><small>${family.rel} · ${family.kid === 'Noah' ? 'Miss Poole’s class' : 'Miss Taylor’s class'}</small></div></div>
+        <div class="dm-who"><b>${family.n}</b><small>${family.rel}</small></div></div>
       <div class="jc-log" role="log"></div>
       <form class="dm-comp"><input aria-label="Message ${family.reply}" placeholder="Message ${family.reply}" autocomplete="off"><button type="submit" aria-label="Send"><i class="ph-fill ph-paper-plane-tilt"></i></button></form></section>`);
     $('#phone').append(screen);
@@ -1293,7 +1314,7 @@ function playdateDM(family, w, kidNames, place, pickup, { confirmed = true } = {
     log.append(classMessage({ n:'Tony' }, playdateInvite(w, kidNames, family, place, pickup), true));
     if (confirmed) {
       log.append(el(`<div class="dm-sys"><i class="ph ph-calendar-check"></i>${family.reply} confirmed · ${playdateWhen(w)}</div>`));
-      log.append(classMessage(who, `Yes! ${family.kid} is so excited. See you ${w.day.w === 'Sat' ? 'Saturday' : w.day.day}!`));
+      log.append(classMessage(who, `Yes! ${family.kid} is so excited. See you ${w.day.long.split(',')[0]}!`));
     }
     screen.querySelector('form').onsubmit = e => { e.preventDefault(); const t = input.value.trim(); if (!t) return; log.append(classMessage({ n:'Tony' }, t, true)); input.value = ''; log.scrollTop = log.scrollHeight; };
     screen.querySelector('.dm-back').onclick = () => { screen.classList.add('gone'); setTimeout(() => { screen.remove(); done(); }, 250); };
@@ -1301,91 +1322,105 @@ function playdateDM(family, w, kidNames, place, pickup, { confirmed = true } = {
   });
 }
 X.flows.playdate = async (p, opt = {}) => {
-  /* L5: one child per playdate (Tony: "I would just do it for one kid") */
-  let kid = KIDS[0], pickup = false;
+  /* P1 (Tony, 20 Nov US): "Let's try and put the kids up top... you're selecting for which kid, the date is already
+     defaulted, there's quick options." Kids first, as one row of photo chips with no class label ("that's not how parents
+     look at their own kids... Maya or Jake or both"); quick times, places on one line each, so the card stays short
+     even with four kids. */
+  let picked = [KIDS[0]], pickup = false;
   let place = FAMILY.address, where = 0;
-  const options = ['Our place', 'A park', 'Out for lunch', 'Somewhere else'];
-  await p.say('Fun. Pick the time, which kid, and where. Then I’ll message the other parent for you.', 800);
-  const w = await playdateTime(p, { addFields:next => {
-    const fields = el(`<div><div class="dlabel" style="margin-top:16px">For</div><div class="ua-rows" role="radiogroup">${KIDS.map(k => `<button type="button" class="ua-row${k === kid ? ' on' : ''}" data-kid="${k.n}" role="radio" aria-checked="${k === kid}"><span class="uaph" style="background-image:url(${k.img})"></span><span class="tx"><b>${k.n}</b><small>${k.age} · ${k.cls}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button>`).join('')}</div>
-      <div class="dlabel" style="margin-top:16px">Where</div><div class="qk">${options.map((label, i) => `<button type="button" class="chip${i === where ? ' sel' : ''}" aria-pressed="${i === where}" data-where="${i}">${label}</button>`).join('')}</div>
+  const options = ['Our place', 'A park', 'Lunch spot', 'Somewhere else'];
+  await p.say('Fun. Who’s it for, when and where? Then I’ll message the other parent for you.', 800);
+  const w = await playdateTime(p, { canContinue:() => picked.length > 0, addFields:next => {
+    const card = next.closest('.card');
+    const kidsRow = el(`<div><div class="dlabel" style="margin-top:14px">For</div><div class="pd-kids">${KIDS.map(k => `<button type="button" class="pd-kid${picked.includes(k) ? ' on' : ''}" data-kid="${k.n}" aria-pressed="${picked.includes(k)}"><span class="uaph" style="background-image:url(${k.img})"></span>${k.n}<i class="ph-bold ph-check"></i></button>`).join('')}</div></div>`);
+    card.querySelector('.ctop').after(kidsRow);
+    const fields = el(`<div><div class="dlabel" style="margin-top:16px">Where</div><div class="qk pd-strip">${options.map((label, i) => `<button type="button" class="chip${i === where ? ' sel' : ''}" aria-pressed="${i === where}" data-where="${i}">${label}</button>`).join('')}</div>
       <button type="button" class="ua-row pk" data-pickup aria-pressed="false" style="margin-top:12px"><span class="uaph uamono" style="width:40px;height:40px"><i class="ph ph-car-profile"></i></span><span class="tx"><b>We can pick up and drop off</b><small>Said in the invite, so the other parent knows</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button></div>`);
     next.before(fields);
-    const kids = [...fields.querySelectorAll('[data-kid]')], places = [...fields.querySelectorAll('[data-where]')], pk = fields.querySelector('[data-pickup]');
-    kids.forEach(b => b.onclick = () => {
-      kid = KIDS.find(k => k.n === b.dataset.kid);
-      kids.forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-checked', x === b); });
+    card.querySelector('.qk').classList.add('pd-strip');   // the quick times, one line too
+    const kidBtns = [...kidsRow.querySelectorAll('[data-kid]')], places = [...fields.querySelectorAll('[data-where]')], pk = fields.querySelector('[data-pickup]');
+    kidBtns.forEach(b => b.onclick = () => {
+      const k = KIDS.find(x => x.n === b.dataset.kid);
+      picked = picked.includes(k) ? picked.filter(x => x !== k) : KIDS.filter(x => x === k || picked.includes(x));
+      kidBtns.forEach(x => { const on = picked.some(k2 => k2.n === x.dataset.kid); x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
+      next.disabled = !picked.length;
     });
     pk.onclick = () => { pickup = !pickup; pk.classList.toggle('on', pickup); pk.setAttribute('aria-pressed', pickup); };
     places.forEach(b => b.onclick = async () => {
       const i = +b.dataset.where;
-      const picked = i === 0 ? FAMILY.address : await editText('Place name', i === where ? playdateEscape(place) : '', { rows:2 });
-      if (!picked) return;
-      place = picked; where = i;
+      const chosen = i === 0 ? FAMILY.address : await editText('Place name', i === where ? playdateEscape(place) : '', { rows:2 });
+      if (!chosen) return;
+      place = chosen; where = i;
       places.forEach((row, n) => {
         row.classList.toggle('sel', row === b); row.setAttribute('aria-pressed', row === b);
         row.textContent = n && n === where ? `${options[n]} · ${place}` : options[n];
       });
     });
   } });
-  const kids = [kid];
-  const kidNames = kid.n;
+  const kids = picked;
+  const kidNames = joinNames(kids.map(k => k.n));
   sub(p, `Playdate · ${w.day.day}`);
   p.title = `Playdate · ${kidNames}`;
-  let family, withoutLily = false;
+  let family, widget, withoutLily = false, acceptedTheirs = false;
   for (;;) {
     family = await classmatesCard(p, kids, { withoutLily });
-    await sendPlaydateInvite(p, w, kidNames, family, place, pickup);
-    const status = `Waiting for ${family.ask}`;
+    const sending = p.work(`Messaging ${family.ask}`, 'In Sprout');
+    await sleep(900);
+    sending.done(`Messaged ${family.ask}`, `${playdateWhen(w)} · in Sprout`, 'ph-chat-circle-text');
+    widget = playdateWidget(p, { w, kidNames, family, place, pickup });
+    const status = `Waiting on ${family.ask}`;
     p.set(status, { when:w.day.short });
     const declined = family.kid === 'Lily' && route === 'playdate-cant';
     const proposed = family.kid === 'Lily' && (route === 'playdate-new-time' || opt.newTime);
-    const reply = declined ? 'Ana can’t make it this time' : proposed ? 'Ana suggested a new time' : `${family.reply} confirmed the playdate`;
-    await later(p, { status, small:playdateWhen(w), ms:2500, title:reply, body:joinNames([kid.n, family.kid]) });
+    const reply = declined ? `${family.ask} can’t make it this time` : proposed ? `${family.ask} suggested a new time` : `${family.reply} confirmed the playdate`;
+    await later(p, { status, small:playdateWhen(w), ms:2500, title:reply, body:joinNames([...kids.map(k => k.n), family.kid]) });
     if (declined) {
+      widget.declined();
+      playdateReply(p, family, 'So sorry, we can’t make it this time! Another weekend?');
       withoutLily = true;
-      await p.say('Ana can’t make it this time. Ask another family?', 700);
+      await p.say(`${family.ask} can’t make it this time. Ask another family?`, 700);
       continue;
     }
     if (proposed) {
+      /* P3 (Tony, 20 Nov US): "It needs to show what the suggested time would be, and then I need to have the options:
+         accept it, suggest a different time, reply." The same card shows both times; the choice lives on it. */
       const suggested = { day:DAYS.find(d => d.w === 'Sun'), from:900, to:1020 };
-      p.set(`Ana suggested ${playdateWhen(suggested)}`, { when:suggested.day.short, attn:true });
-      const proposal = p.block(`<div class="card"><div class="ctop">${clay('calendar-check')}<div><div class="ttl">Ana suggested a new time</div></div></div>
-        <div class="fact"><i class="ph ph-clock"></i>${playdateWhen(suggested)}</div></div>`).querySelector('.card');
+      const was = { ...w };
+      widget.time(suggested, was); widget.proposed(family.ask);
+      playdateReply(p, family, `Saturday’s tricky for us. Could we do ${suggested.day.long.split(',')[0]}, ${range(suggested.from, suggested.to)} instead?`);
+      p.set(`${family.ask} suggested ${playdateWhen(suggested)}`, { when:suggested.day.short, attn:true });
+      await p.say(`${family.ask} suggested ${playdateWhen(suggested)} instead. Does that work?`, 700);
       for (;;) {
-        proposal.querySelector('.chips')?.remove();
-        const choice = await p.chips(['Accept', 'Suggest another time', 'Message Ana'], { into:proposal });
-        if (choice === 0) { Object.assign(w, suggested); break; }
+        widget.card.querySelector('.chips')?.remove();
+        const choice = await p.chips(['Accept', 'Suggest another time', 'Reply'], { into:widget.card });
+        if (choice === 0) { Object.assign(w, suggested); widget.time(w); acceptedTheirs = true; break; }
         if (choice === 1) {
           const revised = await suggestPlaydateTime(suggested);
           if (!revised) continue;
           Object.assign(w, revised);
-          await sendPlaydateInvite(p, w, kidNames, family, place, pickup);
-          await later(p, { status, small:playdateWhen(w), ms:2500, title:'Ana confirmed the playdate', body:playdateWhen(w) });
+          widget.card.querySelector('.chips')?.remove();
+          widget.time(w, suggested); widget.wait();
+          widget.message(`How about ${w.day.long.split(',')[0]}, ${range(w.from, w.to)}?`);
+          await later(p, { status, small:playdateWhen(w), ms:2500, title:`${family.ask} confirmed the playdate`, body:playdateWhen(w) });
+          widget.time(w);
           break;
         }
         await playdateDM(family, w, kidNames, place, pickup, { confirmed:false });
       }
-    }
+      widget.card.querySelector('.chips')?.remove();
+    } else playdateReply(p, family, `Yes! ${family.kid} is so excited. See you ${w.day.long.split(',')[0]}!`);
     break;
   }
-  await p.say(`${family.reply} confirmed the playdate.`, 700);
-  const title = where === 0 ? `${family.kid} is coming over` : `Playdate at ${playdateEscape(place)}`;
-  const participants = joinNames([kid.n, family.kid]);
-  const done = p.block(`<div class="card"><div class="ctop">${clay('calendar-check')}<div><div class="eyebrow">Playdate · ${w.day.day}</div><div class="ttl">${title}</div></div></div>
-    <div class="fact"><i class="ph ph-users"></i>${participants}</div>
-    <div class="fact"><i class="ph ph-clock"></i>${range(w.from, w.to)}</div>
-    <div class="fact"><i class="ph ph-map-pin"></i>${playdateEscape(place)}</div>
-    ${pickup ? `<div class="fact"><i class="ph ph-car-profile"></i>You do pickup and drop-off for ${family.kid}</div>` : ''}
-    <div class="fact"><i class="ph ph-calendar-check"></i>On the family calendar · Dana has it too</div>
-    <div class="fact"><i class="ph ph-bell-ringing"></i>Reminder for you both at ${ampm(w.from - 30)}, then the playdate on your lock screens</div></div>`).querySelector('.card');
+  /* the card solidifies in place: confirmed, on the calendar, the reminder; then straight into the DM if you want */
+  widget.confirmed(`${acceptedTheirs ? `You accepted ${family.ask}’s time` : `${family.ask} confirmed`} · on your calendar · Dana has it too`);
+  widget.card.insertAdjacentHTML('beforeend', `<div class="fact"><i class="ph ph-bell-ringing"></i>Reminder for you both at ${ampm(w.from - 30)}</div>`);
   sub(p, `Playdate · ${w.day.day}`);
   p.set(`Confirmed · ${family.kid} · ${playdateWhen(w)}`, { when:w.day.short, done:true });
-  const booked = CLOCK.book({ p, i:DAYS.indexOf(w.day), S:w.from, E:w.to, playdate:{ place, kids:participants } });
-  /* L5: straight into the DM with the other parent */
+  await p.say(`It’s set. ${joinNames([...kids.map(k => k.n), family.kid])} on ${playdateWhen(w)}.`, 700);
+  const booked = CLOCK.book({ p, i:w.day.i, S:w.from, E:w.to, playdate:{ place, kids:joinNames([...kids.map(k => k.n), family.kid]) } });
   for (;;) {
-    done.querySelector('.chips')?.remove();
-    const k = await p.chips([`Message ${family.reply}`, 'Done'], { into:done, echo:false });
+    widget.card.querySelector('.chips')?.remove();
+    const k = await p.chips([`Message ${family.reply}`, 'Done'], { into:widget.card, echo:false });
     if (k === 1) { p.me('Done'); break; }
     await playdateDM(family, w, kidNames, place, pickup);
   }
@@ -1766,7 +1801,7 @@ function playdateInbox(){
   };
   const invitation = el(`<div class="card" style="margin:0 0 16px 48px"><div class="ctop">${clay('calendar-check')}<div>
     <div class="eyebrow">Playdate</div><div class="ttl">Maya and Lily</div></div></div>
-    <div class="fact"><i class="ph ph-clock"></i>${playdateWhen(w)}</div>
+    <div class="fact" data-when><i class="ph ph-clock"></i>${playdateWhen(w)}</div>
     <div class="fact"><i class="ph ph-map-pin"></i>${playdateEscape(FAMILY.address)}</div>
     <div class="chips"><button type="button" class="chip" data-confirm>Confirm</button><button type="button" class="chip" data-suggest>Suggest another time</button><button type="button" class="chip" data-cant>Can’t make it</button><button type="button" class="chip" data-reply>Reply</button></div></div>`);
   const actions = invitation.querySelector('.chips');
@@ -1776,7 +1811,9 @@ function playdateInbox(){
   invitation.querySelector('[data-suggest]').onclick = async () => {
     const suggested = await suggestPlaydateTime(w);
     if (!suggested) return;
-    actions.remove();
+    /* P3: the same card shows the change on this side too, and who it's waiting on now */
+    invitation.querySelector('[data-when]').innerHTML = `<i class="ph ph-clock"></i><span><s>${playdateWhen(w)}</s><br>${playdateWhen(suggested)}</span>`;
+    actions.replaceWith(el('<div class="pd-state wait"><span class="spinner"></span>You suggested a new time · waiting on Tony</div>'));
     addReply(`Could we do ${suggested.day.day}, ${range(suggested.from, suggested.to)} instead?`);
   };
   invitation.querySelector('[data-cant]').onclick = () => {   // N4: the third answer, Tony sees it and Sprout offers another family
