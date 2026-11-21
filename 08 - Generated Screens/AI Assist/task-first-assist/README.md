@@ -2,6 +2,21 @@
 
 Live: https://sprout-assist-tasks.vercel.app/assist/ · local: `python3 build.py`, then serve `site/` (preview config `assist-tasks`, port 4330).
 
+## 20 Nov US · regular carpool (MEETING-2026-11-21-tasks.md, C2)
+
+Try `/plan-carpool/` (Regular carpool) and Aisha's side at `/receiver/?v=carpool-regular`. `cpRank` + `cpRegular` in
+`app/sitter-v3.js`; the old "everyone who says yes gets turns" branch is gone.
+
+- **Two families, asked in order**: "Who should I ask first?" ranks nearby families (closest two pre-ranked 1 and 2,
+  tap to add or remove). No group-chat option for a regular carpool. "Ask Priya first".
+- **One at a time, in Sprout** (not text): Sprout messages #1; a no ("can't this season") means it asks #2, and says
+  so. Demo: Priya can't (`TEAM` `regular:'no'`), Aisha is in.
+- **The split before sharing**: `rotaCard` alternates You / Aisha under one "Who drives" label (names only, no
+  "drives" on every row); tap a turn to change it; "Share with Aisha".
+- **Shared**: the message Aisha gets shows the schedule, on her calendar. Her side: the ask card with We're in /
+  Can't this season / Reply to Tony; We're in → waiting → "Tony shared the schedule" with her turns in green and the
+  calendar + reminder note.
+
 ## 20 Nov US · one-time carpool (MEETING-2026-11-21-tasks.md, C1)
 
 Try `/plan-carpool/` (One time) and the other parent at `/receiver/?v=carpool-chat`.

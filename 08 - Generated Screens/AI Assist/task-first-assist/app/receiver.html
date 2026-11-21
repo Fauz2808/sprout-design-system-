@@ -13,6 +13,7 @@
 <!-- 20 Nov (Ahmad): the other parent's side of a request, for the presentation (/other-side/). One phone, three moments,
      tap to move on: 1 the notification on their lock screen, 2 the request, 3 their answer and what comes back.
      ?v=carpool-chat   Priya, in Jake's team chat in Sprout (Tony picked "Post in Jake's team chat")
+     ?v=carpool-regular Aisha, asked in Sprout for a regular carpool (second on Tony's list, C2)
      ?v=carpool-text   Priya, a group text with Tony and Sprout (Tony picked "Parents I pick"; works without Sprout, N10)
      ?v=sitter-text    Alex the sitter, a group text with Tony and Sprout (N9: Sprout texts, the parent is on the text)
      Playdate is the existing /playdate-invite/ (Ana, in Sprout). Names and times match the sender flows. -->
@@ -80,6 +81,12 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
 .ride .f.wait{margin-top:12px;padding:10px 12px;border-radius:12px;background:#f3efe6;color:var(--subtle);font-weight:600;font-size:13px}
 .ride .f.wait .spin{width:14px;height:14px;border-radius:50%;border:2px solid #cfc8b8;border-top-color:var(--brand);animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+/* C2: the shared turns, one line each */
+.ride .sch{margin-top:12px;border-radius:12px;background:#f6f3ec;overflow:hidden}
+.ride .sch-r{display:flex;justify-content:space-between;padding:7px 12px;font-size:13px;border-top:1px solid #ebe5d9}
+.ride .sch-r:first-child{border-top:0}
+.ride .sch-r b{font-weight:600;color:var(--ink)}
+.ride .sch-r.you b{color:var(--brand)}
 /* the "when could you drive?" sheet (Ahmad, 21 Nov) */
 .tsheet{position:absolute;inset:0;z-index:30}
 .ts-scrim{position:absolute;inset:0;background:rgb(0 0 0 / .32)}
@@ -216,6 +223,47 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
         const log = view.querySelector('.log');
         log.append(el(`<div class="m me in"><div class="b">I might be able to! Is 9:45 okay? Leo’s game is at 10.</div></div>`));
       },
+    },
+    /* C2 (Tony, 20 Nov US): a regular carpool is asked one family at a time, in Sprout. Aisha was second on Tony's list
+       (Priya couldn't). She answers on the card; when Tony shares the turns she gets the schedule, on her calendar. */
+    'carpool-regular': {
+      who: 'Aisha Khan, Ava’s mom. Asked in Sprout, second on Tony’s list',
+      push: { app: 'Sprout', icon: SPROUT, when: 'now', text: '<b>Tony Martin</b><br>Want to share Jake’s rides to soccer? Saturdays through Oct 31, we’d take turns driving.' },
+      thread() {
+        return el(`<section class="view chat">${sb()}
+          <div class="top"><span class="bk"><i class="ph ph-caret-left"></i></span><span class="lg" style="background-image:url(${TONY})"></span><div><b>Tony Martin</b><small>Jake’s dad · Jake’s team</small></div></div>
+          <div class="log">
+            <div class="m in"><span class="av" style="background-image:url(${TONY})"></span><div class="b">Hi Aisha! Want to share Jake’s rides from home to soccer at Lakeline Park? Saturdays through Oct 31, pickup at 9:30 AM, one way. We’d take turns driving. Tony</div></div>
+            <div class="ride in" style="animation-delay:.25s"><div class="h"><img src="${A}illus/carpool.webp" alt=""><div><b>Regular carpool</b><small>Saturdays · 9:30 AM · through Oct 31</small></div></div>
+              <div class="f"><i class="ph ph-map-pin"></i>Banks Court to Lakeline Park, one way</div>
+              <div class="f"><i class="ph ph-arrows-left-right"></i>Two families, you take turns</div>
+              <div class="f"><i class="ph ph-navigation-arrow"></i>1.4 mi from you · Ava plays too</div>
+              <div class="two"><button data-no>Can’t this season</button><button class="go" data-yes>We’re in</button></div>
+              <button class="reply" data-reply>Reply to Tony</button></div>
+          </div><div class="comp">Message Tony</div></section>`);
+      },
+      yes(view) {
+        const card = view.querySelector('.ride');
+        card.querySelector('[data-reply]')?.remove();
+        card.querySelector('.two').replaceWith(el(`<div class="f wait in"><span class="spin"></span>You’re in · Tony is setting the turns</div>`));
+        const log = view.querySelector('.log');
+        setTimeout(() => {
+          card.querySelector('.wait').replaceWith(el(`<div class="f in" style="margin-top:12px;color:var(--brand);font-weight:600"><i class="ph-fill ph-check-circle"></i>You’re in</div>`));
+          log.append(el(`<div class="sys in"><i class="ph-fill ph-car-profile"></i>Tony shared the schedule</div>`));
+          const T = ['Sat, Aug 1', 'Sat, Aug 8', 'Sat, Aug 15', 'Sat, Aug 22', 'Sat, Aug 29', 'Sat, Sep 5'];
+          log.append(el(`<div class="ride done in"><div class="h"><img src="${A}illus/carpool.webp" alt=""><div><b>Jake and Ava’s carpool</b><small>Saturdays · 9:30 AM · Home to Lakeline Park</small></div></div>
+            <div class="sch">${T.map((d, i) => `<div class="sch-r${i % 2 ? ' you' : ''}"><span>${d}</span><b>${i % 2 ? 'You' : 'Tony'}</b></div>`).join('')}</div>
+            <div class="f" style="font-size:12.5px;color:var(--subtle)">Then the same order through Sat, Oct 31 · 14 rides</div>
+            <div class="conf"><div class="ch"><i class="ph-fill ph-calendar-check"></i>Your turns are on your calendar</div>
+              <div class="f"><i class="ph ph-bell-ringing"></i>Reminder the night before each of your turns</div>
+              <div class="f"><i class="ph ph-arrows-left-right"></i>Can’t drive one? Ask to swap from the turn</div></div></div>`));
+        }, 1800);
+      },
+      no(view) {
+        view.querySelector('.ride [data-reply]')?.remove();
+        view.querySelector('.ride .two').replaceWith(el(`<div class="f in" style="margin-top:12px;color:var(--subtle)"><i class="ph ph-x-circle"></i>You said you can’t this season. Only Tony sees it.</div>`));
+      },
+      reply(view) { view.querySelector('.log').append(el(`<div class="m me in"><div class="b">Maybe! Could we start in September? Ava has camp on Saturdays in August.</div></div>`)); },
     },
     'carpool-text': {
       who: 'Priya Shah. A group text, so it works even without Sprout',

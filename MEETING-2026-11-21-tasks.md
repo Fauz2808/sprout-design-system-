@@ -14,8 +14,8 @@ Website: `01 - Website/sprout-reach-scene-iteration/` (hero kerja: `home-v3.html
 | 1 | **S1–S7** Babysitter | Mohit **sedang membangun flow ini hari ini** dan punya banyak pertanyaan; tiap jam desain belum beres = Mohit nebak | Flow sitter di prototype sesuai semua poin di bawah + satu pesan jawaban ke Mohit | **Selesai**: commit `67cf2be`, live di sprout-assist-tasks.vercel.app. Pesan ke Mohit belum dikirim |
 | 2 | **W1** Website hero | Permintaan eksplisit penutup meeting: "update that image at the top, header and subheader, see how that looks" | Hero baru dengan foto parent di depan sekolah + copy dari doc Tony, dikirim ke Tony | **Selesai**: commit `f6b3e56`, live di sprout-reach-scene-iteration.vercel.app/home-v3.html. Belum dikirim ke Tony |
 | 3 | **P1–P3** Playdate | Tony review paling panjang; layout + sinkron dua sisi | Anak di atas, satu baris; widget sama di dua sisi; balasan "Suggest another time" punya opsi | **Selesai**: commit `60c6472`, live di sprout-assist-tasks.vercel.app (`/playdate/`, `/playdate-new-time/`, `/playdate-invite/`) |
-| 4 | **C1** Carpool sekali | "The one I wanna focus on, obviously, is the one-time carpool" | Anak satu baris, header baru, sisi Priya + widget konfirmasi | **Selesai** lokal (belum commit, belum deploy) |
-| 5 | **C2** Carpool rutin | Dirombak: dua keluarga, tanya satu per satu | Demo: keluarga 1 tidak bisa, keluarga 2 bisa, jadwal bisa diubah, Share | Belum mulai |
+| 4 | **C1** Carpool sekali | "The one I wanna focus on, obviously, is the one-time carpool" | Anak satu baris, header baru, sisi Priya + widget konfirmasi | **Selesai**: commit `632f348`, live (`/plan-carpool/`, `/receiver/?v=carpool-chat`) + tawaran jam dari parent lain |
+| 5 | **C2** Carpool rutin | Dirombak: dua keluarga, tanya satu per satu | Demo: keluarga 1 tidak bisa, keluarga 2 bisa, jadwal bisa diubah, Share | **Selesai** lokal (belum commit, belum deploy) |
 | 6 | **W2** Website bagian 2–6 | Doc Tony bilang "all copy below is final", tapi di meeting dia bilang hero dulu | Lima bagian sesuai doc, setelah Tony oke hero | Tunggu Tony oke hero |
 
 Commit `67cf2be` dan `f6b3e56` ada di branch `assist/sitter-date-night-map`, **belum di-push**.
@@ -140,7 +140,7 @@ S1–S7: commit `67cf2be`, deploy https://sprout-assist-tasks.vercel.app (`/book
 ### Carpool (`flows.js`, `carpool-review.html`)
 - [x] **C1** Sekali: anak satu baris, header baru, "Home"; first-confirm-wins + pesan "all set" ke sisanya; sisi Priya (Confirm / Can't / Reply → widget kalender)
 - [x] **C1b** (Ahmad, 21 Nov) "Can't at 9:30" membuka sheet jam: parent lain centang jam yang dia bisa; Tony pilih "Pick up at 9:45" → pickup pindah, parent itu yang nyetir
-- [ ] **C2** Rutin: dua keluarga; pilih keluarga berurutan, tanya satu per satu; demo no → yes; jadwal bisa diubah; Share → konfirmasi + kalender; pesan in-app
+- [x] **C2** Rutin: dua keluarga; pilih keluarga berurutan, tanya satu per satu; demo no → yes; jadwal bisa diubah; Share → konfirmasi + kalender; pesan in-app
 
 ### Lainnya
 - [ ] Kirim jawaban sitter ke Mohit (draf di bawah)

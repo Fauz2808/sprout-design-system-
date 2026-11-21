@@ -1437,8 +1437,8 @@ X.flows.playdate = async (p, opt = {}) => {
    Families are samples: Jake's SSC team (Priya and Aisha are on the soccer card) and Lincoln families. */
 const illIco = n => `<span class="clayico" style="background-image:url(${A}illus/${n}.webp)"></span>`;
 const TEAM = [
-  { n:'Priya Shah', ask:'Priya', kid:'Leo', rel:'Leo’s mom', mi:0.8, photo:A + 'priya.webp', offer:[15, 30] },   // one time: can't at the asked time, offers two later ones (Ahmad, 21 Nov)
-  { n:'Aisha Khan', ask:'Aisha', kid:'Ava', rel:'Ava’s mom', mi:1.4, photo:A + 'aisha.webp', cant:true },
+  { n:'Priya Shah', ask:'Priya', kid:'Leo', rel:'Leo’s mom', mi:0.8, photo:A + 'priya.webp', offer:[15, 30], regular:'no', why:'Leo has swim those days this fall' },   // one time: offers two later times (Ahmad, 21 Nov); regular: can't
+  { n:'Aisha Khan', ask:'Aisha', kid:'Ava', rel:'Ava’s mom', mi:1.4, photo:A + 'aisha.webp', cant:true, regular:'yes' },
   { n:'Elena Ruiz', ask:'Elena', kid:'Noah', rel:'Noah’s mom', mi:2.6, photo:A + 'elena.webp' },
   { n:'Marcus Lee', ask:'Marcus', kid:'Owen', rel:'Owen’s dad', mi:2.9 },
 ];
@@ -1636,7 +1636,8 @@ function rotaCard(p, run, drivers, go){
     const turns = run.turns.map((t, i) => ({ ...t, by:drivers[i % drivers.length] }));
     const kidsLine = joinNames([...(run.kids || [run.kid]), ...drivers.filter(d => !d.you).map(f => f.kid)]);
     const c = p.block(`<div class="card"><div class="ctop">${illIco('carpool')}<div><div class="eyebrow">${run.span}</div><div class="ttl">${run.title}</div></div></div>
-      <div class="fields" data-rows></div>
+      <div class="dlabel" style="margin-top:14px">Who drives</div>
+      <div class="fields rota" data-rows></div>
       ${run.more ? `<div class="fact" style="margin-top:10px"><i class="ph ph-arrows-clockwise"></i>${run.more}</div>` : ''}
       <div class="fact"${run.more ? '' : ' style="margin-top:10px"'}><i class="ph ph-users"></i>${kidsLine}</div>
       <div class="fact"><i class="ph ph-clock"></i>${run.pick}</div>
@@ -1644,7 +1645,7 @@ function rotaCard(p, run, drivers, go){
       <div class="two"><button type="button" class="btn ghost" data-k="no">Not now</button><button type="button" class="btn" data-k="go">${go}</button></div></div>`).querySelector('.card');
     const rows = c.querySelector('[data-rows]');
     const paint = () => {
-      rows.innerHTML = turns.map((t, i) => `<button type="button" class="field" data-t="${i}" style="width:100%;text-align:left;background:transparent"><div style="display:flex;align-items:center;gap:10px">${face(t.by.you ? TONY : { n:t.by.ask, photo:t.by.photo }, 28)}<div><div class="l">${t.d}</div><div class="v">${t.by.you ? 'You drive' : `${t.by.ask} drives`}</div></div></div><span class="s">Change <i class="ph ph-pencil-simple"></i></span></button>`).join('');
+      rows.innerHTML = turns.map((t, i) => `<button type="button" class="field" data-t="${i}" style="width:100%;text-align:left;background:transparent"><div style="display:flex;align-items:center;gap:10px">${face(t.by.you ? TONY : { n:t.by.ask, photo:t.by.photo }, 28)}<div><div class="l">${t.d}</div><div class="v">${t.by.you ? 'You' : t.by.ask}</div></div></div><span class="s">Change <i class="ph ph-pencil-simple"></i></span></button>`).join('');
       rows.querySelectorAll('[data-t]').forEach(b => b.onclick = () => change(+b.dataset.t));
     };
     const change = i => {
@@ -1659,6 +1660,81 @@ function rotaCard(p, run, drivers, go){
     c.querySelector('[data-k=go]').onclick = () => { c.querySelector('.two').remove(); rows.querySelectorAll('button').forEach(b => { b.disabled = true; b.querySelector('.s').remove(); }); p.me(go); res(turns); };
     paint(); p.scroll();
   });
+}
+/* ======================= C2 · Regular carpool (Tony, 20 Nov US) =======================
+   "Make it so it's only between two families, me and some other family. I can select to ask multiple families, but
+   it's only gonna ask one by one. If I get a no from the first one, then it'll message the next one, until someone
+   says yes." Then a suggested split Tony can change before he shares it, and the other parent gets "the carpool is
+   confirmed, here's the schedule, added to your calendar". All in Sprout, not text: "we're not gonna text people".
+   Demo: the first family can't (Priya), the second says yes (Aisha). Her side: /receiver/?v=carpool-regular. */
+function cpRank(p, near, g){
+  return new Promise(res => {
+    let order = [0, 1];   // closest two, pre-ranked; tap to change
+    const c = p.block(`<div class="card"><div class="ctop">${clay('two-people')}<div><div class="eyebrow">${g.near}</div><div class="ttl">Who should I ask first?</div></div></div>
+      <div class="fact" style="margin-top:10px"><i class="ph ph-list-numbers"></i>I ask one family at a time, in Sprout. Only if they can’t do I ask the next.</div>
+      <div class="rk" role="list"></div>
+      <button type="button" class="btn" style="margin-top:12px"></button></div>`).querySelector('.card');
+    const list = c.querySelector('.rk'), btn = c.querySelector('.btn');
+    const paint = () => {
+      list.innerHTML = near.map((f, i) => { const n = order.indexOf(i);
+        return `<button type="button" class="rk-row${n >= 0 ? ' on' : ''}" data-i="${i}" role="listitem">${face({ n:f.ask, photo:f.photo }, 36)}<span class="rk-tx"><b>${f.n}</b><small>${f.rel} · ${f.mi} mi · ${g.doing(f)}</small></span><span class="rk-n">${n >= 0 ? n + 1 : '<i class="ph ph-plus"></i>'}</span></button>`; }).join('');
+      list.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { const i = +b.dataset.i; order = order.includes(i) ? order.filter(x => x !== i) : [...order, i]; paint(); });
+      btn.disabled = !order.length;
+      btn.textContent = order.length ? `Ask ${near[order[0]].ask} first` : 'Pick at least one family';
+    };
+    btn.onclick = () => { if (btn.disabled) return; list.querySelectorAll('button').forEach(b => b.disabled = true); btn.remove(); p.me(`${order.map((i, k) => `${k + 1}. ${near[i].ask}`).join('  ')}`); res(order.map(i => near[i])); };
+    paint(); p.scroll();
+  });
+}
+async function cpRegular(p, { w, kids, riders, from, to, back, g, near, rides, whenTxt, route }){
+  await p.say(`A regular carpool works best with one other family. Who should I ask? Put them in order: I’ll ask one at a time and only ask the next if they can’t.`, 900);
+  const ranked = await cpRank(p, near, g);
+  const askText = f => `Hi ${f.ask}! Want to share ${riders}’s rides from ${route}? ${whenTxt.replace(/^./, x => x.toUpperCase())}, pickup at ${tl(w.at)}${back ? `, back at ${tl(back)}` : ', one way'}. We’d take turns driving. Tony`;
+  let partner = null;
+  for (const [i, f] of ranked.entries()) {
+    const job = p.work(`Messaging ${f.ask}`, 'In Sprout');
+    await sleep(900);
+    job.done(`Asked ${f.ask}`, i ? `${ranked[i - 1].ask} couldn’t, so ${f.ask} was next` : `First on your list${ranked.length > 1 ? ` · ${ranked.slice(1).map(x => x.ask).join(', ')} only if needed` : ''}`, 'ph-chat-circle-text');
+    p.block(`<div class="preview gtx"><small>${face(TONY, 18)}You to ${f.n} · in Sprout</small><p></p></div>`).querySelector('p').textContent = askText(f);
+    const status = `Waiting on ${f.ask}`;
+    p.set(status, { when:'Now' });
+    const no = f.regular === 'no';
+    await later(p, { status, small:`${riders}’s carpool`, ms:2500, title:`${f.ask} replied`, body:no ? 'Can’t this season' : 'We’re in!' });
+    playdateReply(p, { ...f, reply:f.ask }, no ? `So sorry, we can’t this season. ${f.why.replace(/^./, x => x.toUpperCase())}.` : `We’re in! Happy to take turns.`);
+    if (!no) { partner = f; break; }
+    if (ranked[i + 1]) await p.say(`${f.ask} can’t this season. Asking ${ranked[i + 1].ask} next, as you ranked.`, 800);
+  }
+  if (!partner) {
+    await p.say(`Nobody on your list can this season. Want to ask another family?`, 800);
+    await p.chips(['Not now']); p.set('No carpool yet', { done:true }); return;
+  }
+  /* the split: alternate turns, Tony can change any turn before it goes to the other family */
+  const you = { you:true, ask:'You' }, drivers = [you, partner];
+  const single = w.days.length === 1;
+  const turns = single ? rides.slice(0, 6).map(d => ({ d:cpDate(d) })) : w.days.map(d => ({ d:`${WDL[d]}s` }));
+  const run = { kid:riders, kids:kids.map(k => k.n), span:`${whenTxt.replace(/^./, x => x.toUpperCase())}`, title:`${riders}’s carpool with ${partner.ask}`, turns,
+    pick:`${tl(w.at)} · ${cpShort(from)} to ${cpShort(to)}${back ? ` · back at ${tl(back)}` : ''}`,
+    more:single && rides.length > 6 ? `Then the same order through ${cpDate(rides[rides.length - 1])} · ${rides.length} rides` : '' };
+  await p.say(`${partner.ask} is in. Here’s a fair split: you take turns. Change any turn before I share it with ${partner.ask}.`, 900);
+  const plan = await rotaCard(p, run, drivers, `Share with ${partner.ask}`);
+  if (!plan) { await p.say(`Okay. Nothing was sent to ${partner.ask}. The turns stay here.`, 700); p.set('Turns not shared', { done:true }); return; }
+  const share = p.work(`Sharing the schedule with ${partner.ask}`, 'In Sprout');
+  await sleep(1000);
+  share.done('Schedule shared', `On both families’ calendars`, 'ph-check-circle');
+  /* what Aisha gets: the carpool, confirmed, her turns on her calendar */
+  p.block(`<div class="preview gtx pd-sched"><small>${face(TONY, 18)}You to ${partner.n} · in Sprout</small><p>Carpool’s set! Here’s our schedule. It’s on your calendar.</p>
+    <div class="sch">${plan.map(t => `<div class="sch-r"><span>${t.d}</span><b>${t.by.you ? 'Tony' : partner.ask}</b></div>`).join('')}</div>
+    ${run.more ? `<small>${run.more}</small>` : ''}</div>`);
+  const yours = plan.filter(t => t.by.you);
+  await p.say(`The carpool is set with ${partner.ask}. I’ll remind you the night before each of your turns.`, 800);
+  p.block(`<div class="card"><div class="ctop">${illIco('carpool')}<div><div class="eyebrow">${run.span}</div><div class="ttl">${run.title}</div></div></div>
+    <div class="faces" style="margin-top:12px"><span><i style="background-image:url(${TONY.photo})"></i>${partner.photo ? `<i style="background-image:url(${partner.photo})"></i>` : ''}</span>You and ${partner.ask}</div>
+    <div class="fact" style="margin-top:10px"><i class="ph ph-steering-wheel"></i>Your turns: ${yours.length ? joinNames(yours.map(t => t.d)) + (run.more ? ', then the same order' : '') : 'none'}</div>
+    <div class="fact"><i class="ph ph-clock"></i>${run.pick}</div>
+    <div class="fact"><i class="ph ph-calendar-check"></i>Every turn is on both families’ calendars · Dana has it too</div>
+    <div class="fact"><i class="ph ph-arrows-left-right"></i>Can’t drive a turn? Tell me and I’ll ask ${partner.ask} to swap</div></div>`);
+  p.set(`${run.title}`, { when:turns[0].d.split(',')[0], done:true });
+  await p.chips(['Done']);
 }
 X.flows.carpool = async p => {
   await p.say('Happy to set up a carpool. Is it one ride, or the same ride every week?', 800);
@@ -1681,6 +1757,7 @@ X.flows.carpool = async p => {
   const look = p.work('Checking families near home', g.look);
   await sleep(1300);
   look.done(`${near.length} families nearby on ${g.near.replace(/^Lincoln · /, '')}`, 'Closest to home first', 'ph-users-three');
+  if (!once) return cpRegular(p, { w, kids, riders, from, to, back, g, near, rides, whenTxt, route, act });
   await p.say(`${near[0].ask} and ${near[1].ask} live closest, and their kids ${act === 'soccer' ? 'play on Jake’s team' : act === 'camp' ? 'are at Pinecrest' : 'go to Lincoln'} too. Should I post in ${g.chat}, or ask parents you pick?`, 900);
   /* in the team chat Tony posts it himself; a picked parent gets a group text from Sprout with Tony on it (N10), in
      Sprout's voice like the sitter texts, so it matches what they see (/receiver/?v=carpool-text) */
@@ -1764,39 +1841,6 @@ X.flows.carpool = async p => {
     return;
   }
 
-  /* regular: everyone who says yes shares the turns */
-  const ins = [];
-  for (const [i, f] of asked.entries()) {
-    if (group && f.cant) continue;
-    await later(p, { status:waiting, small:`${riders}’s carpool`, ms:i ? 1500 : 2500, title:group ? `${f.ask} replied in ${g.chat}` : `${f.ask} replied`, body:f.cant ? 'Can’t this season' : 'We’re in!' });
-    if (f.cant) p.note(`${f.ask} can’t this season`, 'Said no in your group text', 'ph-x-circle'); else ins.push(f);
-    if (group && ins.length === 2) break;
-  }
-  if (!ins.length) { await p.say(`${names} can’t this season. Want me to post in ${g.chat}?`, 800); await p.chips(['Not now']); p.set('No carpool yet', { done:true }); return; }
-  const you = { you:true, ask:'You' }, drivers = [you, ...ins];
-  const single = w.days.length === 1;
-  const turns = single
-    ? rides.slice(0, 6).map(d => ({ d:cpDate(d) }))
-    : w.days.map(d => ({ d:`${WDL[d]}s` }));
-  const run = { kid:riders, kids:kids.map(k => k.n), span:`${whenTxt.replace(/^./, s => s.toUpperCase())}`, title:`${riders}’s carpool`, turns,
-    pick:`${tl(w.at)} · ${cpShort(from)} to ${cpShort(to)}${back ? ` · back at ${tl(back)}` : ''}`,
-    more:single && rides.length > 6 ? `Then the same order through ${cpDate(rides[rides.length - 1])} · ${rides.length} rides` : '' };
-  await p.say(`${joinNames(ins.map(f => f.ask))} ${ins.length > 1 ? 'are' : 'is'} in. Here’s a fair split: each family drives once every ${drivers.length} ${single ? WDL[w.days[0]] : 'turn'}s. Tap a turn to change who drives.`, 900);
-  const plan = await rotaCard(p, run, drivers, 'Share these turns');
-  if (!plan) { await p.say('Okay. Nothing else was sent. The turns stay here if you want them later.', 700); p.set('Turns not shared', { done:true }); return; }
-  const share = p.work(`Sharing the turns with ${joinNames(ins.map(f => f.ask))}`, group ? `In ${g.chat}` : 'In each group text');
-  await sleep(1000);
-  share.done('Turns shared', 'Everyone has their turns on their calendar', 'ph-check-circle');
-  const yours = plan.filter(t => t.by.you);
-  await p.say(`The carpool is set. I’ll text you the night before each of your turns.`, 800);
-  p.block(`<div class="card"><div class="ctop">${illIco('carpool')}<div><div class="eyebrow">${run.span}</div><div class="ttl">${run.title}</div></div></div>
-    <div class="faces" style="margin-top:12px"><span><i style="background-image:url(${TONY.photo})"></i>${ins.map(f => f.photo ? `<i style="background-image:url(${f.photo})"></i>` : '').join('')}</span>${joinNames(['You', ...ins.map(f => f.ask)])}</div>
-    <div class="fact" style="margin-top:10px"><i class="ph ph-steering-wheel"></i>Your turns: ${yours.length ? joinNames(yours.map(t => t.d)) + (run.more ? ', then the same order' : '') : 'none'}</div>
-    <div class="fact"><i class="ph ph-clock"></i>${run.pick}</div>
-    <div class="fact"><i class="ph ph-calendar-check"></i>Every turn is on the family calendar · Dana has it too</div>
-    <div class="fact"><i class="ph ph-arrows-left-right"></i>Can’t drive? Tell me and I’ll ask the others to swap</div></div>`);
-  p.set(`${run.title} · ${joinNames(['you', ...ins.map(f => f.ask)])}`, { when:turns[0].d.split(',')[0], done:true });
-  await p.chips(['Done']);
 };
 
 function playdateInbox(){
