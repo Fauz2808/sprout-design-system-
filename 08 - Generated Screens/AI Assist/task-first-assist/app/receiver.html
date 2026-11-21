@@ -71,6 +71,33 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
 .ride .two{display:flex;gap:8px;margin-top:12px}
 .ride .two button{flex:1;height:42px;border-radius:999px;font:500 15px var(--serif);background:var(--field);color:var(--ink)}
 .ride .two button.go{background:var(--brand);color:#fff}
+/* C1 (20 Nov US): the third answer, and the confirmation the card becomes */
+.ride .reply{display:block;width:100%;margin-top:8px;height:36px;border-radius:999px;background:transparent;color:var(--brand);font:500 14px var(--serif)}
+.ride .conf{margin-top:12px;padding:12px;border-radius:14px;background:#eaf3ec}
+.ride .conf .ch{display:flex;align-items:center;gap:8px;font:600 14.5px Inter,system-ui,sans-serif;color:var(--brand)}
+.ride .conf .ch i{font-size:19px}
+.ride .conf .f{margin-top:6px;font-size:13px}
+.ride .f.wait{margin-top:12px;padding:10px 12px;border-radius:12px;background:#f3efe6;color:var(--subtle);font-weight:600;font-size:13px}
+.ride .f.wait .spin{width:14px;height:14px;border-radius:50%;border:2px solid #cfc8b8;border-top-color:var(--brand);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* the "when could you drive?" sheet (Ahmad, 21 Nov) */
+.tsheet{position:absolute;inset:0;z-index:30}
+.ts-scrim{position:absolute;inset:0;background:rgb(0 0 0 / .32)}
+.ts-box{position:absolute;left:0;right:0;bottom:0;padding:10px 20px 30px;border-radius:24px 24px 0 0;background:var(--bg);box-shadow:0 -10px 30px rgb(0 0 0 / .18)}
+.ts-grab{display:block;width:38px;height:5px;margin:0 auto 14px;border-radius:3px;background:#d4cec2}
+.ts-box b{display:block;font:500 21px var(--serif);color:var(--ink)}
+.ts-box p{margin:6px 0 14px;font-size:13.5px;line-height:1.4;color:var(--subtle)}
+/* Ahmad, 21 Nov: say up front that more than one time can be picked */
+.ts-multi{display:flex;align-items:center;gap:6px;margin:0 0 8px;font:600 12px Inter,system-ui,sans-serif;letter-spacing:.02em;color:var(--brand)}
+.ts-multi i{font-size:16px}
+.ts-times{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ts-times button{position:relative}
+.ts-times button.on::after{content:"✓";position:absolute;top:50%;right:12px;translate:0 -50%;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font:700 11px/18px Inter,system-ui,sans-serif;text-align:center}
+.ts-times button{height:46px;border-radius:14px;background:#fff;border:1.5px solid #e2ddd2;font:600 15px Inter,system-ui,sans-serif;color:var(--ink)}
+.ts-times button.on{border-color:var(--brand);background:#eaf3ec;color:var(--brand)}
+.ts-send{display:block;width:100%;height:50px;margin-top:16px;border-radius:999px;background:var(--brand);color:#fff;font:500 16px var(--serif)}
+.ts-send:disabled{opacity:.45}
+.ts-none{display:block;width:100%;height:42px;margin-top:6px;background:transparent;color:var(--subtle);font:500 14px var(--serif)}
 .ride.done{border-color:var(--brand);background:#f3f8f4}
 .comp{flex:none;margin:10px 12px 30px;height:44px;border-radius:999px;background:#fff;border:1px solid #e6e1d6;display:flex;align-items:center;padding:0 16px;font-size:14px;color:#a49a88}
 
@@ -131,19 +158,64 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
             <div class="ride in" style="animation-delay:.25s"><div class="h"><img src="${A}illus/carpool.webp" alt=""><div><b>Ride for Jake</b><small>Sat, Aug 1 · 9:30 AM</small></div></div>
               <div class="f"><i class="ph ph-map-pin"></i>Banks Court to Lakeline Park, one way</div>
               <div class="f"><i class="ph ph-navigation-arrow"></i>0.8 mi from you · Leo plays too</div>
-              <div class="two"><button data-no>Can’t this time</button><button class="go" data-yes>I can drive</button></div></div>
+              <div class="two"><button data-no>Can’t at 9:30</button><button class="go" data-yes>I can drive</button></div>
+              <button class="reply" data-reply>Reply to Tony</button></div>
           </div><div class="comp">Message Jake’s team</div></section>`);
       },
-      yes(view) {
+      /* C1 (Tony, 20 Nov US): "There should be those pre-automated selections... confirm, I can't, or reply. If they hit
+         confirm, there needs to be that confirmation widget... saved to your calendars." The ride card becomes the
+         confirmation: who you're driving, when, where, and that it's on your calendar. */
+      yes(view, at = '9:30 AM', moved) {
         const card = view.querySelector('.ride');
         card.classList.add('done');
-        card.querySelector('.two').replaceWith(el(`<div class="f in" style="margin-top:12px;font-weight:600;color:var(--brand)"><i class="ph-fill ph-check-circle"></i>You’re driving Jake. It’s on your calendar.</div>`));
+        card.querySelector('[data-reply]')?.remove();
+        if (moved) card.querySelector('.h small').textContent = `Sat, Aug 1 · ${at}`;
+        (card.querySelector('.two') || card.querySelector('.wait')).replaceWith(el(`<div class="conf in"><div class="ch"><i class="ph-fill ph-check-circle"></i>You’re driving Jake</div>
+          <div class="f"><i class="ph ph-clock"></i>Pick up at ${at} · 10212 Banks Court</div>
+          <div class="f"><i class="ph ph-flag-checkered"></i>Drop off at Lakeline Park</div>
+          <div class="f"><i class="ph ph-calendar-check"></i>Added to your calendar · reminder at ${{ '9:30 AM':'9:00 AM', '9:45 AM':'9:15 AM', '10:00 AM':'9:30 AM', '9:00 AM':'8:30 AM', '10:15 AM':'9:45 AM' }[at]}</div></div>`));
         const log = view.querySelector('.log');
-        log.append(el(`<div class="m me in"><div class="b">I can take him! Leo’s going anyway.</div></div>`));
-        setTimeout(() => { log.append(el(`<div class="sys in"><i class="ph-fill ph-car-profile"></i>Priya is driving Jake · Tony was told</div>`));
-          log.append(el(`<div class="m in"><span class="av" style="background-image:url(${TONY})"></span><div class="b"><small>Tony · Jake’s dad</small>Thank you Priya! He’ll be ready at 9:30.</div></div>`)); }, 900);
+        /* no reply typed for Priya: Sprout never writes a template message as her (Tony on the playdate, same rule) */
+        setTimeout(() => { log.append(el(`<div class="sys in"><i class="ph-fill ph-car-profile"></i>${moved ? `Tony moved pickup to ${at} · you’re driving Jake` : 'Priya is driving Jake · Tony was told'}</div>`));
+          log.append(el(`<div class="m in"><span class="av" style="background-image:url(${TONY})"></span><div class="b"><small>Tony · Jake’s dad</small>Thank you Priya! He’ll be ready at ${at.replace(' AM', '')}.</div></div>`)); }, 900);
       },
-      no(view) { view.querySelector('.ride .two').replaceWith(el(`<div class="f in" style="margin-top:12px;color:var(--subtle)"><i class="ph ph-x-circle"></i>You said you can’t. Only Tony sees it.</div>`)); },
+      /* Ahmad, 21 Nov: "Can't" at the asked time usually means "I could at another time". Can't at 9:30 opens a time
+         sheet: tick the times you could drive and Tony can move the pickup to fit; or say you can't drive at all. */
+      no(view) {
+        const T = ['9:00 AM', '9:45 AM', '10:00 AM', '10:15 AM'], on = new Set();
+        const sheet = el(`<div class="tsheet"><div class="ts-scrim"></div><div class="ts-box in">
+            <span class="ts-grab"></span>
+            <b>When could you drive Jake?</b>
+            <p>Sat, Aug 1 · Banks Court to Lakeline Park. Tony can move the pickup to fit you.</p>
+            <div class="ts-multi"><i class="ph ph-checks"></i>Pick all that work</div>
+            <div class="ts-times">${T.map(t => `<button type="button" data-t="${t}">${t}</button>`).join('')}</div>
+            <button type="button" class="ts-send" disabled>Pick a time</button>
+            <button type="button" class="ts-none">I can’t drive this time</button></div></div>`);
+        view.append(sheet);
+        const send = sheet.querySelector('.ts-send'), close = () => sheet.remove();
+        sheet.querySelector('.ts-scrim').onclick = close;
+        sheet.querySelectorAll('[data-t]').forEach(b => b.onclick = () => {
+          on.has(b.dataset.t) ? on.delete(b.dataset.t) : on.add(b.dataset.t); b.classList.toggle('on', on.has(b.dataset.t));
+          const picked = T.filter(t => on.has(t));
+          /* Ahmad, 21 Nov: the button doesn't list the times (four made it wrap); the ticks already say which */
+          send.disabled = !picked.length; send.textContent = !picked.length ? 'Pick a time' : picked.length > 1 ? 'I can drive at these times' : 'I can drive at this time';
+        });
+        sheet.querySelector('.ts-none').onclick = () => { close(); view.querySelector('.ride [data-reply]')?.remove();
+          view.querySelector('.ride .two').replaceWith(el(`<div class="f in" style="margin-top:12px;color:var(--subtle)"><i class="ph ph-x-circle"></i>You said you can’t. Only Tony sees it.</div>`)); };
+        send.onclick = () => {
+          const picked = T.filter(t => on.has(t)); if (!picked.length) return;
+          close(); view.querySelector('.ride [data-reply]')?.remove();
+          view.querySelector('.ride .two').replaceWith(el(`<div class="f wait in"><span class="spin"></span>You offered ${picked.join(' or ')} · waiting on Tony</div>`));
+          const log = view.querySelector('.log');
+          log.append(el(`<div class="sys in"><i class="ph ph-clock"></i>You told Tony you could drive at ${picked.join(' or ')}</div>`));
+          /* the demo plays Tony's side: he moves the pickup to her first time */
+          setTimeout(() => this.yes(view, picked[0], true), 2200);
+        };
+      },
+      reply(view) {
+        const log = view.querySelector('.log');
+        log.append(el(`<div class="m me in"><div class="b">I might be able to! Is 9:45 okay? Leo’s game is at 10.</div></div>`));
+      },
     },
     'carpool-text': {
       who: 'Priya Shah. A group text, so it works even without Sprout',
@@ -220,6 +292,7 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
   lock.querySelector('.note').onclick = open;
   thread.querySelectorAll('[data-yes]').forEach(b => b.onclick = () => { hint(false); s.yes(thread); });
   thread.querySelectorAll('[data-no]').forEach(b => b.onclick = () => { hint(false); s.no(thread); });
+  thread.querySelectorAll('[data-reply]').forEach(b => b.onclick = () => { hint(false); s.reply && s.reply(thread); });
   /* in the presentation page the phones play on their own if nobody taps: open after 3 s */
   if (new URLSearchParams(location.search).get('auto') !== '0') setTimeout(() => { if (!lock.hidden) open(); }, 3200);
 })();

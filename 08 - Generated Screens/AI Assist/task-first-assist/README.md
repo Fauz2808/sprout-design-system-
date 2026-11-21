@@ -2,6 +2,23 @@
 
 Live: https://sprout-assist-tasks.vercel.app/assist/ · local: `python3 build.py`, then serve `site/` (preview config `assist-tasks`, port 4330).
 
+## 20 Nov US · one-time carpool (MEETING-2026-11-21-tasks.md, C1)
+
+Try `/plan-carpool/` (One time) and the other parent at `/receiver/?v=carpool-chat`.
+
+- **Kids first**: `cpWhen` is now "Plan a ride" (regular: "Plan a regular carpool"), with For as one line of photo chips
+  (the playdate's `.pd-kid`), no class labels, before the date and pickup time.
+- **First yes drives** (unchanged), and Tony now sees the words the others get: "We're all set now: Priya is taking
+  Jake…" (one group text or each, worded to match).
+- **Priya's side** (`receiver.html`, carpool-chat): the ride card has I can drive / Can't this time / Reply to Tony.
+  I can drive turns the card into the confirmation: You're driving Jake, pickup time and address, drop-off, added to
+  your calendar with a 9:00 reminder. No reply is typed for her (same rule as the playdate).
+- **Can't at 9:30 → offer a time** (Ahmad, 21 Nov): on Priya's card the no is "Can't at 9:30". It opens a sheet, "When
+  could you drive Jake?", with 9:00 / 9:45 / 10:00 / 10:15 to tick, or "I can't drive this time". Her card then waits on
+  Tony; the demo plays his move to her first time and the card confirms at it. On Tony's side (`TEAM` Priya `offer`,
+  one time only) the ride card says "Priya can't at 9:30" with her times: Pick up at 9:45 / at 10 / Keep 9:30, ask
+  others. Picking a time moves the pickup and she drives.
+
 ## 20 Nov US · playdate (MEETING-2026-11-21-tasks.md, P1–P3)
 
 All in `X.flows.playdate` (`app/sitter-v3.js`). Try `/playdate/`, `/playdate-new-time/`, `/playdate-cant/`, and the other

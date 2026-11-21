@@ -1437,7 +1437,7 @@ X.flows.playdate = async (p, opt = {}) => {
    Families are samples: Jake's SSC team (Priya and Aisha are on the soccer card) and Lincoln families. */
 const illIco = n => `<span class="clayico" style="background-image:url(${A}illus/${n}.webp)"></span>`;
 const TEAM = [
-  { n:'Priya Shah', ask:'Priya', kid:'Leo', rel:'Leo’s mom', mi:0.8, photo:A + 'priya.webp' },
+  { n:'Priya Shah', ask:'Priya', kid:'Leo', rel:'Leo’s mom', mi:0.8, photo:A + 'priya.webp', offer:[15, 30] },   // one time: can't at the asked time, offers two later ones (Ahmad, 21 Nov)
   { n:'Aisha Khan', ask:'Aisha', kid:'Ava', rel:'Ava’s mom', mi:1.4, photo:A + 'aisha.webp', cant:true },
   { n:'Elena Ruiz', ask:'Elena', kid:'Noah', rel:'Noah’s mom', mi:2.6, photo:A + 'elena.webp' },
   { n:'Marcus Lee', ask:'Marcus', kid:'Owen', rel:'Owen’s dad', mi:2.9 },
@@ -1484,9 +1484,9 @@ function cpWhen(p, kind){
   return new Promise(res => {
     let kids = [KIDS[1]], day = DAYS.find(d => d.w === 'Sat'), days = [6], until = CP_UNTIL[1], at = 570;   // N11 (Tony, 20 Nov): "I need the option to select multiple kids"
     const once = kind === 'once';
-    const c = p.block(`<div class="card"><div class="ctop">${clay('calendar-check')}<div><div class="eyebrow">Carpool · ${once ? 'one time' : 'regular'}</div><div class="ttl">${once ? 'When is the ride?' : 'When are the rides?'}</div></div></div>
+    const c = p.block(`<div class="card"><div class="ctop">${clay('calendar-check')}<div><div class="eyebrow">Carpool · ${once ? 'one time' : 'regular'}</div><div class="ttl">${once ? 'Plan a ride' : 'Plan a regular carpool'}</div></div></div>
       <div class="dlabel" style="margin-top:14px">For</div>
-      <div class="ua-rows" role="group">${KIDS.map(k => `<button type="button" class="ua-row" data-kid="${k.n}" aria-pressed="false"><span class="uaph" style="background-image:url(${k.img})"></span><span class="tx"><b>${k.n}</b><small>${k.age} · ${k.cls}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button>`).join('')}</div>
+      <div class="pd-kids" role="group">${KIDS.map(k => `<button type="button" class="pd-kid" data-kid="${k.n}" aria-pressed="false"><span class="uaph" style="background-image:url(${k.img})"></span>${k.n}<i class="ph-bold ph-check"></i></button>`).join('')}</div>
       ${once ? `<div class="dlabel" style="margin-top:16px">Date</div><div class="ua-days">${DAYS.map((d, i) => `<button type="button" class="ua-day" data-i="${i}"><small>${d.w}</small><b>${d.d}</b><i></i></button>`).join('')}</div>`
         : `<div class="dlabel" style="margin-top:16px">Every</div><div class="qk cp-wd">${[1, 2, 3, 4, 5, 6, 0].map(d => `<button type="button" class="chip" data-wd="${d}" aria-pressed="false">${WD[d]}</button>`).join('')}</div>
         <div class="dlabel" style="margin-top:16px">Until</div><div class="qk">${CP_UNTIL.map((u, i) => `<button type="button" class="chip" data-until="${i}">${i ? `Through ${u[0]}` : u[0]}</button>`).join('')}</div>`}
@@ -1704,7 +1704,28 @@ X.flows.carpool = async p => {
     let yes = null;
     const order = group ? asked.filter(f => !f.cant) : asked;
     for (const [i, f] of order.entries()) {
-      await later(p, { status:waiting, small:`${w.day.day} · ${tl(w.at)}`, ms:i ? 1500 : 2500, title:group ? `${f.ask} replied in ${g.chat}` : `${f.ask} replied`, body:f.cant ? 'Can’t this time' : `I can take ${riders}!` });
+      const offer = f.offer && f.offer.map(m => w.at + m);
+      await later(p, { status:waiting, small:`${w.day.day} · ${tl(w.at)}`, ms:i ? 1500 : 2500, title:group ? `${f.ask} replied in ${g.chat}` : `${f.ask} replied`,
+        body:f.cant ? 'Can’t this time' : offer ? `Can’t at ${tl(w.at)}, could drive at ${joinNames(offer.map(tl)).replace(' and ', ' or ')}` : `I can take ${riders}!` });
+      /* Ahmad, 21 Nov: a "can't" at the asked time can come with times they could drive. The ride card shows both and
+         Tony moves the pickup to fit, or keeps his time and Sprout asks the next family. */
+      if (offer) {
+        const asked0 = w.at;
+        const c = p.block(`<div class="card"><div class="ctop">${illIco('carpool')}<div><div class="eyebrow">Ride for ${riders} · ${w.day.day}</div><div class="ttl">${f.ask} can’t at ${tl(asked0)}</div></div></div>
+          <div class="ua-row on" style="margin-top:12px">${face({ n:f.ask, photo:f.photo })}<span class="tx"><b>${f.n}</b><small>Could drive at ${joinNames(offer.map(tl)).replace(' and ', ' or ')}</small></span><span class="ck"><i class="ph-bold ph-clock"></i></span></div>
+          <div class="fact" style="margin-top:10px"><i class="ph ph-clock"></i><span><s>${tl(asked0)}</s> · your pickup time</span></div>
+          <div class="fact"><i class="ph ph-arrow-right"></i>${cpShort(from)} to ${cpShort(to)}</div></div>`).querySelector('.card');
+        p.set(`${f.ask} could drive at ${tl(offer[0])}`, { when:w.day.short, attn:true });
+        await p.say(`${f.ask} can’t at ${tl(asked0)}, but could drive at ${joinNames(offer.map(tl)).replace(' and ', ' or ')}. Move the pickup?`, 800);
+        const k = await p.chips([...offer.map(m => `Pick up at ${tl(m)}`), `Keep ${tl(asked0)}, ask others`], { into:c });
+        if (k < offer.length) {
+          w.at = offer[k];
+          c.querySelector('.fact span').innerHTML = `<s>${tl(asked0)}</s> → ${tl(w.at)} · pickup moved`;
+          yes = f; break;
+        }
+        p.note(`Kept ${tl(asked0)}`, `Asking the next family`, 'ph-arrow-right');
+        continue;
+      }
       if (!f.cant) { yes = f; break; }
       p.note(`${f.ask} can’t this time`, 'Said no in your group text', 'ph-x-circle');
     }
@@ -1721,7 +1742,11 @@ X.flows.carpool = async p => {
     tell.done(`${yes.ask} · ride set`, `${w.day.day} · ${tl(w.at)}${back ? ` and ${tl(back)}` : ''}`, 'ph-car-profile');
     const others = group ? [] : asked.filter(f => f !== yes && !f.cant).map(f => f.ask);
     if (group) p.note(`Posted “${yes.ask} has it, thanks!” in ${g.chat}`, 'So nobody else offers', 'ph-chat-circle-text');
-    else if (others.length) p.note(`Told ${joinNames(others)} you found a ride`, 'Sent in their group texts', 'ph-paper-plane-tilt');
+    else if (others.length) {
+      p.note(`Told ${joinNames(others)} you found a ride`, others.length > 1 ? 'Sent in their group texts' : 'Sent in your group text', 'ph-paper-plane-tilt');
+      p.block(`<div class="preview gtx"><small>To ${joinNames(others)} · ${others.length > 1 ? 'in each group text' : 'in your group text'} · from Sprout</small><p></p></div>`).querySelector('p').textContent =
+        `Hi! We’re all set now: ${yes.ask} is taking ${riders} on ${w.day.day}. Thank you so much for checking! Sprout, for Tony`;
+    }
     await p.say(`${yes.ask} is driving ${riders}. It’s on both families’ calendars, and Dana has it too.`, 900);
     const done = p.block(`<div class="card"><div class="ctop">${illIco('carpool')}<div><div class="eyebrow">Carpool · ${w.day.day}</div><div class="ttl">${yes.ask} drives ${riders}</div></div></div>
       <div class="ua-row on" style="margin-top:12px">${face({ n:yes.ask, photo:yes.photo })}<span class="tx"><b>${yes.n}</b><small>${yes.rel} · ${yes.mi} mi from home</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></div>
