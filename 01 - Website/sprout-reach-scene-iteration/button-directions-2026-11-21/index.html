@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hero button · 3 directions</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<!-- Ahmad, 21 Nov: "Join Sprout" is too basic and the Apple / Android icons are dull. Research first, then decide.
+     Three directions, each live on the real hero (same photo, scrim and copy as home-v3). Hover, press and Tab them.
+     Nothing here is wired into home-v3 yet. -->
+<style>
+  :root { --bg: #f4f1ea; --ink: #18231c; --text: #4a544d; --green: #186338; --green-d: #124f2c; --mint: #cfe7d5;
+    --serif: "Playfair Display", Georgia, serif; --sans: Inter, system-ui, sans-serif; --spring: cubic-bezier(.19, 1, .22, 1); }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--sans); }
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.top h1 { font: 500 34px/1.15 var(--serif); margin: 0 0 8px; }
+  header.top p { max-width: 74ch; margin: 0; color: var(--text); }
+
+  /* what the references do */
+  .refs { margin: 28px 0 8px; border-collapse: collapse; width: 100%; font-size: 13.5px; background: #fff; border-radius: 16px; overflow: hidden; }
+  .refs th, .refs td { text-align: left; padding: 10px 14px; border-bottom: 1px solid #ece7dc; vertical-align: top; }
+  .refs th { font: 600 12px var(--sans); letter-spacing: .04em; text-transform: uppercase; color: var(--text); background: #faf8f3; }
+  .refs td:first-child { font-weight: 600; white-space: nowrap; }
+  .refs a { color: var(--green); }
+
+  /* one panel per direction: its own title and context above it */
+  .panel { margin-top: 56px; }
+  .panel h2 { font: 500 26px/1.2 var(--serif); margin: 0; }
+  .panel h2 small { font: 600 12px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--green); display: block; margin-bottom: 4px; }
+  .panel .ctx { display: grid; grid-template-columns: 1.3fr 1fr; gap: 8px 32px; margin: 10px 0 16px; color: var(--text); }
+  .panel .ctx p { margin: 0; }
+  .panel .ctx ul { margin: 0; padding-left: 18px; }
+  @media (max-width: 860px) { .panel .ctx { grid-template-columns: 1fr; } }
+
+  /* the hero, as in home-v3 */
+  .stage { position: relative; border-radius: 32px; overflow: hidden; min-height: 620px; display: flex; align-items: center; isolation: isolate; }
+  .stage .photo { position: absolute; inset: 0; z-index: -2; background: url(../assets/hero-dropoff-wide.webp) 62% 30% / cover; }
+  .stage::before { content: ""; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(90deg, rgb(14 26 18 / .74) 0%, rgb(14 26 18 / .5) 34%, rgb(14 26 18 / .08) 62%, rgb(14 26 18 / 0) 100%),
+                linear-gradient(0deg, rgb(14 26 18 / .4) 0%, rgb(14 26 18 / 0) 42%); }
+  .copy { max-width: min(620px, 46%); margin-left: clamp(28px, 5.5vw, 80px); }
+  .copy h3 { margin: 0; font: 500 clamp(36px, 4.4vw, 62px)/1.06 var(--serif); letter-spacing: -.014em; color: #fff; text-wrap: balance; }
+  .copy h3 em { display: block; margin-top: .08em; color: var(--mint); }
+  .copy .lede { margin: 18px 0 0; max-width: 40ch; font-size: 18px; color: rgb(255 255 255 / .92); }
+  .row { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 18px; margin-top: 28px; }
+  .stack { margin-top: 28px; }
+  @media (max-width: 860px) { .stage { min-height: 560px; align-items: flex-end; } .stage .photo { background-position: 70% 30%; }
+    .stage::before { background: linear-gradient(0deg, rgb(14 26 18 / .88) 0%, rgb(14 26 18 / .6) 45%, rgb(14 26 18 / .1) 75%); }
+    .copy { max-width: none; margin: 0 20px 26px; } .copy .lede { font-size: 15.5px; } }
+
+  a:focus-visible, button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+  /* ── A · Soft glow pill (Timeleft's breathing width + Bevel's rising light) ── */
+  .a-btn { position: relative; display: inline-flex; align-items: center; height: 58px; padding: 0 30px; border-radius: 999px; overflow: hidden;
+    background: linear-gradient(180deg, #ffffff 0%, #f3efe5 100%); border: 2px solid rgb(255 255 255 / .75); color: var(--green);
+    font: 600 18px var(--serif); text-decoration: none; isolation: isolate;
+    box-shadow: 0 1px 0 rgb(255 255 255 / .9) inset, 0 10px 26px -12px rgb(10 30 18 / .55);
+    transition: padding .5s var(--spring), transform .6s var(--spring), box-shadow .3s; }
+  .a-btn::before { content: ""; position: absolute; z-index: -1; left: 50%; top: 100%; width: 160%; aspect-ratio: 1; translate: -50% 0; border-radius: 50%;
+    background: radial-gradient(circle closest-side, rgb(207 231 213 / .95), rgb(207 231 213 / 0)); transition: translate .6s var(--spring); }
+  .a-btn:hover { padding: 0 38px; transform: scale(1.025); box-shadow: 0 0 6px rgb(255 255 255 / .8) inset, 0 16px 34px -12px rgb(10 30 18 / .6); }
+  .a-btn:hover::before { translate: -50% -62%; }
+  .a-btn:active { transform: scale(.97); transition-duration: .12s; }
+  .a-or { margin: 18px 0 10px; font: 500 13px var(--sans); color: rgb(255 255 255 / .8); }
+  .a-badges { display: flex; gap: 10px; }
+  .a-badges a { display: block; border-radius: 9px; transition: transform .4s var(--spring), box-shadow .3s; box-shadow: 0 0 0 1px rgb(255 255 255 / .25); }
+  .a-badges a:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px rgb(255 255 255 / .5), 0 10px 20px -10px rgb(0 0 0 / .6); }
+  .a-badges img { display: block; height: 44px; width: auto; }
+
+  /* ── B · Arrow handoff (Lusion's dot → arrow, Stripe's chevron growing a stem) ── */
+  .b-btn { position: relative; display: inline-flex; align-items: center; gap: 14px; height: 58px; padding: 0 7px 0 28px; border-radius: 999px; overflow: hidden;
+    background: #fff; color: var(--green); font: 600 18px var(--serif); text-decoration: none; isolation: isolate;
+    box-shadow: 0 10px 26px -12px rgb(10 30 18 / .55); transition: color .45s var(--spring), transform .6s var(--spring); }
+  .b-btn::before { content: ""; position: absolute; z-index: -1; top: 7px; right: 7px; height: 44px; width: 44px; border-radius: 999px; background: var(--green);
+    transition: width .55s var(--spring), top .55s var(--spring), right .55s var(--spring), height .55s var(--spring); }
+  .b-btn .lbl { transition: transform .55s var(--spring); }
+  .b-btn .end { position: relative; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: #fff; }
+  .b-btn .dot { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #fff; transition: transform .35s var(--spring), opacity .25s; }
+  .b-btn .arr { font-size: 20px; transform: translateX(-26px); opacity: 0; transition: transform .45s var(--spring), opacity .3s; }
+  .b-btn:hover { color: #fff; }
+  .b-btn:hover::before { top: 0; right: 0; height: 100%; width: 100%; }
+  .b-btn:hover .lbl { transform: translateX(6px); }
+  .b-btn:hover .dot { transform: scale(0); opacity: 0; }
+  .b-btn:hover .arr { transform: none; opacity: 1; }
+  .b-btn:active { transform: scale(.97); transition-duration: .12s; }
+  .b-get { display: inline-flex; align-items: center; gap: 10px; height: 58px; padding: 0 22px 0 18px; border-radius: 999px; text-decoration: none;
+    color: #fff; font: 500 15px var(--sans); background: rgb(255 255 255 / .14); border: 1px solid rgb(255 255 255 / .38);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3); backdrop-filter: blur(14px) saturate(1.3); transition: background .3s, border-color .3s, transform .6s var(--spring); }
+  .b-get .marks { display: inline-flex; gap: 6px; font-size: 21px; }
+  .b-get:hover { background: rgb(255 255 255 / .24); border-color: rgb(255 255 255 / .6); transform: translateY(-1px); }
+  .b-get:active { transform: scale(.97); }
+
+  /* ── C · Sprout in the button (Family's mark inside the CTA, Bevel's QR + proof on desktop) ── */
+  .c-btn { position: relative; display: inline-flex; align-items: center; gap: 12px; height: 60px; padding: 0 28px 0 8px; border-radius: 999px; overflow: hidden;
+    background: var(--green); color: #fff; font: 600 18px var(--serif); text-decoration: none; isolation: isolate;
+    box-shadow: 0 1px 0 rgb(255 255 255 / .22) inset, 0 12px 28px -12px rgb(6 30 16 / .8);
+    transition: transform .6s var(--spring), box-shadow .3s, background .3s; }
+  .c-btn::after { content: ""; position: absolute; inset: 0; z-index: -1; transform: translateX(-120%);
+    background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / .22) 50%, transparent 70%); }
+  .c-btn .app { width: 44px; height: 44px; border-radius: 13px; background: #fff url(../assets/logo.png) center / 30px no-repeat; flex: none;
+    box-shadow: 0 2px 6px rgb(0 0 0 / .2); transition: transform .5s cubic-bezier(.34, 1.56, .64, 1); }
+  .c-btn:hover { transform: translateY(-2px); background: #1b6f3f; box-shadow: 0 1px 0 rgb(255 255 255 / .25) inset, 0 18px 34px -12px rgb(6 30 16 / .85); }
+  .c-btn:hover .app { transform: translateY(-3px) rotate(-8deg) scale(1.06); }
+  .c-btn:hover::after { transform: translateX(120%); transition: transform .9s ease; }
+  .c-btn:active { transform: scale(.97); transition-duration: .12s; }
+  .c-qr { display: inline-flex; align-items: center; gap: 12px; padding: 7px 14px 7px 7px; border-radius: 18px; background: rgb(255 255 255 / .94); color: var(--ink);
+    text-decoration: none; box-shadow: 0 10px 24px -14px rgb(0 0 0 / .6); transition: transform .6s var(--spring); }
+  .c-qr:hover { transform: translateY(-2px); }
+  .c-qr img { width: 46px; height: 46px; display: block; }
+  .c-qr b { display: block; font: 600 13.5px var(--sans); }
+  .c-qr small { display: flex; align-items: center; gap: 5px; font: 500 12px var(--sans); color: var(--text); }
+  .c-qr small i { font-size: 14px; color: var(--ink); }
+  .c-proof { display: flex; align-items: center; gap: 10px; margin-top: 18px; font: 500 13.5px var(--sans); color: rgb(255 255 255 / .9); }
+  .c-faces { display: flex; }
+  .c-faces span { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; margin-left: -8px; background: center / cover #ddd; }
+  .c-faces span:first-child { margin-left: 0; }
+  @media (max-width: 860px) { .c-qr { display: none; } }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+
+  .verdict { margin-top: 56px; padding: 22px 24px; border-radius: 20px; background: #fff; }
+  .verdict h2 { margin: 0 0 8px; font: 500 22px var(--serif); }
+  .verdict p { margin: 6px 0 0; color: var(--text); max-width: 90ch; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Hero button: three directions</h1>
+    <p>Each one is live on the real hero. Hover, press and Tab through them. Every “Join Sprout” keeps today’s behavior:
+      on a computer it opens the QR pop-up, on a phone it goes straight to the right store. Pick one and I’ll build it as the site’s button component.</p>
+  </header>
+
+  <table class="refs">
+    <thead><tr><th>Reference</th><th>Primary button</th><th>Hover / press</th><th>How they say “it’s an app”</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://timeleft.com" target="_blank" rel="noopener">Timeleft</a></td><td>56 px pill, soft pink vertical gradient, 2 px white rim, 18 px semibold</td><td>The pill slowly widens (padding 32 → 40 px over 0.5 s)</td><td>“or download our app” + official App Store and Google Play badges</td></tr>
+      <tr><td><a href="https://www.bevel.health" target="_blank" rel="noopener">Bevel</a></td><td>Dark pill “Download App”</td><td>Scale 1.025 on a long spring (0.6 s), white inner glow, a radial light rises from below</td><td>Official App Store badge as the main button, star rating under it, QR card on desktop</td></tr>
+      <tr><td><a href="https://family.co" target="_blank" rel="noopener">Family</a></td><td>Dark pill “Download on iOS” with the Apple mark inside</td><td>Quick color change only</td><td>The platform mark lives inside the button</td></tr>
+      <tr><td><a href="https://partiful.com" target="_blank" rel="noopener">Partiful</a></td><td>White “Create event” + dark “Get the app”</td><td>Almost none</td><td>A second button just for the app</td></tr>
+      <tr><td><a href="https://lusion.co" target="_blank" rel="noopener">Lusion</a> (agency)</td><td>Dark pill “Let’s talk” with a small white dot</td><td>The dot shrinks away, an arrow slides in from the left, the text shifts (0.3 s)</td><td>n/a</td></tr>
+      <tr><td><a href="https://stripe.com" target="_blank" rel="noopener">Stripe</a></td><td>Solid pill “Get started ›”</td><td>The chevron grows a stem into an arrow, fill darkens</td><td>Secondary button carries a full-color Google logo</td></tr>
+      <tr><td><a href="https://locomotive.ca/en" target="_blank" rel="noopener">Locomotive</a> (agency)</td><td>Text link “Let’s talk”</td><td>Letters scramble, then settle (too techy for Sprout)</td><td>n/a</td></tr>
+    </tbody>
+  </table>
+
+  <!-- A -->
+  <section class="panel">
+    <h2><small>Direction A</small>Soft glow pill</h2>
+    <div class="ctx">
+      <p>Closest to Timeleft, the site most like ours. A warm white pill that breathes wider on hover while a soft mint light rises inside it. The dull icons are replaced by the official store badges under “or get the app”.</p>
+      <ul><li>From: Timeleft (widening), Bevel (rising light, 1.025 spring)</li><li>Strength: instantly familiar for parents, badges are crisp and official</li><li>Watch: two rows of things to read under the lede</li></ul>
+    </div>
+    <div class="stage"><div class="photo"></div>
+      <div class="copy">
+        <h3>It takes a village to raise a family. <em>Sprout brings yours together.</em></h3>
+        <p class="lede">Meet the parents at your school. Sprout remembers the little things and helps you get them done.</p>
+        <div class="stack">
+          <a class="a-btn" href="#" data-demo>Join Sprout</a>
+          <p class="a-or">or get the app</p>
+          <div class="a-badges">
+            <a href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052" data-demo><img src="../assets/app-store.png" alt="Download on the App Store" /></a>
+            <a href="https://play.google.com/store/apps/details?id=com.meetingpoint" data-demo><img src="../assets/play-store.png" alt="Get it on Google Play" /></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- B -->
+  <section class="panel">
+    <h2><small>Direction B</small>Arrow handoff</h2>
+    <div class="ctx">
+      <p>The agency move. A white pill with a small green circle at the end holding a dot. On hover the green floods the whole pill, the label turns white and the dot hands over to an arrow. Beside it, a frosted “Get the app” pill with crisp, full-white Apple and Android marks.</p>
+      <ul><li>From: Lusion (dot → arrow), Stripe (arrow that grows)</li><li>Strength: the most crafted feel, one clean row</li><li>Watch: Apple’s guidelines prefer the official badge over the bare Apple logo</li></ul>
+    </div>
+    <div class="stage"><div class="photo"></div>
+      <div class="copy">
+        <h3>It takes a village to raise a family. <em>Sprout brings yours together.</em></h3>
+        <p class="lede">Meet the parents at your school. Sprout remembers the little things and helps you get them done.</p>
+        <div class="row">
+          <a class="b-btn" href="#" data-demo><span class="lbl">Join Sprout</span><span class="end"><span class="dot"></span><i class="ph-bold ph-arrow-right arr"></i></span></a>
+          <a class="b-get" href="#" data-demo><span class="marks" aria-hidden="true"><i class="ph-fill ph-apple-logo"></i><i class="ph-fill ph-android-logo"></i></span>Get the app</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- C -->
+  <section class="panel">
+    <h2><small>Direction C</small>Sprout in the button</h2>
+    <div class="ctx">
+      <p>Brand-first. A deep green pill with the Sprout app icon inside, so the button itself says “this is an app”. On hover the icon hops and tilts, the pill lifts and a soft shine passes once. On a computer, a small QR card beside it lets parents scan straight away; under it, faces from the school as proof.</p>
+      <ul><li>From: Family (mark inside the CTA), Bevel (QR + proof on desktop)</li><li>Strength: most Sprout-owned, no third-party logos needed</li><li>Watch: the green pill is darker on the photo than A or B</li></ul>
+    </div>
+    <div class="stage"><div class="photo"></div>
+      <div class="copy">
+        <h3>It takes a village to raise a family. <em>Sprout brings yours together.</em></h3>
+        <p class="lede">Meet the parents at your school. Sprout remembers the little things and helps you get them done.</p>
+        <div class="row">
+          <a class="c-btn" href="#" data-demo><span class="app" aria-hidden="true"></span>Join Sprout</a>
+          <a class="c-qr" href="#" data-demo><img src="../assets/qr/app-store.svg" alt="QR code for Sprout on the App Store" /><span><b>Scan to get the app</b><small><i class="ph-fill ph-apple-logo"></i><i class="ph-fill ph-android-logo"></i>Free on iPhone and Android</small></span></a>
+        </div>
+        <div class="c-proof"><span class="c-faces"><span style="background-image:url(../assets/brief/dana.webp)"></span><span style="background-image:url(../assets/brief/priya.webp)"></span><span style="background-image:url(../assets/assist/dm-fatima.webp)"></span></span>Parents at your school are already here</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="verdict" style="border: 2px solid var(--green)">
+    <h2>Chosen (Ahmad, 21 Nov): B’s button + A’s store badges</h2>
+    <p>The arrow handoff for “Join Sprout”, with “or get the app” and the official App Store and Google Play badges under it.
+      Built into home-v3 as <code>.btn-hand</code> (home-v3.css). B’s frosted “Get the app” pill was too dull.</p>
+  </div>
+  <div class="verdict">
+    <h2>Claude’s first pick was C, with A’s badges on phones</h2>
+    <p>C is the only one that feels like Sprout rather than borrowed: the app icon in the button answers “is this an app?” without the dull grey glyphs, and the QR card turns a desktop visit into an install on the spot. On a phone the QR card hides and the button goes straight to the store.</p>
+    <p>If you want the safest choice for Tony’s parents, A. If you want the most “agency” feel, B.</p>
+  </div>
+</div>
+<script>
+  // demo only: nothing navigates from the board
+  document.querySelectorAll("[data-demo]").forEach(a => a.addEventListener("click", e => e.preventDefault()));
+</script>
+</body>
+</html>

@@ -25,6 +25,17 @@ slides), room parent strip, kids' privacy and inbox trust lines, Assist cut to a
 "The parents who matter most are already at drop-off." home-v2 no longer uses `home-v2-gp.css` (assist.html still
 does). Handoff page for Syed: `handoff.html`; legal pages copied to `legal/`. Check: `node review/home-v2-shots.mjs`.
 
+**Website v3 (20 Nov), `home-v3.html`:** home-v2 with the hero Tony liked, refined (2b from
+`hero-photo-2026-11-20/`: the families photo behind everything inside a rounded inset, the title on two lines, one phone
+with the current Daily Brief playing an email becoming a to-do, Dana checking one off and the day scrolling by), and the
+app screens brought up to the current Prod UI: `daily-brief.js/.css` (Figma Prod BRIEF-10 `16180:365329`, used by the
+hero on a loop and by the Daily Brief section on the pinned scroll), the current Chat screen (CHAT-CURRENT
+`16190:366278`), the docked tab bar with the raised clover in every phone, and the current profile parts. The FAQ and the
+class "updates" trust line now say what Sprout really reads (school, coach and activity emails, read only, no sender
+list). The sky, mascot portal and flying notes are gone from v3. Check: `node review/home-v3-shots.mjs` (shots in
+`review/shots/home-v3/`). **home-v2 is untouched and is still what `review/export-site.py` exports to the live site**;
+switch the export to v3 only after Tony approves.
+
 Validation:
 
 ```sh

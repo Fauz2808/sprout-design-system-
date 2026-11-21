@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hero: version 2, refined</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="icon" href="../assets/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<!-- Review scaffolding, not part of the site. Three heroes combining Timeleft (a photo of people up front) and Bevel (a sharp mockup that moves), 20 Nov. Pages 1-3 are hand-written; shared.css / shared.js hold the phone, the floating pills and the pointer tilt. -->
+<style>
+:root { --bg: #ece8de; --card: #f8f6f0; --ink: #1e3e2b; --text: #4d525b; --muted: #7d715e; --green: #186338; --line: rgb(30 62 43 / 0.14);
+  --serif: "Playfair Display", Georgia, serif; --sans: "Inter", -apple-system, system-ui, sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+.wrap { width: min(100% - 32px, 1760px); margin: 0 auto; padding: 32px 0 80px; }
+.scaffold { display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 5px 12px; border: 1px dashed rgb(125 113 94 / 0.6); border-radius: 99px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+h1 { margin: 16px 0 6px; font: 500 clamp(28px, 3vw, 40px)/1.15 var(--serif); color: var(--ink); }
+.intro { margin: 0; max-width: 78ch; }
+.dir { margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--line); }
+.head { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 18px; align-items: baseline; margin-bottom: 18px; }
+.k { grid-row: span 2; font: 500 44px/1 var(--serif); color: var(--green); }
+.head h2 { margin: 0; font: 500 24px/1.2 var(--serif); color: var(--ink); }
+.head h2 em { font-style: italic; font-weight: 400; color: var(--muted); }
+.head p { grid-column: 2; margin: 0; max-width: 92ch; }
+.head a { grid-row: 1; grid-column: 3; font-size: 13px; font-weight: 500; color: var(--green); white-space: nowrap; }
+.row { display: flex; gap: var(--gap); align-items: flex-start; --gap: 28px; }
+.f { flex: none; }
+.f small { display: block; margin-bottom: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.view { position: relative; overflow: hidden; background: #f4f1ea; border-radius: 10px; box-shadow: 0 0 0 1px var(--line), 0 18px 40px -26px rgb(30 40 25 / 0.45); }
+.view iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; background: #f4f1ea; }
+.d .view { width: calc(1440px * var(--ds)); height: calc(900px * var(--ds)); }
+.d iframe { width: 1440px; height: 900px; transform: scale(var(--ds)); }
+.m .view { width: calc(390px * var(--ps)); height: calc(844px * var(--ps)); border-radius: calc(54px * var(--ps)); }
+.m iframe { width: 390px; height: 844px; transform: scale(var(--ps)); }
+@media (max-width: 760px) {
+  .row { flex-direction: column; }
+  .head { grid-template-columns: auto 1fr; }
+  .head a { grid-row: auto; grid-column: 2; }
+}
+.refs { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; margin-top: 18px; }
+.refs figure { margin: 0; }
+.refs img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; border-radius: 10px; box-shadow: 0 0 0 1px var(--line); display: block; }
+.refs figcaption { margin-top: 8px; font-size: 13px; }
+.refs figcaption b { color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="scaffold">Review scaffolding · not part of the site</p>
+  <h1>joinsprout.co hero: version 2, refined</h1>
+  <p class="intro">Ahmad, 20 Nov, on version 2: the title on two lines like Bevel, no “Kiker families…” and “Free for parents” lines, real HTML screens in the phones so the Daily Brief plays its real motion, a working phone layout, and a second version where the photo is the hero’s background with a margin on every side. Update (same day): one phone only, the <b>current</b> Daily Brief (Figma Prod 16180:365329), coded, so the motion shows what it does: a teacher’s email becomes a to-do at the top of the list, Dana checks one off, then the day scrolls by. 2b (the photo behind everything) is the pick; 2a stays for comparison. Open a page full screen and move the pointer over it: the phone leans, the photo drifts.</p>
+
+  <section class="dir">
+    <div class="head"><span class="k">2b</span><h2>The park behind everything <em>· the photo as the background, inset</em></h2><a href="2b.html" target="_blank">Open full page ↗</a>
+      <p>Ahmad’s pick. The families photo fills the hero inside a rounded frame with a margin on every side; white title and button on a soft dark gradient. One phone: the current Daily Brief, coded, on a 16-second loop: (1) “New to-do from Miss Taylor’s email” arrives and drops in at the top of the To-Do List, (2) Dana checks off soccer pickup, (3) the brief scrolls through invitations, Happening today, upcoming events, lunch and birthdays. The pills say what each part does.</p></div>
+    <div class="row"><div class="f d"><small>Desktop 1440</small><div class="view"><iframe src="2b.html" title="2b, desktop"></iframe></div></div>
+      <div class="f m"><small>Phone 390</small><div class="view"><iframe src="2b.html" title="2b, phone"></iframe></div></div></div>
+  </section>
+
+  <section class="dir">
+    <div class="head"><span class="k">2a</span><h2>Phones over the park <em>· the photo as a band</em></h2><a href="2a.html" target="_blank">Open full page ↗</a>
+      <p>Kept for comparison. The photo as a band under the phone, cream above. Same phone and motion as 2b.</p></div>
+    <div class="row"><div class="f d"><small>Desktop 1440</small><div class="view"><iframe src="2a.html" title="2a, desktop"></iframe></div></div>
+      <div class="f m"><small>Phone 390</small><div class="view"><iframe src="2a.html" title="2a, phone"></iframe></div></div></div>
+  </section>
+
+  <h2 style="margin:64px 0 0;font:500 22px var(--serif);color:var(--ink)">Earlier today</h2>
+  <section class="dir">
+    <div class="head"><span class="k">R</span><h2>The two references</h2><p>Captured 20 Nov. Bevel: a crisp upright phone and watch, small data pills floating around them on a soft glow. Timeleft: a full-bleed photo of people, the headline on a cream card with the city on top.</p></div>
+    <div class="refs">
+      <figure><img src="../hero-explorations-2026-11-20/research/bevel-desktop.png" alt="Bevel home page"><figcaption><b>Bevel.</b> The mockup and the floating pills.</figcaption></figure>
+      <figure><img src="../hero-explorations-2026-11-20/research/bevel-scroll-450.png" alt="Bevel home page scrolled"><figcaption><b>Bevel, scrolled.</b> The pills drift around the devices.</figcaption></figure>
+      <figure><img src="../hero-explorations-2026-11-20/research/timeleft-desktop.png" alt="Timeleft home page"><figcaption><b>Timeleft.</b> People first, headline on a card, the city on top.</figcaption></figure>
+      <figure><img src="../hero-explorations-2026-11-20/research/timeleft-mobile.png" alt="Timeleft on a phone" style="object-fit:contain;background:#fff"><figcaption><b>Timeleft, phone.</b> The photo fills the screen, the card overlaps it.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="dir">
+    <div class="head"><span class="k">A</span><h2>Tony’s version <em>· the base</em></h2><a href="../home-v2-hero-preview.html" target="_blank">Open full page ↗</a>
+      <p>The hero Tony liked, for comparison.</p></div>
+    <div class="row"><div class="f d"><small>Desktop 1440</small><div class="view"><iframe src="../home-v2-hero-preview.html" title="A, desktop"></iframe></div></div>
+      <div class="f m"><small>Phone 390</small><div class="view"><iframe src="../home-v2-hero-preview.html" title="A, phone"></iframe></div></div></div>
+  </section>
+
+  <section class="dir">
+    <div class="head"><span class="k">1</span><h2>The picnic, and the plan <em>· Timeleft card + Bevel phone</em></h2><a href="1.html" target="_blank">Open full page ↗</a>
+      <p>The families on the blanket fill the screen. The headline sits on a cream card with the place on top (Circle C · Austin), Timeleft’s way. The Daily Brief phone stands upright on the right with three pills floating around it: a to-do from the teacher’s email, a playdate invite, the class chat.</p></div>
+    <div class="row"><div class="f d"><small>Desktop 1440</small><div class="view"><iframe src="1.html" title="1, desktop"></iframe></div></div>
+      <div class="f m"><small>Phone 390</small><div class="view"><iframe src="1.html" title="1, phone"></iframe></div></div></div>
+  </section>
+
+  <section class="dir">
+    <div class="head"><span class="k">2</span><h2>Rising from the park <em>· Bevel layout, Timeleft photo</em></h2><a href="2.html" target="_blank">Open full page ↗</a>
+      <p>Bevel’s structure: centered headline and button, the devices rising in the middle. Bevel pairs a phone and a watch; Sprout pairs the Daily Brief and the class chat. Where Bevel has a soft glow, the devices rise out of a wide photo of the families.</p></div>
+    <div class="row"><div class="f d"><small>Desktop 1440</small><div class="view"><iframe src="2.html" title="2, desktop"></iframe></div></div>
+      <div class="f m"><small>Phone 390</small><div class="view"><iframe src="2.html" title="2, phone"></iframe></div></div></div>
+  </section>
+
+  <section class="dir">
+    <div class="head"><span class="k">3</span><h2>How this afternoon happened <em>· the photo, and the chat that made it</em></h2><a href="3.html" target="_blank">Open full page ↗</a>
+      <p>The photo full-bleed with the headline straight on it. The phone plays the class chat that made this afternoon happen: “Anyone at Brodie Park after pickup Saturday?”, three parents say yes, and it lands on four families’ calendars. It replays every few seconds.</p></div>
+    <div class="row"><div class="f d"><small>Desktop 1440</small><div class="view"><iframe src="3.html" title="3, desktop"></iframe></div></div>
+      <div class="f m"><small>Phone 390</small><div class="view"><iframe src="3.html" title="3, phone"></iframe></div></div></div>
+  </section>
+  <p class="intro" style="margin-top:40px">The photo is the one already in the site’s assets. For the real site, a photo from an actual Kiker or Lincoln pickup or park day will carry this much better than any generated image.</p>
+</div>
+<script>
+/* scale both frames so they share one height and fill the row: 1440*ds + 390*ps + gap = row width, 900*ds = 844*ps */
+(function () {
+  const fit = () => document.querySelectorAll(".row").forEach((row) => {
+    const w = row.clientWidth, stacked = getComputedStyle(row).flexDirection === "column";
+    let ds, ps;
+    if (stacked) { ds = w / 1440; ps = Math.min(1, (w * 0.8) / 390); }
+    else { ds = (w - 28) / (1440 + 390 * 900 / 844); ps = ds * 900 / 844; }
+    row.style.setProperty("--ds", ds.toFixed(4));
+    row.style.setProperty("--ps", ps.toFixed(4));
+  });
+  fit();
+  addEventListener("resize", fit);
+})();
+</script>
+</body>
+</html>

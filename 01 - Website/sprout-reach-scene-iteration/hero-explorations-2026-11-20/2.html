@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sprout hero 2 · Both halves, two phones</title>
+    <meta name="description" content="The parent community for your school, plus a daily plan that does the remembering. Meet other families, coordinate plans, and never miss what matters." />
+    <meta name="theme-color" content="#f4f1ea" />
+    <!-- the link preview (Tony, 10 Oct: iMessage). Absolute URLs: iMessage ignores relative ones. The image is built by
+         review/make-og.mjs from review/og-card.html; bump ?v= when it changes, iMessage caches previews hard -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sprout" />
+    <meta property="og:url" content="https://joinsprout.co/" />
+    <!-- the line under the image (Tony, 11 Oct): not the image's header again -->
+    <meta property="og:title" content="Sprout - The parent community for your school" />
+    <meta property="og:description" content="Plus a daily plan that does the remembering." />
+    <meta property="og:image" content="https://joinsprout.co/assets/og/sprout-link.jpg?v=20261011-4" />
+    <meta property="og:image:width" content="2400" />
+    <meta property="og:image:height" content="1260" />
+    <meta property="og:image:alt" content="Sprout: Your school’s parent community. Plus a daily plan that does the remembering." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://joinsprout.co/assets/og/sprout-link.jpg?v=20261011-4" />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="icon" href="../assets/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+    <!-- Website v2, structure pass (Tony, 7 Oct). The app screens are coded, not screenshots:
+         the Daily Brief from Figma 13266:241031, the class screens from sections-demo.js, the Chat
+         and Clubs screens from assist-demo.css, the Assist phones from assist.html (home-v2-gp.css). -->
+    <link rel="stylesheet" href="../assist-demo.css?v=20260925-27" />
+    <link rel="stylesheet" href="../sections-demo.css?v=20260925-2" />
+    <link rel="stylesheet" href="../hero-portal.css?v=20261008-1" />
+    <link rel="stylesheet" href="../home-v2.css?v=20261013-1" />
+    <style>
+      .hero-preview-page .top.over { background: var(--bg); }
+      .hero-preview-page .top.over::before { opacity: 0; }
+      .hero-preview-page .top.over .logo { min-width: 44px; min-height: 44px; color: var(--ink); }
+      .hero-preview-page .top.over .top-rp { background: transparent; color: var(--green); }
+      .hero-preview-page .top.over .top-rp:hover { background: var(--green-subtle); }
+      .hero-preview-page .top :is(.top-cta, .top-rp) { display: inline-flex; min-height: 44px; align-items: center; }
+      .hero-preview-page .top a:focus-visible,
+      .hero-preview a:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; }
+
+      .hero-sky.hero-preview {
+        display: block;
+        padding: 88px 20px 0;
+        color: var(--ink);
+        background: radial-gradient(ellipse at 50% 82%, var(--sand), transparent 53%) var(--bg);
+      }
+      .hero-preview .hero-copy {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        align-items: start;
+        width: min(100%, 1120px);
+        height: 100%;
+        margin-inline: auto;
+      }
+      .hero-preview .hero-message { position: relative; z-index: 1; }
+      .hero-preview h1 {
+        font-size: clamp(31px, 10.2vw, 44px);
+        line-height: 1.05;
+        color: var(--ink);
+        text-shadow: none;
+      }
+      .hero-preview h1 em { font-weight: 500; color: var(--green); }
+      .hero-preview .lede {
+        max-width: 33ch;
+        margin: 14px auto 0;
+        color: var(--text);
+        font-weight: 400;
+        font-size: 16px;
+        text-shadow: none;
+      }
+      .hero-preview .more {
+        position: static;
+        transform: none;
+        min-height: 44px;
+        margin-top: 18px;
+        background: var(--green-subtle);
+        color: var(--green);
+        font-family: var(--serif);
+        font-size: 15px;
+      }
+      .hero-preview .more:hover { background: var(--green); color: var(--bg); }
+      .hero-preview .proof {
+        margin: 12px 0 0;
+        padding: 0;
+        border-radius: 0;
+        background: none;
+        backdrop-filter: none;
+        color: var(--text);
+        text-shadow: none;
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      .hero-preview .proof span { flex-basis: 100%; }
+
+      .hero-stage-shot {
+        position: relative;
+        align-self: stretch;
+        min-height: 0;
+        pointer-events: none;
+        perspective: 1050px;
+      }
+      .hero-stage-shot .hero-clover {
+        position: absolute;
+        top: 0;
+        left: 54%;
+        width: clamp(315px, 114vw, 575px);
+        max-width: none;
+        opacity: .12;
+        mix-blend-mode: multiply;
+        transform: translateX(-50%) rotate(-22deg);
+      }
+      .hero-device-slot {
+        position: absolute;
+        top: 16px;
+        left: 50%;
+        width: min(68vw, 290px);
+        translate: -50% 0;
+      }
+      .hero-device {
+        position: relative;
+        width: 100%;
+        padding: 1.6%;
+        aspect-ratio: 402 / 861;
+        border-radius: 13.4% / 6.2%;
+        background: linear-gradient(148deg, #e1e7d6 0%, #9da994 18%, #3a493c 46%, #899483 72%, #ccd2c4 100%);
+        box-shadow: inset 0 0 0 1px rgb(248 251 241 / .48), 13px 26px 48px rgb(70 55 30 / .22);
+      }
+      .hero-device-screen {
+        position: relative;
+        height: 100%;
+        overflow: hidden;
+        border: 2px solid #18271f;
+        border-radius: 12.5% / 5.8%;
+        background: var(--bg);
+        text-align: left;
+      }
+      .hero-device-screen .hero-brief-image { display: block; width: 100%; height: 100%; }
+      .hero-preview .hero-stage-shot .h-orb {
+        position: absolute;
+        top: 7.3%;
+        left: 4.1%;
+        width: 10.2%;
+        height: auto;
+        aspect-ratio: 1;
+        margin: 0;
+        visibility: hidden;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .hero-device-slot { animation: hero-device-arrive 1.25s var(--ease) both; }
+        .hero-device {
+          transform: rotateZ(calc(2.75deg - var(--p, 0) * 12deg))
+            rotateY(calc(-6deg + var(--p, 0) * 24deg)) translateY(calc(var(--p, 0) * -38px));
+        }
+      }
+      @keyframes hero-device-arrive {
+        from { opacity: .68; transform: translateY(30px) rotate(-4deg) scale(.97); }
+        to { opacity: 1; transform: none; }
+      }
+
+      @media (max-width: 640px) and (max-height: 720px) {
+        .hero-sky.hero-preview { padding-top: 78px; }
+        .hero-preview h1 { font-size: clamp(28px, 9.4vw, 40px); }
+        .hero-preview .lede { margin-top: 10px; font-size: 15px; }
+        .hero-preview .more { margin-top: 14px; }
+        .hero-preview .proof { margin-top: 9px; }
+        .hero-device-slot { top: 13px; width: min(63vw, 260px); }
+      }
+      @media (max-width: 640px) and (max-height: 620px) {
+        .hero-sky.hero-preview { padding-top: 73px; }
+        .hero-preview .lede { font-size: 14px; }
+        .hero-preview .proof { font-size: 12px; }
+        .hero-device-slot { top: 10px; }
+      }
+      @media (min-width: 821px) {
+        .hero-sky.hero-preview {
+          padding: 64px clamp(28px, 6vw, 96px) 0;
+          text-align: left;
+          background: radial-gradient(ellipse at 74% 60%, var(--sand), transparent 51%) var(--bg);
+        }
+        .hero-preview .hero-copy { grid-template: 1fr / minmax(0, 1fr) minmax(0, .98fr); align-items: center; }
+        .hero-preview .hero-message { padding-bottom: 33px; }
+        .hero-preview h1 { font-size: clamp(38px, 4.55vw, 65px); }
+        .hero-preview .lede { margin: 22px 0 0; font-size: 19px; }
+        .hero-preview .more { margin-top: 24px; }
+        .hero-preview .proof { margin-top: 17px; }
+        .hero-stage-shot .hero-clover { top: 50%; left: 55%; width: min(52vw, 735px); transform: translate(-50%, -50%) rotate(-22deg); }
+        .hero-device-slot {
+          top: 49%;
+          left: 54%;
+          width: clamp(245px, calc(44svh - 58px), 350px);
+          translate: -50% -50%;
+        }
+      }
+    /* Exploration 2 · Both halves, two phones (20 Nov, from Bevel): Bevel shows the phone and the watch together, one product in two places. The headline promises two things (the parent community, and the Daily Brief), so the class chat phone stands behind the Daily Brief phone. */
+
+.hx { position: absolute; z-index: 2; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 16px;
+  background: rgb(255 255 255 / .92); box-shadow: 0 1px 0 rgb(30 62 43 / .06), 0 14px 30px -12px rgb(40 50 30 / .28);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); text-align: left; font-family: var(--sans); }
+.hx b { display: block; font: 600 13px/1.3 var(--sans); color: var(--ink); }
+.hx small { display: block; font-size: 12px; line-height: 1.35; color: var(--text); }
+.hx .av { width: 34px; height: 34px; border-radius: 50%; flex: none; background: center / cover var(--green-subtle); }
+.hx .ic { width: 34px; height: 34px; border-radius: 10px; flex: none; display: grid; place-items: center; background: var(--green-subtle); color: var(--green); font-size: 18px; }
+.hx .ic img, .hx .gm { width: 18px; height: 18px; }
+.hx > div { min-width: 0; flex: 1; }
+.hx .t { margin-left: auto; align-self: flex-start; font-size: 11px; color: var(--muted, #7d715e); white-space: nowrap; padding-left: 6px; }
+@media (prefers-reduced-motion: no-preference) {
+  .hx { opacity: 0; animation: hx-in .7s var(--ease, cubic-bezier(.22,1,.36,1)) forwards; }
+}
+@keyframes hx-in { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: none; } }
+@media (max-width: 820px) { .hx { padding: 8px 10px; gap: 8px; border-radius: 14px; } .hx b { font-size: 12px; } .hx small { font-size: 11px; } .hx .av, .hx .ic { width: 28px; height: 28px; } }
+
+.hero-stage-shot .back-slot { z-index: 0; }
+.hero-stage-shot .hero-device-slot:not(.back-slot) { z-index: 1; }
+.hero-device.back { transform: rotateZ(-9deg) !important; filter: saturate(.92); }
+.hero-stage-shot .back-slot { top: 40px; left: 30%; width: min(58vw, 240px); }
+.hero-stage-shot .hero-device-slot:not(.back-slot) { left: 62%; }
+.hx.tag1 { top: 0; left: 0; animation-delay: .8s; } .hx.tag2 { top: 52%; right: -2%; animation-delay: 1.4s; }
+@media (min-width: 821px) {
+  .hero-stage-shot .back-slot { top: 47%; left: 34%; width: clamp(210px, calc(38svh - 50px), 300px); }
+  .hero-stage-shot .hero-device-slot:not(.back-slot) { top: 52%; left: 64%; }
+  .hx { width: 250px; } .hx.tag1 { top: 10%; left: 0; } .hx.tag2 { top: 78%; right: 0; }
+}
+@media (max-width: 820px) { .hx { width: min(56vw, 210px); } .hx.tag2 { top: 64%; } }
+
+    </style>
+    <script src="../sections-demo.js?v=20260925-2" defer></script>
+    <script src="../home-v2.js?v=20261009-2" defer></script>
+    <script src="../hero-portal.js?v=20261007-3" defer></script>
+  </head>
+  <body class="hero-preview-page">
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top over" id="top">
+      <a class="logo" href="#home" aria-label="Sprout home"><img src="../assets/logo.png" alt="" width="30" height="30" />Sprout</a>
+      <nav class="top-links" aria-label="Sections">
+        <a href="#brief">Daily Brief</a><a href="#classes">Class chats</a><a href="#directory">Directory</a><a href="#faq">FAQ</a>
+      </nav>
+      <!-- room parents: Tony wanted it in the header (8 Oct); the section below was cut the same day ("confusing if I'm a
+           normal parent"), so the button goes straight to RoomParent -->
+      <a class="top-rp" href="https://roomparent.com" rel="noopener"><span class="lg">I’m a room parent</span><span class="sm">Room parent</span></a>
+      <a class="top-cta" href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052" data-join>Join your schools</a>
+    </header>
+
+    <main id="main">
+      <!-- The Daily Brief mascot remains the origin of the existing scroll portal. -->
+      <section class="portal" id="portal">
+        <div class="portal-pin">
+          <div class="hero hero-sky hero-preview" id="home" aria-labelledby="hero-h">
+            <div class="hero-copy">
+              <div class="hero-message">
+                <h1 id="hero-h">Your school’s<br><em>parent community.</em></h1>
+                <p class="lede">Meet other school families and keep track of the day with your Daily Brief.</p>
+                <a class="more" href="#brief">See your morning <i class="ph ph-arrow-down" aria-hidden="true"></i></a>
+                <p class="proof"><span>Kiker families in Circle C are already here</span><span>Free for parents. Always.</span></p>
+              </div>
+              <div class="hero-stage-shot" role="img" aria-label="Sprout Daily Brief. RSVP for Meet the Teacher night, due Friday.">
+                <img class="hero-clover" src="../assets/assist/clover.webp" width="300" height="300" alt="" />
+                <div class="hero-device-slot" aria-hidden="true">
+                  <div class="hero-device">
+                    <div class="hero-device-screen">
+                      <!-- Captured from sprout-assist-tasks.vercel.app/, with personal demo details removed. -->
+                      <img class="hero-brief-image" src="../assets/sprout-deployed-daily-brief.png" width="784" height="1700" alt="" fetchpriority="high" />
+                      <span class="h-orb"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="hero-device-slot back-slot" aria-hidden="true"><div class="hero-device back"><div class="hero-device-screen"><img src="../assets/class-chat.png" width="393" height="852" alt="" style="display:block;width:100%;height:100%" /></div></div></div>
+                <div class="hx tag1"><span class="ic"><i class="ph-fill ph-users-three"></i></span><div><b>Your class chats</b><small>Every class your kids are in</small></div></div>
+                <div class="hx tag2"><span class="ic"><i class="ph-fill ph-sun"></i></span><div><b>Your Daily Brief</b><small>What today needs, every morning</small></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="portal-layer" id="portalLayer" aria-hidden="true">
+            <span class="ml portal-ml" data-live></span>
+            <!-- the notes: where parents look today (the old "too many places" chips, now flying out of the portal) -->
+            <div class="fly" id="fly">
+              <div class="fly-i fly-note" data-note><img src="../assets/assist/need-what.webp" alt="" width="64" height="64" /><span>School emails</span></div>
+              <div class="fly-i fly-note" data-note><img src="../assets/assist/need-who.webp" alt="" width="64" height="64" /><span>Class group texts</span></div>
+              <div class="fly-i fly-note" data-note><img src="../assets/assist/need-when.webp" alt="" width="64" height="64" /><span>The calendar on the fridge</span></div>
+              <div class="fly-i fly-note" data-note><img src="../assets/assist/need-why.webp" alt="" width="64" height="64" /><span>Sign-up links</span></div>
+              <div class="fly-i fly-note" data-note><img src="../assets/assist/event-lg.webp" alt="" width="64" height="64" /><span>Teacher newsletters</span></div>
+              <div class="fly-i fly-note" data-note><img src="../assets/assist/bday-lg.webp" alt="" width="64" height="64" /><span>Birthday invites</span></div>
+              <div class="fly-i fly-note" data-note><img src="../assets/assist/bell.webp" alt="" width="64" height="64" /><span>Texts with your spouse</span></div>
+              <div class="fly-i fly-note" data-note><img src="../assets/assist/bus-lg.webp" alt="" width="64" height="64" /><span>Pickup times</span></div>
+              <div class="fly-i fly-note" data-note><img src="../assets/assist/need-where.webp" alt="" width="64" height="64" /><span>Playdates</span></div>
+              <div class="fly-i fly-note" data-note><img src="../assets/assist/club-lg.webp" alt="" width="64" height="64" /><span>Clubs and teams</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2 · DAILY BRIEF. The section is tall; the phone sticks: first centred under "Sprout puts them in one place",
+           then it moves right, the copy comes in and the brief scrolls with the page (Tony: "as I scroll, it should
+           scroll down the daily brief"). -->
+      <section class="scrolly brief" id="brief" aria-labelledby="brief-h">
+        <div class="scrolly-pin">
+          <!-- the landing (Ahmad, 7 Oct): after the notes fly past, the brief arrives in the middle under this line,
+               then moves right and the copy comes in (home-v2.js, scrubBrief) -->
+          <p class="brief-intro" aria-hidden="true"><img src="../assets/logo.png" alt="" width="34" height="34" />Sprout puts them in one place.</p>
+          <div class="scrolly-copy">
+            <p class="eyebrow">Daily Brief</p>
+            <h2 id="brief-h">Your whole morning at a glance. Shared with your spouse.</h2>
+            <!-- Tony, 8 Oct evening: the 7:02 AM cards beside the phone read as a second, different list ("not sure what it's
+                 trying to accomplish"). The phone carries the real morning now; one supporting line, as on mobile. -->
+            <p>Every morning, Sprout lines up what needs doing across all your kids' classes. Connect your spouse and you both see the same list, and who already did what.</p>
+          </div>
+          <div class="scrolly-stage">
+            <div class="phone" id="briefPhone" role="img" aria-label="Sprout Daily Brief for Thursday: Pajama Day, $5 for the book fair, Ava's party invitation, morning carpool and Lydia on pickup"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 · CLASS GROUP CHATS. Pinned like the Daily Brief (Tony, 8 Oct: the text kept sliding up and was hard to read,
+           "I'd rather it just flash perfectly in the right spot"): the copy stays put, the scroll swaps one step for the
+           next in the same place. Step 0 = every class in one list (the kids' names come in, it gets two units of
+           scroll); steps 1-4 = what each class holds. --units = total scroll units, home-v2.js reads data-w. -->
+      <section class="scrolly steps classes" id="classes" aria-labelledby="classes-h" style="--units: 6">
+        <div class="scrolly-pin">
+          <div class="scrolly-copy">
+            <div class="step-head"><p class="eyebrow">Class group chats</p>
+            <h2 id="classes-h">Every class. One app. Zero reply-all.</h2></div>
+            <div class="step-list">
+              <article class="step" data-step="list" data-w="2"><h3>One list for every class</h3><p>Presley's, Jake's and Mia's classes sit side by side in Chat, each with a group chat of the parents in that class.</p></article>
+              <article class="step" data-step="chat"><h3>The class group chat</h3><p>Every parent in the class, in one thread. Ask about the field trip, offer a ride, share the photos.</p></article>
+              <article class="step" data-step="calendar"><h3>The class calendar</h3><p>Events, No School days and reminders from your room parent. They show up in your Daily Brief too.</p></article>
+              <article class="step" data-step="updates"><h3>Teacher and room parent emails</h3><p>Class updates pulled from your inbox and kept with the class, so nothing gets buried.</p>
+                <!-- the trust line sits where we ask for the inbox (Tony, 8 Oct, point 4) -->
+                <p class="trust"><i class="ph-fill ph-lock-simple" aria-hidden="true"></i>You choose which senders Sprout reads. Nothing else.</p></article>
+              <article class="step" data-step="links"><h3>Important links</h3><p>The school site, the wish list, donations. Pinned, not scrolled for.</p></article>
+            </div>
+            <div class="bar" aria-hidden="true"><i></i></div>
+          </div>
+          <div class="scrolly-stage">
+            <div class="phone" id="classPhone" role="img" aria-label="Sprout Chat: every class your kids are in, and inside one class its chat, calendar, updates and links">
+              <!-- sections-demo.js mounts the coded class screens in here -->
+              <div id="class-screen-panel"><span data-class-view="chat" aria-selected="true" hidden></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 · MEMBER DIRECTORY. Communities, the list, a profile, a message without swapping numbers. Pinned, like the
+           class chats. -->
+      <section class="scrolly steps directory" id="directory" aria-labelledby="dir-h" style="--units: 4">
+        <div class="scrolly-pin">
+          <div class="scrolly-copy">
+            <div class="step-head"><p class="eyebrow">Member directory</p>
+            <h2 id="dir-h">Know the parents around your kids.</h2></div>
+            <div class="step-list">
+              <article class="step" data-step="comms"><h3>Every community your kids are in</h3><p>School, daycare, the soccer league, summer camp. Each one has its own directory of parents.</p></article>
+              <article class="step" data-step="list"><h3>See who's who</h3><p>Find Erick's dad or Flore's mom by name, by class, or by the kid you already know.</p></article>
+              <article class="step" data-step="profile"><h3>Open a profile</h3><p>Their kids, what they're into, and the events you've been to together.</p></article>
+              <article class="step" data-step="message"><h3>Message without swapping numbers</h3><p>Say hi in Sprout. Your phone number and email stay private until you decide to share them.</p></article>
+            </div>
+            <div class="bar" aria-hidden="true"><i></i></div>
+          </div>
+          <div class="scrolly-stage">
+            <div class="phone" id="dirPhone" role="img" aria-label="Sprout Clubs: the member directory for each community, a parent's profile, and a private message"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 · SPROUT ASSIST, a three-line teaser (Tony, 8 Oct, point 3): it hasn't shipped, so one outcome, not the
+           longest section on the page. The safety details (payments, passwords, what it reads) moved to the FAQ. The
+           mascot lives here only: "this little guy is the AI guy". -->
+      <section class="assist" id="assist" aria-labelledby="assist-h">
+        <div class="assist-tease">
+          <!-- live, like the hero's (Tony, 11 Oct: "Can you fix this so it's animated"): eyes follow, blinks, leaves sway,
+               hops on tap (hero-portal.js, every [data-live]) -->
+          <span class="ml assist-mascot" data-live role="img" aria-label="Sprout Assist"></span>
+          <div>
+            <p class="eyebrow">Coming soon · Sprout Assist</p>
+            <h2 id="assist-h">Camp signups done at 7:00 AM sharp, before your coffee.</h2>
+            <p>A helper you and your spouse share. It's arriving in stages, starting with reminders you can say out loud.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ (Tony, 8 Oct): the questions the page raises, answered once. Plain <details>, no script. -->
+      <section class="faq" id="faq" aria-labelledby="faq-h">
+        <h2 id="faq-h">Questions parents ask</h2>
+        <div class="faq-list">
+          <details open><summary>Is Sprout free?</summary><p>Yes. Sprout is free for parents. Always.</p></details>
+          <details><summary>What if my school isn't on Sprout yet?</summary><p>Get Sprout and ask for your school from the app. The fastest way to bring your whole class is your room parent: they can set the class up on <a href="https://roomparent.com" rel="noopener">RoomParent</a> in about 5 minutes, and every parent they invite lands in the same class on Sprout.</p></details>
+          <details><summary>Who can see my kids?</summary><p>No kid profiles. No public posts. Only verified parents at your school can see your class, and your phone number and email stay private until you choose to share them.</p></details>
+          <details><summary>What does Sprout read from my email?</summary><p>Only the senders you choose, like your teacher and your room parent. Nothing else. You can turn a sender off at any time.</p></details>
+          <details><summary>Will Sprout Assist pay for things or see my passwords?</summary><p>Nothing is paid or sent without your yes. Before checkout it shows you what, who it's for and how much, and your spouse sees who approved it. When a site asks you to sign in, Sprout pauses and hands it to you. It never sees or saves your password.</p></details>
+          <details><summary>Can my spouse see the same things?</summary><p>Invite them from your Daily Brief. Once they join, you share one Family To-Do List, the same invitations and the same calendar, and you both see who already did what.</p></details>
+        </div>
+      </section>
+
+      <!-- 7 · CLOSE (Ahmad, 7 Oct, after Orbits' close; headline Tony, 8 Oct, point 6: the hero's punch, not a mission
+           statement): the line, the button, "free", and Sprout's own 3D icons flying in around the mascot. The button
+           goes straight to the store (home-v2.js). -->
+      <section class="end" id="download" aria-labelledby="end-h">
+        <h2 id="end-h">The parents who matter most are already at drop-off.</h2>
+        <a class="join-btn" href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052" data-join>Join your schools <i class="ph ph-arrow-right"></i></a>
+        <p class="end-free">Free for parents. Always.</p>
+        <div class="tiles" aria-hidden="true">
+          <span class="tile" style="--x:8%;--y:70px;--r:-6deg;--i:0"><span class="tile-in"><img src="../assets/assist/need-what.webp" alt="" width="72" height="72" /></span></span>
+          <span class="tile" style="--x:25%;--y:0px;--r:5deg;--i:1"><span class="tile-in"><img src="../assets/assist/bell.webp" alt="" width="72" height="72" /></span></span>
+          <span class="tile" style="--x:16%;--y:190px;--r:4deg;--i:2"><span class="tile-in"><img src="../assets/assist/need-when.webp" alt="" width="72" height="72" /></span></span>
+          <span class="tile" style="--x:40%;--y:172px;--r:-4deg;--i:3"><span class="tile-in"><img src="../assets/assist/need-who.webp" alt="" width="72" height="72" /></span></span>
+          <span class="tile" style="--x:50%;--y:58px;--r:0deg;--i:4"><span class="tile-in"><span class="ml tile-ml" data-live role="img" aria-label="Sprout"></span></span></span>
+          <span class="tile" style="--x:64%;--y:186px;--r:5deg;--i:5"><span class="tile-in"><img src="../assets/assist/bus-lg.webp" alt="" width="72" height="72" /></span></span>
+          <span class="tile" style="--x:77%;--y:6px;--r:-5deg;--i:6"><span class="tile-in"><img src="../assets/assist/bday-lg.webp" alt="" width="72" height="72" /></span></span>
+          <span class="tile" style="--x:91%;--y:150px;--r:6deg;--i:7"><span class="tile-in"><img src="../assets/assist/event-lg.webp" alt="" width="72" height="72" /></span></span>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>© 2026 Sprout</span>
+      <nav><a href="https://joinsprout.co/privacy">Privacy</a><a href="https://joinsprout.co/terms">Terms</a><a href="https://joinsprout.co/child-safety">Child safety</a><a href="mailto:tony@joinsprout.co">Contact</a></nav>
+    </footer>
+
+    <!-- "Join your schools" on a computer (Tony, 9 Oct): a pop-up with both stores' QR codes, iOS on the left, Android on
+         the right. On a phone the button goes straight to the right store instead (home-v2.js). The QR codes are made
+         from the same store links by review/make-qr.py. -->
+    <dialog class="getapp" id="getApp" aria-labelledby="getapp-h">
+      <button type="button" class="getapp-x" data-close aria-label="Close"><i class="ph ph-x"></i></button>
+      <img class="getapp-logo" src="../assets/logo.png" alt="" width="48" height="48" />
+      <h2 id="getapp-h">Get Sprout on your phone</h2>
+      <p class="getapp-sub">Scan the code for your phone with its camera. Free for parents. Always.</p>
+      <div class="getapp-codes">
+        <a class="getapp-card" href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052" data-store="ios">
+          <span class="getapp-qr"><img src="../assets/qr/app-store.svg" alt="QR code for Sprout on the App Store" width="180" height="180" /><img class="getapp-mark" src="../assets/logo.png" alt="" width="40" height="40" /></span>
+          <span class="getapp-os"><i class="ph-fill ph-apple-logo" aria-hidden="true"></i>iPhone</span>
+          <img class="getapp-badge" src="../assets/app-store.png" alt="Download on the App Store" width="135" height="40" />
+        </a>
+        <a class="getapp-card" href="https://play.google.com/store/apps/details?id=com.meetingpoint" data-store="android">
+          <span class="getapp-qr"><img src="../assets/qr/google-play.svg" alt="QR code for Sprout on Google Play" width="180" height="180" /><img class="getapp-mark" src="../assets/logo.png" alt="" width="40" height="40" /></span>
+          <span class="getapp-os"><i class="ph-fill ph-android-logo" aria-hidden="true"></i>Android</span>
+          <img class="getapp-badge" src="../assets/play-store.png" alt="Get it on Google Play" width="135" height="40" />
+        </a>
+      </div>
+    </dialog>
+
+  </body>
+</html>

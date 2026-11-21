@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sprout hero 2 · Rising from the park</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="icon" href="../assets/logo.png" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+<link rel="stylesheet" href="shared.css" />
+<!-- Hero 2 (20 Nov, Ahmad: combine Timeleft and Bevel). Bevel's structure: centered headline and button, then the two
+     devices rising in the middle on a soft glow (Bevel: phone + watch; Sprout: Daily Brief + class chat). Timeleft's
+     people: the glow is replaced by a wide rounded photo of school families, so the devices rise out of the park. -->
+<style>
+.hero { position: relative; min-height: max(100svh, 760px); padding: 104px var(--gx) 0; text-align: center; overflow: hidden;
+  background: radial-gradient(60% 40% at 50% 0%, #e7efe6, transparent 70%), var(--bg); }
+.hero .lede { margin-inline: auto; }
+.proof { display: flex; justify-content: center; gap: 14px; }
+.band { position: absolute; z-index: 1; left: 50%; bottom: 0; translate: -50% 0; width: min(1280px, calc(100% - 2 * var(--gx))); height: 46%; border-radius: 34px 34px 0 0; overflow: hidden; }
+.band .photo { position: absolute; inset: -4%; background: url(../assets/family-neighborhood.webp) 50% 42% / cover; transition: transform .8s var(--ease); }
+.band::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgb(244 241 234 / .65), transparent 38%); }
+.h1 { font-size: clamp(38px, 4.2vw, 62px); }
+.stage { position: relative; z-index: 3; width: max-content; margin: 26px auto 0; }
+.stage .device { width: clamp(220px, calc(40svh - 40px), 290px); }
+.second { position: absolute; z-index: 2; left: 72%; top: 22%; width: 66%; rotate: 7deg; }
+.second .device { width: 100%; box-shadow: inset 0 0 0 1px rgb(248 251 241 / .55), 0 30px 50px -16px rgb(30 40 25 / .45); }
+.p1 { top: 16%; left: -58%; } .p2 { top: 52%; left: -66%; } .p3 { top: 6%; right: -78%; }
+.p2 { animation-delay: .5s, 0s; } .p3 { animation-delay: 1s, 0s; }
+@media (max-width: 820px) {
+  .hero { padding-top: 92px; }
+  .h1 { font-size: 40px; }
+  .proof { flex-direction: column; gap: 0; }
+  .stage .device { width: 220px; }
+  .stage { margin-left: calc(50% - 150px); }
+  .hero { min-height: auto; padding-bottom: 0; }
+  .band { height: 46%; width: calc(100% - 24px); border-radius: 24px 24px 0 0; }
+  .p1 { top: 10%; left: -30%; } .p2 { display: none; } .p3 { top: auto; bottom: 18%; right: -32%; }
+  .pill { font-size: 11.5px; padding: 7px 11px 7px 7px; } .pill .ic, .pill .av { width: 24px; height: 24px; font-size: 13px; }
+}
+</style>
+</head>
+<body>
+<header class="top"><a class="logo" href="#"><img src="../assets/logo.png" alt="" /><span>Sprout</span></a>
+  <nav><a href="#">Daily Brief</a><a href="#">Class chats</a><a href="#">Directory</a><a href="#">FAQ</a></nav>
+  <a class="rp" href="#">I’m a room parent</a><a class="cta" href="#">Join your schools</a></header>
+<main>
+  <section class="hero" data-hero aria-labelledby="h">
+    <h1 class="h1" id="h">Your school’s <em>parent community.</em></h1>
+    <p class="lede">Meet other school families and keep track of the day with your Daily Brief.</p>
+    <a class="more" href="#">See your morning <i class="ph ph-arrow-down"></i></a>
+    <p class="proof"><span>Kiker families in Circle C are already here</span><span>Free for parents. Always.</span></p>
+    <div class="stage">
+      <div class="tilt">
+        <div class="device"><div class="screen"><span class="island"></span><img src="../assets/sprout-deployed-daily-brief.png" width="784" height="1700" alt="Sprout Daily Brief" /></div></div>
+        <div class="second" aria-hidden="true"><div class="device"><div class="screen"><span class="island"></span><img src="../assets/class-chat.png" width="393" height="852" alt="" /></div></div></div>
+      </div>
+      <div class="pill p1"><span class="ic"><img src="../assets/gmail.svg" alt="" /></span><div>Picture Day is Thursday<small>From Miss Taylor’s email</small></div></div>
+      <div class="pill p2"><span class="ic"><i class="ph-fill ph-check-circle"></i></span><div>Dana checked it off<small>Sign the field trip form</small></div></div>
+      <div class="pill p3"><span class="av" style="background-image:url(../assets/assist/mem-jessica.webp)"></span><div>Jessica · Robert’s mom<small>Brodie Park after pickup?</small></div></div>
+    </div>
+    <div class="band"><div class="photo" data-photo role="img" aria-label="Parents from the same school with their kids on a picnic blanket in a park"></div></div>
+  </section>
+</main>
+<script src="shared.js"></script>
+</body>
+</html>

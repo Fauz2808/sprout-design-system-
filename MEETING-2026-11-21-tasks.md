@@ -115,8 +115,13 @@ Jangan tampilkan: tile Birthday + Date night, baris "Register my kids", "Saved d
 - [x] **S7** Payout: SMS ke sitter setelah booking terkonfirmasi, link profil + rekening bank (Stripe), hanya kalau belum ada
 
 ### Website (`sprout-reach-scene-iteration/`)
-- [ ] **W0** Ambil foto carousel "Your people are here to help" (parent di depan sekolah) dari link yang Tony kirim di meeting; regenerate HD kalau resolusinya kurang
-- [ ] **W1** Hero baru: foto itu, copy dari doc, HP Daily Brief di pojok, CTA Join Sprout; kirim ke Tony
+- [x] **W0** Ambil foto carousel "Your people are here to help" (parent di depan sekolah) dari link yang Tony kirim di meeting; regenerate HD kalau resolusinya kurang
+      Foto = `community.png` slide 1 carousel Rainyday (14 Okt, https://sprout-carousel-review.vercel.app/rainyday).
+      Asli portrait 1122 px: dipakai untuk HP (`assets/hero-dropoff-portrait.webp`); desktop = versi lebar 16:9
+      orang yang sama (Seedream 5.5, flow ElevenLabs "Sprout website hero: parents at drop-off (wide)").
+- [x] **W1** Hero baru: foto itu, copy dari doc, HP Daily Brief di pojok, CTA Join Sprout; kirim ke Tony
+      Dibangun di `home-v3.html` (section `.hero2.village`), frame inset 2b tetap; hero 2b lama di
+      `hero-photo-2026-11-20/v3-before-village/`. Tombol = arrow handoff (`.btn-hand`) + badge App Store/Google Play; HP = foto di atas, copy di panel hijau. Live: https://sprout-reach-scene-iteration.vercel.app/home-v3.html (21 Nov). Belum dikirim ke Tony, belum di-commit.
 - [ ] **W2** Bagian 2–6 sesuai doc; hapus bagian yang mengulang Daily Brief; Assist hanya 3 tile
 - [ ] **W3** Setelah Tony oke: `python3 review/export-site.py`, commit + push `sprout-website`, kabari Mohit
 
