@@ -1292,10 +1292,11 @@ function parentGrid(families, { multi = false, on = [], show = 8, extra, onChang
       if (multi) { if (sel.has(i)) sel.delete(i); else sel.add(i); } else { sel.clear(); sel.add(i); }
       paint(); onChange();
     });
-    if (more) more.hidden = all || !!q;
+    /* Ahmad, 22 Nov: once the whole class shows, the same button says Show less (it said Show all 20 again) */
+    if (more) { more.hidden = !!q; more.textContent = all ? 'Show less' : `Show all ${families.length}`; }
     wrap.querySelector('.pg-none').hidden = list.length > 0;
   };
-  if (more) more.onclick = () => { all = true; paint(); };
+  if (more) more.onclick = () => { all = !all; paint(); if (!all) wrap.scrollIntoView({ block:'nearest', behavior:'smooth' }); };
   if (input) input.oninput = () => { q = input.value.trim().toLowerCase(); paint(); };
   paint();
   return { el:wrap, picked:() => [...sel].sort((a, b) => a - b).map(i => families[i]), lock(){ wrap.querySelectorAll('button,input').forEach(b => b.disabled = true); if (more) more.remove(); if (input) wrap.querySelector('.pg-search').remove(); grid.querySelectorAll('.pg-t:not(.on)').forEach(b => b.remove()); } };
