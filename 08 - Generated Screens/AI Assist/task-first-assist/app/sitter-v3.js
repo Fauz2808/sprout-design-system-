@@ -1312,6 +1312,57 @@ function playdateTime(p, { w, addFields, canContinue, title = 'Plan a playdate' 
     return host;
   } }, { mode:'playdate', preset:w ? { w:w.day.w, from:w.from, to:w.to } : { w:'Sat', from:840, to:960 }, canContinue });
 }
+/* Ahmad, 22 Nov: "if i chose somewhere else instead of our place... give em recommendation for the near place or
+   best place... so the user just need to few tap". A park / Lunch spot / Somewhere else open nearby places on the same
+   map and photo cards as birthday venues: closest first, why it suits a playdate (and which classmates go), one-tap
+   Choose. Typing an address stays, last. Real Austin places reuse the venue photos; Casa Verde and Rosie's are samples. */
+const PLAYDATE_PLACES = [
+  /* closest parks to Banks Court; photos are AI stand-ins (assets/playdate/), not the real parks */
+  { key:'mary-moore', name:'Mary Moore Searight Park', detail:'907 W Slaughter Ln, Austin', coords:[30.1676,-97.7957], types:[1], kind:'Park', photo:'playdate/mary-moore.webp',
+    facilities:'Aisha and Ava go after school. Playground under big oaks, shady trails and open lawns. Free.',
+    food:'Bring a picnic. Tables by the playground.', website:'https://www.austintexas.gov/department/parks-and-recreation' },
+  { key:'dick-nichols', name:'Dick Nichols District Park', detail:'8011 Beckett Rd, Austin', coords:[30.2063,-97.8545], types:[1], kind:'Park',  photo:'playdate/dick-nichols.webp',
+    facilities:'Closest to home. Shaded playground, picnic tables and lots of room to run. Free.',
+    food:'Bring a picnic.', website:'https://www.austintexas.gov/department/parks-and-recreation' },
+  { key:'zilker-park', name:'Zilker Park', detail:'2100 Barton Springs Rd, Austin', coords:[30.26768,-97.76661], types:[1], kind:'Park',
+    facilities:'Priya and Leo go most weekends. Big playground, open lawns and shade by the creek. Free.',
+    food:'Bring a picnic. Food trucks park along Barton Springs Rd.', website:'https://www.austintexas.gov/parks/locations/zilker-metropolitan-park' },
+  { key:'austin-zoo', name:'Austin Zoo', detail:'10808 Rawhide Trail, Austin', coords:[30.25782,-97.93688], types:[1], kind:'Zoo and picnic area',
+    facilities:'Small, walkable zoo with picnic tables. Good for an hour or two. Tickets at the gate.',
+    food:'Bring your own snacks.', website:'https://austinzoo.org/' },
+  { key:'rosies', name:'Rosie’s', detail:'Sample place · South Austin', coords:[30.1992,-97.8611], types:[2], photo:'dn/rosie-1.jpg', kind:'Lunch spot',
+    facilities:'Aisha’s family goes. Shaded patio with lawn games, so kids play while you eat.', food:'Smokehouse plates and kids meals.' },
+  { key:'casa-verde', name:'Casa Verde', detail:'Sample place · South Austin', coords:[30.2135,-97.8292], types:[2], photo:'dn/casa-1.jpg', kind:'Lunch spot',
+    facilities:'Kids plates and a small play corner on the garden patio.', food:'Tacos, quesadillas and kids plates.' },
+  { key:'chuck-e-cheese', name:'Chuck E. Cheese', detail:'9811 S I-35, Austin', coords:[30.16267,-97.78759], types:[2], kind:'Lunch and games',
+    facilities:'Pizza and arcade games. Busy on weekend afternoons.', food:'Pizza, wings and salad bar.', website:'https://www.chuckecheese.com/austin-south/' },
+  { key:'thinkery', name:'Thinkery', detail:'1830 Simond Ave, Austin', coords:[30.29777,-97.70554], types:[0], kind:'Kids museum',
+    facilities:'Elena and Noah went last month. Hands-on science play, indoors and out. Book tickets ahead on weekends.',
+    food:'A café on site, or bring snacks.', website:'https://thinkeryaustin.org/' },
+  { key:'westgate', name:'Bouldering Project · Westgate', detail:'4477 S Lamar Blvd, Austin', coords:[30.231,-97.796], types:[0], kind:'Climbing gym',
+    facilities:'Low kids’ walls with staff nearby. Each kid needs a signed waiver.', food:'No food. Cafés nearby on S Lamar.', website:'https://boulderingproject.com/' },
+  { key:'little-gym', name:'The Little Gym', detail:'2716 W William Cannon Dr, Austin', coords:[30.20745,-97.81564], types:[0], kind:'Indoor play',
+    facilities:'Indoor gym for little kids. Check the open-play times first.', food:'No food on site.', website:'https://www.thelittlegym.com/texas-austin-south/' },
+];
+function playdatePlace(i, currentKey){
+  const kind = [null, { styleIndex:1, heading:'Parks', search:'parks and playgrounds for kids' }, { styleIndex:2, heading:'Lunch spots', search:'kid friendly restaurants' }, { styleIndex:0, heading:'Places for kids', search:'things to do with kids' }][i];
+  return new Promise(resolve => {
+    const sheet = X.overlay({ title:`${kind.heading} near you`, sub:'Closest first', body:`<div data-results></div>
+      <button type="button" class="textbtn" data-type style="display:flex;align-items:center;gap:6px;margin:14px auto 4px;color:var(--brand)"><i class="ph ph-pencil-simple"></i>Type a place or address</button>` });
+    let open = true;
+    const finish = v => { if (!open) return; open = false; sheet.close(); resolve(v); };
+    sheet.o.querySelector('.wclose').onclick = () => finish(null);
+    const ranked = partyRanked(PARTY_HOME, kind.styleIndex, PLAYDATE_PLACES).filter(v => v.matches);
+    const results = sheet.body.querySelector('[data-results]');
+    const panel = { block:html => { results.innerHTML = html; return results; }, me(){}, scroll(){} };
+    partyResults(panel, null, PARTY_HOME, ranked, { heading:kind.heading, search:kind.search, styleIndex:kind.styleIndex, currentKey, back:false })
+      .then(place => finish(place ? { key:place.key, short:place.name, full:place.detail.startsWith('Sample') ? place.name : `${place.name}, ${place.detail}` } : null));
+    sheet.body.querySelector('[data-type]').onclick = async () => {
+      const t = await editText('Place name or address', '', { rows:2 });
+      if (t) finish({ key:null, short:t, full:t });
+    };
+  });
+}
 function suggestPlaydateTime(w){
   return new Promise(resolve => {
     const v = bsheet({ onBack:() => resolve(null), body:'', foot:'<button type="button" class="btn">Save</button>' });
@@ -1476,15 +1527,17 @@ X.flows.playdate = async (p, opt = {}) => {
       next.disabled = !picked.length;
     });
     pk.onclick = () => { pickup = !pickup; pk.classList.toggle('on', pickup); pk.setAttribute('aria-pressed', pickup); };
+    let placeKey = null, placeShort = '';
     places.forEach(b => b.onclick = async () => {
       const i = +b.dataset.where;
-      const chosen = i === 0 ? FAMILY.address : await editText('Place name', i === where ? playdateEscape(place) : '', { rows:2 });
+      const chosen = i === 0 ? { key:null, short:'', full:FAMILY.address } : await playdatePlace(i, i === where ? placeKey : null);
       if (!chosen) return;
-      place = chosen; where = i;
+      place = chosen.full; placeKey = chosen.key; placeShort = chosen.short; where = i;
       places.forEach((row, n) => {
         row.classList.toggle('sel', row === b); row.setAttribute('aria-pressed', row === b);
-        row.textContent = n && n === where ? `${options[n]} · ${place}` : options[n];
+        row.textContent = n && n === where ? placeShort : options[n];
       });
+      b.scrollIntoView({ block:'nearest', inline:'nearest' });
     });
   } });
   const kids = picked;
@@ -2409,17 +2462,17 @@ const partyPhotoStyle = place => `background-image:url(${partyPhoto(place)})`;
 
 function partyDetails(place, w, miles){
   return new Promise(resolve => {
-    const sections = `<section class="party-detail-section"><h3 class="bq">Availability</h3>
-        <div class="fact"><i class="ph ph-calendar-blank"></i>${w.day.day} · Starts at ${tl(w.from)}</div>
+    const sections = `${w || place.schedule || place.website ? `<section class="party-detail-section"><h3 class="bq">${w ? 'Availability' : 'Hours'}</h3>
+        ${w ? `<div class="fact"><i class="ph ph-calendar-blank"></i>${w.day.day} · Starts at ${tl(w.from)}</div>` : ''}
         ${place.schedule ? `<p class="bp">${place.schedule}</p>` : ''}
-        ${external(place.website, 'Check availability', 'link')}</section>
+        ${place.website ? external(place.website, w ? 'Check availability' : 'Website', 'link') : ''}</section>` : ''}
       <section class="party-detail-section"><h3 class="bq">Facilities</h3><p class="bp">${place.facilities}</p></section>
       <section class="party-detail-section"><h3 class="bq">Food &amp; drinks</h3><p class="bp">${place.food}</p>
         ${place.menu ? external(place.menu, 'See the menu', 'link') : ''}</section>`;
     const sheet = X.overlay({ title:'Venue details', body:`<article class="party-detail">
         <img class="bhero party-detail-photo" src="${partyPhoto(place)}" alt="${place.name}">
         <h2 class="btitle">${place.name}</h2>
-        <div class="bsub">${PARTY_STYLES[place.types[0]].label} · ${miles.toFixed(1)} mi away</div>
+        <div class="bsub">${place.kind || PARTY_STYLES[place.types[0]].label} · ${miles.toFixed(1)} mi away</div>
         ${external(mapDirections(place.detail), `<i class="ph ph-map-pin" aria-hidden="true"></i> ${place.detail}`)}
         ${sections}</article>`,
       foot:'<button type="button" class="btn" data-choose>Choose this place</button>' });
@@ -2579,7 +2632,7 @@ function partyResults(p, w, origin, ranked, { heading, search, currentKey, style
       const tile = el(`<div class="card dn3" data-k="${place.key}">
         <div class="dn3img" role="img" aria-label="${place.name}" style="${partyPhotoStyle(place)}">${!list.children.length && i === 0 ? '<span class="dn3pick">My pick</span>' : ''}</div>
         <div class="dn3bd"><div class="dn3top"><b>${place.name}</b></div>
-        <div class="dn3sub">${style.one} · ${miles.toFixed(1)} mi away</div>
+        <div class="dn3sub">${place.kind || style.one} · ${miles.toFixed(1)} mi away</div>
         <p class="dn3why">${place.facilities}</p>
         <div class="dn3cta"><button class="dn3link" data-details><i class="ph ph-info"></i>Details</button><button class="btn dn3go" data-choose>Choose</button></div>
         </div></div>`);

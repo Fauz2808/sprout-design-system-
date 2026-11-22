@@ -2,6 +2,16 @@
 
 Live: https://sprout-assist-tasks.vercel.app/assist/ · local: `python3 build.py`, then serve `site/` (preview config `assist-tasks`, port 4330).
 
+## 22 Nov · playdate place picker (Ahmad)
+
+"If i chose somewhere else instead of our place... give em recommendation for the near place or best place... so the
+user just need to few tap." A park / Lunch spot / Somewhere else open nearby places (`playdatePlace`, `PLAYDATE_PLACES`)
+on the birthday venue map and photo cards (`partyResults`): closest to Banks Court first, a playdate reason and which
+classmates go, one-tap Choose, Details, and "Type a place or address" last. The chip shows the name; the invite gets
+name + address. Dick Nichols and Mary Moore Searight are the real nearest parks; their photos (`assets/playdate/`) are
+AI stand-ins (ElevenLabs, seedream 5 pro). Casa Verde and Rosie's stay samples. `partyDetails` no longer breaks on a
+place without a website or a date.
+
 ## 22 Nov · both-sides page is live (Ahmad)
 
 `/other-side/`: on every row the two phones are one conversation. Ahmad: "if i do action on screen one to set a
