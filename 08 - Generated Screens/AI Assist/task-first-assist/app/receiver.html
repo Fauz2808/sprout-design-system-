@@ -140,6 +140,20 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
 /* linked (?link=): the composer is a real field */
 .comp.lk input{flex:1;min-width:0;border:0;background:transparent;font:inherit;color:#111;outline:none}
 .sms .comp.lk input{font-family:var(--ios)}
+/* Figma "Push Notification" (13562:200846): glass, 8px padding, 16px radius, Inter 10/1.55 white */
+.note.pn{align-items:center;gap:8px;padding:8px;border-radius:16px;background:rgba(244,241,234,.1);border:1px solid rgba(255,255,255,.1);
+  -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);box-shadow:1px 4px 25px 2px rgba(13,13,18,.2);color:#fff;font:400 10px/1.55 Inter,system-ui,sans-serif}
+.pn-av{position:relative;flex:none;width:40px;height:40px;border-radius:10px;background:linear-gradient(#f2edea,#e7d8d2);display:grid;place-items:center}
+.pn-av img{width:24.875px;height:27.639px}
+.pn-av.person{border-radius:50%;background:center/cover #ddd}
+.pn-av.group{background:center/contain no-repeat #fff}
+.pn-av.person i{position:absolute;right:-2px;bottom:-2px;width:16px;height:16px;border-radius:5px;background:linear-gradient(#f2edea,#e7d8d2);display:grid;place-items:center;box-shadow:0 0 0 1.5px rgba(255,255,255,.6)}
+.pn-av.person i img{width:10px;height:11px}
+.pn-tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.pn-row{display:flex;gap:8px;white-space:nowrap}
+.pn-row b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.pn-sub{font-weight:600}
+.pn-body{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 </style>
 </head>
 <body>
@@ -151,6 +165,19 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
   const phone = document.getElementById('phone');
   const sb = light => `<div class="sb${light ? ' light' : ''}"><span>${light ? '' : '9:41'}</span><span><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>`;
   const el = h => { const t = document.createElement('template'); t.innerHTML = h.trim(); return t.content.firstElementChild; };
+  /* Ahmad, 22 Nov: the push = Figma "Push Notification" (13562:200846). Avatar per Figma "Push / Avatar": Sprout
+     (clover tile), Person (photo + clover badge, asked in Sprout), Contact (photo, no badge: a text message),
+     Group (the team or class logo). Title + "now", optional subtitle, body. */
+  const PCLOVER = A + 'push-clover.png';
+  const pushNote = ({ av = 'sprout', photo, title, sub = '', body = '' }) => {
+    const avatar = av === 'person' ? `<span class="pn-av person" style="background-image:url(${photo})"><i><img src="${PCLOVER}" alt=""></i></span>`
+      : av === 'contact' ? `<span class="pn-av person" style="background-image:url(${photo})"></span>`
+      : av === 'group' ? `<span class="pn-av group" style="background-image:url(${photo})"></span>`
+      : `<span class="pn-av"><img src="${PCLOVER}" alt=""></span>`;
+    return `<button class="note pn" aria-label="Open the notification">${avatar}<span class="pn-tx"><span class="pn-row"><b>${title}</b><small>now</small></span>${sub ? `<span class="pn-sub">${sub}</span>` : ''}${body ? `<span class="pn-body">${body}</span>` : ''}</span></button>`;
+  };
+  /* the sample rows' pushes: "<b>Title</b><br>body" → Figma's parts */
+  const fromText = (push, av, photo) => { const m = /^<b>(.*?)<\/b><br>([\s\S]*)$/.exec(push.text) || [0, push.app, push.text]; return pushNote({ av, photo, title:m[1], body:m[2] }); };
   /* the answer to tap pulses (a floating hint covered the buttons) */
   const hint = on => phone.querySelectorAll('[data-yes]').forEach(b => b.classList.toggle('nudge', !!on));
   const TONY = A + 'tony.webp', PRIYA = A + 'priya.webp', SPROUT = A + 'app-icon-180.png', ALEX = A + 'sitters/woman.webp', CLOVER = A + 'assist-clover.webp';
@@ -336,7 +363,7 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
   const s = S[v] || S['carpool-chat'];
   /* 1 · the lock screen with the notification */
   const lock = el(`<section class="view lock">${sb(true)}<div class="date">Monday, July 27</div><div class="time">7:52</div>
-    <button class="note" aria-label="Open the notification">${s.push.icon === 'messages' ? '<span class="ic msg"><i class="ph-fill ph-chat-circle"></i></span>' : `<span class="ic" style="background-image:url(${s.push.icon})"></span>`}<div style="flex:1"><div class="hd"><span>${s.push.app}</span><small>${s.push.when}</small></div><p>${s.push.text}</p></div></button>
+    ${{ 'carpool-chat':fromText(s.push, 'group', A + 'ssc-logo.webp'), 'carpool-regular':fromText(s.push, 'person', TONY) }[v] || fromText(s.push, 'contact', TONY)}
     <div class="tapto">Tap the notification</div></section>`);
   const thread = s.thread(); thread.hidden = true;
   phone.append(lock, thread, el('<span class="home"></span>'));
@@ -481,9 +508,10 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
     const arrive = a => {
       ask = a; reset(); build(a);
       const sm = sms();
-      const text = a.kind === 'chat' ? `<b>${esc(a.chat)}</b><br>Tony needs a ride for ${esc(a.riders)} on ${esc(a.day)} at ${a.at.l}. Can you help?`
-        : `<b>${sm ? 'Tony Martin &amp; Sprout' : 'Tony Martin'}</b><br>${esc(a.text.length > 110 ? a.text.slice(0, 108) + '…' : a.text)}`;
-      const note = el(`<button class="note" aria-label="Open the notification">${sm ? '<span class="ic msg"><i class="ph-fill ph-chat-circle"></i></span>' : `<span class="ic" style="background-image:url(${SPROUT})"></span>`}<div style="flex:1"><div class="hd"><span>${sm ? 'Messages' : 'Sprout'}</span><small>now</small></div><p>${text}</p></div></button>`);
+      const note = el(a.kind === 'chat'
+        ? pushNote({ av:a.act === 'soccer' ? 'group' : 'sprout', photo:A + 'ssc-logo.webp', title:esc(a.chat), sub:'Tony · Jake’s dad', body:`Needs a ride for ${esc(a.riders)} on ${esc(a.day)} at ${a.at.l}. Can you help?` })
+        : sm ? pushNote({ av:'contact', photo:TONY, title:'Tony Martin &amp; Sprout', body:esc(a.text) })
+        : pushNote({ av:'person', photo:TONY, title:'Tony Martin', sub:esc(a.title), body:esc(a.text) }));
       lock.append(note);
       const v0 = view;
       const open = () => { if (view !== v0 || !lock.isConnected || lock.hidden) return; lock.hidden = true; view.hidden = false; phone.querySelector('.home').classList.remove('light'); hint(true); };

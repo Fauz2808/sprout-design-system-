@@ -1121,9 +1121,17 @@ X.flows.shareSitter = async p => {
 };
 
 /* ======================= entries by route ======================= */
+/* Ahmad, 22 Nov: every lock-screen push follows Figma "Push Notification" (13562:200846, 30-minutes-before set
+   13670:17472): a glass card, the clover tile (or the parent's photo with a clover badge), the title with "now",
+   an optional subtitle, then the body. */
+function pushNote({ title, sub = '', body = '', when = 'now', photo = '', tag = 'button', attrs = '' }){
+  const av = photo ? `<span class="pn-av person" style="background-image:url(${photo})"><i><img src="/assets/push-clover.png" alt=""></i></span>`
+    : '<span class="pn-av"><img src="/assets/push-clover.png" alt=""></span>';
+  return `<${tag} ${tag === 'button' ? 'type="button" ' : 'role="button" '}class="lnote pn" aria-label="Open the Sprout notification" ${attrs}>${av}<span class="pn-tx"><span class="pn-row"><b>${title}</b><small>${when}</small></span>${sub ? `<span class="pn-sub">${sub}</span>` : ''}${body ? `<span class="pn-body">${body}</span>` : ''}</span></${tag}>`;
+}
 function lockScreen({ date, time, title, body, onOpen }){
   const lock = el(`<div class="lock" role="button" aria-label="Open the Sprout notification"><div class="ldate">${date}</div><div class="ltime">${time}</div>
-    <div class="lnote"><img src="/assets/app-icon-180.png" alt=""><div><b>Sprout<small>now</small></b><p><strong>${title}</strong><br>${body}</p></div></div><div class="lhint">Tap the notification</div></div>`);
+    ${pushNote({ title, body, tag:'div' })}<div class="lhint">Tap the notification</div></div>`);
   $('#phone').appendChild(lock);
   lock.querySelector('.lnote').onclick = () => { lock.classList.add('gone'); setTimeout(() => { lock.remove(); onOpen(); }, 380); };
 }
@@ -2152,7 +2160,7 @@ function playdateInboxLinked(){
     if (m.t === 'invite' && !inv) {
       inv = { ...m, w:wIn(m.w) };
       const lock0 = lock;
-      const note = el(`<div class="lnote" role="button" aria-label="Open the Sprout notification"><img src="/assets/app-icon-180.png" alt=""><div><b>Sprout<small>now</small></b><p><strong>Tony · Playdate</strong><br>Would ${playdateEscape(inv.family.kid)} like to play with ${playdateEscape(inv.kidNames)} on ${playdateWhen(inv.w)}?</p></div></div>`);
+      const note = el(pushNote({ title:'Tony', sub:'Playdate invite', body:`Would ${playdateEscape(inv.family.kid)} like to play with ${playdateEscape(inv.kidNames)} on ${playdateWhen(inv.w)}?`, photo:A + 'tony.webp', tag:'div' }));
       lock0.append(note);
       let opened = false;
       const go = () => { if (opened || lock0 !== lock) return; opened = true; lock0.classList.add('gone'); setTimeout(() => lock0.remove(), 380); open(); };
@@ -2946,7 +2954,7 @@ function laHtml(r, m){
   const up = sp.map(([v], i) => i > 0 && i < sp.length - 1 && pc(v) - pc(sp[i - 1][0]) < 30);
   return `<div class="la"><div class="la-top"><img src="/assets/app-icon-180.png" alt=""><b>${recTitle(r)}</b>· Sprout<span class="r">${st.r}</span></div>
     <div class="la-t">${st.t}</div><div class="la-s">${st.s}</div>
-    <div class="trk${up.some(Boolean) ? ' has-up' : ''}"><div class="bar"></div><div class="fill" style="width:${pc(m)}%"></div>${sp.map(([v, l], i) => `<span class="stop${m >= v ? ' on' : ''}" style="left:${pc(v)}%"></span><span class="lbl${up[i] ? ' up' : ''}" style="left:${pc(v)}%">${l}</span>`).join('')}</div>
+    <div class="trk${up.some(Boolean) ? ' has-up' : ''}"><div class="bar"></div><div class="fill" style="width:${pc(m)}%"></div>${sp.map(([v, l], i) => `<span class="stop${m >= v ? ' on' : ''}${i === 0 ? ' s0' : i === sp.length - 1 ? ' sn' : ''}" style="left:${pc(v)}%"></span><span class="lbl${up[i] ? ' up' : ''}${i === 0 ? ' s0' : i === sp.length - 1 ? ' sn' : ''}" style="left:${pc(v)}%">${l}</span>`).join('')}</div>
     ${r.playdate ? '<div class="la-acts"><button type="button" data-playdate><i class="ph ph-calendar-check"></i>View playdate</button></div>' : st.end ? ''
       : st.pay ? `<div class="la-acts"><button type="button" class="la-pay" data-pay><i class="ph-bold ph-currency-dollar"></i>Pay ${r.who.n}</button><button data-t="Opens Messages to ${r.who.n}"><i class="ph-bold ph-chat-circle-dots"></i>Text ${r.who.n}</button></div>`
       : `<div class="la-acts">${r.who ? `<button data-t="Opens Messages to ${r.who.n}"><i class="ph-bold ph-chat-circle-dots"></i>Text ${r.who.n}</button>` : ''}${r.place && !st.soon ? `<button data-t="Opens Maps to ${r.place.n}"><i class="ph-bold ph-map-trifold"></i>Directions</button>` : ''}${r.place && st.soon ? `<button data-t="Opens Maps home"><i class="ph-bold ph-house-line"></i>Directions home</button>` : ''}</div>`}</div>`;
@@ -2955,7 +2963,7 @@ function laHtml(r, m){
 function famLock({ i, m, notes = [], la = '', onPay }){
   $('#phone .lock')?.remove();
   const lock = el(`<div class="lock fam"><div class="ldate">${dLong(i)}</div><div class="ltime">${lockTime(m)}</div>
-    <div class="lstack">${la}${notes.map((n, k) => `<button type="button" class="lnote" data-k="${k}"><img src="/assets/app-icon-180.png" alt=""><div><b>Sprout<small>now</small></b><p><strong>${n.title}</strong><br>${n.body}</p></div></button>`).join('')}</div>
+    <div class="lstack">${la}${notes.map((n, k) => pushNote({ ...n, attrs:`data-k="${k}"` })).join('')}</div>
     <div class="lhint">${notes.length ? 'Tap a notification' : 'Tap anywhere to unlock'}</div></div>`);
   $('#phone').appendChild(lock);
   const close = then => { lock.classList.add('gone'); setTimeout(() => { lock.remove(); then && then(); }, 380); };
@@ -3000,8 +3008,8 @@ const CLOCK = (() => {
     const title = recTitle(r), line = recLine(r);
     if (r.playdate) {
       const i = Math.floor(x.t / 1440), m = x.t - r.i * 1440;
-      const note = { title:'Playdate in 30 minutes', body:line, open:openPlan(p) };
-      if (x.k === 'soon') push('Tony and Dana', note.title, note.body + ' · Live Activity starts');
+      const note = { title:'Playdate in 30 min', sub:r.playdate.kids, body:`Today, ${range(r.S, r.E)} · ${playdateEscape(r.playdate.place)}`, open:openPlan(p) };
+      if (x.k === 'soon') push('Tony and Dana', note.title, `${note.sub} · ${note.body} · Live Activity starts`);
       if (x.k === 'finish') r.resolve();
       setBriefDay(i);
       famLock({ i, m:x.t - i * 1440, la:x.k === 'finish' ? '' : laHtml(r, m), notes:x.k === 'soon' ? [note] : [] });
@@ -3022,8 +3030,9 @@ const CLOCK = (() => {
     }
     if (x.k === 'soon') {
       setBriefDay(r.i); happeningFor(r, true, openPlan(p));
-      const n = r.who ? { title:`Babysitter ${r.who.n} arrives in 30 minutes`, body:`${r.place ? `Dinner at ${r.place.n} is at ${ampm(r.D)}. ` : ''}Dana has this too.` } : { title:'Dinner in 30 minutes', body:`Your table at ${r.place.n} is at ${ampm(r.D)}.` };
-      push('Tony and Dana', n.title, n.body + ' Live Activity starts.');
+      /* Figma countdown-first order (13670:17479): short title, then what, then the detail */
+      const n = r.who ? { title:`Babysitter ${r.who.n} arrives in 30 min`, sub:r.place ? `Dinner at ${r.place.n} at ${ampm(r.D)}` : `With ${joinNames(r.kids.map(k => k.n))} until ${ampm(r.E)}`, body:'Dana has this too.' } : { title:'Dinner in 30 min', sub:`Table for 2 at ${r.place.n}`, body:`Today at ${ampm(r.D)}.` };
+      push('Tony and Dana', n.title, `${n.sub}. ${n.body} Live Activity starts.`);
       p.set(`Happening now · ${line}`, { when:'Today' });
       famLock({ i:r.i, m:x.t % 1440, la:laHtml(r, x.t % 1440), notes:[{ ...n, open:openBrief }] });
     }

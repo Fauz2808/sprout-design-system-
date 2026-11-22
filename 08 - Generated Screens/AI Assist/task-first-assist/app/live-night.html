@@ -45,7 +45,7 @@ h2{font:600 20px var(--serif);margin:0 0 4px}
 .la-top .r{margin-left:auto;font:600 12px var(--sans);color:var(--brand)}
 .la-t{font:500 19px/1.2 var(--serif);margin:6px 0 1px}
 .la-s{font-size:12px;color:var(--sub);line-height:1.35}
-.trk{position:relative;height:30px;margin:10px 4px 0}
+.trk{position:relative;height:30px;margin:10px 0 0}
 .trk .bar{position:absolute;left:0;right:0;top:6px;height:5px;border-radius:3px;background:#e2ddd2}
 .trk .fill{position:absolute;left:0;top:6px;height:5px;border-radius:3px;background:var(--brand);transition:width .4s}
 .trk .stop{position:absolute;top:2px;width:13px;height:13px;margin-left:-6.5px;border-radius:7px;background:#fff;border:2px solid #cfc8b8}
@@ -109,6 +109,18 @@ section{margin-top:40px}
 .mo .phone{width:240px;height:520px;border-radius:38px}
 .mo .lock .d{margin-top:44px;font-size:12px}.mo .lock .tm{font-size:52px}
 .mo .la-t{font-size:16px}.mo .trk .lbl{font-size:8.5px}.mo .stack{margin-top:16px}
+/* Ahmad, 22 Nov: track edge to edge; end labels align to the edges */
+.trk .stop.s0{margin-left:0}.trk .stop.sn{margin-left:-13px}
+.trk .lbl.s0{transform:none}.trk .lbl.sn{transform:translateX(-100%)}
+/* Figma "Push Notification" (13562:200846) */
+.nt.pn{align-items:center;gap:8px;padding:8px;border-radius:16px;background:rgba(244,241,234,.1);border:1px solid rgba(255,255,255,.1);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);box-shadow:1px 4px 25px 2px rgba(13,13,18,.2);color:#fff;font:400 10px/1.55 Inter,system-ui,sans-serif}
+.nt.pn .pn-av{flex:none;width:40px;height:40px;border-radius:10px;background:linear-gradient(#f2edea,#e7d8d2);display:grid;place-items:center}
+.nt.pn .pn-av img{width:24.875px;height:27.639px;border-radius:0}
+.nt.pn .pn-tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.nt.pn .pn-row{display:flex;gap:8px;white-space:nowrap}
+.nt.pn .pn-row b{display:block;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;font-weight:600;font-size:10px}
+.nt.pn .pn-row small{font-size:10px;color:#fff}
+.nt.pn .pn-sub{font-weight:600}
 </style>
 </head>
 <body>
@@ -147,7 +159,7 @@ const STOPS = [[1125, 'Alex 6:45'], [1155, 'Dinner 7:15'], [1230, 'Bed 8:30'], [
 const T0 = 1095, T1 = 1350;   // Live Activity: 6:15 PM → 10:30 PM
 const tl = m => { const h = Math.floor(m / 60), mm = m % 60; return `${h % 12 || 12}:${String(mm).padStart(2, '0')}`; };
 /* milestones evenly spaced (a step track, like a delivery Live Activity); "now" moves between them */
-const pct = m => { const xs = [1095, ...STOPS.map(x => x[0])], ps = [0, 6, 33, 58, 96];
+const pct = m => { const xs = [1095, ...STOPS.map(x => x[0])], ps = [0, 0, 33, 66, 100];   // Ahmad, 22 Nov: first stop at the left edge, last at the right
   if (m <= xs[0]) return 0; for (let i = 1; i < xs.length; i++) if (m <= xs[i]) return ps[i - 1] + (m - xs[i - 1]) / (xs[i] - xs[i - 1]) * (ps[i] - ps[i - 1]); return 100; };
 function state(m){
   if (m < 1125) { const n = 1125 - m; return { t:`Babysitter Alex arrives in ${n} min`, s:'Dinner at Olive & Ember 7:15 · leave by 6:55', r:`${n}m`, dil:'Alex', acts:[['chat-circle-dots', 'Text Alex'], ['map-trifold', 'Directions']] }; }
@@ -157,11 +169,12 @@ function state(m){
   if (m < 1335) return { t:'Home by 10:15', s:'Alex is booked until 10:15', r:`${1335 - m}m`, dil:'Home', acts:[['clock-clockwise', 'Ask Alex for 30 more min'], ['chat-circle-dots', 'Text Alex']] };
   return { t:'Hope it was lovely', s:'I’ll ask about paying Alex tomorrow morning', r:'Done', dil:'Done', acts:[], end:true };
 }
-const track = m => `<div class="trk"><div class="bar"></div><div class="fill" style="width:${pct(m)}%"></div>${STOPS.map(([x, l], i) => `<span class="stop${m >= x ? ' on' : ''}" style="left:${pct(x)}%"></span><span class="lbl" style="left:${pct(x)}%;${i === STOPS.length - 1 ? 'transform:translateX(-88%)' : ''}">${l}</span>`).join('')}<span class="now" style="left:${pct(m)}%"></span></div>`;
+const track = m => `<div class="trk"><div class="bar"></div><div class="fill" style="width:${pct(m)}%"></div>${STOPS.map(([x, l], i) => `<span class="stop${m >= x ? ' on' : ''}${i === 0 ? ' s0' : i === STOPS.length - 1 ? ' sn' : ''}" style="left:${pct(x)}%"></span><span class="lbl${i === 0 ? ' s0' : i === STOPS.length - 1 ? ' sn' : ''}" style="left:${pct(x)}%">${l}</span>`).join('')}<span class="now" style="left:calc(${pct(m)}% - ${(pct(m) * .17).toFixed(1)}px);margin-left:0"></span></div>`;
 const laHtml = (m, acts = true) => { const st = state(m); return `<div class="la"><div class="la-top"><img src="${ICON}" alt=""><b>Date night</b>· Sprout<span class="r">${st.end ? 'Ended' : st.r}</span></div>
   <div class="la-t">${st.t}</div><div class="la-s">${st.s}</div>${track(m)}
   ${acts && st.acts.length ? `<div class="la-acts">${st.acts.map(([i, l]) => `<button data-act="${l}"><i class="ph-bold ph-${i}"></i>${l}</button>`).join('')}</div>` : ''}</div>`; };
-const pushHtml = (ago) => `<div class="nt"><img src="${ICON}" alt=""><div><b>Sprout<small>${ago}</small></b><p><strong>Babysitter Alex arrives in 30 minutes</strong><br>Dinner at Olive &amp; Ember is at 7:15. Dana has this too.</p></div></div>`;
+/* Ahmad, 22 Nov: Figma "Push Notification" (13562:200846): clover tile, title + time, subtitle, body */
+const pushHtml = (ago) => `<div class="nt pn"><span class="pn-av"><img src="/assets/push-clover.png" alt=""></span><span class="pn-tx"><span class="pn-row"><b>Babysitter Alex arrives in 30 min</b><small>${ago}</small></span><span class="pn-sub">Dinner at Olive &amp; Ember at 7:15</span><span class="pn-body">Dana has this too.</span></span></div>`;
 const ago = m => m - 1095 < 1 ? 'now' : m - 1095 < 60 ? `${m - 1095}m ago` : `${Math.floor((m - 1095) / 60)}h ago`;
 const $ = s => document.querySelector(s);
 let cur = 1095, expanded = false;
