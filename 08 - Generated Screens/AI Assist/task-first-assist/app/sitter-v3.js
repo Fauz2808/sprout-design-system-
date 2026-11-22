@@ -92,7 +92,7 @@ const MY = STATE === 'saved' ? SAVED.map(x => ({ ...x })) : [];   // the family'
 const remember = s => { const i = MY.findIndex(x => x.n === s.n); if (i < 0) MY.push(s); else MY[i] = { ...MY[i], ...s }; return MY.find(x => x.n === s.n); };
 /* the family's details Sprout fills in, all editable (F4) */
 const FAMILY = { address:'10212 Banks Court, Austin', notes:'Bedtime 8:30. Maya reads first; Jake sleeps with the hall light on.', known:STATE === 'saved' };   // known = saved from an earlier booking
-const face = (s, size = 46) => s.photo ? `<span class="uaph" style="width:${size}px;height:${size}px;background-image:url(${s.photo})"></span>` : `<span class="uaph uamono" style="width:${size}px;height:${size}px">${s.n[0]}</span>`;
+const face = (s, size = 46) => s.photo ? `<span class="uaph" style="width:${size}px;height:${size}px;background-image:url(${s.photo})"></span>` : `<span class="uaph uamono" style="width:${size}px;height:${size}px${size < 30 ? `;font-size:${Math.round(size * .5)}px` : ''}">${s.n[0]}</span>`;   // small monograms scale the letter to the circle (Ahmad, 22 Nov)
 
 /* ---------- time helpers (minutes since midnight) ---------- */
 const tl = m => { const h = Math.floor(m / 60) % 24, mm = m % 60, hh = h % 12 || 12; return `${hh}${mm ? ':' + String(mm).padStart(2, '0') : ''} ${h < 12 ? (h === 0 && m >= 1440 ? 'AM' : 'AM') : 'PM'}`; };
