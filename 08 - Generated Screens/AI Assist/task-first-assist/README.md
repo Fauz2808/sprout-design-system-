@@ -2,6 +2,24 @@
 
 Live: https://sprout-assist-tasks.vercel.app/assist/ · local: `python3 build.py`, then serve `site/` (preview config `assist-tasks`, port 4330).
 
+## 22 Nov · both-sides page is live (Ahmad)
+
+`/other-side/`: on every row the two phones are one conversation. Ahmad: "if i do action on screen one to set a
+playdate then the request will showing up on the screen 2."
+
+- `?link=<id>` puts Tony's flow and the other phone on one `BroadcastChannel` (same origin, page only, nothing sent).
+  Rows: `pd` playdate, `cp2` team chat, `cp3` group text, `cp4` regular, `st5` sitter.
+- The right phone waits on the lock screen, gets Tony's real request (his kids, times, places, message), and
+  becomes whoever he asks; the label above it follows. A "can't" moves Tony on, and the phone becomes the next
+  family's (playdate, regular carpool).
+- Her taps drive Tony's flow (confirm, new time, offered times, can't, we're in, I'm free); Tony's answers come back
+  (accept, counter, moved pickup, kept, set, covered, the shared schedule, booking + payout + paid texts).
+  Typed messages show on both phones. No template reply is written as anyone.
+- People asked who aren't on screen (Sam, Riley, Elena, the second family in a group text) answer on their own as before.
+- Start over on either phone resets both. Without `?link` every route and `/receiver/?v=` behaves as before.
+- Code: `link`, `liveAsk`, `liveSay`, `liveWords` in `app/sitter-v3.js`; `linked()` in `app/receiver.html`;
+  `playdateInboxLinked()` for the playdate phone.
+
 ## 20 Nov US · regular carpool (MEETING-2026-11-21-tasks.md, C2)
 
 Try `/plan-carpool/` (Regular carpool) and Aisha's side at `/receiver/?v=carpool-regular`. `cpRank` + `cpRegular` in

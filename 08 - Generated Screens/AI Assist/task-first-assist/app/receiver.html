@@ -137,6 +137,9 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
 @keyframes ring{0%{box-shadow:0 0 0 0 rgb(24 99 56 / .45)}70%,100%{box-shadow:0 0 0 10px rgb(24 99 56 / 0)}}
 .quick .nudge{animation-name:ringb}
 @keyframes ringb{0%{box-shadow:0 0 0 0 rgb(10 132 255 / .45)}70%,100%{box-shadow:0 0 0 10px rgb(10 132 255 / 0)}}
+/* linked (?link=): the composer is a real field */
+.comp.lk input{flex:1;min-width:0;border:0;background:transparent;font:inherit;color:#111;outline:none}
+.sms .comp.lk input{font-family:var(--ios)}
 </style>
 </head>
 <body>
@@ -328,6 +331,8 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
       },
     },
   };
+  const LINK = new URLSearchParams(location.search).get('link');
+  if (LINK && 'BroadcastChannel' in window) return linked();
   const s = S[v] || S['carpool-chat'];
   /* 1 · the lock screen with the notification */
   const lock = el(`<section class="view lock">${sb(true)}<div class="date">Monday, July 27</div><div class="time">7:52</div>
@@ -343,6 +348,166 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
   thread.querySelectorAll('[data-reply]').forEach(b => b.onclick = () => { hint(false); s.reply && s.reply(thread); });
   /* in the presentation page the phones play on their own if nobody taps: open after 3 s */
   if (new URLSearchParams(location.search).get('auto') !== '0') setTimeout(() => { if (!lock.hidden) open(); }, 3200);
+
+  /* Ahmad, 22 Nov: ?link=<id>, from /other-side/. This phone waits on the lock screen for what Tony actually sends
+     (a team chat post, a group text, an ask in Sprout, a sitter text), becomes that person's phone, and sends their
+     answers back to Tony's phone. Only words someone typed show as their message; Sprout's texts are Sprout's. */
+  function linked(){
+    const ch = new BroadcastChannel('sprout-link-' + LINK), send = m => ch.postMessage(m);
+    const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+    const tl = m => { const h = Math.floor(m / 60) % 24, mm = m % 60; return `${h % 12 || 12}${mm ? ':' + String(mm).padStart(2, '0') : ''} ${h < 12 ? 'AM' : 'PM'}`; };
+    let ask = null, view = null, lock = null;
+    const reset = () => {
+      phone.innerHTML = '';
+      lock = el(`<section class="view lock">${sb(true)}<div class="date">Monday, July 27</div><div class="time">7:52</div></section>`);
+      phone.append(lock, el('<span class="home light"></span>'));
+      view = null;
+    };
+    reset();
+    const sms = () => ask.kind === 'text' || ask.kind === 'sitter';
+    const add = node => view.querySelector('.log').append(node);
+    const smsFrom = (from, text) => { add(el(`<span class="who in">${from}</span>`)); const r = el(`<div class="row in"><span class="av" style="background-image:url(${from === 'Sprout' ? SPROUT : TONY})"></span><div class="bb"></div></div>`); r.querySelector('.bb').textContent = text; add(r); };
+    const smsMine = text => { const r = el('<div class="row me in"><div class="bb"></div></div>'); r.querySelector('.bb').textContent = text; add(r); };
+    const fromTony = text => {
+      if (sms()) return smsFrom('Tony Martin', text);
+      const m = el(`<div class="m in"><span class="av" style="background-image:url(${TONY})"></span><div class="b"><small>${ask.kind === 'chat' ? 'Tony · Jake’s dad' : 'Tony'}</small></div></div>`);
+      m.querySelector('.b').append(document.createTextNode(text)); add(m);
+    };
+    const mine = text => { const m = el('<div class="m me in"><div class="b"></div></div>'); m.querySelector('.b').textContent = text; add(m); };
+    const sys = (icon, html) => add(el(`<div class="sys in"><i class="${icon}"></i>${html}</div>`));
+    const composer = ph => `<form class="comp lk"><input placeholder="${ph}" aria-label="${ph}" autocomplete="off"></form>`;
+    const card = () => view.querySelector('.ride');
+    const setState = node => { const c = card(); c.querySelector('[data-reply]')?.remove(); (c.querySelector('.two') || c.querySelector('[data-st]')).replaceWith(node); };
+    const state = (html, cls = 'f in') => { const n = el(`<div class="${cls}" data-st style="margin-top:12px">${html}</div>`); setState(n); };
+
+    /* the four threads */
+    const rideCard = a => el(`<div class="ride in" style="animation-delay:.25s"><div class="h"><img src="${A}illus/carpool.webp" alt=""><div><b>Ride for ${esc(a.riders)}</b><small>${esc(a.day)} · ${a.at.l}</small></div></div>
+      <div class="f"><i class="ph ph-map-pin"></i>${esc(a.from)} to ${esc(a.to)}${a.back ? `, back at ${a.back}` : ', one way'}</div>
+      <div class="f"><i class="ph ph-navigation-arrow"></i>${esc(a.dist)}</div>
+      <div class="two"><button data-no>Can’t at ${a.at.l.replace(/ [AP]M$/, '')}</button><button class="go" data-yes>I can drive</button></div>
+      <button class="reply" data-reply>Reply to Tony</button></div>`);
+    const regularCard = a => el(`<div class="ride in" style="animation-delay:.25s"><div class="h"><img src="${A}illus/carpool.webp" alt=""><div><b>${esc(a.title)}</b><small>${esc(a.when)}</small></div></div>
+      <div class="f"><i class="ph ph-map-pin"></i>${esc(a.route)}</div>
+      <div class="f"><i class="ph ph-arrows-left-right"></i>Two families, you take turns</div>
+      <div class="f"><i class="ph ph-navigation-arrow"></i>${esc(a.dist)}</div>
+      <div class="two"><button data-no>Can’t this season</button><button class="go" data-yes>We’re in</button></div>
+      <button class="reply" data-reply>Reply to Tony</button></div>`);
+    const build = a => {
+      if (sms()) {
+        const quick = a.kind === 'sitter' ? [`Yes, I’m free!${a.rate ? '' : ' I charge $25/hr.'}`, 'Sorry, I can’t that night!'] : [`Yes, I can take ${a.riders}!`, 'Sorry, not this time!'];
+        view = el(`<section class="view sms">${sb()}
+          <div class="top"><i class="ph ph-caret-left bk"></i><div class="avs"><i style="background-image:url(${TONY})"></i><i style="background-image:url(${SPROUT})"></i></div><b>Tony Martin, Sprout ›</b><small>Group text · 3 people</small></div>
+          <div class="log"><span class="kind">Text Message · Today ${a.kind === 'sitter' ? '4:10 PM' : '7:52 AM'}</span></div>
+          <div class="quick"><button data-yes></button><button data-no></button></div>${composer('Text Message')}</section>`);
+        view.querySelector('[data-yes]').textContent = quick[0]; view.querySelector('[data-no]').textContent = quick[1];
+        phone.insertBefore(view, phone.querySelector('.home'));
+        smsFrom('Sprout', a.text);
+        const answer = (t, text) => {
+          view.querySelector('.quick')?.remove(); smsMine(text); send({ t, text });
+          if (t === 'no') setTimeout(() => smsFrom('Sprout', a.kind === 'sitter' ? `No worries, thanks ${a.who.n}! I’ll let Tony know.` : 'No problem, thanks for letting us know! I’ll ask another family.'), 900);
+        };
+        view.querySelector('[data-yes]').onclick = () => { hint(false); answer('yes', quick[0]); };
+        view.querySelector('[data-no]').onclick = () => { hint(false); answer('no', quick[1]); };
+      } else {
+        const chat = a.kind === 'chat';
+        view = el(`<section class="view chat">${sb()}
+          <div class="top"><span class="bk"><i class="ph ph-caret-left"></i></span><span class="lg" style="background-image:url(${chat ? (a.act === 'soccer' ? A + 'ssc-logo.webp' : SPROUT) : TONY})"></span><div><b>${chat ? esc(a.chat) : 'Tony Martin'}</b><small>${chat ? esc(a.size) : 'Jake’s dad'}</small></div></div>
+          <div class="log"></div>${composer(chat ? 'Message ' + esc(a.chat) : 'Message Tony')}</section>`);
+        phone.insertBefore(view, phone.querySelector('.home'));
+        fromTony(a.text);
+        add(chat ? rideCard(a) : regularCard(a));
+        view.querySelector('[data-reply]').onclick = () => view.querySelector('.comp input').focus();
+        view.querySelector('[data-yes]').onclick = () => {
+          hint(false);
+          if (chat) confirmRide(a.at, false); else state('<span class="spin"></span>You’re in · Tony is setting the turns', 'f wait in');
+          send({ t:'yes' });
+        };
+        view.querySelector('[data-no]').onclick = () => { hint(false); if (chat) whenCould(a); else { state('<i class="ph ph-x-circle"></i>You said you can’t this season. Only Tony sees it.'); card().querySelector('[data-st]').style.color = 'var(--subtle)'; send({ t:'no' }); } };
+      }
+      view.hidden = true;
+      view.querySelector('form').onsubmit = e => {
+        e.preventDefault();
+        const i = view.querySelector('form input'), text = i.value.trim();
+        if (!text) return;
+        if (sms()) smsMine(text); else mine(text);
+        i.value = ''; i.blur(); send({ t:'text', text });
+      };
+    };
+    const confirmRide = (at, moved) => {
+      const c = card(); c.classList.add('done');
+      c.querySelector('.h small').textContent = `${ask.day} · ${at.l}`;
+      setState(el(`<div class="conf in" data-st><div class="ch"><i class="ph-fill ph-check-circle"></i>You’re driving ${esc(ask.riders)}</div>
+        <div class="f"><i class="ph ph-clock"></i>Pick up at ${at.l} · ${esc(ask.pickAddr)}</div>
+        <div class="f"><i class="ph ph-flag-checkered"></i>Drop off at ${esc(ask.to)}</div>
+        ${ask.back ? `<div class="f"><i class="ph ph-arrow-left"></i>Back at ${ask.back}</div>` : ''}
+        <div class="f"><i class="ph ph-calendar-check"></i>Added to your calendar · reminder at ${tl(at.m - 30)}</div></div>`));
+      if (moved) sys('ph ph-clock', `Tony moved pickup to ${at.l} · you’re driving ${esc(ask.riders)}`);
+    };
+    /* "Can't at 9:30": tick the times you could drive (Ahmad, 21 Nov), or say you can't at all */
+    const whenCould = a => {
+      const on = new Set();
+      const sheet = el(`<div class="tsheet"><div class="ts-scrim"></div><div class="ts-box in"><span class="ts-grab"></span>
+        <b>When could you drive ${esc(a.riders)}?</b><p>${esc(a.day)} · ${esc(a.from)} to ${esc(a.to)}. Tony can move the pickup to fit you.</p>
+        <div class="ts-multi"><i class="ph ph-checks"></i>Pick all that work</div>
+        <div class="ts-times">${a.slots.map(s => `<button type="button" data-t="${s.m}">${s.l}</button>`).join('')}</div>
+        <button type="button" class="ts-send" disabled>Pick a time</button><button type="button" class="ts-none">I can’t drive this time</button></div></div>`);
+      view.append(sheet);
+      const go = sheet.querySelector('.ts-send'), close = () => sheet.remove();
+      sheet.querySelector('.ts-scrim').onclick = close;
+      sheet.querySelectorAll('[data-t]').forEach(b => b.onclick = () => {
+        const m = +b.dataset.t; on.has(m) ? on.delete(m) : on.add(m); b.classList.toggle('on', on.has(m));
+        go.disabled = !on.size; go.textContent = !on.size ? 'Pick a time' : on.size > 1 ? 'I can drive at these times' : 'I can drive at this time';
+      });
+      sheet.querySelector('.ts-none').onclick = () => { close(); state('<i class="ph ph-x-circle"></i>You said you can’t. Only Tony sees it.'); card().querySelector('[data-st]').style.color = 'var(--subtle)'; send({ t:'no' }); };
+      go.onclick = () => {
+        if (!on.size) return;
+        const times = a.slots.filter(s => on.has(s.m)), words = times.map(s => s.l).join(' or ');
+        close(); state(`<span class="spin"></span>You offered ${words} · waiting on Tony`, 'f wait in');
+        sys('ph ph-clock', `You told Tony you could drive at ${words}`);
+        send({ t:'offer', times:times.map(s => s.m) });
+      };
+    };
+    const schedule = m => {
+      card().querySelector('[data-st]')?.replaceWith(el('<div class="f in" data-st style="margin-top:12px;color:var(--brand);font-weight:600"><i class="ph-fill ph-check-circle"></i>You’re in</div>'));
+      sys('ph-fill ph-car-profile', 'Tony shared the schedule');
+      add(el(`<div class="ride done in"><div class="h"><img src="${A}illus/carpool.webp" alt=""><div><b>${esc(m.title)}</b><small>${esc(m.pick)}</small></div></div>
+        <div class="sch">${m.rows.map(r => `<div class="sch-r${r.you ? ' you' : ''}"><span>${esc(r.d)}</span><b>${r.you ? 'You' : 'Tony'}</b></div>`).join('')}</div>
+        ${m.more ? `<div class="f" style="font-size:12.5px;color:var(--subtle)">${esc(m.more)}</div>` : ''}
+        <div class="conf"><div class="ch"><i class="ph-fill ph-calendar-check"></i>Your turns are on your calendar</div>
+          <div class="f"><i class="ph ph-bell-ringing"></i>Reminder the night before each of your turns</div>
+          <div class="f"><i class="ph ph-arrows-left-right"></i>Can’t drive one? Ask to swap from the turn</div></div></div>`));
+    };
+
+    const arrive = a => {
+      ask = a; reset(); build(a);
+      const sm = sms();
+      const text = a.kind === 'chat' ? `<b>${esc(a.chat)}</b><br>Tony needs a ride for ${esc(a.riders)} on ${esc(a.day)} at ${a.at.l}. Can you help?`
+        : `<b>${sm ? 'Tony Martin &amp; Sprout' : 'Tony Martin'}</b><br>${esc(a.text.length > 110 ? a.text.slice(0, 108) + '…' : a.text)}`;
+      const note = el(`<button class="note" aria-label="Open the notification">${sm ? '<span class="ic msg"><i class="ph-fill ph-chat-circle"></i></span>' : `<span class="ic" style="background-image:url(${SPROUT})"></span>`}<div style="flex:1"><div class="hd"><span>${sm ? 'Messages' : 'Sprout'}</span><small>now</small></div><p>${text}</p></div></button>`);
+      lock.append(note);
+      const v0 = view;
+      const open = () => { if (view !== v0 || !lock.isConnected || lock.hidden) return; lock.hidden = true; view.hidden = false; phone.querySelector('.home').classList.remove('light'); hint(true); };
+      note.onclick = open;
+      setTimeout(open, 3000);
+    };
+    ch.onmessage = e => {
+      const m = e.data;
+      if (m.t === 'ask') { if (!(ask && ask.kind === m.kind && ask.who.n === m.who.n)) arrive(m); return; }
+      if (!view) return;
+      if (m.t === 'tony-text') fromTony(m.text);
+      if (m.t === 'sms') smsFrom(m.from === 'Sprout' ? 'Sprout' : 'Tony Martin', m.text);
+      if (m.t === 'moved') { ask.moved = true; confirmRide(m.at, true); }
+      if (m.t === 'kept') { state(`<i class="ph ph-arrow-right"></i>Tony kept ${ask.at.l} and is asking others`); card().querySelector('[data-st]').style.color = 'var(--subtle)'; }
+      if (m.t === 'set') {
+        if (ask.kind === 'text') smsFrom('Sprout', `Thanks ${ask.who.ask}! You’re driving ${ask.riders} on ${ask.day} at ${m.at.l}. Pickup at ${ask.pickAddr}. Add it to your calendar: sprout.link/r/8KQ2`);
+        else if (!ask.moved) sys('ph-fill ph-car-profile', `You’re driving ${esc(ask.riders)} · Tony was told`);
+      }
+      if (m.t === 'covered') { if (m.text) smsFrom('Sprout', m.text); else sys('ph-fill ph-car-profile', `${esc(m.by)} is driving ${esc(m.riders)} · thanks for checking`); }
+      if (m.t === 'schedule') schedule(m);
+      if (m.t === 'held') { const st = card().querySelector('[data-st]'); if (st) st.innerHTML = '<span class="spin"></span>You’re in · Tony hasn’t shared the turns yet'; }
+    };
+    send({ t:'hello' });
+  }
 })();
 </script>
 </body>
