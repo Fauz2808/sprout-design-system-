@@ -393,7 +393,14 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
     reset();
     const sms = () => ask.kind === 'text' || ask.kind === 'sitter';
     const add = node => view.querySelector('.log').append(node);
-    const smsFrom = (from, text) => { add(el(`<span class="who in">${from}</span>`)); const r = el(`<div class="row in"><span class="av" style="background-image:url(${from === 'Sprout' ? SPROUT : TONY})"></span><div class="bb"></div></div>`); r.querySelector('.bb').textContent = text; add(r); };
+    const smsFrom = (from, text, href) => {
+      add(el(`<span class="who in">${from}</span>`)); const r = el(`<div class="row in"><span class="av" style="background-image:url(${from === 'Sprout' ? SPROUT : TONY})"></span><div class="bb"></div></div>`);
+      const bb = r.querySelector('.bb'), m = href && /sprout\.app\/\S+/.exec(text);
+      /* Ahmad, 22 Nov: the payout link is tappable and opens the sitter's payout page */
+      if (m) { bb.append(text.slice(0, m.index)); const a = document.createElement('a'); a.href = href; a.target = '_blank'; a.rel = 'noopener'; a.textContent = m[0]; bb.append(a, text.slice(m.index + m[0].length)); }
+      else bb.textContent = text;
+      add(r);
+    };
     const smsMine = text => { const r = el('<div class="row me in"><div class="bb"></div></div>'); r.querySelector('.bb').textContent = text; add(r); };
     const fromTony = text => {
       if (sms()) return smsFrom('Tony Martin', text);
@@ -524,7 +531,7 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
       if (m.t === 'ask') { if (!(ask && ask.kind === m.kind && ask.who.n === m.who.n)) arrive(m); return; }
       if (!view) return;
       if (m.t === 'tony-text') fromTony(m.text);
-      if (m.t === 'sms') smsFrom(m.from === 'Sprout' ? 'Sprout' : 'Tony Martin', m.text);
+      if (m.t === 'sms') smsFrom(m.from === 'Sprout' ? 'Sprout' : 'Tony Martin', m.text, m.href);
       if (m.t === 'moved') { ask.moved = true; confirmRide(m.at, true); }
       if (m.t === 'kept') { state(`<i class="ph ph-arrow-right"></i>Tony kept ${ask.at.l} and is asking others`); card().querySelector('[data-st]').style.color = 'var(--subtle)'; }
       if (m.t === 'set') {

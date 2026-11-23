@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#f4f1ea">
+<title>Get paid · Sprout</title>
+<link rel="icon" href="/assets/app-icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+  /* Ahmad, 22 Nov (direction A, booking first): the page behind the payout link Sprout texts a sitter right after
+     a booking (S7). It opens on the booking itself (who booked, when, the pay), asks once where the pay should go,
+     hands the details to Stripe, and ends on when the money arrives. Web only, no app, no login. Same look as the
+     sitter profile page (/sitter-profile/). Nothing is collected or sent; the Stripe step is a mock. */
+  :root{--bg:#f4f1ea;--white:#fff;--strong:#1d2a22;--text:#333d36;--subtle:#6b746d;--border:#ddd8cc;--soft:#ebe7de;--field:#f1eee7;--brand:#186338;--tint:#e3efe6;--serif:'Playfair Display',Georgia,serif;--sans:Inter,system-ui,sans-serif}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 var(--sans)}
+  button,input{font:inherit;color:inherit}
+  button{border:0;background:none;cursor:pointer;padding:0}
+  button:focus{outline:none} button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+  [hidden]{display:none!important}
+  .url{position:sticky;top:0;z-index:2;background:rgba(244,241,234,.95);padding:10px 16px 8px;text-align:center;font-size:12.5px;color:var(--subtle);border-bottom:1px solid var(--soft)}
+  .url b{color:var(--strong);font-weight:500}
+  main{max-width:440px;margin:0 auto;padding:18px 16px 40px}
+  .brand{display:flex;align-items:center;gap:8px;font:600 16px var(--serif);color:var(--brand);margin-bottom:16px}
+  .brand img{width:26px;height:26px;border-radius:7px}
+  .card{background:var(--white);border:1px solid var(--soft);border-radius:20px;padding:16px;margin-bottom:12px;animation:rise .3s both}
+  .ask{font:500 24px/1.25 var(--serif);color:var(--strong);margin:2px 0 6px}
+  .lede{margin:0 0 4px;color:var(--subtle);font-size:14px}
+  .who{display:flex;align-items:center;gap:12px;margin:14px 0 6px}
+  .who i{width:48px;height:48px;border-radius:24px;background:center/cover;flex:none}
+  .who b{display:block;font:500 19px/1.2 var(--serif);color:var(--strong)}
+  .who small{font-size:13px;color:var(--subtle)}
+  .fact{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--strong);padding:8px 0;border-top:1px solid var(--soft)}
+  .fact i{font-size:20px;color:var(--brand);flex:none}
+  .fact.pay b{font-weight:600}
+  .q{font:500 18px var(--serif);color:var(--strong);margin:18px 0 10px}
+  .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 14px;border-radius:16px;background:var(--field);border:2px solid transparent;margin-top:8px;transition:all .15s}
+  .opt i.ic{font-size:24px;color:var(--subtle)}
+  .opt b{display:block;font:500 17px var(--serif);color:var(--strong)}
+  .opt small{font-size:13px;color:var(--subtle)}
+  .opt .ck{margin-left:auto;width:22px;height:22px;border-radius:11px;border:2px solid var(--border);display:grid;place-items:center;color:#fff;font-size:13px}
+  .opt.on{border-color:var(--brand);background:var(--tint)}
+  .opt.on i.ic{color:var(--brand)}
+  .opt.on .ck{background:var(--brand);border-color:var(--brand)}
+  .send{width:100%;margin-top:16px;padding:15px;border-radius:999px;background:var(--brand);color:#fff;font:500 17px var(--serif)}
+  .send[disabled]{opacity:.4}
+  .priv{display:flex;gap:8px;font-size:12.5px;color:var(--subtle);margin-top:12px}
+  .priv i{font-size:16px;color:var(--brand);flex:none}
+  .textbtn{display:block;margin:10px auto 0;padding:8px 0;color:var(--strong);font:500 15px var(--serif)}
+  /* the payment partner's step: a neutral, separate-looking sheet (plain text name, no logo) */
+  .partner{background:#fff;border:1px solid var(--soft);border-radius:20px;overflow:hidden;animation:rise .3s both}
+  .partner .pt-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#f7f7f9;border-bottom:1px solid #ececf1;font-size:13px;color:#555}
+  .partner .pt-head b{font:600 15px var(--sans);color:#222}
+  .partner .pt-head span{display:flex;align-items:center;gap:5px}
+  .partner .pb{padding:16px}
+  .partner h2{font:600 18px var(--sans);color:#222;margin:0 0 4px}
+  .partner p{margin:0 0 12px;font-size:13.5px;color:#666}
+  .banks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .banks button{padding:12px 10px;border-radius:12px;border:1.5px solid #e3e3ea;font:500 14px var(--sans);color:#222;text-align:left}
+  .banks button.on{border-color:#222;background:#f4f4f7}
+  .acct{display:flex;align-items:center;gap:10px;margin-top:12px;padding:12px;border-radius:12px;background:#f4f4f7;font-size:14px;color:#222}
+  .acct i{font-size:20px;color:#222}
+  .acct b{font-weight:600}
+  .field{margin-top:10px}
+  .field label{display:block;font-size:12.5px;color:#666;margin-bottom:4px}
+  .field div{padding:11px 12px;border-radius:10px;border:1.5px solid #e3e3ea;font-size:15px;color:#222}
+  .partner .send{background:#222;font:600 16px var(--sans)}
+  .status{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:14px;color:#444}
+  .spinner{width:18px;height:18px;border-radius:9px;border:2px solid #e3e3ea;border-top-color:#222;animation:spin .8s linear infinite}
+  .done{text-align:center;padding:18px 8px 16px}
+  .tick{width:64px;height:64px;border-radius:32px;background:var(--tint);color:var(--brand);display:grid;place-items:center;font-size:32px;margin:0 auto 12px}
+  .done .ask{margin:0 0 6px}
+  .done p{color:var(--subtle);margin:0}
+  .more{display:block;margin-top:4px;padding:14px 16px;border-radius:16px;background:var(--white);border:1px solid var(--soft);color:var(--strong);text-decoration:none}
+  .more b{display:block;font:500 16px var(--serif)}
+  .more small{color:var(--subtle);font-size:13px}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="url"><i class="ph ph-lock-simple"></i> <b>sprout.app</b>/pay/<span data-slug>alex</span></div>
+<main>
+  <div class="brand"><img src="/assets/app-icon-180.png" alt="">Sprout</div>
+
+  <!-- 1 · the booking, then where the pay goes -->
+  <section class="card" data-step="booking">
+    <h1 class="ask" tabindex="-1">Get paid for <span data-dayword>Monday</span></h1>
+    <p class="lede"><span data-n>Alex</span>, add where your pay should go. You only do this once.</p>
+    <div class="who"><i style="background-image:url(/assets/tony.webp)"></i><div><b>Tony Martin booked you</b><small>Through Sprout</small></div></div>
+    <div class="fact"><i class="ph ph-calendar-check"></i><span data-when>Mon, Jul 27 · 6–10 PM</span></div>
+    <div class="fact"><i class="ph ph-users"></i><span data-kids>Maya (7) and Jake (5)</span></div>
+    <div class="fact"><i class="ph ph-map-pin"></i>Banks Court, Austin</div>
+    <div class="fact pay"><i class="ph ph-currency-dollar"></i><span><b data-total>About $100</b> · <span data-rate>$25/hr</span>, plus any tip</span></div>
+    <p class="q">Where should your pay go?</p>
+    <button type="button" class="opt on" data-way="bank" aria-pressed="true"><i class="ph ph-bank ic"></i><span><b>Bank account</b><small>1–2 business days · no fee</small></span><span class="ck"><i class="ph ph-check"></i></span></button>
+    <button type="button" class="opt" data-way="card" aria-pressed="false"><i class="ph ph-credit-card ic"></i><span><b>Debit card</b><small>Usually within minutes · small fee</small></span><span class="ck"><i class="ph ph-check"></i></span></button>
+    <button type="button" class="send" data-go>Continue</button>
+    <p class="priv"><i class="ph ph-shield-check"></i>Your details go to Stripe, Sprout’s payment partner. Tony and Sprout never see them.</p>
+  </section>
+
+  <!-- 2 · the payment partner (mock) -->
+  <section class="partner" data-step="stripe" hidden>
+    <div class="pt-head"><b>Stripe</b><span><i class="ph ph-lock-simple"></i>Secure · for Sprout</span></div>
+    <div class="pb" data-bank>
+      <h2>Connect your bank</h2>
+      <p>Pick your bank, then sign in to it. Stripe only gets the account to pay into.</p>
+      <div class="banks">
+        <button type="button" data-b="Chase">Chase</button><button type="button" data-b="Bank of America">Bank of America</button>
+        <button type="button" data-b="Wells Fargo">Wells Fargo</button><button type="button" data-b="Frost Bank">Frost Bank</button>
+      </div>
+      <div class="status" data-connecting hidden><span class="spinner"></span><span data-connecting-label>Connecting</span></div>
+      <div class="acct" data-acct hidden><i class="ph ph-bank"></i><span><b data-acct-name>Chase Checking</b> ••••6789</span><i class="ph-fill ph-check-circle" style="margin-left:auto"></i></div>
+    </div>
+    <div class="pb" data-card hidden>
+      <h2>Add your debit card</h2>
+      <p>Payouts to a debit card usually arrive within minutes.</p>
+      <div class="field"><label>Card number</label><div>•••• •••• •••• 4821</div></div>
+      <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><label>Expires</label><div>08 / 28</div></div><div><label>ZIP</label><div>78739</div></div></div>
+    </div>
+    <div class="pb" style="padding-top:0">
+      <button type="button" class="send" data-finish disabled>Agree and finish</button>
+      <p class="priv" style="color:#777"><i class="ph ph-info" style="color:#777"></i>Prototype: nothing is collected. In the app this step is Stripe’s own page.</p>
+    </div>
+  </section>
+
+  <!-- 3 · done: when the money arrives -->
+  <section data-step="done" hidden>
+    <div class="card done">
+      <div class="tick"><i class="ph ph-check"></i></div>
+      <h1 class="ask" tabindex="-1">You’re set, <span data-n>Alex</span></h1>
+      <p data-when-paid>When Monday is done, Tony pays you in Sprout. It goes to Chase ••••6789 in 1–2 business days.</p>
+    </div>
+    <div class="card" style="animation-delay:.08s">
+      <div class="fact" style="border-top:0"><i class="ph ph-chat-circle-dots"></i>We’ll text you when Tony pays, with the amount</div>
+      <div class="fact"><i class="ph ph-arrows-clockwise"></i>Next time a Sprout family books you, pay goes here too</div>
+      <div class="fact"><i class="ph ph-pencil-simple"></i>Need to change it? Reply “pay” in any Sprout text</div>
+    </div>
+    <a class="more" href="/sitter-profile/" style="animation:rise .3s .16s both"><b>Want more bookings?</b><small>Lincoln families can find you with a free sitter profile. 2 minutes.</small></a>
+  </section>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  /* the booking comes from the link Sprout texted (?n=&d=&t=&r=&h=&k=); defaults = the demo booking */
+  const q = new URLSearchParams(location.search);
+  const b = { n:q.get('n') || 'Alex', d:q.get('d') || 'Mon, Jul 27', t:q.get('t') || '6–10 PM', r:+q.get('r') || 25, h:+q.get('h') || 4, k:q.get('k') || 'Maya (7) and Jake (5)' };
+  const days = { Mon:'Monday', Tue:'Tuesday', Wed:'Wednesday', Thu:'Thursday', Fri:'Friday', Sat:'Saturday', Sun:'Sunday' };
+  const dayword = days[b.d.slice(0, 3)] || b.d;
+  $$('[data-n]').forEach(e => e.textContent = b.n);
+  $('[data-slug]').textContent = b.n.toLowerCase();
+  $('[data-dayword]').textContent = dayword;
+  $('[data-when]').textContent = `${b.d} · ${b.t}`;
+  $('[data-kids]').textContent = b.k;
+  $('[data-rate]').textContent = `$${b.r}/hr`;
+  $('[data-total]').textContent = `About $${Math.round(b.r * b.h)}`;
+  document.title = `Get paid · ${b.n} · Sprout`;
+
+  let way = 'bank', bank = null;
+  const show = step => { $$('[data-step]').forEach(s => s.hidden = s.dataset.step !== step); scrollTo({ top:0 }); $(`[data-step="${step}"] h1`)?.focus({ preventScroll:true }); };
+  $$('[data-way]').forEach(o => o.onclick = () => { way = o.dataset.way; $$('[data-way]').forEach(x => { x.classList.toggle('on', x === o); x.setAttribute('aria-pressed', x === o); }); });
+  $('[data-go]').onclick = () => {
+    $('[data-bank]').hidden = way !== 'bank'; $('[data-card]').hidden = way !== 'card';
+    $('[data-finish]').disabled = way === 'bank' && !bank;
+    show('stripe');
+  };
+  $$('[data-b]').forEach(btn => btn.onclick = () => {
+    bank = btn.dataset.b;
+    $$('[data-b]').forEach(x => x.classList.toggle('on', x === btn));
+    $('[data-acct]').hidden = true; $('[data-finish]').disabled = true;
+    $('[data-connecting-label]').textContent = `Signing in to ${bank}`; $('[data-connecting]').hidden = false;
+    setTimeout(() => { $('[data-connecting]').hidden = true; $('[data-acct-name]').textContent = `${bank} Checking`; $('[data-acct]').hidden = false; $('[data-finish]').disabled = false; }, 1100);
+  });
+  $('[data-finish]').onclick = () => {
+    if ($('[data-finish]').disabled) return;
+    $('[data-when-paid]').textContent = way === 'bank'
+      ? `When ${dayword} is done, Tony pays you in Sprout. It goes to ${bank} ••••6789 in 1–2 business days.`
+      : `When ${dayword} is done, Tony pays you in Sprout. It goes to your debit card ••••4821, usually within minutes.`;
+    show('done');
+  };
+})();
+</script>
+</body>
+</html>

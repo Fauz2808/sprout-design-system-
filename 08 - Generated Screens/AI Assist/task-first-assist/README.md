@@ -2,6 +2,16 @@
 
 Live: https://sprout-assist-tasks.vercel.app/assist/ · local: `python3 build.py`, then serve `site/` (preview config `assist-tasks`, port 4330).
 
+## 22 Nov · sitter payout page, booking first (Ahmad, direction A)
+
+`/pay/` (`app/sitter-pay.html`) is what the S7 payout link opens (`sprout.app/pay/<name>`). It replaced the old
+profile step at `/sitter-profile/?s=pay`, which showed Jordan, no booking and ended on a profile.
+1 the booking: "Tony Martin booked you", date and time, kids, Banks Court, about $X at $Y/hr, then bank (1–2 days,
+no fee) or debit card (usually minutes, small fee). 2 Stripe (mock, plain text name): pick the bank → account, or
+the card. 3 "You're set": when the pay arrives and where, a text when Tony pays, then an optional free profile.
+The booking comes from the link (`?n=&d=&t=&r=&h=&k=`), built in `payoutLink`; the link is tappable on Tony's
+phone and on the sitter's phone (`/other-side/` row 5).
+
 ## 22 Nov · playdate place picker (Ahmad)
 
 "If i chose somewhere else instead of our place... give em recommendation for the near place or best place... so the

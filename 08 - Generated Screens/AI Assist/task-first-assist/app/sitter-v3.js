@@ -33,7 +33,7 @@ const LIVE = { who:null, msg:null };
 if (link) link.on(m => { if (m.t === 'hello' && LIVE.msg) link.send(LIVE.msg); });
 const isLive = f => !!(link && LIVE.who && f && (f === LIVE.who || f.n === LIVE.who.n));
 function liveAsk(who, msg){ if (!link) return; LIVE.who = who; LIVE.no = false; LIVE.msg = { t:'ask', ...msg }; link.send(LIVE.msg); }
-function liveSay(who, text, from = 'Sprout'){ if (isLive(who)) link.send({ t:'sms', from, text }); }
+function liveSay(who, text, from = 'Sprout', href = ''){ if (isLive(who)) link.send({ t:'sms', from, text, href }); }
 function liveHeard(p, f, where, text){
   p.block(`<div class="preview gtx sms-in"><small>${face({ n:f.ask || f.n, photo:f.photo }, 18)}${f.n} · ${where}</small><p></p></div>`).querySelector('p').textContent = text;
   p.scroll();
@@ -512,17 +512,21 @@ function smsIn(p, s, w){
 /* S7 (Tony, 20 Nov US): ask the sitter where to get paid as soon as the booking is confirmed, not after the job
    ("they'll have some extra time... it's not like, I'm looking last minute"). Only if they haven't set it up yet.
    Bank details go to Stripe; the link opens the sitter's web profile (no app). */
+const PAY_KIDS = {};
 async function payoutLink(p, who, w){
   if (who.payout) return;
   const job = p.work(`Asking ${who.n} where to get paid`, 'Only once. After that, paying is one tap');
   await sleep(900);
   job.done(`Sent ${who.n} a payout link`, 'Their bank details go to Stripe, not to you or Sprout', 'ph-bank');
-  const b = p.block(`<div class="preview gtx"><small>Group text · ${groupWho(who)}</small><p></p><a class="gtx-link" href="/sitter-profile/" target="_blank" rel="noopener">sprout.app/pay/${who.n.toLowerCase()}</a></div>`);
+  /* Ahmad, 22 Nov (A): the link opens the booking-first payout page (/pay/), with this booking */
+  const href = '/pay/?' + new URLSearchParams({ n:who.n, d:w.day.day, t:range(w.from, w.to), r:who.rate || 25, h:(w.to - w.from) / 60, k:kidsShort(PAY_KIDS.kids || KIDS) });
+  const b = p.block(`<div class="preview gtx"><small>Group text · ${groupWho(who)}</small><p></p><a class="gtx-link" href="${href}" target="_blank" rel="noopener">sprout.app/pay/${who.n.toLowerCase()}</a></div>`);
   b.querySelector('p').textContent = `${who.n}, so Tony can pay you through Sprout after ${w.day.long.split(',')[0]}, add where you’d like to get paid. Takes 2 minutes, and you only do it once:`;
-  liveSay(who, `${b.querySelector('p').textContent} sprout.app/pay/${who.n.toLowerCase()}`);
+  liveSay(who, `${b.querySelector('p').textContent} sprout.app/pay/${who.n.toLowerCase()}`, 'Sprout', href);
   remember({ ...who, payout:true }); who.payout = true;
 }
 async function sendAndBook(p, asked, w, kids, { pick } = {}){
+  PAY_KIDS.kids = kids;
   const sent = await groupTexts(p, asked, w, kids);
   const replied = new Map();
   /* linked (/other-side/): the first sitter asked is the phone on the right; the others still answer on their own */
