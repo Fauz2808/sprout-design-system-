@@ -33,22 +33,44 @@
   .split{flex:none;align-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;width:70px;color:var(--brand);font:600 12px Inter;text-align:center}
   .split span{font-size:30px;line-height:1}
   .note{margin-top:20px;color:var(--sub);font-size:13px;max-width:820px}
+  .rowh{font:600 22px/1.2 'Playfair Display',serif;margin:38px 0 4px;padding-top:24px;border-top:1px solid var(--line)}
+  .rowp{margin:0;color:var(--sub);max-width:820px}
 </style>
 </head>
 <body><div class="wrap">
   <span class="tag">Review page · not part of the app</span>
   <h1>Sitter sign-up, start to finish</h1>
-  <p class="lede">How a sitter goes from Sprout’s text to a live profile they can log back into. Each phone is the real page at that step, so you can tap it. Scroll sideways for the next step.</p>
+  <p class="lede">Two ways a sitter joins Sprout, each from the first screen to a live profile they can log back into. Each phone is the real page at that step, so you can tap it. Scroll sideways for the next step.</p>
+
+  <h2 class="rowh">1 · A new sitter signs up on their own</h2>
+  <p class="rowp">At sprout.app/sitter: sign up with their number, make a profile, say what they offer, set up pay. Families see them only when a parent they sat for, or a class parent, shares them.</p>
+  <div class="actions">
+    <a class="go" href="/sitter-profile/?flow=new&s=start&fresh=1" target="_blank" rel="noopener">Run it start to finish</a>
+  </div>
+  <div class="row" data-row="new"></div>
+
+  <h2 class="rowh">2 · A sitter a family already booked</h2>
+  <p class="rowp">They sat for Tony through Sprout’s text. The next morning Sprout invites them to make a profile.</p>
   <div class="actions">
     <a class="go" href="/sitter-profile/?s=thread&fresh=1" target="_blank" rel="noopener">Run it start to finish</a>
     <a class="alt" href="/sitter-profile/?s=login" target="_blank" rel="noopener">Log in as the sitter</a>
     <a class="alt" href="/pay/?n=Alex" target="_blank" rel="noopener">The booked sitter’s pay link</a>
   </div>
-
-  <div class="row" data-row></div>
+  <div class="row" data-row="invited"></div>
   <p class="note">Prototype: nothing is sent or saved to a real account. “Run it start to finish” forgets this browser’s demo sitter first. The photo step needs a photo from your computer. The log-in code is 482 913.</p>
 </div>
 <script>
+  const NEW = [
+    ['Babysit for Sprout families', 'sprout.app/sitter. What they get: booked by text, paid in Sprout or their apps, shared by parents. No app.', '/sitter-profile/?flow=new&s=start'],
+    ['Sign up with your number', 'Their number, then a texted code. No password. The number is their account.', '/sitter-profile/?flow=new&s=login'],
+    ['Photo and name', 'A photo (required: parents want to see who’s coming) and their name.', '/sitter-profile/?flow=new&s=name'],
+    ['Where do you sit?', 'Home ZIP and how far they drive. Parents only see the area.', '/sitter-profile/?flow=new&s=area'],
+    ['What you offer', 'Rate, the ages they sit, CPR or first aid, a few words. New for self sign-up.', '/sitter-profile/?flow=new&s=offer'],
+    ['How do you want to get paid?', 'Set up pay, or Not now. The same setup as every sitter.', '/sitter-profile/?flow=new&s=pay'],
+    ['Get paid through Sprout', 'Sprout first: bank or card through Stripe. Or Venmo, Zelle or cash.', '/pay/?from=profile&n=Maria&p=(512)+555-0163'],
+    ['Anything else?', 'Optional: Venmo and Zelle by number, PayPal by signing in, Cash App, cash.', '/pay/?from=profile&n=Maria&p=(512)+555-0163&step=others'],
+    ['Your profile is live', 'What they offer, “New on Sprout”, Payments, and how families find them: copy their link. Sample data.', '/sitter-profile/?flow=new&s=done&pay=demo'],
+  ];
   const STEPS = [
     ['Sprout’s text', 'The sitter just sat for Tony. The next morning Sprout texts a link to make a free profile.', '/sitter-profile/?s=thread'],
     ['Make a profile', 'Name and number came from the text. Add a photo and a last name; pick iMessage or WhatsApp.', '/sitter-profile/?s=name'],
@@ -60,11 +82,12 @@
     ['Your profile is live', 'Profile, Payments with Change, Log out. Shown with a sample setup.', '/sitter-profile/?s=done&pay=demo'],
     ['Log in later', 'Back any time: number, then the texted code. No password.', '/sitter-profile/?s=login'],
   ];
-  const row = document.querySelector('[data-row]');
-  row.innerHTML = STEPS.map(([t, d, src], i) => `${i === 4 ? '<div class="split"><span>→</span>Pay setup<br>(/pay/)</div>' : i === 7 ? '<div class="split"><span>→</span>Back to<br>the profile</div>' : ''}
+  const phones = (list, splits) => list.map(([t, d, src], i) => `${splits[i] ? `<div class="split"><span>→</span>${splits[i]}</div>` : ''}
     <div class="ph"><div class="n">${String(i + 1).padStart(2, '0')}</div><h3>${t}</h3><p>${d}</p>
       <div class="frame"><iframe data-src="${src}" title="${t}" loading="lazy"></iframe></div>
       <div class="bar"><button type="button" data-r>Start over</button><a href="${src}" target="_blank" rel="noopener">Open alone</a></div></div>`).join('');
+  document.querySelector('[data-row="new"]').innerHTML = phones(NEW, { 6:'Pay setup<br>(/pay/)', 8:'Back to<br>the profile' });
+  document.querySelector('[data-row="invited"]').innerHTML = phones(STEPS, { 4:'Pay setup<br>(/pay/)', 7:'Back to<br>the profile' });
   const frames = [...document.querySelectorAll('iframe')];
   frames.forEach(f => f.src = f.dataset.src);
   document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { const f = b.closest('.ph').querySelector('iframe'); f.src = 'about:blank'; setTimeout(() => f.src = f.dataset.src, 60); });

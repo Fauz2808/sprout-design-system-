@@ -109,6 +109,9 @@
   .pay-list li.none{color:var(--subtle)}
   .autofill{display:flex;align-items:center;gap:8px;width:100%;margin:10px 0 4px;padding:10px 12px;border-radius:12px;background:var(--tint);color:var(--brand);font-size:14px}
   .autofill b{font-weight:600;letter-spacing:.04em}
+  /* new sitter (direction A) */
+  .choices .chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+  .intro{margin:10px 0 4px;padding:10px 12px;border-radius:12px;background:var(--field);font-size:14.5px;color:var(--strong)}
   .who i.av.empty{background:var(--field) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256' fill='%236b7470'%3E%3Cpath d='M208 56h-27.72l-13.63-20.44A8 8 0 0 0 160 32H96a8 8 0 0 0-6.65 3.56L75.71 56H48a24 24 0 0 0-24 24v112a24 24 0 0 0 24 24h160a24 24 0 0 0 24-24V80a24 24 0 0 0-24-24Zm8 136a8 8 0 0 1-8 8H48a8 8 0 0 1-8-8V80a8 8 0 0 1 8-8h32a8 8 0 0 0 6.66-3.56L100.28 48h55.43l13.63 20.44A8 8 0 0 0 176 72h32a8 8 0 0 1 8 8ZM128 88a44 44 0 1 0 44 44 44.05 44.05 0 0 0-44-44Zm0 72a28 28 0 1 1 28-28 28 28 0 0 1-28 28Z'/%3E%3C/svg%3E") center/24px no-repeat}
   .known{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 0;padding:10px 14px;border-radius:14px;background:var(--field)}
   .known small{display:block;font-size:12.5px;color:var(--subtle)}
@@ -120,6 +123,19 @@
 <div class="url"><i class="ph ph-lock-simple"></i> <b>joinsprout.co</b>/s/jordan</div>
 <main>
   <div class="brand"><img src="/assets/app-icon-180.png" alt="">Sprout</div>
+  <!-- Ahmad, 22 Nov (direction A): a new sitter signs up on their own at sprout.app/sitter. No app. Same steps as an
+       invited sitter plus "What you offer". Families only see them when someone they sat for, or a class parent,
+       shares them (Tony, 20 Nov: sitters are per family, no global list). -->
+  <section class="card" data-step="start" hidden>
+    <h1 class="ask" tabindex="-1">Babysit for Sprout families</h1>
+    <p class="lede">A free profile, made in a few minutes. No app to download.</p>
+    <div class="fact" style="border-top:0;margin-top:8px"><i class="ph ph-chat-circle-dots" aria-hidden="true"></i>Families book you by text</div>
+    <div class="fact"><i class="ph ph-currency-dollar" aria-hidden="true"></i>Get paid in Sprout, Venmo, PayPal or cash</div>
+    <div class="fact"><i class="ph ph-share-network" aria-hidden="true"></i>Parents you sit for can share you with their class</div>
+    <button type="button" class="send" data-signup>Sign up with your number</button>
+    <button type="button" class="textbtn" data-have>Already on Sprout? Log in</button>
+  </section>
+
   <section class="card" data-step="thread" hidden>
     <div class="cmp-head"><span class="cmp-app"><i class="ph-fill ph-chat-circle-dots"></i>Messages</span></div>
     <div class="cmp-to"><span>Tony, Sprout and Jordan</span></div>
@@ -170,6 +186,27 @@
 
   <!-- Ahmad, 22 Nov: the same pay setup a booked sitter gets from the /pay/ link (Sprout first through Stripe, then
        PayPal sign-in, Venmo and Zelle by number, Cash App, cash). It opens /pay/ in profile mode and comes back here. -->
+  <form class="card" data-step="offer" hidden>
+    <h1 class="ask" tabindex="-1">What you offer</h1>
+    <p class="lede">Parents see this on your profile.</p>
+    <label for="rate">Your rate</label><div class="rate"><span>$</span><input id="rate" inputmode="numeric" maxlength="3" placeholder="22" autocomplete="off"><span>/hr</span></div>
+    <p class="q" style="margin-top:14px">Ages you sit</p>
+    <div class="choices" role="group" aria-label="Ages you sit">
+      <button type="button" class="chip" data-age="Babies" aria-pressed="false">Babies · 0–1</button><button type="button" class="chip" data-age="Toddlers" aria-pressed="false">Toddlers · 1–3</button>
+      <button type="button" class="chip" data-age="Kids" aria-pressed="false">Kids · 4–8</button><button type="button" class="chip" data-age="Big kids" aria-pressed="false">Big kids · 9+</button>
+    </div>
+    <p class="q" style="margin-top:14px">Certified in <small style="font:400 13px var(--sans);color:var(--subtle)">optional</small></p>
+    <div class="choices" role="group" aria-label="Certifications">
+      <button type="button" class="chip" data-cert="CPR" aria-pressed="false">CPR</button><button type="button" class="chip" data-cert="First aid" aria-pressed="false">First aid</button>
+    </div>
+    <label for="intro" style="margin-top:14px">A few words about you <span style="color:var(--subtle)">· optional</span></label>
+    <textarea id="intro" maxlength="200" placeholder="UT nursing student. I’ve nannied for 3 years and love crafts and bedtime stories."></textarea>
+    <button type="submit" class="send">Next</button>
+    <p class="priv" data-offer-error role="alert" hidden></p>
+    <p class="priv" data-storage-error role="alert" hidden></p>
+    <button type="button" class="textbtn" data-cancel="offer" hidden>Cancel</button>
+  </form>
+
   <section class="card" data-step="pay" hidden>
     <h1 class="ask" tabindex="-1">How do you want to get paid?</h1>
     <p class="lede">Families who book you through Sprout pay you there. Bank or card through Sprout, or Venmo, Zelle, PayPal and cash. You set it up once.</p>
@@ -203,11 +240,20 @@
     <div class="card">
       <div class="who profile-photo"><i class="av" data-avatar role="img" aria-label="Profile photo"></i><div><b data-name></b><small data-area></small></div></div>
       <div class="fact"><i class="ph ph-car" aria-hidden="true"></i><span data-distance></span></div>
-      <div class="fact"><i class="ph ph-users" aria-hidden="true"></i>Sat for 1 Lincoln family</div>
+      <div class="fact" data-offer-rate hidden><i class="ph ph-currency-dollar" aria-hidden="true"></i><span></span></div>
+      <div class="fact" data-offer-cert hidden><i class="ph ph-first-aid-kit" aria-hidden="true"></i><span></span></div>
+      <div class="fact"><i class="ph ph-users" aria-hidden="true"></i><span data-sat>Sat for 1 Lincoln family</span></div>
+      <p class="intro" data-offer-intro hidden></p>
       <!-- L8 open question (Tony: "how would they get to their profile again?"). Ahmad, 22 Nov: log in by number. -->
       <div class="fact"><i class="ph ph-sign-in" aria-hidden="true"></i>Log in anytime at sprout.app/sitter with your number</div>
       <button type="button" class="send" data-edit="name">Edit profile</button>
       <button type="button" class="textbtn" data-edit="area">Edit service area</button>
+      <button type="button" class="textbtn" data-edit="offer" hidden>Edit what you offer</button>
+    </div>
+    <div class="card" data-share hidden>
+      <b style="font:500 18px var(--serif);color:var(--strong)">How families find you</b>
+      <p class="lede" style="margin-top:4px">Families see your profile when a parent you sat for, or a class parent, shares it. Send your link to families you already sit for.</p>
+      <button type="button" class="send" data-copy>Copy my profile link</button>
     </div>
     <div class="card payments">
       <div class="pay-head"><b>Payments</b><button type="button" class="textbtn" data-change-pay>Change</button></div>
@@ -226,13 +272,17 @@
      start; ?pay=demo shows a sample setup on the profile instead of what this browser saved */
   const demoPay = params.get('pay') === 'demo';
   if (params.get('fresh') === '1') { try { Object.keys(localStorage).filter(k => k.startsWith('sprout:sitter')).forEach(k => localStorage.removeItem(k)); } catch {} }
-  const initial = screens.some(el => el.dataset.step === requested) ? requested : 'name';
+  const flow = params.get('flow') === 'new' ? 'new' : 'invited';   // new = signs up on their own, invited = from a family's text
+  const initial = screens.some(el => el.dataset.step === requested) ? requested : flow === 'new' ? 'start' : 'name';
   const profileForm = $('[data-step="name"]');
   const areaForm = $('[data-step="area"]');
   const photoInput = $('#photo');
   const storageKey = 'sprout:sitter-profile';
   /* the text thread already gave us Jordan's first name, number and app (iMessage); the photo starts empty */
-  const defaults = { first:'Jordan', last:demoPay ? 'Reyes' : '', phone:'(512) 555-0148', channel:'iMessage', area:'78739', miles:10, photo:initial === 'done' ? '/assets/sitters/man.webp' : '', paid:initial === 'done' };
+  const defaults = flow === 'new'
+    ? { first:demoPay ? 'Maria' : '', last:demoPay ? 'Lopez' : '', phone:demoPay ? '(512) 555-0163' : '', channel:'iMessage', area:demoPay ? '78745' : '', miles:10, photo:demoPay ? '/assets/sitters/woman.webp' : '', isNew:true,
+        offer:demoPay ? { rate:22, ages:['Toddlers', 'Kids'], cert:['CPR', 'First aid'], intro:'UT nursing student. I’ve nannied for 3 years and love crafts and bedtime stories.' } : null }
+    : { first:'Jordan', last:demoPay ? 'Reyes' : '', phone:'(512) 555-0148', channel:'iMessage', area:'78739', miles:10, photo:initial === 'done' ? '/assets/sitters/man.webp' : '', paid:initial === 'done' };
   const readProfile = () => {
     try { return JSON.parse(localStorage.getItem(storageKey)); } catch { return null; }
   };
@@ -253,10 +303,19 @@
       $('[data-name]').textContent = [state.first, state.last].filter(Boolean).join(' ');
       $('[data-area]').textContent = areaLabel(state.area);
       $('[data-distance]').textContent = `Drives up to ${state.miles} mi`;
+      const o = state.offer;
+      $('[data-offer-rate]').hidden = !o; $('[data-offer-cert]').hidden = !(o && o.cert && o.cert.length); $('[data-offer-intro]').hidden = !(o && o.intro);
+      if (o) {
+        $('[data-offer-rate] span').textContent = `$${o.rate}/hr · ${o.ages.join(', ')}`;
+        $('[data-offer-cert] span').textContent = `${(o.cert || []).join(' and ')} certified`;
+        $('[data-offer-intro]').textContent = o.intro || '';
+      }
+      $('[data-sat]').textContent = state.isNew ? 'New on Sprout' : 'Sat for 1 Lincoln family';
+      $('[data-share]').hidden = !state.isNew; $('[data-edit="offer"]').hidden = !o;
       paintPay();
     }
     /* the address bar: the log-in page lives at sprout.app/sitter, the profile at joinsprout.co/s/<name> */
-    $('.url').innerHTML = step === 'login' ? '<i class="ph ph-lock-simple"></i> <b>sprout.app</b>/sitter'
+    $('.url').innerHTML = step === 'login' || step === 'start' || (state.isNew && !state.first) ? '<i class="ph ph-lock-simple"></i> <b>sprout.app</b>/sitter'
       : `<i class="ph ph-lock-simple"></i> <b>joinsprout.co</b>/s/${(state.first || 'jordan').toLowerCase().replace(/[^a-z0-9]/g, '')}`;
     screens.forEach(el => el.hidden = el.dataset.step !== step);
     if (focus) $('main [data-step]:not([hidden]) h1')?.focus({ preventScroll:true });
@@ -275,7 +334,7 @@
     }
   };
   const finishSetup = () => {
-    if (initial === 'name') {
+    if (initial === 'name' || state.isNew) {
       const keep = save(state, 'done');
       if (keep && requested) {
         const url = new URL(location.href);
@@ -366,7 +425,7 @@
     if (editing) finishEdit(updates, 'area');
     else {
       state = { ...state, ...updates };
-      show('pay');
+      show(state.isNew ? 'offer' : 'pay', true);
     }
   };
   const startEdit = step => {
@@ -374,7 +433,7 @@
     $('[data-saved]').hidden = true;
     const form = $(`[data-step="${step}"]`);
     form.querySelector('[data-storage-error]').hidden = true;
-    form.querySelector('h1').textContent = step === 'name' ? 'Edit profile' : 'Edit service area';
+    form.querySelector('h1').textContent = step === 'name' ? 'Edit profile' : step === 'offer' ? 'Edit what you offer' : 'Edit service area';
     form.querySelector('.send').textContent = 'Save changes';
     form.querySelector('[data-cancel]').hidden = false;
     if (step === 'name') {
@@ -388,6 +447,8 @@
       $('[data-photo-error]').hidden = true;
       draftPhoto = state.photo;
       paintPhoto(form.querySelector('[data-avatar]'), draftPhoto);
+    } else if (step === 'offer') {
+      fillOffer(state.offer);
     } else {
       $('#area').value = state.area;
       draftMiles = state.miles;
@@ -430,6 +491,15 @@
 
   /* log in: number, then the text code (prototype: the code "arrives" as an autofill suggestion) */
   const loginForm = $('[data-step="login"]'), loginErr = $('[data-login-error]');
+  let signingUp = false;
+  const loginMode = up => {
+    signingUp = up;
+    loginForm.querySelector('h1').textContent = up ? 'Sign up with your number' : 'Log in to Sprout';
+    loginForm.querySelector('.lede').textContent = up ? 'We’ll text you a code. No password, no app.' : 'Sitters log in with their phone number. No password.';
+    $('[data-login-go]').textContent = up ? 'Continue' : 'Log in';
+  };
+  $('[data-signup]').onclick = () => { loginMode(true); show('login', true); };
+  $('[data-have]').onclick = () => { loginMode(false); show('login', true); };
   const digits = v => v.replace(/\D/g, '');
   loginForm.onsubmit = e => {
     e.preventDefault(); loginErr.hidden = true;
@@ -442,17 +512,58 @@
       return;
     }
     if (digits($('#login-code').value) !== '482913') { loginErr.textContent = 'That code doesn’t match. Check the text from Sprout.'; loginErr.hidden = false; return; }
+    if (signingUp) {   // a new sitter: the number is verified, now the profile
+      state = { ...defaults, phone:$('[data-login-to]').textContent };
+      paintPhone(); $('#first').value = ''; draftPhoto = ''; paintPhoto(profileForm.querySelector('[data-avatar]'), '');
+      $('#area').value = '';
+      show('name', true);
+      return;
+    }
     state = { ...defaults, ...readProfile(), phone:$('[data-login-to]').textContent };
     show('done', true);
   };
   $('[data-autofill]').onclick = () => { $('#login-code').value = '482 913'; };
   $('[data-login-back]').onclick = () => { $('[data-login-code]').hidden = true; $('[data-login-phone]').hidden = false; $('#login-code').value = ''; loginErr.hidden = true; };
+  /* What you offer (new sitters) */
+  const offerForm = $('[data-step="offer"]');
+  const toggle = b => b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') !== 'true');
+  offerForm.querySelectorAll('[data-age],[data-cert]').forEach(b => b.onclick = () => toggle(b));
+  function fillOffer(o){
+    $('#rate').value = o ? o.rate : '';
+    offerForm.querySelectorAll('[data-age]').forEach(b => b.setAttribute('aria-pressed', !!(o && o.ages.includes(b.dataset.age))));
+    offerForm.querySelectorAll('[data-cert]').forEach(b => b.setAttribute('aria-pressed', !!(o && (o.cert || []).includes(b.dataset.cert))));
+    $('#intro').value = o ? o.intro || '' : '';
+  }
+  offerForm.onsubmit = e => {
+    e.preventDefault();
+    const err = $('[data-offer-error]'), rate = +$('#rate').value.replace(/\D/g, '');
+    const pick = sel => [...offerForm.querySelectorAll(sel)].filter(b => b.getAttribute('aria-pressed') === 'true');
+    const ages = pick('[data-age]').map(b => b.dataset.age), cert = pick('[data-cert]').map(b => b.dataset.cert);
+    if (!rate || rate < 5 || rate > 200) { err.textContent = 'Add your hourly rate.'; err.hidden = false; $('#rate').focus(); return; }
+    if (!ages.length) { err.textContent = 'Pick at least one age group.'; err.hidden = false; return; }
+    err.hidden = true;
+    const offer = { rate, ages, cert, intro:$('#intro').value.trim() };
+    if (editing) finishEdit({ offer }, 'offer');
+    else { state = { ...state, offer }; show('pay', true); }
+  };
+  $('[data-copy]').onclick = async () => {
+    const url = `${location.origin}/sitter-profile/`;
+    try { await navigator.clipboard.writeText(url); } catch {}
+    $('[data-copy]').textContent = 'Link copied';
+    setTimeout(() => { $('[data-copy]').textContent = 'Copy my profile link'; }, 1800);
+  };
   $('[data-logout]').onclick = () => { $('[data-login-back]').click(); $('#login-phone').value = ''; show('login', true); };
 
   paintPhoto(profileForm.querySelector('[data-avatar]'), draftPhoto);
+  if (flow === 'new' || state.isNew) {
+    $('[data-new-only]').textContent = 'Add a photo and your name. Parents want to see who’s coming.';
+    if (initial !== 'done') $('#first').value = state.first;
+    if (initial === 'offer') fillOffer(state.offer);
+  }
   paintPhone();
-  $('#area').value = initial === 'done' || saved ? state.area : '';   // new to Sprout: the ZIP is asked, not guessed
+  $('#area').value = initial === 'done' || saved ? state.area : flow === 'new' && demoPay ? state.area : '';   // new to Sprout: the ZIP is asked, not guessed
   paintMiles();
+  if (flow === 'new' && initial === 'login') loginMode(true);   // review: open straight on "Sign up with your number"
   show(saved && !requested ? 'done' : initial);
 </script>
 </body>

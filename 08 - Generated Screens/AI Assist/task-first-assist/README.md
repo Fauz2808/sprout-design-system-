@@ -2,6 +2,15 @@
 
 Live: https://sprout-assist-tasks.vercel.app/assist/ · local: `python3 build.py`, then serve `site/` (preview config `assist-tasks`, port 4330).
 
+## 22 Nov · new sitter signs up on their own (Ahmad, direction A)
+
+`/sitter-profile/?flow=new&s=start` at sprout.app/sitter, web only: Babysit for Sprout families → Sign up with your
+number (number + text code, the number is the account) → photo and name → area → What you offer (rate, ages, CPR /
+first aid, intro; new step, editable later) → how you get paid (/pay/ in profile mode) → profile live with "New on
+Sprout" and "How families find you" (copy profile link). Visibility stays per family (Tony, 20 Nov): families see a
+sitter only when a parent they sat for, or a class parent, shares them. `/sitter-signup/` shows this as row 1 and
+the invited-by-a-family flow as row 2.
+
 ## 22 Nov · sitter profile: same pay setup + log in by number (Ahmad)
 
 `/sitter-profile/`: the old "Add your bank on Stripe" step is now "How do you want to get paid?" → Set up how you
