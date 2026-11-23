@@ -214,13 +214,15 @@ function whenCard(p, { mode = 'sitter', preset, canContinue } = {}){
   });
 }
 
-/* ---------- which kids (A): photo rows, tint when on, all on ---------- */
+/* ---------- which kids: one line of photo chips, all on ----------
+   Ahmad, 22 Nov: same as the playdate (P1). Tall rows with the class grew a row per kid, so four kids pushed the
+   button off screen; the chips stay on one line and scroll sideways. No class label (Tony, P1). */
 function kidsCard(p, cur, { birthday = false } = {}){
   return new Promise(res => {
     const c = p.block(`<div class="card"><div class="ctop">${clay('two-people')}<div><div class="eyebrow">${birthday ? 'Birthday party' : 'Sitter'}</div><div class="ttl">${birthday ? 'Whose birthday is it?' : 'Who is the sitter for?'}</div></div></div>
-      <div class="ua-rows">${KIDS.map(k => `<button class="ua-row${!cur || cur.some(c => c.n === k.n) ? ' on' : ''}" data-n="${k.n}"><span class="uaph" style="background-image:url(${k.img})"></span><span class="tx"><b>${k.n}</b><small>${k.age} · ${k.cls}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button>`).join('')}</div>
+      <div class="pd-kids" role="group" style="margin-top:12px">${KIDS.map(k => `<button type="button" class="pd-kid${!birthday && (!cur || cur.some(c => c.n === k.n)) ? ' on' : ''}" data-n="${k.n}"><span class="uaph" style="background-image:url(${k.img})"></span>${k.n}<i class="ph-bold ph-check"></i></button>`).join('')}</div>
       <button class="btn" style="margin-top:14px">Next · Maya and Jake</button></div>`).querySelector('.card');
-    const btn = c.querySelector('.btn'), picks = [...c.querySelectorAll('.ua-row')];
+    const btn = c.querySelector('.btn'), picks = [...c.querySelectorAll('.pd-kid')];
     const names = () => picks.filter(x => x.classList.contains('on')).map(x => x.dataset.n);
     const paint = () => {
       const n = names();
