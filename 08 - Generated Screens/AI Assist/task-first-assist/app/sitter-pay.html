@@ -178,6 +178,8 @@
   });
   $('[data-finish]').onclick = () => {
     if ($('[data-finish]').disabled) return;
+    /* tells Tony's Sprout (same site, any tab): set up, bank or card. No bank name or numbers go to Tony. */
+    if (q.get('l') && 'BroadcastChannel' in window) { const ch = new BroadcastChannel('sprout-pay-' + q.get('l')); ch.postMessage({ t:'payout', n:b.n, way }); setTimeout(() => ch.close(), 500); }
     $('[data-when-paid]').textContent = way === 'bank'
       ? `When ${dayword} is done, Tony pays you in Sprout. It goes to ${bank} ••••6789 in 1–2 business days.`
       : `When ${dayword} is done, Tony pays you in Sprout. It goes to your debit card ••••4821, usually within minutes.`;

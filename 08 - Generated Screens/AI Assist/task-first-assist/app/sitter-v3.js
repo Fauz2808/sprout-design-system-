@@ -76,7 +76,7 @@ const AV = g => `${A}sitters/${g === 'm' ? 'man' : 'woman'}.webp`;   // 3D clay 
 const clay = n => `<span class="clayico" style="background-image:url(${A}clay/${n}.png)"></span>`;
 const SAVED = [
   { n:'Alex', ch:'Messages', phone:'(512) 555-0114', venmo:'@alex-rivera', times5:4, rate:25, by:'Saved by you', times:'Sat for you 4 times', photo:AV('f') },
-  { n:'Sam', ch:'Messages', phone:'(512) 555-0127', venmo:'@sam-okafor', rate:28, by:'Saved by Dana', times:'Sat for you twice', photo:AV('m') },
+  { n:'Sam', ch:'Messages', phone:'(512) 555-0127', venmo:'@sam-okafor', rate:28, by:'Saved by Dana', times:'Sat for you twice', photo:AV('m'), payout:{ way:'bank' } },   // set up on an earlier booking
   { n:'Riley', ch:'Messages', phone:'(512) 555-0136', rate:24, by:'Saved by you', times:'Sat for you once', photo:AV('f'), cant:true },
 ];
 const CLASS_SITTERS = [
@@ -513,17 +513,42 @@ function smsIn(p, s, w){
    ("they'll have some extra time... it's not like, I'm looking last minute"). Only if they haven't set it up yet.
    Bank details go to Stripe; the link opens the sitter's web profile (no app). */
 const PAY_KIDS = {};
+/* Ahmad, 22 Nov: where a sitter gets paid belongs to the sitter's own Sprout account (their number), not to one
+   family. Every sitter sets it up once, the first time anyone books them; after that no family asks again. Tony
+   only ever sees that it's set up and whether it's a bank or a debit card, never the details (they go to Stripe). */
+const payoutKind = who => who.payout && who.payout.way === 'card' ? 'a debit card' : 'a bank account';
+const payoutFact = who => who.payout ? `<i class="ph ph-bank"></i>${who.n} gets paid in Sprout · ${payoutKind(who)} is set up`
+  : `<i class="ph ph-hourglass-medium"></i>Waiting on ${who.n} to add where to get paid`;
+const payoutFoot = who => who.payout ? `<i class="ph ph-bank"></i>Through Sprout: to ${who.n}’s ${payoutKind(who).slice(2)}, ${who.payout.way === 'card' ? 'usually within minutes' : 'in 1–2 days'}`
+  : `<i class="ph ph-hourglass-medium"></i>${who.n} hasn’t added where to get paid yet. Sprout holds it and texts ${pro(who, 'obj')}; it lands once they do.`;
 async function payoutLink(p, who, w){
-  if (who.payout) return;
+  if (who.payout) {
+    p.note(`${who.n} is already set up to get paid`, `${payoutKind(who).replace(/^./, x => x.toUpperCase())}, saved on ${pro(who, 'obj') === 'him' ? 'his' : 'her'} Sprout account. No link needed`, 'ph-bank');
+    return;
+  }
   const job = p.work(`Asking ${who.n} where to get paid`, 'Only once. After that, paying is one tap');
   await sleep(900);
   job.done(`Sent ${who.n} a payout link`, 'Their bank details go to Stripe, not to you or Sprout', 'ph-bank');
   /* Ahmad, 22 Nov (A): the link opens the booking-first payout page (/pay/), with this booking */
-  const href = '/pay/?' + new URLSearchParams({ n:who.n, d:w.day.day, t:range(w.from, w.to), r:who.rate || 25, h:(w.to - w.from) / 60, k:kidsShort(PAY_KIDS.kids || KIDS) });
+  const pid = Math.random().toString(36).slice(2, 8);
+  const href = '/pay/?' + new URLSearchParams({ n:who.n, d:w.day.day, t:range(w.from, w.to), r:who.rate || 25, h:(w.to - w.from) / 60, k:kidsShort(PAY_KIDS.kids || KIDS), l:pid });
+  /* when the sitter finishes /pay/ (any tab, same site), Tony's phone hears it: a note, a ping, the status lines */
+  if ('BroadcastChannel' in window) {
+    const ch = new BroadcastChannel('sprout-pay-' + pid);
+    ch.onmessage = e => {
+      if (e.data?.t !== 'payout') return;
+      ch.close();
+      who.payout = { way:e.data.way }; remember({ ...who });
+      document.querySelectorAll(`[data-payout="${who.n}"]`).forEach(x => x.innerHTML = payoutFact(who));
+      document.querySelectorAll(`[data-payout-foot="${who.n}"]`).forEach(x => x.innerHTML = payoutFoot(who));
+      p.note(`${who.n} added where to get paid`, `${payoutKind(who).replace(/^./, x => x.toUpperCase())}, through Stripe. Paying ${pro(who, 'obj')} is one tap now`, 'ph-bank');
+      X.notify(p, `${who.n} can be paid in Sprout`, `Added ${payoutKind(who)}`);
+      p.scroll();
+    };
+  }
   const b = p.block(`<div class="preview gtx"><small>Group text · ${groupWho(who)}</small><p></p><a class="gtx-link" href="${href}" target="_blank" rel="noopener">sprout.app/pay/${who.n.toLowerCase()}</a></div>`);
   b.querySelector('p').textContent = `${who.n}, so Tony can pay you through Sprout after ${w.day.long.split(',')[0]}, add where you’d like to get paid. Takes 2 minutes, and you only do it once:`;
   liveSay(who, `${b.querySelector('p').textContent} sprout.app/pay/${who.n.toLowerCase()}`, 'Sprout', href);
-  remember({ ...who, payout:true }); who.payout = true;
 }
 async function sendAndBook(p, asked, w, kids, { pick } = {}){
   PAY_KIDS.kids = kids;
@@ -647,6 +672,7 @@ async function sendAndBook(p, asked, w, kids, { pick } = {}){
     ${pick ? `<div class="fact" style="margin-top:10px"><i class="ph ph-fork-knife"></i>${pick.place.n} · ${pick.time} · table for 2</div>` : ''}
     <div class="fact"><i class="ph ph-users"></i>${joinNames(kids.map(k => k.n))}</div>
     <div class="fact"><i class="ph ph-map-pin"></i>${FAMILY.address}</div>
+    <div class="fact" data-payout="${who.n}">${payoutFact(who)}</div>
     <div class="fact"><i class="ph ph-calendar-check"></i>${pick ? 'On the family calendar' : `“${who.n}’s babysitting” on the family calendar`} · Dana has it too</div>
     <div class="fact"><i class="ph ph-bell-ringing"></i>Reminder for you both at ${tl(w.from - 30)}, then the evening on your lock screens</div></div>`);
   p.set(`Booked · ${pick ? pick.place.n + ' ' + pick.time + ' · ' : ''}${who.n} ${range(w.from, w.to)}`, { when:w.day.short, done:false });
@@ -760,7 +786,7 @@ function payCard(p, who, w, H){
       <div class="line" data-tl><span>Tip</span><span data-v2></span></div>
       <div class="total"><span>Total</span><span data-tot></span></div>
       <button class="cardrow" data-card style="width:100%;text-align:left;background:transparent"><i class="ph ph-credit-card" style="font-size:20px"></i><div><span class="cl">${card.label}</span><small class="cs">${card.sub}</small></div><i class="ph ph-caret-right"></i></button>
-      <div class="foot"><i class="ph ph-bank"></i>Through Sprout: in ${who.n}’s bank in 1–2 days</div>
+      <div class="foot" data-payout-foot="${who.n}">${payoutFoot(MY.find(x => x.n === who.n) || who)}</div>
       <button class="btn" data-pay style="margin-top:12px"></button>
       <button class="textbtn" data-other style="display:block;margin:10px auto 0">Already paid (cash or Venmo)</button></div>`).querySelector('.card');
     const money = n => '$' + (Math.round(n * 100) / 100).toFixed(2);
