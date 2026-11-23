@@ -995,12 +995,20 @@ X.flows.club = async p => {
 /* ======================= review links + deep links ======================= */
 /* L2 (Tony, 19 Nov: "what's the point of all these links?"): every link starts its flow from the beginning */
 /* M2 (Tony, 19 Nov chat): only the 8 home flows. The other review states stay reachable by their URL. */
-const LINKS = [['/assist/', 'Sprout Assist home'], ['/playdate/', 'Playdate'], ['/book-a-sitter-saved/', 'Book a sitter'],
-  ['/plan-a-date-night/', 'Date night'], ['/birthdays/', 'Birthday'], ['/sports/', 'Sports · SSC Kids'], ['/after-school/', 'After school'], ['/summer-camps/', 'Camps'], ['/tutoring/', 'Tutoring'],
-  ['/review/', 'All 8 flows on one page']];
+/* Ahmad, 22 Nov: "a clear navigation here to all of our update". Three groups: the parent's flows in the app, the
+   other person's side (other parent, sitter), and the review pages. New = changed since the 21 Nov update to Tony. */
+const NAV = [
+  ['In the app', [['/assist/', 'Sprout Assist home'], ['/playdate/', 'Playdate', 1], ['/book-a-sitter-saved/', 'Book a sitter', 1], ['/plan-carpool/', 'Carpool', 1],
+    ['/plan-a-date-night/', 'Date night'], ['/birthdays/', 'Birthday', 1], ['/sports/', 'Sports · SSC Kids'], ['/after-school/', 'After school'], ['/summer-camps/', 'Camps'], ['/tutoring/', 'Tutoring']]],
+  ['The other side', [['/other-side/', 'Both sides of a request', 1], ['/sitter-signup/', 'Sitter sign-up, start to finish', 1], ['/pay/?n=Alex', 'Sitter pay link', 1],
+    ['/sitter-profile/?s=login', 'Sitter log in', 1], ['/date-night-live/', 'Lock screen · Live Activity', 1]]],
+  ['Review pages', [['/review/', 'All 8 flows on one page']]],
+];
 const route = location.pathname.split('/').filter(Boolean)[0] || '';
 const review = new URLSearchParams(location.search).get('review');
-$('#deskLinks').innerHTML = LINKS.map(([h, t]) => `<li><a href="${h}"${('/' + route + '/').replace('//', '/') === h ? ' aria-current="page"' : ''}>${t}</a></li>`).join('');
+const here = ('/' + route + '/').replace('//', '/');
+$('#deskLinks').innerHTML = NAV.map(([group, links]) => `<li class="dk-h">${group}</li>` + links.map(([h, t, isNew]) =>
+  `<li><a href="${h}"${here === h ? ' aria-current="page"' : ''}>${t}</a>${isNew ? '<span class="dk-new">New</span>' : ''}</li>`).join('')).join('');
 const ROUTE = {
   assist: () => { X.showHome(); X.openSheet(); },
   sports: () => X.start('sports', { echo:'Sports leagues' }), 'summer-camps': () => X.start('camps', { echo:'Summer camps' }),
