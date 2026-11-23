@@ -535,7 +535,7 @@ async function payoutLink(p, who, w){
   job.done(`Sent ${who.n} a payout link`, 'Their bank details go to Stripe, not to you or Sprout', 'ph-bank');
   /* Ahmad, 22 Nov (A): the link opens the booking-first payout page (/pay/), with this booking */
   const pid = Math.random().toString(36).slice(2, 8);
-  const href = '/pay/?' + new URLSearchParams({ n:who.n, d:w.day.day, t:range(w.from, w.to), r:who.rate || 25, h:(w.to - w.from) / 60, k:kidsShort(PAY_KIDS.kids || KIDS), l:pid });
+  const href = '/pay/?' + new URLSearchParams({ n:who.n, d:w.day.day, t:range(w.from, w.to), r:who.rate || 25, h:(w.to - w.from) / 60, k:kidsShort(PAY_KIDS.kids || KIDS), l:pid, ...(who.phone ? { p:who.phone } : {}) });
   /* when the sitter finishes /pay/ (any tab, same site), Tony's phone hears it: a note, a ping, the status lines */
   if ('BroadcastChannel' in window) {
     const ch = new BroadcastChannel('sprout-pay-' + pid);

@@ -13,6 +13,10 @@ Picked: Venmo, Zelle, Cash App, PayPal, cash, next to Sprout.
   the rating. A sitter who isn't in Sprout has no Pay button, only their ways. Payments outside Sprout are only
   known because Tony taps them.
 - Demo: Sam is set up with Sprout, Venmo (@sam-okafor) and cash.
+- Ahmad, 22 Nov: "like how Upwork does it... sign in to PayPal and it's integrated". PayPal = Connect with PayPal
+  (mock sign-in, then consent: name and email, can pay you, can't take money out). Venmo and Zelle have no sign-in
+  for other apps; both pay to a phone number, so they default to the sitter's number from the text (one tap,
+  Change to use another). Cash App has no sign-in either, so the $cashtag stays typed.
 - Fixed with it: the clock's Live Activity for a booking made today said "arrives in 1200 min" (negative minutes).
 
 ## 22 Nov · sitter payout page, booking first (Ahmad, direction A)

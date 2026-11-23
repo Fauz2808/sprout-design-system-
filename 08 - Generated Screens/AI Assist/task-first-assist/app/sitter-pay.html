@@ -57,6 +57,31 @@
   .handle span{display:block;font-size:12.5px;color:var(--subtle);margin-bottom:4px}
   .handle input{width:100%;padding:11px 12px;border-radius:12px;border:0;background:var(--field);outline:none;font-size:15px;color:var(--strong)}
   .handle input:focus{outline:2px solid var(--brand)}
+  /* Ahmad, 22 Nov: PayPal connects by signing in (like Upwork); Venmo and Zelle use the number Sprout already has */
+  .way{margin-top:10px;padding:12px;border-radius:14px;background:var(--field)}
+  .way>b{display:block;font:600 13px var(--sans);color:var(--strong);margin-bottom:6px}
+  .connect{width:100%;padding:12px;border-radius:999px;background:#1d2a22;color:#fff;font:600 15px var(--sans)}
+  .linked{display:flex;align-items:center;gap:10px;font-size:14.5px;color:var(--strong)}
+  .linked i{font-size:20px;color:var(--brand)}
+  .linked small{display:block;color:var(--subtle);font-size:12.5px}
+  .linked button{margin-left:auto;font:600 13px var(--sans);color:var(--brand)}
+  .way input{width:100%;margin-top:8px;padding:11px 12px;border-radius:12px;border:0;background:#fff;outline:none;font-size:15px;color:var(--strong)}
+  .way input:focus{outline:2px solid var(--brand)}
+  .sheet{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.35);animation:fade .2s both}
+  .sheet .box{width:100%;max-width:440px;background:#fff;border-radius:22px 22px 0 0;padding:18px 18px 28px;animation:up .28s cubic-bezier(.2,.9,.25,1) both;font-family:var(--sans);color:#222}
+  .sheet .bar{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#666;margin-bottom:14px}
+  .sheet .bar b{font:700 18px var(--sans);color:#222}
+  .sheet h2{font:600 19px var(--sans);margin:0 0 4px}
+  .sheet p{margin:0 0 12px;font-size:14px;color:#555}
+  .sheet .f{display:block;margin-top:10px}
+  .sheet .f span{display:block;font-size:12.5px;color:#666;margin-bottom:4px}
+  .sheet .f div{padding:12px;border-radius:10px;border:1.5px solid #dcdce3;font-size:15px}
+  .sheet .go{width:100%;margin-top:16px;padding:14px;border-radius:999px;background:#222;color:#fff;font:600 16px var(--sans)}
+  .sheet .no{display:block;margin:10px auto 0;font:500 14px var(--sans);color:#555}
+  .sheet ul{margin:6px 0 0;padding:0 0 0 18px;font-size:14px;color:#333}
+  .sheet li{margin:6px 0}
+  .sheet .note{margin-top:14px;font-size:12px;color:#888}
+  @keyframes fade{from{opacity:0}}@keyframes up{from{transform:translateY(40px);opacity:0}}
   .sum{margin:12px 0 0;padding:0;list-style:none}
   .sum li{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--soft);font-size:15px;color:var(--strong)}
   .sum li:first-child{border-top:0}
@@ -124,7 +149,7 @@
     </div>
     <div class="handles" data-handles></div>
     <button type="button" class="send" data-go>Continue</button>
-    <p class="priv"><i class="ph ph-shield-check"></i>Bank and card details go to Stripe, Sprout’s payment partner; Tony never sees them. Your app usernames are shown to families who book you, so they can pay you there.</p>
+    <p class="priv"><i class="ph ph-shield-check"></i>Bank and card details go to Stripe, Sprout’s payment partner; Tony never sees them. Families who book you see where to pay you in the apps you pick (your PayPal email, the number for Venmo and Zelle).</p>
   </section>
 
   <!-- 2 · the payment partner (mock) -->
@@ -186,23 +211,64 @@
   document.title = `Get paid · ${b.n} · Sprout`;
 
   let way = 'bank', bank = null;
-  const APPS = { venmo:{ n:'Venmo', ph:'@username', lab:'Venmo username' }, zelle:{ n:'Zelle', ph:'Phone or email', lab:'Zelle phone or email' },
-    cashapp:{ n:'Cash App', ph:'$cashtag', lab:'Cash App $cashtag' }, paypal:{ n:'PayPal', ph:'Email or @name', lab:'PayPal email or @name' }, cash:{ n:'Cash' } };
+  /* how each one gets set up: PayPal signs in (its real "Log in with PayPal" connect, like Upwork); Venmo and Zelle
+     send to a phone number, and Sprout already has the sitter's from the text, so it's one tap; Cash App has no
+     sign-in for other apps, so the $cashtag is typed; cash needs nothing. */
+  const phone = q.get('p') || '(512) 555-0114', email = `${b.n.toLowerCase()}.sits@email.com`;
+  const APPS = { venmo:{ n:'Venmo', how:'phone' }, zelle:{ n:'Zelle', how:'phone' },
+    cashapp:{ n:'Cash App', ph:'$cashtag', lab:'Cash App $cashtag' }, paypal:{ n:'PayPal', how:'connect' }, cash:{ n:'Cash' } };
+  const connected = {}, other = {};
   const ORDER = ['venmo', 'zelle', 'cashapp', 'paypal', 'cash'];
   const picked = new Set(), handles = {};
-  const apps = () => ORDER.filter(k => picked.has(k)).map(k => ({ k, n:APPS[k].n, h:(handles[k] || '').trim() }));
-  const ready = () => way !== 'none' || picked.size > 0;
-  const paintGo = () => { const go = $('[data-go]'); go.disabled = !ready(); go.textContent = !ready() ? 'Pick at least one way' : way === 'none' ? 'Finish' : 'Continue'; };
+  const handleOf = k => APPS[k].how === 'connect' ? connected[k] || '' : APPS[k].how === 'phone' ? (other[k] != null ? other[k] : phone) : (handles[k] || '');
+  const apps = () => ORDER.filter(k => picked.has(k)).map(k => ({ k, n:APPS[k].n, h:String(handleOf(k)).trim() }));
+  const waiting = () => ORDER.filter(k => picked.has(k) && APPS[k].how === 'connect' && !connected[k]);
+  const ready = () => (way !== 'none' || picked.size > 0) && !waiting().length;
+  const paintGo = () => { const go = $('[data-go]'); go.disabled = !ready(); go.textContent = waiting().length ? `Connect ${APPS[waiting()[0]].n} first` : !(way !== 'none' || picked.size) ? 'Pick at least one way' : way === 'none' ? 'Finish' : 'Continue'; };
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
   const paintHandles = () => {
     const box = $('[data-handles]');
-    box.innerHTML = ORDER.filter(k => picked.has(k) && APPS[k].ph).map(k => `<label class="handle"><span>${APPS[k].lab}</span><input data-h="${k}" placeholder="${APPS[k].ph}" autocomplete="off" value="${(handles[k] || '').replace(/"/g, '&quot;')}"></label>`).join('');
+    box.innerHTML = ORDER.filter(k => picked.has(k) && k !== 'cash').map(k => {
+      const a = APPS[k];
+      if (a.how === 'connect') return `<div class="way"><b>${a.n}</b>${connected[k]
+        ? `<div class="linked"><i class="ph-fill ph-check-circle"></i><span>Connected<small>${esc(connected[k])}</small></span><button type="button" data-unlink="${k}">Disconnect</button></div>`
+        : `<button type="button" class="connect" data-connect="${k}">Connect with ${a.n}</button>`}</div>`;
+      if (a.how === 'phone') return `<div class="way"><b>${a.n}</b>${other[k] == null
+        ? `<div class="linked"><i class="ph ph-device-mobile"></i><span>${esc(phone)}<small>The number this text came to</small></span><button type="button" data-other-num="${k}">Change</button></div>`
+        : `<input data-h-other="${k}" placeholder="Phone or email on ${a.n}" autocomplete="off" value="${esc(other[k])}">`}</div>`;
+      return `<label class="handle"><span>${a.lab}</span><input data-h="${k}" placeholder="${a.ph}" autocomplete="off" value="${esc(handles[k] || '')}"></label>`;
+    }).join('');
     box.querySelectorAll('[data-h]').forEach(i => i.oninput = () => { handles[i.dataset.h] = i.value; });
+    box.querySelectorAll('[data-h-other]').forEach(i => i.oninput = () => { other[i.dataset.hOther] = i.value; });
+    box.querySelectorAll('[data-other-num]').forEach(btn => btn.onclick = () => { other[btn.dataset.otherNum] = ''; paintHandles(); box.querySelector(`[data-h-other="${btn.dataset.otherNum}"]`)?.focus(); });
+    box.querySelectorAll('[data-unlink]').forEach(btn => btn.onclick = () => { delete connected[btn.dataset.unlink]; paintHandles(); paintGo(); });
+    box.querySelectorAll('[data-connect]').forEach(btn => btn.onclick = () => signIn(btn.dataset.connect));
+  };
+  /* the PayPal sign-in, then the consent; in the app this is PayPal's own page, opened from here */
+  const signIn = k => {
+    const a = APPS[k], sh = document.createElement('div');
+    sh.className = 'sheet';
+    const step = html => { sh.innerHTML = `<div class="box" role="dialog" aria-label="${a.n} sign in"><div class="bar"><b>${a.n}</b><span><i class="ph ph-lock-simple"></i> ${a.n.toLowerCase()}.com</span></div>${html}</div>`; };
+    const close = () => sh.remove();
+    step(`<h2>Log in to connect to Sprout</h2><p>Sprout sends ${esc(b.n)}’s pay here when a family pays with ${a.n}.</p>
+      <label class="f"><span>Email</span><div>${esc(email)}</div></label><label class="f"><span>Password</span><div>••••••••••</div></label>
+      <button type="button" class="go" data-login>Log in</button><button type="button" class="no" data-cancel>Cancel</button>
+      <p class="note">Prototype: nothing is sent. In the app this is ${a.n}’s own sign-in page.</p>`);
+    document.body.append(sh);
+    sh.onclick = e => { if (e.target === sh || e.target.closest('[data-cancel]')) close(); };
+    sh.querySelector('[data-login]').onclick = () => {
+      step(`<h2>Connect ${a.n} to Sprout?</h2><p>Signed in as ${esc(email)}</p>
+        <ul><li>Sprout can see your name and email</li><li>Families who book you through Sprout can pay you here</li><li>Sprout can’t take money out or see your balance</li></ul>
+        <button type="button" class="go" data-agree>Agree and connect</button><button type="button" class="no" data-cancel>Cancel</button>`);
+      sh.querySelector('[data-agree]').onclick = () => { connected[k] = email; close(); paintHandles(); paintGo(); };
+    };
   };
   $$('[data-app]').forEach(btn => btn.onclick = () => {
     const k = btn.dataset.app; picked.has(k) ? picked.delete(k) : picked.add(k);
     btn.classList.toggle('on', picked.has(k)); btn.setAttribute('aria-pressed', picked.has(k));
     paintHandles(); paintGo();
     if (picked.has(k) && APPS[k].ph) $(`[data-h="${k}"]`)?.focus();
+    if (picked.has(k) && APPS[k].how === 'connect' && !connected[k]) signIn(k);   // tapping PayPal goes straight to its sign-in
   });
   const finishDone = () => {
     const list = [];
