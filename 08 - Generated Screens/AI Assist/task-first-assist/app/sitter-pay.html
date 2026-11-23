@@ -347,6 +347,10 @@
     paintGo(); show('others');
   };
   $('[data-skip]').onclick = () => { way = 'none'; toOthers(); };
+  /* review (/sitter-signup/): ?step=stripe or ?step=others opens that screen, as after picking Sprout + Chase */
+  const startAt = q.get('step');
+  if (startAt === 'stripe') toStripe();
+  if (startAt === 'others') { bank = 'Chase'; way = 'bank'; toOthers(); }
   $('[data-go]').onclick = () => {
     if (!ready()) return;
     if (way === 'none') $('[data-when-paid]').textContent = `When ${dayword} is done, Tony picks one of these and pays you there.`;

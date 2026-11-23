@@ -126,7 +126,7 @@
     <div class="cmp-thread received"><div><small>Sprout</small><div class="cmp-bub">Great, you’re booked! Sat, Aug 1, 6:30–10 PM for Maya (7) and Jake (5). We’re at 10212 Banks Court, Austin. See you then! Sprout, for Tony</div></div></div>
     <div class="cmp-thread"><div class="cmp-bub">Thanks, see you Saturday!</div></div>
     <p class="morning">Sunday, Aug 2 · Morning</p>
-    <div class="cmp-thread received"><div><small>Sprout</small><div class="cmp-bub">Hi Jordan, it's Sprout. Want more bookings from Lincoln families? Make a free sitter profile in 2 minutes: <a href="/sitter-profile/">joinsprout.co/s/jordan</a>.</div></div></div>
+    <div class="cmp-thread received"><div><small>Sprout</small><div class="cmp-bub">Hi Jordan, it's Sprout. Want more bookings from Lincoln families? Make a free sitter profile in 2 minutes: <a href="/sitter-profile/?s=name">joinsprout.co/s/jordan</a>.</div></div></div>
   </section>
 
   <form class="card" data-step="name" hidden>
@@ -221,18 +221,22 @@
 <script>
   const $ = s => document.querySelector(s);
   const screens = [...document.querySelectorAll('[data-step]')];
-  const requested = new URLSearchParams(location.search).get('s');
+  const params = new URLSearchParams(location.search), requested = params.get('s');
+  /* review helpers (/sitter-signup/): ?fresh=1 forgets this browser's demo sitter, so the sign-up runs from the
+     start; ?pay=demo shows a sample setup on the profile instead of what this browser saved */
+  const demoPay = params.get('pay') === 'demo';
+  if (params.get('fresh') === '1') { try { Object.keys(localStorage).filter(k => k.startsWith('sprout:sitter')).forEach(k => localStorage.removeItem(k)); } catch {} }
   const initial = screens.some(el => el.dataset.step === requested) ? requested : 'name';
   const profileForm = $('[data-step="name"]');
   const areaForm = $('[data-step="area"]');
   const photoInput = $('#photo');
   const storageKey = 'sprout:sitter-profile';
   /* the text thread already gave us Jordan's first name, number and app (iMessage); the photo starts empty */
-  const defaults = { first:'Jordan', last:'', phone:'(512) 555-0148', channel:'iMessage', area:'78739', miles:10, photo:initial === 'done' ? '/assets/sitters/man.webp' : '', paid:initial === 'done' };
+  const defaults = { first:'Jordan', last:demoPay ? 'Reyes' : '', phone:'(512) 555-0148', channel:'iMessage', area:'78739', miles:10, photo:initial === 'done' ? '/assets/sitters/man.webp' : '', paid:initial === 'done' };
   const readProfile = () => {
     try { return JSON.parse(localStorage.getItem(storageKey)); } catch { return null; }
   };
-  const saved = !requested || initial === 'done' ? readProfile() : null;
+  const saved = demoPay ? null : !requested || initial === 'done' ? readProfile() : null;
   let state = { ...defaults, ...saved };
   let editing = false;
   let draftPhoto = state.photo;
@@ -405,7 +409,8 @@
   /* Ahmad, 22 Nov: payments = the /pay/ setup (saved per sitter by /pay/), shown on the profile with Change */
   const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
   const payKey = () => 'sprout:sitter-pay:' + (state.first || 'jordan').toLowerCase();
-  const readPay = () => { try { return JSON.parse(localStorage.getItem(payKey())); } catch { return null; } };
+  const readPay = () => demoPay ? { way:'bank', bank:'Chase', apps:[{ k:'venmo', n:'Venmo', h:'(512) 555-0148' }, { k:'paypal', n:'PayPal', h:'jordan.sits@email.com' }, { k:'cash', n:'Cash', h:'' }] }
+    : (() => { try { return JSON.parse(localStorage.getItem(payKey())); } catch { return null; } })();
   function paintPay(){
     const pay = readPay(), rows = [];
     if (pay && pay.way && pay.way !== 'none') rows.push(`<li><i class="ph ph-bank"></i>Sprout<small>${pay.way === 'bank' ? `${esc(pay.bank || 'Bank')} ••••6789` : 'Debit card ••••4821'}</small></li>`);

@@ -74,6 +74,9 @@ if (APP / 'sprout-map.html').exists():   # I1 (17 Nov): whole-Sprout map; data i
 # Ahmad, 22 Nov (A): the payout link Sprout texts a booked sitter, booking first
 (SITE / 'pay').mkdir(exist_ok=True)
 (SITE / 'pay' / 'index.html').write_text((APP / 'sitter-pay.html').read_text())
+# Ahmad, 22 Nov: the whole sitter sign-up side by side, for review
+(SITE / 'sitter-signup').mkdir(exist_ok=True)
+(SITE / 'sitter-signup' / 'index.html').write_text((APP / 'sitter-signup.html').read_text())
 (SITE / 'ui-directions').mkdir(exist_ok=True)
 (SITE / 'ui-directions' / 'index.html').write_text((APP / 'ui-review.html').read_text())
 # K1 (18 Nov): Assist home, Uber-style services grid, current vs A vs B
