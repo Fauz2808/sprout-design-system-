@@ -76,7 +76,7 @@ const AV = g => `${A}sitters/${g === 'm' ? 'man' : 'woman'}.webp`;   // 3D clay 
 const clay = n => `<span class="clayico" style="background-image:url(${A}clay/${n}.png)"></span>`;
 const SAVED = [
   { n:'Alex', ch:'Messages', phone:'(512) 555-0114', venmo:'@alex-rivera', times5:4, rate:25, by:'Saved by you', times:'Sat for you 4 times', photo:AV('f') },
-  { n:'Sam', ch:'Messages', phone:'(512) 555-0127', venmo:'@sam-okafor', rate:28, by:'Saved by Dana', times:'Sat for you twice', photo:AV('m'), payout:{ way:'bank' } },   // set up on an earlier booking
+  { n:'Sam', ch:'Messages', phone:'(512) 555-0127', venmo:'@sam-okafor', rate:28, by:'Saved by Dana', times:'Sat for you twice', photo:AV('m'), payout:{ way:'bank', apps:[{ k:'venmo', n:'Venmo', h:'@sam-okafor' }, { k:'cash', n:'Cash', h:'' }] } },   // set up on an earlier booking
   { n:'Riley', ch:'Messages', phone:'(512) 555-0136', rate:24, by:'Saved by you', times:'Sat for you once', photo:AV('f'), cant:true },
 ];
 const CLASS_SITTERS = [
@@ -517,13 +517,17 @@ const PAY_KIDS = {};
    family. Every sitter sets it up once, the first time anyone books them; after that no family asks again. Tony
    only ever sees that it's set up and whether it's a bank or a debit card, never the details (they go to Stripe). */
 const payoutKind = who => who.payout && who.payout.way === 'card' ? 'a debit card' : 'a bank account';
-const payoutFact = who => who.payout ? `<i class="ph ph-bank"></i>${who.n} gets paid in Sprout · ${payoutKind(who)} is set up`
+/* Ahmad, 22 Nov: a sitter can also take Venmo, Zelle, Cash App, PayPal or cash, so the family has choices */
+const inSprout = who => who.payout && who.payout.way !== 'none';
+const payoutWays = who => [...(inSprout(who) ? ['Sprout'] : []), ...((who.payout && who.payout.apps) || []).map(a => a.n)];
+const payoutFact = who => who.payout ? `<i class="ph ph-bank"></i>${who.n} takes ${joinNames(payoutWays(who))}${inSprout(who) ? ` · ${payoutKind(who)} set up` : ''}`
   : `<i class="ph ph-hourglass-medium"></i>Waiting on ${who.n} to add where to get paid`;
-const payoutFoot = who => who.payout ? `<i class="ph ph-bank"></i>Through Sprout: to ${who.n}’s ${payoutKind(who).slice(2)}, ${who.payout.way === 'card' ? 'usually within minutes' : 'in 1–2 days'}`
-  : `<i class="ph ph-hourglass-medium"></i>${who.n} hasn’t added where to get paid yet. Sprout holds it and texts ${pro(who, 'obj')}; it lands once they do.`;
+const payoutFoot = who => !who.payout ? `<i class="ph ph-hourglass-medium"></i>${who.n} hasn’t added where to get paid yet. Sprout holds it and texts ${pro(who, 'obj')}; it lands once they do.`
+  : inSprout(who) ? `<i class="ph ph-bank"></i>Through Sprout: to ${who.n}’s ${payoutKind(who).slice(2)}, ${who.payout.way === 'card' ? 'usually within minutes' : 'in 1–2 days'}`
+  : `<i class="ph ph-info"></i>${who.n} doesn’t take payments in Sprout. Pick a way below`;
 async function payoutLink(p, who, w){
   if (who.payout) {
-    p.note(`${who.n} is already set up to get paid`, `${payoutKind(who).replace(/^./, x => x.toUpperCase())}, saved on ${pro(who, 'obj') === 'him' ? 'his' : 'her'} Sprout account. No link needed`, 'ph-bank');
+    p.note(`${who.n} is already set up to get paid`, `Takes ${joinNames(payoutWays(who))}, saved on ${pro(who, 'obj') === 'him' ? 'his' : 'her'} Sprout account. No link needed`, 'ph-bank');
     return;
   }
   const job = p.work(`Asking ${who.n} where to get paid`, 'Only once. After that, paying is one tap');
@@ -538,11 +542,11 @@ async function payoutLink(p, who, w){
     ch.onmessage = e => {
       if (e.data?.t !== 'payout') return;
       ch.close();
-      who.payout = { way:e.data.way }; remember({ ...who });
+      who.payout = { way:e.data.way, apps:e.data.apps || [] }; remember({ ...who });
       document.querySelectorAll(`[data-payout="${who.n}"]`).forEach(x => x.innerHTML = payoutFact(who));
       document.querySelectorAll(`[data-payout-foot="${who.n}"]`).forEach(x => x.innerHTML = payoutFoot(who));
-      p.note(`${who.n} added where to get paid`, `${payoutKind(who).replace(/^./, x => x.toUpperCase())}, through Stripe. Paying ${pro(who, 'obj')} is one tap now`, 'ph-bank');
-      X.notify(p, `${who.n} can be paid in Sprout`, `Added ${payoutKind(who)}`);
+      p.note(`${who.n} added where to get paid`, `Takes ${joinNames(payoutWays(who))}${inSprout(who) ? `. In Sprout it goes to ${payoutKind(who)} through Stripe` : ''}`, 'ph-bank');
+      X.notify(p, `${who.n} added where to get paid`, `Takes ${joinNames(payoutWays(who))}`);
       p.scroll();
     };
   }
@@ -788,7 +792,17 @@ function payCard(p, who, w, H){
       <button class="cardrow" data-card style="width:100%;text-align:left;background:transparent"><i class="ph ph-credit-card" style="font-size:20px"></i><div><span class="cl">${card.label}</span><small class="cs">${card.sub}</small></div><i class="ph ph-caret-right"></i></button>
       <div class="foot" data-payout-foot="${who.n}">${payoutFoot(MY.find(x => x.n === who.n) || who)}</div>
       <button class="btn" data-pay style="margin-top:12px"></button>
+      <div data-alt></div>
       <button class="textbtn" data-other style="display:block;margin:10px auto 0">Already paid (cash or Venmo)</button></div>`).querySelector('.card');
+    /* Ahmad, 22 Nov: the ways this sitter takes besides Sprout (from /pay/). An app opens with the amount; cash is
+       marked paid. Either way Sprout tells the sitter and moves on to the rating. */
+    const me = MY.find(x => x.n === who.n) || who, alt = (me.payout && me.payout.apps) || [];
+    if (alt.length) {
+      c.querySelector('[data-alt]').innerHTML = `<div class="dlabel" style="margin-top:14px">${inSprout(me) ? `Or pay ${who.n} another way` : `Pay ${who.n} with`}</div>
+        <div class="fchips" style="margin-top:6px">${alt.map((a, i) => `<button type="button" class="chip" data-app="${i}">${a.n}</button>`).join('')}</div>`;
+      c.querySelector('[data-other]').remove();
+    }
+    if (me.payout && !inSprout(me)) { c.querySelector('[data-pay]').remove(); c.querySelector('.cardrow').remove(); }
     const money = n => '$' + (Math.round(n * 100) / 100).toFixed(2);
     const dur = x => x % 1 === 0 ? hrs(x) : x < 1 ? '30 min' : `${Math.floor(x)}½ hours`;
     const sum = () => { const sub = who.rate * h, t = tipAmt != null ? tipAmt : Math.round(sub * tip) / 100; return { sub, t, total:sub + t }; };
@@ -820,7 +834,22 @@ function payCard(p, who, w, H){
     };
     const cr = c.querySelector('[data-card]');
     cr.onclick = () => X.pickCard(k => { card = k; cr.querySelector('.cl').textContent = k.label; cr.querySelector('.cs').textContent = k.sub; }, card.id);
-    const lock = () => { c.querySelectorAll('button').forEach(b => b.disabled = true); c.querySelector('[data-other]').remove(); c.querySelector('[data-pay]').remove(); c.querySelector('.fchips').remove(); c.querySelector('.dlabel').remove(); };
+    const lock = () => { c.querySelectorAll('button').forEach(b => b.disabled = true); c.querySelector('[data-other]')?.remove(); c.querySelector('[data-pay]')?.remove(); c.querySelectorAll('.fchips').forEach(x => x.remove()); c.querySelectorAll('.dlabel').forEach(x => x.remove()); };
+    c.querySelectorAll('[data-app]').forEach(btn => btn.onclick = () => {
+      const a = alt[+btn.dataset.app], r = sum(), amount = money(r.total).replace(/\.00$/, '');
+      const done = () => {
+        lock(); c.querySelector('.cardrow')?.remove(); c.querySelector('[data-payout-foot]')?.remove();
+        c.querySelector('.eyebrow').textContent = `Paid ${who.n}`;
+        c.appendChild(el(`<div class="paid"><i class="ph ph-check-circle"></i><span>Paid ${money(r.total)} · ${a.k === 'cash' ? 'in cash' : `on ${a.n}${a.h ? ' to ' + playdateEscape(a.h) : ''}`}</span></div>`));
+        p.me(a.k === 'cash' ? `Paid ${who.n} ${amount} in cash` : `Paid ${who.n} ${amount} on ${a.n}`); p.scroll();
+        res({ how:'app', app:a, hours:h, ...r });
+      };
+      if (a.k === 'cash') return done();
+      const v = bsheet({ body:`<div class="bh"><span class="icotile"><i class="ph ph-device-mobile"></i></span><b>Pay ${who.n} on ${a.n}</b></div>
+          <p class="bp">${amount} to ${a.h ? `<b>${playdateEscape(a.h)}</b>` : who.n}. ${a.n} opens with the amount filled in; come back and Sprout marks it paid.</p>`,
+        foot:`<button type="button" class="btn" data-go>Open ${a.n} · ${amount}</button>` });
+      v.foot.querySelector('[data-go]').onclick = () => { v.close(); toast(`Opens ${a.n}: ${amount} to ${a.h || who.n}`); setTimeout(done, 700); };
+    });
     c.querySelector('[data-pay]').onclick = async e => {
       const b = e.currentTarget; b.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,.35);border-top-color:#fff"></span>'; c.querySelectorAll('button').forEach(x => x.style.pointerEvents = 'none');
       await X.faceId();
@@ -830,7 +859,8 @@ function payCard(p, who, w, H){
       p.me(`Pay ${who.n} ${money(r.total).replace(/\.00$/, '')}`); p.scroll();
       res({ how:'sprout', hours:h, ...r });
     };
-    c.querySelector('[data-other]').onclick = () => { const r = sum(); lock(); c.querySelector('.cardrow').remove(); c.querySelector('.foot').remove(); res({ how:'other', hours:h, ...r }); };
+    const other = c.querySelector('[data-other]');   // gone when the sitter listed their own ways (the chips replace it)
+    if (other) other.onclick = () => { const r = sum(); lock(); c.querySelector('.cardrow')?.remove(); c.querySelector('.foot')?.remove(); res({ how:'other', hours:h, ...r }); };
     paint(); p.scroll();
   });
 }
@@ -850,6 +880,14 @@ async function payTonight(p, who, w, kids, H, opt = {}){
     liveSay(who, `${who.n}, Tony just paid you ${total} for ${dayName}. It’ll be in your bank in 1–2 days. Thank you! Sprout`);
     p.block(`<div class="preview gtx"><small>Group text · ${groupWho(who)}</small><p></p></div>`).querySelector('p').textContent =
       `${who.n}, Tony just paid you ${total} for ${dayName}${pay.t ? ` ($${(pay.sub).toFixed(2).replace(/\.00$/, '')} + $${pay.t.toFixed(2).replace(/\.00$/, '')} tip)` : ''}. It’ll be in your bank in 1–2 days. Thank you! Sprout`;
+  } else if (pay.how === 'app') {
+    const a = pay.app, how = a.k === 'cash' ? 'in cash' : `on ${a.n}`;
+    via = a.k === 'cash' ? 'Cash' : `${a.n}${a.h ? ' · ' + a.h : ''}`;
+    const t = p.work(`Telling ${who.n} you paid`, `In your group text with ${who.n}`); await sleep(800);
+    t.done(`Told ${who.n} you paid`, `${total} ${how}`, 'ph-paper-plane-tilt');
+    const msg = `${who.n}, Tony paid you ${total} ${how} for ${dayName}. Thank you! Sprout`;
+    liveSay(who, msg);
+    p.block(`<div class="preview gtx"><small>Group text · ${groupWho(who)}</small><p></p></div>`).querySelector('p').textContent = msg;
   } else {
     p.me('Already paid');
     await p.say(`Got it. How did you pay ${who.n}?`, 700);
@@ -3058,7 +3096,7 @@ const CLOCK = (() => {
       const body = `${line}. ${r.who ? 'Dana has this too.' : 'On the family calendar.'}`;
       push('Tony and Dana', `${todayWord(r)}: ${tonight(r)}`, body);
       p.set(`Today · ${line}`, { when:'Today' });
-      famLock({ i:r.i, m:x.t % 1440, notes:[{ title:`${todayWord(r)}: ${tonight(r)}`, body, open:openBrief }] });
+      famLock({ i:r.i, m:((x.t % 1440) + 1440) % 1440, notes:[{ title:`${todayWord(r)}: ${tonight(r)}`, body, open:openBrief }] });
     }
     if (x.k === 'soon') {
       setBriefDay(r.i); happeningFor(r, true, openPlan(p));
@@ -3066,17 +3104,17 @@ const CLOCK = (() => {
       const n = r.who ? { title:`Babysitter ${r.who.n} arrives in 30 min`, sub:r.place ? `Dinner at ${r.place.n} at ${ampm(r.D)}` : `With ${joinNames(r.kids.map(k => k.n))} until ${ampm(r.E)}`, body:'Dana has this too.' } : { title:'Dinner in 30 min', sub:`Table for 2 at ${r.place.n}`, body:`Today at ${ampm(r.D)}.` };
       push('Tony and Dana', n.title, `${n.sub}. ${n.body} Live Activity starts.`);
       p.set(`Happening now · ${line}`, { when:'Today' });
-      famLock({ i:r.i, m:x.t % 1440, la:laHtml(r, x.t % 1440), notes:[{ ...n, open:openBrief }] });
+      famLock({ i:r.i, m:((x.t % 1440) + 1440) % 1440, la:laHtml(r, ((x.t % 1440) + 1440) % 1440), notes:[{ ...n, open:openBrief }] });
     }
-    if (x.k === 'during') { famLock({ i:r.i, m:x.t % 1440, la:laHtml(r, x.t % 1440) }); log.unshift({ t:now, to:'Lock screens', title:'Live Activity updates', body:laState(r, x.t % 1440).t }); }
-    if (x.k === 'last') { famLock({ i:r.i, m:x.t % 1440, la:laHtml(r, x.t % 1440) }); log.unshift({ t:now, to:'Lock screens', title:'Live Activity updates', body:laState(r, x.t % 1440).t }); }
+    if (x.k === 'during') { famLock({ i:r.i, m:((x.t % 1440) + 1440) % 1440, la:laHtml(r, ((x.t % 1440) + 1440) % 1440) }); log.unshift({ t:now, to:'Lock screens', title:'Live Activity updates', body:laState(r, ((x.t % 1440) + 1440) % 1440).t }); }
+    if (x.k === 'last') { famLock({ i:r.i, m:((x.t % 1440) + 1440) % 1440, la:laHtml(r, ((x.t % 1440) + 1440) % 1440) }); log.unshift({ t:now, to:'Lock screens', title:'Live Activity updates', body:laState(r, ((x.t % 1440) + 1440) % 1440).t }); }
     if (x.k === 'end') {
       restoreHappening();
       if (r.who) {
         const n = { title:`${r.who.n} is done`, body:`Pay ${r.who.n} $${r.amt} and say how it went. It’s on your to-dos too.` };
         push('Tony', n.title, n.body); p.set(`Pay ${r.who.n} $${r.amt}`, { when:'Now', attn:true });
-        famLock({ i:r.i, m:x.t % 1440, la:laHtml(r, x.t % 1440), notes:[{ ...n, open:openPlan(p) }], onPay:openPlan(p) });
-      } else famLock({ i:r.i, m:x.t % 1440 });
+        famLock({ i:r.i, m:((x.t % 1440) + 1440) % 1440, la:laHtml(r, ((x.t % 1440) + 1440) % 1440), notes:[{ ...n, open:openPlan(p) }], onPay:openPlan(p) });
+      } else famLock({ i:r.i, m:((x.t % 1440) + 1440) % 1440 });
       r.resolve();
     }
     paint();

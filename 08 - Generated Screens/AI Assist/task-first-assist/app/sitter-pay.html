@@ -47,6 +47,21 @@
   .opt.on{border-color:var(--brand);background:var(--tint)}
   .opt.on i.ic{color:var(--brand)}
   .opt.on .ck{background:var(--brand);border-color:var(--brand)}
+  /* Ahmad, 22 Nov: other ways the sitter takes, so the parent who books them has choices */
+  .opt.none b{font-size:16px}
+  .apps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .apps button{padding:11px 6px;border-radius:14px;background:var(--field);border:2px solid transparent;font:600 14px var(--sans);color:var(--strong)}
+  .apps button.on{border-color:var(--brand);background:var(--tint);color:var(--brand)}
+  .handles{margin-top:4px}
+  .handle{display:block;margin-top:10px}
+  .handle span{display:block;font-size:12.5px;color:var(--subtle);margin-bottom:4px}
+  .handle input{width:100%;padding:11px 12px;border-radius:12px;border:0;background:var(--field);outline:none;font-size:15px;color:var(--strong)}
+  .handle input:focus{outline:2px solid var(--brand)}
+  .sum{margin:12px 0 0;padding:0;list-style:none}
+  .sum li{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--soft);font-size:15px;color:var(--strong)}
+  .sum li:first-child{border-top:0}
+  .sum li i{font-size:20px;color:var(--brand)}
+  .sum li small{color:var(--subtle);margin-left:auto;font-size:13px}
   .send{width:100%;margin-top:16px;padding:15px;border-radius:999px;background:var(--brand);color:#fff;font:500 17px var(--serif)}
   .send[disabled]{opacity:.4}
   .priv{display:flex;gap:8px;font-size:12.5px;color:var(--subtle);margin-top:12px}
@@ -100,8 +115,16 @@
     <p class="q">Where should your pay go?</p>
     <button type="button" class="opt on" data-way="bank" aria-pressed="true"><i class="ph ph-bank ic"></i><span><b>Bank account</b><small>1–2 business days · no fee</small></span><span class="ck"><i class="ph ph-check"></i></span></button>
     <button type="button" class="opt" data-way="card" aria-pressed="false"><i class="ph ph-credit-card ic"></i><span><b>Debit card</b><small>Usually within minutes · small fee</small></span><span class="ck"><i class="ph ph-check"></i></span></button>
+    <button type="button" class="opt none" data-way="none" aria-pressed="false"><i class="ph ph-prohibit ic"></i><span><b>Not through Sprout</b><small>Only the ways below</small></span><span class="ck"><i class="ph ph-check"></i></span></button>
+    <p class="q">Other ways you take</p>
+    <p class="lede">Parents can pick any of these when they pay you. Pick all that work.</p>
+    <div class="apps" role="group" aria-label="Other ways you take">
+      <button type="button" data-app="venmo" aria-pressed="false">Venmo</button><button type="button" data-app="zelle" aria-pressed="false">Zelle</button><button type="button" data-app="cashapp" aria-pressed="false">Cash App</button>
+      <button type="button" data-app="paypal" aria-pressed="false">PayPal</button><button type="button" data-app="cash" aria-pressed="false">Cash</button>
+    </div>
+    <div class="handles" data-handles></div>
     <button type="button" class="send" data-go>Continue</button>
-    <p class="priv"><i class="ph ph-shield-check"></i>Your details go to Stripe, Sprout’s payment partner. Tony and Sprout never see them.</p>
+    <p class="priv"><i class="ph ph-shield-check"></i>Bank and card details go to Stripe, Sprout’s payment partner; Tony never sees them. Your app usernames are shown to families who book you, so they can pay you there.</p>
   </section>
 
   <!-- 2 · the payment partner (mock) -->
@@ -136,6 +159,7 @@
       <h1 class="ask" tabindex="-1">You’re set, <span data-n>Alex</span></h1>
       <p data-when-paid>When Monday is done, Tony pays you in Sprout. It goes to Chase ••••6789 in 1–2 business days.</p>
     </div>
+    <div class="card" style="animation-delay:.04s"><b style="font:500 17px var(--serif);color:var(--strong)">Parents can pay you with</b><ul class="sum" data-sum></ul></div>
     <div class="card" style="animation-delay:.08s">
       <div class="fact" style="border-top:0"><i class="ph ph-chat-circle-dots"></i>We’ll text you when Tony pays, with the amount</div>
       <div class="fact"><i class="ph ph-arrows-clockwise"></i>Next time a Sprout family books you, pay goes here too</div>
@@ -162,9 +186,41 @@
   document.title = `Get paid · ${b.n} · Sprout`;
 
   let way = 'bank', bank = null;
+  const APPS = { venmo:{ n:'Venmo', ph:'@username', lab:'Venmo username' }, zelle:{ n:'Zelle', ph:'Phone or email', lab:'Zelle phone or email' },
+    cashapp:{ n:'Cash App', ph:'$cashtag', lab:'Cash App $cashtag' }, paypal:{ n:'PayPal', ph:'Email or @name', lab:'PayPal email or @name' }, cash:{ n:'Cash' } };
+  const ORDER = ['venmo', 'zelle', 'cashapp', 'paypal', 'cash'];
+  const picked = new Set(), handles = {};
+  const apps = () => ORDER.filter(k => picked.has(k)).map(k => ({ k, n:APPS[k].n, h:(handles[k] || '').trim() }));
+  const ready = () => way !== 'none' || picked.size > 0;
+  const paintGo = () => { const go = $('[data-go]'); go.disabled = !ready(); go.textContent = !ready() ? 'Pick at least one way' : way === 'none' ? 'Finish' : 'Continue'; };
+  const paintHandles = () => {
+    const box = $('[data-handles]');
+    box.innerHTML = ORDER.filter(k => picked.has(k) && APPS[k].ph).map(k => `<label class="handle"><span>${APPS[k].lab}</span><input data-h="${k}" placeholder="${APPS[k].ph}" autocomplete="off" value="${(handles[k] || '').replace(/"/g, '&quot;')}"></label>`).join('');
+    box.querySelectorAll('[data-h]').forEach(i => i.oninput = () => { handles[i.dataset.h] = i.value; });
+  };
+  $$('[data-app]').forEach(btn => btn.onclick = () => {
+    const k = btn.dataset.app; picked.has(k) ? picked.delete(k) : picked.add(k);
+    btn.classList.toggle('on', picked.has(k)); btn.setAttribute('aria-pressed', picked.has(k));
+    paintHandles(); paintGo();
+    if (picked.has(k) && APPS[k].ph) $(`[data-h="${k}"]`)?.focus();
+  });
+  const finishDone = () => {
+    const list = [];
+    if (way !== 'none') list.push(`<li><i class="ph ph-bank"></i>Sprout<small>${way === 'bank' ? `${bank} ••••6789` : 'Debit card ••••4821'}</small></li>`);
+    apps().forEach(a => list.push(`<li><i class="ph ${a.k === 'cash' ? 'ph-money' : 'ph-device-mobile'}"></i>${a.n}${a.h ? `<small>${a.h.replace(/</g, '&lt;')}</small>` : ''}</li>`));
+    $('[data-sum]').innerHTML = list.join('');
+    /* tells Tony's Sprout (same site, any tab): bank or card, plus the other ways and their handles (he needs those to pay) */
+    if (q.get('l') && 'BroadcastChannel' in window) { const ch = new BroadcastChannel('sprout-pay-' + q.get('l')); ch.postMessage({ t:'payout', n:b.n, way, apps:apps() }); setTimeout(() => ch.close(), 500); }
+    show('done');
+  };
   const show = step => { $$('[data-step]').forEach(s => s.hidden = s.dataset.step !== step); scrollTo({ top:0 }); $(`[data-step="${step}"] h1`)?.focus({ preventScroll:true }); };
-  $$('[data-way]').forEach(o => o.onclick = () => { way = o.dataset.way; $$('[data-way]').forEach(x => { x.classList.toggle('on', x === o); x.setAttribute('aria-pressed', x === o); }); });
+  $$('[data-way]').forEach(o => o.onclick = () => { way = o.dataset.way; $$('[data-way]').forEach(x => { x.classList.toggle('on', x === o); x.setAttribute('aria-pressed', x === o); }); paintGo(); });
   $('[data-go]').onclick = () => {
+    if (!ready()) return;
+    if (way === 'none') {
+      $('[data-when-paid]').textContent = `When ${dayword} is done, Tony picks one of the ways below and pays you there.`;
+      return finishDone();
+    }
     $('[data-bank]').hidden = way !== 'bank'; $('[data-card]').hidden = way !== 'card';
     $('[data-finish]').disabled = way === 'bank' && !bank;
     show('stripe');
@@ -178,12 +234,10 @@
   });
   $('[data-finish]').onclick = () => {
     if ($('[data-finish]').disabled) return;
-    /* tells Tony's Sprout (same site, any tab): set up, bank or card. No bank name or numbers go to Tony. */
-    if (q.get('l') && 'BroadcastChannel' in window) { const ch = new BroadcastChannel('sprout-pay-' + q.get('l')); ch.postMessage({ t:'payout', n:b.n, way }); setTimeout(() => ch.close(), 500); }
     $('[data-when-paid]').textContent = way === 'bank'
       ? `When ${dayword} is done, Tony pays you in Sprout. It goes to ${bank} ••••6789 in 1–2 business days.`
       : `When ${dayword} is done, Tony pays you in Sprout. It goes to your debit card ••••4821, usually within minutes.`;
-    show('done');
+    finishDone();
   };
 })();
 </script>

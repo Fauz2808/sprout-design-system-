@@ -2,6 +2,19 @@
 
 Live: https://sprout-assist-tasks.vercel.app/assist/ · local: `python3 build.py`, then serve `site/` (preview config `assist-tasks`, port 4330).
 
+## 22 Nov · more ways to pay a sitter (Ahmad)
+
+"Add more option for payment in sitter POV, so the user that book this sitter can have a lot of option to pay."
+Picked: Venmo, Zelle, Cash App, PayPal, cash, next to Sprout.
+- `/pay/`: Through Sprout (bank, debit card, or Not through Sprout), then "Other ways you take" (pick all), with a
+  handle for each app. The done page lists them under "Parents can pay you with".
+- Tony: the booked card says "Sam takes Sprout, Venmo and Cash"; the pay card adds "Or pay Sam another way" with
+  exactly those. An app opens with the amount (mock), cash is marked paid; Sprout texts the sitter and goes on to
+  the rating. A sitter who isn't in Sprout has no Pay button, only their ways. Payments outside Sprout are only
+  known because Tony taps them.
+- Demo: Sam is set up with Sprout, Venmo (@sam-okafor) and cash.
+- Fixed with it: the clock's Live Activity for a booking made today said "arrives in 1200 min" (negative minutes).
+
 ## 22 Nov · sitter payout page, booking first (Ahmad, direction A)
 
 `/pay/` (`app/sitter-pay.html`) is what the S7 payout link opens (`sprout.app/pay/<name>`). It replaced the old
