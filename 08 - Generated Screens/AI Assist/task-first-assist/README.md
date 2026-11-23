@@ -2,6 +2,14 @@
 
 Live: https://sprout-assist-tasks.vercel.app/assist/ · local: `python3 build.py`, then serve `site/` (preview config `assist-tasks`, port 4330).
 
+## 22 Nov · payout page, one decision per screen (Ahmad, direction B)
+
+Ahmad: two pickers on one screen (bank / card / not through Sprout, then five apps) left the sitter unsure what to
+do first. Now: 1 the booking + "Get paid through Sprout" with one button, Add your bank or card, and a quiet "I'd
+rather use Venmo, Zelle or cash". 2 Stripe, where bank vs debit card is chosen. 3 "Anything else families can use?"
+(optional, "Skip and finish"), or after skipping Sprout "How can families pay you?" (at least one, plus "Add a bank
+or card after all"). 4 You're set. Sprout first matches Tony's Stripe call and keeps payments trackable.
+
 ## 22 Nov · more ways to pay a sitter (Ahmad)
 
 "Add more option for payment in sitter POV, so the user that book this sitter can have a lot of option to pay."

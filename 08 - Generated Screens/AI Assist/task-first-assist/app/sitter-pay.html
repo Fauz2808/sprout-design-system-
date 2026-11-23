@@ -119,6 +119,17 @@
   .more{display:block;margin-top:4px;padding:14px 16px;border-radius:16px;background:var(--white);border:1px solid var(--soft);color:var(--strong);text-decoration:none}
   .more b{display:block;font:500 16px var(--serif)}
   .more small{color:var(--subtle);font-size:13px}
+  /* B: screen 1's single action, the bank/card switch inside Stripe, and screen 2's "Sprout is set" line */
+  .sprout-pay{margin-top:16px;padding:16px;border-radius:16px;background:var(--tint)}
+  .sprout-pay .q{margin:0 0 4px}
+  .sprout-pay .send{margin-top:12px}
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .seg button{padding:10px;border-radius:12px;border:1.5px solid #e3e3ea;font:600 14px var(--sans);color:#222;text-align:left}
+  .seg button small{display:block;font-weight:400;font-size:12px;color:#666;margin-top:2px}
+  .seg button.on{border-color:#222;background:#f4f4f7}
+  .setnote{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--tint);font:600 14px var(--sans);color:var(--brand);margin-bottom:6px}
+  .setnote i{font-size:22px}
+  .setnote small{display:block;font-weight:400;color:var(--subtle);font-size:12.5px}
   @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
   @keyframes spin{to{transform:rotate(360deg)}}
 </style>
@@ -131,30 +142,48 @@
   <!-- 1 · the booking, then where the pay goes -->
   <section class="card" data-step="booking">
     <h1 class="ask" tabindex="-1">Get paid for <span data-dayword>Monday</span></h1>
-    <p class="lede"><span data-n>Alex</span>, add where your pay should go. You only do this once.</p>
+    <p class="lede"><span data-n>Alex</span>, set up how you get paid. You only do this once.</p>
     <div class="who"><i style="background-image:url(/assets/tony.webp)"></i><div><b>Tony Martin booked you</b><small>Through Sprout</small></div></div>
     <div class="fact"><i class="ph ph-calendar-check"></i><span data-when>Mon, Jul 27 · 6–10 PM</span></div>
     <div class="fact"><i class="ph ph-users"></i><span data-kids>Maya (7) and Jake (5)</span></div>
     <div class="fact"><i class="ph ph-map-pin"></i>Banks Court, Austin</div>
     <div class="fact pay"><i class="ph ph-currency-dollar"></i><span><b data-total>About $100</b> · <span data-rate>$25/hr</span>, plus any tip</span></div>
-    <p class="q">Where should your pay go?</p>
-    <button type="button" class="opt on" data-way="bank" aria-pressed="true"><i class="ph ph-bank ic"></i><span><b>Bank account</b><small>1–2 business days · no fee</small></span><span class="ck"><i class="ph ph-check"></i></span></button>
-    <button type="button" class="opt" data-way="card" aria-pressed="false"><i class="ph ph-credit-card ic"></i><span><b>Debit card</b><small>Usually within minutes · small fee</small></span><span class="ck"><i class="ph ph-check"></i></span></button>
-    <button type="button" class="opt none" data-way="none" aria-pressed="false"><i class="ph ph-prohibit ic"></i><span><b>Not through Sprout</b><small>Only the ways below</small></span><span class="ck"><i class="ph ph-check"></i></span></button>
-    <p class="q">Other ways you take</p>
-    <p class="lede">Parents can pick any of these when they pay you. Pick all that work.</p>
-    <div class="apps" role="group" aria-label="Other ways you take">
+    <!-- Ahmad, 22 Nov (direction B): one decision per screen. Here only "get paid through Sprout"; bank vs card is
+         chosen inside Stripe, and Venmo, Zelle, PayPal, Cash App and cash come after, on their own screen. -->
+    <div class="sprout-pay">
+      <p class="q">Get paid through Sprout</p>
+      <p class="lede">Tony pays you in one tap. It goes to your bank or debit card, and we text you when it’s on its way.</p>
+      <button type="button" class="send" data-sprout>Add your bank or card</button>
+      <button type="button" class="textbtn" data-skip>I’d rather use Venmo, Zelle or cash</button>
+    </div>
+    <p class="priv"><i class="ph ph-shield-check"></i>Bank and card details go to Stripe, Sprout’s payment partner. Tony never sees them.</p>
+  </section>
+
+  <!-- 3 · anything else families can use (optional after Sprout, required if they skipped it) -->
+  <section class="card" data-step="others" hidden>
+    <div class="setnote" data-set hidden><i class="ph-fill ph-check-circle"></i><span>Sprout is set<small data-set-where>Chase ••••6789</small></span></div>
+    <h1 class="ask" tabindex="-1" data-others-title>Anything else families can use?</h1>
+    <p class="lede" data-others-lede>Optional. Pick any that work; families see them when they pay you.</p>
+    <div class="apps" role="group" aria-label="Other ways families can pay you" style="margin-top:12px">
       <button type="button" data-app="venmo" aria-pressed="false">Venmo</button><button type="button" data-app="zelle" aria-pressed="false">Zelle</button><button type="button" data-app="cashapp" aria-pressed="false">Cash App</button>
       <button type="button" data-app="paypal" aria-pressed="false">PayPal</button><button type="button" data-app="cash" aria-pressed="false">Cash</button>
     </div>
     <div class="handles" data-handles></div>
-    <button type="button" class="send" data-go>Continue</button>
-    <p class="priv"><i class="ph ph-shield-check"></i>Bank and card details go to Stripe, Sprout’s payment partner; Tony never sees them. Families who book you see where to pay you in the apps you pick (your PayPal email, the number for Venmo and Zelle).</p>
+    <button type="button" class="send" data-go>Finish</button>
+    <button type="button" class="textbtn" data-back-sprout hidden>Add a bank or card after all</button>
+    <p class="priv"><i class="ph ph-shield-check"></i>Families who book you see where to pay you in the apps you pick: your PayPal email, the number for Venmo and Zelle.</p>
   </section>
 
   <!-- 2 · the payment partner (mock) -->
   <section class="partner" data-step="stripe" hidden>
     <div class="pt-head"><b>Stripe</b><span><i class="ph ph-lock-simple"></i>Secure · for Sprout</span></div>
+    <div class="pb" style="padding-bottom:0">
+      <p style="margin-bottom:8px">Where should Sprout send your pay?</p>
+      <div class="seg" role="radiogroup" aria-label="Pay to">
+        <button type="button" data-way="bank" role="radio" aria-checked="true" class="on">Bank account<small>1–2 business days · no fee</small></button>
+        <button type="button" data-way="card" role="radio" aria-checked="false">Debit card<small>Usually minutes · small fee</small></button>
+      </div>
+    </div>
     <div class="pb" data-bank>
       <h2>Connect your bank</h2>
       <p>Pick your bank, then sign in to it. Stripe only gets the account to pay into.</p>
@@ -172,7 +201,8 @@
       <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><label>Expires</label><div>08 / 28</div></div><div><label>ZIP</label><div>78739</div></div></div>
     </div>
     <div class="pb" style="padding-top:0">
-      <button type="button" class="send" data-finish disabled>Agree and finish</button>
+      <button type="button" class="send" data-finish disabled>Agree and continue</button>
+      <button type="button" class="textbtn" data-back style="color:#555;font:500 14px var(--sans)">Back</button>
       <p class="priv" style="color:#777"><i class="ph ph-info" style="color:#777"></i>Prototype: nothing is collected. In the app this step is Stripe’s own page.</p>
     </div>
   </section>
@@ -210,7 +240,7 @@
   $('[data-total]').textContent = `About $${Math.round(b.r * b.h)}`;
   document.title = `Get paid · ${b.n} · Sprout`;
 
-  let way = 'bank', bank = null;
+  let way = 'bank', bank = null;   // 'bank' | 'card' (through Sprout) | 'none' (skipped Sprout)
   /* how each one gets set up: PayPal signs in (its real "Log in with PayPal" connect, like Upwork); Venmo and Zelle
      send to a phone number, and Sprout already has the sitter's from the text, so it's one tap; Cash App has no
      sign-in for other apps, so the $cashtag is typed; cash needs nothing. */
@@ -224,7 +254,8 @@
   const apps = () => ORDER.filter(k => picked.has(k)).map(k => ({ k, n:APPS[k].n, h:String(handleOf(k)).trim() }));
   const waiting = () => ORDER.filter(k => picked.has(k) && APPS[k].how === 'connect' && !connected[k]);
   const ready = () => (way !== 'none' || picked.size > 0) && !waiting().length;
-  const paintGo = () => { const go = $('[data-go]'); go.disabled = !ready(); go.textContent = waiting().length ? `Connect ${APPS[waiting()[0]].n} first` : !(way !== 'none' || picked.size) ? 'Pick at least one way' : way === 'none' ? 'Finish' : 'Continue'; };
+  /* screen 2: optional after Sprout ("Skip and finish" with nothing picked), at least one way if they skipped Sprout */
+  const paintGo = () => { const go = $('[data-go]'); go.disabled = !ready(); go.textContent = waiting().length ? `Connect ${APPS[waiting()[0]].n} first` : !(way !== 'none' || picked.size) ? 'Pick at least one way' : !picked.size ? 'Skip and finish' : 'Finish'; };
   const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
   const paintHandles = () => {
     const box = $('[data-handles]');
@@ -280,16 +311,33 @@
     show('done');
   };
   const show = step => { $$('[data-step]').forEach(s => s.hidden = s.dataset.step !== step); scrollTo({ top:0 }); $(`[data-step="${step}"] h1`)?.focus({ preventScroll:true }); };
-  $$('[data-way]').forEach(o => o.onclick = () => { way = o.dataset.way; $$('[data-way]').forEach(x => { x.classList.toggle('on', x === o); x.setAttribute('aria-pressed', x === o); }); paintGo(); });
+  /* inside Stripe: bank or debit card (moved here from screen 1) */
+  const setWay = w => {
+    way = w;
+    $$('[data-way]').forEach(x => { x.classList.toggle('on', x.dataset.way === w); x.setAttribute('aria-checked', x.dataset.way === w); });
+    $('[data-bank]').hidden = w !== 'bank'; $('[data-card]').hidden = w !== 'card';
+    $('[data-finish]').disabled = w === 'bank' ? $('[data-acct]').hidden : false;
+  };
+  $$('[data-way]').forEach(o => o.onclick = () => setWay(o.dataset.way));
+  const toStripe = () => { setWay(way === 'card' ? 'card' : 'bank'); show('stripe'); };
+  $('[data-sprout]').onclick = toStripe;
+  $('[data-back-sprout]').onclick = toStripe;
+  $('[data-back]').onclick = () => show(way === 'none' ? 'others' : 'booking');
+  /* screen 2, in one of two moods */
+  const toOthers = () => {
+    const skipped = way === 'none';
+    $('[data-set]').hidden = skipped;
+    if (!skipped) $('[data-set-where]').textContent = way === 'bank' ? `${bank} ••••6789 · through Stripe` : 'Debit card ••••4821 · through Stripe';
+    $('[data-others-title]').textContent = skipped ? 'How can families pay you?' : 'Anything else families can use?';
+    $('[data-others-lede]').textContent = skipped ? 'Pick at least one. Families see these when they pay you.' : 'Optional. Pick any that work; families see them when they pay you.';
+    $('[data-back-sprout]').hidden = !skipped;
+    paintGo(); show('others');
+  };
+  $('[data-skip]').onclick = () => { way = 'none'; toOthers(); };
   $('[data-go]').onclick = () => {
     if (!ready()) return;
-    if (way === 'none') {
-      $('[data-when-paid]').textContent = `When ${dayword} is done, Tony picks one of the ways below and pays you there.`;
-      return finishDone();
-    }
-    $('[data-bank]').hidden = way !== 'bank'; $('[data-card]').hidden = way !== 'card';
-    $('[data-finish]').disabled = way === 'bank' && !bank;
-    show('stripe');
+    if (way === 'none') $('[data-when-paid]').textContent = `When ${dayword} is done, Tony picks one of these and pays you there.`;
+    finishDone();
   };
   $$('[data-b]').forEach(btn => btn.onclick = () => {
     bank = btn.dataset.b;
@@ -303,7 +351,7 @@
     $('[data-when-paid]').textContent = way === 'bank'
       ? `When ${dayword} is done, Tony pays you in Sprout. It goes to ${bank} ••••6789 in 1–2 business days.`
       : `When ${dayword} is done, Tony pays you in Sprout. It goes to your debit card ••••4821, usually within minutes.`;
-    finishDone();
+    toOthers();
   };
 })();
 </script>
