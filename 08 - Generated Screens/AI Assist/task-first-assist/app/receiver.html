@@ -436,20 +436,20 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
         view.querySelector('[data-yes]').onclick = () => { hint(false); answer('yes', quick[0]); };
         view.querySelector('[data-no]').onclick = () => { hint(false); answer('no', quick[1]); };
       } else {
-        const chat = a.kind === 'chat';
+        const chat = a.kind === 'chat', ride = chat || a.kind === 'dm';
         view = el(`<section class="view chat">${sb()}
           <div class="top"><span class="bk"><i class="ph ph-caret-left"></i></span><span class="lg" style="background-image:url(${chat ? (a.act === 'soccer' ? A + 'ssc-logo.webp' : SPROUT) : TONY})"></span><div><b>${chat ? esc(a.chat) : 'Tony Martin'}</b><small>${chat ? esc(a.size) : 'Jake’s dad'}</small></div></div>
           <div class="log"></div>${composer(chat ? 'Message ' + esc(a.chat) : 'Message Tony')}</section>`);
         phone.insertBefore(view, phone.querySelector('.home'));
         fromTony(a.text);
-        add(chat ? rideCard(a) : regularCard(a));
+        add(ride ? rideCard(a) : regularCard(a));
         view.querySelector('[data-reply]').onclick = () => view.querySelector('.comp input').focus();
         view.querySelector('[data-yes]').onclick = () => {
           hint(false);
-          if (chat) confirmRide(a.at, false); else state('<span class="spin"></span>You’re in · Tony is setting the turns', 'f wait in');
+          if (ride) confirmRide(a.at, false); else state('<span class="spin"></span>You’re in · Tony is setting the turns', 'f wait in');
           send({ t:'yes' });
         };
-        view.querySelector('[data-no]').onclick = () => { hint(false); if (chat) whenCould(a); else { state('<i class="ph ph-x-circle"></i>You said you can’t this season. Only Tony sees it.'); card().querySelector('[data-st]').style.color = 'var(--subtle)'; send({ t:'no' }); } };
+        view.querySelector('[data-no]').onclick = () => { hint(false); if (ride) whenCould(a); else { state('<i class="ph ph-x-circle"></i>You said you can’t this season. Only Tony sees it.'); card().querySelector('[data-st]').style.color = 'var(--subtle)'; send({ t:'no' }); } };
       }
       view.hidden = true;
       view.querySelector('form').onsubmit = e => {
@@ -511,6 +511,7 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
       const note = el(a.kind === 'chat'
         ? pushNote({ av:a.act === 'soccer' ? 'group' : 'sprout', photo:A + 'ssc-logo.webp', title:esc(a.chat), sub:'Tony · Jake’s dad', body:`Needs a ride for ${esc(a.riders)} on ${esc(a.day)} at ${a.at.l}. Can you help?` })
         : sm ? pushNote({ av:'contact', photo:TONY, title:'Tony Martin &amp; Sprout', body:esc(a.text) })
+        : a.kind === 'dm' ? pushNote({ av:'person', photo:TONY, title:'Tony Martin', sub:`Ride for ${esc(a.riders)} · ${esc(a.day)}`, body:esc(a.text) })
         : pushNote({ av:'person', photo:TONY, title:'Tony Martin', sub:esc(a.title), body:esc(a.text) }));
       lock.append(note);
       const v0 = view;
@@ -530,7 +531,7 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
         if (ask.kind === 'text') smsFrom('Sprout', `Thanks ${ask.who.ask}! You’re driving ${ask.riders} on ${ask.day} at ${m.at.l}. Pickup at ${ask.pickAddr}. Add it to your calendar: sprout.link/r/8KQ2`);
         else if (!ask.moved) sys('ph-fill ph-car-profile', `You’re driving ${esc(ask.riders)} · Tony was told`);
       }
-      if (m.t === 'covered') { if (m.text) smsFrom('Sprout', m.text); else sys('ph-fill ph-car-profile', `${esc(m.by)} is driving ${esc(m.riders)} · thanks for checking`); }
+      if (m.t === 'covered') { if (m.text && sms()) smsFrom('Sprout', m.text); else sys('ph-fill ph-car-profile', `${esc(m.by)} is driving ${esc(m.riders)} · thanks for checking`); }
       if (m.t === 'schedule') schedule(m);
       if (m.t === 'held') { const st = card().querySelector('[data-st]'); if (st) st.innerHTML = '<span class="spin"></span>You’re in · Tony hasn’t shared the turns yet'; }
     };

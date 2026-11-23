@@ -1796,7 +1796,7 @@ function cpSend(p, g, near, text){
       const picks = grid.picked();
       c.querySelectorAll('[data-m]').forEach(b => { const on = b.dataset.m === mode; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
       c.querySelector('[data-pg]').hidden = mode !== 'pick';
-      c.querySelector('[data-to]').textContent = mode === 'group' ? `In ${g.chat} · from you` : picks.length > 1 ? 'A group text with each · you, them and Sprout' : picks.length ? `Group text · you, ${picks[0].ask} and Sprout` : 'Pick at least one parent';
+      c.querySelector('[data-to]').textContent = mode === 'group' ? `In ${g.chat} · from you` : picks.length > 1 ? 'In Sprout · a DM with each · from you' : picks.length ? `In Sprout · your DM with ${picks[0].ask}` : 'Pick at least one parent';
       msg.textContent = custom || text(mode === 'pick' && picks.length ? picks[0] : null);
       btn.disabled = mode === 'pick' && !picks.length;
       btn.textContent = mode === 'group' ? `Post in ${g.chat}` : picks.length ? `Ask ${joinNames(picks.map(f => f.ask))}` : 'Pick at least one parent';
@@ -1976,18 +1976,18 @@ X.flows.carpool = async p => {
   look.done(`${near.length} families nearby on ${g.near.replace(/^Lincoln · /, '')}`, 'Closest to home first', 'ph-users-three');
   if (!once) return cpRegular(p, { w, kids, riders, from, to, back, g, near, rides, whenTxt, route, act });
   await p.say(`${near[0].ask} and ${near[1].ask} live closest, and their kids ${act === 'soccer' ? 'play on Jake’s team' : act === 'camp' ? 'are at Pinecrest' : 'go to Lincoln'} too. Should I post in ${g.chat}, or ask parents you pick?`, 900);
-  /* in the team chat Tony posts it himself; a picked parent gets a group text from Sprout with Tony on it (N10), in
-     Sprout's voice like the sitter texts, so it matches what they see (/receiver/?v=carpool-text) */
+  /* in the team chat Tony posts it himself. Ahmad, 22 Nov: a picked parent is on Sprout too, so the ask goes to a
+     Sprout DM from Tony, with the ride card, not a group text ("it just make us easy... to track everything"). */
   const text = f => f
     ? (once
-      ? `Hi ${f.ask}! It’s Sprout, texting with Tony Martin (he’s on this text too). Could you take ${riders} from ${route} on ${w.day.day} at ${tl(w.at)}${backTxt}? ${back ? 'It’s both ways.' : 'It’s one way.'} Just reply here.`
-      : `Hi ${f.ask}! It’s Sprout, texting with Tony Martin (he’s on this text too). Want to share ${riders}’s rides from ${route}? ${whenTxt}, pickup at ${tl(w.at)}${back ? `, back at ${tl(back)}` : ', one way'}. Families take turns driving. Just reply here.`)
+      ? `Hi ${f.ask}! Could you take ${riders} from ${route} on ${w.day.day} at ${tl(w.at)}${backTxt}? We’re on Banks Court. Happy to return the favor! Tony`
+      : `Hi ${f.ask}! Want to share ${riders}’s rides from ${route}? ${whenTxt}, pickup at ${tl(w.at)}${back ? `, back at ${tl(back)}` : ', one way'}. We’d take turns driving. Tony`)
     : (once
       ? `Hi everyone! Could anyone near us take ${riders} from ${route} on ${w.day.day} at ${tl(w.at)}${backTxt}? We’re on Banks Court. Happy to return the favor! Tony`
       : `Hi everyone! Want to share ${riders}’s rides from ${route}? ${whenTxt}, pickup at ${tl(w.at)}${back ? `, back at ${tl(back)}` : ', one way'}. We’d take turns driving. Tony`);
   const sent = await cpSend(p, g, near, text);
   const group = sent.mode === 'group', asked = group ? near : sent.picks, names = joinNames(asked.map(f => f.ask));
-  const job = p.work(group ? `Posting in ${g.chat}` : `Messaging ${names}`, group ? g.size : asked.length > 1 ? 'A group text with each family · you and Sprout on each' : `Group text · you, ${asked[0].ask} and Sprout`);
+  const job = p.work(group ? `Posting in ${g.chat}` : `Messaging ${names}`, group ? g.size : asked.length > 1 ? 'In Sprout · a DM with each family' : `In Sprout · your DM with ${asked[0].ask}`);
   await sleep(1100);
   job.done(group ? `Posted in ${g.chat}` : `Asked ${names}`, once ? 'First yes drives · I tell the others' : 'Everyone who says yes gets turns', 'ph-paper-plane-tilt');
   const waiting = group ? `Waiting for replies in ${g.chat}` : `Waiting for ${names}`;
@@ -1997,11 +1997,11 @@ X.flows.carpool = async p => {
     /* first yes drives; in the group chat only the yes comes back */
     let yes = null;
     const order = group ? asked.filter(f => !f.cant) : asked;
-    const live = link ? order[0] : null, offWords = live ? liveWords(p, live, group ? `in ${g.chat}` : 'in your group text') : () => {};
+    const live = link ? order[0] : null, offWords = live ? liveWords(p, live, group ? `in ${g.chat}` : 'in Sprout') : () => {};
     if (live) {
       const slots = [-30, 15, 30, 45].map(d => w.at + d).filter(m => m >= 360 && m <= 1320).map(m => ({ m, l:tl(m) }));
-      liveAsk(live, { kind:group ? 'chat' : 'text', who:{ n:live.n, ask:live.ask, kid:live.kid, photo:live.photo }, label:`${live.ask}, ${live.rel}`,
-        sub:group ? `Gets a push, opens ${g.chat}, sees the ride card.` : 'A group text with Tony and Sprout. Works without Sprout.',
+      liveAsk(live, { kind:group ? 'chat' : 'dm', who:{ n:live.n, ask:live.ask, kid:live.kid, photo:live.photo }, label:`${live.ask}, ${live.rel}`,
+        sub:group ? `Gets a push, opens ${g.chat}, sees the ride card.` : 'Gets Tony’s ask in their Sprout DM, with the ride card.',
         chat:g.chat, size:g.size, act, riders, text:sent.text, at:{ m:w.at, l:tl(w.at) }, day:w.day.day, back:back ? tl(back) : null,
         from:cpThere(from), to:cpThere(to), pickAddr:from.k === 'home' ? '10212 Banks Court' : cpShort(from), dist:`${live.mi} mi from you · ${g.doing(live)}`, slots });
     }
@@ -2010,7 +2010,7 @@ X.flows.carpool = async p => {
       if (f === live) {
         ans = await liveWait(p, { status:waiting, small:`${w.day.day} · ${tl(w.at)}`, types:['yes', 'offer', 'no'] });
         X.notify(p, group ? `${f.ask} replied in ${g.chat}` : `${f.ask} replied`, ans.t === 'yes' ? `I can take ${riders}!` : ans.t === 'no' ? 'Can’t this time' : 'Could drive at another time');
-        if (ans.text) liveHeard(p, f, 'in your group text', ans.text);
+        if (ans.text) liveHeard(p, f, group ? `in ${g.chat}` : 'in Sprout', ans.text);
       }
       const cant = ans ? ans.t === 'no' : f.cant;
       if (ans && cant) LIVE.no = true;
@@ -2039,7 +2039,7 @@ X.flows.carpool = async p => {
         continue;
       }
       if (!cant) { yes = f; break; }
-      p.note(`${f.ask} can’t this time`, 'Said no in your group text', 'ph-x-circle');
+      p.note(`${f.ask} can’t this time`, group ? `Said no in ${g.chat}` : 'Said no in Sprout', 'ph-x-circle');
     }
     if (!yes) {
       await p.say(`${names} can’t this time. Want me to post in ${g.chat}?`, 800);
@@ -2049,7 +2049,7 @@ X.flows.carpool = async p => {
       yes = near.find(f => !f.cant && !asked.includes(f)) || near[0];
       await later(p, { status:`Waiting for replies in ${g.chat}`, small:`${w.day.day} · ${tl(w.at)}`, ms:2200, title:`${yes.ask} replied in ${g.chat}`, body:`I can take ${riders}!` });
     }
-    const tell = p.work(`Telling ${yes.ask} it’s set`, group ? `In ${g.chat} · your address shared` : `In your group text with ${yes.ask} · your address shared`);
+    const tell = p.work(`Telling ${yes.ask} it’s set`, group ? `In ${g.chat} · your address shared` : `In your Sprout DM with ${yes.ask} · your address shared`);
     await sleep(900);
     tell.done(`${yes.ask} · ride set`, `${w.day.day} · ${tl(w.at)}${back ? ` and ${tl(back)}` : ''}`, 'ph-car-profile');
     offWords();
@@ -2058,8 +2058,8 @@ X.flows.carpool = async p => {
     const others = group ? [] : asked.filter(f => f !== yes && !f.cant).map(f => f.ask);
     if (group) p.note(`Posted “${yes.ask} has it, thanks!” in ${g.chat}`, 'So nobody else offers', 'ph-chat-circle-text');
     else if (others.length) {
-      p.note(`Told ${joinNames(others)} you found a ride`, others.length > 1 ? 'Sent in their group texts' : 'Sent in your group text', 'ph-paper-plane-tilt');
-      p.block(`<div class="preview gtx"><small>To ${joinNames(others)} · ${others.length > 1 ? 'in each group text' : 'in your group text'} · from Sprout</small><p></p></div>`).querySelector('p').textContent =
+      p.note(`Told ${joinNames(others)} you found a ride`, 'Sent in Sprout', 'ph-paper-plane-tilt');
+      p.block(`<div class="preview gtx"><small>To ${joinNames(others)} · in Sprout · from Sprout</small><p></p></div>`).querySelector('p').textContent =
         `Hi! We’re all set now: ${yes.ask} is taking ${riders} on ${w.day.day}. Thank you so much for checking! Sprout, for Tony`;
     }
     await p.say(`${yes.ask} is driving ${riders}. It’s on both families’ calendars, and Dana has it too.`, 900);
