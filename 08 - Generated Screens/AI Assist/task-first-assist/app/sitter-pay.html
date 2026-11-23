@@ -218,7 +218,7 @@
     <div class="card" style="animation-delay:.08s">
       <div class="fact" style="border-top:0"><i class="ph ph-chat-circle-dots"></i>We’ll text you when Tony pays, with the amount</div>
       <div class="fact"><i class="ph ph-arrows-clockwise"></i>Next time a Sprout family books you, pay goes here too</div>
-      <div class="fact"><i class="ph ph-pencil-simple"></i>Need to change it? Reply “pay” in any Sprout text</div>
+      <div class="fact"><i class="ph ph-sign-in"></i><span>Change it anytime: <a href="/sitter-profile/?s=login" style="color:var(--brand)">log in at sprout.app/sitter</a> with your number</span></div>
     </div>
     <a class="more" href="/sitter-profile/" style="animation:rise .3s .16s both"><b>Want more bookings?</b><small>Lincoln families can find you with a free sitter profile. 2 minutes.</small></a>
   </section>
@@ -239,6 +239,16 @@
   $('[data-rate]').textContent = `$${b.r}/hr`;
   $('[data-total]').textContent = `About $${Math.round(b.r * b.h)}`;
   document.title = `Get paid · ${b.n} · Sprout`;
+  /* Ahmad, 22 Nov: the sitter profile (/sitter-profile/) opens this same setup with ?from=profile: no booking card,
+     and it goes back to the profile when done. Either way the setup is saved per sitter, so their profile shows it. */
+  const fromProfile = q.get('from') === 'profile';
+  if (fromProfile) {
+    $$('[data-step="booking"] .who, [data-step="booking"] .fact').forEach(e => e.remove());
+    $('[data-step="booking"] h1').textContent = 'How do you want to get paid?';
+    $('[data-step="booking"] .lede').textContent = `${b.n}, families who book you through Sprout pay you here. You set it up once.`;
+    $('.sprout-pay .lede').textContent = 'Families pay you in one tap. It goes to your bank or debit card, and we text you when it’s on its way.';
+    $('[data-step="booking"] > .priv').lastChild.textContent = 'Bank and card details go to Stripe, Sprout’s payment partner. Families never see them.';
+  }
 
   let way = 'bank', bank = null;   // 'bank' | 'card' (through Sprout) | 'none' (skipped Sprout)
   /* how each one gets set up: PayPal signs in (its real "Log in with PayPal" connect, like Upwork); Venmo and Zelle
@@ -308,6 +318,9 @@
     $('[data-sum]').innerHTML = list.join('');
     /* tells Tony's Sprout (same site, any tab): bank or card, plus the other ways and their handles (he needs those to pay) */
     if (q.get('l') && 'BroadcastChannel' in window) { const ch = new BroadcastChannel('sprout-pay-' + q.get('l')); ch.postMessage({ t:'payout', n:b.n, way, apps:apps() }); setTimeout(() => ch.close(), 500); }
+    /* saved on the sitter's account (here: this browser), so their profile and log-in show it */
+    try { localStorage.setItem('sprout:sitter-pay:' + b.n.toLowerCase(), JSON.stringify({ way, bank, apps:apps() })); } catch {}
+    if (fromProfile) { location.href = '/sitter-profile/?s=done'; return; }
     show('done');
   };
   const show = step => { $$('[data-step]').forEach(s => s.hidden = s.dataset.step !== step); scrollTo({ top:0 }); $(`[data-step="${step}"] h1`)?.focus({ preventScroll:true }); };

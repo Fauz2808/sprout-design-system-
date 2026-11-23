@@ -2,6 +2,15 @@
 
 Live: https://sprout-assist-tasks.vercel.app/assist/ · local: `python3 build.py`, then serve `site/` (preview config `assist-tasks`, port 4330).
 
+## 22 Nov · sitter profile: same pay setup + log in by number (Ahmad)
+
+`/sitter-profile/`: the old "Add your bank on Stripe" step is now "How do you want to get paid?" → Set up how you
+get paid, which opens `/pay/?from=profile` (no booking card) and comes back to the profile. The profile shows a
+Payments section (Sprout, apps and handles, Change). /pay/ saves the setup per sitter (`sprout:sitter-pay:<name>`,
+this browser stands in for the account). Log in: `?s=login` at sprout.app/sitter, phone number → text code (the
+prototype code 482 913 appears as a "From Messages" autofill) → the profile; Log out on the profile. Replaces "No
+login. Text profile". The booked-sitter /pay/ done page now says change it by logging in.
+
 ## 22 Nov · payout page, one decision per screen (Ahmad, direction B)
 
 Ahmad: two pickers on one screen (bank / card / not through Sprout, then five apps) left the sitter unsure what to

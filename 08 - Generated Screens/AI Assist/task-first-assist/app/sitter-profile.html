@@ -97,6 +97,18 @@
   /* L8 (19 Nov): prefilled number, required photo */
   .lede{margin:0 0 4px;color:var(--subtle);font-size:14px}
   .profile-photo .need{display:block;margin-top:4px;font-size:12.5px;color:var(--subtle)}
+  /* Ahmad, 22 Nov: payments on the profile + log in by number */
+  .payments .pay-head{display:flex;align-items:center;justify-content:space-between}
+  .payments .pay-head b{font:500 18px var(--serif);color:var(--strong)}
+  .payments .pay-head .textbtn{margin:0;padding:4px 0;font:600 14px var(--sans);color:var(--brand)}
+  .pay-list{margin:8px 0 0;padding:0;list-style:none}
+  .pay-list li{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--soft);font-size:15px;color:var(--strong)}
+  .pay-list li:first-child{border-top:0}
+  .pay-list li i{font-size:20px;color:var(--brand)}
+  .pay-list li small{margin-left:auto;color:var(--subtle);font-size:13px;overflow-wrap:anywhere;text-align:right}
+  .pay-list li.none{color:var(--subtle)}
+  .autofill{display:flex;align-items:center;gap:8px;width:100%;margin:10px 0 4px;padding:10px 12px;border-radius:12px;background:var(--tint);color:var(--brand);font-size:14px}
+  .autofill b{font-weight:600;letter-spacing:.04em}
   .who i.av.empty{background:var(--field) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256' fill='%236b7470'%3E%3Cpath d='M208 56h-27.72l-13.63-20.44A8 8 0 0 0 160 32H96a8 8 0 0 0-6.65 3.56L75.71 56H48a24 24 0 0 0-24 24v112a24 24 0 0 0 24 24h160a24 24 0 0 0 24-24V80a24 24 0 0 0-24-24Zm8 136a8 8 0 0 1-8 8H48a8 8 0 0 1-8-8V80a8 8 0 0 1 8-8h32a8 8 0 0 0 6.66-3.56L100.28 48h55.43l13.63 20.44A8 8 0 0 0 176 72h32a8 8 0 0 1 8 8ZM128 88a44 44 0 1 0 44 44 44.05 44.05 0 0 0-44-44Zm0 72a28 28 0 1 1 28-28 28 28 0 0 1-28 28Z'/%3E%3C/svg%3E") center/24px no-repeat}
   .known{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 0;padding:10px 14px;border-radius:14px;background:var(--field)}
   .known small{display:block;font-size:12.5px;color:var(--subtle)}
@@ -156,15 +168,34 @@
     <button type="button" class="textbtn" data-cancel="area" hidden>Cancel</button>
   </form>
 
+  <!-- Ahmad, 22 Nov: the same pay setup a booked sitter gets from the /pay/ link (Sprout first through Stripe, then
+       PayPal sign-in, Venmo and Zelle by number, Cash App, cash). It opens /pay/ in profile mode and comes back here. -->
   <section class="card" data-step="pay" hidden>
-    <h1 class="ask">Get paid through Sprout</h1>
-    <p>Parents pay in Sprout. Stripe sends the money straight to your bank.</p>
-    <div data-pay-actions>
-      <button type="button" class="send" data-bank>Add your bank on Stripe</button>
-      <button type="button" class="textbtn" data-skip>Not now</button>
-    </div>
-    <div class="status" data-stripe role="status" hidden><span class="spinner"></span><span data-stripe-label>Opening Stripe…</span></div>
+    <h1 class="ask" tabindex="-1">How do you want to get paid?</h1>
+    <p class="lede">Families who book you through Sprout pay you there. Bank or card through Sprout, or Venmo, Zelle, PayPal and cash. You set it up once.</p>
+    <button type="button" class="send" data-setup-pay>Set up how you get paid</button>
+    <button type="button" class="textbtn" data-skip>Not now</button>
+    <p class="priv" data-storage-error role="alert" hidden></p>
   </section>
+
+  <!-- Ahmad, 22 Nov: sitters log in with their number and a text code (no password), to see and change their profile
+       and how they get paid. Replaces "No login. Text profile in any Sprout thread". -->
+  <form class="card" data-step="login" hidden>
+    <h1 class="ask" tabindex="-1">Log in to Sprout</h1>
+    <p class="lede">Sitters log in with their phone number. No password.</p>
+    <div data-login-phone>
+      <label for="login-phone">Phone number</label><div class="rate"><input id="login-phone" type="tel" autocomplete="tel" placeholder="(512) 555-0148"></div>
+      <button type="submit" class="send" data-send-code>Text me a code</button>
+    </div>
+    <div data-login-code hidden>
+      <p class="lede" style="margin-top:10px">We texted a 6-digit code to <b data-login-to></b>.</p>
+      <button type="button" class="autofill" data-autofill><i class="ph ph-chat-circle-dots"></i>From Messages · <b>482 913</b></button>
+      <label for="login-code">Code</label><div class="rate"><input id="login-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="000 000"></div>
+      <button type="submit" class="send" data-login-go>Log in</button>
+      <button type="button" class="textbtn" data-login-back>Use a different number</button>
+    </div>
+    <p class="priv" data-login-error role="alert" hidden></p>
+  </form>
 
   <section data-step="done" hidden>
     <h1 class="ask profile-title" tabindex="-1">Your profile is live</h1>
@@ -173,13 +204,17 @@
       <div class="who profile-photo"><i class="av" data-avatar role="img" aria-label="Profile photo"></i><div><b data-name></b><small data-area></small></div></div>
       <div class="fact"><i class="ph ph-car" aria-hidden="true"></i><span data-distance></span></div>
       <div class="fact"><i class="ph ph-users" aria-hidden="true"></i>Sat for 1 Lincoln family</div>
-      <div class="fact" data-paid hidden><i class="ph ph-bank" aria-hidden="true"></i>Gets paid through Sprout</div>
-      <!-- L8 open question (Tony: "how would they get to their profile again?"). Proposal, no login: the link is sent
-           again by text. Not decided. -->
-      <div class="fact"><i class="ph ph-chat-circle-dots" aria-hidden="true"></i>No login. Text “profile” in any Sprout thread and we send this link again.</div>
+      <!-- L8 open question (Tony: "how would they get to their profile again?"). Ahmad, 22 Nov: log in by number. -->
+      <div class="fact"><i class="ph ph-sign-in" aria-hidden="true"></i>Log in anytime at sprout.app/sitter with your number</div>
       <button type="button" class="send" data-edit="name">Edit profile</button>
       <button type="button" class="textbtn" data-edit="area">Edit service area</button>
     </div>
+    <div class="card payments">
+      <div class="pay-head"><b>Payments</b><button type="button" class="textbtn" data-change-pay>Change</button></div>
+      <ul class="pay-list" data-pay-list></ul>
+      <button type="button" class="send" data-add-pay hidden>Set up how you get paid</button>
+    </div>
+    <button type="button" class="textbtn" data-logout>Log out</button>
     <p class="priv" data-storage-error role="alert" hidden></p>
   </section>
 </main>
@@ -214,8 +249,11 @@
       $('[data-name]').textContent = [state.first, state.last].filter(Boolean).join(' ');
       $('[data-area]').textContent = areaLabel(state.area);
       $('[data-distance]').textContent = `Drives up to ${state.miles} mi`;
-      $('[data-paid]').hidden = !state.paid;
+      paintPay();
     }
+    /* the address bar: the log-in page lives at sprout.app/sitter, the profile at joinsprout.co/s/<name> */
+    $('.url').innerHTML = step === 'login' ? '<i class="ph ph-lock-simple"></i> <b>sprout.app</b>/sitter'
+      : `<i class="ph ph-lock-simple"></i> <b>joinsprout.co</b>/s/${(state.first || 'jordan').toLowerCase().replace(/[^a-z0-9]/g, '')}`;
     screens.forEach(el => el.hidden = el.dataset.step !== step);
     if (focus) $('main [data-step]:not([hidden]) h1')?.focus({ preventScroll:true });
     window.scrollTo(0, 0);
@@ -364,17 +402,47 @@
       $(`[data-edit="${button.dataset.cancel}"]`).focus();
     };
   });
-  $('[data-bank]').onclick = () => {
-    $('[data-pay-actions]').hidden = true;
-    $('[data-stripe]').hidden = false;
-    setTimeout(() => {
-      state.paid = true;
-      $('[data-stripe]').firstElementChild.outerHTML = '<i class="ph ph-check-circle" aria-hidden="true"></i>';
-      $('[data-stripe-label]').textContent = 'Bank account added · payouts in 2 business days';
-      setTimeout(finishSetup, 2200);
-    }, 900);
+  /* Ahmad, 22 Nov: payments = the /pay/ setup (saved per sitter by /pay/), shown on the profile with Change */
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+  const payKey = () => 'sprout:sitter-pay:' + (state.first || 'jordan').toLowerCase();
+  const readPay = () => { try { return JSON.parse(localStorage.getItem(payKey())); } catch { return null; } };
+  function paintPay(){
+    const pay = readPay(), rows = [];
+    if (pay && pay.way && pay.way !== 'none') rows.push(`<li><i class="ph ph-bank"></i>Sprout<small>${pay.way === 'bank' ? `${esc(pay.bank || 'Bank')} ••••6789` : 'Debit card ••••4821'}</small></li>`);
+    ((pay && pay.apps) || []).forEach(a => rows.push(`<li><i class="ph ${a.k === 'cash' ? 'ph-money' : 'ph-device-mobile'}"></i>${esc(a.n)}${a.h ? `<small>${esc(a.h)}</small>` : ''}</li>`));
+    $('[data-pay-list]').innerHTML = rows.join('') || '<li class="none"><i class="ph ph-hourglass-medium"></i>Not set up yet. Families can’t pay you in Sprout.</li>';
+    $('[data-add-pay]').hidden = rows.length > 0;
+    $('[data-change-pay]').hidden = !rows.length;
+  }
+  const goPay = () => {
+    save({ ...state }, 'pay');   // keep the profile while the sitter is on the pay page
+    location.href = '/pay/?' + new URLSearchParams({ from:'profile', n:state.first || 'Jordan', p:state.phone || '' });
   };
+  $('[data-setup-pay]').onclick = goPay;
+  $('[data-change-pay]').onclick = goPay;
+  $('[data-add-pay]').onclick = goPay;
   $('[data-skip]').onclick = finishSetup;
+
+  /* log in: number, then the text code (prototype: the code "arrives" as an autofill suggestion) */
+  const loginForm = $('[data-step="login"]'), loginErr = $('[data-login-error]');
+  const digits = v => v.replace(/\D/g, '');
+  loginForm.onsubmit = e => {
+    e.preventDefault(); loginErr.hidden = true;
+    if ($('[data-login-code]').hidden) {
+      const ph = $('#login-phone').value.trim();
+      if (digits(ph).length < 10) { loginErr.textContent = 'Enter the number your sitter texts come to.'; loginErr.hidden = false; return; }
+      $('[data-login-to]').textContent = ph;
+      $('[data-login-phone]').hidden = true; $('[data-login-code]').hidden = false;
+      setTimeout(() => $('#login-code').focus(), 50);
+      return;
+    }
+    if (digits($('#login-code').value) !== '482913') { loginErr.textContent = 'That code doesn’t match. Check the text from Sprout.'; loginErr.hidden = false; return; }
+    state = { ...defaults, ...readProfile(), phone:$('[data-login-to]').textContent };
+    show('done', true);
+  };
+  $('[data-autofill]').onclick = () => { $('#login-code').value = '482 913'; };
+  $('[data-login-back]').onclick = () => { $('[data-login-code]').hidden = true; $('[data-login-phone]').hidden = false; $('#login-code').value = ''; loginErr.hidden = true; };
+  $('[data-logout]').onclick = () => { $('[data-login-back]').click(); $('#login-phone').value = ''; show('login', true); };
 
   paintPhoto(profileForm.querySelector('[data-avatar]'), draftPhoto);
   paintPhone();
