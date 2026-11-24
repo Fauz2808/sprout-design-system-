@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Store screenshots · V.8 Living onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/mascot-live.css">
+<style>
+  :root {
+    --green: #186338; --deep: #12301f; --ink: #1d2a21; --muted: #6d6a60; --line: #e7e2d6; --cream: #f4f1ea;
+    --leaf: #cfe6c4; --sage: #e1ebdd; --page: #ece9e2; --red: #f6dada; --redink: #9b2c2c; --amber: #f7ecd2; --amberink: #7a5a12;
+    --gap: 16px; --w: min(300px, calc((100vw - 96px - 5 * var(--gap)) / 6));
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--page); color: var(--ink); font-family: Inter, system-ui, sans-serif; padding: 36px 48px 80px; }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; max-width: 1500px; }
+  .top h1 { font: 600 30px/1.15 'Playfair Display', serif; }
+  .top p { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--muted); max-width: 760px; }
+  .btn { font: 600 13px/1 Inter; color: #fff; background: var(--green); border: 0; border-radius: 999px; padding: 11px 18px; cursor: pointer; white-space: nowrap; }
+  h2.section { font: 600 22px/1.2 'Playfair Display', serif; margin: 40px 0 6px; }
+  p.why { font-size: 13.5px; line-height: 1.5; color: var(--muted); max-width: 980px; margin-bottom: 16px; }
+  .row { display: flex; gap: var(--gap); }
+  .slide-wrap { width: var(--w); flex: none; }
+  .slide-wrap .cap { font-size: 11.5px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+  .slide-wrap .cap b { color: var(--ink); font-weight: 600; }
+  .learn { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; max-width: 1500px; }
+  .learn div { background: #fff; border-radius: 14px; padding: 14px 16px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+  .learn b { display: block; color: var(--ink); font-size: 13.5px; margin-bottom: 4px; }
+  details { margin-top: 14px; }
+  summary { cursor: pointer; font: 600 13px/1 Inter; color: var(--green); }
+  .refs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .refs img { width: 100%; border-radius: 10px; display: block; }
+
+  /* ---------- slide shell (1290 × 2796, in container units) ---------- */
+  .slide { width: 100%; aspect-ratio: 1290 / 2796; position: relative; overflow: hidden; container-type: inline-size; border-radius: calc(var(--w) * .07);
+    box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.08); color: var(--deep); isolation: isolate; }
+  .bg-cream  { background: radial-gradient(90% 55% at 50% 0%, #fffdf8 0%, #f6f2e8 55%, #ebe5d6 100%); }
+  .bg-sage   { background: radial-gradient(90% 55% at 50% 0%, #f7fbf4 0%, #e4eedf 60%, #cfe0c9 100%); }
+  .bg-butter { background: radial-gradient(90% 55% at 50% 0%, #fffaf0 0%, #f8edd3 60%, #f0dcae 100%); }
+  .bg-peach  { background: radial-gradient(90% 55% at 50% 0%, #fff8f3 0%, #f8e6da 60%, #efcfba 100%); }
+  .bg-mint   { background: radial-gradient(90% 55% at 50% 0%, #f5fbf8 0%, #dcefe6 60%, #bfdfcf 100%); }
+  .head { position: absolute; left: 7cqw; right: 7cqw; top: 13cqw; text-align: center; z-index: 5; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 1.6cqw; font: 700 3cqw/1 Inter; letter-spacing: .14em; text-transform: uppercase; color: var(--green); }
+  .eyebrow img { width: 4.2cqw; height: 4.2cqw; }
+  .h { font: 600 11.4cqw/1.02 'Playfair Display', serif; letter-spacing: -.015em; margin-top: 4.4cqw; color: var(--deep); }
+  .h em { font-style: italic; color: var(--green); }
+  .sub { font: 400 3.8cqw/1.42 Inter; color: #5b5a52; margin-top: 4cqw; }
+
+  /* ---------- phone ---------- */
+  .phone { position: absolute; left: 50%; transform: translateX(-50%); width: 76cqw; aspect-ratio: 393 / 852; border-radius: 12cqw; padding: 1.7cqw;
+    background: linear-gradient(145deg, #3a3a3c, #121214 40%, #2a2a2c); box-shadow: 0 0 0 .35cqw #4a4a4d inset, 0 4cqw 9cqw rgba(30,40,30,.28), 0 1cqw 2cqw rgba(0,0,0,.18); z-index: 2; }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: 10.4cqw; overflow: hidden; background: var(--cream); container-type: inline-size; --u: calc(100cqw / 393); font-family: Inter, sans-serif; color: var(--ink); }
+  .island { position: absolute; top: calc(var(--u)*11); left: 50%; transform: translateX(-50%); width: calc(var(--u)*122); height: calc(var(--u)*36); border-radius: 99px; background: #000; z-index: 3; }
+  .sbar { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; padding: calc(var(--u)*19) calc(var(--u)*34) 0 calc(var(--u)*40); font: 600 calc(var(--u)*16)/1 -apple-system, Inter; }
+  .sbar i { font-style: normal; letter-spacing: .1em; font-size: calc(var(--u)*12); }
+  .pad { padding: 0 calc(var(--u)*16); }
+
+  /* Sprout UI (all in points via --u) */
+  .card { background: #fff; color: var(--ink); border-radius: calc(var(--u)*20); box-shadow: 0 calc(var(--u)*1) calc(var(--u)*3) rgba(0,0,0,.06); }
+  .av { border-radius: 50%; object-fit: cover; display: block; flex: none; }
+  .row-todo { display: flex; align-items: center; gap: calc(var(--u)*11); padding: calc(var(--u)*13) calc(var(--u)*14); }
+  .row-todo + .row-todo { border-top: 1px solid var(--line); }
+  .cb { width: calc(var(--u)*22); height: calc(var(--u)*22); border-radius: calc(var(--u)*7); border: calc(var(--u)*1.6) solid #cfc9bb; flex: none; }
+  .face { position: relative; width: calc(var(--u)*40); height: calc(var(--u)*40); flex: none; }
+  .face .av { width: 100%; height: 100%; }
+  .face .gm { position: absolute; right: calc(var(--u)*-4); bottom: calc(var(--u)*-4); width: calc(var(--u)*19); height: calc(var(--u)*19); border-radius: 50%; background: #fff; display: grid; place-items: center; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .face .gm svg { width: 64%; }
+  .faces2 { display: flex; }
+  .faces2 .av { width: calc(var(--u)*36); height: calc(var(--u)*36); border: calc(var(--u)*2.5) solid #fff; }
+  .faces2 .av + .av { margin-left: calc(var(--u)*-13); }
+  .tt { font: 500 calc(var(--u)*16)/1.25 'Playfair Display', serif; }
+  .meta { display: flex; align-items: center; gap: calc(var(--u)*7); margin-top: calc(var(--u)*6); font-size: calc(var(--u)*12); color: var(--muted); white-space: nowrap; overflow: hidden; }
+  .chip { font: 600 calc(var(--u)*11)/1 Inter; padding: calc(var(--u)*5) calc(var(--u)*8); border-radius: 999px; background: var(--sage); color: var(--green); white-space: nowrap; }
+  .chip.red { background: var(--red); color: var(--redink); }
+  .chip.amber { background: var(--amber); color: var(--amberink); }
+  .grow { flex: 1; min-width: 0; }
+  .box-h { display: flex; align-items: center; gap: calc(var(--u)*10); padding: calc(var(--u)*13) calc(var(--u)*14); border-bottom: 1px solid var(--line); }
+  .box-h .t { font: 500 calc(var(--u)*18)/1 'Playfair Display', serif; flex: 1; }
+  .plus { width: calc(var(--u)*28); height: calc(var(--u)*28); border-radius: 50%; background: var(--sage); color: var(--green); display: grid; place-items: center; font-size: calc(var(--u)*19); line-height: 1; }
+  .gmpill { font: 600 calc(var(--u)*10.5)/1 Inter; color: var(--green); background: var(--sage); padding: calc(var(--u)*5) calc(var(--u)*8); border-radius: 999px; }
+  .ticks { text-align: center; color: var(--green); font: 500 calc(var(--u)*11.5)/1 Inter; flex: none; }
+  .ticks svg { width: calc(var(--u)*21); height: calc(var(--u)*13); display: block; margin: 0 auto calc(var(--u)*4); }
+  .ticks.gray { color: #9a958a; }
+
+  /* breakout elements live in slide units (cqw of the slide) */
+  .out { position: absolute; z-index: 4; --u: .25cqw; font-family: Inter, sans-serif; color: var(--ink); }
+  .float { box-shadow: 0 2.4cqw 6cqw rgba(30,40,30,.22), 0 .4cqw 1cqw rgba(0,0,0,.08); }
+  .bub { background: #fff; font: 400 calc(var(--u)*15)/1.38 Inter; padding: calc(var(--u)*11) calc(var(--u)*14); border-radius: calc(var(--u)*18) calc(var(--u)*18) calc(var(--u)*18) calc(var(--u)*5); }
+  .bub.me { background: var(--green); color: #fff; border-radius: calc(var(--u)*18) calc(var(--u)*18) calc(var(--u)*5) calc(var(--u)*18); }
+  .push { display: flex; gap: calc(var(--u)*11); padding: calc(var(--u)*13) calc(var(--u)*15); border-radius: calc(var(--u)*22); background: rgba(255,255,255,.92); backdrop-filter: blur(8px); }
+  .push .ic { width: calc(var(--u)*38); height: calc(var(--u)*38); border-radius: calc(var(--u)*9); background: var(--cream); display: grid; place-items: center; flex: none; box-shadow: inset 0 0 0 .5px rgba(0,0,0,.12); }
+  .push .ic img { width: 76%; }
+  .push .pt { font: 600 calc(var(--u)*14.5)/1.3 -apple-system, Inter; }
+  .push .pb { font: 400 calc(var(--u)*14.5)/1.32 -apple-system, Inter; margin-top: calc(var(--u)*2); }
+  .push .pw { font: 400 calc(var(--u)*12.5)/1 -apple-system, Inter; color: #7c7c80; margin-left: auto; padding-left: calc(var(--u)*8); }
+  .tag { position: absolute; z-index: 4; font: 600 3.2cqw/1 Inter; padding: 2.4cqw 3.6cqw; border-radius: 999px; background: #fff; color: var(--deep); white-space: nowrap; box-shadow: 0 1.6cqw 4cqw rgba(30,40,30,.18); display: inline-flex; align-items: center; gap: 1.6cqw; }
+  .tag.green { background: var(--green); color: #fff; }
+
+  /* mascot peeking from behind the phone */
+  .mascot { position: absolute; z-index: 1; }
+  .mascot.front { z-index: 6; }
+
+  /* ---------- hero orbit ---------- */
+  .orbit { position: absolute; left: 50%; width: 0; height: 0; z-index: 2; }
+  .ringline { position: absolute; border-radius: 50%; border: .3cqw solid rgba(24,99,56,.13); transform: translate(-50%, -50%); left: 0; top: 0; }
+  .ringline.dash { border-style: dashed; border-color: rgba(24,99,56,.18); }
+  .spin { position: absolute; left: 0; top: 0; width: 0; height: 0; animation: spin var(--dur) linear infinite; animation-direction: var(--dir, normal); }
+  .sat { position: absolute; left: 0; top: 0; transform: rotate(var(--a)) translateX(var(--r)) rotate(calc(-1 * var(--a))); }
+  .sat > .c { position: absolute; transform: translate(-50%, -50%); }
+  .sat > .c > .cr { animation: spin var(--dur) linear infinite; animation-direction: var(--cdir, reverse); }
+  .sat img { width: var(--s); height: var(--s); border-radius: 50%; display: block; filter: drop-shadow(0 1.2cqw 2.4cqw rgba(30,40,30,.18)); }
+  .dot { width: var(--s); height: var(--s); border-radius: 50%; background: var(--leaf); box-shadow: 0 0 0 .8cqw rgba(207,230,196,.35); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes floaty { 50% { transform: translate(-50%, calc(-50% - 1.4cqw)); } }
+  .paused * { animation-play-state: paused !important; }
+  .free { position: absolute; z-index: 5; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 2cqw; font: 600 3.6cqw/1 Inter; color: var(--deep); background: #fff; padding: 2.8cqw 4.4cqw; border-radius: 999px; box-shadow: 0 1.6cqw 4cqw rgba(30,40,30,.16); white-space: nowrap; }
+  .free i { font-style: normal; color: var(--green); }
+
+  /* App Store mock */
+  .store-wrap { display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; }
+  .store { width: 360px; background: #fff; border-radius: 28px; padding: 18px 16px 20px; box-shadow: 0 8px 30px rgba(0,0,0,.08); }
+  .store .app { display: flex; align-items: center; gap: 12px; }
+  .store .icon { width: 62px; height: 62px; border-radius: 15px; background: var(--cream); display: grid; place-items: center; box-shadow: inset 0 0 0 .5px rgba(0,0,0,.12); }
+  .store .icon img { width: 46px; }
+  .store .name { font: 600 16px/1.2 -apple-system, Inter, sans-serif; }
+  .store .tagline { font: 400 13px/1.3 -apple-system, Inter, sans-serif; color: #8a8a8e; }
+  .store .get { font: 700 14px/1 -apple-system, Inter; color: #0a84ff; background: #eef0f4; border-radius: 999px; padding: 8px 20px; margin-left: auto; }
+  .store .shots { display: flex; gap: 8px; margin-top: 14px; }
+  .store .shots .slide-wrap { width: 104px; --w: 104px; }
+  .store .shots .slide { border-radius: 10px; }
+  .notes { max-width: 560px; font-size: 13.5px; line-height: 1.55; color: var(--muted); }
+  .notes b { color: var(--ink); }
+  .notes li + li { margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div>
+    <h1>App Store screenshots · V.8 “Living onboarding”</h1>
+    <p>Built from the screenshots of apps people are downloading now, including our competitors Orbits and Ohai. Slide 1 is the onboarding community, alive: the Sprout mascot in the middle, the parents and the school orbiting it. Slides 2 to 6 follow the onboarding story, each with a real phone, the mascot peeking from behind it, and one piece of UI breaking out.</p>
+  </div>
+  <button class="btn" id="pause">Pause motion</button>
+</div>
+
+<h2 class="section">What the trending apps do</h2>
+<div class="learn">
+  <div><b>Slide 1 is a character, not a phone.</b>Tolan, Finch and Orbits (“Meet Bit. The little planet that could.”) open with their mascot and one big promise.</div>
+  <div><b>The mascot lives in the product.</b>Ohai’s octopus peeks out from behind every phone. Bit sits inside Orbits’ UI. It makes a set feel like one story.</div>
+  <div><b>Warm, light backgrounds.</b>Tolan, Orbits, Ohai and Structured all use cream, peach or pastel with dark, friendly headlines and one word in the brand color.</div>
+  <div><b>UI breaks out of the phone.</b>Chat bubbles, cards and reminders float over the frame edge (Tolan, Bevel, Ohai), so the point reads at thumbnail size.</div>
+  <div><b>Before → after stories.</b>Orbits: “Take the group chat from this… / To this…”, “Go from emails… to actions.” Exactly Sprout’s email-to-to-do promise.</div>
+</div>
+<details><summary>See the real App Store screenshots we studied (Tolan, Orbits, Ohai, Finch, Opal, Structured, Bevel, Retro, Locket, grug, Moonlitt, Gentler Streak)</summary>
+  <div class="refs"><img src="research/trending-1.jpg" alt=""><img src="research/trending-2.jpg" alt=""><img src="research/trending-3.jpg" alt=""><img src="research/trending-4.jpg" alt=""></div>
+</details>
+
+<h2 class="section">The set</h2>
+<p class="why">Order and headlines follow onboarding. Slide 1 moves (this is also the App Preview video, which plays before the screenshots in search). On slides 2 to 6 the mascot breathes and blinks here for review; the uploaded PNGs are still frames.</p>
+<div class="row" id="set"></div>
+
+<h2 class="section">In App Store search</h2>
+<p class="why">The first three slides beside the icon, about 104 px wide on a phone.</p>
+<div class="store-wrap">
+  <div class="store" id="store"></div>
+  <ul class="notes">
+    <li><b>Slide 1 sells the feeling:</b> everyone at your school, in one place, with a friendly character in the middle.</li>
+    <li><b>Slides 2 and 3 prove it:</b> the class chat and the parent directory, in a real phone.</li>
+    <li>The Daily Brief, Gmail to-dos and family reminders follow for parents who swipe.</li>
+    <li>No ratings or press badges yet: Tolan and Ohai use them, we add ours when they are real.</li>
+  </ul>
+</div>
+
+<script src="assets/mascot-motion.js"></script>
+<script>
+const P = n => `assets/people/${n}.png`, O = n => `assets/orbit/${n}.png`;
+const GMAIL = '<svg viewBox="0 0 48 36"><path fill="#4285F4" d="M3 36h8V17L0 9v24c0 1.7 1.3 3 3 3z"/><path fill="#34A853" d="M37 36h8c1.7 0 3-1.3 3-3V9l-11 8z"/><path fill="#FBBC04" d="M37 3v14l11-8V5c0-4-4.6-6.3-7.8-3.9z"/><path fill="#EA4335" d="M11 17V3l13 9.8L37 3v14L24 26.6z"/><path fill="#C5221F" d="M0 5v4l11 8V3L7.8 1.1C4.6-1.3 0 1 0 5z"/></svg>';
+const DTICK = '<svg viewBox="0 0 22 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 7.5l4 4L12.5 3"/><path d="M8.5 11.5L16.5 3"/></svg>';
+const STICK = '<svg viewBox="0 0 22 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7.5l4 4L16.5 3"/></svg>';
+const MIC = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+const sbar = `<div class="island"></div><div class="sbar"><span>9:41</span><i>●●● ◔ ▮</i></div>`;
+const mascot = (x, y, s, profile, front = false, flip = false) => `<span class="mascot${front ? ' front' : ''}" data-profile="${profile}" style="left:${x}cqw;top:${y}cqw;width:${s}cqw;height:${s * 1.08}cqw;${flip ? 'transform:scaleX(-1);' : ''}">${SproutMotion.markup().replace(/assets\/mascot-live/g, 'assets/mascot-live')}</span>`;
+const todo = o => `<div class="row-todo"><div class="cb"></div>
+  ${o.faces ? `<div class="faces2">${o.faces.map(f => `<img class="av" src="${P(f)}" alt="">`).join('')}</div>` : `<div class="face"><img class="av" src="${P(o.face)}" alt="">${o.gmail ? `<div class="gm">${GMAIL}</div>` : ''}</div>`}
+  <div class="grow"><div class="tt">${o.title}</div><div class="meta"><span class="chip ${o.chipc || ''}">${o.chip}</span>${o.from ? `<span>${o.from}</span>` : ''}</div></div>
+  ${o.ticks ? `<div class="ticks ${o.ticks === 1 ? 'gray' : ''}">${o.ticks === 2 ? DTICK : STICK}${o.at}</div>` : ''}</div>`;
+const head = (eyebrow, h, sub) => `<div class="head"><div class="eyebrow"><img src="assets/clover.png" alt="">${eyebrow}</div><div class="h">${h}</div>${sub ? `<div class="sub">${sub}</div>` : ''}</div>`;
+
+/* ---------- Slide 1 · hero orbit ---------- */
+function hero() {
+  const C = 136; // orbit centre (cqw from top)
+  const ring = (r, dur, dir, items) => `<div class="spin" style="--dur:${dur}s;--dir:${dir};--cdir:${dir === 'reverse' ? 'normal' : 'reverse'}">${items.map(([a, html, s]) => `<div class="sat" style="--a:${a}deg;--r:${r}cqw;--s:${s}cqw;--dur:${dur}s;--cdir:${dir === 'reverse' ? 'normal' : 'reverse'}"><div class="c"><div class="cr">${html}</div></div></div>`).join('')}</div>`;
+  const img = n => `<img src="${O(n)}" alt="">`;
+  return `<div class="slide bg-cream">
+    ${head('Sprout', 'Your school’s <em>parent community.</em>', 'Join your kids’ schools<br>and meet the parents in them.')}
+    <div class="orbit" style="top:${C}cqw">
+      <div class="ringline" style="width:96cqw;height:96cqw"></div>
+      <div class="ringline dash" style="width:72cqw;height:72cqw"></div>
+      <div class="ringline" style="width:140cqw;height:140cqw;opacity:.6"></div>
+      ${ring(48, 70, 'normal', [[-90, img('school'), 22], [-25, img('mom-blonde'), 19], [35, img('cake'), 18], [95, img('dad-bald'), 19], [155, img('ball'), 17], [215, img('mom-bun'), 19], [275, `<span class="dot"></span>`, 4.6]])}
+      ${ring(36, 48, 'reverse', [[-60, img('girl-bday'), 14.5], [10, `<span class="dot"></span>`, 3.6], [60, img('dad-mustache'), 18], [130, img('kid-yard'), 14.5], [200, img('tent'), 17], [260, img('kid-balloons'), 14.5], [320, img('boy-suit'), 13]])}
+    </div>
+    ${mascot(30, C - 22, 40, 9, true)}
+    <div class="free" style="top:200cqw"><i>●</i> Free for parents, always</div>
+  </div>`;
+}
+
+/* ---------- Slides 2–6 ---------- */
+const SL = [];
+SL.push({ cap: '<b>Class details.</b> Chat, calendar, updates and links for every class.', html: () => `<div class="slide bg-sage">
+  ${head('Class group', 'All your class details, <em>in one place.</em>')}
+  ${mascot(64, 52, 22, 0, true)}
+  <div class="phone" style="top:70cqw"><div class="screen">${sbar}
+    <div class="pad" style="text-align:center;margin-top:calc(var(--u)*14)">
+      <img class="av" src="${P('teacher-taylor')}" style="width:calc(var(--u)*64);height:calc(var(--u)*64);margin:0 auto" alt="">
+      <div style="font:500 calc(var(--u)*18)/1.2 'Playfair Display',serif;margin-top:calc(var(--u)*8)">Mrs. Taylor’s Class</div>
+      <div style="font-size:calc(var(--u)*12);color:var(--muted);margin-top:calc(var(--u)*3)">18 members</div>
+      <div style="display:flex;justify-content:space-around;margin-top:calc(var(--u)*14);font:500 calc(var(--u)*12)/1 Inter;color:var(--muted)">
+        <span style="color:var(--green);border-bottom:2px solid var(--green);padding-bottom:calc(var(--u)*8)">💬 Chat</span><span>📅 Calendar</span><span>📣 Updates</span><span>🔗 Links</span></div>
+    </div>
+    <div class="pad" style="border-top:1px solid var(--line);padding-top:calc(var(--u)*12)">
+      <div style="display:flex;gap:calc(var(--u)*9);align-items:flex-end"><img class="av" src="${P('lydia')}" style="width:calc(var(--u)*30);height:calc(var(--u)*30)" alt=""><div><div style="font:600 calc(var(--u)*11)/1 Inter;color:var(--muted);margin:0 0 calc(var(--u)*5) calc(var(--u)*3)">Lydia · room parent</div><div class="bub" style="--u:inherit;background:#fff;font:400 calc(var(--u)*14)/1.38 Inter;padding:calc(var(--u)*10) calc(var(--u)*12);border-radius:calc(var(--u)*16) calc(var(--u)*16) calc(var(--u)*16) calc(var(--u)*4)">I added the Fall Festival to our class calendar. We need four volunteers for the bake sale table.</div></div></div>
+      <div class="card" style="display:flex;gap:calc(var(--u)*11);align-items:center;padding:calc(var(--u)*10) calc(var(--u)*12);margin:calc(var(--u)*10) 0 0 calc(var(--u)*39)"><div style="width:calc(var(--u)*44);text-align:center;background:var(--sage);border-radius:calc(var(--u)*10);padding:calc(var(--u)*6) 0;color:var(--green)"><div style="font:600 calc(var(--u)*10)/1 Inter">OCT</div><div style="font:600 calc(var(--u)*20)/1.1 'Playfair Display',serif">30</div></div><div><div class="tt">Fall Festival</div><div class="meta">Fri · 2 PM · Class calendar</div></div></div>
+      <div style="display:flex;gap:calc(var(--u)*9);align-items:flex-end;margin-top:calc(var(--u)*12)"><img class="av" src="${P('marcus')}" style="width:calc(var(--u)*30);height:calc(var(--u)*30)" alt=""><div><div style="font:600 calc(var(--u)*11)/1 Inter;color:var(--muted);margin:0 0 calc(var(--u)*5) calc(var(--u)*3)">Marcus</div><div style="background:#fff;font:400 calc(var(--u)*14)/1.38 Inter;padding:calc(var(--u)*10) calc(var(--u)*12);border-radius:calc(var(--u)*16) calc(var(--u)*16) calc(var(--u)*16) calc(var(--u)*4)">I can do the first hour 🙋</div></div></div>
+    </div>
+  </div></div>
+  <div class="out float bub" style="left:6cqw;top:150cqw;max-width:62cqw;--u:.27cqw"><div style="font:600 calc(var(--u)*11)/1 Inter;color:var(--muted);margin-bottom:calc(var(--u)*6)">Priya</div>Count me in! I’ll bring banana muffins 🧁</div>
+  <div class="out float bub me" style="right:6cqw;top:178cqw;--u:.27cqw">We’ll take the 2 PM slot!</div>
+</div>` });
+
+SL.push({ cap: '<b>Parent directory.</b> Names, faces and kids, before the first birthday party.', html: () => `<div class="slide bg-butter">
+  ${head('Parent directory', 'Discover the names, faces and stories of <em>all parents.</em>')}
+  ${mascot(8, 64, 22, 4, true, true)}
+  <div class="phone" style="top:82cqw"><div class="screen">${sbar}
+    <div class="pad" style="text-align:center;margin-top:calc(var(--u)*30)">
+      <img class="av" src="${O('dad-mustache')}" style="width:calc(var(--u)*96);height:calc(var(--u)*96);margin:0 auto" alt="">
+      <div style="font:500 calc(var(--u)*26)/1.1 'Playfair Display',serif;margin-top:calc(var(--u)*12)">James Martin</div>
+      <div style="font-size:calc(var(--u)*15);margin-top:calc(var(--u)*8)">Dad of 3 kids</div>
+      <div style="font-size:calc(var(--u)*12.5);color:var(--muted);margin-top:calc(var(--u)*4)">Miss Taylor’s Class · Kindergarten</div>
+      <div style="display:flex;gap:calc(var(--u)*10);justify-content:center;margin-top:calc(var(--u)*18)">
+        ${[['girl-bday', 'Nicole', '6 yrs'], ['kid-yard', 'Niki', '2 yrs'], ['kid-balloons', 'Alex', '10 months']].map(([n, a, b]) => `<div class="card" style="padding:calc(var(--u)*10) calc(var(--u)*12);text-align:center;width:calc(var(--u)*100)"><img class="av" src="${O(n)}" style="width:calc(var(--u)*46);height:calc(var(--u)*46);margin:0 auto" alt=""><div style="font-size:calc(var(--u)*12.5);margin-top:calc(var(--u)*6)">${a}</div><div class="chip" style="display:inline-block;margin-top:calc(var(--u)*5)">${b}</div></div>`).join('')}
+      </div>
+      <div style="text-align:left;font:500 calc(var(--u)*15)/1 'Playfair Display',serif;margin:calc(var(--u)*20) 0 calc(var(--u)*10)">Interests</div>
+      <div style="display:flex;flex-wrap:wrap;gap:calc(var(--u)*8)">${['🏡 Kid-Friendly', '💧 Water', '🚣 Rowing', '🥾 Hiking', '🏕️ Camping', '🚴 Cycling'].map(t => `<span style="font:500 calc(var(--u)*12.5)/1 Inter;padding:calc(var(--u)*8) calc(var(--u)*11);border:1px solid var(--line);border-radius:calc(var(--u)*10);background:#fff">${t}</span>`).join('')}</div>
+    </div>
+  </div></div>
+  <span class="tag" style="right:4cqw;top:96cqw;transform:rotate(4deg)">⚽ Soccer dad</span>
+  <span class="tag green" style="left:5cqw;top:176cqw;transform:rotate(-4deg)">🏕️ Also loves camping</span>
+</div>` });
+
+SL.push({ cap: '<b>Daily Brief.</b> The family’s whole day on one screen, every morning.', html: () => `<div class="slide bg-peach">
+  ${head('Daily Brief', 'Wake up to your <em>family’s brief.</em>')}
+  ${mascot(66, 52, 22, 1, true)}
+  <div class="phone" style="top:70cqw"><div class="screen">${sbar}
+    <div class="pad" style="margin-top:calc(var(--u)*10)">
+      <div style="display:flex;align-items:center;gap:calc(var(--u)*10)"><img class="av" src="${P('tony')}" style="width:calc(var(--u)*36);height:calc(var(--u)*36)" alt=""><div style="flex:1;text-align:center;margin-right:calc(var(--u)*36)"><div style="font:600 calc(var(--u)*15)/1.2 'Playfair Display',serif">Sprout AI</div><div style="font-size:calc(var(--u)*11);color:var(--muted)">Thursday, November 6</div></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-top:calc(var(--u)*18)"><div><div style="font:500 calc(var(--u)*27)/1.1 'Playfair Display',serif">Your day, in order.</div><div style="font:italic 500 calc(var(--u)*15)/1.4 'Playfair Display',serif;color:var(--muted);margin-top:calc(var(--u)*5)">Full, but manageable.</div></div><div class="card" style="padding:calc(var(--u)*7) calc(var(--u)*10);text-align:center;font-size:calc(var(--u)*11);color:var(--muted)"><div style="font-size:calc(var(--u)*22)">☀️</div>68–86°</div></div>
+      <div class="card" style="margin-top:calc(var(--u)*16)">
+        <div class="box-h"><div class="faces2"><img class="av" src="${P('tony')}" alt=""><img class="av" src="${P('jen')}" alt=""></div><div class="t">Family To-Do List</div><div class="plus">+</div></div>
+        ${todo({ faces: ['tony', 'jen'], title: 'Sign Jake’s permission slip', chip: 'Today · 8:00 AM', chipc: 'red', from: 'Miss Taylor’s Class' })}
+        ${todo({ face: 'tony', gmail: true, title: 'Return library book', chip: 'Due tomorrow', chipc: 'amber', from: 'ktaylor@lincolnelem.org' })}
+        ${todo({ faces: ['tony', 'jen'], title: 'Bring towels for Water Day', chip: 'Due Oct 13', from: 'Miss Taylor’s Class' })}
+      </div>
+    </div>
+  </div></div>
+  <div class="out float push" style="left:5cqw;right:5cqw;top:176cqw;--u:.26cqw"><div class="ic"><img src="assets/clover.png" alt=""></div><div class="grow"><div style="display:flex"><div class="pt">Good morning! You have 4 updates</div><div class="pw">7:00 AM</div></div><div class="pb">✅ 2 to-dos + 📅 2 events. Tap to view.</div></div></div>
+</div>` });
+
+SL.push({ cap: '<b>School emails.</b> Connect Gmail, Sprout turns teacher emails into to-dos.', html: () => `<div class="slide bg-mint">
+  ${head('Gmail', 'School emails in, <em>your day out.</em>')}
+  <div class="out" style="left:0;right:0;top:60cqw;display:flex;justify-content:center;align-items:center;gap:2.4cqw;font:600 3.2cqw/1 Inter">
+    <span class="tag" style="position:static"><span style="width:4.4cqw;display:inline-flex">${GMAIL}</span>Gmail</span><span style="width:6cqw;border-top:.4cqw dashed var(--green)"></span><span class="tag green" style="position:static">Connected</span><span style="width:6cqw;border-top:.4cqw dashed var(--green)"></span><span class="tag" style="position:static"><img src="assets/clover.png" style="width:4.4cqw" alt="">Sprout</span></div>
+  ${mascot(0, 168, 21, 5, true, true)}
+  <div class="out float card" style="left:6cqw;right:16cqw;top:76cqw;padding:3cqw 3.6cqw;border-radius:4.4cqw;transform:rotate(-2.5deg);--u:.25cqw">
+    <div style="display:flex;justify-content:space-between;font:600 calc(var(--u)*11)/1 Inter;color:var(--muted)"><span>Miss Taylor · 1st Grade</span><span>7:02 AM</span></div>
+    <div style="font:600 calc(var(--u)*16)/1.3 Inter;margin-top:calc(var(--u)*6)">Picture day is Thursday!</div>
+    <div style="font:400 calc(var(--u)*12.5)/1.45 Inter;color:var(--muted);margin-top:calc(var(--u)*4)">Please <u style="color:var(--green)">send the order form back by Friday</u> and have Jake <u style="color:var(--green)">wear the class shirt on Thursday</u>.</div>
+  </div>
+  <div class="phone" style="top:104cqw"><div class="screen">${sbar}
+    <div class="pad" style="margin-top:calc(var(--u)*14)">
+      <div class="card">
+        <div class="box-h"><div class="faces2"><img class="av" src="${P('tony')}" alt=""></div><div class="t">To-Do List</div><span class="gmpill">2 new from Gmail</span></div>
+        ${todo({ face: 'tony', gmail: true, title: 'Jake wears the class shirt', chip: 'Due Thu', chipc: 'amber', from: 'ktaylor@lincolnelem.org' })}
+        ${todo({ face: 'tony', gmail: true, title: 'Send the picture day order form', chip: 'Due Fri', from: 'ktaylor@lincolnelem.org' })}
+      </div>
+    </div>
+  </div></div>
+</div>` });
+
+SL.push({ cap: '<b>Family reminders.</b> Say it once, Sprout puts it on the family list.', html: () => `<div class="slide bg-cream">
+  ${head('Family reminders', 'Set family <em>reminders.</em>', 'Just say it: “Remind my husband to pick up Presley at 2.”')}
+  ${mascot(8, 62, 22, 7, true, true)}
+  <div class="phone" style="top:80cqw"><div class="screen">${sbar}
+    <div class="pad" style="margin-top:calc(var(--u)*14)">
+      <div class="card">
+        <div class="box-h"><div class="faces2"><img class="av" src="${P('tony')}" alt=""><img class="av" src="${P('jen')}" alt=""></div><div class="t">Family To-Do List</div><div class="plus">+</div></div>
+        ${todo({ face: 'jen', title: 'Pick up Presley from school', chip: 'Today · 2:00 PM', chipc: 'red', ticks: 2, at: '8:12' })}
+        ${todo({ face: 'jen', title: 'Buy a gift for Leo’s party', chip: 'Due Sat', ticks: 1, at: '9:40' })}
+        ${todo({ faces: ['tony', 'jen'], title: 'Bring towels for Water Day', chip: 'Due Oct 13', ticks: 2, at: '7:58' })}
+      </div>
+    </div>
+  </div></div>
+  <div class="out float card" style="right:4cqw;top:150cqw;width:62cqw;padding:3.4cqw;border-radius:4.4cqw;--u:.26cqw">
+    <div style="font:500 calc(var(--u)*12)/1 Inter;color:var(--muted)">New reminder</div>
+    <div style="font:600 calc(var(--u)*16)/1.3 Inter;margin-top:calc(var(--u)*7)">Pick up Presley from school</div>
+    <div style="display:flex;gap:calc(var(--u)*6);align-items:center;margin-top:calc(var(--u)*8)"><span class="chip">Today · 2:00 PM</span></div>
+    <div style="display:flex;gap:calc(var(--u)*7);align-items:center;margin-top:calc(var(--u)*9);font-size:calc(var(--u)*12.5)"><img class="av" src="${P('jen')}" style="width:calc(var(--u)*20);height:calc(var(--u)*20)" alt="">For Dana</div>
+    <div style="margin-top:calc(var(--u)*12);background:var(--green);color:#fff;text-align:center;font:600 calc(var(--u)*14)/1 'Playfair Display',serif;padding:calc(var(--u)*12);border-radius:999px">Set reminder</div>
+  </div>
+  <div class="out" style="left:8cqw;top:168cqw;width:17cqw;height:17cqw;border-radius:50%;background:var(--green);display:grid;place-items:center;box-shadow:0 0 0 3cqw rgba(24,99,56,.16),0 2cqw 5cqw rgba(24,99,56,.35)"><span style="width:7cqw;height:7cqw;display:block">${MIC}</span></div>
+  <span class="tag" style="right:4cqw;top:72cqw;transform:rotate(3deg)"><span style="color:var(--green);display:inline-flex;width:4.6cqw">${DTICK}</span>Dana saw it · 8:12</span>
+</div>` });
+
+const ALL = [{ cap: '<b>Hero, moving.</b> The onboarding community: parents and the school orbit the Sprout mascot.', html: hero }, ...SL];
+document.getElementById('set').innerHTML = ALL.map((s, i) => `<div class="slide-wrap">${s.html()}<div class="cap">${i + 1} · ${s.cap}</div></div>`).join('');
+document.getElementById('store').innerHTML = `<div class="app"><div class="icon"><img src="assets/clover.png" alt=""></div>
+  <div><div class="name">Sprout</div><div class="tagline">Your school’s parent community</div></div><div class="get">GET</div></div>
+  <div class="shots">${ALL.slice(0, 3).map(s => `<div class="slide-wrap">${s.html()}</div>`).join('')}</div>`;
+
+/* live mascot: deterministic pose from SproutMotion, one clock for all */
+let paused = false, t0 = performance.now(), frozenAt = 0;
+const actors = [...document.querySelectorAll('.mascot')];
+function frame(now) {
+  const t = paused ? frozenAt : (now - t0) / 1000;
+  for (const m of actors) {
+    const actor = m.querySelector('.sprout-actor');
+    const pose = SproutMotion.sample(+m.dataset.profile, (t + (+m.dataset.profile) * .37) % 6.5, .5);
+    SproutMotion.apply(actor, pose, m.getBoundingClientRect().width);
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+document.getElementById('pause').onclick = e => {
+  paused = !paused;
+  if (paused) frozenAt = (performance.now() - t0) / 1000; else t0 = performance.now() - frozenAt * 1000;
+  document.body.classList.toggle('paused', paused);
+  e.target.textContent = paused ? 'Play motion' : 'Pause motion';
+};
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.getElementById('pause').click();
+</script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Store header + search art · branded (V.13)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  /* V.13 (14 Nov). Ahmad on V.12: "make it more branded for Sprout and make more variants".
+     Still no screenshots (Tony 13 Nov). What "branded" means here, from 07 - Design Guide/sprout-brand-guidelines.html:
+       - Playfair Display 600 for headlines, tight tracking; Inter 600 uppercase .1em labels; pill shapes; sage chips
+       - Forest #1E4A35 / brand green #186338, cream #F0EDE6-#F4F1EA, sage #D6E8DC
+       - the clover always in its true form; never the wordmark without the clover
+       - brand idea "You got lucky when you found these people."; tagline "Where parents bond and childhoods flourish."
+       - the onboarding orbit (parents, school, ball, cake, tent around the clover) = the V.11 hero, not a screenshot
+     Sizes, safe areas and iPhone crops are the same as V.12 (store-header-message-v12.html). Every variant fits its
+     message into a box inside the iPhone view and below the back/share buttons; ?safe fits everything into Apple's
+     safe area instead (crop-proof on every device, smaller).
+     Export: node "08 - Generated Screens/App Store/tools/export-branded-v13.mjs" [--v=1,2,…] [--safe] */
+  :root { --forest: #1e4a35; --green: #186338; --sage: #d6e8dc; --cream: #f4f1ea; --deep: #12301f; --muted: #6d6a60; --page: #e6e2d9; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--page); color: var(--deep); font-family: Inter, system-ui, sans-serif; padding: 36px 48px 80px; }
+  h1 { font: 600 30px/1.15 'Playfair Display', serif; }
+  p.lede { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--muted); max-width: 1120px; }
+  h2 { font: 600 22px/1.2 'Playfair Display', serif; margin: 52px 0 4px; }
+  .why { font-size: 13px; line-height: 1.5; color: var(--muted); max-width: 1120px; margin-bottom: 16px; }
+  .fit { position: relative; overflow: hidden; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.08); flex: none; }
+  .safe { position: absolute; border: 2px dashed #ff6f9c; pointer-events: none; }
+  .row { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-end; }
+  .cap { font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+  .tag { display: inline-block; font: 600 11px/1 Inter; letter-spacing: .06em; text-transform: uppercase; padding: 5px 8px; border-radius: 6px; background: #fff; color: var(--deep); margin-left: 10px; vertical-align: middle; }
+
+  .art { position: relative; overflow: hidden; isolation: isolate; }
+  .bgx { position: absolute; inset: 0; }
+  .ring { position: absolute; border-radius: 50%; border-style: solid; transform: translate(-50%, -50%); }
+  .msg { position: absolute; display: flex; align-items: center; justify-content: center; }
+  .in { display: inline-flex; align-items: center; justify-content: center; gap: .55em; }
+  .in.col { flex-direction: column; gap: .32em; text-align: center; }
+  .in.row { flex-direction: row; text-align: left; }
+  .txt { display: flex; flex-direction: column; gap: .3em; }
+  .in.col .txt { align-items: center; }
+  .in.row .txt { align-items: flex-start; }
+
+  /* brand pieces, all in em so the fit scales them together */
+  .hl { font: 600 1em/1.04 'Playfair Display', serif; letter-spacing: -.02em; white-space: nowrap; }
+  .hl em { font-style: italic; font-weight: 500; }
+  .lbl { font: 600 .27em/1 Inter, sans-serif; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; }
+  .lock { display: inline-flex; align-items: center; gap: .3em; font: 600 .5em/1 'Playfair Display', serif; letter-spacing: -.01em; white-space: nowrap; }
+  .lock img { width: 1.25em; height: 1.25em; border-radius: 23.75%; display: block; box-shadow: 0 .08em .3em rgba(0,0,0,.22); }
+  .chips { display: flex; gap: .3em; font: 500 .26em/1 Inter, sans-serif; white-space: nowrap; }
+  .chips span { padding: .62em 1.05em; border-radius: 999px; }
+  .faces { display: flex; align-items: center; }
+  .faces img { width: .9em; height: .9em; border-radius: 50%; object-fit: cover; margin-left: -.18em; border: .05em solid var(--fb); display: block; }
+  .faces img:first-child { margin-left: 0; }
+  .faces .more { margin-left: -.5em; height: 3em; padding: 0 1.3em; border-radius: 999px; display: grid; place-items: center; font: 600 .3em/1 Inter; border: .17em solid var(--fb); white-space: nowrap; }
+  .faces .more b { font-size: 1.25em; font-weight: 600; }
+  .orbit { position: relative; flex: none; }
+  .orbit .ringline { position: absolute; inset: 0; border-radius: 50%; }
+  .orbit .sat { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; box-shadow: 0 .05em .16em rgba(0,0,0,.18); }
+  .orbit .hub { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); border-radius: 24%; box-shadow: 0 .08em .3em rgba(0,0,0,.25); }
+  .bigclover { flex: none; display: block; filter: drop-shadow(0 .06em .14em rgba(0,0,0,.28)); }
+
+  .sim { position: relative; overflow: hidden; background: #fff; border-radius: 22px; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.1); flex: none; }
+  .sim .img { position: absolute; overflow: hidden; }
+  .sim .btn { position: absolute; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.4); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.5); display: grid; place-items: center; color: #111; font: 600 17px/1 Inter; }
+  .sim .island { position: absolute; left: 50%; transform: translateX(-50%); top: 9px; width: 96px; height: 28px; border-radius: 16px; background: #000; }
+  .sim .stat { position: absolute; top: 15px; font: 600 13px/1 -apple-system, Inter; }
+</style>
+</head>
+<body>
+<h1>App Store header + search art · branded (V.13)</h1>
+<p class="lede">Ahmad 14 Nov: more branded, more options; then kept 3 and 6 and added 7–10 from them. No screenshots (Tony). Built from the Sprout brand guide: Playfair 600 headlines, forest + cream + sage, pill chips, the knitted clover in its true form, the onboarding orbit, and the brand's own lines. Each variant: iPhone product page and search card as Apple shows them, then the four files. Pink dashed box = Apple's safe area. Add <code>?safe</code> to fit every variant inside the safe area instead (crop-proof, smaller).</p>
+<div id="out"></div>
+
+<script>
+const ICON = 'assets/logo/app-icon-knit-1024.png', KNIT = 'assets/logo/clover-knit-1024.png', SIL = 'assets/logo/clover-silhouette.svg';
+const OB = n => `assets/orbit-hd/${n}.png`, PP = n => `assets/people/${n}.png`;
+
+/* Backgrounds */
+const BGS = {
+  forest: (W, H) => `radial-gradient(${W * .5}px ${H * .85}px at ${W / 2}px ${H * .6}px, rgba(70,150,95,.34), transparent 70%), linear-gradient(160deg, #0f3a24 0%, #1e4a35 40%, #186338 74%, #237448 100%)`,
+  cream:  (W, H) => `radial-gradient(${W * .55}px ${H * .9}px at ${W / 2}px ${H * .55}px, #fffdf8 0%, rgba(255,253,248,0) 70%), linear-gradient(170deg, #f4f1ea 0%, #efeadf 60%, #e3ecdf 100%)`,
+  sage:   (W, H) => `radial-gradient(${W * .5}px ${H * .9}px at ${W / 2}px ${H * .55}px, #f7fbf4 0%, rgba(247,251,244,0) 72%), linear-gradient(165deg, #e9f2e4 0%, #d6e8dc 60%, #c3dccb 100%)`,
+};
+/* Theme: colours for text pieces on that background */
+const TH = {
+  forest: { hl: '#ffffff', em: '#cfe6c4', lbl: 'rgba(214,232,220,.8)', chipBg: 'rgba(255,255,255,.1)', chipBd: 'rgba(255,255,255,.24)', chipTx: '#eef6ea', fb: '#1e4a35', moreBg: '#d6e8dc', moreTx: '#1e4a35', ring: 'rgba(255,255,255,.18)', satBg: '#f4f1ea', lock: '#ffffff', line: 'rgba(255,255,255,.06)' },
+  cream:  { hl: '#1e4a35', em: '#186338', lbl: '#6b6860', chipBg: '#d6e8dc', chipBd: 'transparent', chipTx: '#1e4a35', fb: '#f4f1ea', moreBg: '#1e4a35', moreTx: '#ffffff', ring: 'rgba(24,99,56,.22)', satBg: '#ffffff', lock: '#1e4a35', line: 'rgba(24,99,56,.08)' },
+  sage:   { hl: '#1e4a35', em: '#186338', lbl: '#3d6b52', chipBg: '#ffffff', chipBd: 'transparent', chipTx: '#1e4a35', fb: '#e3eee5', moreBg: '#1e4a35', moreTx: '#ffffff', ring: 'rgba(24,99,56,.25)', satBg: '#ffffff', lock: '#1e4a35', line: 'rgba(24,99,56,.09)' },
+};
+const rings = (W, H, k, T, cy = .55) => [3000, 4300].map((d, i) => `<span class="ring" style="left:${W / 2}px;top:${H * cy}px;width:${d * k}px;height:${d * k}px;border-width:${5 * k}px;border-color:${T.line};opacity:${1 - i * .3}"></span>`).join('');
+/* clover pattern: silhouette as a repeating mask, tinted */
+/* tiled knitted clover, brightened to a sage tint (an SVG mask is blocked on file:// exports) */
+const pattern = (size, op, rot = -12) => `<span class="bgx" style="opacity:${op};background:url(${KNIT}) 0 0/${size}px ${size}px repeat;filter:brightness(2.6) saturate(.35);transform:rotate(${rot}deg) scale(1.6)"></span>`;
+
+/* Pieces (strings, em-based) */
+const HL = (T, a, b) => `<div class="hl" style="color:${T.hl}">${a}<br><em style="color:${T.em}">${b}</em></div>`;
+const LBL = (T, s) => `<div class="lbl" style="color:${T.lbl}">${s}</div>`;
+const LOCK = T => `<div class="lock" style="color:${T.lock}"><img src="${ICON}" alt="">Sprout</div>`;
+const CHIPS = (T, list) => `<div class="chips">${list.map(c => `<span style="background:${T.chipBg};border:.06em solid ${T.chipBd};color:${T.chipTx}">${c}</span>`).join('')}</div>`;
+const FACES = T => `<div class="faces" style="--fb:${T.fb};font-size:1.05em">${['priya', 'marcus', 'aisha', 'jen', 'elena', 'lydia'].map(n => `<img src="${PP(n)}" alt="">`).join('')}<span class="more" style="background:${T.moreBg};color:${T.moreTx}"><b>+ your class</b></span></div>`;
+/* the onboarding orbit, static: clover hub + 8 satellites on one ring (d = diameter in em) */
+const ORBIT = (T, d = 3.3) => { const sats = ['mom-bun', 'school', 'dad-mustache', 'ball', 'mom-blonde', 'cake', 'dad-bald', 'tent'];
+  const r = d / 2, s = d * .19;
+  return `<div class="orbit" style="width:${d}em;height:${d}em"><span class="ringline" style="border:.025em solid ${T.ring}"></span>` +
+    sats.map((n, i) => { const a = -90 + i * 45, x = r + r * Math.cos(a * Math.PI / 180), y = r + r * Math.sin(a * Math.PI / 180);
+      return `<img class="sat" src="${OB(n)}" alt="" style="left:${x}em;top:${y}em;width:${s}em;height:${s}em;background:${T.satBg}">`; }).join('') +
+    `<img class="hub" src="${ICON}" alt="" style="width:${d * .34}em;height:${d * .34}em"></div>`; };
+const CLOVER = (h = 3.1) => `<img class="bigclover" src="${KNIT}" alt="" style="height:${h}em;width:${h}em">`;
+/* the clover on the tab-bar button look (sage disc + cream ring, 14 Nov nav) so it reads on dark green */
+const DISC = (d = 2.7) => `<span style="flex:none;display:grid;place-items:center;width:${d}em;height:${d}em;border-radius:50%;background:#e2e9e3;box-shadow:inset 0 0 0 ${d * .06}em #eae6db, 0 ${d * .06}em ${d * .18}em rgba(0,0,0,.28)"><img src="${KNIT}" alt="" style="width:${d * .8}em;height:${d * .8}em;display:block"></span>`;
+
+/* Variants. Ahmad 14 Nov: removed 1 Orbit, 2 Big clover, 4 Clover pattern, 5 Faces; kept 3 and 6; 7-10 are built from
+   what was kept (3's lockup + chips + cream, 6's lucky line + clover + sage), mixed. art sits beside (row) or above (col). */
+const LUCKY = T => HL(T, 'You got lucky when you', 'found these people.');
+const SCHOOL = T => HL(T, 'Your school’s', 'parent community.');
+const DOES = T => CHIPS(T, ['Class chat', 'Daily Brief', 'Sign-ups, done for you']);
+const VARIANTS = {
+  3:  { name: '3 · Cream lockup', bg: 'cream', why: 'Kept. The app’s own look: cream background, forest Playfair, sage pill chips, the full Sprout lockup. Closest to opening the app.',
+        art: null, text: T => [LOCK(T), SCHOOL(T), DOES(T)] },
+  6:  { name: '6 · Lucky (brand idea)', bg: 'sage', why: 'Kept. The brand idea as the message, with the knitted clover, on sage. Says the feeling, not the feature.',
+        art: () => CLOVER(2.6), text: T => [LUCKY(T), LBL(T, 'Sprout · the app for parents')] },
+  7:  { name: '7 · Cream lockup, lucky line', bg: 'cream', why: 'New, 3 × 6: variant 3’s cream and Sprout lockup, carrying 6’s brand line instead of the slogan. Branded and warm, no feature talk.',
+        art: null, text: T => [LOCK(T), LUCKY(T)] },
+  8:  { name: '8 · Sage lockup', bg: 'sage', why: 'New, 3 on 6’s background: lockup, slogan and chips on sage. A touch more colour than cream, same calm.',
+        art: null, text: T => [LOCK(T), SCHOOL(T), DOES(T)] },
+  9:  { name: '9 · Lucky + what it does', bg: 'sage', why: 'New, 6 + 3’s chips: clover and the lucky line, then the three chips, so the feeling comes with the reason.',
+        art: () => CLOVER(2.6), text: T => [LUCKY(T), DOES(T)] },
+  10: { name: '10 · Cream, clover beside', bg: 'cream', why: 'New, 6’s layout on 3’s cream: the big knitted clover beside the slogan and chips. The clover reads at any size, even in the search card.',
+        art: () => CLOVER(2.6), text: T => [SCHOOL(T), DOES(T)] },
+  /* 17 Nov, Ahmad: "content copy from Variant 3 but background color from variant 8". Everything of 3 (lockup, slogan,
+     chips and their sage fill) except the background, which is 8's sage. */
+  11: { name: '11 · Cream lockup on sage', bg: 'sage', th: 'cream', why: 'New (17 Nov): variant 3 exactly, lockup, slogan and sage chips, on variant 8’s sage background.',
+        art: null, text: T => [LOCK(T), SCHOOL(T), DOES(T)] },
+};
+
+const ASSETS = {
+  header:    { W: 3840, H: 1646, file: 'header-21x9-3840x1646.png',  label: 'Header 21:9', k: 1, safe: [1097, 493, 1646, 661], box: [720, 540, 2400, 1000] },
+  search:    { W: 3840, H: 2560, file: 'search-3x2-3840x2560.png',   label: 'Search results 3:2', k: 1, safe: [836, 765, 2168, 1030], box: [440, 380, 2960, 1420] },
+  universal: { W: 5244, H: 2950, file: 'universal-16x9-5244x2950.png', label: 'Universal 16:9 (PNG only)', k: 1.25, safe: [1921, 660, 1402, 962], box: [1600, 600, 2044, 1180] },
+  feature:   { W: 1024, H: 500,  file: 'google-play-feature-graphic-1024x500.png', label: 'Google Play feature graphic', k: .27, box: [60, 50, 904, 400] },
+};
+const q = new URLSearchParams(location.search), SAFE = q.has('safe');
+const boxOf = a => SAFE && a.safe ? a.safe : a.box;
+
+function art(n, V, id = '') { const a = ASSETS[n], T = TH[V.th || V.bg], [x, y, w, h] = boxOf(a);
+  const row = V.art && w / h > 1.6;
+  const inner = V.art ? `<div class="in ${row ? 'row' : 'col'}">${V.art(T)}<div class="txt">${V.text(T).join('')}</div></div>`
+                      : `<div class="in col">${V.text(T).join('')}</div>`;
+  const deco = (V.pattern ? pattern(300 * a.k, .1) : '') + rings(a.W, a.H, a.k, T);
+  return `<div class="art" ${id} style="width:${a.W}px;height:${a.H}px;background:${BGS[V.bg](a.W, a.H)}">${deco}<div class="msg" data-box="${w},${h}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px">${inner}</div></div>`; }
+
+function fitAll() { for (const m of document.querySelectorAll('.msg')) { const [w, h] = m.dataset.box.split(',').map(Number), inn = m.firstElementChild;
+  let lo = 4, hi = 2000; for (let i = 0; i < 24; i++) { const mid = (lo + hi) / 2; m.style.fontSize = mid + 'px';
+    if (inn.offsetWidth <= w * .92 && inn.offsetHeight <= h * .9) lo = mid; else hi = mid; }
+  m.style.fontSize = Math.floor(lo) + 'px'; } }
+
+const scaled = (n, V, w) => { const a = ASSETS[n], s = w / a.W, [x, y, sw, sh] = a.safe || [0, 0, 0, 0];
+  return `<div class="fit" style="width:${w}px;height:${a.H * s}px"><div style="transform:scale(${s});transform-origin:0 0">${art(n, V)}</div>${a.safe ? `<div class="safe" style="left:${x * s}px;top:${y * s}px;width:${sw * s}px;height:${sh * s}px"></div>` : ''}</div>`; };
+function simHeader(V) { const a = ASSETS.header, w = 300, vis = a.W * .835, s = w / vis, hh = Math.round(w * .663), ah = a.H * s, top = hh - ah, dark = V.bg === 'forest';
+  return `<div class="sim" style="width:${w}px;height:${hh + 44}px"><div class="img" style="left:0;top:0;width:${w}px;height:${hh}px">
+    <div style="position:absolute;left:${-(a.W - vis) / 2 * s}px;top:0;transform:translateY(${top + 1}px) scale(${s}, ${-s});transform-origin:0 0;filter:blur(${8 / s}px)">${art('header', V)}</div>
+    <div style="position:absolute;left:${-(a.W - vis) / 2 * s}px;top:${top}px;transform:scale(${s});transform-origin:0 0">${art('header', V)}</div></div>
+    <span class="stat" style="left:34px;color:${dark ? '#fff' : '#111'}">8:34</span><span class="island"></span>
+    <span class="btn" style="left:12px;top:${hh * .28}px">‹</span><span class="btn" style="right:12px;top:${hh * .28}px">⇪</span>
+    <div style="position:absolute;left:14px;top:${hh + 14}px;font:600 13px/1 Inter">Sprout: The App for Parents</div></div>`; }
+function simSearch(V) { const a = ASSETS.search, cw = 270, s = cw / a.W, ch = Math.round(cw / 2.024);
+  return `<div class="sim" style="width:300px;height:${56 + ch + 16}px;background:#f2f2f7"><div style="position:absolute;left:15px;top:16px;font:600 12px/1.2 Inter">Sprout: The App for Parents</div>
+    <div style="position:absolute;left:15px;top:32px;font:400 10.5px/1.2 Inter;color:#8a8a8e">Parents Bond, Kids flourish</div>
+    <div class="img" style="left:15px;top:56px;width:${cw}px;height:${ch}px;border-radius:14px"><div style="transform:scale(${s});transform-origin:0 0">${art('search', V)}</div></div></div>`; }
+
+const FIGMA = q.has('figma') || location.hash === '#figma' || location.hash.includes('figmacapture=');
+const only = (q.get('v') || '').split(',').filter(Boolean);
+const LIST = Object.entries(VARIANTS).filter(([k]) => !only.length || only.includes(k));
+if (q.has('export')) {
+  document.body.innerHTML = art(q.get('export'), VARIANTS[q.get('v') || '3'], 'id="asset"');
+  document.body.style.cssText = 'margin:0;padding:0';
+} else if (FIGMA) {
+  document.body.innerHTML = `<div style="display:flex;flex-direction:column;gap:400px;width:max-content">` + LIST.map(([, V]) =>
+    `<div style="display:flex;gap:240px;align-items:flex-start">` + Object.keys(ASSETS).map(n => `<div data-name="V.13 ${V.name} / ${ASSETS[n].label} / ${ASSETS[n].W}x${ASSETS[n].H}">${art(n, V)}</div>`).join('') + `</div>`).join('') + '</div>';
+  document.body.style.cssText = 'margin:0;padding:0;background:transparent;width:max-content';
+} else {
+  document.getElementById('out').innerHTML = LIST.map(([k, V]) => `
+    <h2>${V.name}<span class="tag">--v=${k}</span></h2><p class="why">${V.why}</p>
+    <div class="row">
+      <div>${simHeader(V)}<div class="cap">iPhone product page (header)</div></div>
+      <div>${simSearch(V)}<div class="cap">iPhone search card</div></div>
+      <div>${scaled('header', V, 420)}<div class="cap">Header 3840 × 1646</div></div>
+      <div>${scaled('search', V, 300)}<div class="cap">Search 3840 × 2560</div></div>
+      <div>${scaled('universal', V, 420)}<div class="cap">Universal 5244 × 2950</div></div>
+      <div>${scaled('feature', V, 300)}<div class="cap">Google Play 1024 × 500</div></div>
+    </div>`).join('');
+}
+document.fonts.ready.then(() => Promise.all([...document.images].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; }))))
+  .then(() => { fitAll(); document.body.dataset.fitted = '1'; });
+</script>
+</body>
+</html>

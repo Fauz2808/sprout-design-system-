@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Store header + search art · Green fan V.11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  /* Green fan, rebuilt on V.11 (13 Nov). What was live (A / Universal 16:9, Sep screens) broke in two places on Tony's
+     iPhone: the search card showed "parent in your class, in on" and the product header put the headline under the back
+     and share buttons. Both are crops Apple makes of the universal asset. Measured from Tony's screenshots:
+       product header (iPhone portrait) = centred x 1030..4210, y 0..1876 of 5244 x 2950, buttons in the top corners
+       search card                      = centred x 1500..3750, y  390..1890
+     So: header has no words, search carries the headline inside its own 3:2, and the universal keeps every word inside
+     both measured crops. Phones = the V.11 Figma exports (assets/figma), V.11 clean light frame. */
+  :root { --green: #186338; --deep: #12301f; --leaf: #cfe6c4; --muted: #6d6a60; --page: #ece9e2; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--page); color: var(--deep); font-family: Inter, system-ui, sans-serif; padding: 36px 48px 80px; }
+  h1 { font: 600 30px/1.15 'Playfair Display', serif; }
+  p.lede { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--muted); max-width: 1000px; }
+  h2 { font: 600 20px/1.2 'Playfair Display', serif; margin: 40px 0 6px; }
+  h2 small { font: 500 13px/1 Inter; color: var(--muted); margin-left: 10px; }
+  .why { font-size: 13px; line-height: 1.5; color: var(--muted); max-width: 1000px; margin-bottom: 14px; }
+  .fit { position: relative; overflow: hidden; border-radius: 14px; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.08); }
+  .crop { position: absolute; border: 3px dashed; pointer-events: none; }
+  .row { display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-start; }
+  .sim-cap { font-size: 12px; color: var(--muted); margin-top: 8px; max-width: 420px; line-height: 1.45; }
+
+  .art { position: relative; overflow: hidden; isolation: isolate; }
+  .ring { position: absolute; border-radius: 50%; border: solid rgba(255,255,255,.075); transform: translate(-50%, -50%); }
+  .glow { position: absolute; border-radius: 50%; transform: translate(-50%, -50%); background: radial-gradient(closest-side, rgba(120,190,140,.22), rgba(120,190,140,0)); }
+  .brand { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; color: #fff; font-family: 'Playfair Display', serif; font-weight: 500; white-space: nowrap; }
+  .brand .ic { position: relative; border-radius: 23.75%; background: linear-gradient(#f2edea, #e7d8d2); overflow: hidden; flex: none; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+  .brand .ic img { position: absolute; left: -3.125%; top: -3.125%; width: 106.25%; height: 106.25%; display: block; }
+  .head { position: absolute; left: 0; right: 0; text-align: center; font-family: 'Playfair Display', serif; font-weight: 500; line-height: 1.06; letter-spacing: -.012em; color: #fff; }
+  .head span { display: inline-block; }
+  .head em { font-style: italic; color: var(--leaf); }
+
+  /* V.11 clean phone, sized in px by --p (phone width) */
+  .phone { position: absolute; width: var(--p); aspect-ratio: 393 / 852; transform: translateX(-50%) rotate(var(--rot, 0deg)); transform-origin: 50% 100%;
+    border-radius: calc(var(--p) * .153); padding: calc(var(--p) * .017); background: #fbfaf7; border: calc(var(--p) * .006) solid #dcd7cc;
+    box-shadow: 0 calc(var(--p) * .06) calc(var(--p) * .16) rgba(4,30,14,.45), 0 calc(var(--p) * .01) calc(var(--p) * .025) rgba(4,30,14,.25); }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: calc(var(--p) * .134); overflow: hidden; background: #f4f1ea; container-type: inline-size; }
+  .screen > img { position: absolute; left: 0; top: 0; width: 100%; display: block; }
+  .sbar { position: absolute; top: 0; left: 0; right: 0; z-index: 2; display: flex; justify-content: space-between; padding: 6.6cqw 11.8cqw 0 14.5cqw; font: 600 5.4cqw/1 -apple-system, Inter; color: #111; }
+  .sbar i { font-style: normal; letter-spacing: .08em; font-size: 4.5cqw; }
+
+  /* iPhone simulations of the two places Tony saw it */
+  .sim { position: relative; overflow: hidden; background: #fff; border-radius: 26px; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.1); }
+  .sim .img { position: absolute; overflow: hidden; }
+  .sim .img > .art { transform-origin: 0 0; position: absolute; }
+  .sim .btn { position: absolute; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.28); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.35); display: grid; place-items: center; color: #fff; font: 600 20px/1 Inter; }
+  .sim .island { position: absolute; left: 50%; transform: translateX(-50%); top: 11px; width: 120px; height: 34px; border-radius: 20px; background: #000; }
+  .sim .stat { position: absolute; top: 18px; font: 600 16px/1 -apple-system, Inter; color: #fff; }
+</style>
+</head>
+<body>
+<h1>App Store header + search art · Green fan on V.11</h1>
+<p class="lede">Rebuild of "A. Green fan" (Figma 13604:9782), the art that is live now. Same idea: brand green, three real screens fanned in the centre. What changed:
+the screens are the V.11 ones (Mrs. Taylor's Class, the Daily Brief, Discover) in the V.11 light phone frame, the line is the V.11 slide 1 headline,
+and no word sits where iOS crops or puts a button. Below the assets: the same art inside Tony's two iPhone views, at the crops measured from his screenshots.</p>
+<div id="out"></div>
+
+<script>
+const F = n => `assets/figma/${n}.png`;
+const ICON = 'assets/logo/clover-800.png';
+
+/* one phone: centre x, top y, width p, rotation, inner html */
+const phone = (x, y, p, rot, inner) => `<div class="phone" style="left:${x}px;top:${y}px;--p:${p}px;--rot:${rot}deg"><div class="screen">${inner}</div></div>`;
+const SCREENS = {
+  class: `<div class="sbar"><span>9:41</span><i>●●● ▮</i></div><img src="${F('class')}" alt="" style="top:12%;left:-3%;width:106%">`,
+  brief: `<img src="${F('brief')}" alt="">`,
+  discover: `<img src="${F('discover')}" alt="">`,
+};
+/* fan: centre phone (Daily Brief) on top, Class left, Discover right; side phones smaller, lower, tilted out */
+const fan = (cx, top, p, spread, drop) => [
+  phone(cx - spread, top + drop, p * .9, -7, SCREENS.class),
+  phone(cx + spread, top + drop, p * .9, 7, SCREENS.discover),
+  phone(cx, top, p, 0, SCREENS.brief),
+].join('');
+
+/* V.11 slide 1 brand mark + headline, character for character */
+const brand = (top, s) => `<div class="brand" style="top:${top}px;gap:${s * .36}px;font-size:${s}px"><span class="ic" style="width:${s * 1.25}px;height:${s * 1.25}px"><img src="${ICON}" alt=""></span>Sprout</div>`;
+const head = (top, size) => `<div class="head" style="top:${top}px;font-size:${size}px"><span data-w>Your school’s</span><br><em data-w>parent community.</em></div>`;
+
+const BG = (W, H) => `radial-gradient(${W * .7}px ${H * 1.1}px at ${W * .62}px ${-H * .08}px, #2e7a4b 0%, #1d6a3e 38%, #155a32 68%, #0f4627 100%)`;
+const decor = (W, H, k) => [
+  `<span class="glow" style="left:${W * .78}px;top:${H * .05}px;width:${1500 * k}px;height:${1500 * k}px"></span>`,
+  `<span class="glow" style="left:${W * .12}px;top:${H * .92}px;width:${1200 * k}px;height:${1200 * k}px;opacity:.7"></span>`,
+  `<span class="ring" style="left:${W * .5}px;top:${H * .5}px;width:${3200 * k}px;height:${3200 * k}px;border-width:${5 * k}px"></span>`,
+  `<span class="ring" style="left:${W * .5}px;top:${H * .5}px;width:${4300 * k}px;height:${4300 * k}px;border-width:${5 * k}px;opacity:.7"></span>`,
+].join('');
+
+/* Every asset in its own px. head = [top, size], brand = [top, size], fan = [cx, top, p, spread, drop] */
+const ASSETS = {
+  header:    { W: 3840, H: 1646, file: 'header-21x9-3840x1646.png', label: 'Header 21:9', k: 1, fan: [1920, 360, 700, 900, 240] },
+  search:    { W: 3840, H: 2560, file: 'search-3x2-3840x2560.png', label: 'Search results 3:2', k: 1, brand: [215, 92], head: [400, 240], fan: [1920, 1060, 800, 1060, 170] },
+  universal: { W: 5244, H: 2950, file: 'universal-16x9-5244x2950.png', label: 'Universal 16:9 (PNG only)', k: 1.25, brand: [455, 64], head: [585, 172], fan: [2622, 1090, 900, 1130, 170],
+               crops: [['#e0b400', 1030, 0, 3180, 1876, 'iPhone product header (measured)'], ['#2f7fd8', 1500, 390, 2250, 1500, 'iPhone search card (measured)']] },
+  feature:   { W: 1024, H: 500, file: 'google-play-feature-graphic-1024x500.png', label: 'Google Play feature graphic', k: .27, fan: [512, 70, 210, 270, 50] },
+};
+const art = (a, id = '') => `<div class="art" ${id} style="width:${a.W}px;height:${a.H}px;background:${BG(a.W, a.H)}">${decor(a.W, a.H, a.k)}${a.brand ? brand(...a.brand) : ''}${a.head ? head(...a.head) : ''}${fan(...a.fan)}</div>`;
+
+/* Tony's two views, at iPhone 17 Pro points (402 wide). The art is placed exactly at the measured crop. */
+function simSearch(a, cropX, cropY, cropW) {
+  const cw = 360, ch = 240, s = cw / cropW;
+  return `<div class="sim" style="width:402px;height:330px"><div style="position:absolute;left:21px;top:22px;font:600 15px/1.2 Inter">Sprout: The App for Parents</div>
+    <div style="position:absolute;left:21px;top:42px;font:400 13px/1.2 Inter;color:#8a8a8e">Parents Bond, Kids flourish</div>
+    <div class="img" style="left:21px;top:72px;width:${cw}px;height:${ch}px;border-radius:18px"><div class="art-wrap" style="position:absolute;left:${-cropX * s}px;top:${-cropY * s}px;transform:scale(${s});transform-origin:0 0">${art(a)}</div></div></div>`;
+}
+function simHeader(a, cropX, cropW) {
+  const w = 402, s = w / cropW, h = Math.round(Math.min(a.H, cropW / 1.69) * s);
+  return `<div class="sim" style="width:${w}px;height:${h + 60}px"><div class="img" style="left:0;top:0;width:${w}px;height:${h}px"><div style="position:absolute;left:${-cropX * s}px;top:0;transform:scale(${s});transform-origin:0 0">${art(a)}</div></div>
+    <span class="stat" style="left:44px">8:34</span><span class="island"></span>
+    <span class="btn" style="left:16px;top:${h * .2}px">‹</span><span class="btn" style="right:16px;top:${h * .2}px">⇪</span>
+    <div style="position:absolute;left:20px;top:${h + 18}px;font:600 17px/1 Inter">Sprout: The App for Parents</div></div>`;
+}
+
+const q = new URLSearchParams(location.search);
+const FIGMA = q.has('figma') || location.hash === '#figma' || location.hash.includes('figmacapture=');
+if (q.has('export')) {
+  document.body.innerHTML = art(ASSETS[q.get('export')], 'id="asset"');
+  document.body.style.cssText = 'margin:0;padding:0;background:#155a32';
+} else if (FIGMA) {
+  document.body.innerHTML = `<div style="display:flex;gap:240px;align-items:flex-start;flex-wrap:wrap;width:${3840 * 2 + 240}px">` +
+    ['header', 'search', 'universal', 'feature'].map(n => `<div data-name="A · V.11 / ${ASSETS[n].label} / ${ASSETS[n].W}x${ASSETS[n].H}">${art(ASSETS[n])}</div>`).join('') + '</div>';
+  document.body.style.cssText = 'margin:0;padding:0;background:transparent;width:max-content';
+} else {
+  const show = (n, w) => { const a = ASSETS[n], s = w / a.W;
+    const crops = (a.crops || []).map(([c, x, y, cw, ch]) => `<div class="crop" style="border-color:${c};left:${x * s}px;top:${y * s}px;width:${cw * s}px;height:${ch * s}px"></div>`).join('');
+    return `<h2>${a.label} <small>${a.W} × ${a.H} · ${a.file}</small></h2>
+      <div class="fit" style="width:${w}px;height:${a.H * s}px"><div style="transform:scale(${s});transform-origin:0 0">${art(a)}</div>${crops}</div>`; };
+  const H = ASSETS.header, S = ASSETS.search, U = ASSETS.universal;
+  const hx = (H.W - H.H * 1.69) / 2;
+  document.getElementById('out').innerHTML =
+    `<h2>On Tony's iPhone <small>left: header + search uploaded as two assets (recommended) · right: universal in both slots (what is live now)</small></h2>
+     <div class="row">
+       <div>${simHeader(H, hx, H.H * 1.69)}<p class="sim-cap">Header 21:9, centre crop to the iPhone's 1.69:1. No words, so the buttons and the island cover only green.</p></div>
+       <div>${simSearch(S, 0, 0, S.W)}<p class="sim-cap">Search 3:2 fills the 3:2 card whole. Headline and phone tops in view.</p></div>
+       <div>${simHeader(U, 1030, 3180)}<p class="sim-cap">Universal in the header, measured crop. Headline clears both buttons.</p></div>
+       <div>${simSearch(U, 1500, 390, 2250)}<p class="sim-cap">Universal in the search card, measured crop (the one that cut "Every ... app"). Headline whole.</p></div>
+     </div>` +
+    show('header', 1200) + show('search', 900) +
+    `<p class="why" style="margin-top:14px">Universal: yellow = the iPhone product header crop, blue = the iPhone search card crop, both measured from Tony's 13 Nov screenshots of the live listing. Every word sits inside both.</p>` +
+    show('universal', 1200) + show('feature', 1024);
+}
+</script>
+</body>
+</html>

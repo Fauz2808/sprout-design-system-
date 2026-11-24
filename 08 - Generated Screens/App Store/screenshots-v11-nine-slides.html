@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Store screenshots · V.11 Nine slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&display=swap" rel="stylesheet">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  :root { --green: #186338; --deep: #12301f; --muted: #6d6a60; --cream: #f4f1ea; --leaf: #cfe6c4; --page: #ece9e2; --gap: 16px; --w: 250px; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--page); color: var(--deep); font-family: Inter, system-ui, sans-serif; padding: 36px 48px 80px; }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; max-width: 1500px; }
+  .top h1 { font: 600 30px/1.15 'Playfair Display', serif; }
+  .top p { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--muted); max-width: 860px; }
+  .btn { font: 600 13px/1 Inter; color: #fff; background: var(--green); border: 0; border-radius: 999px; padding: 11px 18px; cursor: pointer; white-space: nowrap; }
+  h2.section { font: 600 22px/1.2 'Playfair Display', serif; margin: 40px 0 6px; }
+  h2.section small { font: 500 13px/1 Inter; color: var(--muted); margin-left: 10px; }
+  p.why { font-size: 13.5px; line-height: 1.5; color: var(--muted); max-width: 1000px; margin-bottom: 16px; }
+  .row { display: flex; gap: var(--gap); overflow-x: auto; padding: 4px 4px 14px; scroll-snap-type: x proximity; }
+  .slide-wrap { width: var(--w); flex: none; scroll-snap-align: start; }
+  .slide-wrap .cap { font-size: 11.5px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+  .slide-wrap .cap b { color: var(--deep); font-weight: 600; }
+  table.src { border-collapse: collapse; font-size: 12.5px; color: var(--muted); max-width: 1200px; }
+  table.src td { padding: 4px 14px 4px 0; vertical-align: top; }
+  table.src td:first-child { color: var(--deep); font-weight: 600; white-space: nowrap; }
+  table.src code { font-size: 11.5px; background: #fff; padding: 1px 5px; border-radius: 4px; }
+
+  /* slide shell: 1290 × 2796 in container units */
+  .slide { width: 100%; aspect-ratio: 1290 / 2796; position: relative; overflow: hidden; container-type: inline-size; border-radius: calc(var(--w) * .07);
+    box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.08); isolation: isolate; }
+  .bg-cream  { background: radial-gradient(90% 55% at 50% 0%, #fffdf8 0%, #f6f2e8 55%, #ebe5d6 100%); }
+  .bg-sage   { background: radial-gradient(90% 55% at 50% 0%, #f7fbf4 0%, #e4eedf 60%, #cfe0c9 100%); }
+  .bg-butter { background: radial-gradient(90% 55% at 50% 0%, #fffaf0 0%, #f8edd3 60%, #f0dcae 100%); }
+  .bg-peach  { background: radial-gradient(90% 55% at 50% 0%, #fff8f3 0%, #f8e6da 60%, #efcfba 100%); }
+  .bg-mint   { background: radial-gradient(90% 55% at 50% 0%, #f5fbf8 0%, #dcefe6 60%, #bfdfcf 100%); }
+  .logo { position: absolute; top: 9cqw; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 1.6cqw; font: 500 5.6cqw/1 'Playfair Display', serif; color: var(--deep); z-index: 5; }
+  .logo img { width: 6.6cqw; height: 6.6cqw; }
+  .head { position: absolute; left: 6cqw; right: 6cqw; top: 22cqw; text-align: center; z-index: 5; }
+  .h { font: 500 10cqw/1.06 'Playfair Display', serif; letter-spacing: -.012em; color: var(--deep); }
+  .h em { font-style: italic; color: var(--green); }
+  .sub { font: 400 3.7cqw/1.45 Inter; color: #5f5d55; margin: 4cqw auto 0; max-width: 84cqw; }
+
+  /* clean phone: thin light frame, soft gray stroke, no extra black */
+  .phone { position: absolute; left: 50%; transform: translateX(-50%) rotate(var(--rot, 0deg)); width: 76cqw; aspect-ratio: 393 / 852; border-radius: 11.6cqw; padding: 1.3cqw;
+    background: #fbfaf7; border: .45cqw solid #dcd7cc; box-shadow: 0 3.4cqw 8cqw rgba(40,50,35,.16), 0 .6cqw 1.6cqw rgba(40,50,35,.08); z-index: 2; }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: 10.2cqw; overflow: hidden; background: var(--cream); container-type: inline-size; }
+  .screen > img { position: absolute; left: 0; top: 0; width: 100%; display: block; }
+  /* device exports (?device=ipad|play): screen card without the phone bezel */
+  .frameless .phone { background: transparent; border: 0; padding: 0; border-radius: 6cqw; }
+  .frameless .screen { border-radius: 6cqw; }
+  .sbar { position: absolute; top: 0; left: 0; right: 0; z-index: 2; display: flex; justify-content: space-between; padding: 5cqw 9cqw 0 11cqw; font: 600 4.1cqw/1 -apple-system, Inter; color: #111; }
+  .sbar i { font-style: normal; letter-spacing: .08em; font-size: 3.4cqw; }
+
+  .piece { position: absolute; z-index: 4; display: block; }
+  .piece.card { border-radius: 4.2cqw; box-shadow: 0 2.4cqw 6cqw rgba(30,40,30,.2), 0 .4cqw 1cqw rgba(0,0,0,.06); }
+  /* Sprout app icon (09 - Logo source: rounded square + textured clover), floating in place of the mascot */
+  .slogo { position: absolute; z-index: 6; width: var(--s); height: var(--s); }
+  .slogo .fl { position: absolute; inset: 0; animation: float 5s ease-in-out infinite; animation-delay: var(--d, 0s); }
+  .slogo .tl { position: absolute; inset: 0; animation: tilt 7.5s ease-in-out infinite; animation-delay: var(--d, 0s); }
+  .slogo .ic { position: absolute; inset: 0; border-radius: 23.75%; background: linear-gradient(#f2edea, #e7d8d2);
+    box-shadow: 0 calc(var(--s) * .09) calc(var(--s) * .2) rgba(40,50,35,.18), 0 calc(var(--s) * .015) calc(var(--s) * .04) rgba(40,50,35,.1), inset 0 0 0 calc(var(--s) * .006) rgba(255,255,255,.7); }
+  .slogo .ic img { position: absolute; left: -3.125%; top: -3.125%; width: 106.25%; height: 106.25%; display: block; }
+  .slogo.hero .halo { position: absolute; left: 50%; top: 50%; width: 150%; height: 150%; border-radius: 50%; transform: translate(-50%, -50%);
+    background: radial-gradient(closest-side, rgba(255,255,255,.75), rgba(255,255,255,0)); animation: halo 5s ease-in-out infinite; }
+  .slogo.hero .fl { animation-name: breathe; }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(calc(var(--s) * -.07)); } }
+  @keyframes tilt { 0%, 100% { transform: rotate(var(--r0, -3deg)); } 50% { transform: rotate(var(--r1, 3deg)); } }
+  @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035); } }
+  @keyframes halo { 0%, 100% { opacity: .55; transform: translate(-50%, -50%) scale(.94); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); } }
+
+  /* iOS notification, light (system UI; copy from the Figma push, section 6 · 6.1) */
+  .push { position: absolute; z-index: 5; display: flex; gap: 2.8cqw; align-items: flex-start; padding: 3.4cqw 3.8cqw; border-radius: 5.2cqw;
+    background: rgba(255,255,255,.86); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    box-shadow: 0 2.6cqw 6cqw rgba(40,50,35,.16), inset 0 0 0 .25cqw rgba(255,255,255,.8); font-family: -apple-system, Inter, sans-serif; color: #111; }
+  .push .ic { width: 10cqw; height: 10cqw; border-radius: 2.4cqw; background: var(--cream); display: grid; place-items: center; flex: none; box-shadow: inset 0 0 0 .2cqw rgba(0,0,0,.08); }
+  .push .ic img { width: 76%; }
+  .push .grow { flex: 1; min-width: 0; }
+  .push .pt { font-weight: 600; font-size: 3.8cqw; line-height: 1.3; }
+  .push .pb { font-size: 3.8cqw; line-height: 1.32; margin-top: .4cqw; }
+  .push .pw { font-size: 3.2cqw; color: #8a8a8e; margin-left: 2cqw; white-space: nowrap; }
+
+  /* hero orbit */
+  .orbit { position: absolute; left: 50%; width: 0; height: 0; z-index: 2; }
+  .ringline { position: absolute; border-radius: 50%; border: .3cqw solid rgba(24,99,56,.13); transform: translate(-50%, -50%); left: 0; top: 0; }
+  .ringline.dash { border-style: dashed; border-color: rgba(24,99,56,.18); }
+  .spin { position: absolute; left: 0; top: 0; width: 0; height: 0; animation: spin var(--dur) linear infinite; animation-direction: var(--dir, normal); }
+  .sat { position: absolute; left: 0; top: 0; transform: rotate(var(--a)) translateX(var(--r)) rotate(calc(-1 * var(--a))); }
+  .sat > .c { position: absolute; transform: translate(-50%, -50%); }
+  .sat > .c > .cr { animation: spin var(--dur) linear infinite; animation-direction: var(--cdir, reverse); }
+  .sat img { width: var(--s); height: var(--s); border-radius: 50%; display: block; filter: drop-shadow(0 1.2cqw 2.4cqw rgba(30,40,30,.18)); }
+  .dot { display: block; width: var(--s); height: var(--s); border-radius: 50%; background: var(--leaf); box-shadow: 0 0 0 .8cqw rgba(207,230,196,.35); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .store-wrap { display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap; }
+  .store { width: 360px; background: #fff; border-radius: 28px; padding: 18px 16px 20px; box-shadow: 0 8px 30px rgba(0,0,0,.08); }
+  .store .lab { font: 600 12px/1 Inter; color: var(--muted); margin-bottom: 12px; }
+  .store .app { display: flex; align-items: center; gap: 12px; }
+  .store .icon { width: 62px; height: 62px; border-radius: 15px; background: var(--cream); display: grid; place-items: center; box-shadow: inset 0 0 0 .5px rgba(0,0,0,.12); }
+  .store .icon img { width: 46px; }
+  .store .name { font: 600 16px/1.2 -apple-system, Inter, sans-serif; }
+  .store .tagline { font: 400 13px/1.3 -apple-system, Inter, sans-serif; color: #8a8a8e; }
+  .store .get { font: 700 14px/1 -apple-system, Inter; color: #0a84ff; background: #eef0f4; border-radius: 999px; padding: 8px 20px; margin-left: auto; }
+  .store .shots { display: flex; gap: 8px; margin-top: 14px; }
+  .store .shots .slide-wrap { width: 104px; --w: 104px; }
+  .store .shots .slide { border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div>
+    <h1>App Store screenshots · V.11 “Nine slides”</h1>
+    <p>V.10 after Tony’s review on 6 Nov. Slide 1’s orbit is smaller so every face and icon stays inside the slide as it turns, the way the in-app onboarding orbit sits on screen. “Set family reminders” is removed (not built yet). Palette A, the mixed tints Tony picked. Slides 1–5 are the onboarding story with onboarding copy; 6–9 are Sprout Assist, Discover, Events and Invites with the copy from the Figma App Store V.2 set.</p>
+  </div>
+  <button class="btn" id="pause">Pause motion</button>
+</div>
+
+<h2 class="section">Palette A · mixed tints <small>cream, sage, butter, peach, mint, repeating</small></h2>
+<div class="row" id="setA"></div>
+
+<h2 class="section">In App Store search</h2>
+<p class="why">The first three slides beside the icon, about 104 px wide on a phone.</p>
+<div class="store-wrap" id="stores"></div>
+
+<h2 class="section">Where each piece comes from</h2>
+<table class="src">
+  <tr><td>Copy 1–5</td><td>Headline + subline of onboarding frames <code>14023:21667</code> … <code>14023:23226</code>, unchanged (the “Set family reminders” frame is no longer used).</td></tr>
+  <tr><td>Copy 6–9</td><td>Headline + subline of the App Store V.2 slides (section <code>15194:15366</code>): 2 Sprout Assist, 5 Discover, 6 Events, 7 Invites, unchanged.</td></tr>
+  <tr><td>Screens</td><td>Class Tabs <code>14126:20591</code> · Profile Card <code>14026:26392</code> · Daily Brief 7·2 <code>14282:23224</code> · Gmail row, email, To-Do List <code>14054:24435</code> · Assist v2 D·1, Discover, Create Event · Invite Sent, Send Invites (screens inside V.2 slides 2, 5, 6, 7).</td></tr>
+  <tr><td>Not from Figma</td><td>Phone frame and backgrounds. Logo: the Sprout app icon from <code>09 - Logo</code> (textured clover on the rounded cream square).</td></tr>
+</table>
+
+<script>
+const O = n => `assets/orbit/${n}.png`, F = n => `assets/figma/${n}.png`;
+/* [segments [text, italic]], sub — exact from Figma (U+2028 / \n become <br>) */
+const COPY = [
+  [[['Your school’s<br>'], ['parent community.', 1]], 'Join your kids’ schools and<br>meet the parents in them.'],
+  [[['All your class details,<br>in '], ['one place.', 1]], 'Chat, calendar, updates, and key links for every class — no more digging through emails.'],
+  [[['Discover the names, faces, and stories of '], ['all parents.', 1]], 'See who\'s who — every parent in your kid\'s grade, their families, and what they\'re into.'],
+  [[['Wake up to your '], ['family’s brief.', 1]], 'Every morning, one screen with your family’s to-dos, today’s events and school news. Your spouse sees the same list.'],
+  [[['School emails in, '], ['your day out.', 1]], 'Connect Gmail and Sprout turns teacher and coach emails into to-dos. You pick which ones to add.'],
+  [[['Just say it. Sprout handles the rest.']], 'Set reminders, plan events and find activities for your kids, all in one chat.'],
+  [[['Find events<br>'], ['your', 1], [' kids<br>will love']], 'Curated activities for every age, right in your neighborhood'],
+  [[['Plan<br>'], ['important', 1], ['<br>moments']], 'Create birthday parties, playdates and family events, then share them with families in your grade.'],
+  [[['Invite the right<br>'], ['families', 1], [',<br>in one tap']], 'Share with your class, your grade, or your whole school instantly'],
+];
+const head = i => `<div class="logo"><img src="assets/clover.png" alt="">Sprout</div><div class="head"><div class="h">${COPY[i][0].map(([t, it]) => it ? `<em>${t}</em>` : t).join('')}</div><div class="sub">${COPY[i][1]}</div></div>`;
+/* logo(x, y, s, slot, flip) keeps the mascot's old call signature: same box centre, icon sized .85 of the mascot width.
+   slot staggers the float so neighbouring slides don't bob in sync; flip mirrors the tilt direction. */
+const LOGO_IMG = 'assets/logo/clover-800.png';
+const logo = (x, y, s, slot, flip = false, hero = false) => { const w = s * (hero ? .6 : .85), cx = x + s / 2, cy = y + s * .54;
+  return `<span class="slogo${hero ? ' hero' : ''}" style="left:${cx - w / 2}cqw;top:${cy - w / 2}cqw;--s:${w}cqw;--d:${-(slot * .73) % 5}s;${flip ? '--r0:3deg;--r1:-3deg;' : ''}">${hero ? '<span class="halo"></span>' : ''}<span class="fl"><span class="tl"><span class="ic"><img src="${LOGO_IMG}" alt="Sprout"></span></span></span></span>`; };
+const phone = (top, inner, rot = 0) => `<div class="phone" style="top:${top}cqw;--rot:${rot}deg"><div class="screen">${inner}</div></div>`;
+const shot = n => `<img src="${F(n)}" alt="">`;
+
+function hero(bg) {
+  /* V.11: whole orbit inside the slide. Outer ring 36 + half the 18cqw school = 45cqw from centre,
+     inside the 50cqw half-width with room for the drop shadow. Was 48 + 11 = 59cqw (cut off, Tony 6 Nov).
+     Rings 16cqw apart > biggest outer + inner half-sizes (9 + 6.5), so counter-rotating satellites never collide;
+     inner ring evenly spaced (7 slots, 51.4 deg); logo 18cqw, the onboarding orbit's logo-to-ring ratio. */
+  const C = 138, RO = 36, RI = 20;
+  const ring = (r, dur, dir, items) => `<div class="spin" style="--dur:${dur}s;--dir:${dir}">${items.map(([a, html, s]) => `<div class="sat" style="--a:${a}deg;--r:${r}cqw;--s:${s}cqw;--dur:${dur}s;--cdir:${dir === 'reverse' ? 'normal' : 'reverse'}"><div class="c"><div class="cr">${html}</div></div></div>`).join('')}</div>`;
+  const img = n => `<img src="${O(n)}" alt="">`;
+  return `<div class="slide ${bg}">${head(0)}
+    <div class="orbit" style="top:${C}cqw">
+      <div class="ringline" style="width:${2 * RO}cqw;height:${2 * RO}cqw"></div>
+      <div class="ringline dash" style="width:${2 * RI}cqw;height:${2 * RI}cqw"></div>
+      <div class="ringline" style="width:88cqw;height:88cqw;opacity:.6"></div>
+      ${ring(RO, 70, 'normal', [[-90, img('school'), 18], [-25, img('mom-blonde'), 15.6], [35, img('cake'), 14.8], [95, img('dad-bald'), 15.6], [155, img('ball'), 14], [215, img('mom-bun'), 15.6], [242.5, '<span class="dot"></span>', 3.8]])}
+      ${ring(RI, 48, 'reverse', [[-60, img('girl-bday'), 11.5], [-8.6, '<span class="dot"></span>', 3], [42.9, img('dad-mustache'), 13], [94.3, img('kid-yard'), 11.5], [145.7, img('tent'), 12.5], [197.1, img('kid-balloons'), 11.5], [248.6, img('boy-suit'), 11]])}
+    </div>
+    ${logo(35, C - 16.2, 30, 9, false, true)}</div>`;
+}
+
+const SLIDES = [
+  { cap: '<b>Community, moving.</b> Onboarding’s parents and school orbit the Sprout logo.', html: hero },
+  { cap: '<b>Class details.</b> The real Class Tabs screen.', html: bg => `<div class="slide ${bg}">${head(1)}
+    ${phone(80.5, `<div class="sbar"><span>9:41</span><i>●●● ▮</i></div><img src="${F('class')}" alt="" style="top:12%;left:-3%;width:106%">`)}</div>` },
+  { cap: '<b>Parents.</b> The onboarding profile card, large.', html: bg => `<div class="slide ${bg}">${head(2)}
+    <img class="piece" src="${F('profile')}" alt="" style="left:2cqw;width:96cqw;top:92.3cqw;transform:rotate(-1.5deg);z-index:3"></div>` },
+  { cap: '<b>Daily Brief.</b> The current Figma Daily Brief.', html: bg => `<div class="slide ${bg}">${head(3)}
+    ${phone(75.3, shot('brief'))}</div>` },
+  { cap: '<b>School emails.</b> Onboarding’s Gmail row, email and To-Do List.', html: bg => `<div class="slide ${bg}">${head(4)}
+    <img class="piece" src="${F('connected')}" alt="" style="left:10cqw;width:80cqw;top:75.3cqw">
+    <img class="piece" src="${F('email')}" alt="" style="left:0;width:100cqw;top:87.3cqw;transform:rotate(-1.5deg)">
+    <img class="piece" src="${F('todo')}" alt="" style="left:0;width:100cqw;top:123.3cqw">
+    </div>` },
+  { cap: '<b>Sprout Assist.</b> “What can I take off your plate?”', html: bg => `<div class="slide ${bg}">${head(5)}
+    ${phone(69.9, shot('assist'))}</div>` },
+  { cap: '<b>Discover.</b> Activities nearby, by day.', html: bg => `<div class="slide ${bg}">${head(6)}
+    ${phone(80.5, shot('discover'))}</div>` },
+  { cap: '<b>Events.</b> Birthday invite sent, from Create Event.', html: bg => `<div class="slide ${bg}">${head(7)}
+    ${phone(85.9, shot('events'))}</div>` },
+  { cap: '<b>Invites.</b> Send to your clubs, subgroups and friends.', html: bg => `<div class="slide ${bg}">${head(8)}
+    ${phone(80.5, shot('invites'))}</div>` },
+];
+
+const PAL = {
+  A: ['bg-cream', 'bg-sage', 'bg-butter', 'bg-peach', 'bg-mint', 'bg-cream', 'bg-sage', 'bg-butter', 'bg-peach'],
+};
+for (const k of ['A']) document.getElementById('set' + k).innerHTML = SLIDES.map((s, i) => `<div class="slide-wrap">${s.html(PAL[k][i])}<div class="cap">${i + 1} · ${s.cap}</div></div>`).join('');
+document.getElementById('stores').innerHTML = ['A'].map(k => `<div class="store"><div class="lab">Palette ${k}</div><div class="app"><div class="icon"><img src="assets/clover.png" alt=""></div>
+  <div><div class="name">Sprout</div><div class="tagline">Your school’s parent community</div></div><div class="get">GET</div></div>
+  <div class="shots">${SLIDES.slice(0, 3).map((s, i) => `<div class="slide-wrap">${s.html(PAL[k][i])}</div>`).join('')}</div></div>`).join('');
+
+/* export mode: ?export=N&pal=A|B&w=1290&h=2796 renders one slide alone at exact pixels */
+const q = new URLSearchParams(location.search);
+if (q.has('export')) {
+  const n = +q.get('export'), k = q.get('pal') || 'A', w = +q.get('w') || 1290, h = +q.get('h') || 2796;
+  const dev = q.get('device'); // ipad (2064 x 2752) | play (1080 x 1920): wider canvases than the 6.9" slot
+  if (dev) {
+    /* The iPhone composition keeps its exact proportions in a centred column as tall as the canvas (cw = h x 1290/2796);
+       the background tint fills the full width. Frameless: no phone bezel, the screen is a rounded card,
+       because Apple rejects iPad screenshots that show an iPhone, and Google Play wants the app, not device imagery. */
+    const cw = +q.get('cw') || Math.round(h * 1290 / 2796), bg = PAL[k][n - 1];
+    document.body.innerHTML = `<div class="${bg}" style="position:relative;width:${w}px;height:${h}px;overflow:hidden">${SLIDES[n - 1].html(bg)}</div>`;
+    document.body.classList.add('frameless');
+    document.querySelector('.slide').style.cssText = `position:absolute;left:${(w - cw) / 2}px;top:0;width:${cw}px;height:${cw * 2796 / 1290}px;aspect-ratio:auto;border-radius:0;box-shadow:none;background:none;overflow:visible;--w:${cw}px`;
+  } else {
+    document.body.innerHTML = SLIDES[n - 1].html(PAL[k][n - 1]);
+    document.querySelector('.slide').style.cssText = `width:${w}px;height:${h}px;aspect-ratio:auto;border-radius:0;box-shadow:none;--w:${w}px`;
+  }
+  document.body.style.cssText = 'margin:0;padding:0;background:#f4f1ea';
+}
+
+/* Figma capture mode: ?figma (or #figma) lays out both palettes at exact App Store size, motion frozen */
+const FIGMA = q.has('figma') || location.hash === '#figma' || location.hash.includes('figmacapture=');
+if (FIGMA) {
+  document.body.innerHTML = ['A'].map(k => `<section style="margin:0 0 240px"><div style="font:600 64px/1 'Playfair Display',serif;color:#12301f;margin:0 0 48px">V.11 · Palette A · mixed tints · 9 slides</div>
+    <div style="display:flex;gap:120px">${SLIDES.map((s, i) => `<div class="slide-wrap" style="width:1290px;--w:1290px" data-name="${i + 1} - 6.9 · ${k}">${s.html(PAL[k][i]).replace('class="slide ', 'style="border-radius:0;box-shadow:none" class="slide ')}</div>`).join('')}</div></section>`).join('');
+  document.body.style.cssText = 'margin:0;padding:120px;background:#ece9e2;width:max-content';
+}
+/* All motion is CSS (orbit spin, logo float/tilt/breathe), so one clock drives it.
+   Video export: ?export=N&pal=K&video pauses every animation and exposes window.__seek(seconds),
+   which the exporter calls per frame. Figma capture freezes at 2.2 s. */
+let paused = FIGMA;
+const seek = t => document.getAnimations().forEach(a => { a.pause(); a.currentTime = t * 1000; });
+window.__seek = seek;
+if (FIGMA) seek(2.2);
+if (q.has('export') && (q.has('video') || q.has('still'))) seek(+q.get('t') || 2.2);
+const pb = document.getElementById('pause');
+if (pb) {
+  pb.onclick = () => {
+    paused = !paused;
+    document.getAnimations().forEach(a => paused ? a.pause() : a.play());
+    pb.textContent = paused ? 'Play motion' : 'Pause motion';
+  };
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) pb.click();
+}
+</script>
+</body>
+</html>

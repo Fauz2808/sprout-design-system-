@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Store header + search art · fan on V.11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  /* Round 2 (13 Nov). App Store Connect sizes (Mohit's upload screen + Apple's Creative assets specifications page):
+       Header 21:9      3840 x 1646   art safe area 1646 x 661 at (1097, 493)
+       Search 3:2       3840 x 2560   art safe area 2168 x 1030 at (836, 765)
+       Universal 16:9   5244 x 2950   art safe area 1402 x 962 at (1921, 660)   PNG only
+     Every word and the top of the centre phone sit inside the safe area; the rest is background ("auxiliary art").
+     Background is a choice: ?pal=green|cream|sage|butter|peach|mint (V.11 Palette A tints + brand green).
+     v1 (headline above the search safe area) kept in store-header-green-fan-v11-backup-13nov-v1.html. */
+  :root { --green: #186338; --deep: #12301f; --muted: #6d6a60; --page: #ece9e2; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--page); color: var(--deep); font-family: Inter, system-ui, sans-serif; padding: 36px 48px 80px; }
+  h1 { font: 600 30px/1.15 'Playfair Display', serif; }
+  p.lede { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--muted); max-width: 1080px; }
+  h2 { font: 600 22px/1.2 'Playfair Display', serif; margin: 44px 0 4px; }
+  h2 small { font: 500 13px/1 Inter; color: var(--muted); margin-left: 10px; }
+  .why { font-size: 13px; line-height: 1.5; color: var(--muted); max-width: 1080px; margin-bottom: 14px; }
+  .fit { position: relative; overflow: hidden; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.08); flex: none; }
+  .safe { position: absolute; border: 2px dashed #e0457b; pointer-events: none; }
+  .row { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-end; }
+  .cap { font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+  .pick { display: inline-block; font: 600 11px/1 Inter; letter-spacing: .06em; text-transform: uppercase; padding: 5px 8px; border-radius: 6px; background: #fff; color: var(--deep); margin-left: 10px; vertical-align: middle; }
+
+  .art { position: relative; overflow: hidden; isolation: isolate; }
+  .ring { position: absolute; border-radius: 50%; border-style: solid; transform: translate(-50%, -50%); }
+  .glow { position: absolute; border-radius: 50%; transform: translate(-50%, -50%); }
+  .brand { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; font-family: 'Playfair Display', serif; font-weight: 500; white-space: nowrap; }
+  .brand .ic { position: relative; border-radius: 23.75%; background: linear-gradient(#f2edea, #e7d8d2); overflow: hidden; flex: none; box-shadow: 0 6px 18px rgba(30,40,30,.16), inset 0 0 0 1px rgba(255,255,255,.7); }
+  .brand .ic img { position: absolute; left: -3.125%; top: -3.125%; width: 106.25%; height: 106.25%; display: block; }
+  .head { position: absolute; left: 0; right: 0; text-align: center; font-family: 'Playfair Display', serif; font-weight: 500; line-height: 1.06; letter-spacing: -.012em; }
+  .head span, .head em { display: inline-block; }
+  .head em { font-style: italic; }
+
+  /* V.11 clean phone, sized in px by --p (phone width) */
+  .phone { position: absolute; width: var(--p); aspect-ratio: 393 / 852; transform: translateX(-50%) rotate(var(--rot, 0deg)); transform-origin: 50% 100%;
+    border-radius: calc(var(--p) * .153); padding: calc(var(--p) * .017); background: #fbfaf7; border: calc(var(--p) * .006) solid #dcd7cc; }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: calc(var(--p) * .134); overflow: hidden; background: #f4f1ea; container-type: inline-size; }
+  .screen > img { position: absolute; left: 0; top: 0; width: 100%; display: block; }
+  .sbar { position: absolute; top: 0; left: 0; right: 0; z-index: 2; display: flex; justify-content: space-between; padding: 6.6cqw 11.8cqw 0 14.5cqw; font: 600 5.4cqw/1 -apple-system, Inter; color: #111; }
+  .sbar i { font-style: normal; letter-spacing: .08em; font-size: 4.5cqw; }
+
+  .sim { position: relative; overflow: hidden; background: #fff; border-radius: 22px; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.1); flex: none; }
+  .sim .img { position: absolute; overflow: hidden; }
+  .sim .btn { position: absolute; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.4); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.5); display: grid; place-items: center; color: #111; font: 600 17px/1 Inter; }
+  .sim .island { position: absolute; left: 50%; transform: translateX(-50%); top: 9px; width: 96px; height: 28px; border-radius: 16px; background: #000; }
+  .sim .stat { position: absolute; top: 15px; font: 600 13px/1 -apple-system, Inter; }
+</style>
+</head>
+<body>
+<h1>App Store header + search art · B Cream (picked 13 Nov)</h1>
+<p class="lede">Built to the App Store Connect templates: Header 3840 × 1646, Search results 3840 × 2560, Universal 5244 × 2950 (the two sizes on Mohit's Header tab are Header and Universal; Search results has its own tab).
+Pink dashed box = Apple's art safe area: the part every device shows. The canvas outside it is background that some devices crop.
+Ahmad 13 Nov: B Cream, and the whole fan plus headline fit inside the safe area (phones run off the bottom of the box, nothing important outside it). The six background options: <code>?all</code>.</p>
+<div id="out"></div>
+
+<script>
+const F = n => `assets/figma/${n}.png`;
+const ICON = 'assets/logo/clover-800.png';
+
+/* Backgrounds. Light ones are the V.11 Palette A slide tints (screenshots-v11-nine-slides.html), so the header reads as
+   the top of the screenshot strip under it. text/em = headline, line = rings, shadow = phone shadow rgb. */
+const PAL = {
+  green:  { name: 'Brand green', stops: ['#2e7a4b', '#1d6a3e', '#155a32', '#0f4627'], text: '#ffffff', em: '#cfe6c4', brand: '#ffffff', line: 'rgba(255,255,255,.075)', glow: 'rgba(120,190,140,.22)', shadow: '4,30,14', sh: .45 },
+  cream:  { name: 'Cream (V.11 slide 1)', stops: ['#fffdf8', '#f6f2e8', '#ebe5d6', '#e1eadb'], text: '#12301f', em: '#186338', brand: '#12301f', line: 'rgba(24,99,56,.10)', glow: 'rgba(255,255,255,.7)', shadow: '40,50,35', sh: .18 },
+  sage:   { name: 'Sage (V.11 slide 2)', stops: ['#f7fbf4', '#e4eedf', '#cfe0c9', '#bcd3b5'], text: '#12301f', em: '#186338', brand: '#12301f', line: 'rgba(24,99,56,.12)', glow: 'rgba(255,255,255,.6)', shadow: '30,55,35', sh: .2 },
+  butter: { name: 'Butter (V.11 slide 3)', stops: ['#fffaf0', '#f8edd3', '#f0dcae', '#e8cf98'], text: '#12301f', em: '#186338', brand: '#12301f', line: 'rgba(120,90,20,.10)', glow: 'rgba(255,255,255,.65)', shadow: '70,55,20', sh: .18 },
+  peach:  { name: 'Peach (V.11 slide 4)', stops: ['#fff8f3', '#f8e6da', '#efcfba', '#e6bea4'], text: '#12301f', em: '#186338', brand: '#12301f', line: 'rgba(130,70,40,.10)', glow: 'rgba(255,255,255,.65)', shadow: '80,45,25', sh: .18 },
+  mint:   { name: 'Mint (V.11 slide 5)', stops: ['#f5fbf8', '#dcefe6', '#bfdfcf', '#a9d2bf'], text: '#12301f', em: '#186338', brand: '#12301f', line: 'rgba(24,99,56,.12)', glow: 'rgba(255,255,255,.6)', shadow: '25,60,45', sh: .2 },
+};
+const BG = (P, W, H) => P === PAL.green
+  ? `radial-gradient(${W * .7}px ${H * 1.1}px at ${W * .62}px ${-H * .08}px, ${P.stops[0]} 0%, ${P.stops[1]} 38%, ${P.stops[2]} 68%, ${P.stops[3]} 100%)`
+  : `radial-gradient(${W * .62}px ${H * .95}px at ${W / 2}px ${H * .32}px, ${P.stops[0]} 0%, ${P.stops[1]} 42%, ${P.stops[2]} 78%, ${P.stops[3]} 100%)`;
+
+const phone = (P, x, y, p, rot, inner) => `<div class="phone" style="left:${x}px;top:${y}px;--p:${p}px;--rot:${rot}deg;box-shadow:0 ${p * .06}px ${p * .16}px rgba(${P.shadow},${P.sh}),0 ${p * .01}px ${p * .025}px rgba(${P.shadow},${P.sh * .55})"><div class="screen">${inner}</div></div>`;
+const SCREENS = {
+  class: `<div class="sbar"><span>9:41</span><i>●●● ▮</i></div><img src="${F('class')}" alt="" style="top:12%;left:-3%;width:106%">`,
+  brief: `<img src="${F('brief')}" alt="">`,
+  discover: `<img src="${F('discover')}" alt="">`,
+};
+const fan = (P, cx, top, p, spread, drop, rot = 7) => [
+  phone(P, cx - spread, top + drop, p * .9, -rot, SCREENS.class),
+  phone(P, cx + spread, top + drop, p * .9, rot, SCREENS.discover),
+  phone(P, cx, top, p, 0, SCREENS.brief),
+].join('');
+/* V.11 slide 1 brand mark + headline, character for character */
+const brand = (P, top, s) => `<div class="brand" style="top:${top}px;gap:${s * .36}px;font-size:${s}px;color:${P.brand}"><span class="ic" style="width:${s * 1.25}px;height:${s * 1.25}px"><img src="${ICON}" alt=""></span>Sprout</div>`;
+const head = (P, top, size) => `<div class="head" style="top:${top}px;font-size:${size}px;color:${P.text}"><span data-w>Your school’s</span><br><em data-w style="color:${P.em}">parent community.</em></div>`;
+const decor = (P, W, H, k) => [
+  `<span class="glow" style="left:${W * .78}px;top:${H * .05}px;width:${1500 * k}px;height:${1500 * k}px;background:radial-gradient(closest-side,${P.glow},transparent)"></span>`,
+  `<span class="glow" style="left:${W * .14}px;top:${H * .9}px;width:${1200 * k}px;height:${1200 * k}px;opacity:.7;background:radial-gradient(closest-side,${P.glow},transparent)"></span>`,
+  `<span class="ring" style="left:${W * .5}px;top:${H * .5}px;width:${3200 * k}px;height:${3200 * k}px;border-width:${5 * k}px;border-color:${P.line}"></span>`,
+  `<span class="ring" style="left:${W * .5}px;top:${H * .5}px;width:${4300 * k}px;height:${4300 * k}px;border-width:${5 * k}px;border-color:${P.line};opacity:.7"></span>`,
+].join('');
+
+/* Sizes from App Store Connect. safe = Apple's art safe area [x, y, w, h].
+   brand/head = [top, size]; fan = [cx, top, p, spread, drop]. */
+const ASSETS = {
+  header:    { W: 3840, H: 1646, file: 'header-21x9-3840x1646.png', label: 'Header 21:9', k: 1, safe: [1097, 493, 1646, 661],
+               fan: [1920, 505, 520, 500, 120, 5] },
+  search:    { W: 3840, H: 2560, file: 'search-3x2-3840x2560.png', label: 'Search results 3:2', k: 1, safe: [836, 765, 2168, 1030],
+               brand: [790, 70], head: [905, 200], fan: [1920, 1375, 620, 700, 120, 5] },
+  universal: { W: 5244, H: 2950, file: 'universal-16x9-5244x2950.png', label: 'Universal 16:9 (PNG only)', k: 1.25, safe: [1921, 660, 1402, 962],
+               brand: [680, 52], head: [770, 158], fan: [2622, 1150, 440, 425, 80, 5] },
+  feature:   { W: 1024, H: 500, file: 'google-play-feature-graphic-1024x500.png', label: 'Google Play feature graphic', k: .27,
+               fan: [512, 70, 210, 270, 50] },
+};
+/* ?fan=big (Ahmad 13 Nov, after ASC Device Preview): header fan sized to what an iPhone actually shows (art x 320-3528),
+   not to Apple's 1646-wide safe area. Centre phone top stays inside the safe area's top edge (y 493) so iPad/Mac keep
+   the phone tops; side phones run past the safe area's sides and may be cut at the edges there. Default fan unchanged. */
+const BIG = new URLSearchParams(location.search).get('fan') === 'big';
+/* Round 2 of ?fan=big (Ahmad: "that is plenty of space"): every canvas filled edge to edge, no empty band on top.
+   Header: centre phone starts near the top (between the back/share buttons on iPhone), side phones drop below the buttons.
+   Search/universal: brand + headline in the top third at ~1.8x, phones right under and bleeding off the bottom. */
+if (BIG) Object.assign(ASSETS.header, { fan: [1920, 110, 1000, 1020, 330, 5] });
+/* Headline 360 was "such a huge title" (Ahmad, same day): back to ~1.2x the original, the phones carry the fill. */
+if (BIG) Object.assign(ASSETS.search, { brand: [250, 84], head: [390, 240], fan: [1920, 1000, 1080, 1130, 170, 5] });
+if (BIG) Object.assign(ASSETS.universal, { brand: [300, 90], head: [450, 250], fan: [2622, 1130, 1200, 1250, 180, 5] });
+const art = (a, P, id = '') => `<div class="art" ${id} style="width:${a.W}px;height:${a.H}px;background:${BG(P, a.W, a.H)}">${decor(P, a.W, a.H, a.k)}${a.brand ? brand(P, ...a.brand) : ''}${a.head ? head(P, ...a.head) : ''}${fan(P, ...a.fan)}</div>`;
+
+const scaled = (a, P, w, safe = true) => { const s = w / a.W, [x, y, sw, sh] = a.safe || [0, 0, 0, 0];
+  return `<div class="fit" style="width:${w}px;height:${a.H * s}px"><div style="transform:scale(${s});transform-origin:0 0">${art(a, P)}</div>${safe && a.safe ? `<div class="safe" style="left:${x * s}px;top:${y * s}px;width:${sw * s}px;height:${sh * s}px"></div>` : ''}</div>`; };
+/* iPhone views, MEASURED 13 Nov from App Store Connect's Device Preview (template-matched against the uploaded PNGs).
+   Header: the 21:9 file is drawn so the screen shows art x 320-3528 (83.5% of its width), full height, bottom-aligned to
+   the header's bottom edge; the header is 0.663 x screen width tall, so the band above the art (~23% of the header,
+   behind the island + back/share buttons) is Apple's extension of the art's top edge.
+   Search: the 3:2 file is drawn full width in a 2.02:1 card, TOP-anchored, so only y 0-1893 of 2560 shows. */
+function simHeader(a, P) { const w = 300, vis = a.W * .835, s = w / vis, hh = Math.round(w * .663), ah = a.H * s, top = hh - ah, lightText = P === PAL.green ? '#fff' : '#111';
+  return `<div class="sim" style="width:${w}px;height:${hh + 44}px"><div class="img" style="left:0;top:0;width:${w}px;height:${hh}px">
+    <div style="position:absolute;left:${-(a.W - vis) / 2 * s}px;top:0;transform:translateY(${top + 1}px) scale(${s}, ${-s});transform-origin:0 0;filter:blur(${8 / s}px)">${art(a, P)}</div>
+    <div style="position:absolute;left:${-(a.W - vis) / 2 * s}px;top:${top}px;transform:scale(${s});transform-origin:0 0">${art(a, P)}</div></div>
+    <span class="stat" style="left:34px;color:${lightText}">8:34</span><span class="island"></span>
+    <span class="btn" style="left:12px;top:${hh * .28}px">‹</span><span class="btn" style="right:12px;top:${hh * .28}px">⇪</span>
+    <div style="position:absolute;left:14px;top:${hh + 14}px;font:600 13px/1 Inter">Sprout: The App for Parents</div></div>`; }
+function simSearch(a, P) { const cw = 270, s = cw / a.W, ch = Math.round(cw / 2.024);
+  return `<div class="sim" style="width:300px;height:${56 + ch + 16}px"><div style="position:absolute;left:15px;top:16px;font:600 12px/1.2 Inter">Sprout: The App for Parents</div>
+    <div style="position:absolute;left:15px;top:32px;font:400 10.5px/1.2 Inter;color:#8a8a8e">Parents Bond, Kids flourish</div>
+    <div class="img" style="left:15px;top:56px;width:${cw}px;height:${ch}px;border-radius:14px"><div style="transform:scale(${s});transform-origin:0 0">${art(a, P)}</div></div></div>`; }
+
+const q = new URLSearchParams(location.search);
+const P0 = PAL[q.get('pal')] || PAL.cream;
+const FIGMA = q.has('figma') || location.hash === '#figma' || location.hash.includes('figmacapture=');
+if (q.has('export')) {
+  document.body.innerHTML = art(ASSETS[q.get('export')], P0, 'id="asset"');
+  document.body.style.cssText = 'margin:0;padding:0';
+} else if (FIGMA) {
+  document.body.innerHTML = `<div style="display:flex;gap:240px;align-items:flex-start;flex-wrap:wrap;width:${3840 * 2 + 240}px">` +
+    ['header', 'search', 'universal', 'feature'].map(n => `<div data-name="${P0.name} / ${ASSETS[n].label} / ${ASSETS[n].W}x${ASSETS[n].H}">${art(ASSETS[n], P0)}</div>`).join('') + '</div>';
+  document.body.style.cssText = 'margin:0;padding:0;background:transparent;width:max-content';
+} else {
+  const { header: H, search: S, universal: U } = ASSETS;
+  document.getElementById('out').innerHTML = Object.entries(PAL).map(([k, P], i) => [k, P, i]).filter(([k]) => q.has('all') || k === 'cream').map(([k, P, i]) => `
+    <h2>${String.fromCharCode(65 + i)} · ${P.name}<span class="pick">?pal=${k}</span></h2>
+    <div class="row">
+      <div>${simHeader(H, P)}<div class="cap">iPhone product page (header)</div></div>
+      <div>${simSearch(S, P)}<div class="cap">iPhone search card</div></div>
+      <div>${scaled(H, P, 420)}<div class="cap">Header 3840 × 1646</div></div>
+      <div>${scaled(S, P, 300)}<div class="cap">Search 3840 × 2560</div></div>
+      <div>${scaled(U, P, 420)}<div class="cap">Universal 5244 × 2950</div></div>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>
