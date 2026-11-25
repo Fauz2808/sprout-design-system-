@@ -30,7 +30,7 @@ const link = LINK_ID && 'BroadcastChannel' in window ? (() => {
 /* the person on the right-hand phone. liveAsk sends Tony's request (and re-sends it if that phone reloads);
    liveSay puts a line in their thread; liveWords shows what they typed on Tony's phone. */
 const LIVE = { who:null, msg:null };
-if (link) link.on(m => { if (m.t === 'hello' && LIVE.msg) link.send(LIVE.msg); });
+if (link) link.on(m => { if (m.t !== 'hello') return; if (LIVE.cls && LIVE.cls !== LIVE.msg) link.send(LIVE.cls); if (LIVE.msg) link.send(LIVE.msg); });   // 25 Nov: row 6 has class phones and a sitter phone
 const isLive = f => !!(link && LIVE.who && f && (f === LIVE.who || f.n === LIVE.who.n));
 function liveAsk(who, msg){ if (!link) return; LIVE.who = who; LIVE.no = false; LIVE.msg = { t:'ask', ...msg }; link.send(LIVE.msg); }
 function liveSay(who, text, from = 'Sprout', href = ''){ if (isLive(who)) link.send({ t:'sms', from, text, href }); }
@@ -322,15 +322,28 @@ async function requestCard(p, w, kids, dinner){
    WhatsApp is gone: "most sitters just live on text messages". She / He stays (used in "she's free"). */
 const CONTACTS = [['Aisha Khan', '(512) 555-0102'], ['Ben Ortiz', '(512) 555-0119'], ['Casey Nguyen', '(512) 555-0161'], ['Dana Martin', '(512) 555-0100'],
   ['Emma Brooks', '(512) 555-0175'], ['Grace Lee', '(512) 555-0133'], ['Jordan Pike', '(512) 555-0148'], ['Mia Torres', '(512) 555-0184'], ['Nina Patel', '(512) 555-0156'], ['Sophie Hart', '(512) 555-0190']];
-function pickContact(){
+/* A2 (Tony, 25 Nov): sharing a sitter starts here, several at once ("no one's gonna have them" saved). multi = tick
+   any number, then Add; taken = phones already on the list (shown as Added). Single pick stays for Add a sitter. */
+function pickContact({ multi = false, taken = [] } = {}){
   return new Promise(res => {
+    const on = new Set();
     const rows = q => { const list = CONTACTS.filter(([n]) => n.toLowerCase().includes(q.toLowerCase())); let L = '';
-      return list.length ? list.map(([n, ph]) => { const h = L !== n[0] ? `<div class="ct-l">${(L = n[0])}</div>` : ''; return `${h}<button type="button" class="ct-row" data-k="${CONTACTS.findIndex(c => c[0] === n)}"><span class="ct-av">${n.split(' ').map(x => x[0]).join('')}</span><span><b>${n}</b><small>mobile ${ph}</small></span></button>`; }).join('') : '<p class="bp" style="text-align:center;margin-top:18px">No contacts found</p>'; };
-    const v = bsheet({ onBack:() => res(null), body:`<div class="ct-head"><b>Contacts</b><small>Pick the sitter. Sprout only gets this one name and number.</small></div>
-      <label class="ct-search"><i class="ph ph-magnifying-glass"></i><input placeholder="Search" autocomplete="off"></label><div class="ct-list" data-list>${rows('')}</div>` });
-    const list = v.body.querySelector('[data-list]'), bind = () => list.querySelectorAll('.ct-row').forEach(b => b.onclick = () => { v.close(); const [full, phone] = CONTACTS[+b.dataset.k]; res({ full, phone }); });
+      return list.length ? list.map(([n, ph]) => { const h = L !== n[0] ? `<div class="ct-l">${(L = n[0])}</div>` : '', k = CONTACTS.findIndex(c => c[0] === n), had = taken.includes(ph);
+        return `${h}<button type="button" class="ct-row${on.has(k) ? ' on' : ''}" data-k="${k}"${multi ? ` aria-pressed="${on.has(k)}"` : ''}${had ? ' disabled' : ''}><span class="ct-av">${n.split(' ').map(x => x[0]).join('')}</span><span><b>${n}</b><small>${had ? 'Added' : 'mobile ' + ph}</small></span>${multi ? '<span class="ck"><i class="ph-bold ph-check"></i></span>' : ''}</button>`; }).join('') : '<p class="bp" style="text-align:center;margin-top:18px">No contacts found</p>'; };
+    const v = bsheet({ onBack:() => res(null), body:`<div class="ct-head"><b>Contacts</b><small>${multi ? 'Pick your sitters. Sprout only gets the names and numbers you pick.' : 'Pick the sitter. Sprout only gets this one name and number.'}</small></div>
+      <label class="ct-search"><i class="ph ph-magnifying-glass"></i><input placeholder="Search" autocomplete="off"></label><div class="ct-list" data-list>${rows('')}</div>`,
+      foot:multi ? '<button type="button" class="btn" data-go disabled>Pick someone</button>' : '' });
+    const list = v.body.querySelector('[data-list]'), go = v.foot && v.foot.querySelector('[data-go]');
+    const first = k => CONTACTS[k][0].split(' ')[0];
+    const paint = () => { if (!go) return; const n = [...on]; go.disabled = !n.length; go.textContent = !n.length ? 'Pick someone' : n.length > 2 ? `Add ${n.length} sitters` : `Add ${joinNames(n.map(first))}`; };
+    const bind = () => list.querySelectorAll('.ct-row').forEach(b => b.onclick = () => {
+      const k = +b.dataset.k;
+      if (!multi) { v.close(); const [full, phone] = CONTACTS[k]; return res({ full, phone }); }
+      on.has(k) ? on.delete(k) : on.add(k); b.classList.toggle('on', on.has(k)); b.setAttribute('aria-pressed', on.has(k)); paint();
+    });
     v.body.querySelector('input').oninput = e => { list.innerHTML = rows(e.target.value); bind(); };
-    bind();
+    if (go) go.onclick = () => { if (go.disabled) return; v.close(); res([...on].map(k => ({ full:CONTACTS[k][0], phone:CONTACTS[k][1] }))); };
+    bind(); paint();
   });
 }
 function sitterFields({ name = '', phone = '', rate = '' } = {}){
@@ -525,15 +538,10 @@ const payoutFact = who => who.payout ? `<i class="ph ph-bank"></i>${who.n} takes
 const payoutFoot = who => !who.payout ? `<i class="ph ph-hourglass-medium"></i>${who.n} hasn’t added where to get paid yet. Sprout holds it and texts ${pro(who, 'obj')}; it lands once they do.`
   : inSprout(who) ? `<i class="ph ph-bank"></i>Through Sprout: to ${who.n}’s ${payoutKind(who).slice(2)}, ${who.payout.way === 'card' ? 'usually within minutes' : 'in 1–2 days'}`
   : `<i class="ph ph-info"></i>${who.n} doesn’t take payments in Sprout. Pick a way below`;
+/* A3 (Tony, 25 Nov): after Book there is one summary, so the payout link is sent without its own rows in the chat.
+   It returns the link; the booked card's payout line carries it (tappable on Tony's phone too). */
 async function payoutLink(p, who, w){
-  if (who.payout) {
-    p.note(`${who.n} is already set up to get paid`, `Takes ${joinNames(payoutWays(who))}, saved on ${pro(who, 'obj') === 'him' ? 'his' : 'her'} Sprout account. No link needed`, 'ph-bank');
-    return;
-  }
-  const job = p.work(`Asking ${who.n} where to get paid`, 'Only once. After that, paying is one tap');
-  await sleep(900);
-  job.done(`Sent ${who.n} a payout link`, 'Their bank details go to Stripe, not to you or Sprout', 'ph-bank');
-  /* Ahmad, 22 Nov (A): the link opens the booking-first payout page (/pay/), with this booking */
+  if (who.payout) return null;
   const pid = Math.random().toString(36).slice(2, 8);
   const href = '/pay/?' + new URLSearchParams({ n:who.n, d:w.day.day, t:range(w.from, w.to), r:who.rate || 25, h:(w.to - w.from) / 60, k:kidsShort(PAY_KIDS.kids || KIDS), l:pid, ...(who.phone ? { p:who.phone } : {}) });
   /* when the sitter finishes /pay/ (any tab, same site), Tony's phone hears it: a note, a ping, the status lines */
@@ -550,16 +558,16 @@ async function payoutLink(p, who, w){
       p.scroll();
     };
   }
-  const b = p.block(`<div class="preview gtx"><small>Group text · ${groupWho(who)}</small><p></p><a class="gtx-link" href="${href}" target="_blank" rel="noopener">sprout.app/pay/${who.n.toLowerCase()}</a></div>`);
-  b.querySelector('p').textContent = `${who.n}, so Tony can pay you through Sprout after ${w.day.long.split(',')[0]}, add where you’d like to get paid. Takes 2 minutes, and you only do it once:`;
-  liveSay(who, `${b.querySelector('p').textContent} sprout.app/pay/${who.n.toLowerCase()}`, 'Sprout', href);
+  const said = `${who.n}, so Tony can pay you through Sprout after ${w.day.long.split(',')[0]}, add where you’d like to get paid. Takes 2 minutes, and you only do it once:`;
+  liveSay(who, `${said} sprout.app/pay/${who.n.toLowerCase()}`, 'Sprout', href);
+  return href;
 }
 async function sendAndBook(p, asked, w, kids, { pick } = {}){
   PAY_KIDS.kids = kids;
   const sent = await groupTexts(p, asked, w, kids);
   const replied = new Map();
   /* linked (/other-side/): the first sitter asked is the phone on the right; the others still answer on their own */
-  const live = link ? asked[0] : null;
+  const live = link ? asked[0] : null;   // 25 Nov: row 6 has a sitter phone too, so a class-shared sitter answers live
   let liveAns = null, offWords = () => {};
   if (live) {
     liveAsk(live, { kind:'sitter', who:{ n:live.n, photo:live.photo }, label:`${live.n}, the sitter`, sub:'A normal text, no app to download.', text:groupMsg(live, w, kids), rate:live.rate || null });
@@ -642,41 +650,30 @@ async function sendAndBook(p, asked, w, kids, { pick } = {}){
         if (!sent) continue;
         p.block(`<div class="preview gtx sms-out"><small>You · in your group text with ${who.n}</small><p></p></div>`).querySelector('p').textContent = `Awesome, thank you ${who.n}! See you ${w.day.long.split(',')[0]}.`;
         liveSay(who, `Awesome, thank you ${who.n}! See you ${w.day.long.split(',')[0]}.`, 'Tony Martin');
-        await p.say(`I saw your text, so ${who.n} is booked. I’ll send ${pro(who, 'obj')} the address and notes.`, 900);
         selfReplied = true; break;
       }
       await p.say(`Okay. Nothing is booked yet. Tap Book when you’re ready.`, 600);
     }
   }
   const bookMsg = `${selfReplied ? `Hi ${who.n}, Sprout here with the details.` : 'Great, you’re booked!'} ${w.day.day}, ${range(w.from, w.to)} for ${kidsShort(kids)}. We’re at ${FAMILY.address}.${FAMILY.notes ? ' ' + FAMILY.notes : ''} See you then! Sprout, for Tony`;
-  const booking = p.work(`Texting ${who.n} the booking`, `In your group text with ${who.n}`);
-  await sleep(1200);
-  booking.done(`${who.n} · booked`, `Details sent · ${w.day.day} ${range(w.from, w.to)}`, 'ph-calendar-check');
-  p.block(`<div class="preview gtx"><small>Group text · ${groupWho(who)}</small><p></p></div>`).querySelector('p').textContent = bookMsg;
+  /* A3 (Tony, 25 Nov): "Alex is booked. I let Sam know you found someone." One summary after Book, no stack of
+     what was texted to each sitter above it. The texts still go (and show on the linked phones); only the log is gone. */
+  if (link && LIVE.classOnly) link.send({ t:'booked', n:who.n, when:`${w.day.day}, ${range(w.from, w.to)}` });
   liveSay(who, bookMsg);
-  await payoutLink(p, who, w);
+  const payHref = await payoutLink(p, who, w);
   /* M1 (Tony, 19 Nov chat): no "Want to let Jordan know?" question. Every other sitter who was asked and didn't
      already say no hears right away that the family found someone, so nobody is left holding the evening. */
   const others = [...sent].filter(name => name !== who.n && replied.get(name) !== 'no');
   const toldNames = joinNames(others);
-  if (others.length) {
-    await sleep(500);
-    const where = others.length > 1 ? 'each sitter’s group text' : `your group text with ${others[0]}`;
-    const covered = p.work(`Letting ${toldNames} know you found a sitter`, `Sprout sends in ${where}`);
-    for (const name of others) await sleep(600);
-    covered.done(`Told ${toldNames} you found a sitter`, `Sent in ${where}`, 'ph-paper-plane-tilt');
-    p.block(`<div class="preview"><small>In ${where} · from Sprout</small><p></p></div>`).querySelector('p').textContent =
-      `Hi! We found a sitter for ${w.day.day}, so we’re all set this time. Thank you! Sprout, for Tony`;
-    if (live && others.includes(live.n)) liveSay(live, `Hi! We found a sitter for ${w.day.day}, so we’re all set this time. Thank you! Sprout, for Tony`);
-  }
-  await p.say(`${who.n} is booked.${others.length ? ` I let ${toldNames} know you found someone.` : ''}${who.parent ? ` ${who.n} is saved to your sitters now.` : ''} It’s an event in your Daily Brief for ${w.day.day}. When ${who.n} is done, you pay and rate right here.`, 900);
+  if (others.length && live && others.includes(live.n)) liveSay(live, `Hi! We found a sitter for ${w.day.day}, so we’re all set this time. Thank you! Sprout, for Tony`);
+  await p.say(`${selfReplied ? 'I saw your text, so ' : ''}${who.n} is booked.${others.length ? ` I let ${toldNames} know you found someone.` : ''} It’s in your Daily Brief. When ${who.n} is done, you’ll pay and rate here.`, 900);
   p.block(`<div class="card">${pick ? `<div class="cover" style="${M.ph(pick.k, 3)}"></div>` : ''}
     <div class="ctop">${clay('calendar-check')}<div><div class="eyebrow">${pick ? 'Date night' : 'Sitter'} · ${w.day.day}</div><div class="ttl">${pick ? 'Your evening' : `${who.n} is booked`}</div></div></div>
     <div class="ua-row on" style="margin-top:12px">${face(who)}<span class="tx"><b>${who.n}</b><small>${range(w.from, w.to)} · $${who.rate}/hr · pay in Sprout when they’re done</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></div>
     ${pick ? `<div class="fact" style="margin-top:10px"><i class="ph ph-fork-knife"></i>${pick.place.n} · ${pick.time} · table for 2</div>` : ''}
     <div class="fact"><i class="ph ph-users"></i>${joinNames(kids.map(k => k.n))}</div>
     <div class="fact"><i class="ph ph-map-pin"></i>${FAMILY.address}</div>
-    <div class="fact" data-payout="${who.n}">${payoutFact(who)}</div>
+    <div class="fact" data-payout="${who.n}">${payoutFact(who)}${payHref ? `<a class="link" href="${payHref}" target="_blank" rel="noopener">Payout link</a>` : ''}</div>
     <div class="fact"><i class="ph ph-calendar-check"></i>${pick ? 'On the family calendar' : `“${who.n}’s babysitting” on the family calendar`} · Dana has it too</div>
     <div class="fact"><i class="ph ph-bell-ringing"></i>Reminder for you both at ${tl(w.from - 30)}, then the evening on your lock screens</div></div>`);
   p.set(`Booked · ${pick ? pick.place.n + ' ' + pick.time + ' · ' : ''}${who.n} ${range(w.from, w.to)}`, { when:w.day.short, done:false });
@@ -922,6 +919,16 @@ async function classGroup(p, w, kids, opt){
   }
   p.note(where, 'Posted · waiting for parents', 'ph-chat-circle-text');
   p.set('Waiting for class parents', { when:w.day.short });
+  /* Ahmad, 24 Nov (/other-side/ row 6): linked, the right phone is a parent in that class. Priya for Maya's class
+     (or both), Elena for Jake's. Tony's exact post lands in their class chat; what they share comes back here. */
+  /* Ahmad, 25 Nov: row 6 is four phones. Two class parents (one with the chat open, one who gets the push) can both
+     share; the first share opens the list, later ones join it (or are saved, if Tony already asked). */
+  const CPS = g === 1 ? CLASS_PARENTS.jake : CLASS_PARENTS.maya, CP = CPS[0];
+  let firstShare = null, laterShare = null;
+  const sharedLive = link ? new Promise(r => firstShare = r) : null;
+  if (link) link.on(m => { if (m.t !== 'shared') return; if (firstShare) { const f = firstShare; firstShare = null; f(m); } else if (laterShare) laterShare(m); });
+  if (link) { LIVE.classOnly = true; liveAsk({ n:CP.n }, { kind:'class', label:`${CP.n}, ${CP.rel}`, sub:`A parent in ${where}. Gets Tony’s post in the class chat.`, text:m.querySelector('[data-txt]').textContent, cp:CP, cps:CPS, kid:g === 1 ? 'Jake' : 'Maya', where:g === 1 ? 'Miss Poole’s class' : 'Miss Taylor’s class' }); LIVE.cls = LIVE.msg; }
+  const closeLive = why => { if (link) link.send({ t:'closed', why }); };
   await p.say('Posted. I’ll tell you when parents share someone.', 800);
   /* G5 (17 Nov): the waiting card has a small X (cancel the class request) and "Add a sitter while you wait".
      Adding someone doesn't stop the class request: if parents share later, their sitters slot into the open list
@@ -934,7 +941,18 @@ async function classGroup(p, w, kids, opt){
     wc.querySelector('[data-x]')?.remove(); wc.querySelector('[data-add]')?.remove(); };
   p.scroll();
   let live = true, list = null;   // list = the open "Who should I ask?" card, once there is one
-  const replies = new Promise(r => setTimeout(() => r('replies'), 9000));
+  /* linked: what each class parent shared, privately, tagged with who shared it */
+  const leadsOf = x => x.sitters.map(s => ({ ch:'Messages', rate:25, ...s, parent:x.by.n, kid:x.by.kid, rel:x.by.rel, pimg:x.by.pimg || undefined, note:s.note || '' }));
+  const replies = link ? sharedLive.then(x => {
+    LEADS.splice(0, LEADS.length, ...leadsOf(x));
+    laterShare = y => {   /* the second parent shares later: into the open list, or saved for next time */
+      const ls = leadsOf(y).filter(l => !LEADS.some(o => o.n === l.n)); if (!ls.length) return;
+      LEADS.push(...ls); ls.forEach(l => remember({ ...l, times:`Shared by ${l.parent}` }));
+      const what = `${y.by.n} shared ${joinNames(ls.map(l => l.n))}`;
+      if (list && list.isOpen()) { ls.forEach(l => list.addRow({ ...MY.find(o => o.n === l.n) }, false)); toast(what); }
+      else X.notify(p, what, 'Saved to your sitters');
+    };
+    return 'replies'; }) : new Promise(r => setTimeout(() => r('replies'), 9000));
   const cancelled = new Promise(r => wc.querySelector('[data-x]').onclick = () => r('cancel'));
   const added = new Promise(r => wc.querySelector('[data-add]').onclick = async () => { const a = await addSitter(); if (a) r(a); });
   const shareIn = () => {   /* parents replied: save their sitters; if the list is still open, add them to it (unticked) */
@@ -947,7 +965,7 @@ async function classGroup(p, w, kids, opt){
   const first = await Promise.race([replies, cancelled, added]);
 
   if (first === 'cancel') {
-    live = false; setWait('Class request cancelled', `${where} · parents can’t reply to it now`, 'ph-x-circle');
+    live = false; setWait('Class request cancelled', `${where} · parents can’t reply to it now`, 'ph-x-circle'); closeLive('cancel');
     p.set('Request cancelled', { when:w.day.short });
     p.me('Cancel the class request');
     await p.say('Cancelled. Want to add a sitter you know instead?', 700);
@@ -964,22 +982,23 @@ async function classGroup(p, w, kids, opt){
     wc.querySelector('[data-add]')?.remove();
     await p.say(`Saved ${a.n}. I’m still asking ${where}, so anyone parents share shows up here too. Tap × on the request to stop it.`, 900);
     replies.then(() => { if (live) { live = false; shareIn(); } });
-    wc.querySelector('[data-x]').onclick = () => { if (!live) return; live = false; setWait('Class request cancelled', `${where} · parents can’t reply to it now`, 'ph-x-circle'); toast('Class request cancelled'); };
+    wc.querySelector('[data-x]').onclick = () => { if (!live) return; live = false; setWait('Class request cancelled', `${where} · parents can’t reply to it now`, 'ph-x-circle'); closeLive('cancel'); toast('Class request cancelled'); };
     const who = await whoCard(p, [{ ...a, added:true }], { hours:(w.to - w.from) / 60, line:x => x.phone, onReady:api => list = api });
-    if (live) { live = false; setWait('Class request closed', `You picked ${joinNames(who.map(x => x.n))}, so I stopped asking ${where}`, 'ph-check-circle'); }
+    if (live) { live = false; setWait('Class request closed', `You picked ${joinNames(who.map(x => x.n))}, so I stopped asking ${where}`, 'ph-check-circle'); closeLive('found'); }
     return sendAndBook(p, who.map(x => MY.find(m => m.n === x.n) || x), w, kids, opt);
   }
 
   live = false;
   LEADS.forEach(l => remember({ ...l, times:`Shared by ${l.parent}` }));
   setWait(`${joinNames(LEADS.map(l => l.parent))} shared a sitter`, `${joinNames(LEADS.map(l => l.n))} · saved to your sitters`, 'ph-hand-heart');
-  X.notify(p, '2 parents shared a sitter', 'Priya and Aisha replied');
-  await p.say('Two parents shared a sitter. I saved both to your sitters.', 900);
-  p.block(`<div class="card"><div class="ctop">${clay('person-plus')}<div><div class="eyebrow">Shared by class parents</div><div class="ttl">2 new sitters</div></div></div>
-    ${LEADS.map(l => `<div class="lead">${face(l, 44)}<div><div class="v">${l.n} · ${l.phone}</div><div class="fs"><i class="ucp" style="background-image:url(${A}${l.pimg})"></i>From ${l.parent}, ${l.kid}’s mom</div><q>${l.note}</q></div></div>`).join('')}
+  const sharers = [...new Set(LEADS.map(l => l.parent))], nS = LEADS.length, nW = ['', 'One', 'Two', 'Three', 'Four', 'Five'][sharers.length] || sharers.length;
+  X.notify(p, `${sharers.length} parent${sharers.length > 1 ? 's' : ''} shared a sitter`, `${joinNames(sharers)} replied`);
+  await p.say(`${nW} parent${sharers.length > 1 ? 's' : ''} shared ${nS > 1 ? nS + ' sitters' : 'a sitter'}. I saved ${nS > 2 ? 'them all' : nS > 1 ? 'both' : LEADS[0].n} to your sitters.`, 900);
+  p.block(`<div class="card"><div class="ctop">${clay('person-plus')}<div><div class="eyebrow">Shared by class parents</div><div class="ttl">${nS} new sitter${nS > 1 ? 's' : ''}</div></div></div>
+    ${LEADS.map(l => `<div class="lead">${face(l, 44)}<div><div class="v">${l.n} · ${l.phone}</div><div class="fs">${l.pimg ? `<i class="ucp" style="background-image:url(${A}${l.pimg})"></i>` : ''}From ${l.parent}, ${l.rel || l.kid + '’s mom'}</div>${l.note ? `<q>${playdateEscape(l.note)}</q>` : ''}</div></div>`).join('')}
     <div class="foot ok"><i class="ph ph-check-circle"></i>Saved to your sitters</div></div>`);
   await p.say('Who should I ask?', 600);
-  const who = await whoCard(p, LEADS.map(s => ({ ...MY.find(m => m.n === s.n) })), { hours:(w.to - w.from) / 60, line:s => s.phone });   /* G4: Add a sitter here too */
+  const who = await whoCard(p, LEADS.map(s => ({ ...MY.find(m => m.n === s.n) })), { hours:(w.to - w.from) / 60, line:s => s.phone, onReady:api => list = api });   /* G4: Add a sitter here too */
   return sendAndBook(p, who, w, kids, opt);
 }
 
@@ -1179,13 +1198,13 @@ X.flows.shareSitter = async p => {
   const m = p.block(`<div class="card"><div class="preview"><small>Miss Taylor’s class · Tony Martin</small><p>Hi everyone! We’re looking for a sitter for Sat, Aug 1, 6–10 PM, for Maya (7) and Jake (5). If you have one you trust, tap “Share a sitter” and add their name and number. Thank you!</p></div></div>`);
   const i = await p.chips(['Share a sitter', 'I don’t know one'], { into:m });
   if (i === 1) { await p.say('No problem. Nothing is sent to Tony.', 700); p.set('Skipped', { done:true }); return; }
-  await p.say('Pick any of your sitters, or add someone new. Add a note to each if you like.', 800);
+  await p.say('Pick them from your contacts. Only Tony sees their numbers, and I save them to your sitters too.', 800);
   const shared = await shareSheet('Tony');
   if (!shared) { await p.say('Okay. Nothing was shared.', 600); return; }
   const names = joinNames(shared.map(s => s.n)), fresh = shared.filter(s => s.isNew);
   p.me(`Share ${names}`);
   const w = p.work('Sharing with Tony', 'Miss Taylor’s class'); await sleep(1200);
-  w.done(`Shared ${names} with Tony`, `Saved to the Martins’ sitters${fresh.length ? ` · ${joinNames(fresh.map(s => s.n))} saved to yours too` : ''}`, 'ph-hand-heart');
+  w.done(`Shared ${names} privately with Tony`, `Only Tony sees the numbers${fresh.length ? ` · ${joinNames(fresh.map(s => s.n))} saved to your sitters` : ''}`, 'ph-hand-heart');
   p.set(`Shared ${names}`, { done:true });
   await p.say(`Thanks! Tony can ask ${shared.length > 1 ? 'them' : shared[0].n} now. I’ll let you know if they book.`, 800);
 };
@@ -1242,12 +1261,18 @@ if (route === 'pay-todo') {   /* review shortcut: Alex just finished, Saturday 1
     payTonight(p, who, w, KIDS, 3.5, { clock:true });
   }, 600);
 }
-if (route === 'sitter-v3-share') {
+if (route === 'sitter-v3-share' || route === 'sitter-v3-share-saved') {
   const g = $('.day .hi'); if (g) g.textContent = 'Afternoon, Priya';
   const fam = $('#sheet .fam'); if (fam) fam.innerHTML = `<i style="background-image:url(${A}priya.webp)"></i>`;
   lockScreen({ date:'Tuesday, July 28', time:'12:40', title:'Tony is looking for a sitter', body:'Maya’s dad asked Miss Taylor’s class. Know someone you trust?', onOpen:() => X.start('shareSitter') });
 }
 /* ======================= J4 · Class chat, Priya’s phone ======================= */
+/* Ahmad, 25 Nov (/other-side/ row 6): two parents per class. [0] has the class chat open in Sprout (?as=app),
+   [1] is on the lock screen and gets the push (?as=push). Made-up families; Marcus has no photo, so a monogram. */
+const CLASS_PARENTS = {
+  maya:[{ n:'Priya', kid:'Leo', rel:'Leo’s mom', pimg:'priya.webp', cls:'Miss Taylor Class' }, { n:'Aisha', kid:'Ava', rel:'Ava’s mom', pimg:'aisha.webp', cls:'Miss Taylor Class' }],
+  jake:[{ n:'Elena', kid:'Noah', rel:'Noah’s mom', pimg:'elena.webp', cls:'Miss Poole Class' }, { n:'Marcus', kid:'Owen', rel:'Owen’s dad', pimg:'', cls:'Miss Poole Class' }],
+};
 function classChat(label){
   const screen = el(`<section class="jc-screen" aria-label="${label}">
     <div class="jc-head" role="img" aria-label="Miss Taylor Class chat header"></div>
@@ -1263,45 +1288,70 @@ function classMessage(who, text, own = false){
   msg.querySelector('.jc-bubble').textContent = text;
   return msg;
 }
-/* L4 (Tony, 19 Nov): "it's only letting me share one sitter." Priya picks any of her sitters, adds a note to each,
-   and can add someone new; a new sitter is saved to Priya's own sitters too. Only Tony sees numbers, never the chat. */
-const PRIYA_SITTERS = [
+/* L4 (Tony, 19 Nov): "it's only letting me share one sitter." Priya picks several, adds a note to each; only Tony
+   sees numbers, never the chat.
+   A2 (Tony, 25 Nov): "no one's gonna have them. Let's just do it with shared contacts and then add in the sitter."
+   The sheet starts at Choose from contacts (multi-pick, then Add; Add another for more). Saved sitters are not the
+   start: if the parent has any, they sit below as "Your sitters", unticked. Everyone shared is saved to hers too.
+   Priya has none saved by default; /sitter-v3-share-saved/ is the review state where she has two. */
+const PRIYA_SITTERS = route === 'sitter-v3-share-saved' ? [
   { ...CLASS_SITTERS[0], by:'Saved by you', times:'Sits for you most Fridays', note:'Sits for us most Fridays. Great with little ones.' },
   { n:'Jamie', ch:'Messages', phone:'(512) 555-0185', rate:23, by:'Saved by Raj', times:'Sat for you twice', photo:AV('m'), note:'' },
-];
+] : [];
 function shareSheet(to = 'Tony'){
   return new Promise(res => {
-    const list = PRIYA_SITTERS.map(s => ({ ...s, on:s === PRIYA_SITTERS[0] }));
+    const list = PRIYA_SITTERS.map(s => ({ ...s, on:false, saved:true }));
     const v = bsheet({ onBack:() => res(null), body:`<div class="bh"><span class="icotile"><i class="ph ph-hand-heart"></i></span><b>Share sitters with ${to}</b></div>
-      <p class="bp">Pick as many as you like. Add a note so ${to} knows why you trust them.</p>
-      <div class="sl" data-list></div>
-      <button type="button" class="sl-add" data-add><i class="ph ph-plus"></i>Add someone else</button>
+      <p class="bp">Pick them from your contacts. Add a note so ${to} knows why you trust them.</p>
+      <div data-list></div>
+      <button type="button" class="ct-pick" data-contacts><i class="ph ph-address-book"></i><span><b data-pick-t>Choose from contacts</b><small>Pick as many as you like</small></span><i class="ph ph-caret-right"></i></button>
+      <button type="button" class="textbtn" data-add style="margin-top:6px;width:auto;padding:4px 0;color:var(--brand)"><i class="ph ph-keyboard"></i> Not in your contacts? Type it in</button>
       <div data-form hidden><div class="dlabel" style="margin-top:14px">New sitter</div><div data-f></div><button type="button" class="btn ghost" data-save style="margin-top:10px">Add to the list</button></div>
-      <p class="hint2">Only ${to} sees the numbers. Nothing is posted in the class chat. New sitters are saved to your sitters too.</p>`,
+      <div data-mine></div>
+      <p class="hint2">Only ${to} sees the numbers. Nothing is posted in the class chat. Everyone you share is saved to your sitters too.</p>`,
       foot:`<button type="button" class="btn" data-go></button>` });
-    const host = v.body.querySelector('[data-list]'), go = v.foot.querySelector('[data-go]'), formBox = v.body.querySelector('[data-form]');
+    const host = v.body.querySelector('[data-list]'), mine = v.body.querySelector('[data-mine]'), go = v.foot.querySelector('[data-go]'), formBox = v.body.querySelector('[data-form]'), addBtn = v.body.querySelector('[data-add]');
     let form = null;
+    const row = (s, i) => `<div class="shr${s.on ? ' on' : ''}"><button type="button" class="sl-row${s.on ? ' on' : ''}" data-i="${i}" aria-pressed="${s.on}">${face(s, 36)}
+          <span class="sl-tx"><span class="sl-n">${s.n}</span><small>${s.saved ? s.times + ' · ' + s.phone : s.phone + ' · ' + (s.typed ? 'typed in' : 'from your contacts')}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button>
+        ${s.on ? `<label class="field in shr-note"><div style="width:100%"><div class="l">Note for ${to} (optional)</div><input data-note="${i}" value="${playdateEscape(s.note || '')}" placeholder="How you know ${s.n}" autocomplete="off"></div></label>` : ''}</div>`;
     const paint = () => {
-      host.innerHTML = list.map((s, i) => `<div class="shr${s.on ? ' on' : ''}"><button type="button" class="sl-row${s.on ? ' on' : ''}" data-i="${i}" aria-pressed="${s.on}">${face(s, 36)}
-          <span class="sl-tx"><span class="sl-n">${s.n}${s.isNew ? ' <span class="sl-tag">New</span>' : ''}</span><small>${s.isNew ? s.phone + ' · saved to your sitters' : s.times + ' · ' + s.phone}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button>
-        ${s.on ? `<label class="field in shr-note"><div style="width:100%"><div class="l">Note for ${to} (optional)</div><input data-note="${i}" value="${playdateEscape(s.note || '')}" placeholder="How you know ${s.n}" autocomplete="off"></div></label>` : ''}</div>`).join('');
-      host.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { const s = list[+b.dataset.i]; s.on = !s.on; paint(); });
-      host.querySelectorAll('[data-note]').forEach(x => x.oninput = () => { list[+x.dataset.note].note = x.value; });
+      const added = list.map((s, i) => [s, i]).filter(([s]) => !s.saved), saved = list.map((s, i) => [s, i]).filter(([s]) => s.saved);
+      host.innerHTML = added.length ? `<div class="sl" style="margin-bottom:10px">${added.map(([s, i]) => row(s, i)).join('')}</div>` : '';
+      mine.innerHTML = saved.length ? `<div class="dlabel shr-sec">Your sitters</div><div class="sl">${saved.map(([s, i]) => row(s, i)).join('')}</div>` : '';
+      v.body.querySelector('[data-pick-t]').textContent = added.length ? 'Add another from contacts' : 'Choose from contacts';
+      v.body.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { const s = list[+b.dataset.i]; s.on = !s.on; paint(); });
+      v.body.querySelectorAll('[data-note]').forEach(x => x.oninput = () => { list[+x.dataset.note].note = x.value; });
       const n = list.filter(s => s.on).length;
-      go.disabled = !n; go.textContent = n ? `Share ${n === 1 ? list.find(s => s.on).n : n + ' sitters'} with ${to}` : 'Pick at least one';
+      go.disabled = !n; go.textContent = n ? `Share ${n === 1 ? list.find(s => s.on).n : n + ' sitters'} with ${to}` : 'Choose someone to share';
     };
-    v.body.querySelector('[data-add]').onclick = () => {
-      formBox.hidden = false; v.body.querySelector('[data-add]').hidden = true;
+    const addOne = (s, extra = {}) => {
+      const known = list.find(x => x.phone === s.phone);
+      if (known) { known.on = true; return; }
+      list.push({ n:s.full.split(' ')[0], full:s.full, phone:s.phone, rate:s.rate || null, photo:s.photo, ch:'Messages', isNew:true, on:true, note:'', ...extra });
+    };
+    v.body.querySelector('[data-contacts]').onclick = async () => {
+      const picked = await pickContact({ multi:true, taken:list.filter(s => !s.saved).map(s => s.phone) });
+      if (!picked || !picked.length) return;
+      picked.forEach(c => addOne(c)); paint();
+      toast(picked.length === 1 ? `${picked[0].full.split(' ')[0]} added` : `${picked.length} sitters added`);
+    };
+    addBtn.onclick = () => {
+      formBox.hidden = false; addBtn.hidden = true;
       form = sitterFields(); const f = formBox.querySelector('[data-f]'); f.innerHTML = ''; f.append(form.fields);
       form.fields.querySelector('input').focus();
     };
     formBox.querySelector('[data-save]').onclick = () => {
       const s = form.read();
       if (!s.full || !s.phone) return toast('Add a name and a phone number');
-      list.push({ ...s, n:s.full.split(' ')[0], isNew:true, on:true, note:'' });
-      formBox.hidden = true; v.body.querySelector('[data-add]').hidden = false; paint();
+      addOne(s, { typed:true });
+      formBox.hidden = true; addBtn.hidden = false; paint();
     };
-    go.onclick = () => { const picked = list.filter(s => s.on); if (!picked.length) return; v.close(); res(picked); };
+    go.onclick = () => {
+      const picked = list.filter(s => s.on); if (!picked.length) return; v.close();
+      picked.filter(s => s.isNew).forEach(s => { if (!PRIYA_SITTERS.some(x => x.phone === s.phone)) PRIYA_SITTERS.push({ ...s, on:false, isNew:false, by:'Saved by you', times:`Shared with ${to}` }); });
+      res(picked);
+    };
     paint();
   });
 }
@@ -1310,12 +1360,13 @@ function shareClassSitter(chip){
     if (!picked) return;
     const names = joinNames(picked.map(s => s.n)), fresh = picked.filter(s => s.isNew);
     const confirmation = el('<p class="jc-shared" role="status"></p>');
-    confirmation.textContent = `You shared ${names} with Tony${fresh.length ? `. ${joinNames(fresh.map(s => s.n))} saved to your sitters` : ''}`;
+    confirmation.textContent = `You shared ${names} privately with Tony${fresh.length ? `. ${joinNames(fresh.map(s => s.n))} saved to your sitters` : ''}`;
     chip.replaceWith(confirmation); toast(`Shared ${picked.length === 1 ? names : picked.length + ' sitters'} with Tony`);
   });
 }
 
-if (route === 'sitter-class-chat') {
+if (route === 'sitter-class-chat' && link) classChatLinked();
+if (route === 'sitter-class-chat' && !link) {
   const screen = classChat('Priya’s class chat');
   const log = screen.querySelector('.jc-log');
   const tony = classMessage({ n:'Tony', photo:A + 'tony.webp' }, 'Hi everyone! We’re looking for a sitter for Sat, Aug 1, 6–10 PM, for Maya (7) and Jake (5). If you have one you trust, tap “Share a sitter” and add their name and number. Thank you!');
@@ -1323,6 +1374,64 @@ if (route === 'sitter-class-chat') {
   const share = action.firstElementChild; share.onclick = () => shareClassSitter(share);
   log.append(classMessage({ n:'Aisha', photo:A + 'aisha.webp' }, 'Are the kids bringing water bottles on Friday?'),
     classMessage({ n:'Priya' }, 'Yes, we’re packing one.', true), tony, action);
+}
+/* Ahmad, 24 Nov (/other-side/ row 6): a class parent's phone, linked to Tony's. What they share goes to Tony's phone
+   only. If Tony cancels or finds someone first, the button closes; when Tony books, they hear back (thanked by name if
+   it was one they shared).
+   Ahmad, 25 Nov: two of these phones on the row. ?as=app is a parent already in the class chat: Tony's post appears
+   live under the last message. ?as=push is a parent not in the app: the lock screen gets the Sprout push ("Tony is
+   looking for a sitter"), and tapping it opens the chat at Tony's message. Both get Share a sitter. */
+function classChatLinked(){
+  const AS = new URLSearchParams(location.search).get('as') === 'push' ? 1 : 0;
+  let ask = null, me = CLASS_PARENTS.maya[AS], screen = null, action = null, shared = [], pending = null, lock = null;
+  const other = () => (ask ? ask.cps : CLASS_PARENTS.maya)[1 - AS];
+  const status = (icon, text) => { const n = el(`<p class="jc-shared jc-sys" role="status"><i class="ph ${icon}"></i><span></span></p>`); n.querySelector('span').textContent = text; return n; };
+  const after = node => { const log = screen.querySelector('.jc-log'); log.append(node); log.scrollTop = log.scrollHeight; };
+  const buildChat = () => {
+    screen?.remove();
+    screen = classChat(`${me.n}’s class chat`);
+    if (me.cls !== 'Miss Taylor Class') screen.querySelector('.jc-head').insertAdjacentHTML('beforeend', `<span class="jc-title">${me.cls}</span>`);
+    const o = other(), log = screen.querySelector('.jc-log');
+    log.append(classMessage({ n:o.n, photo:o.pimg ? A + o.pimg : '' }, 'Are the kids bringing water bottles on Friday?'), classMessage({ n:me.n }, 'Yes, we’re packing one.', true));
+    log.scrollTop = log.scrollHeight;
+  };
+  const post = () => {   /* Tony's exact message, with Share a sitter under it */
+    action = el('<div class="jc-action"><button type="button" class="chip">Share a sitter</button></div>');
+    const btn = action.firstElementChild;
+    btn.onclick = () => shareSheet('Tony').then(picked => {
+      if (!picked || !btn.isConnected) return;
+      shared = picked.map(x => x.n);
+      const names = joinNames(shared), fresh = picked.filter(x => x.isNew);
+      action.replaceChildren(status('ph-hand-heart', `You shared ${names} privately with Tony${fresh.length ? `. ${joinNames(fresh.map(x => x.n))} saved to your sitters` : ''}`));
+      toast(`Shared ${picked.length === 1 ? names : picked.length + ' sitters'} with Tony`);
+      link.send({ t:'shared', by:{ n:me.n, kid:me.kid, rel:me.rel, pimg:me.pimg }, sitters:picked.map(x => ({ n:x.n, phone:x.phone, rate:x.rate || 25, note:x.note || '', photo:x.photo, isNew:!!x.isNew })) });
+    });
+    const msg = classMessage({ n:'Tony', photo:A + 'tony.webp' }, ask.text);
+    after(msg); after(action);
+    if (pending) { const m = pending; pending = null; handle(m); }
+  };
+  const handle = m => {
+    if (!action) { pending = m; return; }
+    if (m.t === 'closed' && !shared.length) action.replaceChildren(status('ph-x-circle', m.why === 'cancel' ? 'Tony closed this request' : 'Tony found a sitter, so this request is closed'));
+    if (m.t === 'booked') {
+      const mine = shared.includes(m.n);
+      after(status('ph-calendar-check', mine ? `Tony booked ${m.n}, the sitter you shared, for ${m.when}. Thanks for helping!` : `Tony found a sitter for ${m.when}`));
+      if (mine) toast(`Tony booked ${m.n}`);
+    }
+  };
+  if (AS === 0) buildChat();
+  else { lock = el(`<div class="lock" aria-label="Lock screen"><div class="ldate">Monday, July 27</div><div class="ltime">9:41</div></div>`); $('#phone').appendChild(lock); }
+  link.on(m => {
+    if (m.t === 'ask' && m.kind === 'class' && !ask) {
+      ask = m; me = m.cps[AS];
+      if (AS === 0) { buildChat(); post(); return; }   // already in the chat: the post just arrives
+      lock.querySelector('.ltime').textContent = '9:42';
+      lock.insertAdjacentHTML('beforeend', pushNote({ title:'Tony is looking for a sitter', body:`${m.kid}’s dad asked ${m.where}. Know someone you trust?`, photo:A + 'tony.webp', tag:'div' }) + '<div class="lhint">Tap the notification</div>');
+      lock.querySelector('.lnote').onclick = () => { lock.classList.add('gone'); setTimeout(() => { lock.remove(); buildChat(); post(); }, 380); };
+    }
+    if (m.t === 'closed' || m.t === 'booked') handle(m);
+  });
+  link.send({ t:'hello' });
 }
 /* ======================= J6 · Playdate ======================= */
 const PLAYDATE_FAMILIES = {
@@ -1706,12 +1815,75 @@ X.flows.playdate = async (p, opt = {}) => {
    Families are samples: Jake's SSC team (Priya and Aisha are on the soccer card) and Lincoln families. */
 const illIco = n => `<span class="clayico" style="background-image:url(${A}illus/${n}.webp)"></span>`;
 const TEAM = [
-  { n:'Priya Shah', ask:'Priya', kid:'Leo', rel:'Leo’s mom', mi:0.8, photo:A + 'priya.webp', offer:[15, 30], regular:'no', why:'Leo has swim those days this fall' },   // one time: offers two later times (Ahmad, 21 Nov); regular: can't
+  { n:'Priya Shah', ask:'Priya', kid:'Leo', rel:'Leo’s mom', mi:0.8, photo:A + 'priya.webp', regular:'no', why:'Leo has swim those days this fall' },   // one time: says yes (A4, 25 Nov); regular: can't
   { n:'Aisha Khan', ask:'Aisha', kid:'Ava', rel:'Ava’s mom', mi:1.4, photo:A + 'aisha.webp', cant:true, regular:'yes' },
   { n:'Elena Ruiz', ask:'Elena', kid:'Noah', rel:'Noah’s mom', mi:2.6, photo:A + 'elena.webp' },
   { n:'Marcus Lee', ask:'Marcus', kid:'Owen', rel:'Owen’s dad', mi:2.9 },
 ];
 const TONY = { n:'Tony', photo:A + 'tony.webp' };
+/* A4 (Tony, 25 Nov): "I wouldn't even show the adjustment in time... it would be happier path if you didn't have to do
+   the adjustment." Priya just says yes on /plan-carpool/. Her "can't at 9:30, could drive at 9:45 or 10" (Ahmad,
+   21 Nov) is still there on its own review route /plan-carpool-new-time/, and on her phone as the "Can't at 9:30" button. */
+if (route === 'plan-carpool-new-time') TEAM[0].offer = [15, 30];
+/* 24 Nov (Ahmad): nearby is a suggestion, not a fence. Wherever carpool lists families you can add a parent by hand:
+   anyone in the kid's class (closest first, however far) or a number for a family not on Sprout yet, who gets a text.
+   Review state /plan-carpool-none/: nobody lives near, so Sprout offers the class chat, the class list or a number. */
+const CP_NONE = route === 'plan-carpool-none';
+const cpWhere = g => g.near.replace(/^Lincoln · /, '');
+const cpIn = g => (/team/.test(g.near) ? 'on ' : g.near.startsWith('Pinecrest') ? 'among ' : 'in ') + cpWhere(g);   // on Jake’s team, in Miss Poole’s class
+/* the class beyond the nearby list. TEAM are the nearby families, so they never show here; distances are samples */
+const cpRoster = (kid, skip) => PLAYDATE_FAMILIES[kid.n].filter(f => ![...TEAM, ...skip].some(s => s.n === f.n))
+  .map((f, i) => ({ ...f, added:true, mi:+(3.1 + i * .3).toFixed(1) }));
+const cpLine = (f, g) => f.invite ? `${f.phone} · not on Sprout yet, gets a text` : `${f.rel} · ${f.mi} mi · ${f.added ? 'added by you' : g.doing(f)}`;
+/* their reply, in the channel it came on: Sprout, or a text for a parent not on Sprout yet */
+const cpReply = (p, f, text, where) => p.block(`<div class="preview gtx sms-in"><small>${face({ n:f.ask, photo:f.photo }, 18)}${f.n} · ${where || (f.invite ? 'text message' : 'in Sprout')}</small><p></p></div>`).querySelector('p').textContent = text;
+function cpPhoneSheet(){
+  return new Promise(res => {
+    let done = false; const fin = x => { if (!done) { done = true; res(x); } };
+    const v = bsheet({ onBack:() => fin(null), body:`<div class="bh"><span class="icotile"><i class="ph ph-phone"></i></span><b>Add by phone number</b></div>
+      <p class="bp">For a family not on Sprout yet. I text them the ride with a link to say yes.</p>
+      <button type="button" class="ct-pick" data-contacts><i class="ph ph-address-book"></i><span><b>Choose from Contacts</b><small>Fills in their name and number</small></span><i class="ph ph-caret-right"></i></button>
+      <div class="ct-or"><span>or type it in</span></div>
+      <div class="fields" style="margin-top:0">
+        <label class="field in"><div style="width:100%"><div class="l">Name</div><input autocomplete="off" placeholder="Their name"></div></label>
+        <label class="field in"><div style="width:100%"><div class="l">Phone</div><input inputmode="tel" autocomplete="off" placeholder="(512) 555-0100"></div></label></div>`,
+      foot:'<button type="button" class="btn" data-go disabled>Add a name and number</button>' });
+    const [nm, ph] = v.body.querySelectorAll('input'), go = v.foot.querySelector('[data-go]');
+    const paint = () => { const ok = nm.value.trim() && ph.value.replace(/\D/g, '').length >= 10; go.disabled = !ok; go.textContent = ok ? `Add ${nm.value.trim().split(' ')[0]}` : 'Add a name and number'; };
+    [nm, ph].forEach(x => x.oninput = paint);
+    v.body.querySelector('[data-contacts]').onclick = async () => { const c = await pickContact(); if (!c) return; nm.value = c.full; ph.value = c.phone; paint(); };
+    go.onclick = () => { if (go.disabled) return; const n = playdateEscape(nm.value.trim()); v.close();
+      fin({ n, ask:n.split(' ')[0], reply:n.split(' ')[0], rel:'Not on Sprout yet', phone:playdateEscape(ph.value.trim()), invite:true, added:true }); };
+  });
+}
+function cpAddSheet(kid, skip){
+  return new Promise(res => {
+    let done = false; const fin = x => { if (!done) { done = true; res(x); } };
+    const roster = cpRoster(kid, skip);
+    const v = bsheet({ onBack:() => fin(null), body:`<div class="bh"><span class="icotile"><i class="ph ph-user-plus"></i></span><b>Add a parent</b></div>
+      <p class="bp">Anyone in ${kid.cls}, closest to you first.</p><div data-pg></div>
+      <div class="ct-or"><span>not on Sprout yet?</span></div>
+      <button type="button" class="ct-pick" data-phone><i class="ph ph-phone"></i><span><b>Add by phone number</b><small>I text them the ride with a link to say yes</small></span><i class="ph ph-caret-right"></i></button>`,
+      foot:'<button type="button" class="btn" data-go disabled>Pick a parent</button>' });
+    const go = v.foot.querySelector('[data-go]');
+    const grid = parentGrid(roster, { multi:true, show:6, extra:f => `${f.mi} mi from you`, onChange:() => {
+      const n = grid.picked(); go.disabled = !n.length; go.textContent = !n.length ? 'Pick a parent' : n.length > 2 ? `Add ${n.length} parents` : `Add ${joinNames(n.map(f => f.ask))}`; } });
+    v.body.querySelector('[data-pg]').append(grid.el);
+    v.body.querySelector('[data-phone]').onclick = async () => { const f = await cpPhoneSheet(); if (!f) return; v.close(); fin([...grid.picked(), f]); };
+    go.onclick = () => { if (go.disabled) return; v.close(); fin(grid.picked()); };
+  });
+}
+/* nobody nearby: the class chat, the class list, or a number. Returns 'group' or the parents picked */
+async function cpNobody(p, g, kid){
+  await p.say(`Nobody ${cpIn(g)} lives close to you yet. I can post in ${g.chat}, or you pick who to ask.`, 900);
+  for (;;) {
+    const k = await p.chips([`Post in ${g.chat}`, 'Pick from the class', 'Add by phone number']);
+    if (k === 0) return 'group';
+    const add = k === 1 ? await cpAddSheet(kid, []) : await cpPhoneSheet().then(f => f && [f]);
+    if (add && add.length) return add;
+    await p.say('Nobody added yet. Post in the chat, or pick who?', 500);
+  }
+}
 /* the places Sprout already knows for each kid (registrations + home), Tony: "Home, School, Soccer, whatever we have" */
 const CP_PLACES = [
   { k:'home', n:'Home', s:'10212 Banks Court', ico:'house', kids:['Maya', 'Jake'], say:'home' },
@@ -1817,56 +1989,60 @@ function cpPlace(p, { kids, title, eyebrow, not }){
     p.scroll();
   });
 }
-/* 5 · one way or both ways; both asks when the ride back leaves */
+/* 5 · one way or both ways; both asks when the ride back leaves.
+   A4 (Tony, 25 Nov): "when I click these, it just... does the one. But then... once it's already preselected, and then
+   we say find families nearby. These UIs are different." Same as Pick up from / Drop off at now: nothing preselected,
+   tapping a row answers (no Find families nearby button). Both ways asks the ride-back time in the time wheel, the way
+   Somewhere else asks the address. */
 function cpWay(p, from, to, at){
   return new Promise(res => {
-    let both = false, back = Math.ceil((at + 120) / 30) * 30;
     const c = p.block(`<div class="card"><div class="ctop">${illIco('carpool')}<div><div class="eyebrow">Carpool</div><div class="ttl">One way or both ways?</div></div></div>
       <div class="ua-rows" role="radiogroup">
-        <button type="button" class="ua-row pk on" data-w="0" role="radio" aria-checked="true"><span class="uaph uamono"><i class="ph ph-arrow-right"></i></span><span class="tx"><b>One way</b><small>${cpShort(from)} to ${cpShort(to)} at ${tl(at)}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button>
-        <button type="button" class="ua-row pk" data-w="1" role="radio" aria-checked="false"><span class="uaph uamono"><i class="ph ph-arrows-left-right"></i></span><span class="tx"><b>Both ways</b><small>And back to ${cpShort(from)} after</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button></div>
-      <div data-back hidden><div class="dlabel" style="margin-top:16px">Ride back at</div><div class="qk" style="display:flex;flex-wrap:nowrap;overflow-x:auto" data-back-row></div></div>
-      <button type="button" class="btn" style="margin-top:14px">Find families nearby</button></div>`).querySelector('.card');
-    const row = c.querySelector('[data-back-row]'), btn = c.querySelector('.btn');
-    const paintBack = () => {
-      row.innerHTML = timeStrip('back', at + 30, Math.min(at + 600, 1290), back) + '<button type="button" class="chip" style="flex:none" data-other>Other time</button>';
-      row.querySelectorAll('[data-back]').forEach(b => { b.classList.toggle('sel', +b.dataset.back === back); b.onclick = () => { back = +b.dataset.back; paintBack(); }; });
-      row.querySelector('[data-other]').onclick = async () => { const m = await timeWheel({ title:'Ride back', value:back }); if (m == null) return; if (m % 1440 <= at) return toast(`Pick a time after ${tl(at)}.`); back = m % 1440; paintBack(); };
-    };
-    c.querySelectorAll('[data-w]').forEach(b => b.onclick = () => {
-      both = b.dataset.w === '1';
-      c.querySelectorAll('[data-w]').forEach(y => { y.classList.toggle('on', y === b); y.setAttribute('aria-checked', y === b); });
-      c.querySelector('[data-back]').hidden = !both; if (both) { paintBack(); setTimeout(() => { const s = row.querySelector('.sel'); if (s) row.scrollLeft = s.offsetLeft - 40; }, 30); }
-      p.scroll();
+        <button type="button" class="ua-row pk" data-w="0" role="radio" aria-checked="false"><span class="uaph uamono"><i class="ph ph-arrow-right"></i></span><span class="tx"><b>One way</b><small>${cpShort(from)} to ${cpShort(to)} at ${tl(at)}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button>
+        <button type="button" class="ua-row pk" data-w="1" role="radio" aria-checked="false"><span class="uaph uamono"><i class="ph ph-arrows-left-right"></i></span><span class="tx"><b>Both ways</b><small>And back to ${cpShort(from)} after</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button></div></div>`).querySelector('.card');
+    c.querySelectorAll('[data-w]').forEach(b => b.onclick = async () => {
+      let back = null;
+      if (b.dataset.w === '1') {
+        const m = await timeWheel({ title:'Ride back', value:Math.ceil((at + 120) / 30) * 30 });
+        if (m == null) return;
+        if (m % 1440 <= at) return toast(`Pick a time after ${tl(at)}.`);
+        back = m % 1440; b.querySelector('small').textContent = `Back to ${cpShort(from)} at ${tl(back)}`;
+      }
+      c.querySelectorAll('[data-w]').forEach(y => { y.classList.toggle('on', y === b); y.setAttribute('aria-checked', y === b); y.style.pointerEvents = 'none'; });
+      p.me(back != null ? `Both ways, back at ${tl(back)}` : 'One way'); res(back);
     });
-    btn.onclick = () => {
-      c.querySelectorAll('button').forEach(b => b.style.pointerEvents = 'none'); btn.remove();
-      p.me(both ? `Both ways, back at ${tl(back)}` : 'One way'); res(both ? back : null);
-    };
     p.scroll();
   });
 }
 /* 7 · the whole group chat, or parents you pick (same parent grid as Playdate, N4) */
-function cpSend(p, g, near, text){
+function cpSend(p, g, near, text, { kid, mode = 'group' } = {}){
   return new Promise(res => {
-    let mode = 'group';
+    const fams = [...near], mine = near.length && near.every(f => f.added);
     const c = p.block(`<div class="card"><div class="ctop">${clay('two-people')}<div><div class="eyebrow">${g.near}</div><div class="ttl">Who should I ask?</div></div></div>
       <div class="ua-rows" role="radiogroup">
-        <button type="button" class="ua-row pk on" data-m="group" role="radio" aria-checked="true"><span class="uaph uamono"><i class="ph ph-users-three"></i></span><span class="tx"><b>${g.chat}</b><small>Everyone · ${g.size}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button>
-        <button type="button" class="ua-row pk" data-m="pick" role="radio" aria-checked="false"><span class="uaph uamono"><i class="ph ph-user-list"></i></span><span class="tx"><b>Parents I pick</b><small>${near.length} families live near you</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button></div>
-      <div data-pg hidden></div>
+        <button type="button" class="ua-row pk" data-m="group" role="radio" aria-checked="false"><span class="uaph uamono"><i class="ph ph-users-three"></i></span><span class="tx"><b>${g.chat}</b><small>Everyone · ${g.size}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button>
+        <button type="button" class="ua-row pk" data-m="pick" role="radio" aria-checked="false"><span class="uaph uamono"><i class="ph ph-user-list"></i></span><span class="tx"><b>Parents I pick</b><small>${mine ? `${near.length} you picked` : `${near.length} families live near you`}</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></button></div>
+      <div data-pg hidden><button type="button" class="rk-row rk-add" data-add>${cpAddRow(kid)}</button></div>
       <div class="preview"><small data-to></small><p data-msg></p></div>
       <button type="button" class="textbtn" data-edit style="margin-top:6px;width:auto;padding:4px 0;color:var(--brand)"><i class="ph ph-pencil-simple"></i> Edit message</button>
       <button type="button" class="btn" style="margin-top:10px"></button></div>`).querySelector('.card');
     const btn = c.querySelector('.btn'), msg = c.querySelector('[data-msg]');
-    const grid = parentGrid(near, { multi:true, on:[0, 1], extra:f => `${f.mi} mi · ${g.doing(f)}`, onChange:() => paint() });
-    c.querySelector('[data-pg]').append(grid.el);
+    let grid;
+    const mk = on => { c.querySelector('[data-pg] .pg-wrap')?.remove();
+      grid = parentGrid(fams, { multi:true, on, extra:f => f.invite ? `${f.phone} · gets a text` : `${f.mi} mi · ${f.added ? 'added by you' : g.doing(f)}`, onChange:() => paint() });
+      c.querySelector('[data-pg]').prepend(grid.el); };
+    mk(mine ? fams.map((_, i) => i) : [0, 1]);
+    c.querySelector('[data-add]').onclick = async () => {
+      const add = await cpAddSheet(kid, fams); if (!add) return;
+      const on = grid.picked().map(f => fams.indexOf(f)); add.forEach(f => { fams.push(f); on.push(fams.length - 1); });
+      mk(on); paint(); p.scroll(); };
     let custom = null;
     const paint = () => {
       const picks = grid.picked();
       c.querySelectorAll('[data-m]').forEach(b => { const on = b.dataset.m === mode; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
       c.querySelector('[data-pg]').hidden = mode !== 'pick';
-      c.querySelector('[data-to]').textContent = mode === 'group' ? `In ${g.chat} · from you` : picks.length > 1 ? 'In Sprout · a DM with each · from you' : picks.length ? `In Sprout · your DM with ${picks[0].ask}` : 'Pick at least one parent';
+      const via = picks.every(f => f.invite) ? 'By text · one to each' : picks.some(f => f.invite) ? 'In Sprout or by text · one to each' : 'In Sprout · a DM with each';
+      c.querySelector('[data-to]').textContent = mode === 'group' ? `In ${g.chat} · from you` : picks.length > 1 ? `${via} · from you` : picks.length ? (picks[0].invite ? `By text to ${picks[0].ask} · from you` : `In Sprout · your DM with ${picks[0].ask}`) : 'Pick at least one parent';
       msg.textContent = custom || text(mode === 'pick' && picks.length ? picks[0] : null);
       btn.disabled = mode === 'pick' && !picks.length;
       btn.textContent = mode === 'group' ? `Post in ${g.chat}` : picks.length ? `Ask ${joinNames(picks.map(f => f.ask))}` : 'Pick at least one parent';
@@ -1876,7 +2052,7 @@ function cpSend(p, g, near, text){
     btn.onclick = () => {
       if (btn.disabled) return;
       const picks = grid.picked();
-      c.querySelectorAll('button,input').forEach(b => b.disabled = true); c.querySelector('[data-edit]').remove(); btn.remove(); grid.lock();
+      c.querySelectorAll('button,input').forEach(b => b.disabled = true); c.querySelector('[data-edit]').remove(); c.querySelector('[data-add]').remove(); btn.remove(); grid.lock();
       p.me(btn.textContent); res({ mode, picks, text:msg.textContent });
     };
     paint(); p.scroll();
@@ -1941,39 +2117,53 @@ function rotaCard(p, run, drivers, go){
    says yes." Then a suggested split Tony can change before he shares it, and the other parent gets "the carpool is
    confirmed, here's the schedule, added to your calendar". All in Sprout, not text: "we're not gonna text people".
    Demo: the first family can't (Priya), the second says yes (Aisha). Her side: /receiver/?v=carpool-regular. */
-function cpRank(p, near, g){
+const cpAddRow = kid => `<span class="uaph uamono"><i class="ph ph-user-plus"></i></span><span class="rk-tx"><b>Add a parent</b><small>Class list or phone number</small></span><i class="ph ph-caret-right rk-go"></i>`;
+function cpRank(p, near, g, kid){
   return new Promise(res => {
-    let order = [0, 1];   // closest two, pre-ranked; tap to change
+    const list = [...near];
+    let order = list.every(f => f.added) ? list.map((_, i) => i) : [0, 1].filter(i => i < list.length);   // closest two pre-ranked (or everyone you just added); tap to change
     const c = p.block(`<div class="card"><div class="ctop">${clay('two-people')}<div><div class="eyebrow">${g.near}</div><div class="ttl">Who should I ask first?</div></div></div>
-      <div class="fact" style="margin-top:10px"><i class="ph ph-list-numbers"></i>I ask one family at a time, in Sprout. Only if they can’t do I ask the next.</div>
+      <div class="fact" style="margin-top:10px"><i class="ph ph-list-numbers"></i><span data-how></span></div>
       <div class="rk" role="list"></div>
+      <button type="button" class="rk-row rk-add" data-add>${cpAddRow(kid)}</button>
       <button type="button" class="btn" style="margin-top:12px"></button></div>`).querySelector('.card');
-    const list = c.querySelector('.rk'), btn = c.querySelector('.btn');
+    const rows = c.querySelector('.rk'), btn = c.querySelector('.btn'), add = c.querySelector('[data-add]');
     const paint = () => {
-      list.innerHTML = near.map((f, i) => { const n = order.indexOf(i);
-        return `<button type="button" class="rk-row${n >= 0 ? ' on' : ''}" data-i="${i}" role="listitem">${face({ n:f.ask, photo:f.photo }, 36)}<span class="rk-tx"><b>${f.n}</b><small>${f.rel} · ${f.mi} mi · ${g.doing(f)}</small></span><span class="rk-n">${n >= 0 ? n + 1 : '<i class="ph ph-plus"></i>'}</span></button>`; }).join('');
-      list.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { const i = +b.dataset.i; order = order.includes(i) ? order.filter(x => x !== i) : [...order, i]; paint(); });
+      c.querySelector('[data-how]').textContent = `I ask one family at a time, ${list.every(f => f.invite) ? 'by text' : list.some(f => f.invite) ? 'in Sprout or by text' : 'in Sprout'}. Only if they can’t do I ask the next.`;
+      rows.innerHTML = list.map((f, i) => { const n = order.indexOf(i);
+        return `<button type="button" class="rk-row${n >= 0 ? ' on' : ''}" data-i="${i}" role="listitem">${face({ n:f.ask, photo:f.photo }, 36)}<span class="rk-tx"><b>${f.n}</b><small>${cpLine(f, g)}</small></span><span class="rk-n">${n >= 0 ? n + 1 : '<i class="ph ph-plus"></i>'}</span></button>`; }).join('');
+      rows.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { const i = +b.dataset.i; order = order.includes(i) ? order.filter(x => x !== i) : [...order, i]; paint(); });
       btn.disabled = !order.length;
-      btn.textContent = order.length ? `Ask ${near[order[0]].ask} first` : 'Pick at least one family';
+      btn.textContent = order.length ? `Ask ${list[order[0]].ask} first` : 'Pick at least one family';
     };
-    btn.onclick = () => { if (btn.disabled) return; list.querySelectorAll('button').forEach(b => b.disabled = true); btn.remove(); p.me(`${order.map((i, k) => `${k + 1}. ${near[i].ask}`).join('  ')}`); res(order.map(i => near[i])); };
+    add.onclick = async () => { const more = await cpAddSheet(kid, list); if (!more) return; more.forEach(f => { list.push(f); order.push(list.length - 1); }); paint(); p.scroll(); };
+    btn.onclick = () => { if (btn.disabled) return; rows.querySelectorAll('button').forEach(b => b.disabled = true); add.remove(); btn.remove(); p.me(`${order.map((i, k) => `${k + 1}. ${list[i].ask}`).join('  ')}`); res(order.map(i => list[i])); };
     paint(); p.scroll();
   });
 }
-async function cpRegular(p, { w, kids, riders, from, to, back, g, near, rides, whenTxt, route }){
-  await p.say(`A regular carpool works best with one other family. Who should I ask? Put them in order: I’ll ask one at a time and only ask the next if they can’t.`, 900);
-  const ranked = await cpRank(p, near, g);
-  const askText = f => `Hi ${f.ask}! Want to share ${riders}’s rides from ${route}? ${whenTxt.replace(/^./, x => x.toUpperCase())}, pickup at ${tl(w.at)}${back ? `, back at ${tl(back)}` : ', one way'}. We’d take turns driving. Tony`;
+async function cpRegular(p, ctx){
+  const { w, riders, from, to, back, g, near, whenTxt, route, kid } = ctx;
+  let ranked;
+  if (near.length) {
+    await p.say(`A regular carpool works best with one other family. Who should I ask? Put them in order: I’ll ask one at a time and only ask the next if they can’t.`, 900);
+    ranked = await cpRank(p, near, g, kid);
+  } else {
+    const pick = await cpNobody(p, g, kid);
+    if (pick === 'group') return cpPostRegular(p, ctx);
+    await p.say(`A regular carpool works best with one other family. Put them in order: I’ll ask one at a time and only ask the next if they can’t.`, 800);
+    ranked = await cpRank(p, pick, g, kid);
+  }
+  const askText = f => `Hi ${f.ask}! Want to share ${riders}’s rides from ${route}? ${whenTxt.replace(/^./, x => x.toUpperCase())}, pickup at ${tl(w.at)}${back ? `, back at ${tl(back)}` : ', one way'}. We’d take turns driving.${f.invite ? ' See the rides and say yes: sprout.app/carpool.' : ''} Tony`;
   let partner = null;
   for (const [i, f] of ranked.entries()) {
-    const job = p.work(`Messaging ${f.ask}`, 'In Sprout');
+    const job = p.work(f.invite ? `Texting ${f.ask}` : `Messaging ${f.ask}`, f.invite ? 'By text · with a link to say yes' : 'In Sprout');
     await sleep(900);
     job.done(`Asked ${f.ask}`, i ? `${ranked[i - 1].ask} couldn’t, so ${f.ask} was next` : `First on your list${ranked.length > 1 ? ` · ${ranked.slice(1).map(x => x.ask).join(', ')} only if needed` : ''}`, 'ph-chat-circle-text');
-    p.block(`<div class="preview gtx"><small>${face(TONY, 18)}You to ${f.n} · in Sprout</small><p></p></div>`).querySelector('p').textContent = askText(f);
+    p.block(`<div class="preview gtx"><small>${face(TONY, 18)}You to ${f.n} · ${f.invite ? 'text message' : 'in Sprout'}</small><p></p></div>`).querySelector('p').textContent = askText(f);
     const status = `Waiting on ${f.ask}`;
     p.set(status, { when:'Now' });
     let no;
-    if (link) {
+    if (link && !f.invite) {
       liveAsk(f, { kind:'regular', who:{ n:f.n, ask:f.ask, kid:f.kid, photo:f.photo }, label:`${f.ask}, ${f.rel}`, sub:i ? `Asked because ${ranked[i - 1].ask} couldn’t.` : 'First on Tony’s list. Gets the ask in Sprout.',
         text:askText(f), title:'Regular carpool', when:`${whenTxt.replace(/^./, x => x.toUpperCase())} · ${tl(w.at)}`, route:`${cpThere(from)} to ${cpThere(to)}${back ? `, back at ${tl(back)}` : ', one way'}`, dist:`${f.mi} mi from you · ${g.doing(f)}` });
       const off = liveWords(p, f, 'in Sprout');
@@ -1985,7 +2175,7 @@ async function cpRegular(p, { w, kids, riders, from, to, back, g, near, rides, w
     } else {
       no = f.regular === 'no';
       await later(p, { status, small:`${riders}’s carpool`, ms:2500, title:`${f.ask} replied`, body:no ? 'Can’t this season' : 'We’re in!' });
-      playdateReply(p, { ...f, reply:f.ask }, no ? `So sorry, we can’t this season. ${f.why.replace(/^./, x => x.toUpperCase())}.` : `We’re in! Happy to take turns.`);
+      cpReply(p, f, no ? `So sorry, we can’t this season. ${f.why.replace(/^./, x => x.toUpperCase())}.` : `We’re in! Happy to take turns.`);
     }
     if (!no) { partner = f; break; }
     if (ranked[i + 1]) await p.say(`${f.ask} can’t this season. Asking ${ranked[i + 1].ask} next, as you ranked.`, 800);
@@ -1994,6 +2184,23 @@ async function cpRegular(p, { w, kids, riders, from, to, back, g, near, rides, w
     await p.say(`Nobody on your list can this season. Want to ask another family?`, 800);
     await p.chips(['Not now']); p.set('No carpool yet', { done:true }); return;
   }
+  return cpSplit(p, ctx, partner);
+}
+/* nobody nearby, posted in the class chat: the first family to say yes gets the turns */
+async function cpPostRegular(p, ctx){
+  const { w, riders, back, g, whenTxt, route, kid } = ctx;
+  const job = p.work(`Posting in ${g.chat}`, g.size);
+  await sleep(1000);
+  job.done(`Posted in ${g.chat}`, 'The first family to say yes shares the rides', 'ph-paper-plane-tilt');
+  p.block(`<div class="preview gtx"><small>${face(TONY, 18)}You in ${g.chat}</small><p></p></div>`).querySelector('p').textContent =
+    `Hi everyone! Want to share ${riders}’s rides from ${route}? ${whenTxt.replace(/^./, x => x.toUpperCase())}, pickup at ${tl(w.at)}${back ? `, back at ${tl(back)}` : ', one way'}. We’d take turns driving. Tony`;
+  const f = cpRoster(kid, [])[0];
+  p.set(`Waiting for replies in ${g.chat}`, { when:'Now' });
+  await later(p, { status:`Waiting for replies in ${g.chat}`, small:`${riders}’s carpool`, ms:2500, title:`${f.ask} replied in ${g.chat}`, body:'We’re in!' });
+  cpReply(p, f, `We’re in! We’re ${f.mi} miles from you, happy to take turns.`, `in ${g.chat}`);
+  return cpSplit(p, ctx, f);
+}
+async function cpSplit(p, { w, kids, riders, from, to, back, rides, whenTxt }, partner){
   /* the split: alternate turns, Tony can change any turn before it goes to the other family */
   const you = { you:true, ask:'You' }, drivers = [you, partner];
   const single = w.days.length === 1;
@@ -2035,7 +2242,7 @@ X.flows.carpool = async p => {
   const act = [to, from].find(x => ['soccer', 'school', 'camp'].includes(x.k))?.k || 'school';
   const actPlace = CP_PLACES.find(x => x.k === act), kid = kids.find(k => actPlace.kids.includes(k.n)) || kids[0];   // whose group chat to ask in
   const g = cpGroup(act, kid);
-  const near = act === 'school' && kid.n === 'Maya' ? [TEAM[0], TEAM[1], TEAM[3], TEAM[2]] : TEAM;
+  let near = CP_NONE ? [] : act === 'school' && kid.n === 'Maya' ? [TEAM[0], TEAM[1], TEAM[3], TEAM[2]] : TEAM;
   const rides = once ? [] : cpDates(w.days, w.until);
   const whenTxt = once ? w.day.day : `${w.days.map(d => WDL[d] + 's').join(', ')} through ${w.until[1] === 28 ? cpDate(rides[rides.length - 1]) : w.until[0]}`;
   const route = `${cpSay(from)} to ${cpSay(to)}`, backTxt = back ? `, and back at ${tl(back)}` : '';
@@ -2043,9 +2250,9 @@ X.flows.carpool = async p => {
   p.set('Checking families nearby', { when:once ? w.day.short : 'Now' });
   const look = p.work('Checking families near home', g.look);
   await sleep(1300);
-  look.done(`${near.length} families nearby on ${g.near.replace(/^Lincoln · /, '')}`, 'Closest to home first', 'ph-users-three');
-  if (!once) return cpRegular(p, { w, kids, riders, from, to, back, g, near, rides, whenTxt, route, act });
-  await p.say(`${near[0].ask} and ${near[1].ask} live closest, and their kids ${act === 'soccer' ? 'play on Jake’s team' : act === 'camp' ? 'are at Pinecrest' : 'go to Lincoln'} too. Should I post in ${g.chat}, or ask parents you pick?`, 900);
+  if (near.length) look.done(`${near.length} families nearby ${cpIn(g)}`, 'Closest to home first', 'ph-users-three');
+  else look.done(`No families near home ${cpIn(g)}`, 'I check again when new families join', 'ph-users-three');
+  if (!once) return cpRegular(p, { w, kids, riders, from, to, back, g, near, rides, whenTxt, route, act, kid });
   /* in the team chat Tony posts it himself. Ahmad, 22 Nov: a picked parent is on Sprout too, so the ask goes to a
      Sprout DM from Tony, with the ride card, not a group text ("it just make us easy... to track everything"). */
   const text = f => f
@@ -2055,9 +2262,20 @@ X.flows.carpool = async p => {
     : (once
       ? `Hi everyone! Could anyone near us take ${riders} from ${route} on ${w.day.day} at ${tl(w.at)}${backTxt}? We’re on Banks Court. Happy to return the favor! Tony`
       : `Hi everyone! Want to share ${riders}’s rides from ${route}? ${whenTxt}, pickup at ${tl(w.at)}${back ? `, back at ${tl(back)}` : ', one way'}. We’d take turns driving. Tony`);
-  const sent = await cpSend(p, g, near, text);
+  let sent;
+  if (near.length) {
+    await p.say(`${near[0].ask} and ${near[1].ask} live closest, and their kids ${act === 'soccer' ? 'play on Jake’s team' : act === 'camp' ? 'are at Pinecrest' : 'go to Lincoln'} too. Should I post in ${g.chat}, or ask parents you pick?`, 900);
+    sent = await cpSend(p, g, near, text, { kid });
+  } else {
+    const pick = await cpNobody(p, g, kid);
+    if (pick === 'group') {   // the whole class sees it; the closest class families are the ones who answer
+      near = cpRoster(kid, []).slice(0, 3); sent = { mode:'group', picks:[], text:text(null) };
+      p.block(`<div class="preview gtx"><small>${face(TONY, 18)}You in ${g.chat}</small><p></p></div>`).querySelector('p').textContent = sent.text;
+    } else { near = pick; sent = await cpSend(p, g, near, text, { kid, mode:'pick' }); }
+  }
   const group = sent.mode === 'group', asked = group ? near : sent.picks, names = joinNames(asked.map(f => f.ask));
-  const job = p.work(group ? `Posting in ${g.chat}` : `Messaging ${names}`, group ? g.size : asked.length > 1 ? 'In Sprout · a DM with each family' : `In Sprout · your DM with ${asked[0].ask}`);
+  const via = asked.every(f => f.invite) ? 'By text' : asked.some(f => f.invite) ? 'In Sprout or by text' : 'In Sprout';
+  const job = p.work(group ? `Posting in ${g.chat}` : `Messaging ${names}`, group ? g.size : asked.length > 1 ? (via === 'In Sprout' ? 'In Sprout · a DM with each family' : `${via} · one to each family`) : asked[0].invite ? 'By text · with a link to say yes' : `In Sprout · your DM with ${asked[0].ask}`);
   await sleep(1100);
   job.done(group ? `Posted in ${g.chat}` : `Asked ${names}`, once ? 'First yes drives · I tell the others' : 'Everyone who says yes gets turns', 'ph-paper-plane-tilt');
   const waiting = group ? `Waiting for replies in ${g.chat}` : `Waiting for ${names}`;
@@ -2125,14 +2343,15 @@ X.flows.carpool = async p => {
     offWords();
     if (live && !LIVE.no) link.send(yes === live ? { t:'set', at:{ m:w.at, l:tl(w.at) } } : { t:'covered', by:yes.ask, riders,
       text:group ? null : `Hi! We’re all set now: ${yes.ask} is taking ${riders} on ${w.day.day}. Thank you so much for checking! Sprout, for Tony` });
-    const others = group ? [] : asked.filter(f => f !== yes && !f.cant).map(f => f.ask);
+    const othersF = group ? [] : asked.filter(f => f !== yes && !f.cant), others = othersF.map(f => f.ask);
+    const othersVia = othersF.every(f => f.invite) ? 'by text' : othersF.some(f => f.invite) ? 'in Sprout or by text' : 'in Sprout';
     if (group) p.note(`Posted “${yes.ask} has it, thanks!” in ${g.chat}`, 'So nobody else offers', 'ph-chat-circle-text');
     else if (others.length) {
-      p.note(`Told ${joinNames(others)} you found a ride`, 'Sent in Sprout', 'ph-paper-plane-tilt');
-      p.block(`<div class="preview gtx"><small>To ${joinNames(others)} · in Sprout · from Sprout</small><p></p></div>`).querySelector('p').textContent =
+      p.note(`Told ${joinNames(others)} you found a ride`, `Sent ${othersVia}`, 'ph-paper-plane-tilt');
+      p.block(`<div class="preview gtx"><small>To ${joinNames(others)} · ${othersVia} · from Sprout</small><p></p></div>`).querySelector('p').textContent =
         `Hi! We’re all set now: ${yes.ask} is taking ${riders} on ${w.day.day}. Thank you so much for checking! Sprout, for Tony`;
     }
-    await p.say(`${yes.ask} is driving ${riders}. It’s on both families’ calendars, and Dana has it too.`, 900);
+    await p.say(`${yes.ask} can pick up ${riders}. It’s on both families’ calendars, and Dana has it too.`, 900);
     const done = p.block(`<div class="card"><div class="ctop">${illIco('carpool')}<div><div class="eyebrow">Carpool · ${w.day.day}</div><div class="ttl">${yes.ask} drives ${riders}</div></div></div>
       <div class="ua-row on" style="margin-top:12px">${face({ n:yes.ask, photo:yes.photo })}<span class="tx"><b>${yes.n}</b><small>${yes.rel} · ${yes.mi} mi from home</small></span><span class="ck"><i class="ph-bold ph-check"></i></span></div>
       <div class="fact" style="margin-top:10px"><i class="ph ph-arrow-right"></i>${tl(w.at)} · ${cpShort(from)} to ${cpShort(to)}</div>

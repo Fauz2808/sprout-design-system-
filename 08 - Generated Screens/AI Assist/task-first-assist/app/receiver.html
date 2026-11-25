@@ -386,7 +386,8 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
     let ask = null, view = null, lock = null;
     const reset = () => {
       phone.innerHTML = '';
-      lock = el(`<section class="view lock">${sb(true)}<div class="date">Monday, July 27</div><div class="time">7:52</div></section>`);
+      /* row 06 (class group): same clock as the class parents' lock screens (Ahmad, 25 Nov) */
+      lock = el(`<section class="view lock">${sb(true)}<div class="date">Monday, July 27</div><div class="time">${LINK === 'sc6' ? '9:41' : '7:52'}</div></section>`);
       phone.append(lock, el('<span class="home light"></span>'));
       view = null;
     };
@@ -528,7 +529,8 @@ button{font:inherit;border:0;background:none;cursor:pointer;padding:0;color:inhe
     };
     ch.onmessage = e => {
       const m = e.data;
-      if (m.t === 'ask') { if (!(ask && ask.kind === m.kind && ask.who.n === m.who.n)) arrive(m); return; }
+      if (m.t === 'ask') { if (m.kind === 'class') return;   /* 25 Nov: row 6's class post is for the class phones, not this one */
+        if (!(ask && ask.kind === m.kind && ask.who.n === m.who.n)) arrive(m); return; }
       if (!view) return;
       if (m.t === 'tony-text') fromTony(m.text);
       if (m.t === 'sms') smsFrom(m.from === 'Sprout' ? 'Sprout' : 'Tony Martin', m.text, m.href);

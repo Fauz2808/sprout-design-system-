@@ -19,13 +19,13 @@ SITE = HERE / 'site'
 ROUTES = ['assist', 'sports', 'summer-camps', 'own-sitters', 'class-families', 'night-out',
           'birthdays', 'birthday-invite', 'create-event', 'create-club', 'accounts-payments',
           'date-night-a', 'date-night-b', 'date-night-c', 'date-night-v2',
-          'sitter-v3', 'sitter-v3-class', 'sitter-v3-none', 'sitter-v3-share', 'date-night-v3',
+          'sitter-v3', 'sitter-v3-class', 'sitter-v3-none', 'sitter-v3-share', 'sitter-v3-share-saved', 'date-night-v3',
           'sitter-when-a', 'sitter-when-b', 'sitter-class-chat',
           'sitter-profile',
           'playdate', 'playdate-new-time', 'playdate-cant', 'playdate-invite',
           'ui-a', 'ui-b', 'ui-c', 'pay-todo', 'happening-am', 'happening-pm',
           'book-a-sitter', 'book-a-sitter-saved', 'plan-a-date-night', 'booked-evening', 'chat-history', 'add-account', 'assist-ongoing', 'after-school', 'tutoring',
-          'carpool-a', 'carpool-b', 'plan-carpool']
+          'carpool-a', 'carpool-b', 'plan-carpool', 'plan-carpool-none', 'plan-carpool-new-time']
 
 ssc = SSC.read_text()
 css = re.search(r'<style>(.*?)</style>', ssc, re.S).group(1)

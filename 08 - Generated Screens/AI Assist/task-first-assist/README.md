@@ -83,6 +83,25 @@ playdate then the request will showing up on the screen 2."
 - Code: `link`, `liveAsk`, `liveSay`, `liveWords` in `app/sitter-v3.js`; `linked()` in `app/receiver.html`;
   `playdateInboxLinked()` for the playdate phone.
 
+## 24 Nov · carpool: add a parent by hand, and nobody nearby (Ahmad)
+
+Ahmad: "can i add parents manually? and how its looks like if there is no nearby parents?" Nearby is a suggestion, not
+a fence. Try `/plan-carpool/` (both kinds) and `/plan-carpool-none/`.
+
+- **Add a parent** (`cpAddSheet`): a dashed last row under the regular ranking (`cpRank`) and under the one-time
+  "Parents I pick" grid (`cpSend`). The sheet lists the kid's class (`cpRoster`: `PLAYDATE_FAMILIES` minus the
+  nearby `TEAM`, closest first, sample distances) with the playdate parent grid, plus **Add by phone number**
+  (`cpPhoneSheet`: Choose from Contacts or type a name and number) for a family not on Sprout yet. Added parents
+  join the list already picked, ranked after the ones you had.
+- **Not on Sprout yet** (`invite:true`): asked by text with a link to say yes (`sprout.app/carpool`), and every label
+  says so (the status row, the preview, their reply, "Told … you found a ride"). Not sent to the linked receiver phone.
+- **Nobody nearby** (`/plan-carpool-none/`, `CP_NONE`): the status row says "No families near home in Miss Poole's
+  class · I check again when new families join". Sprout offers three chips (`cpNobody`): Post in the class chat,
+  Pick from the class, Add by phone number. The chat post for a regular carpool goes to `cpPostRegular` (the closest
+  class family says yes, then the turn plan). Picks go to the ranking (regular) or the ask card (one time).
+- `cpSplit` is the old turn-plan tail of `cpRegular`, now shared by both regular paths.
+- Open: should "nearby" have a distance cutoff? Today every listed family counts as nearby.
+
 ## 20 Nov US · regular carpool (MEETING-2026-11-21-tasks.md, C2)
 
 Try `/plan-carpool/` (Regular carpool) and Aisha's side at `/receiver/?v=carpool-regular`. `cpRank` + `cpRegular` in
@@ -114,6 +133,12 @@ Try `/plan-carpool/` (One time) and the other parent at `/receiver/?v=carpool-ch
   Tony; the demo plays his move to her first time and the card confirms at it. On Tony's side (`TEAM` Priya `offer`,
   one time only) the ride card says "Priya can't at 9:30" with her times: Pick up at 9:45 / at 10 / Keep 9:30, ask
   others. Picking a time moves the pickup and she drives.
+- **25 Nov (Tony, A4)**: the happy path has no time change ("it might come off a little weird... the kids have to be
+  there at a certain time"). On `/plan-carpool/` Priya just says yes and Sprout says "Priya can pick up Jake", then
+  the ride card. Her new-time offer moved to its own review route, `/plan-carpool-new-time/`; on her phone it is still
+  the explicit "Can't at 9:30" button. And "One way or both ways?" (`cpWay`) now works like Pick up from / Drop off
+  at: nothing preselected, tapping a row answers, no "Find families nearby" button (Tony: "these UIs are different").
+  Both ways asks the ride-back time in the time wheel, like Somewhere else asks the address.
 
 ## 20 Nov US · playdate (MEETING-2026-11-21-tasks.md, P1–P3)
 
@@ -158,6 +183,11 @@ All in `app/sitter-v3.js`. Try `/book-a-sitter/` (no sitters yet) and `/book-a-s
   the chip then shows the amount ($12) and the tip line and total use it. Tip chips are five equal columns.
 - **S7 Payout link** (`payoutLink`): right after the booking text, Sprout texts the sitter a one-time link to add
   their bank (Stripe, opens `/sitter-profile/`), only if they haven't yet.
+- **25 Nov (Tony, A3)**: after **Book Alex** the chat shows one summary, "Alex is booked. I let Sam know you found
+  someone. It's in your Daily Brief. When Alex is done, you'll pay and rate here.", then the booked card. The rows and
+  text previews for the booking text, the payout link and "we found someone" are gone from Tony's chat (the texts
+  still go, and still show on the linked phones). The payout link is a "Payout link" on the card's payout line.
+  Everything before Book and the pay/rate after is unchanged.
 
 ## 20 Nov · meeting + Tony's carpool order (MEETING-2026-11-20-tasks.md, N1–N8)
 
@@ -210,6 +240,11 @@ one line on what changed. The desk links beside the phone (`LINKS` in `app/flows
   paid through Stripe; "Paid another way" covers cash. `/pay-todo/` opens on that lock screen.
 - **L4 Share sitters**: `shareSheet()` (multi-select, a note per sitter, add someone new, saved to Priya's sitters) on
   `/sitter-class-chat/` and `/sitter-v3-share/`.
+  **25 Nov (Tony, A2)**: "no one's gonna have them." The sheet now starts at **Choose from contacts**: `pickContact({ multi })`
+  ticks several, Add puts them in the list (initials, number, the optional note), then **Add another from contacts**.
+  Typing a name and number is a quiet link under it. Saved sitters are no longer the start: if Priya has any they sit
+  below as "Your sitters", unticked. She has none by default; `/sitter-v3-share-saved/` shows two. The send button and
+  the private line stay; the confirmation says "shared privately with Tony" + saved to your sitters.
 - **L5 Playdate**: one kid, "We can pick up and drop off", parent rows ("Leo's mom"), Message → `playdateDM()`.
 - **L6 Birthday**: From / Until, place before cover, class chosen after Send invites. `PARTY_STYLES` = Birthday-friendly
   venues, Parks and playgrounds, Restaurants; search starts near home, "Another area" re-searches (`otherArea()`).
@@ -342,6 +377,29 @@ DM and lets Ana confirm, suggest a time, or reply.
 `/sitter-class-chat/` shows Priya’s view of Tony’s request. `classChat()` and `classMessage()` use the
 CHAT-10 chrome with prototype messages. `shareClassSitter()` shares Taylor or opens the same
 `sitterFields()` form as manual Add a sitter. The builder crops the two chrome images from the supplied PNG using Pillow.
+25 Nov (Tony, A2): the share sheet starts at Choose from contacts now, see L4 under 19 Nov.
+
+Linked (24 Nov, `/other-side/` row 6, `?link=sc6`): `/sitter-v3-none/` is Tony, `/sitter-class-chat/` runs
+`classChatLinked()`. `classGroup()` sends Tony's exact post (`kind:'class'`); the right phone is Priya for Maya's
+class or both, Elena for Jake's (title overlay `.jc-title` covers the PNG's Miss Taylor). Her share comes back as
+`shared` and replaces Priya's entry in `LEADS` (Aisha's Jordan still arrives on her own). `closed` (cancel or found)
+closes her button; `booked` thanks her by name if it was her sitter. `LIVE.classOnly` keeps `sendAndBook()` from
+turning the right phone into a sitter's text thread.
+
+25 Nov (Ahmad): "Tony wants to see how it should behave on the chat group and also how it behaves on the push
+notification." Row 6 is now four linked phones on `sc6` (`.pair.quad`, four up at 1440, wraps narrower), all driven by
+Tony's flow:
+- **Tony** `/sitter-v3-none/?link=sc6`. **A parent in the class chat** `/sitter-class-chat/?link=sc6&as=app`: Priya
+  (Jake's class: Elena) has the chat open; Tony's post arrives live with Share a sitter. **A parent who gets the push**
+  `…&as=push`: Aisha (Jake's class: Marcus, monogram) on the lock screen gets "Tony is looking for a sitter" / "Maya's
+  dad asked Miss Taylor's class. Know someone you trust?" and opens the chat at his message. **The sitter**
+  `/receiver/?link=sc6`: the row 5 Messages view, which now ignores the class post (`kind:'class'`).
+- Both parents share through the contacts-first sheet; `shared` now carries `by` (who shared). The first share opens
+  Tony's list, a later one joins the open list unticked (`laterShare` in `classGroup`) or is saved with a ping. The fixed
+  Aisha sample lead is gone from the linked path. Personas: `CLASS_PARENTS` in `app/sitter-v3.js`.
+- The first sitter Tony asks is the live sitter phone (`sendAndBook` no longer skips it on `classOnly`): her yes comes
+  back, Book sends the booking and payout texts to her, and both class chats hear back. `LIVE.cls` keeps the class post
+  so a reloaded class phone still gets it after the sitter ask. Not on `/review/`.
 
 ## J2 · Sprout in sitter texts (18 Nov)
 

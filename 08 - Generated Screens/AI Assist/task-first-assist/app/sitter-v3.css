@@ -432,6 +432,8 @@
 .jc-msg.own .jc-bubble{background:var(--brand-subtle)}
 .jc-action{margin:-8px 0 0 48px}
 .jc-shared{color:var(--subtle);font-size:13px}
+.jc-sys{display:flex;gap:6px;align-items:flex-start;margin:10px 0 0}.jc-sys i{font-size:16px;color:var(--brand);flex:none;margin-top:1px}
+.jc-head{position:relative}.jc-title{position:absolute;left:50%;top:62.3%;transform:translate(-50%,-50%);padding:1px 18px;background:#f4f1ea;font:600 17px/22px 'Playfair Display',serif;color:#1d2a22;white-space:nowrap}
 
 
 /* J8: the party search reuses the dinner carousel. The invitation follows Sprout's public share layout. */
@@ -475,6 +477,8 @@
 .shr.on{background:var(--brand-subtle);border-radius:14px;padding-bottom:10px;margin:4px 0}
 .shr.on .sl-row{background:transparent}
 .shr-note{margin:0 10px;background:#fff}
+.shr>.sl-row{width:100%}
+.sl>.shr:not(:last-child)>.sl-row:not(.on){border-bottom:1px solid var(--border-soft)}
 
 /* L5 playdate DM: Sprout's 1:1 chat, opened from the confirmed playdate. Plain header (back, parent, kid), real input. */
 .jc-screen.dm{transition:opacity .25s,transform .25s}
@@ -526,8 +530,10 @@
 .pg-more{display:block;margin:10px auto 0;padding:6px 10px;font:600 13px var(--sans);color:var(--brand);background:none;border:0}
 .pg-none{margin:10px 0 0;font-size:13px;color:var(--subtle);text-align:center}
 /* N1 carpool: weekday chips sit on one line */
-.cp-wd{flex-wrap:nowrap}
-.cp-wd .chip{flex:1;padding:9px 0;text-align:center;justify-content:center}
+/* 24 Nov: seven day chips on one row. flex-basis 0 + min-width 0 so they share the row evenly on any phone width,
+   label sized to fit so "Wed" never spills out of its chip and stays centered. */
+.cp-wd{flex-wrap:nowrap;gap:4px}
+.cp-wd .chip{flex:1 1 0;min-width:0;height:36px;padding:0;font-size:12.5px;white-space:nowrap;text-align:center;justify-content:center;align-items:center}
 /* N9 (20 Nov): who is on the group text: you, the sitter (or parent) and Sprout */
 .gtx-who{display:inline-flex;align-items:center;gap:4px;vertical-align:middle}
 .gtx-who .uaph{display:inline-block;border-radius:50%;background-size:cover;background-position:center;margin-left:4px}
@@ -563,6 +569,12 @@
 .ct-av{width:34px;height:34px;border-radius:50%;background:#c9cdd3;color:#fff;font:600 13px var(--sans);display:flex;align-items:center;justify-content:center;flex:none}
 .ct-row b{display:block;font:500 15px var(--sans);color:var(--strong)}
 .ct-row small{display:block;font-size:12px;color:var(--subtle)}
+/* A2 (25 Nov): multi-pick contacts for Share a sitter, the same check as .sl-row */
+.ct-row>span:nth-child(2){flex:1;min-width:0}
+.ct-row .ck{width:22px;height:22px;border-radius:11px;border:1.5px solid var(--border);display:grid;place-items:center;color:transparent;font-size:12px;flex:none}
+.ct-row.on .ck{background:var(--brand);border-color:var(--brand);color:#fff}
+.ct-row:disabled{opacity:.45}
+.shr-sec{margin-top:16px}
 /* S4 (20 Nov US): the sitter's reply in the group text (left, grey like an incoming text), yours on the right,
    and "Sprout read this" under it. S7: the payout link inside Sprout's text. */
 .preview.gtx.sms-in{background:#fff;border:1px solid rgba(0,0,0,.08);margin-right:36px}
@@ -605,6 +617,8 @@
 .pd-w .pd-sent .uaph{display:inline-block;border-radius:50%;background-size:cover;background-position:center}
 .pd-w .pd-sent p{margin:4px 0 0;font-size:13.5px;line-height:1.4;color:var(--strong)}
 .fact s{color:var(--subtle)}
+/* A3 (25 Nov): the payout link rides on the booked card's payout line */
+.fact .link{flex:none;white-space:nowrap;text-decoration:none}
 .pd-state{display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px 12px;border-radius:12px;font:600 13px var(--sans)}
 .pd-state.wait{background:#f3efe6;color:var(--subtle)}
 .pd-state.wait .spinner{width:14px;height:14px}
@@ -620,6 +634,12 @@
 .rk-tx small{display:block;font-size:11.5px;color:var(--subtle);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rk-n{width:26px;height:26px;flex:none;border-radius:50%;display:grid;place-items:center;font:700 13px var(--sans);background:#efebe2;color:var(--subtle)}
 .rk-row.on .rk-n{background:var(--brand);color:#fff}
+/* 24 Nov: Add a parent, the last row under any carpool family list (class list or a phone number) */
+.rk-add{margin-top:6px;background:transparent;border-style:dashed;border-color:rgba(0,0,0,.16)}
+.rk-add .uaph{width:36px;height:36px;flex:none}
+.rk-add .uaph i{font-size:18px}
+.rk-add .rk-go{font-size:16px;color:var(--subtle)}
+[data-pg] .rk-add{margin-top:8px}
 /* the schedule Tony shares: one line per turn, the name only */
 .pd-sched .sch{margin:8px 0 2px;border-radius:12px;background:#fff;overflow:hidden}
 .pd-sched .sch-r{display:flex;justify-content:space-between;padding:7px 10px;font-size:13px;border-top:1px solid #eee8dc}

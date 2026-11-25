@@ -998,7 +998,7 @@ X.flows.club = async p => {
 /* Ahmad, 22 Nov: "a clear navigation here to all of our update". Three groups: the parent's flows in the app, the
    other person's side (other parent, sitter), and the review pages. New = changed since the 21 Nov update to Tony. */
 const NAV = [
-  ['In the app', [['/assist/', 'Sprout Assist home'], ['/playdate/', 'Playdate', 1], ['/book-a-sitter-saved/', 'Book a sitter', 1], ['/plan-carpool/', 'Carpool', 1],
+  ['In the app', [['/assist/', 'Sprout Assist home'], ['/playdate/', 'Playdate', 1], ['/book-a-sitter-saved/', 'Book a sitter', 1], ['/plan-carpool/', 'Carpool', 1], ['/plan-carpool-none/', 'Carpool · nobody nearby', 1], ['/plan-carpool-new-time/', 'Carpool · Priya offers a new time', 1],
     ['/plan-a-date-night/', 'Date night'], ['/birthdays/', 'Birthday', 1], ['/sports/', 'Sports · SSC Kids'], ['/after-school/', 'After school'], ['/summer-camps/', 'Camps'], ['/tutoring/', 'Tutoring']]],
   ['The other side', [['/other-side/', 'Both sides of a request', 1], ['/sitter-signup/', 'Sitter sign-up, start to finish', 1], ['/pay/?n=Alex', 'Sitter pay link', 1],
     ['/sitter-profile/?s=login', 'Sitter log in', 1], ['/date-night-live/', 'Lock screen · Live Activity', 1]]],
@@ -1022,7 +1022,7 @@ const ROUTE = {
   'birthday-invite': () => X.flows.birthdayInvite(COVERS.bday),
   'accounts-payments': () => { X.showHome(); X.openSheet(); setTimeout(X.openWallet, 500); },
   /* N1 carpool in Tony's order (20 Nov), flow in sitter-v3.js; the 19 Nov A/B links open it too */
-  'plan-carpool': () => X.start('carpool', { echo:'Set up a carpool' }), 'carpool-a': () => X.start('carpool', { echo:'Set up a carpool' }), 'carpool-b': () => X.start('carpool', { echo:'Set up a carpool' }),
+  'plan-carpool': () => X.start('carpool', { echo:'Set up a carpool' }), 'plan-carpool-none': () => X.start('carpool', { echo:'Set up a carpool' }), 'plan-carpool-new-time': () => X.start('carpool', { echo:'Set up a carpool' }), 'carpool-a': () => X.start('carpool', { echo:'Set up a carpool' }), 'carpool-b': () => X.start('carpool', { echo:'Set up a carpool' }),
 };
 if (ROUTE[route]) setTimeout(ROUTE[route], 500);
 })();

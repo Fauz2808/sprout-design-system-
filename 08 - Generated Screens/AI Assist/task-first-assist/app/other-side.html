@@ -31,6 +31,8 @@
   iframe{width:393px;height:852px;border:0;transform:scale(var(--k));transform-origin:0 0;display:block}
   .bar{margin-top:8px}
   .bar button{font:500 13px Inter;color:var(--brand);background:none;border:0;cursor:pointer;padding:2px 0}
+  .bar{display:flex;gap:16px;align-items:center}
+  .bar a{font:500 13px Inter;color:var(--brand);text-decoration:underline;text-underline-offset:3px}
   .arrow{align-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--brand);font-size:12px;font-weight:600;text-align:center;margin-top:60px}
   .arrow span{font-size:34px;line-height:1}
   .steps{margin:52px 0 0;padding:18px 20px;border-radius:18px;background:#fff;border:1px solid var(--line)}
@@ -39,6 +41,11 @@
   .steps li{margin:8px 0;font-size:14px}
   .steps li b{color:var(--brand)}
   .note{margin-top:46px;color:var(--sub);font-size:13px}
+  /* Ahmad, 25 Nov: row 6 is four phones on one link (Tony, a parent in the chat, a parent who gets the push, the
+     sitter). Four up at this scale fits the 1180 column on a 1440 screen and wraps on narrower ones. */
+  .pair.quad{grid-template-columns:repeat(auto-fill,var(--w));gap:0 22px}
+  .quad .ph p{min-height:63px}
+  .quad .steps{grid-column:1/-1;margin-top:28px}
   @media (max-width:980px){.pair{grid-template-columns:var(--w) 40px var(--w)}.steps{grid-column:1/-1;margin-top:24px}}
   @media (max-width:640px){.wrap{padding:22px 16px 48px}:root{--k:.8}.pair{grid-template-columns:var(--w)}.arrow{flex-direction:row;margin:16px 0}.arrow span{transform:rotate(90deg)}}
 </style>
@@ -46,8 +53,8 @@
 <body><div class="wrap">
   <span class="tag">Review page · not part of the app</span>
   <h1>Both sides of a request</h1>
-  <p class="lede">When Sprout asks someone for you (a playdate, a ride, a sitter), this is what they get. On each row the two phones are connected: do it on Tony’s phone on the left, and the person he asks gets it on the right. Their answer, and anything they type, goes back to Tony. Start over on either phone resets both.</p>
-  <nav class="toc"><a href="#playdate"><b>1</b> Playdate</a><a href="#carpool-chat"><b>2</b> Carpool · team chat</a><a href="#carpool-text"><b>3</b> Carpool · group text</a><a href="#carpool-regular"><b>4</b> Carpool · regular</a><a href="#sitter"><b>5</b> Babysitter</a></nav>
+  <p class="lede">When Sprout asks someone for you (a playdate, a ride, a sitter, a class group), this is what they get. On each row the two phones are connected: do it on Tony’s phone on the left, and the person he asks gets it on the right. Their answer, and anything they type, goes back to Tony. Start over on either phone resets both.</p>
+  <nav class="toc"><a href="#playdate"><b>1</b> Playdate</a><a href="#carpool-chat"><b>2</b> Carpool · team chat</a><a href="#carpool-text"><b>3</b> Carpool · group text</a><a href="#carpool-regular"><b>4</b> Carpool · regular</a><a href="#sitter"><b>5</b> Babysitter</a><a href="#sitter-class"><b>6</b> Sitter · ask a class</a></nav>
 
   <section id="playdate"><span class="n">01</span><h2>Playdate</h2>
     <p class="why">Live: the two phones are connected. Plan it on Tony’s phone; the parent he picks gets it on the right, in their chat with Tony, and whatever they tap goes back to Tony.</p>
@@ -116,6 +123,21 @@
     </div>
   </section>
 
+  <section id="sitter-class"><span class="n">06</span><h2>Babysitter · ask a class group</h2>
+    <p class="why">Tony has no sitters saved, so Sprout posts his ask in the class chat. Every side of it is its own phone here: a parent who has the chat open, a parent who only gets the push, and the sitter they share, who has no Sprout. Numbers go to Tony only, never into the chat.</p>
+    <div class="pair quad" data-link="sc6">
+      <div class="ph"><h3>Tony</h3><p>Book a sitter, then “Ask a class group” and Maya’s class. Picks from the sitters parents share, then Book.</p><div class="frame"><iframe data-src="/sitter-v3-none/?link=sc6" title="Tony asks a class group for a sitter"></iframe></div><div class="bar"><button data-r>Start over</button></div></div>
+      <div class="ph"><h3>A parent in the class chat</h3><p data-whosub data-kind="class" data-as="0">Priya, Leo’s mom, has the class chat open in Sprout. Tony’s post appears live.</p><div class="frame"><iframe data-src="/sitter-class-chat/?link=sc6&amp;as=app" title="A parent who has the class chat open"></iframe></div><div class="bar"><button data-r>Start over</button></div></div>
+      <div class="ph"><h3>A parent who gets the push</h3><p data-whosub data-kind="class" data-as="1">Aisha, Ava’s mom, isn’t in the app. Her phone is locked until Tony posts.</p><div class="frame"><iframe data-src="/sitter-class-chat/?link=sc6&amp;as=push" title="A parent who gets the push notification"></iframe></div><div class="bar"><button data-r>Start over</button></div></div>
+      <div class="ph"><h3>The sitter</h3><p data-whosub data-kind="sitter">Whoever a parent shares. Messages only, no Sprout. Waits until Tony asks.</p><div class="frame"><iframe data-src="/receiver/?link=sc6" title="What the shared sitter sees in Messages"></iframe></div><div class="bar"><button data-r>Start over</button></div></div>
+      <div class="steps"><h4>How it connects</h4><ol>
+        <li>Tony taps <b>Send to the group</b>. Priya sees his message arrive in the class chat; Aisha’s locked phone gets the push <b>Tony is looking for a sitter</b> and opens the chat at his message.</li>
+        <li>Either taps <b>Share a sitter</b>, picks people from their contacts, adds a note. Only Tony gets the names and numbers; the chat only shows them “You shared … privately with Tony”.</li>
+        <li>Tony sees each parent’s sitters as they come in, saved to his sitters, and taps <b>Ask</b>. The first one he asks gets the text on the fourth phone and taps <b>Yes, I’m free</b>.</li>
+        <li>Tony taps <b>Book</b>. The sitter gets the booking text, the parents hear back in the chat (thanked by name if it was their sitter). <b>Start over</b> on any phone resets all four.</li></ol></div>
+    </div>
+  </section>
+
   <p class="note">Prototype: nothing is sent. The two phones on each row talk to each other inside this page only. The people Tony asks who aren’t on screen (Sam, Riley, Elena) answer on their own.</p>
 </div>
 <script>
@@ -123,6 +145,18 @@
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && !e.target.src) { e.target.src = e.target.dataset.src; io.unobserve(e.target); } }), { rootMargin:'300px' });
   frames.forEach(f => io.observe(f));
   setTimeout(function next(){ const f = frames.find(x => !x.getAttribute('src')); if (!f) return; f.src = f.dataset.src; io.unobserve(f); setTimeout(next, 900); }, 2500);
+
+  /* "Open full screen" under every phone (Ahmad, 25 Nov), the same link the review page has. It opens that side on
+     its own page in a new tab: the standalone route, without ?link (a linked phone opened alone would wait forever). */
+  const SOLO = { 'receiver/cp2': '/receiver/?v=carpool-chat', 'receiver/cp3': '/receiver/?v=carpool-text', 'receiver/cp4': '/receiver/?v=carpool-regular',
+    'receiver/st5': '/receiver/?v=sitter-text', 'receiver/sc6': '/receiver/?v=sitter-text', 'sitter-class-chat/push': '/sitter-v3-share/' };
+  document.querySelectorAll('.ph').forEach(ph => {
+    const f = ph.querySelector('iframe'), bar = ph.querySelector('.bar'); if (!f || !bar) return;
+    const u = new URL(f.dataset.src, location.origin), page = u.pathname.replace(/^\/|\/$/g, ''), link = u.searchParams.get('link'), as = u.searchParams.get('as');
+    const href = SOLO[`${page}/${link}`] || SOLO[`${page}/${as}`] || `/${page}/`;
+    const a = document.createElement('a'); a.href = href; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Open full screen';
+    bar.appendChild(a);
+  });
   document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => {
     const pair = b.closest('[data-link]');
     (pair ? [...pair.querySelectorAll('iframe')] : [b.closest('.ph').querySelector('iframe')]).forEach(f => { f.src = 'about:blank'; setTimeout(() => { f.src = f.dataset.src; }, 60); });
@@ -130,13 +164,21 @@
   });
   /* Ahmad, 22 Nov: linked rows. The right phone becomes whichever parent Tony picks, so its label follows. */
   const WHO0 = new Map();
-  document.querySelectorAll('[data-link]').forEach(pair => WHO0.set(pair, [pair.querySelector('[data-who]').textContent, pair.querySelector('[data-whosub]').textContent]));
-  const resetWho = pair => { const [a, b] = WHO0.get(pair); pair.querySelector('[data-who]').textContent = a; pair.querySelector('[data-whosub]').textContent = b; };
+  document.querySelectorAll('[data-who],[data-whosub]').forEach(e => WHO0.set(e, e.textContent));
+  const resetWho = pair => pair.querySelectorAll('[data-who],[data-whosub]').forEach(e => { e.textContent = WHO0.get(e); });
+  /* 25 Nov: row 6's lines carry data-kind, so each phone's line follows only what is sent to that phone */
   if ('BroadcastChannel' in window) document.querySelectorAll('[data-link]').forEach(pair => {
+    const who = pair.querySelector('[data-who]'), sub = pair.querySelector('[data-whosub]:not([data-kind])');
     new BroadcastChannel('sprout-link-' + pair.dataset.link).onmessage = e => {
       const m = e.data, f = m.family;
-      if (m.t === 'invite' && f) { pair.querySelector('[data-who]').textContent = `${f.ask}, ${f.rel}`; pair.querySelector('[data-whosub]').textContent = 'Gets Tony’s invite in their chat with him.'; }
-      if (m.t === 'ask' && m.label) { pair.querySelector('[data-who]').textContent = m.label; pair.querySelector('[data-whosub]').textContent = m.sub || ''; }
+      if (m.t === 'invite' && f && who) { who.textContent = `${f.ask}, ${f.rel}`; sub.textContent = 'Gets Tony’s invite in their chat with him.'; }
+      if (m.t !== 'ask') return;
+      if (who && m.label) { who.textContent = m.label; sub.textContent = m.sub || ''; }
+      pair.querySelectorAll('[data-kind]').forEach(p => {
+        if (p.dataset.kind !== m.kind) return;
+        if (m.kind === 'class' && m.cps) { const c = m.cps[+p.dataset.as]; p.textContent = `${c.n}, ${c.rel}. ${p.dataset.as === '0' ? 'Has the class chat open in Sprout.' : 'Not in the app, so she gets the push.'}`.replace(' she ', c.rel.endsWith('dad') ? ' he ' : ' she '); }
+        if (m.kind === 'sitter') p.textContent = `${m.label}. Gets Tony’s ask by text, with Sprout on the thread. No app.`;
+      });
     };
   });
 </script>
