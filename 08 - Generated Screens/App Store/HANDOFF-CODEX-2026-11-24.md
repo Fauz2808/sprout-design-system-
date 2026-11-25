@@ -1,5 +1,8 @@
 # Handoff to Codex · App Store screenshots V.15 "People" · 24 Nov 2026
 
+> **SUPERSEDED 25 Nov.** V.16–V.21 came after this file, and the current set is **V.22**
+> (`screenshots-v22-people.html`, six slides, built on V.21; export `tools/export-v22.mjs`). Do not build on V.15.
+
 Read first, in this order: repo `AGENTS.md`, this folder's `AGENTS.md`, then this file. If anything here conflicts with
 `AGENTS.md`, `AGENTS.md` wins and you say so in your report.
 

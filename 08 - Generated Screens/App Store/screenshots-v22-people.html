@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Store screenshots · V.22 People</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&display=swap" rel="stylesheet">
+<style>
+  :root { --green: #186338; --deep: #12301f; --muted: #6d6a60; --cream: #f4f1ea; --page: #ece9e2; --w: 250px; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--page); color: var(--deep); font-family: Inter, system-ui, sans-serif; padding: 36px 48px 80px; }
+  .top h1 { font: 600 30px/1.15 'Playfair Display', serif; }
+  .top p { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--muted); max-width: 920px; }
+  h2.section { font: 600 22px/1.2 'Playfair Display', serif; margin: 40px 0 12px; }
+  .row { display: flex; gap: 16px; overflow-x: auto; padding: 4px 4px 14px; }
+  .slide-wrap { width: var(--w); flex: none; }
+  .slide-wrap .cap { font-size: 11.5px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+  .slide-wrap .cap b { color: var(--deep); font-weight: 600; }
+
+  /* slide: 1290 × 2796, all sizes in cqw (1cqw = 12.9 px at export) */
+  .slide { width: 100%; aspect-ratio: 1290 / 2796; position: relative; overflow: hidden; container-type: inline-size; border-radius: calc(var(--w) * .07);
+    box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.08); isolation: isolate; background: #1d3a27; }
+  .logo { position: absolute; top: 9cqw; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 1.6cqw; font: 500 5.6cqw/1 'Playfair Display', serif; color: #fff; z-index: 6; white-space: nowrap; }
+  .logo-mark { width: calc(84 / 12.9 * 1cqw); height: calc(84 / 12.9 * 1cqw); display: grid; place-items: center; background: #e2e9e3; border-radius: calc(16 / 12.9 * 1cqw); }
+  .logo-mark img { width: calc(67.742 / 12.9 * 1cqw); height: calc(67.742 / 12.9 * 1cqw); display: block; }
+  .head { position: absolute; left: 6cqw; right: 6cqw; top: 22cqw; text-align: center; z-index: 6; }
+  .h { font: 500 10cqw/1.06 'Playfair Display', serif; letter-spacing: -.012em; color: #fff; text-shadow: 0 .3cqw 2cqw rgba(10,25,15,.35); }
+  .h em { font-style: italic; color: #d9eecf; }
+  .sub { font: 600 3.7cqw/1.45 Inter; color: #fff; margin: 4cqw auto 0; max-width: 84cqw; text-shadow: 0 .2cqw .8cqw rgba(10,25,15,.45), 0 0 3cqw rgba(10,25,15,.4); }
+
+  .photo { position: absolute; inset: 0; background-size: cover; background-repeat: no-repeat; z-index: 1; }
+  .scrim { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+  .phone { position: absolute; left: 50%; transform: translateX(-50%); width: var(--pw, 70cqw); aspect-ratio: 393 / 852; border-radius: calc(var(--pw, 70cqw) * .153); padding: 1.3cqw;
+    background: #fbfaf7; border: .45cqw solid #dcd7cc; box-shadow: 0 3.4cqw 8cqw rgba(10,25,15,.32), 0 .6cqw 1.6cqw rgba(10,25,15,.14); z-index: 3; }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: calc(var(--pw, 70cqw) * .134); overflow: hidden; background: var(--cream); }
+  .screen > img { position: absolute; left: 0; top: 0; width: 100%; display: block; }
+  /* one iOS status bar for every full phone (Ahmad, 25 Nov: the bars differed slide to slide and the class chat's was
+     a soft 393 px raster). Sized in screen-width units: 54/393 tall, island 125 x 37 at y 11. */
+  .sbar { position: absolute; z-index: 2; left: 0; right: 0; top: 0; height: calc(54 / 393 * 100%); aspect-ratio: auto; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 7.5% 0 10%; background: var(--cream); color: #111; font: 600 calc(var(--pw, 70cqw) * 17 / 393) -apple-system, 'SF Pro Text', Inter, sans-serif; }
+  .phone .sbar { height: calc(var(--pw, 70cqw) * 54 / 393); }
+  /* ?frameless (iPad 13" and Google Play, 25 Nov): no iPhone bezel or Dynamic Island, just the app screen with a soft
+     shadow. Apple rejects iPhone frames in iPad screenshots; Google Play wants the app, not the device. */
+  .frameless .phone { border: 0; padding: 0; background: none; box-shadow: none; }
+  .frameless .screen { border-radius: calc(var(--pw, 70cqw) * .09); box-shadow: 0 3.4cqw 8cqw rgba(10,25,15,.32), 0 0 0 .3cqw rgba(255,255,255,.5); }
+  .frameless .sbar .isl { display: none; }
+  .sbar .isl { position: absolute; left: 50%; top: calc(var(--pw, 70cqw) * 11 / 393); transform: translateX(-50%); width: 31.8%; height: calc(var(--pw, 70cqw) * 37 / 393); border-radius: 999px; background: #000; }
+  .sbar .r { display: flex; align-items: center; gap: calc(var(--pw, 70cqw) * 6 / 393); }
+  .sbar svg { display: block; height: calc(var(--pw, 70cqw) * 12 / 393); width: auto; fill: #111; }
+  .piece { position: absolute; z-index: 4; display: block; }
+  .piece.card { border-radius: 4.2cqw; box-shadow: 0 2.4cqw 6cqw rgba(10,25,15,.3), 0 .4cqw 1cqw rgba(0,0,0,.08); }
+  .connection-row > img { display: block; width: 100%; }
+  /* The original icon occupies an 84 px square in the 996 × 109 connection row. */
+  .connection-row .logo-mark { position: absolute; left: calc(720 / 996 * 100%); top: calc(12 / 109 * 100%); width: calc(84 / 996 * 100%); height: auto; aspect-ratio: 1; border-radius: calc(16 / 84 * 100%); }
+  .connection-row .logo-mark img { width: calc(67.742 / 84 * 100%); height: auto; }
+
+  .store-wrap { display: flex; gap: 28px; flex-wrap: wrap; }
+  .store { width: 360px; background: #fff; border-radius: 28px; padding: 18px 16px 20px; box-shadow: 0 8px 30px rgba(0,0,0,.08); }
+  .store .app { display: flex; align-items: center; gap: 12px; }
+  .store .icon { width: 62px; height: 62px; border-radius: 15px; background: var(--cream); display: grid; place-items: center; box-shadow: inset 0 0 0 .5px rgba(0,0,0,.12); }
+  .store .icon img { width: 46px; }
+  .store .name { font: 600 16px/1.2 -apple-system, Inter, sans-serif; }
+  .store .tagline { font: 400 13px/1.3 -apple-system, Inter, sans-serif; color: #8a8a8e; }
+  .store .get { font: 700 14px/1 -apple-system, Inter; color: #0a84ff; background: #eef0f4; border-radius: 999px; padding: 8px 20px; margin-left: auto; }
+  .store .shots { display: flex; gap: 8px; margin-top: 14px; }
+  .store .shots .slide-wrap { width: 104px; --w: 104px; }
+  .store .shots .slide { border-radius: 10px; }
+  table.src { border-collapse: collapse; font-size: 12.5px; color: var(--muted); max-width: 1200px; }
+  table.src td { padding: 4px 14px 4px 0; vertical-align: top; }
+  table.src td:first-child { color: var(--deep); font-weight: 600; white-space: nowrap; }
+  table.src code { font-size: 11.5px; background: #fff; padding: 1px 5px; border-radius: 4px; }
+
+
+  /* 25 Nov (Ahmad): slide 2's email and to-do are coded so they tell one story (Picture day email -> Emma's class shirt
+     to-do), with this mom as the avatar (assets/people/email-mom-avatar.webp, Figma AI, scratch H5GZYtSTT9TOR8qc5ieuV7 7:2) */
+  .mail { position: absolute; z-index: 4; padding: 3.2cqw 3.6cqw; border-radius: 4.2cqw; background: #fff; font-family: Inter, sans-serif; color: #1b2a20;
+    box-shadow: 0 2.4cqw 6cqw rgba(10,25,15,.3), 0 .4cqw 1cqw rgba(0,0,0,.08); }
+  .mail .top { display: flex; justify-content: space-between; font: 600 2.5cqw/1.2 Inter; color: #6d6a60; }
+  .mail .top small { font-weight: 500; }
+  .mail h4 { margin: 1.4cqw 0 0; font: 600 3.9cqw/1.25 Inter; color: #1b2a20; }
+  .mail p { margin: 1.2cqw 0 0; font: 500 2.9cqw/1.45 Inter; color: #4b4a44; }
+  .mail p u { color: #186338; text-decoration-color: rgba(24,99,56,.5); text-underline-offset: .5cqw; }
+  .todo { position: absolute; z-index: 4; padding: 2.6cqw 3.2cqw 1cqw; border-radius: 4.2cqw; background: #fff; font-family: Inter, sans-serif;
+    box-shadow: 0 2.4cqw 6cqw rgba(10,25,15,.3), 0 .4cqw 1cqw rgba(0,0,0,.08); }
+  .todo .th { display: flex; align-items: center; gap: 2cqw; padding-bottom: 2cqw; border-bottom: .2cqw solid #efebe3; }
+  .todo .av { width: 7cqw; height: 7cqw; border-radius: 50%; background: center / cover; flex: none; position: relative; }
+  .todo .th b { font: 500 4.4cqw/1 'Playfair Display', serif; color: #1e3e2b; }
+  .todo .new { padding: .7cqw 1.8cqw; border-radius: 99px; background: #e2e9e3; color: #186338; font: 600 2.3cqw Inter; }
+  .todo .plus { margin-left: auto; width: 6cqw; height: 6cqw; border-radius: 50%; display: grid; place-items: center; background: #e2e9e3; color: #186338; font: 500 4cqw/1 Inter; }
+  .todo .r { display: flex; align-items: center; gap: 2.4cqw; padding: 2.4cqw 0; border-bottom: .2cqw solid #efebe3; }
+  .todo .r:last-child { border-bottom: 0; }
+  .todo .box { width: 4.4cqw; height: 4.4cqw; border-radius: 1.2cqw; border: .35cqw solid #cfc8ba; flex: none; }
+  .todo .r .av { width: 7.4cqw; height: 7.4cqw; }
+  .todo .r .av img { position: absolute; right: -.6cqw; bottom: -.4cqw; width: 3.4cqw; height: 3.4cqw; border-radius: 50%; background: #fff; padding: .4cqw; }
+  .todo .tx b { display: block; font: 500 3.6cqw/1.25 'Playfair Display', serif; color: #1e3e2b; }
+  .todo .m { display: flex; align-items: center; gap: 1.4cqw; margin-top: .8cqw; font: 500 2.4cqw Inter; color: #6d6a62; white-space: nowrap; }
+  .todo .chip { padding: .5cqw 1.6cqw; border-radius: 1.2cqw; background: #e2e9e3; color: #1e5a36; font-weight: 600; }
+  /* 25 Nov (Ahmad): slides 3-4 put a real phone mockup INTO the photo: photo, then the phone, then the family cut out of
+     the same photo (Apple Vision, tools/cutout.swift) in front of it, then the scrim. */
+  .scene-phone { z-index: 2 !important; filter: saturate(.94) brightness(.98); box-shadow: 0 3cqw 9cqw rgba(30,20,10,.45), 0 .6cqw 1.6cqw rgba(30,20,10,.2) !important; }
+  .scene-phone .screen::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; background: linear-gradient(125deg, rgba(255,240,215,.16) 0%, rgba(255,240,215,0) 40%), linear-gradient(0deg, rgba(60,40,20,.12), rgba(60,40,20,0) 45%); }
+  .people { position: absolute; inset: 0; z-index: 3; background-repeat: no-repeat; pointer-events: none; }
+  .scene .scrim { z-index: 4; }
+  /* the Assist sheet tucked just under the status bar (Ahmad, 25 Nov: the gap was too big) */
+  .shot-under-sb { top: calc(24 / 393 * 100%) !important; }
+  .scene-plane { position: absolute; height: 100%; left: 50%; transform: translateX(-50%); z-index: 2; pointer-events: none; }
+  .scene-plane { mix-blend-mode: multiply; }
+  .mounted-screen { position: absolute; object-fit: cover; border-radius: 5%; }
+  .community { background: var(--cream); }
+  .community .head { top: 63%; }
+  .community .h, .community .sub { color: var(--deep); text-shadow: none; }
+  .community .h em { color: var(--green); }
+  .icon-flight { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+  .export-still .bubble { animation-play-state: paused; }
+  .origin { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+  .origin .logo-mark { width: 16cqw; height: 16cqw; border-radius: 2.8cqw; }
+  .origin img { width: 82%; height: auto; }
+  .bubble { border-radius: 50%; background: transparent; position: absolute; left: calc(50% - 5cqw); top: calc(50% - 5cqw); width: 10cqw; aspect-ratio: 1; object-fit: contain; animation: rise 4.8s linear infinite; animation-delay: var(--delay); }
+  @keyframes rise {
+    0% { transform: translate(0,0) scale(.08); opacity: 0; }
+    8% { opacity: 1; }
+    24% { transform: translate(var(--kick),-20cqw) rotate(var(--spin)) scale(.85); }
+    55% { transform: translate(var(--bend),-52cqw) rotate(0deg) scale(2.0); }
+    85% { opacity: 1; }
+    100% { transform: translate(var(--end),-111cqw) rotate(var(--spin)) scale(3.8); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { .bubble { animation-play-state: paused; } }
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>App Store screenshots · V.22 “People”</h1>
+  <p>Tony, 24 Nov US standup: cut to six, the four core features first. V.21’s opening (the feature icons rising from the clover, the one Tony liked) and V.20/V.21’s photo-led slides; then Gmail, the family’s Daily Brief, Assist at launch scope (Pick up where you left off + Playdate, Babysitter, Carpool), class chat and the parent directory. Every phone has the same iOS status bar and Dynamic Island. Logo: the 24 Nov clover tile.</p>
+</div>
+<h2 class="section">iPhone 6.9″ · six slides</h2>
+<div class="row" id="set"></div>
+<h2 class="section">In App Store search</h2>
+<div class="store-wrap" id="stores"></div>
+<h2 class="section">Where each piece comes from</h2>
+<table class="src">
+  <tr><td>Copy</td><td>V.11 copy character for character for the six kept slides; the Assist subline cut to launch scope on 25 Nov (“Plan playdates, book a sitter, and set up carpools, in a few taps.”).</td></tr>
+  <tr><td>Screens</td><td>Gmail row <code>14054:24435</code>; email + To-Do coded on the slide (Picture day → Emma’s class shirt, the mom’s own avatar, 25 Nov); Daily Brief and Assist on a phone set into the photo, the family and the ground cut out in front (<code>tools/cutout.swift</code>, Apple Vision); Daily Brief = the coded Prod brief BRIEF-10 <code>16180:365329</code> rendered by <code>tools/make-brief-family.mjs</code> (family to-dos, SSC card hidden); Assist home = prototype <code>/assist-ongoing/</code> at launch scope, rendered by <code>tools/make-assist-launch.mjs</code>; Class Hub Chat <code>8198:109904</code> with a coded status bar; Profile Card <code>14026:26392</code>.</td></tr>
+  <tr><td>Photos</td><td>V.20/V.21 photos (original ImageGen portraits of fictional school families), unchanged.</td></tr>
+</table>
+<script>
+const F = n => `assets/figma/${n}.png`;
+const q = new URLSearchParams(location.search);
+const PHOTOS = [
+  ['v18/school-walk.webp', '50% 100%', 'auto 120%'],
+  ['v18/class-sidewalk.webp', '50% 100%', 'auto 117%'],
+  ['v18/garden-school.webp', '50% 100%', 'auto 110%'],
+  ['v20/school-morning-clean.webp', '50% 50%'],
+  ['v18/school-email.webp', '50% 100%', 'auto 111%'],
+  ['v20/front-steps-clean.webp', '50% 50%'],
+  ['v20/splash-park-large.webp', '50% 50%'],
+  ['v18/garden-party.webp', '50% 100%', 'auto 101%'],
+  ['v18/garden-gate.webp', '50% 100%', 'auto 116%'],
+];
+const COPY = [
+  [[['Your school’s<br>'], ['parent community.', 1]], 'Join your kids’ schools and<br>meet the parents in them.'],
+  [[['All your class details,<br>in '], ['one place.', 1]], 'Chat, calendar, updates, and key links for every class — no more digging through emails.'],
+  [[['Discover the names, faces, and stories of '], ['all parents.', 1]], 'See who\'s who — every parent in your kid\'s grade, their families, and what they\'re into.'],
+  [[['Wake up to your '], ['family’s brief.', 1]], 'Every morning, one screen with your family’s to-dos, today’s events and school news. Your spouse sees the same list.'],
+  [[['School emails in, '], ['your day out.', 1]], 'Connect Gmail and Sprout turns teacher and coach emails into to-dos. You pick which ones to add.'],
+  [[['Take more '], ['off your plate.', 1]], 'Plan playdates, book a sitter, and set up carpools, in a few taps.'],
+  [[['Find events<br>'], ['your', 1], [' kids<br>will love']], 'Curated activities for every age, right in your neighborhood'],
+  [[['Plan<br>'], ['important', 1], ['<br>moments']], 'Create birthday parties, playdates and family events, then share them with families in your grade.'],
+  [[['Invite the right<br>'], ['families', 1], [',<br>in one tap']], 'Share with your class, your grade, or your whole school instantly'],
+];
+/* review hook: window.__COPY_OVERRIDE = {index: [segments, sub]} lets a script preview copy options without editing COPY */
+if (window.__COPY_OVERRIDE) Object.assign(COPY, window.__COPY_OVERRIDE);
+const logoMark = `<span class="logo-mark"><img src="assets/people/v16/clover.png" alt=""></span>`;
+const headline = i => `<div class="head"><div class="h">${COPY[i][0].map(([t, it]) => it ? `<em>${t}</em>` : t).join('')}</div><div class="sub">${COPY[i][1]}</div></div>`;
+const head = i => `<div class="logo">${logoMark}Sprout</div>${headline(i)}`;
+const phone = (top, inner, pw = 64) => `<div class="phone" style="top:${top}cqw;--pw:${pw}cqw"><div class="screen">${inner}${SBAR}</div></div>`;
+const shot = n => `<img src="${F(n)}" alt="">`;
+const SBAR = `<div class="sbar"><span>9:41</span><span class="isl"></span><span class="r"><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="6" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 16 12"><path d="M8 11.5 5.6 9a3.4 3.4 0 0 1 4.8 0zM3.4 6.8a6.5 6.5 0 0 1 9.2 0l-1.3 1.3a4.7 4.7 0 0 0-6.6 0zM1.1 4.5a9.8 9.8 0 0 1 13.8 0l-1.3 1.3a8 8 0 0 0-11.2 0z"/></svg><svg viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="#111"/><rect x="2.5" y="2.5" width="19" height="8" rx="2"/><rect x="25" y="4.5" width="1.5" height="4" rx=".7"/></svg></span></div>`;
+
+/* eased scrim: smoothstep stops between [pos cqw, alpha] keys, so no fade shows an edge */
+const G = '29,58,39';
+const g = keys => { const out = []; for (let k = 0; k < keys.length - 1; k++) { const [p0, a0] = keys[k], [p1, a1] = keys[k + 1];
+  for (let j = 0; j < 10; j++) { const t = j / 10, e = t * t * (3 - 2 * t); out.push(`rgba(${G},${(a0 + (a1 - a0) * e).toFixed(3)}) ${(p0 + (p1 - p0) * t).toFixed(1)}cqw`); } }
+  const [pl, al] = keys[keys.length - 1]; out.push(`rgba(${G},${al}) ${pl}cqw`); return `linear-gradient(180deg, ${out.join(', ')})`; };
+
+/* Slide 1's Figma wash clears the center where the faces sit. */
+const COMMUNITY_WASH = [[0, .58], [36, .44], [70, .12], [100, 0], [170, .1], [216, .5]];
+const CANOPY = [[0, .6], [40, .5], [72, .32], [96, .04], [170, .1], [216, .5]];
+const photoSlide = (i, inner = '', keys = COMMUNITY_WASH) => {
+  const [file, position, size = 'cover'] = PHOTOS[i];
+  return `<div class="slide">
+    <div class="photo" style="background-image:url(assets/people/${file});background-position:${position};background-size:${size}"></div>
+    <div class="scrim" style="background:${g(keys)}"></div>
+    ${q.has('plate') ? '' : head(i) + inner}</div>`;
+};
+
+
+
+/* slide 2's coded email and to-do: one story, this mom's face, her daughter Emma */
+const MOM_AV = 'assets/people/email-mom-avatar.webp', GM = 'assets/gmail.svg';
+const MAIL = `<div class="mail" style="left:5cqw;width:70cqw;top:124cqw;transform:rotate(-1.5deg)"><div class="top"><span>Miss Taylor · 1st Grade</span><small>7:02 AM</small></div>
+  <h4>Picture day is Thursday!</h4><p>Please <u>send the order form back by Friday</u> and have Emma <u>wear the class shirt on Thursday</u>.</p></div>`;
+const todoRow = (t, due) => `<div class="r"><span class="box"></span><span class="av" style="background-image:url(${MOM_AV})"><img src="${GM}" alt=""></span>
+  <span class="tx"><b>${t}</b><span class="m"><span class="chip">${due}</span>From ktaylor@lincolnelem.org</span></span></div>`;
+const TODO = `<div class="todo" style="left:6cqw;width:88cqw;top:160cqw"><div class="th"><span class="av" style="background-image:url(${MOM_AV})"></span><b>To-Do List</b><span class="new">2 new from Gmail</span><span class="plus">+</span></div>
+  ${todoRow('Emma wears the class shirt', 'Due Thu')}${todoRow('Send the picture day order form', 'Due Fri')}</div>`;
+/* slides 3-4: photo, a phone mockup in the scene, the family cut out of the same photo in front, then the scrim */
+const sceneSlide = (i, cutout, phoneHtml, keys = COMMUNITY_WASH) => {
+  const [file, position, size = 'cover'] = PHOTOS[i];
+  return `<div class="slide scene">
+    <div class="photo" style="background-image:url(assets/people/${file});background-position:${position};background-size:${size}"></div>
+    ${phoneHtml.replace('class="phone"', 'class="phone scene-phone"')}
+    <div class="people" style="background-image:url(assets/people/${cutout});background-position:${position};background-size:${size}"></div>
+    <div class="scrim" style="background:${g(keys)}"></div>
+    ${q.has('plate') ? '' : head(i)}</div>`;
+};
+/* where each mounted screen starts showing (object-position y %), tuned 25 Nov on the new screens */
+const BRIEF_CROP = 19, ASSIST_CROP = 30;
+
+function mountedPhone(asset, photoWidth, photoHeight, x, y, width, height, crop) {
+  const proofHeight = 400 * photoHeight / photoWidth;
+  return `<div class="scene-plane" style="aspect-ratio:${photoWidth}/${photoHeight}"><img class="mounted-screen" src="${F(asset)}" alt="" style="object-position:50% ${crop}%;left:${x/4}%;top:${100*y/proofHeight}%;width:${width/4}%;height:${100*height/proofHeight}%"></div>`;
+}
+
+/* Six slides in store order (Tony, 24 Nov US). Each keeps its V.21 photo index (PHOTOS / COPY row). */
+const SLIDES = [
+  { cap: '<b>Community.</b> Sprout’s feature icons rise from the clover (V.21 opening).', html: () => `<div class="slide community">${q.has('plate') ? '' : iconFlight() + headline(0)}</div>` },
+  { cap: '<b>School emails.</b> A mom reading a school email; Sprout connected above her, the email becoming Emma’s to-dos.', html: () => photoSlide(4, `
+      <div class="piece connection-row" style="left:10cqw;width:80cqw;top:70cqw">${shot('connected')}${logoMark}</div>
+      ${MAIL}${TODO}`) },
+  { cap: '<b>Daily Brief.</b> The family’s Daily Brief on a phone set into the scene, the family in front of it.', html: () => sceneSlide(3, 'v20/school-morning-front.png', phone(75, shot('brief-family'), 78)) },
+  { cap: '<b>Sprout Assist.</b> The Assist home on a phone set into the porch scene, dad and daughter in front of it.', html: () => sceneSlide(5, 'v20/front-steps-front.png', phone(72, `<img class="shot-under-sb" src="${F('assist-home-launch')}" alt="">`, 68)) },
+  { cap: '<b>Class details.</b> The class chat conversation.', html: () => photoSlide(1, phone(124, shot('class-chat-v17')), CANOPY) },
+  { cap: '<b>Parents.</b> Parents meeting in the school garden, the profile card over them.', html: () => photoSlide(2,
+      `<img class="piece card" src="${F('profile')}" alt="" style="left:12cqw;width:76cqw;top:135cqw;transform:rotate(-1.5deg)">`, CANOPY) },
+];
+
+function iconFlight() {
+  // copied from the website's assets/illus (25 Nov) so the page works on any local server, not only from disk
+  const websiteAssets = 'assets';
+  // The website uses the treehouse (club.webp) for Playdate.
+  const icons = ['event','week','wallet','remind','camps','sports','date-night','club','sitter','carpool','afterschool','tutoring'];
+  const lanes = [-34,19,-7,38,-22,6,29,-40,14,-15,34,-3];
+  const bubbles = icons.map((name,i) => {
+    const end = lanes[i], wobble = i % 2 ? 8 : -8;
+    return `<img class="bubble" alt="" src="${websiteAssets}/illus/${name}.webp" style="--delay:${-i*.4}s;--end:${end}cqw;--kick:${end*.3+wobble}cqw;--bend:${end*.68-wobble}cqw;--spin:${wobble*2.5}deg">`;
+  }).join('') + `<div class="origin">${logoMark}</div>`;
+  return `<div class="icon-flight" aria-hidden="true">${bubbles}</div>`;
+}
+function render() {
+  document.getElementById('set').innerHTML = SLIDES.map((s, i) => `<div class="slide-wrap">${s.html()}<div class="cap">${i + 1} · ${s.cap}</div></div>`).join('');
+  document.getElementById('stores').innerHTML = `<div class="store"><div class="app"><div class="icon"><img src="assets/people/v16/clover.png" alt=""></div>
+    <div><div class="name">Sprout</div><div class="tagline">Your school’s parent community</div></div><div class="get">GET</div></div>
+    <div class="shots">${SLIDES.slice(0, 3).map(s => `<div class="slide-wrap">${s.html()}</div>`).join('')}</div></div>`;
+}
+if (q.has('export') || q.has('plate')) {
+  const n = Number(q.get('export') ?? q.get('plate'));
+  const w = Number(q.get('w')) || 1290;
+  const h = Number(q.get('h')) || 2796;
+  document.body.classList.add('export-still');
+  if (q.has('frameless')) document.body.classList.add('frameless');
+  document.body.innerHTML = SLIDES[n - 1].html();
+  document.querySelector('.slide').style.cssText = `width:${w}px;height:${h}px;aspect-ratio:auto;border-radius:0;box-shadow:none;--w:${w}px`;
+  document.body.style.cssText = 'margin:0;padding:0;background:#1d3a27';
+} else {
+  render();
+}
+window.__ready = true;
+</script>
+</body>
+</html>

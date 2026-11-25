@@ -37,6 +37,8 @@
     background: #fbfaf7; border: .45cqw solid #dcd7cc; box-shadow: 0 3.4cqw 8cqw rgba(10,25,15,.32), 0 .6cqw 1.6cqw rgba(10,25,15,.14); z-index: 3; }
   .screen { position: relative; width: 100%; height: 100%; border-radius: calc(var(--pw, 70cqw) * .134); overflow: hidden; background: var(--cream); }
   .screen > img { position: absolute; left: 0; top: 0; width: 100%; display: block; }
+  .frameless .phone { background: transparent; border: 0; padding: 0; border-radius: 6cqw; }
+  .frameless .screen { border-radius: 6cqw; }
   .sbar { position: absolute; top: 0; left: 0; right: 0; z-index: 2; display: flex; justify-content: space-between; padding: 5cqw 9cqw 0 11cqw; font: 600 4.1cqw/1 -apple-system, Inter; color: #111; }
   .sbar i { font-style: normal; letter-spacing: .08em; font-size: 3.4cqw; }
   .piece { position: absolute; z-index: 4; display: block; }
@@ -62,28 +64,48 @@
 <body>
 <div class="top">
   <h1>App Store screenshots · V.15 “People”</h1>
-  <p>Direction A from the V.14 concepts, built out to the full nine slides. Tony, 24 Nov: “I really like the people element to the feel of the website. Could we make our app screenshots pictures more like that.” Every slide opens on parents in a real moment, the headline in light type over it, and the app rising out of the photo. Copy and screens are V.11’s, unchanged. Every slide is the photo under a soft gradient, never a solid band.</p>
+  <p>Direction A from the V.14 concepts, built out to the full nine slides, then cut to six on 25 Nov (Tony): the hero, then the four core features (Gmail, Daily Brief, Assist), then class chat and the directory. Tony, 24 Nov: “I really like the people element to the feel of the website. Could we make our app screenshots pictures more like that.” Every slide opens on parents in a real moment, the headline in light type over it, and the app rising out of the photo. Copy and screens are V.11’s, unchanged. Every slide is the photo under a soft gradient, never a solid band.</p>
 </div>
-<h2 class="section">iPhone 6.9″ · nine slides</h2>
+<h2 class="section">iPhone 6.9″ · six slides</h2>
 <div class="row" id="set"></div>
 <h2 class="section">In App Store search</h2>
 <div class="store-wrap" id="stores"></div>
 <h2 class="section">Where each piece comes from</h2>
 <table class="src">
-  <tr><td>Copy</td><td>V.11 slides 1–9, character for character, except slide 6’s headline and subline, rewritten 24 Nov to match the current Assist home (tiles, no voice or chat) (onboarding frames <code>14023:21667</code> … and the App Store V.2 slides <code>15194:15366</code>).</td></tr>
-  <tr><td>Screens</td><td>V.11 Figma exports in <code>assets/figma/</code>: Class Tabs <code>14126:20591</code>, Profile Card <code>14026:26392</code>, Daily Brief 7·2 <code>14282:23224</code>, Gmail row / email / To-Do <code>14054:24435</code>, Assist home = the current 8-tile home (19 Nov review, <code>task-first-assist</code> <code>/assist/</code>, rendered at 3x), Discover, Create Event, Send Invites.</td></tr>
-  <tr><td>Photos</td><td><code>assets/people/</code>. Drop-off = website hero. Picnic = website community section. Morning = Rainyday carousel. Festival, kitchen and porch generated in ElevenLabs flow “Sprout website hero: parents at drop-off (wide)” with the hero photo as the style reference; storytime, birthday and pickup generated with Figma AI (file “Sprout App Store V.15 photos”), portrait with canopy headroom. All fictional adults and kids.</td></tr>
+  <tr><td>Copy</td><td>V.11 slides 1–6, character for character, except the Assist slide (slide 4): headline and subline rewritten 24 Nov to match the current Assist home (tiles, no voice or chat), subline cut to playdates, sitter and carpools on 25 Nov (sports and camps registration is not live) (onboarding frames <code>14023:21667</code> … and the App Store V.2 slides <code>15194:15366</code>).</td></tr>
+  <tr><td>Screens</td><td>V.11 Figma exports in <code>assets/figma/</code>: Class Tabs <code>14126:20591</code>, Profile Card <code>14026:26392</code>, Daily Brief 7·2 <code>14282:23224</code>, Gmail row / email / To-Do <code>14054:24435</code>, Assist home = the current 8-tile home (19 Nov review, <code>task-first-assist</code> <code>/assist/</code>, rendered at 3x).</td></tr>
+  <tr><td>Photos</td><td><code>assets/people/</code>. Drop-off = website hero. Picnic = website community section. Morning = Rainyday carousel. Festival, kitchen and porch generated in ElevenLabs flow “Sprout website hero: parents at drop-off (wide)” with the hero photo as the style reference. All fictional adults and kids.</td></tr>
 </table>
 <script>
 const F = n => `assets/figma/${n}.png`;
-/* ?plate=N renders slide N's photo + blur + gradient only (baked to assets/v15-plates/ by tools/export-v15.mjs --plates);
-   ?figma lays the nine slides out at 1290 x 2796 on those plates, so the Figma capture keeps type and phones as layers */
+/* Every slide has a stable id k = its number in the nine-slide V.15 set, minus 1. PHOTOS, COPY, STORE_CROPS (k + 1) and the
+   plate files (assets/v15-plates/{k + 1}.jpg) are all keyed by k, so reordering SLIDES never needs a re-bake.
+   ?plate=N renders the slide whose k + 1 = N: photo + blur + gradient only (baked by tools/export-v15.mjs --plates);
+   ?export=N renders the Nth slide in SLIDES order;
+   ?figma lays the six slides out at 1290 x 2796 on those plates, so the Figma capture keeps type and phones as layers */
 const QS = new URLSearchParams(location.search);
 const MODE = QS.has('plate') ? 'plate' : (QS.has('figma') || location.hash.includes('figmacapture=')) ? 'figma' : '';
+const device = QS.has('export') && !MODE && QS.get('device');
+const frameless = device === 'ipad' || device === 'play';
+const photoLength = n => frameless ? `calc(${n} * var(--photo-unit))` : `${n}cqw`;
+/* Wider exports need their own sharp-photo crops inside the same fade masks. Keyed by slide id k + 1, not SLIDES position. */
+const STORE_CROPS = {
+  ipad: {
+    2: { box: [34, 150], position: '20% 50%' },
+    3: { box: [72, 140] },
+    5: { box: [59, 141], position: '0% 0%' },
+    6: { position: '34% 0%' },
+  },
+  play: {
+    2: { box: [29, 130], position: '26% 50%' },
+    5: { box: [57, 143] },
+    6: { position: '35% 0%' },
+  },
+};
 /* one photo per slide: [file, background-position, pendingName, box, size].
    box = [top, height] in cqw for the sharp photo. Landscape photos start below the headline (faces land between the
    headline and the app); above them the SAME photo, blurred, fills to the top, so the slide is always photo under a
-   gradient, never a solid band (Ahmad, 24 Nov). Portrait photos (7-9, generated with canopy headroom) run full-bleed. */
+   gradient, never a solid band (Ahmad, 24 Nov). Indexed by slide id k. */
 const PHOTOS = [
   ['dropoff.webp', '50% 0%', 0, [50, 138], '110% auto'],
   ['picnic.webp', '30% 50%', 0, [0, 200]],
@@ -91,24 +113,19 @@ const PHOTOS = [
   ['morning.webp', '50% 55%', 0, [0, 200]],
   ['kitchen-phone.webp', '10% 0%', 'kitchen-phone.webp', [50, 150]],
   ['porch.webp', '39% 0%', 'porch.webp', [40, 150]],
-  ['storytime.webp', '50% 0%', 'storytime.webp', [-26, 244]],
-  ['birthday.webp', '50% 0%', 'birthday.webp', [-14, 244]],
-  ['pickup.webp', '50% 0%', 'pickup.webp', [-24, 244]],
 ];
 /* stand-in until the generated file exists: the nearest existing photo */
-const STANDIN = { 'festival.webp': 'dropoff.webp', 'kitchen-phone.webp': 'morning.webp', 'porch.webp': 'picnic.webp', 'storytime.webp': 'picnic.webp', 'birthday.webp': 'picnic.webp', 'pickup.webp': 'dropoff.webp' };
+const STANDIN = { 'festival.webp': 'dropoff.webp', 'kitchen-phone.webp': 'morning.webp', 'porch.webp': 'picnic.webp' };
+/* indexed by slide id k, like PHOTOS */
 const COPY = [
   [[['Your school’s<br>'], ['parent community.', 1]], 'Join your kids’ schools and<br>meet the parents in them.'],
   [[['All your class details,<br>in '], ['one place.', 1]], 'Chat, calendar, updates, and key links for every class — no more digging through emails.'],
   [[['Discover the names, faces, and stories of '], ['all parents.', 1]], 'See who\'s who — every parent in your kid\'s grade, their families, and what they\'re into.'],
   [[['Wake up to your '], ['family’s brief.', 1]], 'Every morning, one screen with your family’s to-dos, today’s events and school news. Your spouse sees the same list.'],
   [[['School emails in, '], ['your day out.', 1]], 'Connect Gmail and Sprout turns teacher and coach emails into to-dos. You pick which ones to add.'],
-  [[['Take more '], ['off your plate.', 1]], 'Plan playdates, book a sitter, and sign your kids up for sports and camps, in a few taps.'],
-  [[['Find events<br>'], ['your', 1], [' kids<br>will love']], 'Curated activities for every age, right in your neighborhood'],
-  [[['Plan<br>'], ['important', 1], ['<br>moments']], 'Create birthday parties, playdates and family events, then share them with families in your grade.'],
-  [[['Invite the right<br>'], ['families', 1], [',<br>in one tap']], 'Share with your class, your grade, or your whole school instantly'],
+  [[['Take more '], ['off your plate.', 1]], 'Plan playdates, book a sitter, and set up carpools, in a few taps.'],
 ];
-/* review hook: window.__COPY_OVERRIDE = {index: [segments, sub]} lets a script preview copy options without editing COPY */
+/* review hook: window.__COPY_OVERRIDE = {k: [segments, sub]} lets a script preview copy options without editing COPY */
 if (window.__COPY_OVERRIDE) Object.assign(COPY, window.__COPY_OVERRIDE);
 const head = i => `<div class="logo"><img src="assets/clover.png" alt="">Sprout</div><div class="head"><div class="h">${COPY[i][0].map(([t, it]) => it ? `<em>${t}</em>` : t).join('')}</div><div class="sub">${COPY[i][1]}</div></div>`;
 const phone = (top, inner, pw = 70) => `<div class="phone" style="top:${top}cqw;--pw:${pw}cqw"><div class="screen">${inner}</div></div>`;
@@ -117,45 +134,43 @@ const shot = n => `<img src="${F(n)}" alt="">`;
 /* eased scrim: smoothstep stops between [pos cqw, alpha] keys, so no fade shows an edge */
 const G = '29,58,39';
 const g = keys => { const out = []; for (let k = 0; k < keys.length - 1; k++) { const [p0, a0] = keys[k], [p1, a1] = keys[k + 1];
-  for (let j = 0; j < 10; j++) { const t = j / 10, e = t * t * (3 - 2 * t); out.push(`rgba(${G},${(a0 + (a1 - a0) * e).toFixed(3)}) ${(p0 + (p1 - p0) * t).toFixed(1)}cqw`); } }
-  const [pl, al] = keys[keys.length - 1]; out.push(`rgba(${G},${al}) ${pl}cqw`); return `linear-gradient(180deg, ${out.join(', ')})`; };
+  for (let j = 0; j < 10; j++) { const t = j / 10, e = t * t * (3 - 2 * t); out.push(`rgba(${G},${(a0 + (a1 - a0) * e).toFixed(3)}) ${photoLength((p0 + (p1 - p0) * t).toFixed(1))}`); } }
+  const [pl, al] = keys[keys.length - 1]; out.push(`rgba(${G},${al}) ${photoLength(pl)}`); return `linear-gradient(180deg, ${out.join(', ')})`; };
 
 const have = new Set(window.__HAVE || []);
 const photoUrl = i => { const [f, , pend] = PHOTOS[i]; return `assets/people/${pend && !have.has(f) ? STANDIN[f] : f}`; };
 const isStandIn = i => { const [f, , pend] = PHOTOS[i]; return pend && !have.has(f); };
 /* every slide: blurred copy of the photo full-bleed, the sharp photo in its box (top edge faded when it starts low),
    and one soft gradient for the type. Max .55 at the top, never opaque. */
-const photoSlide = (i, inner = '', keys) => { const [, pos, , box, size] = PHOTOS[i], [t, h] = box, url = photoUrl(i);
+const photoSlide = (i, inner = '', keys) => { const [, pos, , box, size] = PHOTOS[i], url = photoUrl(i);
+  const crop = STORE_CROPS[device]?.[i + 1];
+  const [t, h] = crop?.box || box;
   /* sharp photo fades in at the top (when it starts below the headline) and out at the bottom (when it ends above the
      slide's bottom edge), so the blurred copy takes over with no visible seam */
-  const top = t > 0, bottom = t + h < 216.7, mg = `linear-gradient(180deg,${top ? 'transparent,#000 30cqw' : '#000,#000'}${bottom ? ',#000 calc(100% - 26cqw),transparent' : ''})`;
+  const top = t > 0, bottom = t + h < 216.7, mg = `linear-gradient(180deg,${top ? `transparent,#000 ${photoLength(30)}` : '#000,#000'}${bottom ? `,#000 calc(100% - ${photoLength(26)}),transparent` : ''})`;
   const m = top || bottom ? `;-webkit-mask-image:${mg};mask-image:${mg}` : '';
   if (MODE === 'figma') return `<div class="slide"><img src="assets/v15-plates/${i + 1}.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;z-index:1">${head(i)}${inner}</div>`;
   return `<div class="slide">
-  <div class="photo" style="inset:-8cqw;background-image:url(${url});background-position:${pos};filter:blur(4.5cqw) saturate(1.05) brightness(.92)"></div>
-  <div class="photo" style="top:${t}cqw;height:${h}cqw;background-image:url(${url});background-position:${pos};background-size:${size || 'cover'}${m}"></div>
+  <div class="photo" style="inset:${photoLength(-8)};background-image:url(${url});background-position:${pos};filter:blur(${photoLength(4.5)}) saturate(1.05) brightness(.92)"></div>
+  <div class="photo" style="top:${photoLength(t)};height:${photoLength(h)};background-image:url(${url});background-position:${crop?.position || pos};background-size:${size || 'cover'}${m}"></div>
   <div class="scrim" style="background:${g(keys || [[0, .58], [36, .44], [78, .1], [110, .04], [160, .2], [216, .55]])}"></div>${MODE === 'plate' ? '' : head(i) + inner}</div>`; };
 
-/* bright canopy behind the type: a bit more tone through the subline, fading out above the faces */
-const CANOPY = [[0, .6], [40, .5], [72, .32], [96, .04], [160, .2], [216, .55]];
+/* Tony, 25 Nov: six slides, the four core features. Order here = store order; k = the slide's id (see top). */
 const SLIDES = [
-  { cap: '<b>Community.</b> The website hero parents under the headline, no phone.', html: () => photoSlide(0, '', [[0, .58], [36, .44], [70, .12], [100, 0], [170, .1], [216, .5]]) },
-  { cap: '<b>Class details.</b> Picnic parents, the class screen rising.', html: () => photoSlide(1, phone(100, `<div class="sbar"><span>9:41</span><i>●●● ▮</i></div><img src="${F('class')}" alt="" style="top:12%;left:-3%;width:106%">`)) },
-  { cap: '<b>Parents.</b> Parents meeting at the fall festival, the profile card over them.', html: () => photoSlide(2,
-      `<img class="piece card" src="${F('profile')}" alt="" style="left:8cqw;width:84cqw;top:116cqw;transform:rotate(-1.5deg)">`) },
-  { cap: '<b>Daily Brief.</b> Morning kitchen, the brief rising.', html: () => photoSlide(3, phone(98, shot('brief'))) },
-  { cap: '<b>School emails.</b> A mom reading a school email, the email turning into to-dos.', html: () => photoSlide(4, `
+  { k: 0, cap: '<b>Community.</b> The website hero parents under the headline, no phone.', html: () => photoSlide(0, '', [[0, .58], [36, .44], [70, .12], [100, 0], [170, .1], [216, .5]]) },
+  { k: 4, cap: '<b>School emails.</b> A mom reading a school email, the email turning into to-dos.', html: () => photoSlide(4, `
       <img class="piece" src="${F('connected')}" alt="" style="left:10cqw;width:80cqw;top:104cqw">
       <img class="piece card" src="${F('email')}" alt="" style="left:2cqw;width:96cqw;top:116cqw;transform:rotate(-1.5deg)">
       <img class="piece card" src="${F('todo')}" alt="" style="left:2cqw;width:96cqw;top:152cqw">`) },
-  { cap: '<b>Sprout Assist.</b> A dad on the porch while the kids play, Assist rising.', html: () => photoSlide(5, phone(100, shot('assist-home-1119'))) },
-  { cap: '<b>Discover.</b> Families at a park storytime, Discover rising.', html: () => photoSlide(6, phone(108, shot('discover')), CANOPY) },
-  { cap: '<b>Events.</b> A backyard birthday, the invite rising.', html: () => photoSlide(7, phone(108, shot('events')), CANOPY) },
-  { cap: '<b>Invites.</b> Two moms at pickup, Send Invites rising.', html: () => photoSlide(8, phone(108, shot('invites')), CANOPY) },
+  { k: 3, cap: '<b>Daily Brief.</b> Morning kitchen, the brief rising.', html: () => photoSlide(3, phone(98, shot('brief'))) },
+  { k: 5, cap: '<b>Sprout Assist.</b> A dad on the porch while the kids play, Assist rising. Launch tiles only (25 Nov).', html: () => photoSlide(5, phone(122, shot('assist-home-launch'))) },
+  { k: 1, cap: '<b>Class details.</b> Picnic parents, the class screen rising.', html: () => photoSlide(1, phone(100, `<div class="sbar"><span>9:41</span><i>●●● ▮</i></div><img src="${F('class')}" alt="" style="top:12%;left:-3%;width:106%">`)) },
+  { k: 2, cap: '<b>Parents.</b> Parents meeting at the fall festival, the profile card over them.', html: () => photoSlide(2,
+      `<img class="piece card" src="${F('profile')}" alt="" style="left:8cqw;width:84cqw;top:116cqw;transform:rotate(-1.5deg)">`) },
 ];
 
 function render() {
-  document.getElementById('set').innerHTML = SLIDES.map((s, i) => `<div class="slide-wrap">${s.html()}<div class="cap">${i + 1} · ${s.cap}${isStandIn(i) ? '<br><span class="tag">stand-in photo</span>' : ''}</div></div>`).join('');
+  document.getElementById('set').innerHTML = SLIDES.map((s, i) => `<div class="slide-wrap">${s.html()}<div class="cap">${i + 1} · ${s.cap}${isStandIn(s.k) ? '<br><span class="tag">stand-in photo</span>' : ''}</div></div>`).join('');
   document.getElementById('stores').innerHTML = `<div class="store"><div class="app"><div class="icon"><img src="assets/clover.png" alt=""></div>
     <div><div class="name">Sprout</div><div class="tagline">Your school’s parent community</div></div><div class="get">GET</div></div>
     <div class="shots">${SLIDES.slice(0, 3).map(s => `<div class="slide-wrap">${s.html()}</div>`).join('')}</div></div>`;
@@ -166,17 +181,43 @@ Promise.all(pending.map(f => new Promise(r => { const im = new Image(); im.onloa
   const q = new URLSearchParams(location.search);
   if (q.has('plate')) {
     const n = +q.get('plate');
-    document.body.innerHTML = SLIDES[n - 1].html();
+    document.body.innerHTML = SLIDES.find(s => s.k === n - 1).html();
     document.querySelector('.slide').style.cssText = 'width:1290px;height:2796px;aspect-ratio:auto;border-radius:0;box-shadow:none;--w:1290px';
     document.body.style.cssText = 'margin:0;padding:0;background:#1d3a27';
   } else if (MODE === 'figma') {
-    document.body.innerHTML = `<div style="font:600 64px/1 'Playfair Display',serif;color:#12301f;margin:0 0 48px">V.15 · People (Tony 24 Nov) · 9 slides</div>
+    document.body.innerHTML = `<div style="font:600 64px/1 'Playfair Display',serif;color:#12301f;margin:0 0 48px">V.15 · People (Tony 24 Nov, cut to six 25 Nov) · 6 slides</div>
       <div style="display:flex;gap:120px">${SLIDES.map((s, i) => `<div class="slide-wrap" style="width:1290px;--w:1290px">${s.html().replace('class="slide"', 'class="slide" style="border-radius:0;box-shadow:none"')}</div>`).join('')}</div>`;
     document.body.style.cssText = 'margin:0;padding:120px;background:#ece9e2;width:max-content';
   } else if (q.has('export')) {
     const n = +q.get('export'), w = +q.get('w') || 1290, h = +q.get('h') || 2796;
-    document.body.innerHTML = SLIDES[n - 1].html();
-    document.querySelector('.slide').style.cssText = `width:${w}px;height:${h}px;aspect-ratio:auto;border-radius:0;box-shadow:none;--w:${w}px`;
+    if (frameless) {
+      const cw = +q.get('cw') || Math.round(h * 1290 / 2796);
+      document.body.innerHTML = `<div class="device-export" style="position:relative;width:${w}px;height:${h}px;overflow:hidden;--photo-unit:${h * 1290 / 279600}px">${SLIDES[n - 1].html()}</div>`;
+      document.body.classList.add('frameless');
+      const canvas = document.querySelector('.device-export');
+      const slide = canvas.querySelector('.slide');
+      canvas.prepend(...slide.querySelectorAll('.photo, .scrim'));
+      slide.style.cssText = `position:absolute;left:${(w - cw) / 2}px;top:0;width:${cw}px;height:${h}px;aspect-ratio:auto;border-radius:0;box-shadow:none;background:none;overflow:visible;--w:${cw}px;z-index:3`;
+      const compositionHeight = cw * 2796 / 1290;
+      const screen = slide.querySelector('.phone');
+      const pieces = slide.querySelectorAll('.piece');
+      if (screen) {
+        // Preserve the visible app content after removing the 1.3cqw padding and .45cqw border.
+        const inset = cw * .0175;
+        const top = screen.offsetTop;
+        const scale = Math.min(1, (h - top) / (compositionHeight - top - inset) * (1 - 2 * inset / screen.offsetWidth));
+        screen.style.transform = `translateX(-50%) scale(${scale})`;
+        screen.style.transformOrigin = '50% 0';
+      } else if (pieces.length && h / compositionHeight < .999) {
+        const group = document.createElement('div');
+        group.style.cssText = `position:absolute;inset:0;z-index:4;transform:scale(${h / compositionHeight});transform-origin:50% 7%`;
+        group.append(...pieces);
+        slide.append(group);
+      }
+    } else {
+      document.body.innerHTML = SLIDES[n - 1].html();
+      document.querySelector('.slide').style.cssText = `width:${w}px;height:${h}px;aspect-ratio:auto;border-radius:0;box-shadow:none;--w:${w}px`;
+    }
     document.body.style.cssText = 'margin:0;padding:0;background:#1d3a27';
   } else render();
   window.__ready = true;
