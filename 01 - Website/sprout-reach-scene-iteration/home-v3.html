@@ -33,10 +33,10 @@
          sections are gone (git history has them). home-v2 is untouched and is still what the live site exports from. -->
     <link rel="stylesheet" href="./home-v2.css?v=20261013-1" />
     <link rel="stylesheet" href="./daily-brief.css?v=20261124-1" />
-    <link rel="stylesheet" href="./home-v3.css?v=20261124-5" />
+    <link rel="stylesheet" href="./home-v3.css?v=20261125-16" />
     <!-- the Assist flow's live orb (same renderer and "working" state as sprout-assist-tasks) -->
     <script src="./thinking-orb.js?v=20261124-1" defer></script>
-    <script src="./home-v3.js?v=20261124-6" defer></script>
+    <script src="./home-v3.js?v=20261125-11" defer></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -57,12 +57,16 @@
       <section class="hero2 village" id="home" data-hero aria-labelledby="hero-h">
         <div class="inset">
           <div class="photo" data-photo role="img" aria-label="Four parents chatting on the sidewalk after school drop-off, one holding a coffee, one carrying a child’s backpack"></div>
+          <!-- Tony, 25 Nov DM: "little profiles over the people standing there talking". One Sprout profile chip per
+               parent (made-up names), placed on the photo by home-v3.js so it stays on the right person at every size. -->
+          <div class="tags" data-tags aria-hidden="true"></div>
           <div class="copy">
             <h1 id="hero-h">It takes a village to raise a family. <em>Sprout brings yours together.</em></h1>
             <p class="lede">Meet the parents at your school. Sprout remembers the little things and helps you get them done.</p>
             <div class="cta">
               <a class="btn-hand" href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052" data-join><span class="hand-lbl">Join Sprout</span><span class="hand-end" aria-hidden="true"><span class="hand-dot"></span><i class="ph-bold ph-arrow-right hand-arr"></i></span></a>
-              <p class="or">or get the app</p>
+              <!-- Tony, 25 Nov: "Join Sprout" then "or get the app" read as two different things. They are one action
+                   (Join Sprout opens the store), so the badges sit under it with no "or". -->
               <div class="badges">
                 <a href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052"><img src="./assets/app-store.png" alt="Download on the App Store" width="149" height="44" /></a>
                 <a href="https://play.google.com/store/apps/details?id=com.meetingpoint"><img src="./assets/play-store.png" alt="Get it on Google Play" width="147" height="44" /></a>
@@ -79,6 +83,10 @@
            to-dos, the party invite a to-do to RSVP, the practice change goes under Happening today, spirit week under
            Coming up, the 34 class messages one line under Messages. The extra ones fold into the brief's header. The copy
            swaps in the same place. App names and people are made up (brief: no real school or brand names). -->
+      <!-- 25 Nov (Tony, meeting + DM): the notifications pop up around a parent's head, then all of them get pulled into
+           one simple UI, the Daily Brief. Two states and ONE timed transition (no scroll scrubbing), so wherever the
+           scroll stops the page looks whole. Shorter pin than before (460vh → 220vh). The brief's to-dos open a sheet
+           with the summary, the original email and Mark as done. -->
       <section class="story" id="problem" aria-labelledby="problem-h">
         <span class="story-anchor" id="brief" aria-hidden="true"></span>
         <div class="story-pin">
@@ -90,10 +98,15 @@
             <div class="sc sc-b">
               <h2 id="brief-h">Sprout carries the mental load.</h2>
               <p>Connect your email and Sprout pulls out what matters (deadlines, game times, party invites) into one daily brief. Stop digging through your inbox. Open Sprout, see your day.</p>
+              <p class="tap-hint"><i class="ph ph-hand-tap" aria-hidden="true"></i>Tap a to-do to open it</p>
             </div>
           </div>
-          <div class="story-stage">
-            <div class="phone story-phone" data-story role="img" aria-label="A phone lock screen buried in notifications: picture day forms, 34 class messages, practice moved to 5:30, a birthday invite, a carpool ask, spirit week. They slide together into one Sprout daily brief: three to-dos, today’s practice, pajama day coming up, and the class messages in one line."></div>
+          <div class="story-stage" data-stage>
+            <div class="mom-box">
+              <div class="mom" role="img" aria-label="A worried mom in her kitchen holding her phone, school notifications rising from her head, while her husband and son eat breakfast behind her"></div>
+              <div class="pops" data-pops aria-hidden="true"></div>
+            </div>
+            <div class="phone story-phone" data-story aria-label="The Sprout daily brief: the weather, two to-dos, today’s soccer practice, pajama day coming up, and the class messages in one line"></div>
           </div>
         </div>
       </section>
@@ -123,6 +136,8 @@
                 <span class="pt" style="--i:2"><img src="./assets/illus/carpool.webp" alt="" width="240" height="240" /><b>Carpool</b></span>
               </div>
             </div>
+            <!-- Tony, 25 Nov DM: the bigger Assist story, without promising it's live -->
+            <p class="plate-next"><b>Coming next:</b> date nights, tutors, summer camp and sports registration</p>
           </div>
         </div>
       </section>
@@ -134,17 +149,25 @@
         <div class="kin-wrap">
           <div class="kin-visual">
             <div class="kin-photo" role="img" aria-label="Parents talking on a picnic blanket in the park while their kids play"></div>
+            <!-- Tony, 25 Nov DM: "Faces and kids' names instead of random numbers is what makes it more than WhatsApp."
+                 The class's Member Directory: each parent with their photo and their kids. Made-up families. -->
+            <div class="dir-card" role="img" aria-label="Sprout Member Directory for Ms. Taylor’s class: Aisha Rahman, Ava and Zain’s mom; Mike Johnson, Leo’s dad">
+              <div class="dir-hd"><b>Member Directory</b><small>18 parents · Ms. Taylor’s Class</small></div>
+              <div class="dir-row"><img src="./assets/v2/cast-aisha.webp" alt="" /><div class="tx"><b>Aisha Rahman</b><span class="kids"><i>Ava · 1st Grade</i><i>Zain · Pre-K</i></span></div></div>
+              <div class="dir-row"><img src="./assets/assist/mem-mike.webp" alt="" /><div class="tx"><b>Mike Johnson</b><span class="kids"><i>Leo · 1st Grade</i></span></div></div>
+            </div>
             <div class="phone kin-phone" data-chat role="img" aria-label="Sprout Chat: your groups in a row (First Grade, Ms. Taylor’s class, the U8 soccer team, summer camp), then direct messages with other parents"></div>
           </div>
           <div class="kin-copy">
             <h2 id="community-h">Every parent in your kid’s class, one message away.</h2>
             <p>No swapping numbers. Join the groups that matter: class, grade, team. Those parents you wave to at drop-off? Now they’re your village.</p>
+            <p class="kin-dir">Every parent shows up with a face and their kids’ names, not just a phone number.</p>
           </div>
         </div>
       </section>
 
       <!-- 6 · CLOSE. "Echo the hero's look so the page feels like it comes full circle": the same inset frame and the same
-           drop-off parents, darker, everything centred. A big Join Sprout and a small cluster of parents. -->
+           whole school at pickup (its own photo since 25 Nov), darker, everything centred. A big Join Sprout and a small cluster of parents. -->
       <section class="finale" id="join" aria-labelledby="join-h">
         <div class="finale-in">
           <div class="finale-photo" aria-hidden="true"></div>

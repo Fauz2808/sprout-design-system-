@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sprout · In Focus</title>
+    <meta name="description" content="It takes a village to raise a family. Sprout brings yours together. Meet the parents at your school. Sprout remembers the little things and helps you get them done." />
+    <meta name="theme-color" content="#f4f1ea" />
+    <!-- the link preview (Tony, 10 Oct: iMessage). Absolute URLs: iMessage ignores relative ones. The image is built by
+         review/make-og.mjs from review/og-card.html; bump ?v= when it changes, iMessage caches previews hard -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sprout" />
+    <meta property="og:url" content="https://joinsprout.co/" />
+    <meta property="og:title" content="Sprout - It takes a village to raise a family" />
+    <meta property="og:description" content="Sprout brings yours together." />
+    <meta property="og:image" content="https://joinsprout.co/assets/og/sprout-link.jpg?v=20261011-4" />
+    <meta property="og:image:width" content="2400" />
+    <meta property="og:image:height" content="1260" />
+    <meta property="og:image:alt" content="Sprout: Your school’s parent community. Plus a daily plan that does the remembering." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://joinsprout.co/assets/og/sprout-link.jpg?v=20261011-4" />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="icon" href="./assets/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+    <link rel="stylesheet" href="./home-v2.css?v=20261013-1" />
+    <link rel="stylesheet" href="./daily-brief.css?v=20261124-1" />
+    <link rel="stylesheet" href="./home-v3.css?v=20261124-5" />
+    <!-- the Assist flow's live orb (same renderer and "working" state as sprout-assist-tasks) -->
+    <script src="./thinking-orb.js?v=20261124-1" defer></script>
+    <script src="./home-v3.js?v=20261124-6" defer></script>
+    <style>
+      /* Four close-ups come from a single high-resolution photograph. On the first
+         scroll the largest portrait widens to include the other three parents. */
+      .top, .top.over { background: var(--green); border: 0; color: var(--bg); }
+      .top .logo, .top.over .top-links a { color: var(--bg); opacity: 1; }
+      .top.over .top-rp { background: transparent; border-color: var(--bg); color: var(--bg); }
+      .top .top-cta { color: var(--green); background: var(--bg); }
+      .focus-hero { min-height: 0; overflow: visible; text-align: left; background: var(--green); }
+      .focus-cover {
+        max-width: 1640px; margin: auto; min-height: max(100svh,650px); padding: 110px clamp(28px,5.2vw,84px) 70px;
+        display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1fr);
+        grid-template-areas: "title portraits" "intro portraits"; align-content: center;
+        column-gap: clamp(20px,4vw,76px); row-gap: clamp(24px,3.1vw,48px);
+      }
+      .focus-hero h1 { grid-area: title; align-self: end; max-width: none; color: var(--bg);
+        font: 500 clamp(52px,5.9vw,100px)/1.00 var(--serif); letter-spacing: -.052em; }
+      .focus-hero h1 span { display: block; white-space: normal; }
+      .focus-hero h1 em { display: block; margin-top: .48em; font: italic 500 .49em/1.12 var(--serif);
+        letter-spacing: -.037em; color: var(--bg); }
+      .focus-intro { grid-area: intro; align-self: start; max-width: 485px; }
+      .focus-hero .lede { margin: 0; max-width: 35ch; color: var(--bg); font-size: clamp(15px,1.25vw,19px); }
+      .focus-hero .cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-top: 26px; }
+      .focus-hero .btn-hand { box-shadow: none; background-color: var(--bg); flex: none; }
+      .focus-hero .or { font-size: 12px; color: var(--bg); margin: 0; }
+      .focus-hero .badges { display: flex; gap: 6px; }
+      .focus-hero .badges a, .focus-hero .badges img { display: block; }
+      .focus-hero .badges img { width: auto; height: 32px; }
+      .portrait-group { grid-area: portraits; align-self: center; position: relative; aspect-ratio: 1 / 1.02; }
+      .portrait-group > div { position: absolute; border-radius: 50%; overflow: hidden; }
+      .portrait-main { width: 72%; aspect-ratio: 1; left: 0; top: 24%; z-index: 2; }
+      .portrait-main .photo { width: 100%; height: 100%; background: url(./assets/hero-dropoff-wide.webp) 95% 50% / auto 100%;
+        transform-origin: 26% 5%; transform: scale(var(--focus-zoom,2.55)); }
+      .portrait-small { background: url(./assets/hero-dropoff-wide.webp) no-repeat; aspect-ratio: 1; }
+      .portrait-dad { width: 32%; left: 53%; top: 0; background-size: auto 365%; background-position: 50% 0%; }
+      .portrait-mom { width: 22%; left: 77%; top: 46%; background-size: auto 385%; background-position: 86% 13%; }
+      .portrait-cap { width: 15%; left: 69%; top: 81%; background-size: auto 400%; background-position: 93% 3%; }
+      .story { height: 330vh; background: var(--bg); }
+      .story-anchor { top: 71%; }
+      .story-pin { max-width: 1450px; grid-template-columns: minmax(0,1fr) minmax(0,.85fr); gap: clamp(36px,7vw,100px); }
+      .story-stage { grid-row: 1; grid-column: 1; position: relative; isolation: isolate; }
+      .story-stage::before { position: absolute; z-index: -1; content: ""; width: min(44vw, 69svh); aspect-ratio: 1;
+        border-radius: 50%; background: var(--green-subtle); }
+      .story-copy { grid-column: 2; grid-row: 1; }
+      .sc h2, .kin-copy h2 { font-size: clamp(41px,5.3vw,86px); line-height: 1.03; letter-spacing: -.046em; }
+      .plate { background: var(--sand); padding: clamp(80px,8vw,140px) clamp(24px,5.2vw,84px); }
+      .plate-wrap { max-width: 1450px; display: block; }
+      .plate-copy { display: grid; grid-template-columns: 1.2fr .8fr; align-items: end; gap: clamp(30px,9vw,150px); }
+      .plate-copy h2 { max-width: 15ch; font-size: clamp(46px,5.5vw,88px); line-height: 1.04; letter-spacing: -.045em; }
+      .plate-copy p { margin: 0; }
+      .plate-screen { margin-top: clamp(30px,5vw,80px); border-top: 1px solid var(--line); }
+      .plate-sheet { padding: clamp(20px,3vw,40px) 0 0; background: none; border-radius: 0; box-shadow: none;
+        display: grid; grid-template-columns: .82fr 2.1fr; column-gap: clamp(28px,4.5vw,80px); align-content: center; }
+      .plate-head { grid-area: 1 / 1; align-self: end; }
+      .plate-head .round, .plate-head .fam { display: none; }
+      .plate-greet { grid-area: 2 / 1; margin: 22px 0 0; }
+      .plate-sub { grid-area: 3 / 1; align-self: end; }
+      .plate-tiles { grid-area: 1 / 2 / 4 / 3; align-self: center; align-items: end; gap: 0; }
+      .plate-tiles .pt { border: 0; border-radius: 0; background: none; padding: 0; aspect-ratio: auto; box-shadow: none; transform: none; }
+      .plate-tiles .pt img, .plate-tiles.in .pt img { animation: none; opacity: 1; transform: scale(var(--object-focus, 1)); transition: none;
+        width: 100%; margin: 0; filter: none; transform-origin: center 84%; }
+      .plate-tiles .pt b { margin-top: 12px; font: 500 clamp(19px,1.8vw,29px)/1.2 var(--serif); }
+      .kin { background: var(--ink); padding: clamp(82px,10vw,160px) clamp(24px,5.2vw,84px); }
+      .kin-wrap { display: grid; max-width: 1450px; grid-template-columns: .9fr 1fr; gap: clamp(42px,7vw,120px); }
+      .kin-copy { grid-area: 1 / 1; }
+      .kin-copy h2, .kin-copy p { color: var(--bg); }
+      .kin-copy p { max-width: 38ch; }
+      .kin-visual { grid-area: 1 / 2; padding: 0 7% 10% 0; }
+      .kin-photo { aspect-ratio: 1; border-radius: 50%; background-position: 54% 50%; box-shadow: none; }
+      .kin-phone { width: clamp(160px,17vw,255px); right: 0; bottom: 0; }
+      .kin-wrap.in .kin-phone { transform: none; }
+      .finale { padding: 0; }
+      .finale-in { background: var(--bg); min-height: min(84svh,740px); border-radius: 0; }
+      .finale-photo { display: none; }
+      .finale-copy { width: 100%; padding: clamp(70px,9vw,145px) 22px; }
+      .finale h2 { max-width: 17ch; font-size: clamp(46px,6vw,97px); color: var(--green); letter-spacing: -.045em; }
+      .here { gap: 14px; margin-top: 24px; }
+      .faces { align-items: end; justify-content: center; }
+      .faces img { --diameter: clamp(44px,6vw,92px); width: var(--diameter); height: var(--diameter);
+        margin-left: -.3em; border: 2px solid var(--bg); }
+      .faces img:nth-child(2n) { --diameter: clamp(43px,5vw,74px); }
+      .faces img:nth-child(3n) { --diameter: clamp(55px,7.3vw,112px); }
+      .here p { color: var(--text); }
+      .finale .btn-hand { box-shadow: 0 0 0 1px var(--line); }
+      @media (min-width: 901px) {
+        .focus-hero .cta { display: grid; grid-template-columns: max-content 1fr; gap: 7px 16px; }
+        .focus-hero .btn-hand { grid-row: span 2; } .focus-hero .or { align-self: end; }
+        .focus-hero .badges { align-self: start; }
+      }
+      @media (max-width: 900px) {
+        .focus-cover { grid-template-columns: 1fr; grid-template-areas: "title" "portraits" "intro";
+          padding: 96px max(24px,calc((100vw - 620px) / 2)) 48px; row-gap: 24px; min-height: auto; }
+        .focus-hero h1 { max-width: 13ch; font-size: clamp(46px,8.9vw,74px); }
+        .focus-hero h1 em { font-size: .56em; margin-top: .28em; }
+        .portrait-group { width: min(100%,490px); justify-self: center; aspect-ratio: 1.6; }
+        .portrait-main { width: 54%; left: 1%; top: 6%; }
+        .portrait-dad { width: 27%; left: 52%; top: 0; }
+        .portrait-mom { width: 23%; left: 62%; top: 58%; }
+        .portrait-cap { width: 13%; left: 86%; top: 36%; }
+        .focus-intro { max-width: none; }
+        .focus-hero .cta { margin-top: 20px; }
+        .story-pin { grid-template-columns: 1fr; grid-template-rows: auto minmax(0,1fr); gap: 14px; padding: 18px 18px 16px; }
+        .story-copy, .story-stage { grid-column: 1; grid-row: auto; }
+        .story-stage::before { width: min(87vw,52svh); }
+        .sc h2 { font-size: clamp(29px,6.2vw,46px); }
+        .plate-copy { display: block; text-align: left; }
+        .plate-copy h2, .kin-copy h2 { font-size: clamp(42px,8.2vw,67px); }
+        .plate-copy p, .kin-copy p { margin: 16px 0 0; }
+        .plate-sheet { display: block; }
+        .plate-greet { margin-top: 15px; }
+        .plate-sub { margin-top: 24px; }
+        .plate-tiles { margin: 0 -5px; }
+        .plate-tiles .pt b { font-size: clamp(16px,3.5vw,24px); }
+        .kin-wrap { grid-template-columns: 1fr; gap: 36px; }
+        .kin-copy, .kin-visual { grid-area: auto; }
+        .kin-copy { text-align: left; }
+        .kin-visual { padding: 0 8% 16% 0; }
+        .kin-phone { width: clamp(135px,40vw,230px); }
+      }
+      @media (max-width: 540px) {
+        .focus-hero .cta { display: grid; grid-template-columns: max-content minmax(0,1fr); gap: 4px 16px; }
+        .focus-hero .btn-hand { grid-row: span 2; height: 50px; padding-left: 16px; gap: 8px; font-size: 16px; }
+        .focus-hero .btn-hand::before { width: 36px; height: 36px; }
+        .focus-hero .btn-hand:is(:hover, :focus-visible)::before { width: 100%; height: 100%; }
+        .focus-hero .hand-end { width: 36px; height: 36px; }
+        .focus-hero .or { align-self: end; font-size: 11px; }
+        .focus-hero .badges { align-self: start; gap: 4px; }
+        .focus-hero .badges img { width: 100%; height: auto; max-height: 30px; }
+      }
+      @media (max-width: 365px) {
+        .focus-hero h1 { max-width: none; font-size: 11.6vw; }
+        .focus-hero .cta { display: flex; flex-wrap: wrap; gap: 12px; }
+        .focus-hero .or { align-self: center; }
+        .focus-hero .badges { flex-basis: 100%; }
+        .focus-hero .badges img { width: auto; height: 34px; max-height: none; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .story .st-note { opacity: 1 !important; transform: translateX(var(--x)) rotate(var(--r)) !important; }
+        .story .st-lock, .story .sc-a { opacity: 1 !important; }
+        .story .st-brief, .story .sc-b { opacity: 0 !important; }
+        .story[data-show-brief] .st-note, .story[data-show-brief] .st-lock, .story[data-show-brief] .sc-a { opacity: 0 !important; }
+        .story[data-show-brief] .st-brief, .story[data-show-brief] .st-t, .story[data-show-brief] .sc-b { opacity: 1 !important; }
+        .portrait-main .photo, .plate-tiles .pt img { transform: none; }
+        .sc-a, .sc-b { transform: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top over" id="top">
+      <a class="logo" href="#home" aria-label="Sprout home"><img src="./assets/logo.png" alt="" width="30" height="30" />Sprout</a>
+      <nav class="top-links" aria-label="Sections">
+        <a href="#brief">Daily brief</a><a href="#assist">Assist</a><a href="#community">Community</a>
+      </nav>
+      <!-- room parents: Tony wanted it in the header (8 Oct); the button goes straight to RoomParent -->
+      <a class="top-rp" href="https://roomparent.com" rel="noopener"><span class="lg">I’m a room parent</span><span class="sm">Room parent</span></a>
+      <a class="top-cta" href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052" data-join>Join Sprout</a>
+    </header>
+
+    <main id="main">
+      <section class="hero2 focus-hero" id="home" aria-labelledby="hero-h">
+        <div class="focus-cover">
+          <h1 id="hero-h"><span>It takes a village</span> <span>to raise a family.</span> <em>Sprout brings yours together.</em></h1>
+          <div class="portrait-group" role="img" aria-label="Four parents in conversation at school drop-off, seen first in close-up and then together.">
+            <div class="portrait-main"><div class="photo"></div></div>
+            <div class="portrait-small portrait-dad"></div>
+            <div class="portrait-small portrait-mom"></div>
+            <div class="portrait-small portrait-cap"></div>
+          </div>
+          <div class="focus-intro"><p class="lede">Meet the parents at your school. Sprout remembers the little things and helps you get them done.</p>
+            <div class="cta">
+              <a class="btn-hand" href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052" data-join><span class="hand-lbl">Join Sprout</span><span class="hand-end" aria-hidden="true"><span class="hand-dot"></span><i class="ph-bold ph-arrow-right hand-arr"></i></span></a>
+              <p class="or">or get the app</p>
+              <div class="badges">
+                <a href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052"><img src="./assets/app-store.png" alt="Download on the App Store" width="149" height="44" /></a>
+                <a href="https://play.google.com/store/apps/details?id=com.meetingpoint"><img src="./assets/play-store.png" alt="Get it on Google Play" width="147" height="44" /></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="story" id="problem" aria-labelledby="problem-h">
+        <span class="story-anchor" id="brief" aria-hidden="true"></span>
+        <div class="story-pin">
+          <div class="story-copy">
+            <div class="sc sc-a">
+              <h2 id="problem-h">It’s a lot to keep track of.</h2>
+              <p>New school. New families. New group chats. Plus forms, practices, birthdays, carpools, picture day, spirit week… and somehow it all lives in your head.</p>
+            </div>
+            <div class="sc sc-b">
+              <h2 id="brief-h">Sprout carries the mental load.</h2>
+              <p>Connect your email and Sprout pulls out what matters (deadlines, game times, party invites) into one daily brief. Stop digging through your inbox. Open Sprout, see your day.</p>
+            </div>
+          </div>
+          <div class="story-stage">
+            <div class="phone story-phone" data-story role="img" aria-label="A phone lock screen buried in notifications: picture day forms, 34 class messages, practice moved to 5:30, a birthday invite, a carpool ask, spirit week. They slide together into one Sprout daily brief: three to-dos, today’s practice, pajama day coming up, and the class messages in one line."></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="plate" id="assist" aria-labelledby="assist-h">
+        <div class="plate-wrap">
+          <div class="plate-copy">
+            <h2 id="assist-h">What can Sprout take off your plate?</h2>
+            <p>Playdates, babysitters, carpools. Tap what you need and Sprout Assist handles the back-and-forth.</p>
+          </div>
+          <div class="plate-screen" role="img" aria-label="The Sprout Assist screen: What can I take off your plate? with three tiles, Playdate, Babysitter and Carpool">
+            <div class="plate-sheet" aria-hidden="true">
+              <div class="plate-head">
+                <span class="round"><i class="ph ph-x"></i></span>
+                <span class="orb" data-orb><canvas width="128" height="128"></canvas></span>
+                <span class="ttl"><b>Sprout</b><small>Here for you and Dana</small></span>
+                <span class="fam"><i style="background-image:url(./assets/brief/tony.webp)"></i><i style="background-image:url(./assets/brief/dana.webp)"></i></span>
+              </div>
+              <div class="plate-greet"><b>What can I take off your plate?</b><span>I can get these done for you in a few taps.</span></div>
+              <p class="plate-sub">Plan something</p>
+              <div class="plate-tiles" data-tiles>
+                <span class="pt" style="--i:0"><img src="./assets/illus/club.webp" alt="" width="240" height="240" /><b>Playdate</b></span>
+                <span class="pt" style="--i:1"><img src="./assets/illus/sitter.webp" alt="" width="240" height="240" /><b>Babysitter</b></span>
+                <span class="pt" style="--i:2"><img src="./assets/illus/carpool.webp" alt="" width="240" height="240" /><b>Carpool</b></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="kin" id="community" aria-labelledby="community-h">
+        <div class="kin-wrap">
+          <div class="kin-visual">
+            <div class="kin-photo" role="img" aria-label="Parents talking on a picnic blanket in the park while their kids play"></div>
+            <div class="phone kin-phone" data-chat role="img" aria-label="Sprout Chat: your groups in a row (First Grade, Ms. Taylor’s class, the U8 soccer team, summer camp), then direct messages with other parents"></div>
+          </div>
+          <div class="kin-copy">
+            <h2 id="community-h">Every parent in your kid’s class, one message away.</h2>
+            <p>No swapping numbers. Join the groups that matter: class, grade, team. Those parents you wave to at drop-off? Now they’re your village.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="finale" id="join" aria-labelledby="join-h">
+        <div class="finale-in">
+          <div class="finale-photo" aria-hidden="true"></div>
+          <div class="finale-copy">
+            <h2 id="join-h">Free for every parent at your school.</h2>
+            <div class="here">
+              <span class="faces" data-faces aria-hidden="true">
+                <img src="./assets/assist/mem-jessica.webp" alt="" style="--i:0" /><img src="./assets/v2/dad.webp" alt="" style="--i:1" /><img src="./assets/assist/mem-emily.webp" alt="" style="--i:2" /><img src="./assets/v2/cast-aisha.webp" alt="" style="--i:3" /><img src="./assets/assist/mem-mike.webp" alt="" style="--i:4" /><img src="./assets/v2/mom.webp" alt="" style="--i:5" /><img src="./assets/assist/mem-sarah.webp" alt="" style="--i:6" />
+              </span>
+              <p>See who’s already here.</p>
+            </div>
+            <a class="btn-hand big" href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052" data-join><span class="hand-lbl">Join Sprout</span><span class="hand-end" aria-hidden="true"><span class="hand-dot"></span><i class="ph-bold ph-arrow-right hand-arr"></i></span></a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>© 2026 Sprout</span>
+      <nav><a href="https://joinsprout.co/privacy">Privacy</a><a href="https://joinsprout.co/terms">Terms</a><a href="https://joinsprout.co/child-safety">Child safety</a><a href="mailto:tony@joinsprout.co">Contact</a></nav>
+    </footer>
+
+    <!-- "Join Sprout" on a computer (Tony, 9 Oct): a pop-up with both stores' QR codes, iOS on the left, Android on the
+         right. On a phone the button goes straight to the right store instead (home-v3.js). -->
+    <dialog class="getapp" id="getApp" aria-labelledby="getapp-h">
+      <button type="button" class="getapp-x" data-close aria-label="Close"><i class="ph ph-x"></i></button>
+      <img class="getapp-logo" src="./assets/logo.png" alt="" width="48" height="48" />
+      <h2 id="getapp-h">Get Sprout on your phone</h2>
+      <p class="getapp-sub">Scan the code for your phone with its camera. Free for every parent at your school.</p>
+      <div class="getapp-codes">
+        <a class="getapp-card" href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052" data-store="ios">
+          <span class="getapp-qr"><img src="./assets/qr/app-store.svg" alt="QR code for Sprout on the App Store" width="180" height="180" /><img class="getapp-mark" src="./assets/logo.png" alt="" width="40" height="40" /></span>
+          <span class="getapp-os"><i class="ph-fill ph-apple-logo" aria-hidden="true"></i>iPhone</span>
+          <img class="getapp-badge" src="./assets/app-store.png" alt="Download on the App Store" width="135" height="40" />
+        </a>
+        <a class="getapp-card" href="https://play.google.com/store/apps/details?id=com.meetingpoint" data-store="android">
+          <span class="getapp-qr"><img src="./assets/qr/google-play.svg" alt="QR code for Sprout on Google Play" width="180" height="180" /><img class="getapp-mark" src="./assets/logo.png" alt="" width="40" height="40" /></span>
+          <span class="getapp-os"><i class="ph-fill ph-android-logo" aria-hidden="true"></i>Android</span>
+          <img class="getapp-badge" src="./assets/play-store.png" alt="Get it on Google Play" width="135" height="40" />
+        </a>
+      </div>
+    </dialog>
+    <script>
+      (() => {
+        const hero = document.querySelector(".focus-hero");
+        const story = document.querySelector(".story");
+        const assist = document.querySelector(".plate-screen");
+        const clay = Array.from(assist.querySelectorAll(".pt"));
+        const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+        const clamp = (value) => Math.max(0, Math.min(1, value));
+        let frame;
+
+        function render() {
+          frame = null;
+          const bounds = hero.getBoundingClientRect();
+          const progress = reduced.matches ? 1 : clamp(-bounds.top / Math.min(450, bounds.height * .52));
+          hero.style.setProperty("--focus-zoom", (2.55 - 1.55 * progress).toFixed(3));
+
+          if (reduced.matches) {
+            const midpoint = (story.offsetHeight - innerHeight) * .48;
+            story.toggleAttribute("data-show-brief", -story.getBoundingClientRect().top >= midpoint);
+          }
+          const shelf = assist.getBoundingClientRect();
+          const focus = clamp((innerHeight * .76 - shelf.top) / (innerHeight * .58));
+          clay.forEach((tile, index) => {
+            const distance = Math.min(1, Math.abs(index - focus * 2));
+            tile.style.setProperty("--object-focus", reduced.matches ? 1 : (1 - .30 * distance).toFixed(3));
+          });
+        }
+
+        function schedule() {
+          if (!frame) frame = requestAnimationFrame(render);
+        }
+
+        window.addEventListener("scroll", schedule, { passive: true });
+        window.addEventListener("resize", schedule);
+        reduced.addEventListener("change", schedule);
+        render();
+      })();
+    </script>
+  </body>
+</html>

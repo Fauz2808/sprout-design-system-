@@ -36,6 +36,19 @@ list). The sky, mascot portal and flying notes are gone from v3. Check: `node re
 `review/shots/home-v3/`). **home-v2 is untouched and is still what `review/export-site.py` exports to the live site**;
 switch the export to v3 only after Tony approves.
 
+**25 Nov (Tony, meeting + DM):** profile chips on the hero parents (placed on the photo's own pixels, `PEOPLE` in
+home-v3.js); the Problem → Brief scroll is now two states with one timed transition (a mom with notifications around
+her head, then the Daily Brief), pin 220vh; the brief's to-dos open a sheet (summary, original email, Mark as done);
+"Coming next" line under the Assist tiles; a Member Directory card in Community; no "or get the app". Check script
+updated for the new stages.
+
+**Option B (25 Nov), `home-v3-carpool.html`:** the same page with the Assist section telling the Playdate, Babysitter
+and Carpool happy paths by scrolling (tiles as chapters, three steps each). Scroll-locked: each tap sits at a fixed
+scroll point and the phone's chat scrolls with the page (`assist-scrolly.js` / `assist-scrolly.css` drive
+`vendor/assist-story/runtime.html`; re-run
+`python3 vendor/assist-story/export.py` after the Assist prototype changes). `home-v3.html` is option A, no demo.
+Tony picks one.
+
 Validation:
 
 ```sh

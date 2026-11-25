@@ -1,6 +1,7 @@
 /* Website v3, 24 Nov: Tony's "Sprout Website: Copy & Design Brief" (20 Nov).
-   - Problem → Daily brief: one pinned scroll. A lock screen buried in notifications; on the scroll each one flies into
-     its row of the daily brief ("the messy notifications slide together into the single daily brief").
+   - Hero: profile chips on the parents in the photo (Tony, 25 Nov).
+   - Problem → Daily brief (25 Nov): notifications pop up around a mom's head, then one timed transition pulls them into
+     the Daily Brief. Its to-dos open a sheet: summary, the original email, Mark as done.
    - Assist: the three clay tiles pop in when the section comes up.
    - Community: a coded class group chat (393 x 852, scaled into its phone).
    - Close: the parents' faces come in one by one.
@@ -29,111 +30,138 @@
       .map(([icon, label]) => icon ? `<span class="${label === on ? "on" : ""}"><i class="ph${label === on ? "-fill" : ""} ph-${icon}"></i>${label}${label === "Chat" ? "<b>2</b>" : ""}</span>` : '<span class="gap"></span>').join("")}</div>
     <span class="dock-clover"><img src="${A}brief/dock-clover.webp" alt=""><b>1</b></span></div><span class="db2-home"></span>`;
 
-  /* ── 2 + 3 · the lock screen and the brief ── */
-  // the brief's six notifications, newest on top, then more of the same running off the bottom of the screen
-  /* 24 Nov (Ahmad): the icons are app icons, iOS style, the way a real lock screen shows them: the app that delivered
-     it (Mail, Messages, a team app), the sender in bold. Drawn here in the iOS look, not Apple's artwork, and no app
-     is named (brief: no real brand names). */
+  /* ── 2 + 3 · the mental load → the Daily Brief (Tony, 25 Nov). ──
+     State 1: a mom checking her phone, school notifications popping up around her head.
+     State 2: they all get pulled into the phone and the Daily Brief comes up: one simple UI.
+     The scroll only picks the state; the change is one timed transition, so a scroll that stops anywhere still shows
+     a whole screen (Tony's DM: stopping mid-animation looked broken). Made-up senders, iOS-style icons, no app names. */
   const ICON = {
     mail: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.6" y="5.6" width="18.8" height="13" rx="2.4" fill="#fff"/><path d="M3.4 6.9 12 13l8.6-6.1" fill="none" stroke="#1a78f2" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>`,
     msg: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M12 3.6c-5.1 0-9.2 3.4-9.2 7.6 0 2.4 1.3 4.5 3.4 5.9-.2 1.3-.9 2.5-2 3.4 2 .1 3.9-.6 5.4-1.8.8.2 1.6.2 2.4.2 5.1 0 9.2-3.4 9.2-7.6S17.1 3.6 12 3.6Z"/></svg>`,
     team: `<i class="ph-fill ph-soccer-ball"></i>`,
   };
-  // the brief's six notifications, newest on top, then more of the same running off the bottom of the screen
-  const NOTES = [
-    { k: "forms", ic: "mail", from: "School Office", body: "Picture day forms due Friday", t: "now" },
-    { k: "class", ic: "msg", from: "Ms. Rivera’s Class Parents", body: "34 new messages", t: "2m ago" },
-    { k: "soccer", ic: "team", from: "U8 Soccer", body: "Practice moved to 5:30 tonight", t: "6m ago" },
-    { k: "bday", ic: "mail", from: "You’re invited", body: "Maya’s 7th birthday!", t: "14m ago" },
-    { k: "carpool", ic: "msg", from: "Carpool Moms", body: "Can someone take Thursday?", t: "21m ago" },
-    { k: "pta", ic: "mail", from: "PTA", body: "Spirit week schedule (Mon = pajama day)", t: "38m ago" },
-    { ic: "msg", from: "Ms. Rivera’s Class Parents", body: "12 new messages", t: "1h ago" },
-    { ic: "msg", from: "2nd Grade Parents", body: "Who has the field trip form?", t: "1h ago" },
-    { ic: "mail", from: "School Office", body: "Lunch menu for next week", t: "2h ago" },
-    { ic: "team", from: "U8 Soccer", body: "Snack schedule updated", t: "3h ago" },
+  // [icon, sender, body, time, left %, top %, tilt]: around her head (head ≈ 50% / 15% of the photo), never over her face
+  const POPS = [
+    ["mail", "School Office", "Picture day forms due Friday", "now", -18, -5, -3],
+    ["msg", "Ms. Rivera’s Class Parents", "34 new messages", "2m ago", 46, -15, 3],
+    ["team", "U8 Soccer", "Practice moved to 5:30 tonight", "6m ago", 60, 6, -2.5],
+    ["msg", "Carpool Moms", "Can someone take Thursday?", "21m ago", -16, 25, 2],
+    ["mail", "You’re invited", "Maya’s 7th birthday!", "14m ago", 58, 29, 2],
+    ["mail", "PTA", "Spirit week schedule (Mon = pajama day)", "38m ago", -12, 47, -1.5],
+    ["msg", "2nd Grade Parents", "Who has the field trip form?", "1h ago", 60, 66, -2],
+    ["mail", "School Office", "Lunch menu for next week", "2h ago", -20, 71, 2.5],
   ];
-  // where each one sits on the lock screen: a pile, a few tilted, the last ones off the bottom
-  const POSE = [[0, 0, -1.5], [6, 62, 2.5], [-4, 124, -3], [8, 184, 1.5], [-6, 246, 4], [4, 306, -2.5], [-8, 366, 3], [6, 424, -4], [-3, 482, 2], [7, 538, -3]];
-  const row = ({ k, t, chip, red, from, who, gmail }) => `<div class="db2-row st-t" data-t="${k}"><span class="db2-box"><i class="ph-bold ph-check"></i></span>
-    <span class="db2-face${who.length > 1 ? " pair" : ""}">${who.map((s) => `<i style="background-image:url(${s})"></i>`).join("")}${gmail ? `<img class="g" src="${G}" alt="">` : ""}</span>
-    <span class="tx"><b>${t}</b><span class="m"><i class="db2-chip${red ? " red" : ""}">${chip}</i>${from ? `<span>${from}</span>` : ""}</span></span></div>`;
-  const story = document.querySelector("[data-story]");
-  let drawStory = () => {}, measureStory = () => {};
-  if (story) {
+  // the to-dos, today's first (Tony: "today's stuff should be at the top, due Friday below"); each opens a sheet
+  /* 25 Nov (Ahmad): the brief is the MOM's (the woman in the photo, "Dana"), a family to-do list: hers, her husband's,
+     and one they share. Faces are cut from the scene photo (assets/brief/scene-*.webp). Today's first. */
+  const MOM = `${A}brief/scene-mom.webp`, DAD = `${A}brief/scene-dad.webp`;
+  const TODOS = [
+    { t: "Reply about Thursday’s carpool", chip: "Today", red: true, from: "Carpool Moms", who: [MOM], seen: 1, time: "now",
+      sum: ["Priya asked who can drive the kids home on Thursday", "Pickup is 3:15 PM at the school, three kids", "Marcus already has the morning"],
+      src: "Message in Carpool Moms", orig: ["Priya Shah · 7:20 AM", "Hi all! Can anyone take the kids home Thursday? I’m stuck at work until 5. Pickup is 3:15 at the front loop. Marcus has the morning."] },
+    { t: "Pick up Jake from soccer", chip: "Today · 5:30 PM", red: true, from: "", who: [DAD], seen: 2, time: "8:12",
+      sum: ["Practice moved from 4:30 to 5:30 tonight", "Field 2 at Lakeline Park", "Your husband took this one, he saw it at 8:12"],
+      src: "Email from U8 Soccer", orig: ["U8 Soccer · coach@ssckids.org", "Hi families, practice moves to 5:30 tonight on Field 2 because of the field schedule. Cleats and water, please."], gmail: true },
+    { t: "Send the picture day forms", chip: "Due Fri", from: "School Office", who: [MOM, DAD], seen: 2, time: "7:58", gmail: true,
+      sum: ["Fill in the order form and pick a package", "Send it back in Jake’s folder by Friday", "Photos are on Tuesday, class shirts on"],
+      src: "Email from the School Office", orig: ["School Office · office@lincolnelem.org", "Dear families, picture day is next Tuesday. Please return the attached order form with your package choice by Friday. Students should wear their class shirts."] },
+  ];
+  const story = document.querySelector("[data-story]"), stage = document.querySelector("[data-stage]");
+  if (story && stage) {
+    const sec = document.getElementById("problem");
+    const pops = stage.querySelector("[data-pops]");
+    /* 25 Nov (Ahmad): the notes rise out of her head the way the App Store opener's icons rise from the clover (V.21
+       "rise": a kick, a bend, then up and out), on one slow loop, instead of popping in all at once. Each note has its
+       own lane; delays are negative so the loop is already full when the section arrives. x/y/r are the still layout
+       for reduced motion. */
+    // [kick, bend, end, rise] in cqw: from the top of the photo above her head, up and out over the top (Ahmad, 25 Nov: never over her face)
+    const LANES = [[-8, -20, -34, -22], [2, -4, -8, -30], [-14, -28, -46, -14], [6, 8, 6, -26], [-6, -16, -26, -34], [8, 14, 18, -18], [-12, -24, -40, -28], [-2, -12, -20, -12]];
+    pops.innerHTML = POPS.map(([ic, from, body, t, x, y, r], i) => {
+      const [kick, bend, end, rise] = LANES[i % LANES.length];
+      return `<div class="pop" style="--fx:${x}%;--fy:${y}%;--r:${r}deg;--i:${i};--kick:${kick}cqw;--bend:${bend}cqw;--end:${end}cqw;--rise:${rise}cqw;--spin:${(r * 0.8).toFixed(1)}deg">
+      <span class="ic ic-${ic}">${ICON[ic]}</span><span class="tx"><span class="hd"><b>${from}</b><small>${t}</small></span>${body}</span></div>`;
+    }).join("");
+    const todoRow = (d, i) => `<button type="button" class="db2-row st-todo" data-i="${i}" aria-label="Open the to-do: ${d.t}"><span class="db2-box"><i class="ph-bold ph-check"></i></span>
+      <span class="db2-face${d.who.length > 1 ? " pair" : ""}">${d.who.map((s) => `<i style="background-image:url(${s})"></i>`).join("")}${d.gmail ? `<img class="g" src="${G}" alt="">` : ""}</span>
+      <span class="tx"><b>${d.t}</b><span class="m"><i class="db2-chip${d.red ? " red" : ""}">${d.chip}</i>${d.from ? `<span>From ${d.from}</span>` : ""}</span></span>
+      <span class="db2-seen"><i class="ph${d.seen === 2 ? "-bold ph-checks" : " ph-check"}"></i>${d.time}</span></button>`;
     const app = document.createElement("div");
     app.className = "db2 st-app";
-    app.setAttribute("aria-hidden", "true");
     app.innerHTML = `
       <div class="st-brief">
         ${sb(false)}
         <div class="db2-scroll">
-          <div class="db2-hd"><span class="db2-av" style="background-image:url(${T})"></span><div class="mid"><b>Sprout AI</b><small>Tuesday, October 7</small></div><i class="ph ph-bell bell"></i></div>
+          <div class="db2-hd"><span class="db2-av" style="background-image:url(${MOM})"></span><div class="mid"><b>Sprout AI</b><small>Tuesday, October 7</small></div><i class="ph ph-bell bell"></i></div>
+          <div class="db2-hi"><b>Morning, Dana</b><span class="db2-wx">☀️ <strong>68–84°</strong> Sunny</span></div>
           <div class="db2-card db2-todo">
-            <div class="th"><span class="db2-av" style="background-image:url(${T})"></span><b>To-Do List</b><span class="plus"><i class="ph ph-plus"></i></span></div>
-            ${row({ k: "forms", t: "Send the picture day forms", chip: "Due Fri", from: "From the School Office", who: [T], gmail: true })}
-            ${row({ k: "carpool", t: "Reply about Thursday’s carpool", chip: "Today", red: true, from: "From Carpool Moms", who: [T] })}
-            ${row({ k: "bday", t: "RSVP to Maya’s 7th birthday", chip: "Party Sat", from: "From Jessica’s invite", who: [D], gmail: true })}
+            <div class="th"><span class="db2-av" style="background-image:url(${MOM})"></span><b>To-Do List</b><span class="plus"><i class="ph ph-plus"></i></span></div>
+            ${TODOS.map(todoRow).join("")}
           </div>
+          <!-- Prod BRIEF-10 (Figma 16180:365329) without the SSC banner and invitations (Ahmad, 25 Nov): the family to-dos,
+               Happening today in the new card, Upcoming events -->
           <div class="db2-sh"><span>📅 Happening today</span><small>1 thing</small></div>
-          <div class="db2-card"><div class="db2-ev st-t" data-t="soccer"><span class="t">5:30 PM</span><div><b>Soccer practice</b><div class="chips"><i class="db2-chip">Jake · U8 Soccer</i><i class="db2-chip red">Moved from 4:30</i></div></div></div></div>
-          <div class="db2-sh"><span>📆 Coming up</span><small>Next week</small></div>
-          <div class="db2-card"><div class="db2-up st-t" data-t="pta"><span class="d">Oct<b>13</b></span><div><b class="t">Pajama day</b><small>Mon · Spirit week starts</small></div></div></div>
-          <div class="db2-sh"><span>💬 Messages</span><small>34 new</small></div>
-          <div class="db2-card"><div class="st-msg st-t" data-t="class"><span class="ini">MR</span><div><b>Ms. Rivera’s Class Parents</b><small>Book fair needs 2 more helpers</small></div></div></div>
+          <div class="db2-card"><div class="db2-hap"><div class="htop"><img src="${A}brief/calendar-check.png" alt=""><div><b>5:30 PM</b><i class="db2-chip">Jake · U8 Soccer</i></div></div>
+            <h5>Soccer practice</h5><p>Moved from 4:30. Field 2, cleats and water.</p></div></div>
+          <div class="db2-sh"><span>📆 Upcoming events</span><small>Next week</small></div>
+          <div class="db2-card"><div class="db2-up"><span class="d">Oct<b>13</b></span><div><b class="t">Pajama day</b><small>Mon · Spirit week starts</small></div></div></div>
         </div>
         ${nav("Daily Brief")}
       </div>
-      <div class="st-lock">${sb(true)}<div class="st-date">Tuesday, October 7</div><div class="st-time">7:41</div><span class="db2-home light"></span></div>
-      <div class="st-notes">${NOTES.map((n, i) => `<div class="st-note" data-k="${n.k || ""}" style="top:${222 + POSE[i][1]}px;--x:${POSE[i][0]}px;--r:${POSE[i][2]}deg">
-        <span class="ic ic-${n.ic}">${ICON[n.ic]}</span><span class="tx"><span class="hd"><b>${n.from}</b><small>${n.t}</small></span>${n.body}</span></div>`).join("")}</div>`;
+      <div class="td-scrim" data-scrim></div>
+      <div class="td-sheet" data-sheet role="dialog" aria-modal="false" aria-label="To-do details"></div>`;
     story.appendChild(app);
     fit(story, app);
-    const lock = app.querySelector(".st-lock"), brief = app.querySelector(".st-brief"), hd = app.querySelector(".db2-hd");
-    const notes = [...app.querySelectorAll(".st-note")];
-    const sec = document.getElementById("problem"), pin = sec.querySelector(".story-pin");
-    // position of an element in the app's own 393 x 852 pixels
-    const box = (el) => { const a = app.getBoundingClientRect(), r = el.getBoundingClientRect(), k = a.width / 393; return { x: (r.left - a.left) / k, y: (r.top - a.top) / k, w: r.width / k, h: r.height / k }; };
-    let paths = [];
-    measureStory = () => {
-      notes.forEach((n) => (n.style.transform = "none"));
-      paths = notes.map((n) => {
-        const from = box(n), target = n.dataset.k ? app.querySelector(`.st-t[data-t="${n.dataset.k}"]`) : null;
-        const to = box(target || hd);
-        return { n, target, from, to, x: parseFloat(n.style.getPropertyValue("--x")), r: parseFloat(n.style.getPropertyValue("--r")) };
+
+    /* the to-do sheet: summary, the original email (or message), Mark as done (Tony, 25 Nov) */
+    const sheet = app.querySelector("[data-sheet]"), scrim = app.querySelector("[data-scrim]");
+    const rows = [...app.querySelectorAll(".st-todo")];
+    const close = () => { app.classList.remove("sheet-on"); };
+    const open = (i) => {
+      const d = TODOS[i], done = rows[i].classList.contains("done");
+      sheet.innerHTML = `<span class="grab"></span>
+        <div class="td-top"><span class="db2-face${d.who.length > 1 ? " pair" : ""}">${d.who.map((s) => `<i style="background-image:url(${s})"></i>`).join("")}${d.gmail ? `<img class="g" src="${G}" alt="">` : ""}</span><i class="db2-chip${d.red ? " red" : ""}">${d.chip}</i>
+          <button type="button" class="td-x" data-x aria-label="Close"><i class="ph ph-x"></i></button></div>
+        <h3>${d.t}</h3>
+        <p class="td-lb">Summary</p>
+        <ul>${d.sum.map((s) => `<li>${s}</li>`).join("")}</ul>
+        <button type="button" class="td-src" data-src aria-expanded="false">${d.gmail ? `<img src="${G}" alt="">` : '<i class="ph-fill ph-chat-circle-dots"></i>'}<span>${d.src}</span><i class="ph ph-caret-down car"></i></button>
+        <div class="td-orig" data-orig hidden><b>${d.orig[0]}</b><p>${d.orig[1]}</p></div>
+        <button type="button" class="td-done" data-done>${done ? "Mark as not done" : '<i class="ph-bold ph-check"></i>Mark as done'}</button>`;
+      sheet.querySelector("[data-x]").onclick = close;
+      const srcBtn = sheet.querySelector("[data-src]"), orig = sheet.querySelector("[data-orig]");
+      srcBtn.onclick = () => { orig.hidden = !orig.hidden; srcBtn.setAttribute("aria-expanded", String(!orig.hidden)); };
+      sheet.querySelector("[data-done]").onclick = () => { rows[i].classList.toggle("done"); close(); };
+      app.classList.add("sheet-on");
+    };
+    rows.forEach((r, i) => {
+      r.addEventListener("click", (e) => {
+        if (e.target.closest(".db2-box")) { r.classList.toggle("done"); return; }   // the box itself checks it off
+        open(i);
       });
+    });
+    scrim.onclick = close;
+
+    /* the two states: on calm the whole cloud of notes is pulled into the phone (one transform on .pops) */
+    const box = stage.querySelector(".mom-box");
+    const aim = () => {};
+    let calm = null;
+    const set = (c) => {
+      if (c === calm) return;
+      calm = c;
+      sec.classList.toggle("calm", c);
+      story.inert = !c;
+      if (!c) close();
     };
-    drawStory = (p) => {
-      // 0-0.22 the pile holds · 0.22-0.66 each notification flies into its row, top first · the brief holds after
-      const fade = soft(clamp01((p - 0.3) / 0.2));
-      lock.style.opacity = (1 - fade).toFixed(3);
-      brief.style.opacity = soft(clamp01((p - 0.28) / 0.2)).toFixed(3);
-      paths.forEach((q, i) => {
-        const m = soft(clamp01((p - 0.22 - i * 0.026) / 0.22));
-        const tx = (q.to.x + q.to.w / 2) - (q.from.x + q.from.w / 2), ty = (q.to.y + q.to.h / 2) - (q.from.y + q.from.h / 2);
-        const sx = q.target ? q.to.w / q.from.w : 0.4, sy = q.target ? q.to.h / q.from.h : 0.4;
-        q.n.style.transform = `translate(${lerp(q.x, tx, m).toFixed(1)}px, ${(ty * m).toFixed(1)}px) rotate(${lerp(q.r, 0, m).toFixed(2)}deg) scale(${lerp(1, sx, m).toFixed(3)}, ${lerp(1, sy, m).toFixed(3)})`;
-        q.n.style.opacity = (1 - clamp01((m - (q.target ? 0.72 : 0.4)) / 0.28)).toFixed(3);
-        if (q.target) q.target.style.opacity = clamp01((m - 0.62) / 0.38).toFixed(3);
-      });
-      pin.style.setProperty("--swap", soft(clamp01((p - 0.36) / 0.16)).toFixed(3));
-    };
-    // the scroll asks, the screen glides toward it
-    let want = 0, shown = 0, gliding = false;
-    const glide = () => {
-      shown += (want - shown) * (reduce.matches ? 1 : 0.16);
-      if (Math.abs(want - shown) < 0.0005) shown = want;
-      drawStory(shown);
-      if (shown !== want) requestAnimationFrame(glide); else gliding = false;
-    };
-    const scrub = () => {
+    const check = () => {
       const r = sec.getBoundingClientRect();
-      want = clamp01(-r.top / Math.max(1, sec.offsetHeight - innerHeight));
-      if (!gliding) { gliding = true; requestAnimationFrame(glide); }
+      if (r.top < innerHeight * 0.75) sec.classList.add("on");   // the pops come in once the section is on screen
+      set(-r.top / Math.max(1, sec.offsetHeight - innerHeight) > 0.42);
     };
     let ticking = false;
-    addEventListener("scroll", () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { scrub(); ticking = false; }); }, { passive: true });
-    addEventListener("resize", () => { measureStory(); drawStory(shown); scrub(); });
-    (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(() => { measureStory(); scrub(); drawStory(want); shown = want; }, 60));
+    addEventListener("scroll", () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { check(); ticking = false; }); }, { passive: true });
+    addEventListener("resize", () => { aim(); check(); });
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { aim(); check(); });
+    aim(); check();
   }
 
   /* ── 5 · the Chat screen (Ahmad, 24 Nov: Figma Prod 12758:106388). Every class and group the family is in as circles
@@ -184,6 +212,7 @@
   once("[data-tiles]");
   once("[data-faces]", 0.6);
   once(".kin-wrap", 0.2);
+  once(".plate-next", 0.8);
 
   /* ── Join Sprout (Tony, 7 + 9 Oct): a phone goes straight to its store; a computer opens the QR pop-up. iPadOS reports
      itself as a Mac, so a Mac with a touch screen counts as an iPad. ── */
@@ -207,14 +236,57 @@
     });
   }
 
-  /* ── the hero photo drifts away from the pointer (touch and reduced motion: still) ── */
-  const hero = document.querySelector("[data-hero]"), photo = document.querySelector("[data-photo]");
-  if (hero && photo && !reduce.matches && matchMedia("(pointer: fine)").matches) {
-    hero.addEventListener("pointermove", (e) => {
-      const r = hero.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
-      photo.style.transform = `scale(1.06) translate(${-x * 16}px, ${-y * 10}px)`;
-    });
-    hero.addEventListener("pointerleave", () => { photo.style.transform = ""; });
+  /* ── 1 · profile chips on the parents in the hero (Tony, 25 Nov DM: "little profiles over the people standing there
+     talking"). Each chip is placed in the photo's own pixels and mapped through background-size: cover, so it stays on
+     the same person at every width. The avatar is that parent's face cropped from the same photo.
+     face: [x, y, head width] in the wide photo · wide / tall: [x, y] of the chip's centre-top in each photo
+     (tall = the portrait photo phones use; null = not shown there, two chips are enough on a phone). ── */
+  const PEOPLE = [
+    { n: "Dan Ellis", s: "Owen’s dad · 1st Grade", face: "dan", wide: [0.535, 0.47], tall: [0.26, 0.45] },
+    { n: "Jess Moreno", s: "Lily’s mom · 1st Grade", face: "jess", wide: [0.618, 0.635], tall: null },
+    { n: "Grace Lin", s: "Theo’s mom · Kindergarten", face: "grace", wide: [0.792, 0.455], tall: [0.66, 0.24], tag: "New" },
+    { n: "Ben Carter", s: "Ava’s dad · 1st Grade", face: "ben", wide: [0.862, 0.72], tall: null },
+  ];
+  const IMG = { wide: [2400, 1356], tall: [1122, 1402] };
+  const hero = document.querySelector("[data-hero]"), photo = document.querySelector("[data-photo]"), tags = document.querySelector("[data-tags]");
+  if (hero && photo && tags) {
+    // the avatar is that parent's face, cut from the same photo (assets/hero-faces/, 25 Nov)
+    tags.innerHTML = PEOPLE.map((p, i) => `<span class="tag" style="--i:${i}"><img class="av" src="${A}hero-faces/${p.face}.webp" alt=""><span class="tx"><b>${p.n}</b><small>${p.s}</small></span>${p.tag ? `<em>${p.tag}</em>` : ""}</span>`).join("");
+    const chips = [...tags.children];
+    const place = () => {
+      const cs = getComputedStyle(photo), tall = cs.backgroundImage.includes("portrait");
+      const [iw, ih] = IMG[tall ? "tall" : "wide"];
+      const W = photo.offsetWidth, H = photo.offsetHeight;
+      Object.assign(tags.style, { left: `${photo.offsetLeft}px`, top: `${photo.offsetTop}px`, width: `${W}px`, height: `${H}px` });
+      const [px, py] = cs.backgroundPosition.split(" ").map((v) => parseFloat(v) / 100);
+      const k = Math.max(W / iw, H / ih), dw = iw * k, dh = ih * k, ox = (W - dw) * px, oy = (H - dh) * py;
+      // chips scale with the photo (13px at a 1440 wide frame), so they never outgrow the people
+      tags.style.fontSize = `${Math.min(14, Math.max(10, 13 * dh / 864)).toFixed(2)}px`;
+      const inset = photo.parentElement, copy = inset.querySelector(".copy");
+      const minX = -photo.offsetLeft + 12, maxX = -photo.offsetLeft + inset.clientWidth - 12;
+      const side = getComputedStyle(inset).flexDirection !== "column";   // copy beside the photo, not under it
+      const copyR = side && copy ? Math.max(...[...copy.children].map((e) => e.offsetLeft + e.offsetWidth)) - photo.offsetLeft + 20 : -Infinity;
+      chips.forEach((c, i) => {
+        const at = PEOPLE[i][tall ? "tall" : "wide"];
+        c.hidden = !at;
+        if (!at) return;
+        const w = c.offsetWidth;
+        const x = Math.min(maxX - w / 2, Math.max(minX + w / 2, copyR + w / 2, ox + at[0] * dw));
+        c.style.left = `${x.toFixed(1)}px`; c.style.top = `${(oy + at[1] * dh).toFixed(1)}px`;
+      });
+    };
+    new ResizeObserver(place).observe(photo);
+    addEventListener("resize", place);
+    place();
+    setTimeout(() => tags.classList.add("in"), 500);
+    /* the photo drifts away from the pointer and the chips ride with it (touch and reduced motion: still) */
+    if (!reduce.matches && matchMedia("(pointer: fine)").matches) {
+      hero.addEventListener("pointermove", (e) => {
+        const r = hero.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+        photo.style.transform = tags.style.transform = `scale(1.06) translate(${-x * 16}px, ${-y * 10}px)`;
+      });
+      hero.addEventListener("pointerleave", () => { photo.style.transform = tags.style.transform = ""; });
+    }
   }
   void narrow;
 })();

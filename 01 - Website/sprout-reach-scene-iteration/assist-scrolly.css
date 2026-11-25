@@ -1,0 +1,51 @@
+/* Website v3 option B (home-v3-carpool.html, 25 Nov): Playdate, Babysitter, Carpool told by scrolling, "tiles as
+   chapters". Loaded after home-v3.css; only this page uses it. Carpool only for now (Ahmad, 25 Nov): three steps, each about 75% of a screen of scroll. */
+.sly { position: relative; height: calc(100svh + 3 * 75svh); background: var(--sand); overflow-x: clip; }
+.sly-pin { position: sticky; top: 64px; height: calc(100svh - 64px); max-width: 1160px; margin: 0 auto; padding: clamp(18px, 3.5vh, 40px) clamp(16px, 4vw, 40px);
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(32px, 6vw, 96px); align-items: center; }
+.sly-copy h2 { font-size: clamp(32px, 3.8vw, 52px); line-height: 1.08; }
+.sly-lede { margin: 14px 0 0; max-width: 440px; font-size: clamp(16px, 1.3vw, 19px); line-height: 1.5; }
+/* the chapters: Tony's clay tiles; the active one lifts and fills from the bottom as its plan plays */
+.sly-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(8px, 1.1vw, 14px); max-width: 480px; margin-top: clamp(20px, 3.4vh, 34px); }
+.sly-tile { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; aspect-ratio: 1 / 1.02; padding: 0 6px clamp(10px, 1.2vw, 16px);
+  border-radius: clamp(16px, 1.8vw, 24px); border: 1px solid #ebe6dc; background: #fff; cursor: pointer; font: inherit; color: var(--ink);
+  transition: transform .5s cubic-bezier(.19, 1, .22, 1), box-shadow .4s, border-color .3s, opacity .3s; opacity: .62; }
+.sly-tile img { position: relative; z-index: 1; width: 72%; height: auto; margin-bottom: 6%; filter: drop-shadow(0 10px 12px rgb(70 58 34 / .2)); }
+.sly-tile b { position: relative; z-index: 1; font: 600 clamp(13px, 1.2vw, 16px)/1.2 var(--sans); }
+.sly-tile .fill { position: absolute; left: 0; right: 0; bottom: 0; height: 100%; background: #e2e9e3; transform-origin: bottom; transform: scaleY(var(--fill, 0)); transition: transform .25s linear; }
+.sly-tile.on { opacity: 1; border-color: var(--green); box-shadow: 0 0 0 2px var(--green), 0 22px 40px -26px rgb(40 50 30 / .5); transform: translateY(-4px); }
+.sly-tile:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
+/* the step: one line, swapped in place */
+.sly-cap { margin: clamp(22px, 3.6vh, 34px) 0 0; min-height: 2.5em; max-width: 460px; font: 500 clamp(22px, 2.1vw, 30px)/1.22 var(--serif); color: var(--ink); letter-spacing: -.01em; }
+.sly-cap.in { animation: sly-cap .5s cubic-bezier(.19, 1, .22, 1); }
+@keyframes sly-cap { from { opacity: 0; transform: translateY(10px); } }
+.sly-dots { display: flex; gap: 6px; margin-top: 12px; }
+.sly-dots i { width: 22px; height: 4px; border-radius: 2px; background: rgb(30 62 43 / .14); transition: background .3s; }
+.sly-dots i.done { background: rgb(24 99 56 / .45); } .sly-dots i.on { background: var(--green); }
+.sly-copy .plate-next { text-align: left; margin: clamp(18px, 3vh, 28px) 2px 0; }
+/* the phone */
+.sly-stage { display: grid; place-items: center; }
+.sly .film { position: relative; isolation: isolate; aspect-ratio: 393 / 852; width: min(350px, 30vw, calc((100svh - 150px) * 393 / 852)); border-radius: 10% / 4.6%;
+  background: #f4f1ea; overflow: hidden; box-shadow: 0 0 0 2.5px #2b3a2f, 0 40px 80px -30px rgb(20 35 25 / .5); }
+.sly .film iframe { position: absolute; inset: 0; width: 393px; height: 852px; border: 0; transform: scale(var(--app-scale, .75)); transform-origin: top left; pointer-events: none; background: #f4f1ea; }
+/* the next button glows as the scroll reaches it, and squeezes when it is tapped */
+.sly-tap { position: absolute; z-index: 3; transform: translate(-50%, -50%); border-radius: 14px; pointer-events: none; box-shadow: 0 0 0 2px rgb(24 99 56 / .7), 0 0 0 7px rgb(24 99 56 / .14); opacity: 0; transition: opacity .25s; }
+.sly-tap.show { opacity: 1; }
+.sly-tap.go { animation: sly-tap .5s ease-out; }
+@keyframes sly-tap { 0% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 40% { transform: translate(-50%, -50%) scale(.92); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.12); } }
+@media (max-width: 900px) {
+  .sly { height: calc(100svh + 3 * 65svh); }
+  .sly-pin { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); gap: 10px; padding-top: 10px; align-items: start; }
+  .sly-copy { text-align: center; }
+  .sly-copy h2, .sly-lede, .sly-copy .plate-next { display: none; }
+  .sly-tiles { margin: 0 auto; max-width: 300px; gap: 8px; }
+  .sly-tile { aspect-ratio: auto; height: 64px; flex-direction: row; justify-content: center; gap: 4px; padding: 0 6px; }
+  .sly-tile img { width: 30px; margin: 0; }
+  .sly-tile b { font-size: 12px; }
+  .sly-cap { margin: 10px auto 0; min-height: 2.5em; font-size: 19px; }
+  .sly-dots { justify-content: center; margin-top: 6px; }
+  .sly-stage { min-height: 0; align-self: stretch; height: 100%; place-items: start center; }
+  .sly .film { width: auto; height: 100%; max-width: 82vw; }
+}
+@media (prefers-reduced-motion: reduce) { .sly { height: auto; } .sly-pin { position: relative; top: 0; height: auto; min-height: 640px; } .sly-cap.in { animation: none; } }
+.sly-tile:not(.on) { cursor: default; }

@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sprout · Option B · Assist story</title>
+    <meta name="description" content="It takes a village to raise a family. Sprout brings yours together. Meet the parents at your school. Sprout remembers the little things and helps you get them done." />
+    <meta name="theme-color" content="#f4f1ea" />
+    <!-- the link preview (Tony, 10 Oct: iMessage). Absolute URLs: iMessage ignores relative ones. The image is built by
+         review/make-og.mjs from review/og-card.html; bump ?v= when it changes, iMessage caches previews hard -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sprout" />
+    <meta property="og:url" content="https://joinsprout.co/" />
+    <meta property="og:title" content="Sprout - It takes a village to raise a family" />
+    <meta property="og:description" content="Sprout brings yours together." />
+    <meta property="og:image" content="https://joinsprout.co/assets/og/sprout-link.jpg?v=20261011-4" />
+    <meta property="og:image:width" content="2400" />
+    <meta property="og:image:height" content="1260" />
+    <meta property="og:image:alt" content="Sprout: Your school’s parent community. Plus a daily plan that does the remembering." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://joinsprout.co/assets/og/sprout-link.jpg?v=20261011-4" />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="icon" href="./assets/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+    <!-- Website v3, 24 Nov: Tony's "Sprout Website: Copy & Design Brief" (20 Nov), all six sections, copy word for word:
+         1 Hero (the village) · 2 Problem (a lock screen buried in notifications) · 3 Daily brief (the same items as one calm
+         list; the notifications fly into it on the scroll) · 4 Assist (Playdate, Babysitter, Carpool only) · 5 Community
+         (a class group chat, warm, like the hero) · 6 Close (centred, the hero's frame again). Launch scope: no Birthday,
+         Date night, Register my kids, Saved details or events feed anywhere. The October class / directory / FAQ
+         sections are gone (git history has them). home-v2 is untouched and is still what the live site exports from. -->
+    <link rel="stylesheet" href="./home-v2.css?v=20261013-1" />
+    <link rel="stylesheet" href="./daily-brief.css?v=20261124-1" />
+    <link rel="stylesheet" href="./home-v3.css?v=20261125-16" />
+    <!-- the Assist flow's live orb (same renderer and "working" state as sprout-assist-tasks) -->
+    <script src="./thinking-orb.js?v=20261124-1" defer></script>
+    <link rel="stylesheet" href="./assist-scrolly.css?v=20261125-5" />
+    <script src="./assist-scrolly.js?v=20261125-5" defer></script>
+    <script src="./home-v3.js?v=20261125-11" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top over" id="top">
+      <a class="logo" href="#home" aria-label="Sprout home"><img src="./assets/logo.png" alt="" width="30" height="30" />Sprout</a>
+      <nav class="top-links" aria-label="Sections">
+        <a href="#brief">Daily brief</a><a href="#assist">Assist</a><a href="#community">Community</a>
+      </nav>
+      <!-- room parents: Tony wanted it in the header (8 Oct); the button goes straight to RoomParent -->
+      <a class="top-rp" href="https://roomparent.com" rel="noopener"><span class="lg">I’m a room parent</span><span class="sm">Room parent</span></a>
+      <a class="top-cta" href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052" data-join>Join Sprout</a>
+    </header>
+
+    <main id="main">
+      <!-- 1 · HERO, the village (Tony's brief, 20 Nov; built 21 Nov). The inset frame with the parents at drop-off, the
+           copy on the frame's centre line. Ahmad, 21 Nov: no corner phone ("it's not even doing anything"); the store
+           badges say it's an app. Buttons: the arrow handoff (.btn-hand) for Join Sprout, then the official badges. -->
+      <section class="hero2 village" id="home" data-hero aria-labelledby="hero-h">
+        <div class="inset">
+          <div class="photo" data-photo role="img" aria-label="Four parents chatting on the sidewalk after school drop-off, one holding a coffee, one carrying a child’s backpack"></div>
+          <!-- Tony, 25 Nov DM: "little profiles over the people standing there talking". One Sprout profile chip per
+               parent (made-up names), placed on the photo by home-v3.js so it stays on the right person at every size. -->
+          <div class="tags" data-tags aria-hidden="true"></div>
+          <div class="copy">
+            <h1 id="hero-h">It takes a village to raise a family. <em>Sprout brings yours together.</em></h1>
+            <p class="lede">Meet the parents at your school. Sprout remembers the little things and helps you get them done.</p>
+            <div class="cta">
+              <a class="btn-hand" href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052" data-join><span class="hand-lbl">Join Sprout</span><span class="hand-end" aria-hidden="true"><span class="hand-dot"></span><i class="ph-bold ph-arrow-right hand-arr"></i></span></a>
+              <!-- Tony, 25 Nov: "Join Sprout" then "or get the app" read as two different things. They are one action
+                   (Join Sprout opens the store), so the badges sit under it with no "or". -->
+              <div class="badges">
+                <a href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052"><img src="./assets/app-store.png" alt="Download on the App Store" width="149" height="44" /></a>
+                <a href="https://play.google.com/store/apps/details?id=com.meetingpoint"><img src="./assets/play-store.png" alt="Get it on Google Play" width="147" height="44" /></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2 + 3 · PROBLEM → DAILY BRIEF, one pinned scroll (the brief's "optional animation": "the messy notifications
+           slide together into the single daily brief. This one moment explains the product.").
+           The phone starts as a lock screen buried in notifications (overlapping, a few tilted, the pile running off the
+           bottom). On the scroll each notification flies into its row of the brief: the forms and the carpool ask become
+           to-dos, the party invite a to-do to RSVP, the practice change goes under Happening today, spirit week under
+           Coming up, the 34 class messages one line under Messages. The extra ones fold into the brief's header. The copy
+           swaps in the same place. App names and people are made up (brief: no real school or brand names). -->
+      <!-- 25 Nov (Tony, meeting + DM): the notifications pop up around a parent's head, then all of them get pulled into
+           one simple UI, the Daily Brief. Two states and ONE timed transition (no scroll scrubbing), so wherever the
+           scroll stops the page looks whole. Shorter pin than before (460vh → 220vh). The brief's to-dos open a sheet
+           with the summary, the original email and Mark as done. -->
+      <section class="story" id="problem" aria-labelledby="problem-h">
+        <span class="story-anchor" id="brief" aria-hidden="true"></span>
+        <div class="story-pin">
+          <div class="story-copy">
+            <div class="sc sc-a">
+              <h2 id="problem-h">It’s a lot to keep track of.</h2>
+              <p>New school. New families. New group chats. Plus forms, practices, birthdays, carpools, picture day, spirit week… and somehow it all lives in your head.</p>
+            </div>
+            <div class="sc sc-b">
+              <h2 id="brief-h">Sprout carries the mental load.</h2>
+              <p>Connect your email and Sprout pulls out what matters (deadlines, game times, party invites) into one daily brief. Stop digging through your inbox. Open Sprout, see your day.</p>
+              <p class="tap-hint"><i class="ph ph-hand-tap" aria-hidden="true"></i>Tap a to-do to open it</p>
+            </div>
+          </div>
+          <div class="story-stage" data-stage>
+            <div class="mom-box">
+              <div class="mom" role="img" aria-label="A worried mom in her kitchen holding her phone, school notifications rising from her head, while her husband and son eat breakfast behind her"></div>
+              <div class="pops" data-pops aria-hidden="true"></div>
+            </div>
+            <div class="phone story-phone" data-story aria-label="The Sprout daily brief: the weather, two to-dos, today’s soccer practice, pajama day coming up, and the class messages in one line"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 · ASSIST, option B (25 Nov, Ahmad): Playdate, Babysitter and Carpool happy paths told by scrolling, three
+           key steps each, "tiles as chapters": the clay tiles are the chapters (the active one fills as you scroll),
+           one big line says the step, the phone runs the real Assist prototype and moves only as you scroll
+           (assist-scrolly.js). Option A (home-v3.html) keeps the static Assist home. -->
+      <section class="sly" id="assist" data-scrolly aria-labelledby="assist-h">
+        <div class="sly-pin">
+          <div class="sly-copy">
+            <h2 id="assist-h">What can Sprout take off your plate?</h2>
+            <p class="sly-lede">Playdates, babysitters, carpools. Tap what you need and Sprout Assist handles the back-and-forth.</p>
+            <div class="sly-tiles" role="group" aria-label="Show a plan">
+              <button type="button" class="sly-tile" data-flow aria-pressed="false" tabindex="-1"><img src="./assets/illus/club.webp" alt="" width="240" height="240" /><b>Playdate</b><span class="fill"></span></button>
+              <button type="button" class="sly-tile" data-flow aria-pressed="false" tabindex="-1"><img src="./assets/illus/sitter.webp" alt="" width="240" height="240" /><b>Babysitter</b><span class="fill"></span></button>
+              <button type="button" class="sly-tile on" data-flow aria-pressed="true"><img src="./assets/illus/carpool.webp" alt="" width="240" height="240" /><b>Carpool</b><span class="fill"></span></button>
+            </div>
+            <p class="sly-cap" data-step-cap aria-live="polite">One ride, Saturday at 9:30.</p>
+            <span class="sly-dots" data-step-dots aria-hidden="true"><i class="on"></i><i></i><i></i></span>
+            <p class="plate-next"><b>Coming next:</b> date nights, tutors, summer camp and sports registration</p>
+          </div>
+          <div class="sly-stage">
+            <div class="film" role="img" aria-label="Sprout Assist doing the plan shown on the left, step by step as you scroll"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 · COMMUNITY, the emotional payoff, warm like the hero: parents on a picnic blanket while the kids play, and
+           the class group chat on the phone in front of them (made-up families; the teacher never chats, parents only).
+           The chips at the top are the three kinds of group in the copy: class, grade, team. -->
+      <section class="kin" id="community" aria-labelledby="community-h">
+        <div class="kin-wrap">
+          <div class="kin-visual">
+            <div class="kin-photo" role="img" aria-label="Parents talking on a picnic blanket in the park while their kids play"></div>
+            <!-- Tony, 25 Nov DM: "Faces and kids' names instead of random numbers is what makes it more than WhatsApp."
+                 The class's Member Directory: each parent with their photo and their kids. Made-up families. -->
+            <div class="dir-card" role="img" aria-label="Sprout Member Directory for Ms. Taylor’s class: Aisha Rahman, Ava and Zain’s mom; Mike Johnson, Leo’s dad">
+              <div class="dir-hd"><b>Member Directory</b><small>18 parents · Ms. Taylor’s Class</small></div>
+              <div class="dir-row"><img src="./assets/v2/cast-aisha.webp" alt="" /><div class="tx"><b>Aisha Rahman</b><span class="kids"><i>Ava · 1st Grade</i><i>Zain · Pre-K</i></span></div></div>
+              <div class="dir-row"><img src="./assets/assist/mem-mike.webp" alt="" /><div class="tx"><b>Mike Johnson</b><span class="kids"><i>Leo · 1st Grade</i></span></div></div>
+            </div>
+            <div class="phone kin-phone" data-chat role="img" aria-label="Sprout Chat: your groups in a row (First Grade, Ms. Taylor’s class, the U8 soccer team, summer camp), then direct messages with other parents"></div>
+          </div>
+          <div class="kin-copy">
+            <h2 id="community-h">Every parent in your kid’s class, one message away.</h2>
+            <p>No swapping numbers. Join the groups that matter: class, grade, team. Those parents you wave to at drop-off? Now they’re your village.</p>
+            <p class="kin-dir">Every parent shows up with a face and their kids’ names, not just a phone number.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 · CLOSE. "Echo the hero's look so the page feels like it comes full circle": the same inset frame and the same
+           whole school at pickup (its own photo since 25 Nov), darker, everything centred. A big Join Sprout and a small cluster of parents. -->
+      <section class="finale" id="join" aria-labelledby="join-h">
+        <div class="finale-in">
+          <div class="finale-photo" aria-hidden="true"></div>
+          <div class="finale-copy">
+            <h2 id="join-h">Free for every parent at your school.</h2>
+            <div class="here">
+              <span class="faces" data-faces aria-hidden="true">
+                <img src="./assets/assist/mem-jessica.webp" alt="" style="--i:0" /><img src="./assets/v2/dad.webp" alt="" style="--i:1" /><img src="./assets/assist/mem-emily.webp" alt="" style="--i:2" /><img src="./assets/v2/cast-aisha.webp" alt="" style="--i:3" /><img src="./assets/assist/mem-mike.webp" alt="" style="--i:4" /><img src="./assets/v2/mom.webp" alt="" style="--i:5" /><img src="./assets/assist/mem-sarah.webp" alt="" style="--i:6" />
+              </span>
+              <p>See who’s already here.</p>
+            </div>
+            <a class="btn-hand big" href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052" data-join><span class="hand-lbl">Join Sprout</span><span class="hand-end" aria-hidden="true"><span class="hand-dot"></span><i class="ph-bold ph-arrow-right hand-arr"></i></span></a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>© 2026 Sprout</span>
+      <nav><a href="https://joinsprout.co/privacy">Privacy</a><a href="https://joinsprout.co/terms">Terms</a><a href="https://joinsprout.co/child-safety">Child safety</a><a href="mailto:tony@joinsprout.co">Contact</a></nav>
+    </footer>
+
+    <!-- "Join Sprout" on a computer (Tony, 9 Oct): a pop-up with both stores' QR codes, iOS on the left, Android on the
+         right. On a phone the button goes straight to the right store instead (home-v3.js). -->
+    <dialog class="getapp" id="getApp" aria-labelledby="getapp-h">
+      <button type="button" class="getapp-x" data-close aria-label="Close"><i class="ph ph-x"></i></button>
+      <img class="getapp-logo" src="./assets/logo.png" alt="" width="48" height="48" />
+      <h2 id="getapp-h">Get Sprout on your phone</h2>
+      <p class="getapp-sub">Scan the code for your phone with its camera. Free for every parent at your school.</p>
+      <div class="getapp-codes">
+        <a class="getapp-card" href="https://apps.apple.com/us/app/sprout-the-app-for-parents/id6739574052" data-store="ios">
+          <span class="getapp-qr"><img src="./assets/qr/app-store.svg" alt="QR code for Sprout on the App Store" width="180" height="180" /><img class="getapp-mark" src="./assets/logo.png" alt="" width="40" height="40" /></span>
+          <span class="getapp-os"><i class="ph-fill ph-apple-logo" aria-hidden="true"></i>iPhone</span>
+          <img class="getapp-badge" src="./assets/app-store.png" alt="Download on the App Store" width="135" height="40" />
+        </a>
+        <a class="getapp-card" href="https://play.google.com/store/apps/details?id=com.meetingpoint" data-store="android">
+          <span class="getapp-qr"><img src="./assets/qr/google-play.svg" alt="QR code for Sprout on Google Play" width="180" height="180" /><img class="getapp-mark" src="./assets/logo.png" alt="" width="40" height="40" /></span>
+          <span class="getapp-os"><i class="ph-fill ph-android-logo" aria-hidden="true"></i>Android</span>
+          <img class="getapp-badge" src="./assets/play-store.png" alt="Get it on Google Play" width="135" height="40" />
+        </a>
+      </div>
+    </dialog>
+  </body>
+</html>
